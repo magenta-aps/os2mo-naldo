@@ -1,0 +1,10 @@
+stages: 
+  - lint
+
+Pre-commit:
+  image: python:3.9
+  stage: lint
+  before_script: 
+    - pip install pre-commit
+  script:
+    - pre-commit run --all-files
