@@ -1,0 +1,16 @@
+FROM node:16-alpine
+
+ENV NODE_ENV development
+
+WORKDIR /usr/src/app
+
+COPY package.json yarn.lock* ./
+
+RUN yarn
+
+COPY . .
+
+EXPOSE 5173
+EXPOSE 24678
+
+CMD ["yarn", "dev", "--host", "0.0.0.0"]
