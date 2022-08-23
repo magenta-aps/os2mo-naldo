@@ -9,9 +9,9 @@ export const initKeycloak = async () => {
   const res = await fetch(instance)
 
   if (res.status === 404) {
+    isAuth.set(true)
     console.error("keycloak.json could not be fetched")
     console.info("Starting with no authentication ...")
-    isAuth.set(true)
     return
   }
 
@@ -34,4 +34,9 @@ export const initKeycloak = async () => {
       console.error("Failed to auth:", error)
       alert("failed to auth")
     })
+}
+
+export const logoutKeycloak = () => {
+  isAuth.set(false)
+  keycloak.logout()
 }
