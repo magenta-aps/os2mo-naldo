@@ -30,6 +30,7 @@
   },
   "type": "module",
   "dependencies": {
-    "daisyui": "^2.24.0"
+    "daisyui": "^2.24.0",
+    "keycloak-js": "^19.0.1"
   }
 }
