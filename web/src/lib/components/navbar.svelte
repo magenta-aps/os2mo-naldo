@@ -1,5 +1,15 @@
 <script lang="ts">
-  import { logoutKeycloak } from "$lib/util/keycloak"
+  import { logoutKeycloak, keycloak } from "$lib/util/keycloak"
+  import { isAuth } from "$lib/stores/auth"
+
+  const nameBadge = (): string => {
+    if (keycloak && keycloak.idTokenParsed) {
+      return (
+        keycloak.idTokenParsed.given_name[0] + keycloak.idTokenParsed.family_name[0]
+      )
+    }
+    return "??"
+  }
 </script>
 
 <div class="navbar bg-base-100 shadow-xl">
@@ -104,25 +114,30 @@
     </ul>
   </div>
   <div class="flex-none">
-    <div class="dropdown dropdown-end">
-      <label tabindex="0" class="btn btn-ghost btn-circle avatar">
-        <div class="w-10 rounded-full">
-          <img src="https://placeimg.com/80/80/people" />
-        </div>
-      </label>
-      <ul
-        tabindex="0"
-        class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
-      >
-        <li>
-          <a class="justify-between">
-            Profile
-            <span class="badge">New</span>
-          </a>
-        </li>
-        <li><a>Settings</a></li>
-        <li><a on:click={logoutKeycloak}>Logout</a></li>
-      </ul>
-    </div>
+    {#if $isAuth}
+      <div class="dropdown dropdown-end">
+        <label tabindex="0" class="btn btn-ghost btn-circle avatar placeholder">
+          <div class="bg-neutral-focus w-10 rounded-full">
+            <span class="text-neutral-content">{nameBadge()}</span>
+          </div>
+        </label>
+        <ul
+          tabindex="0"
+          class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
+        >
+          <li>
+            <div class="justify-between">
+              {keycloak && keycloak.idTokenParsed
+                ? keycloak.idTokenParsed.name
+                : "Ghost user"}
+              <span class="badge">{nameBadge()}</span>
+            </div>
+          </li>
+          {#if keycloak}
+            <li><div on:click={logoutKeycloak}>Logout</div></li>
+          {/if}
+        </ul>
+      </div>
+    {/if}
   </div>
 </div>
