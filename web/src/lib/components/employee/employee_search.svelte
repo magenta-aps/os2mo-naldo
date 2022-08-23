@@ -14,22 +14,10 @@
     />
     <div>
       <label>
-        <input
-          type="radio"
-          name="radio-1"
-          class="radio"
-          value={true}
-          bind:group={cardView}
-        />
+        <input type="radio" class="radio" value={true} bind:group={cardView} />
       </label>
       <label>
-        <input
-          type="radio"
-          name="radio-1"
-          class="radio"
-          value={false}
-          bind:group={cardView}
-        />
+        <input type="radio" class="radio" value={false} bind:group={cardView} />
       </label>
     </div>
   </div>
