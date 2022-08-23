@@ -16,7 +16,7 @@
     </thead>
     <tbody>
       {#each search(employees, input) as employee}
-        <tr>
+        <tr class="hover">
           <td>
             <div class="flex items-center space-x-3">
               <div class="avatar">

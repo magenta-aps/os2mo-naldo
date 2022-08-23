@@ -1,6 +1,7 @@
 <script lang="ts">
   import { logoutKeycloak, keycloak } from "$lib/util/keycloak"
   import { isAuth } from "$lib/stores/auth"
+  import Search from "./search.svelte"
 
   const nameBadge = (): string => {
     if (keycloak && keycloak.idTokenParsed) {
@@ -29,6 +30,7 @@
       >
     </label>
   </div>
+
   <div class="flex-1 z-10">
     <div class="flex-none lg:hidden">
       <a class="btn btn-ghost normal-case text-xl" href="/">OS2mo</a>
@@ -112,7 +114,9 @@
         </ul>
       </li>
     </ul>
+    <Search />
   </div>
+
   <div class="flex-none">
     {#if $isAuth}
       <div class="dropdown dropdown-end">

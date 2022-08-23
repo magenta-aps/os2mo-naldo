@@ -22,6 +22,8 @@ export const initKeycloak = async () => {
       isAuth.set(true)
       console.info(authenticated, "hest")
 
+      console.info(authenticated, "hest")
+
       // Token refresh
       setInterval(() => {
         keycloak.updateToken(15).catch(() => {
