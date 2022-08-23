@@ -134,7 +134,7 @@
             </div>
           </li>
           {#if keycloak}
-            <li><a on:click={logoutKeycloak}>Logout</a></li>
+            <li><div on:click={logoutKeycloak}>Logout</div></li>
           {/if}
         </ul>
       </div>
