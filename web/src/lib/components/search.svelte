@@ -7,7 +7,7 @@
 
   const [floatingRef, floatingContent] = createFloatingActions({
     strategy: "absolute",
-    placement: "top",
+    placement: "bottom",
     middleware: [offset(6), flip(), shift()],
   })
 
@@ -27,11 +27,11 @@
       bind:value={input}
       type="text"
       placeholder="Søg"
-      class="input input-bordered w-44"
+      class="input input-bordered w-72"
     />
     {#if input}
       <div use:floatingContent>
-        <div class="overflow-x-auto shadow-lg w-44">
+        <div class="overflow-x-auto shadow-lg w-72 max-h-96">
           <table class="table table-compact w-full">
             {#await search(input)}
               <tbody>
@@ -77,5 +77,5 @@
     {/if}
   </div>
 {:else}
-  <input type="text" disabled placeholder="Søg" class="input w-44" />
+  <input type="text" disabled placeholder="Søg" class="input w-72" />
 {/if}
