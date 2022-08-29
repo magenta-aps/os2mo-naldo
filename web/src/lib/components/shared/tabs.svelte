@@ -4,7 +4,7 @@
 
   export let items: string[]
   export let activeItem: string
-  export let tabFormat = "tab tab-lifted"
+  export let tabFormat = "tab tab-bordered"
 </script>
 
 <div class="tabs">
@@ -13,7 +13,7 @@
       class="{tabFormat} {item === activeItem ? 'tab-active' : ''}"
       on:click={() => dispatch("tabChange", item)}
     >
-      {item}
+      {item.toUpperCase()}
     </div>
   {/each}
 </div>
