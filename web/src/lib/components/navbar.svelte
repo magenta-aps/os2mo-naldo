@@ -51,7 +51,7 @@
         </a>
         <ul class="p-2 bg-base-100 shadow-md">
           <li>
-            <a href="">
+            <label for="create-org-modal">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="18"
@@ -63,7 +63,7 @@
                 /></svg
               >
               Opret enhed
-            </a>
+            </label>
           </li>
           <li>
             <a href="">

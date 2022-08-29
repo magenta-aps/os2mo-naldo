@@ -1,4 +1,5 @@
 <script lang="ts">
+  import CreateOrg from "$lib/components/modals/create_org.svelte"
   import "$lib/global.css"
   import Navbar from "$lib/components/navbar.svelte"
   import Footer from "$lib/components/footer.svelte"
@@ -50,3 +51,4 @@
   </div>
 </div>
 <Footer />
+<CreateOrg />
