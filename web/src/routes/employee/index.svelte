@@ -1,11 +1,13 @@
 <script lang="ts">
   import EmployeeCards from "$lib/components/employee/employee_cards.svelte"
-  import EmployeeSearch from "$lib/components/employee/employee_search.svelte"
+  import EmployeeSearchInput from "$lib/components/employee/employee_search_input.svelte"
   import EmployeeTable from "$lib/components/employee/employee_table.svelte"
-  import { fetchGraph } from "$lib/util/http"
+  import { fetchGraph, fetchRest } from "$lib/util/http"
 
   let cardView = true
-  let input = ""
+  let input: string
+  let allEmployees: any[] // Acts as a cache for fetchEmployees()
+  let refreshEmployees: Promise<[]>
 
   const query = `
       query {
@@ -19,41 +21,50 @@
       }
   `
 
-  const search = (employees: Array<any>, input: string) => {
-    if (input.length > 2) {
-      const x = employees.filter((x) =>
-        x.objects.every((y) => y.name.toLowerCase().includes(input.toLowerCase()))
-      )
-      console.log(x.length)
-      return x
-    }
-    return employees
-  }
-
-  const fetchEmoloyeesGraph = async () => {
-    const res = await fetchGraph(query)
-
+  const search = async (query: string) => {
+    // TODO: Switch to GraphQL when #51997 is done
+    const res = await fetchRest(`e/autocomplete/?query=${query}`)
     const json = await res.json()
-    if (json.data) {
-      return json.data.employees
-    } else {
-      throw new Error(json.errors[0].message)
-    }
+    return json.items
   }
+
+  const fetchEmployees = async () => {
+    // Uses GraphQL if no imput, autocomplete if there is
+    // TODO: Switch to all GraphQL when #51997 is done
+    if (input) {
+      return await search(input)
+    }
+
+    if (!allEmployees) {
+      const res = await fetchGraph(query)
+      const json = await res.json()
+
+      if (json.data) {
+        // TODO: Use employee interface
+        allEmployees = json.data.employees.map((v: any) => v.objects[0])
+      } else {
+        throw new Error(json.errors[0].message)
+      }
+    }
+
+    return allEmployees
+  }
+
+  $: input, (refreshEmployees = fetchEmployees())
 </script>
 
 <div class="h-screen m-auto p-10">
-  <EmployeeSearch bind:input bind:cardView />
+  <EmployeeSearchInput bind:input bind:cardView />
   <div class="pt-5">
-    {#await fetchEmoloyeesGraph()}
+    {#await refreshEmployees}
       <div class="flex justify-center pt-10">
         <div class="animate-spin rounded-full h-32 w-32 border-b-8 border-primary" />
       </div>
     {:then employees}
       {#if cardView}
-        <EmployeeCards {employees} {search} {input} />
+        <EmployeeCards {employees} />
       {:else}
-        <EmployeeTable {employees} {search} {input} />
+        <EmployeeTable {employees} />
       {/if}
     {/await}
   </div>
