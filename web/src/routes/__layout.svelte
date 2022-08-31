@@ -3,6 +3,7 @@
   import Navbar from "$lib/components/navbar.svelte"
   import Footer from "$lib/components/footer.svelte"
   import DrawerContent from "$lib/components/drawer_content.svelte"
+  import Search from "$lib/components/search.svelte"
   import { onMount } from "svelte"
   import { isAuth } from "$lib/stores/auth"
   import { initKeycloak } from "$lib/util/keycloak"
@@ -41,8 +42,10 @@
       <!-- Sidebar content here -->
       <div class="flex-none">
         <a class="btn btn-ghost normal-case text-xl" href="/">OS2mo</a>
+        <Search />
+        <br />
+        <DrawerContent />
       </div>
-      <DrawerContent />
     </ul>
   </div>
 </div>

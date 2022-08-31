@@ -20,7 +20,7 @@ export const initKeycloak = async () => {
     .init({ onLoad: "login-required" })
     .then(function (authenticated) {
       isAuth.set(true)
-      console.info(authenticated, "hest")
+      console.info("Authenticated:", authenticated)
 
       // Token refresh
       setInterval(() => {

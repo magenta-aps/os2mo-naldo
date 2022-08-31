@@ -1,7 +1,17 @@
 import { keycloak } from "$lib/util/keycloak"
+
+export const fetchRest = async (path: string) => {
+  const token = keycloak ? keycloak.token : "Keycloak disabled"
+  return await fetch(`http://localhost:5001/service/${path}`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    },
+  })
+}
+
 export const fetchGraph = async (query: string): Promise<Response> => {
   const token = keycloak ? keycloak.token : "Keycloak disabled"
-
   return await fetch("http://localhost:5000/graphql", {
     method: "POST",
     headers: {

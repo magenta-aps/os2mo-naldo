@@ -1,8 +1,6 @@
 <script lang="ts">
   // TODO: Get the employee interface from Strawberry
-  export let employees: [any]
-  export let search: Function
-  export let input: string
+  export let employees: any[]
 </script>
 
 <div class="overflow-x-auto w-full">
@@ -15,8 +13,8 @@
       </tr>
     </thead>
     <tbody>
-      {#each search(employees, input) as employee}
-        <tr>
+      {#each employees as employee}
+        <tr class="hover">
           <td>
             <div class="flex items-center space-x-3">
               <div class="avatar">
@@ -27,12 +25,12 @@
                   />
                 </div>
               </div>
-              <div class="font-bold">{employee.objects[0].name}</div>
+              <div class="font-bold">{employee.name}</div>
             </div>
           </td>
-          <td>{employee.objects[0].cpr_no}</td>
+          <td>{employee.cpr_no}</td>
           <th>
-            <a href={`employee/${employee.objects[0].uuid}`}>
+            <a href={`employee/${employee.uuid}`}>
               <button class="btn btn-xs">detaljer</button>
             </a>
           </th>

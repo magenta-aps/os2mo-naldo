@@ -29,6 +29,7 @@
       >
     </label>
   </div>
+
   <div class="flex-1 z-10">
     <div class="flex-none lg:hidden">
       <a class="btn btn-ghost normal-case text-xl" href="/">OS2mo</a>
@@ -113,6 +114,7 @@
       </li>
     </ul>
   </div>
+
   <div class="flex-none">
     {#if $isAuth}
       <div class="dropdown dropdown-end">
