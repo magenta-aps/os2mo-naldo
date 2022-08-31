@@ -12,10 +12,15 @@
   })
 
   let input = ""
+  let isFocused = false
+
+  const delayedUnfocus = () => {
+    // Stupid hack to make the floatingContent be clickable before it disappears
+    setTimeout(() => (isFocused = false), 250)
+  }
 
   const search = async (query: string) => {
-    const url = `http://localhost:5001/service/e/autocomplete/?query=${query}`
-    const res = await fetchRest(url)
+    const res = await fetchRest(`e/autocomplete/?query=${query}`)
     const json = await res.json()
     return json.items
   }
@@ -25,11 +30,13 @@
   <div use:floatingRef>
     <input
       bind:value={input}
+      on:focus={() => (isFocused = true)}
+      on:blur={delayedUnfocus}
       type="text"
       placeholder="Søg"
       class="input input-bordered w-72"
     />
-    {#if input}
+    {#if isFocused && input}
       <div use:floatingContent>
         <div class="overflow-x-auto shadow-lg w-72 max-h-96">
           <table class="table table-compact w-full">

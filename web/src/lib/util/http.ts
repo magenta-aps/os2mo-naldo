@@ -1,8 +1,8 @@
 import { keycloak } from "$lib/util/keycloak"
 
-export const fetchRest = async (url: string) => {
+export const fetchRest = async (path: string) => {
   const token = keycloak ? keycloak.token : "Keycloak disabled"
-  return await fetch(url, {
+  return await fetch(`http://localhost:5001/service/${path}`, {
     headers: {
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
