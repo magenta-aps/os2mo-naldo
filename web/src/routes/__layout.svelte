@@ -42,7 +42,7 @@
     <ul class="menu p-4 overflow-y-auto w-80 bg-base-300">
       <!-- Sidebar content here -->
       <div class="flex-none">
-        <a class="btn btn-ghost normal-case text-xl" href="/">OS2mo</a>
+        <a class="btn btn-ghost normal-case text-xl mb-2" href="/">OS2mo</a>
         <Search />
         <br />
         <DrawerContent />
