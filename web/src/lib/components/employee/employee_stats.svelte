@@ -2,23 +2,35 @@
   // TODO: employee interface
   export let employee: any
 
-  const employmentPeriod = (engagements: any[]): string => {
+  interface EmploymentPeriod {
+    firstDate: string | undefined
+    lastDate: string | undefined
+  }
+
+  const employmentPeriod = (engagements: any[]): EmploymentPeriod => {
     // Finds and formats the first and last day of the employeement period
     const firstDate = Math.min(...engagements.map((x) => Date.parse(x.validity.from)))
     const lastDate = Math.max(...engagements.map((x) => Date.parse(x.validity.to)))
 
-    const formattedFirstDate = new Date(firstDate).toLocaleString("da-DK", {
-      dateStyle: "long",
-    })
-    const formattedLastDate = new Date(lastDate).toLocaleString("da-DK", {
-      dateStyle: "long",
-    })
+    const formattedFirstDate = isNaN(firstDate)
+      ? undefined
+      : new Date(firstDate).toLocaleString("da-DK", {
+          dateStyle: "long",
+        })
 
-    return `${formattedFirstDate} - ${formattedLastDate}`
+    const formattedLastDate = isNaN(lastDate)
+      ? undefined
+      : new Date(lastDate).toLocaleString("da-DK", {
+          dateStyle: "long",
+        })
+
+    return { firstDate: formattedFirstDate, lastDate: formattedLastDate }
   }
+
+  const period: EmploymentPeriod = employmentPeriod(employee.engagements)
 </script>
 
-<div class="stats stats-vertical lg:stats-horizontal shadow bg-base-300 mb-6">
+<div class="stats stats-vertical 2xl:stats-horizontal shadow bg-base-300 mb-6">
   <div class="stat">
     <div class="stat-title">MEDARBEJDER</div>
     <div class="stat-value text-xl">{employee.name}</div>
@@ -31,6 +43,15 @@
   </div>
   <div class="stat">
     <div class="stat-title">ANSAT</div>
-    <div class="stat-value text-xl">{employmentPeriod(employee.engagements)}</div>
+    {#if period.firstDate}
+      <div class="stat-value text-xl">
+        {period.firstDate} -
+      </div>
+    {/if}
+    {#if period.lastDate}
+      <div class="stat-value text-xl">
+        {period.lastDate}
+      </div>
+    {/if}
   </div>
 </div>
