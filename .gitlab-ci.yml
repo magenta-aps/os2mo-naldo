@@ -1,10 +1,25 @@
 stages: 
   - lint
+  - deploy
 
 Pre-commit:
   image: python:3.9
   stage: lint
-  before_script: 
+  before_script:
     - pip install pre-commit
   script:
     - pre-commit run --all-files
+
+Pages:
+  image: node:latest
+  stage: deploy
+  script:
+    - cd web/
+    - yarn
+    - yarn build
+    - cp -r build/ ../public
+  artifacts:
+    paths:
+      - public
+  # only:
+  #   - master
