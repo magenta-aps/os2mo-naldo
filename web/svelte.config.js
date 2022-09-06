@@ -14,6 +14,9 @@ const config = {
     prerender: {
       enabled: true,
     },
+    pages: {
+      base: "REPLACE ME",
+    },
   },
 }
 
