@@ -1,8 +1,6 @@
 <script lang="ts">
-  import { DateInput, localeFromDateFnsLocale } from "date-picker-svelte"
-  import { da } from "date-fns/locale"
+  import { DateInput } from "date-picker-svelte"
 
-  let locale = localeFromDateFnsLocale(da)
   let startDate = new Date()
   let endDate: Date
   let name: string
@@ -26,7 +24,6 @@
           </label>
           <DateInput
             bind:value={startDate}
-            {locale}
             format={"dd-MM-yyyy"}
             placeholder={"Startdato"}
             min={new Date("1/1/1910")}
@@ -39,7 +36,6 @@
           </label>
           <DateInput
             bind:value={endDate}
-            {locale}
             format={"dd-MM-yyyy"}
             placeholder={"Slutdato"}
             min={startDate}
