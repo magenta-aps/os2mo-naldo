@@ -11,13 +11,14 @@ services:
 
   web:
     build:
-      context: web
-      target: prod
+      context: .
+      dockerfile: web/Dockerfile
+      target: dev # dev, build, prod
     restart: on-failure
     ports:
-      - 5173:5173
-      - 4173:4173
-      - 24678:24678
+      - 5173:5173   # dev
+      - 4173:4173   # build preview
+      - 24678:24678 # hot module reloading
     volumes:
       - ./web:/app
       - ./docker/nginx.conf.template:/docker

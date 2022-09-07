@@ -1,5 +1,3 @@
-# SPDX-FileCopyrightText: 2019-2020 Magenta ApS
-# SPDX-License-Identifier: MPL-2.0
 server {
     listen       80;
     listen  [::]:80;
@@ -9,57 +7,6 @@ server {
     # to allow the proxy to start before all services are initialised.
     resolver 127.0.0.11 valid=5s;  # 127.0.0.11 is the docker DNS server
 
-    # MO Paths
-    # This list should correspond with:
-    # * https://git.magenta.dk/rammearkitektur/os2mo-helm-chart/-/blob/master/os2mo/templates/mo/ingress.yaml#L29
-    # * All the salt pillar ones
-    location /openapi.json {
-        set $mo mo;
-        proxy_pass http://$mo;
-    }
-
-    location /graphql {
-        set $mo mo;
-        proxy_pass http://$mo;
-    }
-
-    location /metrics {
-        set $mo mo;
-        proxy_pass http://$mo;
-    }
-
-    location /docs {
-        set $mo mo;
-        proxy_pass http://$mo;
-    }
-
-    location /service/ {
-        set $mo mo;
-        proxy_pass http://$mo;
-    }
-
-    location /version/ {
-        set $mo mo;
-        proxy_pass http://$mo;
-    }
-
-    location /testing/ {
-        set $mo mo;
-        proxy_pass http://$mo;
-    }
-
-    location /health/ {
-        set $mo mo;
-        proxy_pass http://$mo;
-    }
-
-    # Keycloak
-    location /auth/ {
-        set $keycloak keycloak;
-        proxy_pass http://$keycloak:8080;
-    }
-
-    # Web
     location / {
         set $web web;
         proxy_pass http://$web;
