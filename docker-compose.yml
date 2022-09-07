@@ -1,14 +1,24 @@
 version: "3.7"
 
 services:
+  proxy:
+    image: nginx:1
+    volumes:
+      - ./dev-environment/nginx-proxy.conf.template:/etc/nginx/templates/default.conf.template:ro
+    ports:
+      - "127.0.0.1:1337:80"
+    restart: unless-stopped
+
   web:
-    image: web
-    restart: on-failure
     build:
-      context: ./web
+      context: web
+      target: prod
+    restart: on-failure
     ports:
       - 5173:5173
+      - 4173:4173
       - 24678:24678
     volumes:
-      - ./web:/usr/src/app
-      - /usr/src/app/node_modules
+      - ./web:/app
+      - ./docker/nginx.conf.template:/docker
+      - /src/app/node_modules

@@ -1,16 +1,29 @@
-FROM node:16-alpine
+# TODO: Setup dev and prod env
+FROM node:16-alpine AS base
 
-ENV NODE_ENV development
+WORKDIR /app
 
-WORKDIR /usr/src/app
+COPY package.json yarn.lock ./
 
-COPY package.json yarn.lock* ./
-
-RUN yarn
+RUN yarn install --frozen-lockfile && yarn cache clean
 
 COPY . .
 
-EXPOSE 5173
-EXPOSE 24678
+# --- DEV ---
+FROM base as dev
 
-CMD ["yarn", "dev", "--host", "0.0.0.0"]
+CMD yarn dev --host
+
+# --- BUILD ---
+FROM base as build
+
+RUN yarn build
+CMD yarn preview --host
+
+# --- PROD ---
+FROM nginx:1.19-alpine AS prod
+
+WORKDIR /usr/share/nginx/html
+
+COPY nginx.conf.template /etc/nginx/templates/default.conf.template
+COPY --from=build /app/build .
