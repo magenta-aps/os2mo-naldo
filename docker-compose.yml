@@ -11,8 +11,9 @@ services:
 
   web:
     build:
-      context: web
-      target: prod
+      context: .
+      dockerfile: web/Dockerfile
+      target: prod # dev, build, prod
     restart: on-failure
     ports:
       - 5173:5173

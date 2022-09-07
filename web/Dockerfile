@@ -1,13 +1,13 @@
 # TODO: Setup dev and prod env
 FROM node:16-alpine AS base
 
-WORKDIR /app
+WORKDIR /app/web
 
-COPY package.json yarn.lock ./
+COPY web/package.json web/yarn.lock ./
 
 RUN yarn install --frozen-lockfile && yarn cache clean
 
-COPY . .
+COPY web .
 
 # --- DEV ---
 FROM base as dev
@@ -18,12 +18,11 @@ CMD yarn dev --host
 FROM base as build
 
 RUN yarn build
+
 CMD yarn preview --host
 
 # --- PROD ---
 FROM nginx:1.19-alpine AS prod
 
-WORKDIR /usr/share/nginx/html
-
-COPY nginx.conf.template /etc/nginx/templates/default.conf.template
-COPY --from=build /app/build .
+COPY docker/nginx.conf.template /etc/nginx/templates/default.conf.template
+COPY --from=build /app/web/build /usr/share/nginx/html/
