@@ -28,7 +28,8 @@
     return json.items
   }
 
-  const fetchEmployees = async () => {
+  // Will override itself on input change(triggers a re-render of the #await markdown)
+  $: fetchEmployees = async () => {
     // Uses GraphQL if no imput, autocomplete if there is
     // TODO: Switch to all GraphQL when #51997 is done
     if (input) {
@@ -49,14 +50,12 @@
 
     return allEmployees
   }
-
-  $: input, (refreshEmployees = fetchEmployees())
 </script>
 
 <div class="h-screen m-auto p-10">
   <EmployeeSearchInput bind:input bind:cardView />
   <div class="pt-5">
-    {#await refreshEmployees}
+    {#await fetchEmployees()}
       <div class="flex justify-center pt-10">
         <div class="animate-spin rounded-full h-32 w-32 border-b-8 border-primary" />
       </div>
