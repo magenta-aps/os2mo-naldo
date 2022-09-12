@@ -4,7 +4,6 @@
   import Navbar from "$lib/components/navbar.svelte"
   import Footer from "$lib/components/footer.svelte"
   import DrawerContent from "$lib/components/drawer_content.svelte"
-  import Search from "$lib/components/search.svelte"
   import { onMount } from "svelte"
   import { isAuth } from "$lib/stores/auth"
   import { initKeycloak } from "$lib/util/keycloak"
@@ -16,6 +15,7 @@
   })
 </script>
 
+<Navbar />
 <div class="drawer drawer-mobile">
   <input
     id="my-drawer-3"
@@ -25,7 +25,6 @@
   />
   <div class="drawer-content flex flex-col">
     <!-- Page content here -->
-    <Navbar />
     {#if $isAuth}
       <slot />
     {:else}
@@ -43,7 +42,6 @@
       <!-- Sidebar content here -->
       <div class="flex-none">
         <a class="btn btn-ghost normal-case text-xl mb-2" href="/">OS2mo</a>
-        <Search />
         <br />
         <DrawerContent />
       </div>

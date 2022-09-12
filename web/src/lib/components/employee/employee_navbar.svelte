@@ -1,40 +1,21 @@
-<script lang="ts">
-  import { logoutKeycloak, keycloak } from "$lib/util/keycloak"
-  import { isAuth } from "$lib/stores/auth"
-  import Search from "$lib/components/search.svelte"
-
-  const nameBadge = (): string => {
-    if (keycloak && keycloak.idTokenParsed) {
-      return (
-        keycloak.idTokenParsed.given_name[0] + keycloak.idTokenParsed.family_name[0]
-      )
-    }
-    return "??"
-  }
-</script>
-
-<div class="navbar bg-secondary text-base-100 shadow-xl">
-  <div class="flex-none lg:hidden">
-    <label for="my-drawer-3" class="btn btn-square btn-ghost">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        class="inline-block w-6 h-6 stroke-current"
-        ><path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M4 6h16M4 12h16M4 18h16"
-        /></svg
-      >
-    </label>
-  </div>
-
+<div class="navbar bg-primary text-base-100 shadow-xl">
   <div class="flex-1 z-10">
-    <div class="flex-none lg:hidden">
-      <a class="btn btn-ghost normal-case text-xl" href="/">OS2mo</a>
-    </div>
+    <label class="btn btn-primary" for="create-org-modal">
+      <span class="inline-block align-middle pr-2">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          ><path
+            d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6 13h-5v5h-2v-5h-5v-2h5v-5h2v5h5v2z"
+          /></svg
+        >
+      </span>
+      Opret enhed
+    </label>
+
     <ul class="menu menu-horizontal p-0">
       <li tabindex="0">
         <a href="">
@@ -114,36 +95,5 @@
         </ul>
       </li>
     </ul>
-    <div class="mx-auto">
-      <Search />
-    </div>
-  </div>
-
-  <div class="flex-none">
-    {#if $isAuth}
-      <div class="dropdown dropdown-end">
-        <label tabindex="0" class="btn btn-ghost btn-circle avatar placeholder">
-          <div class="bg-neutral-focus w-10 rounded-full">
-            <span class="text-neutral-content">{nameBadge()}</span>
-          </div>
-        </label>
-        <ul
-          tabindex="0"
-          class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
-        >
-          <li>
-            <div class="justify-between">
-              {keycloak && keycloak.idTokenParsed
-                ? keycloak.idTokenParsed.name
-                : "Ghost user"}
-              <span class="badge">{nameBadge()}</span>
-            </div>
-          </li>
-          {#if keycloak}
-            <li><div on:click={logoutKeycloak}>Logout</div></li>
-          {/if}
-        </ul>
-      </div>
-    {/if}
   </div>
 </div>
