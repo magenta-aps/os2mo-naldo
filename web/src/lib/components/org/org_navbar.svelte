@@ -13,7 +13,7 @@
           /></svg
         >
       </span>
-      Ny medarbejder
+      Opret enhed
     </label>
     <label class="btn btn-primary text-base-100 normal-case" for="">
       <span class="inline-block align-middle pr-2">
@@ -28,7 +28,7 @@
           /></svg
         >
       </span>
-      Orlov
+      Omdøb enhed
     </label>
     <label class="btn btn-primary text-base-100 normal-case" for="">
       <span class="inline-block align-middle pr-2">
@@ -42,7 +42,7 @@
           /></svg
         >
       </span>
-      Flyt engagement
+      Flyt enhed
     </label>
     <label class="btn btn-primary text-base-100 normal-case" for="">
       <span class="inline-block align-middle pr-2">
@@ -57,22 +57,7 @@
           /></svg
         >
       </span>
-      Flyt mange engagementer
-    </label>
-    <label class="btn btn-primary text-base-100 normal-case" for="">
-      <span class="inline-block align-middle pr-2">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          ><path
-            d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6 16.538l-4.592-4.548 4.546-4.587-1.416-1.403-4.545 4.589-4.588-4.543-1.405 1.405 4.593 4.552-4.547 4.592 1.405 1.405 4.555-4.596 4.591 4.55 1.403-1.416z"
-          /></svg
-        >
-      </span>
-      Opsig medarbejder
+      Afslut enhed
     </label>
   </div>
 </div>

@@ -2,7 +2,6 @@
   import CreateOrg from "$lib/components/modals/create_org.svelte"
   import "$lib/global.css"
   import Navbar from "$lib/components/navbar.svelte"
-  import Footer from "$lib/components/footer.svelte"
   import DrawerContent from "$lib/components/drawer_content.svelte"
   import { onMount } from "svelte"
   import { isAuth } from "$lib/stores/auth"
@@ -38,15 +37,12 @@
   </div>
   <div class="drawer-side">
     <label for="my-drawer-3" class="drawer-overlay" />
-    <ul class="menu p-4 overflow-y-auto w-80 bg-base-300">
+    <ul class="menu p-4 overflow-y-auto w-80 bg-base-100 border">
       <!-- Sidebar content here -->
       <div class="flex-none">
-        <a class="btn btn-ghost normal-case text-xl mb-2" href="/">OS2mo</a>
-        <br />
         <DrawerContent />
       </div>
     </ul>
   </div>
 </div>
-<Footer />
 <CreateOrg />
