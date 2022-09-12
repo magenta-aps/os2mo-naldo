@@ -13,13 +13,15 @@
   }
 </script>
 
-<td>
+<td class="whitespace-nowrap">
   <div>
-    Fra {formatDate(validity.from)}
+    <span class="text-gray-400 inline-block min-w-[5rem]">Startdato</span>
+    {formatDate(validity.from)}
   </div>
   {#if validity.to}
     <div>
-      Til {formatDate(validity.to)}
+      <span class="text-gray-400 inline-block min-w-[5rem]">Slutdato</span>
+      {formatDate(validity.to)}
     </div>
   {/if}
 </td>
