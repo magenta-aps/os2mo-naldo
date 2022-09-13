@@ -3,7 +3,7 @@
   import { isAuth } from "$lib/stores/auth"
 </script>
 
-<ul class="menu p-4 overflow-y-auto bg-base-300 text-base-content">
+<ul class="menu p-4 overflow-y-auto bg-base-100 text-base-content">
   <!-- Sidebar content here -->
   <li class="mb-2"><a href="/employee">Medarbejdere</a></li>
 

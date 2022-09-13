@@ -2,9 +2,7 @@
   import CreateOrg from "$lib/components/modals/create_org.svelte"
   import "$lib/global.css"
   import Navbar from "$lib/components/navbar.svelte"
-  import Footer from "$lib/components/footer.svelte"
   import DrawerContent from "$lib/components/drawer_content.svelte"
-  import Search from "$lib/components/search.svelte"
   import { onMount } from "svelte"
   import { isAuth } from "$lib/stores/auth"
   import { initKeycloak } from "$lib/util/keycloak"
@@ -16,6 +14,7 @@
   })
 </script>
 
+<Navbar />
 <div class="drawer drawer-mobile">
   <input
     id="my-drawer-3"
@@ -25,7 +24,6 @@
   />
   <div class="drawer-content flex flex-col">
     <!-- Page content here -->
-    <Navbar />
     {#if $isAuth}
       <slot />
     {:else}
@@ -39,16 +37,12 @@
   </div>
   <div class="drawer-side">
     <label for="my-drawer-3" class="drawer-overlay" />
-    <ul class="menu p-4 overflow-y-auto w-80 bg-base-300">
+    <ul class="menu p-4 overflow-y-auto w-80 bg-base-100 border">
       <!-- Sidebar content here -->
       <div class="flex-none">
-        <a class="btn btn-ghost normal-case text-xl mb-2" href="/">OS2mo</a>
-        <Search />
-        <br />
         <DrawerContent />
       </div>
     </ul>
   </div>
 </div>
-<Footer />
 <CreateOrg />
