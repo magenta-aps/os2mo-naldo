@@ -1,6 +1,9 @@
-<div class="navbar bg-primary text-base-100 shadow-xl">
+<div class="navbar bg-primary min-h-0 h-10 text-base-100 shadow-xl">
   <div class="flex-1 z-10">
-    <label class="btn btn-primary text-base-100 normal-case" for="create-org-modal">
+    <label
+      class="btn btn-sm btn-primary text-base-100 normal-case"
+      for="create-org-modal"
+    >
       <span class="inline-block align-middle pr-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -15,7 +18,7 @@
       </span>
       Opret enhed
     </label>
-    <label class="btn btn-primary text-base-100 normal-case" for="">
+    <label class="btn btn-sm btn-primary text-base-100 normal-case" for="">
       <span class="inline-block align-middle pr-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -30,7 +33,7 @@
       </span>
       Omdøb enhed
     </label>
-    <label class="btn btn-primary text-base-100 normal-case" for="">
+    <label class="btn btn-sm btn-primary text-base-100 normal-case" for="">
       <span class="inline-block align-middle pr-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -44,7 +47,7 @@
       </span>
       Flyt enhed
     </label>
-    <label class="btn btn-primary text-base-100 normal-case" for="">
+    <label class="btn btn-sm btn-primary text-base-100 normal-case" for="">
       <span class="inline-block align-middle pr-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"
