@@ -44,7 +44,7 @@
     {#if $isAuth}
       <div class="dropdown dropdown-end">
         <label tabindex="0" class="btn btn-ghost btn-circle avatar placeholder">
-          <div class="bg-neutral-focus w-10 rounded-full">
+          <div class="bg-neutral-focus w-8 rounded-full">
             <span class="text-neutral-content">{nameBadge()}</span>
           </div>
         </label>
