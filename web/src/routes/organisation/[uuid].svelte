@@ -117,7 +117,7 @@
     </div>
   {:then org}
     <h1 class="text-2xl pb-4">{org.name}</h1>
-    <Tabs styling="pb-6" {activeItem} {items} on:tabChange={tabChange} />
+    <Tabs {activeItem} {items} on:tabChange={tabChange} />
     {#if activeItem === "Enhed"}
       <DetailTable
         headers={["#", "Enhed", "Enhedstype", "Enhedsniveau", "Overenhed", "Dato"]}

@@ -1,17 +1,18 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte"
-  let dispatch = createEventDispatcher()
 
   export let items: string[]
   export let activeItem: string
-  export let tabFormat = "tab tab-bordered"
-  export let styling: string
+
+  let dispatch = createEventDispatcher()
 </script>
 
-<div class="tabs {styling}">
+<div class="tabs">
   {#each items as item}
     <div
-      class="{tabFormat} {item === activeItem ? 'tab-active' : ''}"
+      class="tab tab-bordered {item === activeItem
+        ? 'border-primary text-primary'
+        : 'text-secondary'}"
       on:click={() => dispatch("tabChange", item)}
     >
       {item}
