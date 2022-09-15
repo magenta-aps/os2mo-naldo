@@ -70,6 +70,46 @@
               to
             }
           }
+          itusers {
+            itsystem {
+              name
+            }
+            validity {
+              from
+              to
+            }
+            user_key
+          }
+          roles {
+            employee {
+              name
+            }
+            role_type {
+              name
+            }
+            validity {
+              from
+              to
+            }
+          }
+          managers {
+            employee {
+              name
+            }
+            responsibilities {
+              name
+            }
+            manager_level {
+              name
+            }
+            manager_type {
+              name
+            }
+            validity {
+              from
+              to
+            }
+          }
         }
       }
     }
@@ -95,13 +135,13 @@
     "Engagementer",
     "Tilknytninger",
     "IT",
+    "Roller",
+    "Ledere",
     "KLE-opmærkninger",
     "Relateret",
-    "Ejere",
-    "Engagementstilknytninger",
   ]
 
-  let activeItem = items[2]
+  let activeItem = items[7]
   const tabChange = (e) => (activeItem = e.detail)
 </script>
 
@@ -183,6 +223,54 @@
           </tr>
         {/each}
       </DetailTable>
+    {:else if activeItem === "IT"}
+      <DetailTable headers={["IT system", "Kontornavn", "Dato"]}>
+        {#each org.itusers as ituser}
+          <tr
+            class="px-4 py-4 leading-5 border border-l-2 border-slate-300 text-secondary text-sm"
+          >
+            <td class="px-4 py-4">{ituser.itsystem.name}</td>
+            <td class="px-4 py-4">{ituser.user_key}</td>
+            <ValidityTableCell validity={ituser.validity} />
+          </tr>
+        {/each}
+      </DetailTable>
+    {:else if activeItem === "Roller"}
+      <DetailTable headers={["Navn", "Rolletype", "Dato"]}>
+        {#each org.roles as role}
+          <tr
+            class="px-4 py-4 leading-5 border border-l-2 border-slate-300 text-secondary text-sm"
+          >
+            <td class="px-4 py-4">{role.employee[0].name}</td>
+            <td class="px-4 py-4">{role.role_type.name}</td>
+            <ValidityTableCell validity={role.validity} />
+          </tr>
+        {/each}
+      </DetailTable>
+    {:else if activeItem === "Ledere"}
+      <DetailTable
+        headers={["Navn", "Lederansvar", "Ledertype", "Lederniveau", "Dato"]}
+      >
+        {#each org.managers as manager}
+          <tr
+            class="px-4 py-4 leading-5 border border-l-2 border-slate-300 text-secondary text-sm"
+          >
+            <td class="px-4 py-4">{manager.employee[0].name}</td>
+            <td class="px-4 py-4">
+              {#each manager.responsibilities as responsibility}
+                {responsibility.name} <br />
+              {/each}
+            </td>
+            <td class="px-4 py-4">{manager.manager_type.name}</td>
+            <td class="px-4 py-4">{manager.manager_level.name}</td>
+            <ValidityTableCell validity={manager.validity} />
+          </tr>
+        {/each}
+      </DetailTable>
+    {:else if activeItem === "KLE-opmærkninger"}
+      TODO
+    {:else if activeItem === "Relateret"}
+      TODO
     {/if}
   {:catch error}
     <div class="m-auto px-10">
