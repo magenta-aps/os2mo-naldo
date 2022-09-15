@@ -3,6 +3,13 @@
   import { isAuth } from "$lib/stores/auth"
   import Search from "$lib/components/search.svelte"
 
+  const fullName = (): string => {
+    if (keycloak && keycloak.idTokenParsed) {
+      return keycloak.idTokenParsed.name
+    }
+    return "Ghost user"
+  }
+
   const nameBadge = (): string => {
     if (keycloak && keycloak.idTokenParsed) {
       return (
@@ -42,21 +49,20 @@
 
   <div class="flex-none">
     {#if $isAuth}
+      <p>{fullName()}</p>
       <div class="dropdown dropdown-end">
         <label tabindex="0" class="btn btn-ghost btn-circle avatar placeholder">
-          <div class="bg-neutral-focus w-8 rounded-full">
-            <span class="text-neutral-content">{nameBadge()}</span>
+          <div class="bg-accent w-8 rounded-full">
+            <span class="text-neutral">{nameBadge()}</span>
           </div>
         </label>
         <ul
           tabindex="0"
-          class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
+          class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52 text-neutral"
         >
           <li>
-            <div class="justify-between text-neutral">
-              {keycloak && keycloak.idTokenParsed
-                ? keycloak.idTokenParsed.name
-                : "Ghost user"}
+            <div class="justify-between">
+              {fullName()}
               <span class="badge">{nameBadge()}</span>
             </div>
           </li>
