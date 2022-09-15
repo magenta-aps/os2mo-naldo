@@ -53,7 +53,7 @@
           class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
         >
           <li>
-            <div class="justify-between">
+            <div class="justify-between text-neutral">
               {keycloak && keycloak.idTokenParsed
                 ? keycloak.idTokenParsed.name
                 : "Ghost user"}
