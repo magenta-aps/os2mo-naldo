@@ -34,12 +34,12 @@
       on:blur={delayedUnfocus}
       type="text"
       placeholder="Søg"
-      class="input input-bordered w-72"
+      class="input input-bordered w-80 h-8 text-neutral"
     />
     {#if isFocused && input}
       <div use:floatingContent>
-        <div class="overflow-x-auto shadow-lg w-72 max-h-96">
-          <table class="table table-compact w-full">
+        <div class="overflow-x-auto shadow-lg w-80 max-h-96">
+          <table class="table table-compact w-full text-neutral">
             {#await search(input)}
               <tbody>
                 <tr>
@@ -57,7 +57,7 @@
                         input = ""
                       }}
                     >
-                      <th>
+                      <th class="text-neutral">
                         <a href={`/employee/${result.uuid}`}>
                           {result.name}
                         </a>
@@ -68,7 +68,7 @@
               {:else}
                 <tbody>
                   <tr>
-                    <th class="flex justify-center">Ingen resultater </th>
+                    <th class="flex justify-center text-neutral">Ingen resultater </th>
                   </tr>
                 </tbody>
               {/if}

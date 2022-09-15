@@ -4,4 +4,6 @@
 
 <OrgNavbar />
 
-<slot />
+<div class="overflow-auto">
+  <slot />
+</div>
