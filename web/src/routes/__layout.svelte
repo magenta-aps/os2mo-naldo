@@ -14,35 +14,37 @@
   })
 </script>
 
-<Navbar />
-<div class="drawer drawer-mobile">
-  <input
-    id="my-drawer-3"
-    type="checkbox"
-    class="drawer-toggle"
-    bind:checked={drawerToggled}
-  />
-  <div class="drawer-content flex flex-col">
-    <!-- Page content here -->
-    {#if $isAuth}
-      <slot />
-    {:else}
-      <div class="m-auto">
-        <div
-          class="animate-spin rounded-full h-32 w-32 border-b-8 border-primary flex justify-center"
-        />
-        <p class="pt-6">Authenticating...</p>
-      </div>
-    {/if}
-  </div>
-  <div class="drawer-side">
-    <label for="my-drawer-3" class="drawer-overlay" />
-    <ul class="menu p-4 overflow-y-auto w-80 bg-base-100 border">
-      <!-- Sidebar content here -->
-      <div class="flex-none">
-        <DrawerContent />
-      </div>
-    </ul>
+<div class="flex flex-col h-screen">
+  <Navbar />
+  <div class="drawer drawer-mobile">
+    <input
+      id="my-drawer-3"
+      type="checkbox"
+      class="drawer-toggle"
+      bind:checked={drawerToggled}
+    />
+    <div class="drawer-content flex flex-col">
+      <!-- Page content here -->
+      {#if $isAuth}
+        <slot />
+      {:else}
+        <div class="m-auto">
+          <div
+            class="animate-spin rounded-full h-32 w-32 border-b-8 border-primary flex justify-center"
+          />
+          <p class="pt-6">Authenticating...</p>
+        </div>
+      {/if}
+    </div>
+    <div class="drawer-side">
+      <label for="my-drawer-3" class="drawer-overlay" />
+      <ul class="menu p-4 overflow-y-auto w-80 bg-base-100 border">
+        <!-- Sidebar content here -->
+        <div class="flex-none">
+          <DrawerContent />
+        </div>
+      </ul>
+    </div>
   </div>
 </div>
 <CreateOrg />
