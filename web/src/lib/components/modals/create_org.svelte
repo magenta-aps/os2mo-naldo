@@ -1,13 +1,50 @@
 <script lang="ts">
   import { DateInput } from "date-picker-svelte"
+  import SelectOrgTree from "$lib/components/org/select_tree/org_tree.svelte"
+  import { fetchGraph, postRest } from "$lib/util/http"
 
   let startDate = new Date()
   let endDate: Date
   let name: string
-  let parentOrgUnit: String
+  let parentOrg: any
+  let orgLevel: string
+  let orgType: string
+  let orgNumber: string
+  let createStatus: number
+
+  const fetchDropdownItems = async () => {
+    const query = `
+      query {
+        facets(user_keys: ["org_unit_level", "org_unit_type"]) {
+          uuid
+          user_key
+          classes {
+            name
+            uuid
+          }
+        }
+      }`
+
+    const res = await fetchGraph(query)
+    const json = await res.json()
+    return json.data.facets
+  }
+
+  const createOrg = async () => {
+    const x = postRest(`ou/create`, {
+      name: name,
+      parent: { uuid: parentOrg.uuid },
+      org_unit_level: { uuid: orgLevel },
+      org_unit_type: { uuid: orgType },
+      validity: {
+        from: startDate.toISOString().split("T")[0],
+        to: endDate ? endDate.toISOString().split("T")[0] : undefined,
+      },
+    })
+    createStatus = await x.status
+  }
 </script>
 
-<!-- Put this part before </body> tag -->
 <input type="checkbox" id="create-org-modal" class="modal-toggle" />
 <div class="modal">
   <div class="modal-box w-4/5 max-w-2xl">
@@ -19,9 +56,9 @@
     <form>
       <div class="flex sm:flex-row flex-col gap-2 pb-4">
         <div class="form-control">
-          <label class="label">
+          <div class="label">
             <span class="label-text">Startdato</span>
-          </label>
+          </div>
           <DateInput
             bind:value={startDate}
             format={"dd-MM-yyyy"}
@@ -31,9 +68,9 @@
           />
         </div>
         <div class="form-control">
-          <label class="label">
+          <div class="label">
             <span class="label-text">Slutdato</span>
-          </label>
+          </div>
           <DateInput
             bind:value={endDate}
             format={"dd-MM-yyyy"}
@@ -43,76 +80,70 @@
           />
         </div>
       </div>
-      <div class="form-control pb-4 w-full max-w-xl">
-        <label class="label">
+      <div class="form-control pb-4 max-w-xl">
+        <div class="label">
           <span class="label-text">Angiv overenhed</span>
-        </label>
-        <select class="select select-bordered">
-          <option disabled selected>Angiv overenhed</option>
-          <option>1</option>
-          <option>2</option>
-          <option>3</option>
-          <option>4 </option>
-        </select>
+        </div>
+        <SelectOrgTree bind:selectedOrg={parentOrg} />
       </div>
 
-      <div class="form-control pb-4 w-full max-w-xl">
-        <label class="label">
-          <span class="label-text">Enhedsniveu</span>
-        </label>
-        <select class="select select-bordered">
-          <option disabled selected>Enhedsniveu</option>
-          <option>1</option>
-          <option>2</option>
-          <option>3</option>
-          <option>4 </option>
-        </select>
-      </div>
-
-      <div class="flex md:flex-row flex-col gap-2 pb-4 w-full max-w-xl">
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text">Navn</span>
-          </label>
-          <input
-            bind:value={name}
-            type="text"
-            placeholder="Navn"
-            class="input input-bordered"
-          />
+      {#await fetchDropdownItems()}
+        <div class="animate-spin rounded-full h-32 w-32 border-b-8 border-primary" />
+      {:then dropDownItems}
+        <div class="form-control pb-4 w-full max-w-xl">
+          <div class="label">
+            <span class="label-text">Enhedsniveu</span>
+          </div>
+          <select class="select select-bordered" bind:value={orgLevel}>
+            {#each dropDownItems[0].classes as orgLevel}
+              <option value={orgLevel.uuid}>{orgLevel.name}</option>
+            {/each}
+          </select>
         </div>
 
-        <div class="flex flex-row gap-2">
-          <div>
-            <label class="label">
-              <span class="label-text">Enhedsnummer</span>
-            </label>
-            <select class="select select-bordered">
-              <option disabled selected>Enhedsnummer</option>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4 </option>
-            </select>
+        <div class="flex md:flex-row flex-col gap-2 pb-4 w-full max-w-xl">
+          <div class="form-control">
+            <div class="label">
+              <span class="label-text">Navn</span>
+            </div>
+            <input
+              bind:value={name}
+              type="text"
+              placeholder="Navn"
+              class="input input-bordered w-full"
+            />
           </div>
-          <div>
-            <label class="label">
-              <span class="label-text">Enhedstype</span>
-            </label>
-            <select class="select select-bordered">
-              <option disabled selected>Enhedstype</option>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4 </option>
-            </select>
+
+          <div class="flex flex-row gap-2">
+            <div>
+              <div class="label">
+                <span class="label-text">Enhedsnummer</span>
+              </div>
+              <input
+                bind:value={orgNumber}
+                class="input input-bordered w-full"
+                placeholder="Udfyld eller auto"
+              />
+            </div>
+            <div>
+              <div class="label">
+                <span class="label-text">Enhedstype</span>
+              </div>
+              <select class="select select-bordered w-full" bind:value={orgType}>
+                {#each dropDownItems[1].classes as orgType}
+                  <option value={orgType.uuid}>{orgType.name}</option>
+                {/each}
+              </select>
+            </div>
           </div>
         </div>
-      </div>
-      <p class="pb-4">PLACEHOLDER FOR ADRESSER</p>
-      <div class="modal-action">
-        <label for="create-org-modal" class="btn">Opret</label>
-      </div>
+        <p class="pb-4">PLACEHOLDER FOR ADRESSER</p>
+        <div class="modal-action" on:click={createOrg()}>
+          <label for={createStatus === 200 ? "create-org-modal" : ""} class="btn"
+            >Opret</label
+          >
+        </div>
+      {/await}
     </form>
   </div>
 </div>

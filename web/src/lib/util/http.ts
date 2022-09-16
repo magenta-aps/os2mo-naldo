@@ -11,6 +11,18 @@ export const fetchRest = async (path: string) => {
   })
 }
 
+export const postRest = async (path: string, payload) => {
+  const token = keycloak ? keycloak.token : "Keycloak disabled"
+  return await fetch(`http://localhost:5001/service/${path}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    },
+    body: JSON.stringify(payload),
+  })
+}
+
 export const fetchGraph = async (query: string): Promise<Response> => {
   const token = keycloak ? keycloak.token : "Keycloak disabled"
   return await fetch(`${env.PUBLIC_BASE_URL}/graphql/v2`, {
