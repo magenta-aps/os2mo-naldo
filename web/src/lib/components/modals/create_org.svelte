@@ -1,7 +1,10 @@
 <script lang="ts">
+  import { success, error } from "$lib/stores/alert"
+  import { fetchGraph, postRest } from "$lib/util/http"
   import { DateInput } from "date-picker-svelte"
   import SelectOrgTree from "$lib/components/org/select_tree/org_tree.svelte"
-  import { fetchGraph, postRest } from "$lib/util/http"
+  import Error from "$lib/components/alerts/error.svelte"
+  import Icon from "../icon.svelte"
 
   let startDate = new Date()
   let endDate: Date
@@ -43,109 +46,167 @@
     })
     if (res.status === 201) {
       // Closes the hidden checkbox controlling the open state
+      const json = await res.json()
       document.getElementById("create-org-modal").checked = false
+      $success = {
+        message: `${name} er blevet oprettet`,
+        uuid: json,
+        type: "organisation",
+      }
     } else {
-      console.log(res)
+      const json = await res.json()
+      $error = { message: json.description }
     }
   }
 </script>
 
 <input type="checkbox" id="create-org-modal" class="modal-toggle" />
-<div class="modal">
-  <div class="modal-box w-4/5 max-w-2xl">
-    <label for="create-org-modal" class="btn btn-sm btn-circle absolute right-4 top-4"
-      >✕</label
-    >
-    <h3 class="font-bold text-lg pb-4">Opret enhed</h3>
+<label for="create-org-modal" class="modal cursor-pointer">
+  <label class="modal-box rounded-lg p-0 relative" for="">
+    <div class="flex align-center p-4 pt-6">
+      <h3 class="flex-1">Opret enhed</h3>
+      <label for="create-org-modal" class="flex justify-end cursor-pointer">
+        <Icon type="xmark" size="24" />
+      </label>
+    </div>
 
-    <form method="POST" on:submit|preventDefault={createOrg}>
-      <div class="flex sm:flex-row flex-col gap-2 pb-4">
+    <div class="divider p-0 m-0 w-full" />
+
+    <form class="p-4" method="POST" on:submit|preventDefault={createOrg}>
+      <div class="flex flex-row gap-4 mb-3">
         <div class="form-control">
-          <div class="label">
-            <span class="label-text">Startdato</span>
-          </div>
+          <span name="Start date picker" class="label">
+            <p>Startdato</p>
+          </span>
           <DateInput
             bind:value={startDate}
             format={"dd-MM-yyyy"}
-            placeholder={"Startdato"}
+            placeholder={""}
             min={new Date("1/1/1910")}
             max={endDate ? endDate : new Date(new Date().getFullYear() + 50, 0)}
           />
         </div>
-        <div class="form-control">
-          <div class="label">
-            <span class="label-text">Slutdato</span>
-          </div>
+        <div class="flex-1 justify-end form-control">
+          <span name="End date picker" class="label">
+            <p>Slutdato</p>
+          </span>
           <DateInput
             bind:value={endDate}
             format={"dd-MM-yyyy"}
-            placeholder={"Slutdato"}
+            placeholder={""}
             min={startDate}
             max={new Date(new Date().getFullYear() + 50, 0)}
           />
         </div>
       </div>
-      <div class="form-control pb-4 max-w-xl">
-        <div class="label">
-          <span class="label-text">Angiv overenhed</span>
-        </div>
+      <div class="form-control mb-3">
         <SelectOrgTree bind:selectedOrg={parentOrg} />
       </div>
 
       {#await fetchDropdownItems()}
-        <div class="animate-spin rounded-full h-32 w-32 border-b-8 border-primary" />
-      {:then dropDownItems}
-        <div class="form-control pb-4 w-full max-w-xl">
-          <div class="label">
-            <span class="label-text">Enhedsniveu</span>
+        <div class="form-control mb-3 w-full">
+          <label for="unit-level" class="label">
+            <p>Enhedsniveau</p>
+            <span class="animate-spin rounded-full h-6 w-6 border-b-4 border-primary" />
+          </label>
+          <select
+            id="unit-level"
+            class="select select-bordered select-sm rounded"
+            disabled
+          />
+        </div>
+        <div class="form-control mb-3">
+          <label for="name" class="label">
+            <p>Navn</p>
+          </label>
+          <input
+            id="name"
+            type="text"
+            class="input input-bordered input-sm rounded w-full"
+            disabled
+          />
+        </div>
+
+        <div class="flex flex-row gap-4 ">
+          <div class="basis-1/2">
+            <label for="unit-number" class="label">
+              <p>Enhedsnummer</p>
+            </label>
+            <input
+              id="unit-number"
+              class="input input-bordered input-sm rounded w-full"
+              disabled
+            />
           </div>
-          <select class="select select-bordered" bind:value={orgLevel} required>
+          <div class="basis-1/2">
+            <label for="unit-type" class="label">
+              <p>Enhedstype</p>
+            </label>
+            <select
+              id="unit-type"
+              class="select select-bordered select-sm rounded w-full"
+              disabled
+            />
+          </div>
+        </div>
+
+        <div class="modal-action">
+          <button disabled type="submit" class="btn btn-primary">Opret</button>
+        </div>
+      {:then dropDownItems}
+        <div class="form-control mb-3 w-full">
+          <label for="unit-level" class="label">
+            <p>Enhedsniveau</p>
+          </label>
+          <select
+            id="unit-level"
+            class="select select-bordered select-sm rounded focus:select-secondary active:select-secondary"
+            bind:value={orgLevel}
+            required
+          >
             {#each dropDownItems[0].classes as orgLevel}
               <option value={orgLevel.uuid}>{orgLevel.name}</option>
             {/each}
           </select>
         </div>
+        <div class="form-control mb-3">
+          <label for="name" class="label">
+            <p>Navn</p>
+          </label>
+          <input
+            id="name"
+            bind:value={name}
+            type="text"
+            class="input input-bordered input-sm rounded w-full focus:input-secondary active:input-secondary"
+            required
+          />
+        </div>
 
-        <div class="flex md:flex-row flex-col gap-2 pb-4 w-full max-w-xl">
-          <div class="form-control">
-            <div class="label">
-              <span class="label-text">Navn</span>
-            </div>
+        <div class="flex flex-row gap-4 ">
+          <div class="basis-1/2">
+            <label for="unit-number" class="label">
+              <p>Enhedsnummer</p>
+            </label>
             <input
-              bind:value={name}
-              type="text"
-              placeholder="Navn"
-              class="input input-bordered w-full"
-              required
+              id="unit-number"
+              bind:value={orgNumber}
+              class="input input-bordered input-sm rounded w-full"
             />
           </div>
-
-          <div class="flex flex-row gap-2">
-            <div>
-              <div class="label">
-                <span class="label-text">Enhedsnummer</span>
-              </div>
-              <input
-                bind:value={orgNumber}
-                class="input input-bordered w-full"
-                placeholder="Udfyld eller auto"
-                required
-              />
-            </div>
-            <div>
-              <div class="label">
-                <span class="label-text">Enhedstype</span>
-              </div>
-              <select
-                class="select select-bordered w-full"
-                bind:value={orgType}
-                required
-              >
-                {#each dropDownItems[1].classes as orgType}
-                  <option value={orgType.uuid}>{orgType.name}</option>
-                {/each}
-              </select>
-            </div>
+          <div class="basis-1/2">
+            <label for="unit-type" class="label">
+              <p>Enhedstype</p>
+            </label>
+            <select
+              id="unit-type"
+              class="select select-bordered select-sm rounded w-full"
+              bind:value={orgType}
+              required
+            >
+              {#each dropDownItems[1].classes as orgType}
+                <option value={orgType.uuid}>{orgType.name}</option>
+              {/each}
+            </select>
           </div>
         </div>
         <!-- TODO: Address support missing -->
@@ -153,15 +214,17 @@
           <button type="submit" class="btn btn-primary">Opret</button>
         </div>
       {/await}
+      <Error />
     </form>
-  </div>
-</div>
+  </label>
+</label>
 
 <style>
   :root {
     --date-picker-background: hsl(var(--b1));
     --date-picker-foreground: hsl(var(--bc));
-    --date-picker-highlight-border: hsl(var(--p));
-    --date-picker-highlight-shadow: hsl(var(--p));
+    --date-picker-highlight-border: hsl(var(--s));
+    --date-picker-highlight-shadow: hsl(var(--s));
+    --date-input-width: 232px; /* FIXME: Figure out how to control size */
   }
 </style>

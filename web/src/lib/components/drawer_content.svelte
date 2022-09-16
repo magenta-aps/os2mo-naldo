@@ -6,7 +6,7 @@
   import Icon from "$lib/components/icon.svelte"
 </script>
 
-<ul class="menu p-4 overflow-y-auto text-base">
+<ul class="menu p-4 pb-2 overflow-y-auto text-base">
   <!-- Sidebar content here -->
   <li>
     <div class="flex">

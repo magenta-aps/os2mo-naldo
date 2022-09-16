@@ -32,7 +32,8 @@
     const json = await res.json()
     if (json.data) {
       for (let org of json.data.org_units) {
-        if (!org.objects[0].parent.length) {
+        console.log(org)
+        if (org.objects[0].parent === null) {
           orgTree.push({
             uuid: org.uuid,
             name: org.objects[0].name,
@@ -69,19 +70,24 @@
 </script>
 
 {#await fetchOrgTree(query)}
-  <div class="m-auto">
-    <div class="animate-spin rounded-full h-32 w-32 border-b-8 border-primary" />
-  </div>
+  <label for="select-org-tree" class="label">
+    <p>Angiv overenhed</p>
+    <span class="animate-spin rounded-full h-6 w-6 border-b-4 border-primary" />
+  </label>
+  <input disabled class="input input-bordered input-sm rounded w-full" />
 {:then}
+  <label for="select-org-tree" class="label">
+    <p>Angiv overenhed</p>
+  </label>
   <div use:floatingRef>
     <input
+      name="select-org-tree"
       required
-      placeholder="Vælg organisation"
       on:focus={() => {
         isFocused = true
       }}
       bind:value={selectedOrg.name}
-      class="input input-bordered w-full"
+      class="input input-bordered input-sm rounded active:input-secondary focus:input-secondary w-full"
     />
     {#if isFocused}
       <div

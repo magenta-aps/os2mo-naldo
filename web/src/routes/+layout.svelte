@@ -1,6 +1,7 @@
 <script lang="ts">
-  import CreateOrg from "$lib/components/modals/create_org.svelte"
   import "$lib/global.css"
+  import SuccessAlert from "$lib/components/alerts/success.svelte"
+  import CreateOrg from "$lib/components/modals/create_org.svelte"
   import Navbar from "$lib/components/navbar.svelte"
   import DrawerContent from "$lib/components/drawer_content.svelte"
   import { onMount } from "svelte"
@@ -53,3 +54,4 @@
   </div>
 </div>
 <CreateOrg />
+<SuccessAlert />
