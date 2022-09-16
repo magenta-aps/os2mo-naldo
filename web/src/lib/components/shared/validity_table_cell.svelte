@@ -11,17 +11,17 @@
       dateStyle: "short",
     })
 
-    return dt.split(".").join("/")
+    return dt.split(".").join("-")
   }
 </script>
 
 <td class="whitespace-nowrap px-4 py-2">
   <div>
-    <span class="text-slate-600 inline-block min-w-[2rem]">Fra</span>
+    <span class="text-slate-600 font-light inline-block min-w-[2.25rem]">Start</span>
     {formatDate(validity.from)}
   </div>
   <div>
-    <span class="text-slate-600 inline-block min-w-[2rem]">Til</span>
+    <span class="text-slate-600 font-light inline-block min-w-[2.25rem]">Slut</span>
     {#if validity.to}
       {formatDate(validity.to)}
     {/if}

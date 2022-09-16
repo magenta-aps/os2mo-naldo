@@ -167,9 +167,7 @@
       <DetailTable
         headers={["Enhed", "Enhedstype", "Enhedsniveau", "Overenhed", "Dato"]}
       >
-        <tr
-          class="p-4 leading-5 border border-l-2 border-slate-300 text-secondary text-sm"
-        >
+        <tr class="p-4 leading-5 border-t border-slate-300 text-secondary text-sm">
           <td class="p-4">{org.name}</td>
           <td class="p-4">{org.unit_type.name}</td>
           <td class="p-4">{org.org_unit_level.name}</td>
@@ -184,9 +182,7 @@
     {:else if activeItem === "Adresser"}
       <DetailTable headers={["Adressetype", "Adresse", "Dato"]}>
         {#each org.addresses as address, i}
-          <tr
-            class="p-4 leading-5 border border-l-2 border-slate-300 text-secondary text-sm"
-          >
+          <tr class="p-4 leading-5 border-t border-slate-300 text-secondary text-sm">
             <td class="p-4">{address.address_type.name}</td>
             <td class="p-4">{address.name}</td>
             <ValidityTableCell validity={address.validity} />
@@ -196,9 +192,7 @@
     {:else if activeItem === "Engagementer"}
       <DetailTable headers={["Navn", "Stillingbetegnelse", "Engagementstype", "Dato"]}>
         {#each org.engagements as engagement, i}
-          <tr
-            class="py-4 leading-5 border border-l-2 border-slate-300 text-secondary text-sm"
-          >
+          <tr class="py-4 leading-5 border-t border-slate-300 text-secondary text-sm">
             <td class="p-4">{engagement.employee[0].name}</td>
             <td class="p-4">{engagement.job_function.name}</td>
             <td class="p-4">{engagement.engagement_type.name}</td>
@@ -209,11 +203,8 @@
     {:else if activeItem === "Tilknytninger"}
       <DetailTable headers={["Navn", "Tilknytningsrolle", "Stedfortræder", "Dato"]}>
         {#each org.associations as association}
-          <tr
-            class="p-4 leading-5 border border-l-2 border-slate-300 text-secondary text-sm"
-          >
+          <tr class="p-4 leading-5 border-t border-slate-300 text-secondary text-sm">
             <td class="p-4">{association.employee[0].name}</td>
-            <!-- <td>{engagement.uuid}</td> -->
             <td class="p-4">{association.association_type.name}</td>
             {#if association.substitute.length !== 0}
               <td class="p-4">{association.substitute.name}</td>
@@ -227,9 +218,7 @@
     {:else if activeItem === "IT"}
       <DetailTable headers={["IT system", "Kontornavn", "Dato"]}>
         {#each org.itusers as ituser}
-          <tr
-            class="p-4 leading-5 border border-l-2 border-slate-300 text-secondary text-sm"
-          >
+          <tr class="p-4 leading-5 border-t border-slate-300 text-secondary text-sm">
             <td class="p-4">{ituser.itsystem.name}</td>
             <td class="p-4">{ituser.user_key}</td>
             <ValidityTableCell validity={ituser.validity} />
@@ -239,9 +228,7 @@
     {:else if activeItem === "Roller"}
       <DetailTable headers={["Navn", "Rolletype", "Dato"]}>
         {#each org.roles as role}
-          <tr
-            class="p-4 leading-5 border border-l-2 border-slate-300 text-secondary text-sm"
-          >
+          <tr class="p-4 leading-5 border-t border-slate-300 text-secondary text-sm">
             <td class="p-4">{role.employee[0].name}</td>
             <td class="p-4">{role.role_type.name}</td>
             <ValidityTableCell validity={role.validity} />
@@ -253,9 +240,7 @@
         headers={["Navn", "Lederansvar", "Ledertype", "Lederniveau", "Dato"]}
       >
         {#each org.managers as manager}
-          <tr
-            class="p-4 leading-5 border border-l-2 border-slate-300 text-secondary text-sm"
-          >
+          <tr class="p-4 leading-5 border-t border-slate-300 text-secondary text-sm">
             <td class="p-4">{manager.employee[0].name}</td>
             <td class="p-4">
               {#each manager.responsibilities as responsibility}
