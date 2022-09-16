@@ -75,6 +75,7 @@
 {:then}
   <div use:floatingRef>
     <input
+      required
       placeholder="Vælg organisation"
       on:focus={() => {
         isFocused = true

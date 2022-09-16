@@ -10,7 +10,6 @@
   let orgLevel: string
   let orgType: string
   let orgNumber: string
-  let createStatus: number
 
   const fetchDropdownItems = async () => {
     const query = `
@@ -31,17 +30,23 @@
   }
 
   const createOrg = async () => {
-    const x = postRest(`ou/create`, {
+    const res = await postRest(`ou/create`, {
       name: name,
       parent: { uuid: parentOrg.uuid },
       org_unit_level: { uuid: orgLevel },
       org_unit_type: { uuid: orgType },
       validity: {
+        // End format YYYY-mm-dd
         from: startDate.toISOString().split("T")[0],
         to: endDate ? endDate.toISOString().split("T")[0] : undefined,
       },
     })
-    createStatus = await x.status
+    if (res.status === 201) {
+      // Closes the hidden checkbox controlling the open state
+      document.getElementById("create-org-modal").checked = false
+    } else {
+      console.log(res)
+    }
   }
 </script>
 
@@ -53,7 +58,7 @@
     >
     <h3 class="font-bold text-lg pb-4">Opret enhed</h3>
 
-    <form>
+    <form method="POST" on:submit|preventDefault={createOrg}>
       <div class="flex sm:flex-row flex-col gap-2 pb-4">
         <div class="form-control">
           <div class="label">
@@ -94,7 +99,7 @@
           <div class="label">
             <span class="label-text">Enhedsniveu</span>
           </div>
-          <select class="select select-bordered" bind:value={orgLevel}>
+          <select class="select select-bordered" bind:value={orgLevel} required>
             {#each dropDownItems[0].classes as orgLevel}
               <option value={orgLevel.uuid}>{orgLevel.name}</option>
             {/each}
@@ -111,6 +116,7 @@
               type="text"
               placeholder="Navn"
               class="input input-bordered w-full"
+              required
             />
           </div>
 
@@ -123,13 +129,18 @@
                 bind:value={orgNumber}
                 class="input input-bordered w-full"
                 placeholder="Udfyld eller auto"
+                required
               />
             </div>
             <div>
               <div class="label">
                 <span class="label-text">Enhedstype</span>
               </div>
-              <select class="select select-bordered w-full" bind:value={orgType}>
+              <select
+                class="select select-bordered w-full"
+                bind:value={orgType}
+                required
+              >
                 {#each dropDownItems[1].classes as orgType}
                   <option value={orgType.uuid}>{orgType.name}</option>
                 {/each}
@@ -137,11 +148,9 @@
             </div>
           </div>
         </div>
-        <p class="pb-4">PLACEHOLDER FOR ADRESSER</p>
-        <div class="modal-action" on:click={createOrg()}>
-          <label for={createStatus === 200 ? "create-org-modal" : ""} class="btn"
-            >Opret</label
-          >
+        <!-- TODO: Address support missing -->
+        <div class="modal-action">
+          <button type="submit" class="btn btn-primary">Opret</button>
         </div>
       {/await}
     </form>
