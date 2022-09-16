@@ -4,6 +4,7 @@
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
   import Tabs from "$lib/components/shared/tabs.svelte"
   import DetailTable from "$lib/components/shared/detail_table.svelte"
+  import { activeOrgTab } from "$lib/stores/tab"
 
   $: uuid = $page.params.uuid
 
@@ -118,7 +119,7 @@
   const fetchOrgGraph = async (query: string) => {
     const res = await fetchGraph(query)
     const json = await res.json()
-    console.log(json.data.org_units[0].objects[0])
+
     if (json.data) {
       return json.data.org_units[0].objects[0]
     } else {
@@ -141,8 +142,8 @@
     "Relateret",
   ]
 
-  let activeItem = items[7]
-  const tabChange = (e) => (activeItem = e.detail)
+  let activeItem: string = $activeOrgTab
+  const tabChange = (e: CustomEvent) => ($activeOrgTab = activeItem = e.detail)
 </script>
 
 <div class="px-10">
@@ -167,15 +168,15 @@
         headers={["Enhed", "Enhedstype", "Enhedsniveau", "Overenhed", "Dato"]}
       >
         <tr
-          class="px-4 py-4 leading-5 border border-l-2 border-slate-300 text-secondary text-sm"
+          class="p-4 leading-5 border border-l-2 border-slate-300 text-secondary text-sm"
         >
-          <td class="px-4 py-4">{org.name}</td>
-          <td class="px-4 py-4">{org.unit_type.name}</td>
-          <td class="px-4 py-4">{org.org_unit_level.name}</td>
+          <td class="p-4">{org.name}</td>
+          <td class="p-4">{org.unit_type.name}</td>
+          <td class="p-4">{org.org_unit_level.name}</td>
           {#if org.parent[0]}
-            <td class="px-4 py-4">{org.parent[0].name}</td>
+            <td class="p-4">{org.parent[0].name}</td>
           {:else}
-            <td class="px-4 py-4">Ingen overenhed</td>
+            <td class="p-4">Ingen overenhed</td>
           {/if}
           <ValidityTableCell validity={org.validity} />
         </tr>
@@ -184,10 +185,10 @@
       <DetailTable headers={["Adressetype", "Adresse", "Dato"]}>
         {#each org.addresses as address, i}
           <tr
-            class="px-4 py-4 leading-5 border border-l-2 border-slate-300 text-secondary text-sm"
+            class="p-4 leading-5 border border-l-2 border-slate-300 text-secondary text-sm"
           >
-            <td class="px-4 py-4">{address.address_type.name}</td>
-            <td class="px-4 py-4">{address.name}</td>
+            <td class="p-4">{address.address_type.name}</td>
+            <td class="p-4">{address.name}</td>
             <ValidityTableCell validity={address.validity} />
           </tr>
         {/each}
@@ -196,11 +197,11 @@
       <DetailTable headers={["Navn", "Stillingbetegnelse", "Engagementstype", "Dato"]}>
         {#each org.engagements as engagement, i}
           <tr
-            class="px-4 py-4 leading-5 border border-l-2 border-slate-300 text-secondary text-sm"
+            class="py-4 leading-5 border border-l-2 border-slate-300 text-secondary text-sm"
           >
-            <td class="px-4 py-4">{engagement.employee[0].name}</td>
-            <td class="px-4 py-4">{engagement.job_function.name}</td>
-            <td class="px-4 py-4">{engagement.engagement_type.name}</td>
+            <td class="p-4">{engagement.employee[0].name}</td>
+            <td class="p-4">{engagement.job_function.name}</td>
+            <td class="p-4">{engagement.engagement_type.name}</td>
             <ValidityTableCell validity={engagement.validity} />
           </tr>
         {/each}
@@ -209,13 +210,13 @@
       <DetailTable headers={["Navn", "Tilknytningsrolle", "Stedfortræder", "Dato"]}>
         {#each org.associations as association}
           <tr
-            class="px-4 py-4 leading-5 border border-l-2 border-slate-300 text-secondary text-sm"
+            class="p-4 leading-5 border border-l-2 border-slate-300 text-secondary text-sm"
           >
-            <td class="px-4 py-4">{association.employee[0].name}</td>
+            <td class="p-4">{association.employee[0].name}</td>
             <!-- <td>{engagement.uuid}</td> -->
-            <td class="px-4 py-4">{association.association_type.name}</td>
+            <td class="p-4">{association.association_type.name}</td>
             {#if association.substitute.length !== 0}
-              <td class="px-4 py-4">{association.substitute.name}</td>
+              <td class="p-4">{association.substitute.name}</td>
             {:else}
               <td />
             {/if}
@@ -227,10 +228,10 @@
       <DetailTable headers={["IT system", "Kontornavn", "Dato"]}>
         {#each org.itusers as ituser}
           <tr
-            class="px-4 py-4 leading-5 border border-l-2 border-slate-300 text-secondary text-sm"
+            class="p-4 leading-5 border border-l-2 border-slate-300 text-secondary text-sm"
           >
-            <td class="px-4 py-4">{ituser.itsystem.name}</td>
-            <td class="px-4 py-4">{ituser.user_key}</td>
+            <td class="p-4">{ituser.itsystem.name}</td>
+            <td class="p-4">{ituser.user_key}</td>
             <ValidityTableCell validity={ituser.validity} />
           </tr>
         {/each}
@@ -239,10 +240,10 @@
       <DetailTable headers={["Navn", "Rolletype", "Dato"]}>
         {#each org.roles as role}
           <tr
-            class="px-4 py-4 leading-5 border border-l-2 border-slate-300 text-secondary text-sm"
+            class="p-4 leading-5 border border-l-2 border-slate-300 text-secondary text-sm"
           >
-            <td class="px-4 py-4">{role.employee[0].name}</td>
-            <td class="px-4 py-4">{role.role_type.name}</td>
+            <td class="p-4">{role.employee[0].name}</td>
+            <td class="p-4">{role.role_type.name}</td>
             <ValidityTableCell validity={role.validity} />
           </tr>
         {/each}
@@ -253,16 +254,16 @@
       >
         {#each org.managers as manager}
           <tr
-            class="px-4 py-4 leading-5 border border-l-2 border-slate-300 text-secondary text-sm"
+            class="p-4 leading-5 border border-l-2 border-slate-300 text-secondary text-sm"
           >
-            <td class="px-4 py-4">{manager.employee[0].name}</td>
-            <td class="px-4 py-4">
+            <td class="p-4">{manager.employee[0].name}</td>
+            <td class="p-4">
               {#each manager.responsibilities as responsibility}
                 {responsibility.name} <br />
               {/each}
             </td>
-            <td class="px-4 py-4">{manager.manager_type.name}</td>
-            <td class="px-4 py-4">{manager.manager_level.name}</td>
+            <td class="p-4">{manager.manager_type.name}</td>
+            <td class="p-4">{manager.manager_level.name}</td>
             <ValidityTableCell validity={manager.validity} />
           </tr>
         {/each}
