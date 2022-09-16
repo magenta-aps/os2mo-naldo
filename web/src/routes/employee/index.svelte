@@ -7,7 +7,6 @@
   let cardView = true
   let input: string
   let allEmployees: any[] // Acts as a cache for fetchEmployees()
-  let refreshEmployees: Promise<[]>
 
   const query = `
       query {

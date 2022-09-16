@@ -6,20 +6,24 @@
 
   export let validity: Validity
 
-  const formatDate = (date: string): Date => {
-    return new Date(date).toLocaleString("da-DK", {
-      dateStyle: "long",
+  const formatDate = (date: string): string => {
+    const dt = new Date(date).toLocaleDateString("da-DK", {
+      dateStyle: "short",
     })
+
+    return dt.split(".").join("-")
   }
 </script>
 
-<td>
+<td class="whitespace-nowrap px-4 py-2">
   <div>
-    Fra {formatDate(validity.from)}
+    <span class="text-slate-600 font-light inline-block min-w-[2.25rem]">Start</span>
+    {formatDate(validity.from)}
   </div>
-  {#if validity.to}
-    <div>
-      Til {formatDate(validity.to)}
-    </div>
-  {/if}
+  <div>
+    <span class="text-slate-600 font-light inline-block min-w-[2.25rem]">Slut</span>
+    {#if validity.to}
+      {formatDate(validity.to)}
+    {/if}
+  </div>
 </td>

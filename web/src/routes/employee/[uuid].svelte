@@ -91,15 +91,7 @@ query {
     const res = await fetchGraph(query($page.params.uuid))
     const json = await res.json()
 
-    console.log(json.data.employees[0].objects[0])
-
     return json.data.employees[0].objects[0]
-  }
-
-  const formatDate = (date: string): Date => {
-    return new Date(date).toLocaleString("da-DK", {
-      dateStyle: "long",
-    })
   }
 
   // Tabs
@@ -115,7 +107,7 @@ query {
 
   let items = Object.values(itemCategory)
   let activeItem = items[5]
-  const tabChange = (e) => (activeItem = e.detail)
+  const tabChange = (e: CustomEvent) => (activeItem = e.detail)
 </script>
 
 <div class="px-12 pt-6">

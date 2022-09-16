@@ -23,7 +23,7 @@
       class="drawer-toggle"
       bind:checked={drawerToggled}
     />
-    <div class="drawer-content flex flex-col">
+    <div class="drawer-content flex flex-col h-auto">
       <!-- Page content here -->
       {#if $isAuth}
         <slot />
