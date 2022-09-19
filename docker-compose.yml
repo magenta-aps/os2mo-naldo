@@ -1,24 +1,17 @@
 version: "3.7"
 
 services:
-  prod: # Run docker-compose up -d --build
+  web:
     build:
       context: .
       dockerfile: docker/web.Dockerfile
-      target: prod
-    ports:
-      - "127.0.0.1:1337:80"
-    restart: unless-stopped
-
-  dev:
-    build:
-      context: .
-      dockerfile: docker/web.Dockerfile
-      target: dev # dev, build, prod
-    restart: on-failure
+      target: dev # dev, prod
+    environment:
+      PUBLIC_BASE_URL: http://localhost:5000
     ports:
       - 5173:5173   # dev
       - 24678:24678 # hot module reloading
     volumes:
       - ./web:/app
       - /src/app/node_modules
+    restart: on-failure

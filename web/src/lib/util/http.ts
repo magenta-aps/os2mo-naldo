@@ -1,8 +1,9 @@
+import { env } from "$env/dynamic/public"
 import { keycloak } from "$lib/util/keycloak"
 
 export const fetchRest = async (path: string) => {
   const token = keycloak ? keycloak.token : "Keycloak disabled"
-  return await fetch(`http://localhost:5001/service/${path}`, {
+  return await fetch(`${env.PUBLIC_BASE_URL}/service/${path}`, {
     headers: {
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
@@ -12,7 +13,7 @@ export const fetchRest = async (path: string) => {
 
 export const fetchGraph = async (query: string): Promise<Response> => {
   const token = keycloak ? keycloak.token : "Keycloak disabled"
-  return await fetch("http://localhost:5000/graphql", {
+  return await fetch(`${env.PUBLIC_BASE_URL}/graphql`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
