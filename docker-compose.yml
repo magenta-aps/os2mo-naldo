@@ -1,15 +1,25 @@
 version: "3.7"
 
 services:
-  web:
+  prod:
     build:
       context: .
       dockerfile: docker/web.Dockerfile
-      target: dev # dev, prod
+      target: prod
     environment:
       PUBLIC_BASE_URL: http://localhost:5000
     ports:
       - 4173:3000   # prod - node
+    restart: on-failure
+
+  dev:
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+      target: dev
+    environment:
+      PUBLIC_BASE_URL: http://localhost:5000
+    ports:
       - 5173:5173   # dev
       - 24678:24678 # hot module reloading
     volumes:
