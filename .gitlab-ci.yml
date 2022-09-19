@@ -1,5 +1,24 @@
+variables:
+  DOCKERFILE: ${CI_PROJECT_DIR}/docker/web.Dockerfile
+  RELEASE_REGISTRY: docker.io
+  RELEASE_REGISTRY_IMAGE: index.docker.io/magentaaps/os2mo-naldo
+  IMAGE_SHA: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
+
+include:
+  - project: "labs/salt-automation"
+    ref: "master"
+    file: "/gitlab-ci-templates/common/conventional-commits.v1.yml"
+  - project: "labs/salt-automation"
+    ref: "master"
+    file: "/gitlab-ci-templates/common/docker-build.v1.yml"
+  - project: "labs/salt-automation"
+    ref: "master"
+    file: "/gitlab-ci-templates/common/docker-release.v1.yml"
+
 stages: 
   - lint
+  - build
+  - release
   - deploy
 
 Pre-commit:
