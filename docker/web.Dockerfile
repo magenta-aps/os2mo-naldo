@@ -18,4 +18,8 @@ FROM base as prod
 
 RUN yarn build
 
+# FIXME: Hack to solve this https://github.com/sveltejs/kit/issues/3726
+RUN mkdir /app/build/client/new
+RUN mv /app/build/client/_app /app/build/client/new
+
 CMD node /app/build
