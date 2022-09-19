@@ -1,11 +1,13 @@
 <script lang="ts">
+  import { base } from "$app/paths"
+
   import OrgTree from "$lib/components/org/tree/org_tree.svelte"
   import { isAuth } from "$lib/stores/auth"
 </script>
 
 <ul class="menu p-4 overflow-y-auto bg-base-100 text-base-content">
   <!-- Sidebar content here -->
-  <li class="mb-2"><a href="/employee">Medarbejdere</a></li>
+  <li class="mb-2"><a href="{base}/employee">Medarbejdere</a></li>
 
   <div class="divider" />
 

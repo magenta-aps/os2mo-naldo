@@ -4,6 +4,7 @@
   import { goto } from "$app/navigation"
   import { offset, flip, shift } from "@floating-ui/dom"
   import { createFloatingActions } from "svelte-floating-ui"
+  import { base } from "$app/paths"
 
   const [floatingRef, floatingContent] = createFloatingActions({
     strategy: "absolute",
@@ -58,7 +59,7 @@
                       }}
                     >
                       <th class="text-neutral">
-                        <a href={`/employee/${result.uuid}`}>
+                        <a href={`${base}/employee/${result.uuid}`}>
                           {result.name}
                         </a>
                       </th>

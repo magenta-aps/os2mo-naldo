@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { base } from "$app/paths"
+
   // TODO: Get the employee interface from Strawberry
   export let employees: any[]
 </script>
@@ -30,7 +32,7 @@
           </td>
           <td>{employee.cpr_no}</td>
           <th>
-            <a href={`employee/${employee.uuid}`}>
+            <a href={`${base}/employee/${employee.uuid}`}>
               <button class="btn btn-xs">detaljer</button>
             </a>
           </th>
