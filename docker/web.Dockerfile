@@ -1,6 +1,6 @@
 FROM node:16-alpine AS base
 
-WORKDIR /app/web
+WORKDIR /app
 
 COPY web/package.json web/yarn.lock ./
 
@@ -13,12 +13,9 @@ FROM base as dev
 
 CMD yarn dev --host
 
-# --- BUILD ---
-FROM base as build
+# --- PROD ---
+FROM base as prod
 
 RUN yarn build
 
-# --- PROD ---
-FROM nginx:1.19-alpine AS prod
-
-COPY --from=build /app/web/build /usr/share/nginx/html/
+CMD node /app/build

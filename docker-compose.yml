@@ -1,22 +1,11 @@
 version: "3.7"
 
 services:
-  prod: # Run docker-compose up -d --build
+  web:
     build:
       context: .
       dockerfile: docker/web.Dockerfile
-      target: prod
-    environment:
-      PUBLIC_BASE_URL: http://localhost:5000
-    ports:
-      - "127.0.0.1:1337:80"
-    restart: unless-stopped
-
-  dev:
-    build:
-      context: .
-      dockerfile: docker/web.Dockerfile
-      target: dev # dev, build, prod
+      target: dev # dev, prod
     environment:
       PUBLIC_BASE_URL: http://localhost:5000
     ports:
