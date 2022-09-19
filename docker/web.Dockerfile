@@ -11,15 +11,19 @@ COPY web .
 # --- DEV ---
 FROM base as dev
 
+ENV NODE_ENV=development
+
 CMD yarn dev --host
 
 # --- PROD ---
 FROM base as prod
 
+ENV NODE_ENV=production
+
 RUN yarn build
 
 # FIXME: Hack to solve this https://github.com/sveltejs/kit/issues/3726
-RUN mkdir /app/build/client/new
-RUN mv /app/build/client/_app /app/build/client/new
+RUN mkdir build/client/new
+RUN mv build/client/_app build/client/favicon.png build/client/new
 
 CMD node /app/build

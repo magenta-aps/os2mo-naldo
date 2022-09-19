@@ -5,14 +5,14 @@ services:
     build:
       context: .
       dockerfile: docker/web.Dockerfile
-      target: prod # dev, prod
+      target: dev # dev, prod
     environment:
       PUBLIC_BASE_URL: http://localhost:5000
     ports:
-      - 5173:3000
-      # - 5173:5173   # dev
+      - 4173:3000   # prod - node
+      - 5173:5173   # dev
       - 24678:24678 # hot module reloading
-    # volumes:
-    #   - ./web:/app
-    #   - /src/app/node_modules
+    volumes:
+      - ./web:/app
+      - /src/app/node_modules
     restart: on-failure
