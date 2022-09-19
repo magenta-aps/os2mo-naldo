@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { base } from "$app/paths"
+
   import { page } from "$app/stores"
   import { fetchGraph } from "$lib/util/http"
 
@@ -45,7 +47,7 @@
   }
 </script>
 
-<a href={`/organisation/${uuid}`}>
+<a href={`${base}/organisation/${uuid}`}>
   <li style="padding-left: {indent}px">
     <div class={$page.params.uuid === uuid ? "bg-primary text-primary-content" : ""}>
       {#if loading}

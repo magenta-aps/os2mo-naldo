@@ -2,6 +2,7 @@
   import { logoutKeycloak, keycloak } from "$lib/util/keycloak"
   import { isAuth } from "$lib/stores/auth"
   import Search from "$lib/components/search.svelte"
+  import { base } from "$app/paths"
 
   const fullName = (): string => {
     if (keycloak && keycloak.idTokenParsed) {
@@ -40,7 +41,7 @@
 
   <div class="flex-1 z-10">
     <div class="flex-none">
-      <a class="btn btn-ghost normal-case text-xl" href="/">OS2mo</a>
+      <a class="btn btn-ghost normal-case text-xl" href="{base}/">OS2mo</a>
     </div>
     <div class="mx-auto">
       <Search />
