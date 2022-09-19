@@ -14,6 +14,8 @@ include:
   - project: "labs/salt-automation"
     ref: "master"
     file: "/gitlab-ci-templates/common/docker-release.v1.yml"
+  - project: "labs/salt-automation"
+    file: "gitlab-ci-templates/common/config-updater-meta.v1.yml"
 
 stages: 
   - lint
@@ -42,3 +44,22 @@ Pages:
       - public
   # only:
   #   - master
+
+Deploy to dev:
+  extends: .release-to-dev
+  needs:
+    - Release version
+  variables:
+    ENDPOINT: os2mo/flux/naldo/update-dev
+
+Deploy to test:
+  extends: .release-to-test
+  needs: []
+  variables:
+    ENDPOINT: os2mo/flux/naldo/update-test
+
+Deploy to prod:
+  extends: .release-to-prod
+  needs: []
+  variables:
+    ENDPOINT: os2mo/flux/naldo/update-prod
