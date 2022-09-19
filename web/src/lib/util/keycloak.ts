@@ -1,7 +1,8 @@
 import Keycloak from "keycloak-js"
 import { isAuth } from "$lib/stores/auth"
+import { env } from "$env/dynamic/public"
 
-const instance = "http://localhost:5000/service/keycloak.json"
+const instance = `${env.PUBLIC_BASE_URL}/service/keycloak.json`
 
 export let keycloak: Keycloak
 

@@ -6,6 +6,8 @@ services:
       context: .
       dockerfile: docker/web.Dockerfile
       target: prod
+    environment:
+      PUBLIC_BASE_URL: http://localhost:5000
     ports:
       - "127.0.0.1:1337:80"
     restart: unless-stopped
@@ -15,10 +17,12 @@ services:
       context: .
       dockerfile: docker/web.Dockerfile
       target: dev # dev, build, prod
-    restart: on-failure
+    environment:
+      PUBLIC_BASE_URL: http://localhost:5000
     ports:
       - 5173:5173   # dev
       - 24678:24678 # hot module reloading
     volumes:
       - ./web:/app
       - /src/app/node_modules
+    restart: on-failure
