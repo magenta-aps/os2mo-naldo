@@ -6,6 +6,7 @@
   import { onMount } from "svelte"
   import { isAuth } from "$lib/stores/auth"
   import { initKeycloak } from "$lib/util/keycloak"
+  import Favicon from "$lib/assets/favicon.png"
 
   let drawerToggled: boolean
 
@@ -13,6 +14,10 @@
     await initKeycloak()
   })
 </script>
+
+<svelte:head>
+  <link rel="icon" type="image/png" href={Favicon} />
+</svelte:head>
 
 <div class="flex flex-col h-screen">
   <Navbar />
