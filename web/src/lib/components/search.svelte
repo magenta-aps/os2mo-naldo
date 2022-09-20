@@ -54,7 +54,7 @@
                     <tr
                       class="hover cursor-pointer"
                       on:click={() => {
-                        goto(`/employee/${result.uuid}`)
+                        goto(`${base}/employee/${result.uuid}`)
                         input = ""
                       }}
                     >
