@@ -85,5 +85,10 @@
     {/if}
   </div>
 {:else}
-  <input type="text" disabled placeholder="Søg" class="input w-72" />
+  <input
+    type="text"
+    disabled
+    placeholder="Søg"
+    class="input input-bordered w-80 h-8 text-neutral"
+  />
 {/if}
