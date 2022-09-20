@@ -6,11 +6,9 @@
   import DetailTable from "$lib/components/shared/detail_table.svelte"
   import { activeOrgTab } from "$lib/stores/tab"
 
-  $: uuid = $page.params.uuid
-
   $: query = `
     query {
-      org_units(uuids: "${uuid}") {
+      org_units(uuids: "${$page.params.uuid}") {
         uuid
         objects {
           name

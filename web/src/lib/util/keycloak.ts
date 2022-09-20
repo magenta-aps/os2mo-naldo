@@ -19,7 +19,7 @@ export const initKeycloak = async () => {
   keycloak = new Keycloak(instance)
   keycloak
     .init({ onLoad: "login-required" })
-    .then(function (authenticated) {
+    .then((authenticated) => {
       isAuth.set(true)
       console.info("Authenticated:", authenticated)
 
@@ -30,7 +30,7 @@ export const initKeycloak = async () => {
         })
       }, 5000)
     })
-    .catch(function (error) {
+    .catch((error) => {
       isAuth.set(false)
       console.error("Failed to auth:", error)
       alert("failed to auth")
