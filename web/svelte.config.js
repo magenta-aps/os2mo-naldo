@@ -14,6 +14,9 @@ const config = {
     paths: {
       base: isDev ? "" : "/new",
     },
+    files: {
+      assets: isDev ? "static" : "static/new",
+    },
   },
 }
 
