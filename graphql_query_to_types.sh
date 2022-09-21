@@ -1,7 +1,4 @@
 #!/bin/bash
-quicktype --graphql-introspect http://localhost:5000/graphql/v1 \
-          --graphql-schema temp.gqlschema
-
 echo -e "
     query {
       org_units(uuids: "asdf") {
@@ -37,8 +34,12 @@ echo -e "
         }
       }
     }
-" > query.graphql
+" > temp_query.graphql
 
-quicktype --src-lang graphql --lang ts \
-          --graphql-schema temp.gqlschema \
-          query.graphql --just-types
+quicktype --src-lang graphql \
+          --lang ts --just-types \
+          --graphql-introspect http://localhost:5000/graphql/v1 \
+          query.graphql 
+
+# FIXME: Should probably be piped in instead of a weird temp file
+rm query.graphql
