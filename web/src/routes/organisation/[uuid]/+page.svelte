@@ -169,8 +169,8 @@
           <td class="p-4">{org.name}</td>
           <td class="p-4">{org.unit_type.name}</td>
           <td class="p-4">{org.org_unit_level.name}</td>
-          {#if org.parent[0]}
-            <td class="p-4">{org.parent[0].name}</td>
+          {#if org.parent}
+            <td class="p-4">{org.parent.name}</td>
           {:else}
             <td class="p-4">Ingen overenhed</td>
           {/if}
