@@ -17,7 +17,7 @@
           />
         </figure>
         <div class="card-body items-center text-center">
-          <h2 class="card-title text-sm">{employee.name}</h2>
+          <h2 class="card-title">{employee.name}</h2>
           <p>{employee.cpr_no}</p>
         </div>
       </a>

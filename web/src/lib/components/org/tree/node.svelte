@@ -49,19 +49,14 @@
 
 <a class="hover:no-underline" href={`${base}/organisation/${uuid}`}>
   <li style="padding-left: {indent}px">
-    <div class={$page.params.uuid === uuid ? "bg-primary text-primary-content" : ""}>
+    <div class={$page.params.uuid === uuid ? "bg-accent" : ""}>
       {#if loading}
-        <div
-          class="animate-spin rounded-full h-5 w-5 border-b-4 {$page.params.uuid ===
-          uuid
-            ? 'border-primary-content'
-            : 'border-primary'}"
-        />
+        <div class="animate-spin rounded-full h-4 w-4 border-b-4 border-secondary" />
       {:else if children.length}
         {#if open}
-          <div class="h-5 w-5" on:click={toggleOpen}>
+          <div class="h-4 w-4" on:click={toggleOpen}>
             <svg
-              class={$page.params.uuid === uuid ? "fill-base-100" : "fill-neutral"}
+              class="fill-secondary"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 512 512"
               ><path
@@ -70,9 +65,9 @@
             >
           </div>
         {:else}
-          <div class="h-5 w-5" on:click={toggleOpen}>
+          <div class="h-4 w-4" on:click={toggleOpen}>
             <svg
-              class={$page.params.uuid === uuid ? "fill-base-100" : "fill-neutral"}
+              class="fill-secondary"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 512 512"
               ><path
@@ -82,7 +77,7 @@
           </div>
         {/if}
       {/if}
-      <p class={$page.params.uuid === uuid ? "text-base-100" : "text-neutral"}>
+      <p class="text-secondary">
         {name}
       </p>
     </div>

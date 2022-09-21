@@ -16,7 +16,7 @@
           /></svg
         >
       </span>
-      Opret enhed
+      <p class="text-base">Opret enhed</p>
     </label>
     <label class="btn btn-sm btn-primary text-base-100 normal-case font-light" for="">
       <span class="inline-block align-middle pr-2">
@@ -31,7 +31,7 @@
           /></svg
         >
       </span>
-      Omdøb enhed
+      <p class="text-base">Omdøb enhed</p>
     </label>
     <label class="btn btn-sm btn-primary text-base-100 normal-case font-light" for="">
       <span class="inline-block align-middle pr-2">
@@ -45,7 +45,7 @@
           /></svg
         >
       </span>
-      Flyt enhed
+      <p class="text-base">Flyt enhed</p>
     </label>
     <label class="btn btn-sm btn-primary text-base-100 normal-case font-light" for="">
       <span class="inline-block align-middle pr-2">
@@ -60,7 +60,7 @@
           /></svg
         >
       </span>
-      Afslut enhed
+      <p class="text-base">Afslut enhed</p>
     </label>
   </div>
 </div>

@@ -35,7 +35,7 @@
       on:blur={delayedUnfocus}
       type="text"
       placeholder="Søg"
-      class="input input-bordered w-80 h-8 text-neutral"
+      class="input input-bordered text-base w-80 h-8 text-neutral"
     />
     {#if isFocused && input}
       <div use:floatingContent>
@@ -59,7 +59,7 @@
                       }}
                     >
                       <th class="text-neutral">
-                        <a href={`${base}/employee/${result.uuid}`}>
+                        <a class="text-base" href={`${base}/employee/${result.uuid}`}>
                           {result.name}
                         </a>
                       </th>

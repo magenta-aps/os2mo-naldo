@@ -5,6 +5,7 @@
   import Tabs from "$lib/components/shared/tabs.svelte"
   import DetailTable from "$lib/components/shared/detail_table.svelte"
   import { activeOrgTab } from "$lib/stores/tab"
+  import { base } from "$app/paths"
 
   $: query = `
     query {
@@ -146,11 +147,18 @@
 
 <div class="px-10">
   <!-- TODO: Implement breadcrumbs -->
-  <div class="text-sm py-5 breadcrumbs">
+  <div class="text-base py-5 breadcrumbs">
     <ul>
-      <li>Organisation</li>
-      <li>Kolding Kommune</li>
-      <li>Skole og Børn</li>
+      <li>
+        <a href="{base}/organisation/f06ee470-9f17-566f-acbe-e938112d46d9">
+          Kolding Kommune
+        </a>
+      </li>
+      <li>
+        <a href="{base}/organisation/7a8e45f7-4de0-44c8-990f-43c0565ee505">
+          Skole og Børn
+        </a>
+      </li>
       <li>Social Indsats</li>
     </ul>
   </div>
@@ -159,13 +167,13 @@
       <div class="animate-spin rounded-full h-32 w-32 border-b-8 border-primary" />
     </div>
   {:then org}
-    <h1 class="text-2xl pb-4">{org.name}</h1>
+    <h1 class="pb-4">{org.name}</h1>
     <Tabs {activeItem} {items} on:tabChange={tabChange} />
     {#if activeItem === "Enhed"}
       <DetailTable
         headers={["Enhed", "Enhedstype", "Enhedsniveau", "Overenhed", "Dato"]}
       >
-        <tr class="p-4 leading-5 border-t border-slate-300 text-secondary text-sm">
+        <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
           <td class="p-4">{org.name}</td>
           <td class="p-4">{org.unit_type.name}</td>
           <td class="p-4">{org.org_unit_level.name}</td>
@@ -179,8 +187,8 @@
       </DetailTable>
     {:else if activeItem === "Adresser"}
       <DetailTable headers={["Adressetype", "Adresse", "Dato"]}>
-        {#each org.addresses as address, i}
-          <tr class="p-4 leading-5 border-t border-slate-300 text-secondary text-sm">
+        {#each org.addresses as address}
+          <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
             <td class="p-4">{address.address_type.name}</td>
             <td class="p-4">{address.name}</td>
             <ValidityTableCell validity={address.validity} />
@@ -189,8 +197,8 @@
       </DetailTable>
     {:else if activeItem === "Engagementer"}
       <DetailTable headers={["Navn", "Stillingbetegnelse", "Engagementstype", "Dato"]}>
-        {#each org.engagements as engagement, i}
-          <tr class="py-4 leading-5 border-t border-slate-300 text-secondary text-sm">
+        {#each org.engagements as engagement}
+          <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
             <td class="p-4">{engagement.employee[0].name}</td>
             <td class="p-4">{engagement.job_function.name}</td>
             <td class="p-4">{engagement.engagement_type.name}</td>
@@ -201,7 +209,7 @@
     {:else if activeItem === "Tilknytninger"}
       <DetailTable headers={["Navn", "Tilknytningsrolle", "Stedfortræder", "Dato"]}>
         {#each org.associations as association}
-          <tr class="p-4 leading-5 border-t border-slate-300 text-secondary text-sm">
+          <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
             <td class="p-4">{association.employee[0].name}</td>
             <td class="p-4">{association.association_type.name}</td>
             {#if association.substitute.length !== 0}
@@ -216,7 +224,7 @@
     {:else if activeItem === "IT"}
       <DetailTable headers={["IT system", "Kontornavn", "Dato"]}>
         {#each org.itusers as ituser}
-          <tr class="p-4 leading-5 border-t border-slate-300 text-secondary text-sm">
+          <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
             <td class="p-4">{ituser.itsystem.name}</td>
             <td class="p-4">{ituser.user_key}</td>
             <ValidityTableCell validity={ituser.validity} />
@@ -226,7 +234,7 @@
     {:else if activeItem === "Roller"}
       <DetailTable headers={["Navn", "Rolletype", "Dato"]}>
         {#each org.roles as role}
-          <tr class="p-4 leading-5 border-t border-slate-300 text-secondary text-sm">
+          <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
             <td class="p-4">{role.employee[0].name}</td>
             <td class="p-4">{role.role_type.name}</td>
             <ValidityTableCell validity={role.validity} />
@@ -238,7 +246,7 @@
         headers={["Navn", "Lederansvar", "Ledertype", "Lederniveau", "Dato"]}
       >
         {#each org.managers as manager}
-          <tr class="p-4 leading-5 border-t border-slate-300 text-secondary text-sm">
+          <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
             <td class="p-4">{manager.employee[0].name}</td>
             <td class="p-4">
               {#each manager.responsibilities as responsibility}
