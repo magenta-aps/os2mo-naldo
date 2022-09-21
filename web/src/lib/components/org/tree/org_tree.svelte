@@ -28,7 +28,7 @@
     const json = await res.json()
     if (json.data) {
       for (let org of json.data.org_units) {
-        if (!org.objects[0].parent.length) {
+        if (org.objects[0].parent === null) {
           orgTree.push({
             uuid: org.uuid,
             name: org.objects[0].name,
@@ -37,7 +37,11 @@
         }
       }
     } else {
-      throw new Error(json.errors[0].message)
+      throw new Error(
+        json.errors
+          ? json.errors[0].message
+          : `Something unknown went wrong in org_tree.svelte`
+      )
     }
   }
 </script>
