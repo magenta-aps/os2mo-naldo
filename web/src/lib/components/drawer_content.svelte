@@ -7,7 +7,9 @@
 
 <ul class="menu p-4 overflow-y-auto bg-base-100 text-base-content">
   <!-- Sidebar content here -->
-  <li class="mb-2"><a href="{base}/employee">Medarbejdere</a></li>
+  <li class="mb-2">
+    <a class="hover:no-underline" href="{base}/employee">Medarbejdere</a>
+  </li>
 
   <div class="divider" />
 

@@ -21,7 +21,9 @@
       >
     </label>
 
-    <a class="btn btn-ghost normal-case text-xl" href="{base}/">OS2mo</a>
+    <a class="btn btn-ghost normal-case text-xl hover:no-underline" href="{base}/"
+      >OS2mo</a
+    >
   </div>
 
   <div class="navbar-center">

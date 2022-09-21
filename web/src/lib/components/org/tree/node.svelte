@@ -47,7 +47,7 @@
   }
 </script>
 
-<a href={`${base}/organisation/${uuid}`}>
+<a class="hover:no-underline" href={`${base}/organisation/${uuid}`}>
   <li style="padding-left: {indent}px">
     <div class={$page.params.uuid === uuid ? "bg-primary text-primary-content" : ""}>
       {#if loading}
