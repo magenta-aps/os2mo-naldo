@@ -37,8 +37,7 @@ module.exports = {
         success: "#368632",
         info: "#1053AB",
         warning: "#FBBD23",
-      },
-
+      }
     }],
   }
 }
