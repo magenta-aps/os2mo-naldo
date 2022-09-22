@@ -2,7 +2,11 @@
 module.exports = {
   content: ['./src/**/*.{html,js,svelte,ts}'],
   theme: {
-    extend: {},
+    extend: {
+      textUnderlineOffset: {
+        5: '5px'
+      }
+    },
   },
   plugins: [
     require('daisyui')

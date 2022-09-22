@@ -106,7 +106,7 @@ query {
   }
 
   let items = Object.values(itemCategory)
-  let activeItem = items[5]
+  let activeItem = items[0]
   const tabChange = (e: CustomEvent) => (activeItem = e.detail)
 </script>
 

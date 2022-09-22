@@ -25,7 +25,7 @@
   }
 </script>
 
-<p>{fullName()}</p>
+<p class="text-base">{fullName()}</p>
 <div class="dropdown dropdown-end">
   <div tabindex="0" class="btn btn-ghost btn-circle avatar placeholder">
     <div class="bg-accent w-8 rounded-full">
@@ -38,7 +38,9 @@
   >
     <li>
       <div class="justify-between">
-        {fullName()}
+        <p class="text-base">
+          {fullName()}
+        </p>
         <span class="badge">{nameBadge()}</span>
       </div>
     </li>

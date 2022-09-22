@@ -3,13 +3,40 @@
 
   import OrgTree from "$lib/components/org/tree/org_tree.svelte"
   import { isAuth } from "$lib/stores/auth"
+  import Icon from "$lib/components/icon.svelte"
 </script>
 
-<ul class="menu p-4 overflow-y-auto bg-base-100 text-base-content">
+<ul class="menu p-4 overflow-y-auto text-base">
   <!-- Sidebar content here -->
-  <li class="mb-2"><a href="{base}/employee">Medarbejdere</a></li>
+  <li>
+    <div class="flex">
+      <Icon type="house" />
+      <a class="hover:no-underline text-secondary" href="{base}/">Hjem</a>
+    </div>
+  </li>
+  <li>
+    <div class="flex">
+      <Icon type="user" />
+      <a class="hover:no-underline text-secondary" href="{base}/employee"
+        >Medarbejdere</a
+      >
+    </div>
+  </li>
+  <li>
+    <div class="flex">
+      <Icon type="sitemap" />
+      <!-- FIXME: Doesn't exist yet  -->
+      <a class="hover:no-underline text-secondary" href="{base}/"
+        >Organisationssammenkobling</a
+      >
+    </div>
+  </li>
+</ul>
 
-  <div class="divider" />
+<div class="divider p-0 m-0 w-full" />
+
+<ul class="menu p-4 overflow-y-auto bg-base-100 text-base-content">
+  <p class="font-bold text-secondary pb-4">Organisationsoverblik</p>
 
   {#if $isAuth}
     <OrgTree />

@@ -10,7 +10,7 @@
 <div class="tabs">
   {#each items as item}
     <div
-      class="tab tab-bordered {item === activeItem
+      class="tab tab-bordered text-base {item === activeItem
         ? 'border-primary text-primary'
         : 'text-secondary'}"
       on:click={() => dispatch("tabChange", item)}
