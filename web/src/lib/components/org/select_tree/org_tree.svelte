@@ -32,7 +32,6 @@
     const json = await res.json()
     if (json.data) {
       for (let org of json.data.org_units) {
-        console.log(org)
         if (org.objects[0].parent === null) {
           orgTree.push({
             uuid: org.uuid,
@@ -76,18 +75,18 @@
   </label>
   <input disabled class="input input-bordered input-sm rounded w-full" />
 {:then}
-  <label for="select-org-tree" class="label">
+  <label for="select-org-tree" class="pb-1">
     <p>Angiv overenhed</p>
   </label>
   <div use:floatingRef>
     <input
-      name="select-org-tree"
+      id="select-org-tree"
       required
       on:focus={() => {
         isFocused = true
       }}
       bind:value={selectedOrg.name}
-      class="input input-bordered input-sm rounded active:input-secondary focus:input-secondary w-full"
+      class="input input-bordered input-sm text-base text-secondary font-normal rounded active:input-primary focus:input-primary w-full active:outline-offset-0 focus:outline-offset-0"
     />
     {#if isFocused}
       <div
