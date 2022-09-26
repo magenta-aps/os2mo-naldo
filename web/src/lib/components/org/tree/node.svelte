@@ -52,7 +52,7 @@
     <div class={$page.params.uuid === uuid ? "bg-accent" : ""}>
       {#if loading}
         <div class="animate-spin rounded-full h-4 w-4 border-b-4 border-secondary" />
-      {:else if children.length}
+      {:else if children && children.length}
         {#if open}
           <div class="h-4 w-4" on:click={toggleOpen}>
             <svg

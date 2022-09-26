@@ -1,8 +1,9 @@
 <script lang="ts">
   import { fetchGraph } from "$lib/util/http"
   import Node from "$lib/components/org/tree/node.svelte"
+  import { success } from "$lib/stores/alert"
 
-  let orgTree: any[] = []
+  let orgTree: any[]
 
   const query = `
     query {
@@ -26,6 +27,8 @@
   const fetchOrgTree = async (query: string) => {
     const res = await fetchGraph(query)
     const json = await res.json()
+
+    orgTree = []
     if (json.data) {
       for (let org of json.data.org_units) {
         if (org.objects[0].parent === null) {
@@ -43,6 +46,11 @@
           : `Something unknown went wrong in org_tree.svelte`
       )
     }
+  }
+
+  // Refreshes the org tree every time a new organisation has been added
+  $: if ($success.type === "organisation") {
+    fetchOrgTree(query)
   }
 </script>
 
