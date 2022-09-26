@@ -1,121 +1,166 @@
 <script lang="ts">
+  import { success, error } from "$lib/stores/alert"
+  import { fetchGraph, postRest } from "$lib/util/http"
   import { DateInput } from "date-picker-svelte"
+  import SelectOrgTree from "$lib/components/org/select_tree/org_tree.svelte"
+  import Error from "$lib/components/alerts/error.svelte"
+  import Icon from "$lib/components/icon.svelte"
+  import Input from "$lib/components/modals/shared/input.svelte"
+  import Select from "$lib/components/modals/shared/select.svelte"
 
   let startDate = new Date()
   let endDate: Date
   let name: string
-  let parentOrgUnit: String
+  let parentOrg: any
+  let orgLevel: string
+  let orgType: string
+  let orgNumber: string
+
+  const fetchDropdownItems = async () => {
+    const query = `
+      query {
+        facets(user_keys: ["org_unit_level", "org_unit_type"]) {
+          uuid
+          user_key
+          classes {
+            name
+            uuid
+          }
+        }
+      }`
+
+    const res = await fetchGraph(query)
+    const json = await res.json()
+    return json.data.facets
+  }
+
+  const createOrg = async () => {
+    const res = await postRest(`ou/create`, {
+      name: name,
+      parent: { uuid: parentOrg.uuid },
+      org_unit_level: { uuid: orgLevel },
+      org_unit_type: { uuid: orgType },
+      validity: {
+        // End format YYYY-mm-dd
+        from: startDate.toISOString().split("T")[0],
+        to: endDate ? endDate.toISOString().split("T")[0] : undefined,
+      },
+    })
+    if (res.status === 201) {
+      // Closes the hidden checkbox controlling the open state
+      const json = await res.json()
+      document.getElementById("create-org-modal").checked = false
+      $success = {
+        message: `${name} er blevet oprettet`,
+        uuid: json,
+        type: "organisation",
+      }
+    } else {
+      const json = await res.json()
+      $error = { message: json.description }
+    }
+  }
 </script>
 
-<!-- Put this part before </body> tag -->
 <input type="checkbox" id="create-org-modal" class="modal-toggle" />
-<div class="modal">
-  <div class="modal-box w-4/5 max-w-2xl">
-    <label for="create-org-modal" class="btn btn-sm btn-circle absolute right-4 top-4"
-      >✕</label
-    >
-    <h3 class="font-bold text-lg pb-4">Opret enhed</h3>
+<label for="create-org-modal" class="modal cursor-pointer">
+  <label class="modal-box rounded-lg p-0 relative" for="">
+    <div class="flex align-center px-6 pt-6 pb-4">
+      <h3 class="flex-1">Opret enhed</h3>
+      <label for="create-org-modal" class="flex justify-end cursor-pointer">
+        <Icon type="xmark" size="24" />
+      </label>
+    </div>
 
-    <form>
-      <div class="flex sm:flex-row flex-col gap-2 pb-4">
+    <div class="divider p-0 m-0 mb-4 w-full" />
+
+    <form method="POST" on:submit|preventDefault={createOrg}>
+      <div class="flex flex-row gap-6 mx-6 mb-4">
         <div class="form-control">
-          <label class="label">
-            <span class="label-text">Startdato</span>
-          </label>
+          <span name="Start date picker" class="pb-1">
+            <p>Startdato</p>
+          </span>
           <DateInput
             bind:value={startDate}
             format={"dd-MM-yyyy"}
-            placeholder={"Startdato"}
+            placeholder={""}
             min={new Date("1/1/1910")}
             max={endDate ? endDate : new Date(new Date().getFullYear() + 50, 0)}
           />
         </div>
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text">Slutdato</span>
-          </label>
+        <div class="flex-1 justify-end form-control">
+          <span name="End date picker" class="pb-1">
+            <p>Slutdato</p>
+          </span>
           <DateInput
             bind:value={endDate}
             format={"dd-MM-yyyy"}
-            placeholder={"Slutdato"}
+            placeholder={""}
             min={startDate}
             max={new Date(new Date().getFullYear() + 50, 0)}
           />
         </div>
       </div>
-      <div class="form-control pb-4 w-full max-w-xl">
-        <label class="label">
-          <span class="label-text">Angiv overenhed</span>
-        </label>
-        <select class="select select-bordered">
-          <option disabled selected>Angiv overenhed</option>
-          <option>1</option>
-          <option>2</option>
-          <option>3</option>
-          <option>4 </option>
-        </select>
+      <div class="form-control mx-6 mb-4">
+        <SelectOrgTree bind:selectedOrg={parentOrg} />
       </div>
 
-      <div class="form-control pb-4 w-full max-w-xl">
-        <label class="label">
-          <span class="label-text">Enhedsniveu</span>
-        </label>
-        <select class="select select-bordered">
-          <option disabled selected>Enhedsniveu</option>
-          <option>1</option>
-          <option>2</option>
-          <option>3</option>
-          <option>4 </option>
-        </select>
-      </div>
+      <!-- TODO: Should have a skeleton for the loading stage -->
+      {#await fetchDropdownItems() then dropDownItems}
+        <div class="mx-6">
+          <div class="form-control mb-4">
+            <Input title="Navn" id="name" bind:value={name} required={true} />
+          </div>
+          <div class="form-control mb-4 w-full">
+            <Select
+              title="Enhedstype"
+              id="unit-type"
+              bind:value={orgType}
+              iterable={dropDownItems[1].classes}
+              required={true}
+            />
+          </div>
 
-      <div class="flex md:flex-row flex-col gap-2 pb-4 w-full max-w-xl">
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text">Navn</span>
-          </label>
-          <input
-            bind:value={name}
-            type="text"
-            placeholder="Navn"
-            class="input input-bordered"
-          />
+          <div class="flex flex-row gap-6 mb-6">
+            <div class="basis-1/2">
+              <Select
+                title="Enhedsniveau"
+                id="unit-level"
+                bind:value={orgLevel}
+                iterable={dropDownItems[0].classes}
+                required={true}
+              />
+            </div>
+            <div class="basis-1/2">
+              <Input title="Enhedsnummer" id="unit-number" bind:value={orgNumber} />
+            </div>
+          </div>
+          <!-- TODO: Address support missing -->
+          <button
+            class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+            type="button">+ Tilføj adresser(*)</button
+          >
         </div>
 
-        <div class="flex flex-row gap-2">
-          <div>
-            <label class="label">
-              <span class="label-text">Enhedsnummer</span>
-            </label>
-            <select class="select select-bordered">
-              <option disabled selected>Enhedsnummer</option>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4 </option>
-            </select>
-          </div>
-          <div>
-            <label class="label">
-              <span class="label-text">Enhedstype</span>
-            </label>
-            <select class="select select-bordered">
-              <option disabled selected>Enhedstype</option>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4 </option>
-            </select>
-          </div>
+        <div class="modal-action p-6 gap-4 bg-slate-100">
+          <!-- TODO: Make button close modal -->
+          <button
+            type="button"
+            class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+          >
+            Annullér
+          </button>
+          <button
+            type="submit"
+            class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+            >Opret enhed</button
+          >
         </div>
-      </div>
-      <p class="pb-4">PLACEHOLDER FOR ADRESSER</p>
-      <div class="modal-action">
-        <label for="create-org-modal" class="btn">Opret</label>
-      </div>
+      {/await}
+      <Error />
     </form>
-  </div>
-</div>
+  </label>
+</label>
 
 <style>
   :root {
@@ -123,5 +168,6 @@
     --date-picker-foreground: hsl(var(--bc));
     --date-picker-highlight-border: hsl(var(--p));
     --date-picker-highlight-shadow: hsl(var(--p));
+    --date-input-width: 220px; /* FIXME: Figure out how to control size with percentages */
   }
 </style>

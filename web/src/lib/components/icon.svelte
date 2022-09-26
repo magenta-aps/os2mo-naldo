@@ -1,23 +1,23 @@
 <script lang="ts">
   enum Icon {
-    HOUSE = "house",
-    USER = "user",
-    SITEMAP = "sitemap",
+    HOUSE = "house", // Used for the home nagivation
+    USER = "user", // Used for the employee navigation
+    SITEMAP = "sitemap", // Used for the connecting organizations navigation
+    XMARK = "xmark", // Used for closing
   }
 
   type IconType = `${Icon}`
 
   export let type: IconType
-  export let height = "20"
-  export let width = "20"
+  export let size = "20"
   export let fill = "secondary"
 </script>
 
 {#if type == Icon.HOUSE}
   <svg
     class="fill-{fill}"
-    {height}
-    {width}
+    height={size}
+    width={size}
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 576 512"
     ><path
@@ -27,8 +27,8 @@
 {:else if type == Icon.USER}
   <svg
     class="fill-{fill}"
-    {height}
-    {width}
+    height={size}
+    width={size}
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 448 512"
     ><path
@@ -38,12 +38,23 @@
 {:else if type == Icon.SITEMAP}
   <svg
     class="fill-{fill}"
-    {height}
-    {width}
+    height={size}
+    width={size}
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 576 512"
     ><path
       d="M208 80c0-26.5 21.5-48 48-48h64c26.5 0 48 21.5 48 48v64c0 26.5-21.5 48-48 48h-8v40H464c30.9 0 56 25.1 56 56v32h8c26.5 0 48 21.5 48 48v64c0 26.5-21.5 48-48 48H464c-26.5 0-48-21.5-48-48V368c0-26.5 21.5-48 48-48h8V288c0-4.4-3.6-8-8-8H312v40h8c26.5 0 48 21.5 48 48v64c0 26.5-21.5 48-48 48H256c-26.5 0-48-21.5-48-48V368c0-26.5 21.5-48 48-48h8V280H112c-4.4 0-8 3.6-8 8v32h8c26.5 0 48 21.5 48 48v64c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V368c0-26.5 21.5-48 48-48h8V288c0-30.9 25.1-56 56-56H264V192h-8c-26.5 0-48-21.5-48-48V80z"
+    /></svg
+  >
+{:else if type == Icon.XMARK}
+  <svg
+    class="fill-{fill}"
+    height={size}
+    width={size}
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 320 512"
+    ><path
+      d="M310.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L160 210.7 54.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L114.7 256 9.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 301.3 265.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L205.3 256 310.6 150.6z"
     /></svg
   >
 {/if}
