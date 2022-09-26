@@ -87,7 +87,7 @@ query {
 `
   }
 
-  const fetchEmployee = async () => {
+  $: fetchEmployee = async () => {
     const res = await fetchGraph(query($page.params.uuid))
     const json = await res.json()
 

@@ -9,27 +9,23 @@
 <ul class="menu p-4 pb-2 overflow-y-auto text-base">
   <!-- Sidebar content here -->
   <li>
-    <div class="flex">
+    <a class="flex" href="{base}/">
       <Icon type="house" />
-      <a class="hover:no-underline text-secondary" href="{base}/">Hjem</a>
-    </div>
+      <div class="hover:no-underline text-secondary">Hjem</div>
+    </a>
   </li>
   <li>
-    <div class="flex">
+    <a class="flex" href="{base}/employee">
       <Icon type="user" />
-      <a class="hover:no-underline text-secondary" href="{base}/employee"
-        >Medarbejdere</a
-      >
-    </div>
+      <div class="hover:no-underline text-secondary">Medarbejdere</div>
+    </a>
   </li>
   <li>
-    <div class="flex">
+    <a class="flex" href="{base}/">
       <Icon type="sitemap" />
       <!-- FIXME: Doesn't exist yet  -->
-      <a class="hover:no-underline text-secondary" href="{base}/"
-        >Organisationssammenkobling</a
-      >
-    </div>
+      <div class="hover:no-underline text-secondary">Organisationssammenkobling</div>
+    </a>
   </li>
 </ul>
 
