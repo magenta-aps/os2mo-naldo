@@ -7,6 +7,7 @@
   import Icon from "$lib/components/icon.svelte"
   import Input from "$lib/components/modals/shared/input.svelte"
   import Select from "$lib/components/modals/shared/select.svelte"
+  import Address from "$lib/components/modals/shared/address.svelte"
 
   let startDate = new Date()
   let endDate: Date
@@ -15,8 +16,11 @@
   let orgLevel: string
   let orgType: string
   let orgNumber: string
+  // Needs details interface
+  let details: any[] = []
+  let detailAmount = 0
 
-  const fetchDropdownItems = async () => {
+  const fetchFacets = async () => {
     const query = `
       query {
         facets(user_keys: ["org_unit_level", "org_unit_type"]) {
@@ -45,6 +49,7 @@
         from: startDate.toISOString().split("T")[0],
         to: endDate ? endDate.toISOString().split("T")[0] : undefined,
       },
+      details: details,
     })
     if (res.status === 201) {
       // Closes the hidden checkbox controlling the open state
@@ -106,7 +111,7 @@
       </div>
 
       <!-- TODO: Should have a skeleton for the loading stage -->
-      {#await fetchDropdownItems() then dropDownItems}
+      {#await fetchFacets() then facets}
         <div class="mx-6">
           <div class="form-control mb-4">
             <Input title="Navn" id="name" bind:value={name} required={true} />
@@ -116,7 +121,7 @@
               title="Enhedstype"
               id="unit-type"
               bind:value={orgType}
-              iterable={dropDownItems[1].classes}
+              iterable={facets[1].classes}
               required={true}
             />
           </div>
@@ -127,7 +132,7 @@
                 title="Enhedsniveau"
                 id="unit-level"
                 bind:value={orgLevel}
-                iterable={dropDownItems[0].classes}
+                iterable={facets[0].classes}
                 required={true}
               />
             </div>
@@ -136,12 +141,25 @@
             </div>
           </div>
           <!-- TODO: Address support missing -->
+
+          <div class="mb-6">
+            {#each Array(detailAmount) as _, i}
+              <Address
+                {startDate}
+                {endDate}
+                bind:addresses={details[i]}
+                detailAmount={i}
+              />
+            {/each}
+          </div>
           <button
+            on:click={() => {
+              detailAmount++
+            }}
             class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
             type="button">+ Tilføj adresser(*)</button
           >
         </div>
-
         <div class="modal-action p-6 gap-4 bg-slate-100">
           <!-- TODO: Make button close modal -->
           <button

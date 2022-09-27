@@ -27,7 +27,7 @@
     if (json.data) {
       return json.data.org_units[0].objects[0].children
     } else {
-      throw new Error(json.errors[0].message)
+      throw new error(json.errors[0].message)
     }
   }
 
