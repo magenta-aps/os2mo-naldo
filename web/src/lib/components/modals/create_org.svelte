@@ -7,6 +7,7 @@
   import Icon from "$lib/components/icon.svelte"
   import Input from "$lib/components/modals/shared/input.svelte"
   import Select from "$lib/components/modals/shared/select.svelte"
+  import Address from "$lib/components/modals/shared/address.svelte"
 
   let startDate = new Date()
   let endDate: Date
@@ -15,6 +16,7 @@
   let orgLevel: string
   let orgType: string
   let orgNumber: string
+  let addresses = []
 
   const fetchDropdownItems = async () => {
     const query = `
@@ -136,12 +138,21 @@
             </div>
           </div>
           <!-- TODO: Address support missing -->
+
+          <div class="mb-6">
+            {#each addresses as address, i}
+              <Address />
+            {/each}
+          </div>
           <button
+            on:click={() => {
+              addresses = [...addresses, { hest: "hest" }]
+              console.log(addresses)
+            }}
             class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
             type="button">+ Tilføj adresser(*)</button
           >
         </div>
-
         <div class="modal-action p-6 gap-4 bg-slate-100">
           <!-- TODO: Make button close modal -->
           <button
