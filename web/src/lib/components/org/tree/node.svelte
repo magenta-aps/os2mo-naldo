@@ -54,7 +54,7 @@
         <div class="animate-spin rounded-full h-4 w-4 border-b-4 border-secondary" />
       {:else if children.length}
         {#if open}
-          <div class="h-4 w-4" on:click={toggleOpen}>
+          <div class="h-4 w-4" on:click|preventDefault={toggleOpen}>
             <svg
               class="fill-secondary"
               xmlns="http://www.w3.org/2000/svg"
@@ -65,7 +65,7 @@
             >
           </div>
         {:else}
-          <div class="h-4 w-4" on:click={toggleOpen}>
+          <div class="h-4 w-4" on:click|preventDefault={toggleOpen}>
             <svg
               class="fill-secondary"
               xmlns="http://www.w3.org/2000/svg"
@@ -76,6 +76,8 @@
             >
           </div>
         {/if}
+      {:else}
+        <div class="h-4 w-4" />
       {/if}
       <p class="text-secondary">
         {name}
