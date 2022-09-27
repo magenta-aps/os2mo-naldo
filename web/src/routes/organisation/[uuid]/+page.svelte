@@ -34,6 +34,9 @@
             address_type {
               name
             }
+            visibility {
+              name
+            }
             validity {
               from
               to
@@ -186,11 +189,14 @@
         </tr>
       </DetailTable>
     {:else if activeItem === "Adresser"}
-      <DetailTable headers={["Adressetype", "Adresse", "Dato"]}>
+      <DetailTable headers={["Adressetype", "Adresse", "Synlighed", "Dato"]}>
         {#each org.addresses as address}
           <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
             <td class="p-4">{address.address_type.name}</td>
             <td class="p-4">{address.name}</td>
+            <td class="p-4"
+              >{address.visibility ? address.visibility.name : "Ikke sat"}</td
+            >
             <ValidityTableCell validity={address.validity} />
           </tr>
         {/each}
@@ -249,9 +255,13 @@
           <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
             <td class="p-4">{manager.employee[0].name}</td>
             <td class="p-4">
-              {#each manager.responsibilities as responsibility}
-                {responsibility.name} <br />
-              {/each}
+              <ul>
+                {#each manager.responsibilities as responsibility}
+                  <li>
+                    • {responsibility.name}
+                  </li>
+                {/each}
+              </ul>
             </td>
             <td class="p-4">{manager.manager_type.name}</td>
             <td class="p-4">{manager.manager_level.name}</td>

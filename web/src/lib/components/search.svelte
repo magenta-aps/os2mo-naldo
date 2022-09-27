@@ -59,7 +59,10 @@
                       }}
                     >
                       <th class="text-neutral">
-                        <a class="text-base" href={`${base}/employee/${result.uuid}`}>
+                        <a
+                          class="text-base text-secondary"
+                          href={`${base}/employee/${result.uuid}`}
+                        >
                           {result.name}
                         </a>
                       </th>
