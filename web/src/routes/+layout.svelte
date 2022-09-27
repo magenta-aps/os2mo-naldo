@@ -53,5 +53,8 @@
     </div>
   </div>
 </div>
-<CreateOrg />
+
+{#if $isAuth}
+  <CreateOrg />
+{/if}
 <SuccessAlert />

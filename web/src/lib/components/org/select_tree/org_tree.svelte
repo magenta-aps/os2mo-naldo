@@ -41,7 +41,7 @@
         }
       }
     } else {
-      throw new Error(json.errors[0].message)
+      throw new Error(json.errors ? json.errors[0].message : "Unknown error")
     }
   }
 
