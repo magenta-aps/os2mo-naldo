@@ -76,6 +76,8 @@
             >
           </div>
         {/if}
+      {:else}
+        <div class="h-4 w-4" />
       {/if}
       <p class="text-secondary">
         {name}
