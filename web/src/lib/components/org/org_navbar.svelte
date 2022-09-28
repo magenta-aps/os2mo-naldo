@@ -1,7 +1,7 @@
 <div class="navbar bg-primary min-h-8 h-8 py-5 text-base-100">
   <div class="flex-1 z-10">
     <label
-      class="btn btn-sm btn-primary text-base-100 normal-case font-light"
+      class="btn btn-sm btn-primary text-base-100 normal-case font-normal"
       for="create-org-modal"
     >
       <span class="inline-block align-middle pr-2">
@@ -18,7 +18,7 @@
       </span>
       <p class="text-base-100">Opret enhed</p>
     </label>
-    <label class="btn btn-sm btn-primary text-base-100 normal-case font-light" for="">
+    <label class="btn btn-sm btn-primary text-base-100 normal-case font-normal" for="">
       <span class="inline-block align-middle pr-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -33,7 +33,7 @@
       </span>
       <p class="text-base-100">Omdøb enhed</p>
     </label>
-    <label class="btn btn-sm btn-primary text-base-100 normal-case font-light" for="">
+    <label class="btn btn-sm btn-primary text-base-100 normal-case font-normal" for="">
       <span class="inline-block align-middle pr-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -47,7 +47,7 @@
       </span>
       <p class="text-base-100">Flyt enhed</p>
     </label>
-    <label class="btn btn-sm btn-primary text-base-100 normal-case font-light" for="">
+    <label class="btn btn-sm btn-primary text-base-100 normal-case font-normal" for="">
       <span class="inline-block align-middle pr-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"
