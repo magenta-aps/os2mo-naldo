@@ -1,5 +1,5 @@
 <div class="navbar bg-primary min-h-8 h-8 py-5 text-base-100">
-  <div class="flex-1 z-10">
+  <div class="flex-1">
     <label
       class="btn btn-sm btn-primary text-base-100 normal-case font-normal"
       for="create-org-modal"

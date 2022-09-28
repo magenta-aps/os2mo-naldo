@@ -21,9 +21,11 @@
   }
 
   const search = async (query: string) => {
-    const res = await fetchRest(`e/autocomplete/?query=${query}`)
-    const json = await res.json()
-    return json.items
+    const empRes = await fetchRest(`e/autocomplete/?query=${query}`)
+    const orgRes = await fetchRest(`ou/autocomplete/?query=${query}`)
+    const empJson = await empRes.json()
+    const orgJson = await orgRes.json()
+    return { org: orgJson.items, employee: empJson.items }
   }
 </script>
 
@@ -35,11 +37,11 @@
       on:blur={delayedUnfocus}
       type="text"
       placeholder="Søg"
-      class="input input-bordered text-base w-80 h-8 text-neutral"
+      class="input input-bordered text-base w-[50rem] h-8 text-neutral"
     />
     {#if isFocused && input}
       <div use:floatingContent>
-        <div class="overflow-x-auto shadow-lg w-80 max-h-96">
+        <div class="overflow-x-auto shadow-lg w-[50rem] max-h-96">
           <table class="table table-compact w-full text-neutral">
             {#await search(input)}
               <tbody>
@@ -48,34 +50,80 @@
                 </tr>
               </tbody>
             {:then results}
-              {#if results.length}
-                <tbody>
-                  {#each results as result}
-                    <tr
-                      class="hover cursor-pointer"
-                      on:click={() => {
-                        goto(`${base}/employee/${result.uuid}`)
-                        input = ""
-                      }}
-                    >
-                      <th class="text-neutral">
-                        <a
-                          class="text-base text-secondary"
-                          href={`${base}/employee/${result.uuid}`}
+              <!-- Employee split -->
+
+              <div class="flex w-full">
+                <div class="grid flex-grow place-items-center">
+                  {#if results.employee.length}
+                    <tbody>
+                      {#each results.employee as result}
+                        <tr
+                          class="hover cursor-pointer"
+                          on:click={() => {
+                            goto(`${base}/employee/${result.uuid}`)
+                            input = ""
+                          }}
                         >
-                          {result.name}
-                        </a>
-                      </th>
-                    </tr>
-                  {/each}
-                </tbody>
-              {:else}
-                <tbody>
-                  <tr>
-                    <th class="flex justify-center text-neutral">Ingen resultater </th>
-                  </tr>
-                </tbody>
-              {/if}
+                          <th class="text-neutral">
+                            <a
+                              class="text-base text-secondary"
+                              href={`${base}/employee/${result.uuid}`}
+                            >
+                              {result.name}
+                            </a>
+                          </th>
+                        </tr>
+                      {/each}
+                    </tbody>
+                  {:else}
+                    <tbody>
+                      <tr>
+                        <th class="flex justify-center text-neutral"
+                          >Ingen resultater
+                        </th>
+                      </tr>
+                    </tbody>
+                  {/if}
+                </div>
+
+                <div class="divider divider-horizontal" />
+
+                <div class="grid flex-grow place-items-center">
+                  <!-- Org unit split -->
+                  <div class="flex w-full">
+                    {#if results.org.length}
+                      <tbody>
+                        {#each results.org as result}
+                          <tr
+                            class="hover cursor-pointer"
+                            on:click={() => {
+                              goto(`${base}/employee/${result.uuid}`)
+                              input = ""
+                            }}
+                          >
+                            <th class="text-neutral">
+                              <a
+                                class="text-base text-secondary"
+                                href={`${base}/employee/${result.uuid}`}
+                              >
+                                {result.name}
+                              </a>
+                            </th>
+                          </tr>
+                        {/each}
+                      </tbody>
+                    {:else}
+                      <tbody>
+                        <tr>
+                          <th class="flex justify-center text-neutral"
+                            >Ingen resultater
+                          </th>
+                        </tr>
+                      </tbody>
+                    {/if}
+                  </div>
+                </div>
+              </div>
               <tfoot>
                 <tr>
                   <th class="flex justify-center">{results.length}</th>
