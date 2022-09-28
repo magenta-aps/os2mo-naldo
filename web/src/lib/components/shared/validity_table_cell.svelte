@@ -17,11 +17,11 @@
 
 <td class="whitespace-nowrap px-4 py-2">
   <div>
-    <span class="text-slate-600 font-light inline-block min-w-[2.5rem]">Start</span>
+    <span class="text-slate-600 font-normal inline-block min-w-[2.5rem]">Start</span>
     {formatDate(validity.from)}
   </div>
   <div>
-    <span class="text-slate-600 font-light inline-block min-w-[2.5rem]">Slut</span>
+    <span class="text-slate-600 font-normal inline-block min-w-[2.5rem]">Slut</span>
     {#if validity.to}
       {formatDate(validity.to)}
     {/if}
