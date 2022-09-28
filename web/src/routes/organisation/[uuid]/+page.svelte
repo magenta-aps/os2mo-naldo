@@ -21,6 +21,7 @@
           }
           parent {
             name
+            uuid
             parent {
               name
             }
@@ -51,6 +52,7 @@
             }
             employee {
               name
+              uuid
             }
             validity {
               from
@@ -64,6 +66,7 @@
             }
             employee {
               name
+              uuid
             }
             substitute {
               name
@@ -86,6 +89,7 @@
           roles {
             employee {
               name
+              uuid
             }
             role_type {
               name
@@ -98,6 +102,7 @@
           managers {
             employee {
               name
+              uuid
             }
             responsibilities {
               name
@@ -181,7 +186,9 @@
           <td class="p-4">{org.unit_type.name}</td>
           <td class="p-4">{org.org_unit_level.name}</td>
           {#if org.parent}
-            <td class="p-4">{org.parent.name}</td>
+            <a href="{base}/organisation/{org.parent.uuid}">
+              <td class="p-4">{org.parent.name}</td>
+            </a>
           {:else}
             <td class="p-4">Ingen overenhed</td>
           {/if}
@@ -205,7 +212,9 @@
       <DetailTable headers={["Navn", "Stillingbetegnelse", "Engagementstype", "Dato"]}>
         {#each org.engagements as engagement}
           <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
-            <td class="p-4">{engagement.employee[0].name}</td>
+            <a href="{base}/employee/{engagement.employee[0].uuid}">
+              <td class="p-4">{engagement.employee[0].name}</td>
+            </a>
             <td class="p-4">{engagement.job_function.name}</td>
             <td class="p-4">{engagement.engagement_type.name}</td>
             <ValidityTableCell validity={engagement.validity} />
@@ -216,8 +225,14 @@
       <DetailTable headers={["Navn", "Tilknytningsrolle", "Stedfortræder", "Dato"]}>
         {#each org.associations as association}
           <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-            <td class="p-4">{association.employee[0].name}</td>
-            <td class="p-4">{association.association_type.name}</td>
+            <a href="{base}/employee/{association.employee[0].uuid}">
+              <td class="p-4">{association.employee[0].name}</td>
+            </a>
+            <td class="p-4"
+              >{association.association_type
+                ? association.association_type.name
+                : "Ikke sat"}</td
+            >
             {#if association.substitute.length !== 0}
               <td class="p-4">{association.substitute.name}</td>
             {:else}
@@ -241,7 +256,9 @@
       <DetailTable headers={["Navn", "Rolletype", "Dato"]}>
         {#each org.roles as role}
           <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-            <td class="p-4">{role.employee[0].name}</td>
+            <a href="{base}/employee/{role.employee[0].uuid}">
+              <td class="p-4">{role.employee[0].name}</td>
+            </a>
             <td class="p-4">{role.role_type.name}</td>
             <ValidityTableCell validity={role.validity} />
           </tr>
@@ -253,7 +270,9 @@
       >
         {#each org.managers as manager}
           <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-            <td class="p-4">{manager.employee[0].name}</td>
+            <a href="{base}/employee/{manager.employee[0].uuid}">
+              <td class="p-4">{manager.employee[0].name}</td>
+            </a>
             <td class="p-4">
               <ul>
                 {#each manager.responsibilities as responsibility}

@@ -4,6 +4,7 @@
   import Tabs from "$lib/components/shared/tabs.svelte"
   import EmployeeStats from "$lib/components/employee/employee_stats.svelte"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
+  import { base } from "$app/paths"
 
   const query = (uuid: string) => {
     return `
@@ -15,6 +16,7 @@ query {
         uuid
         org_unit {
           name
+          uuid
         }
         validity {
           to
@@ -41,6 +43,7 @@ query {
       associations {
         org_unit {
           name
+          uuid
         }
         association_type {
           name
@@ -56,6 +59,7 @@ query {
         }
         org_unit {
           name
+          uuid
         }
         validity {
           from
@@ -74,6 +78,7 @@ query {
       manager_roles {
         org_unit {
           name
+          uuid
         }
         validity {
           from
@@ -89,7 +94,7 @@ query {
 
   $: fetchEmployee = async () => {
     const res = await fetchGraph(query($page.params.uuid))
-    const json = await res.json()
+    const json: Query = await res.json()
 
     return json.data.employees[0].objects[0]
   }
@@ -126,9 +131,12 @@ query {
                 <td>
                   {engagement.job_function.name}
                 </td>
-                <td>
-                  {engagement.org_unit[0].name}
-                </td>
+
+                <a href="{base}/organisation/{engagement.org_unit[0].uuid}">
+                  <td>
+                    {engagement.org_unit[0].name}
+                  </td>
+                </a>
                 <ValidityTableCell validity={engagement.validity} />
               </tr>
             {/each}
@@ -152,11 +160,15 @@ query {
           {:else if activeItem === itemCategory.ASSOCIATIONS}
             {#each employee.associations as association}
               <tr>
+                <a href="{base}/organisation/{association.org_unit[0].uuid}">
+                  <td>
+                    {association.org_unit[0].name}
+                  </td>
+                </a>
                 <td>
-                  {association.org_unit[0].name}
-                </td>
-                <td>
-                  {association.association_type.name}
+                  {association.association_type
+                    ? association.association_type.name
+                    : "Ikke sat"}
                 </td>
                 <ValidityTableCell validity={association.validity} />
               </tr>
@@ -167,9 +179,12 @@ query {
                 <td>
                   {role.role_type.name}
                 </td>
-                <td>
-                  {role.org_unit[0].name}
-                </td>
+
+                <a href="{base}/organisation/{role.org_unit[0].uuid}">
+                  <td>
+                    {role.org_unit[0].name}
+                  </td>
+                </a>
                 <ValidityTableCell validity={role.validity} />
               </tr>
             {/each}
@@ -188,9 +203,11 @@ query {
           {:else if activeItem === itemCategory.MANAGER_ROLES}
             {#each employee.manager_roles as manager_role}
               <tr>
-                <td>
-                  {manager_role.org_unit[0].name}
-                </td>
+                <a href="{base}/organisation/{manager_role.org_unit[0].uuid}">
+                  <td>
+                    {manager_role.org_unit[0].name}
+                  </td>
+                </a>
                 <ValidityTableCell validity={manager_role.validity} />
               </tr>
             {/each}
