@@ -4,6 +4,7 @@
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
   import Tabs from "$lib/components/shared/tabs.svelte"
   import DetailTable from "$lib/components/shared/detail_table.svelte"
+  import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
   import { activeOrgTab } from "$lib/stores/tab"
   import { base } from "$app/paths"
 
@@ -154,27 +155,12 @@
 </script>
 
 <div class="px-10">
-  <!-- TODO: Implement breadcrumbs -->
-  <div class="text-base py-5 breadcrumbs">
-    <ul>
-      <li>
-        <a href="{base}/organisation/f06ee470-9f17-566f-acbe-e938112d46d9">
-          Kolding Kommune
-        </a>
-      </li>
-      <li>
-        <a href="{base}/organisation/7a8e45f7-4de0-44c8-990f-43c0565ee505">
-          Skole og Børn
-        </a>
-      </li>
-      <li>Social Indsats</li>
-    </ul>
-  </div>
   {#await fetchOrgGraph(query)}
     <div class="m-auto">
       <div class="animate-spin rounded-full h-32 w-32 border-b-8 border-primary" />
     </div>
   {:then org}
+    <Breadcrumbs currentOrg={org.name} />
     <h1 class="pb-4">{org.name}</h1>
     <Tabs {activeItem} {items} on:tabChange={tabChange} />
     {#if activeItem === "Enhed"}
