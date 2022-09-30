@@ -30,7 +30,9 @@
   const period: EmploymentPeriod = employmentPeriod(employee.engagements)
 </script>
 
-<div class="stats stats-vertical 2xl:stats-horizontal shadow bg-base-300 mb-6">
+<div
+  class="stats stats-vertical text-secondary md:stats-horizontal shadow bg-slate-100 mb-6"
+>
   <div class="stat">
     <div class="stat-title">MEDARBEJDER</div>
     <div class="stat-value text-xl">{employee.name}</div>
