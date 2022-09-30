@@ -1,6 +1,5 @@
 <script lang="ts">
   import { base } from "$app/paths"
-
   import OrgTree from "$lib/components/org/tree/org_tree.svelte"
   import { isAuth } from "$lib/stores/auth"
   import Icon from "$lib/components/icon.svelte"
@@ -37,9 +36,8 @@
   {#if $isAuth}
     <OrgTree />
   {:else}
-    <div class="m-auto">
-      <div class="animate-spin rounded-full h-32 w-32 border-b-8 border-primary" />
-      <p class="pt-6">Authentication...</p>
+    <div role="status" class="max-w-sm animate-pulse">
+      <div class="h-12 bg-base-100 rounded dark:bg-accent max-w-[360px] mb-2.5" />
     </div>
   {/if}
 </ul>

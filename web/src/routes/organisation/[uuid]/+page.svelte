@@ -156,9 +156,7 @@
 
 <div class="px-10">
   {#await fetchOrgGraph(query)}
-    <div class="m-auto">
-      <div class="animate-spin rounded-full h-32 w-32 border-b-8 border-primary" />
-    </div>
+    <div class="text-secondary py-5">Loading page...</div>
   {:then org}
     <Breadcrumbs currentOrg={org.name} />
     <h1 class="pb-4">{org.name}</h1>
