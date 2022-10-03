@@ -11,9 +11,9 @@ export const fetchRest = async (path: string) => {
   })
 }
 
-export const postRest = async (path: string, payload) => {
+export const postRest = async (path: string, payload: any) => {
   const token = keycloak ? keycloak.token : "Keycloak disabled"
-  return await fetch(`http://localhost:5001/service/${path}`, {
+  return await fetch(`${env.PUBLIC_BASE_URL}/service/${path}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

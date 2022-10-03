@@ -14,6 +14,7 @@
 
   export let title: string
   export let id: string
+  export let name = id
   export let value: string | object | undefined
   export let iterable: Element[] | undefined
   export let required = false
@@ -26,6 +27,7 @@
 </label>
 <select
   {id}
+  {name}
   class="select select-bordered select-sm text-base text-secondary font-normal w-full rounded active:select-primary focus:select-primary active:outline-offset-0 focus:outline-offset-0"
   bind:value
   {required}

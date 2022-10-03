@@ -26,8 +26,8 @@
     message: string
   }
 
-  export let startDate: Date
-  export let endDate: Date
+  export let startDate: string
+  export let endDate: string
   export let addresses: any
   export let detailAmount: number
 
@@ -63,8 +63,8 @@
     visibility: { uuid: visibility },
     validity: {
       // End format YYYY-mm-dd
-      from: startDate.toISOString().split("T")[0],
-      to: endDate ? endDate.toISOString().split("T")[0] : undefined,
+      from: startDate,
+      to: endDate ? endDate : undefined,
     },
     value: input,
     type: "address",
