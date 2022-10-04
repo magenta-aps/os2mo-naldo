@@ -88,6 +88,14 @@
       bind:value={selectedOrg.name}
       class="input input-bordered input-sm text-base text-secondary font-normal rounded active:input-primary focus:input-primary w-full active:outline-offset-0 focus:outline-offset-0"
     />
+
+    <!-- Hidden hack to return the UUID while displaying the name -->
+    <input
+      hidden
+      id="select-org-tree"
+      name="select-org-tree"
+      bind:value={selectedOrg.uuid}
+    />
     {#if isFocused}
       <div
         use:floatingContent

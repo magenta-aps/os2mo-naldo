@@ -1,8 +1,20 @@
+<script lang="ts">
+  import { base } from "$app/paths"
+  import { page } from "$app/stores"
+
+  enum Form {
+    CREATE = "create",
+    RENAME = "rename",
+    MOVE = "move",
+    TERMINATE = "terminate",
+  }
+</script>
+
 <div class="navbar bg-primary min-h-8 h-8 py-5 text-base-100">
   <div class="flex-1 z-10">
-    <label
+    <a
+      href="{base}/organisation/{$page.params.uuid}/{Form.CREATE}"
       class="btn btn-sm btn-primary text-base-100 normal-case font-normal"
-      for="create-org-modal"
     >
       <span class="inline-block align-middle pr-2">
         <svg
@@ -17,8 +29,11 @@
         >
       </span>
       <p class="text-base-100">Opret enhed</p>
-    </label>
-    <label class="btn btn-sm btn-primary text-base-100 normal-case font-normal" for="">
+    </a>
+    <a
+      href="{base}/organisation/{$page.params.uuid}/{Form.RENAME}"
+      class="btn btn-sm btn-primary text-base-100 normal-case font-normal"
+    >
       <span class="inline-block align-middle pr-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -32,8 +47,11 @@
         >
       </span>
       <p class="text-base-100">Omdøb enhed</p>
-    </label>
-    <label class="btn btn-sm btn-primary text-base-100 normal-case font-normal" for="">
+    </a>
+    <a
+      href="{base}/organisation/{$page.params.uuid}/{Form.MOVE}"
+      class="btn btn-sm btn-primary text-base-100 normal-case font-normal"
+    >
       <span class="inline-block align-middle pr-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -46,8 +64,11 @@
         >
       </span>
       <p class="text-base-100">Flyt enhed</p>
-    </label>
-    <label class="btn btn-sm btn-primary text-base-100 normal-case font-normal" for="">
+    </a>
+    <a
+      href="{base}/organisation/{$page.params.uuid}/{Form.TERMINATE}"
+      class="btn btn-sm btn-primary text-base-100 normal-case font-normal"
+    >
       <span class="inline-block align-middle pr-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -61,6 +82,6 @@
         >
       </span>
       <p class="text-base-100">Afslut enhed</p>
-    </label>
+    </a>
   </div>
 </div>
