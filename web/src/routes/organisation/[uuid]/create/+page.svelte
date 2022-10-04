@@ -33,7 +33,6 @@
 <form
   use:enhance={() => {
     return async ({ result }) => {
-      console.log("result", result)
       const res = await postRest(`ou/create`, { ...result.data })
       const json = await res.json()
 

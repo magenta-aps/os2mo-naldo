@@ -1,9 +1,4 @@
 <script lang="ts">
-  interface Element {
-    name: string
-    uuid: string
-  }
-
   enum Return {
     NAME = "name",
     UUID = "uuid",
@@ -16,7 +11,7 @@
   export let id: string
   export let name = id
   export let value: string | object | undefined
-  export let iterable: Element[] | undefined
+  export let iterable: any[] | undefined
   export let required = false
   export let returnType: ReturnType = "uuid"
   export let disabled = false

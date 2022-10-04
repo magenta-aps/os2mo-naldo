@@ -1,32 +1,32 @@
 import { env } from "$env/dynamic/public"
-import { keycloak } from "$lib/util/keycloak";
-import type { LoadEvent } from "@sveltejs/kit";
+import { keycloak } from "$lib/util/keycloak"
+import type { LoadEvent } from "@sveltejs/kit"
 
 interface Query {
-  data: Data | null;
-  errors?: Error[];
+  data: Data | null
+  errors?: Error[]
 }
 
 interface Data {
-  facets: Facet[];
+  facets: Facet[]
 }
 
 export interface Facet {
-  uuid: null | string;
-  user_key: string;
-  classes: Class[];
+  uuid: null | string
+  user_key: string
+  classes: Class[]
 }
 
 interface Class {
-  name: string;
-  uuid: null | string;
+  name: string
+  uuid: null | string
 }
 
 interface Error {
-  message: string;
+  message: string
 }
 
-export const load = async (event: LoadEvent): Promise<Facet> => {
+export const load = async (event: LoadEvent): Promise<Facet[] | undefined> => {
   const query = `
       query {
         facets(user_keys: ["org_unit_level", "org_unit_type"]) {

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { DateInput } from "date-picker-svelte"
+  import DateInput from "$lib/components/modals/shared/date_input.svelte"
   import Input from "$lib/components/modals/shared/input.svelte"
   import Select from "$lib/components/modals/shared/select.svelte"
   import { fetchGraph } from "$lib/util/http"
@@ -58,7 +58,7 @@
   }
 
   // Reactivly keeps addresses up to date while being exported to parent components
-  $: addresses = {
+  $: addresses = JSON.stringify({
     address_type: { uuid: addressType?.uuid },
     visibility: { uuid: visibility },
     validity: {
@@ -68,10 +68,14 @@
     },
     value: input,
     type: "address",
-  }
+  })
 </script>
 
 <div class="divider">Adresse {detailAmount + 1}</div>
+
+<!-- Hack to pass the whole detail object as a string -->
+<input name="detail-{detailAmount + 1}" hidden bind:value={addresses} />
+
 {#await fetchFacets()}
   <Select title="Synlighed" id="visibility" disabled={true} />
   <Select title="Adressetype" id="address-type" disabled={true} />
@@ -118,27 +122,22 @@
   {#if uniqueDate}
     <div class="flex flex-row gap-6 mb-4">
       <div class="form-control">
-        <span name="Start date picker" class="pb-1">
-          <p>Startdato</p>
-        </span>
         <DateInput
           bind:value={startDate}
-          format={"dd-MM-yyyy"}
-          placeholder={""}
-          min={new Date("1/1/1910")}
-          max={endDate ? endDate : new Date(new Date().getFullYear() + 50, 0)}
+          title="Start dato"
+          id="other-start-date"
+          max={endDate
+            ? endDate
+            : new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
         />
       </div>
       <div class="flex-1 justify-end form-control">
-        <span name="End date picker" class="pb-1">
-          <p>Slutdato</p>
-        </span>
         <DateInput
           bind:value={endDate}
-          format={"dd-MM-yyyy"}
-          placeholder={""}
+          title="Slutdato"
+          id="other-end-date"
           min={startDate}
-          max={new Date(new Date().getFullYear() + 50, 0)}
+          max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
         />
       </div>
     </div>

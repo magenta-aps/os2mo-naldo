@@ -1,4 +1,4 @@
-import type { Actions } from "@sveltejs/kit";
+import type { Actions } from "@sveltejs/kit"
 
 export const actions: Actions = {
   default: async ({ request }) => {
@@ -9,11 +9,13 @@ export const actions: Actions = {
     const orgType = data.get("org-type")
     const startDate = data.get("start-date")
     const endDate = data.get("end-date")
-    const addressType = data.get("address-type")
 
-    console.log("---server---");
-    console.log("formdata", Object.fromEntries(data.entries()))
-
+    const details: string[] = []
+    for (let i of data.entries()) {
+      if (i[0].startsWith("detail-")) {
+        details.push(JSON.parse(i[1].toString()))
+      }
+    }
 
     return {
       name: name,
@@ -25,8 +27,7 @@ export const actions: Actions = {
         from: startDate,
         to: endDate ? endDate : undefined,
       },
-      // TODO: Details
-      details: addressType,
+      details: details,
     }
-  }
-};
+  },
+}
