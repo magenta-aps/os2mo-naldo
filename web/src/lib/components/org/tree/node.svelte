@@ -3,13 +3,15 @@
 
   import { page } from "$app/stores"
   import { fetchGraph } from "$lib/util/http"
+  import { onMount } from "svelte"
 
   export let name = ""
   export let children: any[] = []
   export let indent = 0
   export let uuid = ""
+  export let breadcrumbs: string[] = []
+  export let open = false
 
-  let open = false
   let loading = false
 
   const fetchChildren = async (uuid: string) => {
@@ -45,6 +47,17 @@
     }
     open = !open
   }
+
+  onMount(async () => {
+    if (breadcrumbs && breadcrumbs[0] === uuid) {
+      // Removes used UUID
+      breadcrumbs = breadcrumbs.slice(1)
+      await toggleOpen()
+    } else {
+      // If UUID isn't a match, you're down a wrong branch
+      breadcrumbs = []
+    }
+  })
 </script>
 
 <a class="hover:no-underline" href={`${base}/organisation/${uuid}`}>
@@ -88,6 +101,6 @@
 
 {#if open}
   {#each children as child}
-    <svelte:self {...child} indent={indent + 24} />
+    <svelte:self {...child} {breadcrumbs} indent={indent + 24} />
   {/each}
 {/if}
