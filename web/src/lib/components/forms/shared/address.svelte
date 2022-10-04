@@ -1,7 +1,7 @@
 <script lang="ts">
-  import DateInput from "$lib/components/modals/shared/date_input.svelte"
-  import Input from "$lib/components/modals/shared/input.svelte"
-  import Select from "$lib/components/modals/shared/select.svelte"
+  import DateInput from "$lib/components/forms/shared/date_input.svelte"
+  import Input from "$lib/components/forms/shared/input.svelte"
+  import Select from "$lib/components/forms/shared/select.svelte"
   import { fetchGraph } from "$lib/util/http"
 
   interface Query {
@@ -131,7 +131,7 @@
             : new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
         />
       </div>
-      <div class="flex-1 justify-end form-control">
+      <div class="form-control">
         <DateInput
           bind:value={endDate}
           title="Slutdato"
