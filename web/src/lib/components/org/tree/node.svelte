@@ -53,6 +53,18 @@
       // Removes used UUID
       breadcrumbs = breadcrumbs.slice(1)
       await toggleOpen()
+
+      // Exhausted breadcrumbs and the correct org should be visible
+      if (breadcrumbs.length === 0) {
+        const activeNode = document.getElementById("active")
+        if (activeNode) {
+          activeNode.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+            inline: "center",
+          })
+        }
+      }
     } else {
       // If UUID isn't a match, you're down a wrong branch
       breadcrumbs = []
@@ -62,7 +74,10 @@
 
 <a class="hover:no-underline" href={`${base}/organisation/${uuid}`}>
   <li style="padding-left: {indent}px">
-    <div class={$page.params.uuid === uuid ? "bg-accent" : ""}>
+    <div
+      class={$page.params.uuid === uuid ? "bg-accent" : ""}
+      id={$page.params.uuid === uuid ? "active" : ""}
+    >
       {#if loading}
         <div class="animate-spin rounded-full h-4 w-4 border-b-4 border-secondary" />
       {:else if children.length}
