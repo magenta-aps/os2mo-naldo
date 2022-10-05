@@ -9,6 +9,8 @@
   import Address from "$lib/components/forms/shared/address.svelte"
   import { enhance } from "$app/forms"
   import type { Facet } from "./+page"
+  import { goto } from "$app/navigation"
+  import { base } from "$app/paths"
 
   let startDate = new Date().toISOString().split("T")[0]
   let endDate: string
@@ -42,6 +44,7 @@
           uuid: json,
           type: "organisation",
         }
+        setTimeout(() => goto(`${base}/organisation/${json}`), 200)
       } else {
         $error = { message: json.description }
       }

@@ -52,17 +52,12 @@ const fetchParent = async (
 export const fetchParentTree = async (
   uuid: string
 ): Promise<ParentOrganisationUnit[]> => {
-  const parents: ParentOrganisationUnit[] = []
-  let nextUuid = uuid
 
-  while (true) {
-    const parent = await fetchParent(nextUuid)
+  const parent = await fetchParent(uuid)
 
-    if (!parent) break
-
-    parents.push(parent)
-    nextUuid = parent.uuid
+  if (!parent) {
+    return []
   }
 
-  return parents
+  return [parent].concat(await fetchParentTree(parent.uuid))
 }
