@@ -1,8 +1,16 @@
 <script lang="ts">
   import { isAuth } from "$lib/stores/auth"
   import DrawerContent from "$lib/components/drawer_content.svelte"
+  import { onMount } from "svelte"
+  import Icon from "./icon.svelte"
 
   let drawerToggled: boolean
+  let sidebar: HTMLElement | null
+  let dragging: boolean
+
+  onMount(() => {
+    sidebar = document.getElementById("sidebar")
+  })
 </script>
 
 <div class="drawer drawer-mobile">
@@ -25,13 +33,32 @@
       </div>
     {/if}
   </div>
-  <div class="drawer-side">
+  <div class="drawer-side w-80" id="sidebar">
     <label for="my-drawer-3" class="drawer-overlay" />
-    <ul class="menu overflow-y-auto w-80 bg-base-100 border">
-      <!-- Sidebar content here -->
+    <ul class="menu overflow-y-auto w-auto bg-base-100 mb-6 border">
       <div class="flex-none">
         <DrawerContent />
       </div>
     </ul>
+    <button
+      class="btn btn-accent btn-sm absolute z-50 bottom-0 p-2"
+      style="width: inherit;"
+      on:mousedown={() => {
+        dragging = true
+      }}
+      on:mouseup={() => {
+        dragging = false
+      }}
+      on:mouseleave={() => {
+        dragging = false
+      }}
+      on:mousemove={(e) => {
+        if (dragging) {
+          sidebar.style.width = e.clientX * 2 + "px"
+        }
+      }}
+    >
+      <Icon type="resize" size="15" />
+    </button>
   </div>
 </div>
