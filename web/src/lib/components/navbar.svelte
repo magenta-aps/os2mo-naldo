@@ -1,7 +1,7 @@
 <script lang="ts">
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
-  import { DateInput } from "date-picker-svelte"
+  import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Avatar from "./navbar/avatar.svelte"
   import Search from "$lib/components/search.svelte"
 </script>
@@ -28,15 +28,13 @@
     >
   </div>
 
-  <div class="navbar-center gap-2">
-    <Search />
-    <div class="rounded-lg">
+  <div class="navbar-center">
+    <div class="flex gap-2">
+      <Search />
       <DateInput
         bind:value={$date}
-        format={"dd-MM-yyyy"}
-        placeholder={""}
-        min={new Date("1/1/1910")}
-        max={new Date(new Date().getFullYear() + 50, 0)}
+        id="other-end-date"
+        max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
       />
     </div>
   </div>

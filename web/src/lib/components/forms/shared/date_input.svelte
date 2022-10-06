@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let title: string
+  export let title: string | undefined = undefined
   export let id: string
   export let name = id
   export let value: string | number | undefined
@@ -8,9 +8,11 @@
   export let max: string
 </script>
 
-<label for={id} class="pb-1">
-  <p>{title}</p>
-</label>
+{#if title}
+  <label for={id} class="pb-1">
+    <p>{title}</p>
+  </label>
+{/if}
 <input
   {id}
   {name}
