@@ -25,7 +25,7 @@
   }
 </script>
 
-<p class="text-base-100">{fullName()}</p>
+<p class="invisible lg:visible text-base-100">{fullName()}</p>
 <div class="dropdown dropdown-end">
   <div tabindex="0" class="btn btn-ghost btn-circle avatar placeholder">
     <div class="bg-accent w-8 rounded-full">

@@ -1,7 +1,9 @@
 <script lang="ts">
-  import Search from "$lib/components/search.svelte"
   import { base } from "$app/paths"
+  import { date } from "$lib/stores/date"
+  import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Avatar from "./navbar/avatar.svelte"
+  import Search from "$lib/components/search.svelte"
 </script>
 
 <div class="navbar bg-secondary text-base-100 shadow-xl">
@@ -27,7 +29,14 @@
   </div>
 
   <div class="navbar-center">
-    <Search />
+    <div class="flex gap-2">
+      <Search />
+      <DateInput
+        bind:value={$date}
+        id="other-end-date"
+        max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
+      />
+    </div>
   </div>
 
   <div class="navbar-end">

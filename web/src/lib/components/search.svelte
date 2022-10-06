@@ -35,7 +35,7 @@
       on:blur={delayedUnfocus}
       type="text"
       placeholder="Søg"
-      class="input input-bordered text-base w-80 h-8 text-neutral"
+      class="input input-bordered rounded text-base w-80 h-8 text-neutral"
     />
     {#if isFocused && input}
       <div use:floatingContent>
