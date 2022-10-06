@@ -5,6 +5,7 @@
   import Tabs from "$lib/components/shared/tabs.svelte"
   import DetailTable from "$lib/components/shared/detail_table.svelte"
   import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
+  import CopyToClipboard from "$lib/components/copy_to_clipboard.svelte"
   import { activeOrgTab } from "$lib/stores/tab"
   import { base } from "$app/paths"
 
@@ -159,7 +160,10 @@
     <div class="text-secondary py-5">Loading page...</div>
   {:then org}
     <Breadcrumbs currentOrg={org.name} />
-    <h1 class="pb-4">{org.name}</h1>
+    <div class="flex gap-5">
+      <h1 class="pb-4">{org.name}</h1>
+      <CopyToClipboard uuid={$page.params.uuid} name={org.name} />
+    </div>
     <Tabs {activeItem} {items} on:tabChange={tabChange} />
     {#if activeItem === "Enhed"}
       <DetailTable
