@@ -23,6 +23,6 @@ services:
       - 5173:5173   # dev
       - 24678:24678 # hot module reloading
     volumes:
-      - ./web:/app
+      - ./web/src:/app/src
       - /src/app/node_modules
     restart: on-failure
