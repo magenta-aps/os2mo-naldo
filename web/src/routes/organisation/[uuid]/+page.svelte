@@ -7,11 +7,12 @@
   import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
   import CopyToClipboard from "$lib/components/copy_to_clipboard.svelte"
   import { activeOrgTab } from "$lib/stores/tab"
+  import { date } from "$lib/stores/date"
   import { base } from "$app/paths"
 
   $: query = `
     query {
-      org_units(uuids: "${$page.params.uuid}") {
+      org_units(uuids: "${$page.params.uuid}" from_date: "${$date}") {
         uuid
         objects {
           name
@@ -152,6 +153,7 @@
   ]
 
   let activeItem: string = $activeOrgTab
+  let activeTime = { past: false, present: true, future: false }
   const tabChange = (e: CustomEvent) => ($activeOrgTab = activeItem = e.detail)
 </script>
 
@@ -165,6 +167,32 @@
       <CopyToClipboard uuid={$page.params.uuid} name={org.name} />
     </div>
     <Tabs {activeItem} {items} on:tabChange={tabChange} />
+    <div class="tabs tabs-boxed w-fit my-5">
+      <div
+        class="tab {activeTime.past ? 'tab-active' : ''}"
+        on:click={() => {
+          activeTime.past = !activeTime.past
+        }}
+      >
+        Fortid
+      </div>
+      <div
+        class="tab {activeTime.present ? 'tab-active' : ''}"
+        on:click={() => {
+          activeTime.present = !activeTime.present
+        }}
+      >
+        Nutid
+      </div>
+      <div
+        class="tab {activeTime.future ? 'tab-active' : ''}"
+        on:click={() => {
+          activeTime.future = !activeTime.future
+        }}
+      >
+        Fremtid
+      </div>
+    </div>
     {#if activeItem === "Enhed"}
       <DetailTable
         headers={["Enhed", "Enhedstype", "Enhedsniveau", "Overenhed", "Dato"]}
