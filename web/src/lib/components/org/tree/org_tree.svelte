@@ -24,9 +24,9 @@
     const json = await res.json()
     const orgTree: any[] = []
 
-    const breadcrumbs = (await fetchParentTree($page.params.uuid))
-      .map((e) => e.uuid)
-      .reverse()
+    const breadcrumbs = $page.routeId?.startsWith("organisation")
+      ? (await fetchParentTree($page.params.uuid)).map((e) => e.uuid).reverse()
+      : []
 
     for (let org of json.data.org_units) {
       orgTree.push({
