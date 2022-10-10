@@ -8,7 +8,7 @@
   import Select from "$lib/components/forms/shared/select.svelte"
   import Address from "$lib/components/forms/shared/address.svelte"
   import { enhance } from "$app/forms"
-  import type { Facet } from "./+page"
+  import type { Data } from "./+page"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
 
@@ -23,7 +23,7 @@
   let details: any[] = []
   let detailAmount = 0
 
-  export let data: Facet
+  export let data: Data
 </script>
 
 <div class="flex align-center px-6 pt-6 pb-4">
@@ -35,18 +35,25 @@
 <form
   use:enhance={() => {
     return async ({ result }) => {
-      const res = await postRest(`ou/create`, { ...result.data })
-      const json = await res.json()
+      if (result.type === "success") {
+        const res = await postRest(`ou/create`, { ...result.data })
+        const json = await res.json()
 
-      if (res.status === 201) {
-        $success = {
-          message: `${name} er blevet oprettet`,
-          uuid: json,
-          type: "organisation",
+        if (res.status === 201) {
+          $success = {
+            message: `${name} er blevet oprettet`,
+            uuid: json,
+            type: "organisation",
+          }
+          setTimeout(() => goto(`${base}/organisation/${json}`), 200)
+        } else {
+          $error = { message: json.description }
         }
-        setTimeout(() => goto(`${base}/organisation/${json}`), 200)
       } else {
-        $error = { message: json.description }
+        JSON.stringify(result)
+        $error = {
+          message: `Something went wrong with the form: ${JSON.stringify(result)}`,
+        }
       }
     }
   }}
@@ -87,7 +94,7 @@
         title="Enhedstype"
         id="org-type"
         bind:value={orgType}
-        iterable={data[1].classes}
+        iterable={data.facets[1].classes}
         required={true}
       />
     </div>
@@ -98,7 +105,7 @@
           title="Enhedsniveau"
           id="org-level"
           bind:value={orgLevel}
-          iterable={data[0].classes}
+          iterable={data.facets[0].classes}
           required={true}
         />
       </div>

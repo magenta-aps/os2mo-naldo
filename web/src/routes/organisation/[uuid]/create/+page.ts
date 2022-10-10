@@ -7,11 +7,11 @@ interface Query {
   errors?: Error[]
 }
 
-interface Data {
+export interface Data {
   facets: Facet[]
 }
 
-export interface Facet {
+interface Facet {
   uuid: null | string
   user_key: string
   classes: Class[]
@@ -26,7 +26,7 @@ interface Error {
   message: string
 }
 
-export const load = async (event: LoadEvent): Promise<Facet[] | undefined> => {
+export const load = async (event: LoadEvent): Promise<Data> => {
   const query = `
       query {
         facets(user_keys: ["org_unit_level", "org_unit_type"]) {
@@ -51,5 +51,11 @@ export const load = async (event: LoadEvent): Promise<Facet[] | undefined> => {
     }),
   })
   const json: Query = await res.json()
-  return json.data?.facets
+  if (json.data) {
+    return json.data
+  } else if (json.errors) {
+    throw new Error(json.errors[0].message)
+  } else {
+    throw new Error("Unknown error during data fetching")
+  }
 }
