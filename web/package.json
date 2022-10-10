@@ -7,8 +7,8 @@
     "package": "svelte-kit package",
     "preview": "vite preview",
     "test": "playwright test",
-    "check": "svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
+    "check": "svelte-check --tsconfig ./tsconfig.json --fail-on-warnings --fail-on-hints",
+    "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch --fail-on-warnings --fail-on-hints",
     "lint": "prettier --check --plugin-search-dir=. .",
     "format": "prettier --write --plugin-search-dir=. ."
   },
