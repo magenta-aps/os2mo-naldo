@@ -1,8 +1,8 @@
 <script lang="ts">
   import { base } from "$app/paths"
-
   import { page } from "$app/stores"
   import { fetchGraph } from "$lib/util/http"
+  import { fetchParentTree } from "$lib/util/parent_tree"
   import { onMount } from "svelte"
 
   export let name = ""
@@ -48,7 +48,7 @@
     open = !open
   }
 
-  onMount(async () => {
+  const expandToActiveChild = async () => {
     if (breadcrumbs && breadcrumbs[0] === uuid) {
       // Removes used UUID
       breadcrumbs = breadcrumbs.slice(1)
@@ -69,6 +69,10 @@
       // If UUID isn't a match, you're down a wrong branch
       breadcrumbs = []
     }
+  }
+
+  onMount(async () => {
+    await expandToActiveChild()
   })
 </script>
 

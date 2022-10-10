@@ -1,11 +1,12 @@
 <script lang="ts">
   import { page } from "$app/stores"
   import { fetchGraph } from "$lib/util/http"
-  import { fetchParentTree } from "$lib/util/parent_tree"
+  import { fetchParentTree } from "$lib/util/parent_tree.js"
   import Node from "$lib/components/org/tree/node.svelte"
+  import { success } from "$lib/stores/alert"
 
   // First load from index
-  const fetchOrgTree = async (): Promise<any[]> => {
+  const fetchOrgTree = async (childUuid?: string): Promise<any[]> => {
     const query = `{
       org_units(parents: null) {
         objects {
@@ -24,8 +25,9 @@
     const json = await res.json()
     const orgTree: any[] = []
 
+    const uuid = childUuid ? childUuid : $page.params.uuid
     const breadcrumbs = $page.routeId?.startsWith("organisation")
-      ? (await fetchParentTree($page.params.uuid)).map((e) => e.uuid).reverse()
+      ? (await fetchParentTree(uuid)).map((e) => e.uuid).reverse()
       : []
 
     for (let org of json.data.org_units) {
@@ -38,9 +40,16 @@
     }
     return orgTree
   }
+
+  let refreshableOrgTree = fetchOrgTree()
+
+  // TODO: Replace with subscriptions when implmented
+  $: if ($success.type === "organisation") {
+    refreshableOrgTree = fetchOrgTree($success.uuid)
+  }
 </script>
 
-{#await fetchOrgTree()}
+{#await refreshableOrgTree}
   <div role="status" class="max-w-sm animate-pulse">
     <div class="h-12 bg-base-100 rounded dark:bg-accent max-w-4 mb-2.5" />
     <span class="sr-only">Loading...</span>
