@@ -52,7 +52,6 @@ const fetchParent = async (
 export const fetchParentTree = async (
   uuid: string
 ): Promise<ParentOrganisationUnit[]> => {
-
   const parent = await fetchParent(uuid)
 
   if (!parent) {
