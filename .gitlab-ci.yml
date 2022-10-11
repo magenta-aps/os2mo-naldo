@@ -1,8 +1,26 @@
+stages: 
+  - lint
+  - build
+  - release
+  - deploy
+
 variables:
   DOCKERFILE: ${CI_PROJECT_DIR}/docker/web.Dockerfile
   RELEASE_REGISTRY: docker.io
   RELEASE_REGISTRY_IMAGE: index.docker.io/magentaaps/os2mo-naldo
   IMAGE_SHA: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
+
+# Conditions
+#############
+# Global Conditions
+.if-tag: &if-tag
+  if: '$CI_COMMIT_TAG'
+
+.if-default-branch-refs: &if-default-branch-refs
+  if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+.if-merge-request: &if-merge-request
+  if: '$CI_MERGE_REQUEST_IID'
 
 include:
   - project: "labs/salt-automation"
@@ -17,11 +35,17 @@ include:
   - project: "labs/salt-automation"
     file: "gitlab-ci-templates/common/config-updater-meta.v1.yml"
 
-stages: 
-  - lint
-  - build
-  - release
-  - deploy
+# Workflow
+###########
+workflow:
+  rules:
+    - <<: *if-tag
+    - <<: *if-default-branch-refs
+    - <<: *if-merge-request
+
+default:
+  # All jobs are interruptible by default
+  interruptible: true
 
 Pre-commit:
   image: python:3.9
