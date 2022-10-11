@@ -26,6 +26,10 @@
   let detailAmount = 0
 </script>
 
+<svelte:head>
+  <title>Opret enhed | OS2mo</title>
+</svelte:head>
+
 <div class="flex align-center px-6 pt-6 pb-4">
   <h3 class="flex-1">Opret enhed</h3>
 </div>

@@ -14,6 +14,7 @@
 
 <svelte:head>
   <link rel="icon" type="image/png" href={Favicon} />
+  <!-- <title>OS2mo</title> -->
 </svelte:head>
 
 <div class="flex flex-col h-screen">
