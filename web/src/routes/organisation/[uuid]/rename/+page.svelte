@@ -24,35 +24,42 @@
 <form
   use:enhance={() => {
     return async ({ result }) => {
-      const res = await postRest(`details/edit`, {
-        data: { ...result.data },
-        type: "org_unit",
-      })
-      const json = await res.json()
+      if (result.type === "success") {
+        const res = await postRest(`details/edit`, {
+          data: { ...result.data },
+          type: "org_unit",
+        })
+        const json = await res.json()
 
-      if (res.status === 200) {
-        console.log("hest", json)
-        $success = {
-          message: `${name} er blevet omdøbt`,
-          uuid: json,
-          type: "organisation",
+        if (res.status === 200) {
+          $success = {
+            message: `${org.name} er blevet omdøbt`,
+            uuid: json,
+            type: "organisation",
+          }
+          setTimeout(() => goto(`${base}/organisation/${json}`), 200)
+        } else {
+          $error = { message: json.description }
         }
-        setTimeout(() => goto(`${base}/organisation/${json}`), 200)
       } else {
-        $error = { message: json.description }
+        $error = {
+          message: `Fejl i omdøbning af ${org.name}: ${JSON.stringify(result)}`,
+        }
       }
     }
   }}
 >
-  <div class="form-control mx-6 mb-6">
-    <DateInput
-      bind:value={startDate}
-      title="Startdato"
-      id="start-date"
-      max={endDate
-        ? endDate
-        : new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
-    />
+  <div class="flex flex-row mx-6 mb-6">
+    <div class="form-control">
+      <DateInput
+        bind:value={startDate}
+        title="Startdato"
+        id="start-date"
+        max={endDate
+          ? endDate
+          : new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
+      />
+    </div>
   </div>
   <div class="form-control mx-6 mb-6">
     <SelectOrgTree bind:selectedOrg={org} labelText="Angiv enhed" />
