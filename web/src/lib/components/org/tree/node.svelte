@@ -2,7 +2,6 @@
   import { base } from "$app/paths"
   import { page } from "$app/stores"
   import { fetchGraph } from "$lib/util/http"
-  import { fetchParentTree } from "$lib/util/parent_tree"
   import { onMount } from "svelte"
 
   export let name = ""

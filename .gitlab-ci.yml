@@ -55,19 +55,21 @@ Pre-commit:
   script:
     - pre-commit run --all-files
 
-Pages:
+Svelte-check:
   image: node:latest
-  stage: deploy
+  stage: lint
+  script:
+    - cd web/
+    - yarn
+    - yarn run check
+
+SvelteKit build:
+  image: node:latest
+  stage: build
   script:
     - cd web/
     - yarn
     - yarn build
-    - cp -r build/ ../public
-  artifacts:
-    paths:
-      - public
-  # only:
-  #   - master
 
 Deploy to dev:
   extends: .release-to-dev

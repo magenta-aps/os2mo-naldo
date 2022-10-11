@@ -10,8 +10,8 @@
   export let title: string
   export let id: string
   export let name = id
-  export let value: string | object | undefined
-  export let iterable: any[] | undefined
+  export let value: string | object | undefined = undefined
+  export let iterable: any[] | undefined = undefined
   export let required = false
   export let returnType: ReturnType = "uuid"
   export let disabled = false

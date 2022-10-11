@@ -50,11 +50,13 @@
     const res = await fetchGraph(query)
     const json: Query = await res.json()
 
-    if (!json.data) {
-      throw new error(json.errors[0].message)
+    if (json.data) {
+      return json.data.facets
+    } else if (json.errors) {
+      throw new Error(json.errors[0].message)
+    } else {
+      throw new Error(`Unknown error: ${JSON.stringify(json)}`)
     }
-
-    return json.data.facets
   }
 
   // Reactivly keeps addresses up to date while being exported to parent components
