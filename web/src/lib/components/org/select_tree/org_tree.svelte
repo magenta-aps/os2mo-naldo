@@ -4,7 +4,7 @@
   import { offset, flip, shift } from "@floating-ui/dom"
   import { createFloatingActions } from "svelte-floating-ui"
 
-  export let selectedOrg = { name: "", uuid: "" }
+  export let selectedOrg: { name: string; uuid: string | null }
   export let labelText = "Angiv overenhed"
   let orgTree: any[] = []
   let isFocused = false
@@ -46,15 +46,6 @@
     }
   }
 
-  // const fetchOrgDetails = async () => {
-  //   if (selectedOrg.uuid) {
-  //     const res = await fetchRest(`ou/${selectedOrg.uuid}/`)
-  //     const json = await res.json()
-  //     console.log(json)
-  //     orgDetails.push(json)
-  //   }
-  // }
-
   const delayedUnfocus = () => {
     // Stupid hack to make the floatingContent be clickable before it disappears
     setTimeout(() => (isFocused = false), 250)
@@ -65,8 +56,6 @@
     placement: "bottom",
     middleware: [offset(6), flip(), shift()],
   })
-
-  // $: selectedOrg, fetchOrgDetails()
 </script>
 
 {#await fetchOrgTree(query)}

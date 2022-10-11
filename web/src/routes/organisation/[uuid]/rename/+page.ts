@@ -8,14 +8,7 @@ interface Query {
 }
 
 export interface Data {
-  facets: Facet[]
   org_units: OrganisationUnitResponse[]
-}
-
-interface Facet {
-  uuid: null | string
-  user_key: string
-  classes: Class[]
 }
 
 interface Class {
@@ -34,14 +27,6 @@ interface Error {
 export const load = async (event: LoadEvent): Promise<Data> => {
   const query = `
       query {
-        facets(user_keys: ["org_unit_level", "org_unit_type"]) {
-          uuid
-          user_key
-          classes {
-            name
-            uuid
-          }
-        }
         org_units(uuids: "${event.params.uuid}") {
           objects {
             uuid

@@ -8,11 +8,14 @@
   import { enhance } from "$app/forms"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
+  import type { Data } from "./+page"
+
+  export let data: Data
 
   let startDate = new Date().toISOString().split("T")[0]
   let endDate: string
   let name: string
-  let org: any
+  let org = data.org_units[0].objects[0]
 </script>
 
 <div class="flex align-center px-6 pt-6 pb-4">
