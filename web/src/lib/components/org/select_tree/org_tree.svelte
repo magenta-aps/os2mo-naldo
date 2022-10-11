@@ -5,6 +5,7 @@
   import { createFloatingActions } from "svelte-floating-ui"
 
   export let selectedOrg = { name: "", uuid: "" }
+  export let labelText = "Angiv overenhed"
   let orgTree: any[] = []
   let isFocused = false
 
@@ -70,13 +71,13 @@
 
 {#await fetchOrgTree(query)}
   <label for="select-org-tree" class="label">
-    <p>Angiv overenhed</p>
+    <p>{labelText}</p>
     <span class="animate-spin rounded-full h-6 w-6 border-b-4 border-primary" />
   </label>
   <input disabled class="input input-bordered input-sm rounded w-full" />
 {:then}
   <label for="select-org-tree" class="pb-1">
-    <p>Angiv overenhed</p>
+    <p>{labelText}</p>
   </label>
   <div use:floatingRef>
     <input
