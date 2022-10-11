@@ -12,18 +12,18 @@
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
 
+  export let data: Data
+
   let startDate = new Date().toISOString().split("T")[0]
   let endDate: string
   let name: string
-  let parentOrg: any
+  let parentOrg = data.org_units[0].objects[0]
   let orgLevel: string
   let orgType: string
   let orgNumber: string
   // Needs details interface
   let details: any[] = []
   let detailAmount = 0
-
-  export let data: Data
 </script>
 
 <div class="flex align-center px-6 pt-6 pb-4">
