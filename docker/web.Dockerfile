@@ -22,8 +22,4 @@ ENV NODE_ENV=production
 
 RUN yarn build
 
-# FIXME: Hack to solve this https://github.com/sveltejs/kit/issues/3726
-RUN mkdir build/client/new
-RUN mv build/client/_app build/client/new
-
 CMD node /app/build
