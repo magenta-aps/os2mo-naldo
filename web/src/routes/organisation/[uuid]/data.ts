@@ -1,6 +1,4 @@
-import { env } from "$env/dynamic/public"
-import { keycloak } from "$lib/util/keycloak"
-import type { LoadEvent } from "@sveltejs/kit"
+import { fetchGraph } from "$lib/util/http"
 
 interface Query {
   data: Data | null
@@ -95,10 +93,10 @@ interface Error {
   message: string
 }
 
-export const load = async (event: LoadEvent): Promise<OrganisationUnitElement> => {
+export const load = async (uuid: string): Promise<OrganisationUnitElement> => {
   const query = `
     query {
-      org_units(uuids: "${event.params.uuid}") {
+      org_units(uuids: "${uuid}") {
         objects {
           name
           unit_type {
@@ -210,17 +208,7 @@ export const load = async (event: LoadEvent): Promise<OrganisationUnitElement> =
       }
     }
   `
-  const token = keycloak ? keycloak.token : "Keycloak disabled"
-  const res = await event.fetch(`${env.PUBLIC_BASE_URL}/graphql/v2`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + token,
-    },
-    body: JSON.stringify({
-      query: query,
-    }),
-  })
+  const res = await fetchGraph(query)
   const json: Query = await res.json()
   if (json.data) {
     return json.data.org_units[0].objects[0]

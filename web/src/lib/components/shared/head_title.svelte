@@ -46,7 +46,7 @@
 
 <svelte:head>
   {#await fetchTitleName($page.params.uuid)}
-    <title>Loader... | OS2mo</title>
+    <title>... | OS2mo</title>
   {:then value}
     <title>{value} | OS2mo</title>
   {/await}
