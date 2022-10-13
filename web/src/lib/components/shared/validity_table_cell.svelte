@@ -1,7 +1,7 @@
 <script lang="ts">
   interface Validity {
     from: string
-    to?: string
+    to: string | null
   }
 
   export let validity: Validity

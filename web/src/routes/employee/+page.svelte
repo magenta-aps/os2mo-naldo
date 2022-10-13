@@ -51,6 +51,10 @@
   }
 </script>
 
+<svelte:head>
+  <title>Medarbejder | OS2mo</title>
+</svelte:head>
+
 <div class="h-screen m-auto p-10">
   <EmployeeSearchInput bind:input bind:cardView />
   <div class="pt-5">
