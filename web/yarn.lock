@@ -125,11 +125,6 @@
     "@rollup/plugin-node-resolve" "^15.0.0"
     rollup "^2.78.1"
 
-"@sveltejs/adapter-static@^1.0.0-next.44":
-  version "1.0.0-next.44"
-  resolved "https://registry.yarnpkg.com/@sveltejs/adapter-static/-/adapter-static-1.0.0-next.44.tgz#44be6fa94c090a8c70079d60482ec03ab25c5368"
-  integrity sha512-qBtkmIMYGiDv5r2F3AfSG0ABHZim2NC+1PL2YVCa+QYz8IVCm1E/wGQ0RW4KVrANZ3MZk8y52PPajx+8/fwmNw==
-
 "@sveltejs/kit@^1.0.0-next.515":
   version "1.0.0-next.515"
   resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.0.0-next.515.tgz#0c3ceddb7f665a216adc401ea1a91dec7aff524a"
@@ -395,16 +390,6 @@ daisyui@^2.31.0:
     css-selector-tokenizer "^0.8.0"
     postcss-js "^4.0.0"
     tailwindcss "^3"
-
-date-fns@^2.29.3:
-  version "2.29.3"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.29.3.tgz#27402d2fc67eb442b511b70bbdf98e6411cd68a8"
-  integrity sha512-dDCnyH2WnnKusqvZZ6+jA1O51Ibt8ZMRNkDZdyAyK4YfbDwa/cEmuztzG5pk6hqlp9aSBPYcjOlktquahGwGeA==
-
-date-picker-svelte@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/date-picker-svelte/-/date-picker-svelte-2.2.0.tgz#b6a8cbd9637c4d026e49468f207c57b127df9fe0"
-  integrity sha512-Hu+FffzjTu1+g+Ymxoh8+os0YXd6Qp5YTwMkYTtRoiFFkT3n4e5t5IBA/Y9daqWJcJv7e8mq9BssO0UN1Qjyig==
 
 debug@^4.3.4:
   version "4.3.4"
