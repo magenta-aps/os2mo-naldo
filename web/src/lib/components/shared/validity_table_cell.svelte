@@ -1,18 +1,12 @@
 <script lang="ts">
+  import { formatDate } from "$lib/util/date"
+
   interface Validity {
     from: string
     to: string | null
   }
 
   export let validity: Validity
-
-  const formatDate = (date: string): string => {
-    const dt = new Date(date).toLocaleDateString("da-DK", {
-      dateStyle: "short",
-    })
-
-    return dt.split(".").join("-")
-  }
 </script>
 
 <td class="whitespace-nowrap px-4 py-2">

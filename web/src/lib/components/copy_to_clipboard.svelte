@@ -17,6 +17,6 @@
     on:click={copyToClipboard}
     class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
   >
-    <Icon type="clipboard" />
+    <Icon type="clipboard" fill="primary" />
   </button>
 </div>

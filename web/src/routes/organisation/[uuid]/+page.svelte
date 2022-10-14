@@ -10,6 +10,8 @@
   import { activeOrgTab } from "$lib/stores/tab"
   import { base } from "$app/paths"
   import { load } from "./data"
+  import Address from "$lib/components/forms/shared/address.svelte"
+  import Icon from "$lib/components/icon.svelte"
 
   // Tabs
   // TODO: enum?
@@ -49,7 +51,7 @@
 
     {#if activeItem === "Enhed"}
       <DetailTable
-        headers={["Enhed", "Enhedstype", "Enhedsniveau", "Overenhed", "Dato"]}
+        headers={["Enhed", "Enhedstype", "Enhedsniveau", "Overenhed", "Dato", "", ""]}
       >
         <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
           <td class="p-4">{data.name}</td>
@@ -65,6 +67,18 @@
             <td class="p-4">Ingen overenhed</td>
           {/if}
           <ValidityTableCell validity={data.validity} />
+          <td>
+            <a href="{base}/organisation/{$page.params.uuid}/edit/unit">
+              <Icon type="pen" />
+            </a>
+          </td><td>
+            <a
+              href="{base}/organisation/{$page.params.uuid}/terminate/unit"
+              class="hover:slate-300"
+            >
+              <Icon type="xmark" size="30" />
+            </a>
+          </td>
         </tr>
       </DetailTable>
     {:else if activeItem === "Adresser"}

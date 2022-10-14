@@ -15,6 +15,7 @@ interface OrganisationUnitResponse {
 
 export interface OrganisationUnitElement {
   name: string
+  uuid: string
   unit_type: Class | null
   org_unit_level: Class | null
   parent: ParentOrganisationUnit | null
@@ -99,6 +100,7 @@ export const load = async (uuid: string): Promise<OrganisationUnitElement> => {
       org_units(uuids: "${uuid}") {
         objects {
           name
+          uuid
           unit_type {
             name
           }
