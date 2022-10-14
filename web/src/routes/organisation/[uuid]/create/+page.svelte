@@ -19,7 +19,7 @@
   let orgLevel: string
   let orgType: string
   let orgNumber: string
-  // Needs details interface
+  // Needs details interfacex
   let details: any[] = []
   let detailAmount = 0
 
@@ -33,6 +33,7 @@
 <div class="divider p-0 m-0 mb-4 w-full" />
 
 <form
+  style="width: 556px; "
   use:enhance={() => {
     return async ({ result }) => {
       const res = await postRest(`ou/create`, { ...result.data })
@@ -52,7 +53,7 @@
   }}
 >
   <div class="flex flex-row gap-6 mx-6 mb-4">
-    <div class="form-control">
+    <div style="width: 250px;" class="form-control">
       <DateInput
         bind:value={startDate}
         title="Startdato"
@@ -63,7 +64,7 @@
       />
     </div>
 
-    <div class="form-control">
+    <div style="width: 250px;" class="form-control">
       <DateInput
         bind:value={endDate}
         title="Slutdato"
@@ -113,27 +114,36 @@
         <Address {startDate} {endDate} bind:addresses={details[i]} detailAmount={i} />
       {/each}
     </div>
-    <button
-      on:click={() => {
-        detailAmount++
-      }}
-      class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-      type="button">+ Tilføj adresser(*)</button
-    >
-  </div>
-  <div class="modal-action p-6 gap-4 bg-slate-100">
+
+    <div class="flex justify-between">
+      <div>
+        <button
+          on:click={() => {
+            detailAmount++
+          }}
+          class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+          type="button">+ Tilføj adresser</button
+        >
+      </div>
+      <div>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+        >
+          Annullér
+        </button>
+        <button
+          type="submit"
+          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+          >Opret enhed</button
+        >
+      </div>
+    </div>
+
     <!-- TODO: Make button close modal -->
-    <button
-      type="button"
-      class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-    >
-      Annullér
-    </button>
-    <button
-      type="submit"
-      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-      >Opret enhed</button
-    >
   </div>
   <Error />
 </form>
+
+<style>
+</style>

@@ -102,7 +102,7 @@
         class="w-96 max-w-full px-5"
         on:mouseleave={delayedUnfocus}
       >
-        <ul class="menu bg-base-200 ">
+        <ul class="menu bg-base-100 ">
           {#each orgTree as child}
             <Node {...child} bind:selectedOrg />
           {/each}
