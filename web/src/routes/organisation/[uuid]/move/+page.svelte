@@ -4,7 +4,6 @@
   import SelectOrgTree from "$lib/components/org/select_tree/org_tree.svelte"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import Input from "$lib/components/forms/shared/input.svelte"
   import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
   import { enhance } from "$app/forms"
   import { goto } from "$app/navigation"
@@ -39,24 +38,40 @@
         if (res.status === 200) {
           const resTwo = await postRest(`validate/candidate-parent-org-unit/`, {
             org_unit: { uuid: result.data.uuid },
-            validity: result.data.validity,
+            parent: { uuid: result.data.parent },
+            validity: { from: result.data.validity.from },
           })
           const jsonTwo = await resTwo.json()
 
           if (resTwo.status === 200) {
-            $success = {
-              message: `${org.name} er blevet omdøbt`,
-              uuid: json,
-              type: "organisation",
+            const resThree = await postRest(`details/edit`, {
+              data: {
+                uuid: result.data.uuid,
+                parent: { uuid: result.data.parent },
+                validity: { from: result.data.validity.from },
+              },
+              type: "org_unit",
+            })
+
+            const jsonThree = await resThree.json()
+
+            if (resThree.status === 200) {
+              $success = {
+                message: `${org.name} er blevet rykket til ${parentOrg.name}`,
+                uuid: jsonThree,
+                type: "organisation",
+              }
+              setTimeout(() => goto(`${base}/organisation/${jsonThree}`), 200)
             }
-            setTimeout(() => goto(`${base}/organisation/${json}`), 200)
+          } else {
+            $error = { message: jsonTwo.description }
           }
         } else {
           $error = { message: json.description }
         }
       } else {
         $error = {
-          message: `Fejl i omdøbning af ${org.name}: ${JSON.stringify(result)}`,
+          message: `Fejl i rykning af ${org.name}: ${JSON.stringify(result)}`,
         }
       }
     }
