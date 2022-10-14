@@ -37,7 +37,7 @@
   </div>
 {:then data}
   <div class="px-10">
-    <Breadcrumbs currentOrg={data.name} />
+    <Breadcrumbs currentOrg={data.name} uuid={$page.params.uuid} />
     <div class="flex gap-5">
       <h1 class="pb-4">{data.name}</h1>
       <CopyToClipboard uuid={$page.params.uuid} name={data.name} />

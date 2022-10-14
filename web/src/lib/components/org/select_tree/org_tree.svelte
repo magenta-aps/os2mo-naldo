@@ -6,6 +6,7 @@
 
   export let selectedOrg: { name: string; uuid: string | null }
   export let labelText = "Angiv overenhed"
+  export let id = "select-org-tree"
   let orgTree: any[] = []
   let isFocused = false
 
@@ -59,18 +60,18 @@
 </script>
 
 {#await fetchOrgTree(query)}
-  <label for="select-org-tree" class="label">
+  <label for={id} class="label">
     <p>{labelText}</p>
     <span class="animate-spin rounded-full h-6 w-6 border-b-4 border-primary" />
   </label>
   <input disabled class="input input-bordered input-sm rounded w-full" />
 {:then}
-  <label for="select-org-tree" class="pb-1">
+  <label for={id} class="pb-1">
     <p>{labelText}</p>
   </label>
   <div use:floatingRef>
     <input
-      id="select-org-tree"
+      {id}
       required
       on:focus={() => {
         isFocused = true
@@ -80,12 +81,7 @@
     />
 
     <!-- Hidden hack to return the UUID while displaying the name -->
-    <input
-      hidden
-      id="select-org-tree"
-      name="select-org-tree"
-      bind:value={selectedOrg.uuid}
-    />
+    <input hidden {id} name={id} bind:value={selectedOrg.uuid} />
     {#if isFocused}
       <div
         use:floatingContent
