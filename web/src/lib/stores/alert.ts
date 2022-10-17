@@ -3,7 +3,7 @@ import { writable } from "svelte/store"
 interface SuccessAlert {
   message: string
   uuid?: string
-  type: "employee" | "organisation" | "clipboard"
+  type?: "employee" | "organisation" | "clipboard"
   timeOutTime?: number
 }
 
@@ -12,7 +12,7 @@ interface ErrorAlert {
   timeOutTime?: number
 }
 
-const defaultSuccessAlert: SuccessAlert = { message: "", type: "employee" }
+const defaultSuccessAlert: SuccessAlert = { message: "" }
 const defaultErrorAlert: ErrorAlert = { message: "" }
 
 export const success = writable(defaultSuccessAlert)

@@ -2,22 +2,21 @@
   import { slide } from "svelte/transition"
   import { error } from "$lib/stores/alert"
 
-  let show = false
-
   const startTimeout = () => {
-    show = true
     setTimeout(
       () => {
-        show = false
+        $error = { message: "" }
       },
-      $error.timeOutTime ? $error.timeOutTime : 3000
+      $error.timeOutTime ? $error.timeOutTime : 5000
     )
   }
 
-  $: $error, startTimeout()
+  $: if ($error.message) {
+    startTimeout()
+  }
 </script>
 
-{#if show && $error.message}
+{#if $error.message}
   <div class="toast toast-end" transition:slide>
     <div class="alert alert-error shadow-lg">
       <div>
