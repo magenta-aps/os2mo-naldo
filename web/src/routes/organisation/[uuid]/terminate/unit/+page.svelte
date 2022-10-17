@@ -1,14 +1,13 @@
 <script lang="ts">
-  import type { OrganisationUnit } from "./+page"
+  import type { OrganisationUnitElement } from "./+page"
   import { formatDate } from "$lib/util/date"
   import { base } from "$app/paths"
-  import { page } from "$app/stores"
   import { enhance } from "$app/forms"
-  import { fetchGraph } from "$lib/util/http"
-  import { success } from "$lib/stores/alert"
+  import { postRest } from "$lib/util/http"
+  import { success, error } from "$lib/stores/alert"
   import { goto } from "$app/navigation"
 
-  export let data: OrganisationUnit
+  export let data: OrganisationUnitElement
   console.log(data)
 </script>
 
@@ -22,29 +21,33 @@
   class="mx-6"
   use:enhance={() => {
     return async () => {
-      const to = data.validity.to ? `, to: "${data.validity.to}", ` : ", "
-      const query = `
-      mutation {
-        org_unit_terminate(
-          unit: {from: "${data.validity.from}" ${to} uuid: "${data.uuid}"}
-        ) {
-          uuid
-        }
-      }
-    `
-      const res = await fetchGraph(query)
+      const res = await postRest("details/terminate", {
+        type: "org_unit",
+        uuid: data.uuid,
+        validity: {
+          from: data.validity.from,
+          to: data.validity.to,
+        },
+      })
+
+      console.log("res", res)
+
       const json = await res.json()
 
-      if (res.status === 201) {
+      console.log("json", json)
+
+      if (res.status === 200) {
+        if (data.parent && data.parent.uuid) {
+          goto(`${base}/organisation/${data.parent.uuid}`)
+        }
         $success = {
           message: `${data.name} er blevet afsluttet`,
-          uuid: json,
+          uuid: data?.parent?.uuid,
           type: "organisation",
         }
-        setTimeout(() => goto(`${base}/organisation/${json}`), 200)
       } else {
-        // $error = { message: json.description }
-        console.error("idk", json.errors)
+        $error = { message: json.description }
+        console.error("idk", json)
       }
     }
   }}

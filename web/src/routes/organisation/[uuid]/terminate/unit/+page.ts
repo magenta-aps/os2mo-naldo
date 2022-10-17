@@ -17,13 +17,18 @@ interface Data {
 }
 
 interface OrganisationUnitResponse {
-  objects: OrganisationUnit[]
+  objects: OrganisationUnitElement[]
 }
 
-export interface OrganisationUnit {
+export interface OrganisationUnitElement {
   name: string
   uuid: null | string
   validity: Validity
+  parent: ParentOrganisationUnit | null
+}
+
+interface ParentOrganisationUnit {
+  uuid: null | string
 }
 
 interface Validity {
@@ -35,7 +40,7 @@ interface Error {
   message: string
 }
 
-export const load = async (event: LoadEvent): Promise<OrganisationUnit> => {
+export const load = async (event: LoadEvent): Promise<OrganisationUnitElement> => {
   const query = `
       query {
         org_units(uuids: "${event.params.uuid}") {
@@ -45,6 +50,9 @@ export const load = async (event: LoadEvent): Promise<OrganisationUnit> => {
             validity {
               from
               to
+            }
+            parent {
+              uuid
             }
           }
         }
