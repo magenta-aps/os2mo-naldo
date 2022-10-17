@@ -14,7 +14,6 @@
 
   let startDate = new Date().toISOString().split("T")[0]
   let endDate: string
-  let name: string
   let org = data.org_units[0].objects[0]
   let parentOrg = { name: "", uuid: "" }
 </script>
@@ -29,6 +28,13 @@
   use:enhance={() => {
     return async ({ result }) => {
       if (result.type === "success") {
+        if (!result.data) {
+          $error = {
+            message: `Fejl i rykning af ${org.name}: Ingen data`,
+          }
+          return
+        }
+
         const validateOrgUnit = await postRest(`validate/org-unit/`, {
           org_unit: { uuid: result.data.uuid },
           validity: result.data.validity,
@@ -97,9 +103,11 @@
     </div>
   </div>
 
-  <div class="mx-6 mb-6">
-    <Breadcrumbs currentOrg={org.name} uuid={org.uuid} />
-  </div>
+  {#if org.uuid}
+    <div class="mx-6 mb-6">
+      <Breadcrumbs currentOrg={org.name} uuid={org.uuid} />
+    </div>
+  {/if}
 
   <div class="form-control mx-6 mb-6">
     <SelectOrgTree

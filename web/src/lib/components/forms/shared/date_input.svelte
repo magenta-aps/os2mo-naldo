@@ -5,7 +5,7 @@
   export let value: string | number | undefined
   export let required = false
   export let min = "1910-01-01"
-  export let max: string
+  export let max: string | undefined = undefined
 </script>
 
 {#if title}

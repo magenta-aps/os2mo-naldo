@@ -4,8 +4,6 @@
   import SelectOrgTree from "$lib/components/org/select_tree/org_tree.svelte"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import Input from "$lib/components/forms/shared/input.svelte"
-  import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
   import { enhance } from "$app/forms"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
@@ -14,9 +12,7 @@
   export let data: Data
 
   let endDate = new Date().toISOString().split("T")[0]
-  let name: string
   let org = data.org_units[0].objects[0]
-  let parentOrg = { name: "", uuid: "" }
 </script>
 
 <div class="flex align-center px-6 pt-6 pb-4">
@@ -29,6 +25,13 @@
   use:enhance={() => {
     return async ({ result }) => {
       if (result.type === "success") {
+        if (!result.data) {
+          $error = {
+            message: `Fejl i terminering af ${org.name}: Ingen data`,
+          }
+          return
+        }
+
         const res = await postRest(`ou/${result.data.org}/terminate`, {
           validity: result.data.validity,
         })
