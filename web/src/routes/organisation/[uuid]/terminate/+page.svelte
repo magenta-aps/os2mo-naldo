@@ -28,7 +28,6 @@
 <form
   use:enhance={() => {
     return async ({ result }) => {
-      console.log(result)
       if (result.type === "success") {
         const res = await postRest(`ou/${result.data.org}/terminate`, {
           validity: result.data.validity,
