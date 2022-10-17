@@ -29,45 +29,49 @@
   use:enhance={() => {
     return async ({ result }) => {
       if (result.type === "success") {
-        const res = await postRest(`validate/org-unit/`, {
+        const validateOrgUnit = await postRest(`validate/org-unit/`, {
           org_unit: { uuid: result.data.uuid },
           validity: result.data.validity,
         })
-        const json = await res.json()
 
-        if (res.status === 200) {
-          const resTwo = await postRest(`validate/candidate-parent-org-unit/`, {
+        const validateCandidateParent = await postRest(
+          `validate/candidate-parent-org-unit/`,
+          {
             org_unit: { uuid: result.data.uuid },
             parent: { uuid: result.data.parent },
             validity: { from: result.data.validity.from },
+          }
+        )
+
+        const validations = await Promise.all([
+          validateOrgUnit,
+          validateCandidateParent,
+        ]).then((res) => Promise.all(res.map((r) => r.json())))
+
+        if (validations.every((item) => item.success)) {
+          const res = await postRest(`details/edit`, {
+            data: {
+              uuid: result.data.uuid,
+              parent: { uuid: result.data.parent },
+              validity: { from: result.data.validity.from },
+            },
+            type: "org_unit",
           })
-          const jsonTwo = await resTwo.json()
 
-          if (resTwo.status === 200) {
-            const resThree = await postRest(`details/edit`, {
-              data: {
-                uuid: result.data.uuid,
-                parent: { uuid: result.data.parent },
-                validity: { from: result.data.validity.from },
-              },
-              type: "org_unit",
-            })
+          const json = await res.json()
 
-            const jsonThree = await resThree.json()
-
-            if (resThree.status === 200) {
-              $success = {
-                message: `${org.name} er blevet rykket til ${parentOrg.name}`,
-                uuid: jsonThree,
-                type: "organisation",
-              }
-              setTimeout(() => goto(`${base}/organisation/${jsonThree}`), 200)
+          if (res.status === 200) {
+            $success = {
+              message: `${org.name} er blevet rykket til ${parentOrg.name}`,
+              uuid: json,
+              type: "organisation",
             }
-          } else {
-            $error = { message: jsonTwo.description }
+            setTimeout(() => goto(`${base}/organisation/${json}`), 200)
           }
         } else {
-          $error = { message: json.description }
+          $error = {
+            message: validations.find((item) => !item.success).description,
+          }
         }
       } else {
         $error = {
