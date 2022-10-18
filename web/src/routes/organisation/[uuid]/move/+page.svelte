@@ -18,6 +18,10 @@
   let parentOrg = { name: "", uuid: "" }
 </script>
 
+<svelte:head>
+  <title>Flyt enhed | OS2mo</title>
+</svelte:head>
+
 <div class="flex align-center px-6 pt-6 pb-4">
   <h3 class="flex-1">Flyt enhed</h3>
 </div>
@@ -105,7 +109,7 @@
 
   {#if org.uuid}
     <div class="mx-6 mb-6">
-      <Breadcrumbs currentOrg={org.name} uuid={org.uuid} />
+      <Breadcrumbs bind:currentOrg={org.name} bind:uuid={org.uuid} orgSelector={true} />
     </div>
   {/if}
 
