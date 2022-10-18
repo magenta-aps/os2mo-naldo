@@ -6,6 +6,7 @@
   import HeadTitle from "$lib/components/shared/head_title.svelte"
   import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
   import CopyToClipboard from "$lib/components/copy_to_clipboard.svelte"
+  import TenseTabs from "$lib/components/shared/tense_tabs.svelte"
   import { activeOrgTab } from "$lib/stores/tab"
   import { base } from "$app/paths"
   import { load } from "./data"
@@ -43,6 +44,9 @@
       <CopyToClipboard uuid={$page.params.uuid} name={data.name} />
     </div>
     <Tabs {activeItem} {items} on:tabChange={tabChange} />
+
+    <TenseTabs />
+
     {#if activeItem === "Enhed"}
       <DetailTable
         headers={["Enhed", "Enhedstype", "Enhedsniveau", "Overenhed", "Dato"]}

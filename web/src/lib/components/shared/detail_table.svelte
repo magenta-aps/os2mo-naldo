@@ -1,9 +1,7 @@
 <script lang="ts">
-  export let time: string = "Nutid"
   export let headers: string[]
 </script>
 
-<h2 class="py-4">{time}</h2>
 <div class="overflow-x-auto rounded border mb-8">
   <table class="border-slate-300 w-full">
     {#if headers}
