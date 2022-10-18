@@ -98,7 +98,7 @@
         title="Enhedstype"
         id="org-type"
         bind:value={orgType}
-        iterable={data.facets[1].classes}
+        iterable={data.facets[1].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
         required={true}
       />
     </div>
@@ -109,7 +109,7 @@
           title="Enhedsniveau"
           id="org-level"
           bind:value={orgLevel}
-          iterable={data.facets[0].classes}
+          iterable={data.facets[0].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
           required={true}
         />
       </div>
