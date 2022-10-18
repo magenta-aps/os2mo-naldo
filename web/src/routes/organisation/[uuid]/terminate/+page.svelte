@@ -15,6 +15,10 @@
   let org = data.org_units[0].objects[0]
 </script>
 
+<svelte:head>
+  <title>Afslut enhed | OS2mo</title>
+</svelte:head>
+
 <div class="flex align-center px-6 pt-6 pb-4">
   <h3 class="flex-1">Afslut enhed</h3>
 </div>

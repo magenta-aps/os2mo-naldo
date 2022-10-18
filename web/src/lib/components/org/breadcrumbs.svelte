@@ -4,6 +4,7 @@
 
   export let currentOrg: string
   export let uuid: string
+  export let orgSelector: boolean = false
 </script>
 
 {#await fetchParentTree(uuid)}
@@ -13,9 +14,21 @@
     <ul>
       {#each parents.reverse() as parent}
         <li>
-          <a href="{base}/organisation/{parent.uuid}">
-            {parent.name}
-          </a>
+          {#if orgSelector}
+            <div
+              class="cursor-pointer link text-primary"
+              on:click={() => {
+                currentOrg = parent.name
+                uuid = parent.uuid
+              }}
+            >
+              {parent.name}
+            </div>
+          {:else}
+            <a href="{base}/organisation/{parent.uuid}">
+              {parent.name}
+            </a>
+          {/if}
         </li>
       {/each}
       <li>
