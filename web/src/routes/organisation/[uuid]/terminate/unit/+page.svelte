@@ -18,7 +18,6 @@
 <div class="divider p-0 m-0 mb-4 w-full" />
 
 <form
-  class="mx-6"
   use:enhance={() => {
     return async () => {
       const res = await postRest("details/terminate", {
@@ -30,11 +29,7 @@
         },
       })
 
-      console.log("res", res)
-
       const json = await res.json()
-
-      console.log("json", json)
 
       if (res.status === 200) {
         if (data.parent && data.parent.uuid) {
@@ -47,18 +42,27 @@
         }
       } else {
         $error = { message: json.description }
-        console.error("idk", json)
       }
     }
   }}
 >
-  <p>Dette vil afslutte registreringen for perioden:</p>
-  <p>Startdato: {formatDate(data.validity.from)}</p>
-  <p>Slutdato: {data.validity.to ? formatDate(data.validity.to) : "Ingen"}</p>
-
-  <br />
-  <button type="submit" class="btn btn-sm btn-warning">Afslut</button>
-  <!-- <a href="{base}/organisation/{$page.params.uuid}"> -->
-  <!--   <button type="reset" class="btn btn-sm btn-warning">Gå tilbage</button> -->
-  <!-- </a> -->
+  <div class="mx-6">
+    {env.PUBLIC_ENABLE_UNIT_TERMINATE}
+    <p>Dette vil afslutte registreringen for perioden:</p>
+    <p>Startdato: {formatDate(data.validity.from)}</p>
+    <p>Slutdato: {data.validity.to ? formatDate(data.validity.to) : "Ingen"}</p>
+  </div>
+  <div class="modal-action p-6 gap-4 bg-slate-100">
+    <button
+      type="button"
+      class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+    >
+      Annullér
+    </button>
+    <button
+      type="submit"
+      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+      >Afslut enhed</button
+    >
+  </div>
 </form>
