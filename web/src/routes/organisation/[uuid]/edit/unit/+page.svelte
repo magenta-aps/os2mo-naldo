@@ -1,6 +1,6 @@
 <script lang="ts">
   import { success, error } from "$lib/stores/alert"
-  import { fetchGraph, postRest } from "$lib/util/http"
+  import { fetchGraph } from "$lib/util/http"
   import SelectOrgTree from "$lib/components/org/select_tree/org_tree.svelte"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
@@ -16,8 +16,10 @@
   let startDate = new Date().toISOString().split("T")[0]
   let endDate: string
   let name = data.org_units[0].objects[0].name
-  let orgLevel: string
-  let orgType: string
+
+  let parent = data.org_units[0].objects[0].parent
+    ? data.org_units[0].objects[0].parent
+    : { name: "", uuid: "" }
 </script>
 
 <svelte:head>
@@ -39,7 +41,7 @@
 
         if (res.status === 200) {
           $success = {
-            message: `${name} er blevet oprettet`,
+            message: `${name} er blevet redigeret`,
             uuid: json.data.org_unit_update.uuid,
             type: "organisation",
           }
@@ -82,30 +84,26 @@
     </div>
   </div>
   <div class="form-control mx-6 mb-4">
-    <SelectOrgTree bind:selectedOrg={data.org_units[0].objects[0].parent} />
+    <SelectOrgTree bind:selectedOrg={parent} required={false} />
   </div>
 
   <div class="mx-6">
     <div class="form-control mb-4">
-      <Input title="Navn" id="name" bind:value={name} required={true} />
+      <Input title="Navn" id="name" bind:value={name} />
     </div>
     <div class="flex flex-row gap-6 mb-6">
       <div class="basis-1/2">
         <Select
           title="Enhedsniveau"
           id="org-level"
-          bind:value={orgLevel}
           iterable={data.facets[0].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
-          required={true}
         />
       </div>
       <div class="basis-1/2">
         <Select
           title="Enhedstype"
           id="org-type"
-          bind:value={orgType}
           iterable={data.facets[1].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
-          required={true}
         />
       </div>
     </div>

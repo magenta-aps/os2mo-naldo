@@ -29,7 +29,13 @@ interface Class {
 }
 
 interface OrganisationUnitResponse {
-  objects: Class[]
+  objects: OrganisationUnit[]
+}
+
+interface OrganisationUnit {
+  uuid: null | string
+  name: string
+  parent: Class | null
 }
 
 interface Error {

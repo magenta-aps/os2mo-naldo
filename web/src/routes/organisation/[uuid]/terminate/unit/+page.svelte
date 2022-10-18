@@ -8,7 +8,6 @@
   import { goto } from "$app/navigation"
 
   export let data: OrganisationUnitElement
-  console.log(data)
 </script>
 
 <div class="flex align-center px-6 pt-6 pb-4">
@@ -47,7 +46,6 @@
   }}
 >
   <div class="mx-6">
-    {env.PUBLIC_ENABLE_UNIT_TERMINATE}
     <p>Dette vil afslutte registreringen for perioden:</p>
     <p>Startdato: {formatDate(data.validity.from)}</p>
     <p>Slutdato: {data.validity.to ? formatDate(data.validity.to) : "Ingen"}</p>
