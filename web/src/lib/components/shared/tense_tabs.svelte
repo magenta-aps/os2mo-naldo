@@ -2,10 +2,10 @@
   import { tenses } from "$lib/stores/tenses"
 </script>
 
-<div class="tabs tabs-boxed p-0 bg-base-100 border-primary border-2 my-5 w-fit">
+<div class="tabs tabs-boxed p-0 bg-base-100 border-primary border rounded my-5 w-fit">
   <div
-    class="border-primary border-r-2 text-slate-600 hover:text-secondary tab 
-        {$tenses.past ? 'bg-accent rounded-l-md' : ''}"
+    class="border-primary border-r text-slate-600 hover:text-secondary tab 
+        {$tenses.past ? 'bg-accent rounded-l' : ''}"
     on:click={() => {
       $tenses.past = !$tenses.past
     }}
@@ -22,8 +22,8 @@
     Nutid
   </div>
   <div
-    class="border-primary border-l-2 text-slate-600 hover:text-secondary tab 
-        {$tenses.future ? 'bg-accent rounded-r-md' : ''}"
+    class="border-primary border-l text-slate-600 hover:text-secondary tab 
+        {$tenses.future ? 'bg-accent rounded-r' : ''}"
     on:click={() => {
       $tenses.future = !$tenses.future
     }}
