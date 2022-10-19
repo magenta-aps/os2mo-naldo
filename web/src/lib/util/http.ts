@@ -23,7 +23,7 @@ export const postRest = async (path: string, payload: any) => {
   })
 }
 
-export const fetchGraph = async (query: string): Promise<Response> => {
+export const fetchGraph = async (query: string | object | any): Promise<Response> => {
   const token = keycloak ? keycloak.token : "Keycloak disabled"
   return await fetch(`${env.PUBLIC_BASE_URL}/graphql/v2`, {
     method: "POST",
@@ -31,8 +31,12 @@ export const fetchGraph = async (query: string): Promise<Response> => {
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
     },
-    body: JSON.stringify({
-      query: query,
-    }),
+    body: JSON.stringify(
+      typeof query === "string"
+        ? { query: query }
+        : typeof query === "object"
+        ? query
+        : TypeError("Bad query")
+    ),
   })
 }

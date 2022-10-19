@@ -6,7 +6,7 @@
   import { success } from "$lib/stores/alert"
 
   // First load from index
-  const fetchOrgTree = async (childUuid?: string): Promise<any[]> => {
+  const fetchOrgTree = async (childUuid?: string | null): Promise<any[]> => {
     const query = `{
       org_units(parents: null) {
         objects {

@@ -19,6 +19,7 @@ services:
       target: dev
     environment:
       PUBLIC_BASE_URL: http://localhost:5000
+      PUBLIC_ENABLE_UNIT_TERMINATE: "false"
     ports:
       - 5173:5173   # dev
       - 24678:24678 # hot module reloading

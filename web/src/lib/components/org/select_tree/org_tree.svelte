@@ -7,6 +7,7 @@
   export let selectedOrg: { name: string; uuid: string | null }
   export let labelText = "Angiv overenhed"
   export let id = "select-org-tree"
+  export let required = true
   let orgTree: any[] = []
   let isFocused = false
 
@@ -72,7 +73,7 @@
   <div use:floatingRef>
     <input
       {id}
-      required
+      {required}
       on:focus={() => {
         isFocused = true
       }}
