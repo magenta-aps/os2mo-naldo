@@ -94,10 +94,17 @@ interface Error {
   message: string
 }
 
-export const load = async (uuid: string): Promise<OrganisationUnitElement> => {
+export const load = async (
+  uuid: string,
+  fromDate: string,
+  toDate?: string
+): Promise<OrganisationUnitElement> => {
+  // const parsedToDate = toDate ? `, to_date: "${toDate}"` : ""
+  // org_units(uuids: "${uuid}", from_date: null, to_date: null) {
+
   const query = `
     query {
-      org_units(uuids: "${uuid}") {
+      org_units(uuids: "${uuid}", from_date: "${fromDate}") {
         objects {
           name
           uuid

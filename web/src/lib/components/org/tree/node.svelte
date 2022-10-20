@@ -10,13 +10,14 @@
   export let uuid = ""
   export let breadcrumbs: string[] = []
   export let open = false
+  export let fromDate: string
 
   let loading = false
 
   const fetchChildren = async (uuid: string) => {
-    const findQuery = `
+    const query = `
       query {
-        org_units(uuids: "${uuid}") {
+        org_units(uuids: "${uuid}", from_date: "${fromDate}") {
           objects {
             children {
               name
@@ -25,7 +26,7 @@
           }
         }
       }`
-    const res = await fetchGraph(findQuery)
+    const res = await fetchGraph(query)
     const json = await res.json()
     if (json.data) {
       return json.data.org_units[0].objects[0].children
@@ -48,8 +49,10 @@
   }
 
   const expandToActiveChild = async () => {
+    console.log("hejsa")
     if (breadcrumbs && breadcrumbs[0] === uuid) {
       // Removes used UUID
+      console.log("breadcrumbs", breadcrumbs)
       breadcrumbs = breadcrumbs.slice(1)
       await toggleOpen()
 

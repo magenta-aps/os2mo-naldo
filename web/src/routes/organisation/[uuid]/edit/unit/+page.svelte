@@ -12,6 +12,7 @@
   import { base } from "$app/paths"
 
   export let data: Data
+  console.log("unit edit data", data)
 
   let startDate = new Date().toISOString().split("T")[0]
   let endDate: string

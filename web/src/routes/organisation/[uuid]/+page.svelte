@@ -12,6 +12,7 @@
   import { load } from "./data"
   import Icon from "$lib/components/icon.svelte"
   import { env } from "$env/dynamic/public"
+  import { date } from "$lib/stores/date"
 
   // Tabs
   // TODO: enum?
@@ -34,7 +35,7 @@
 
 <HeadTitle type="organization" />
 
-{#await load($page.params.uuid)}
+{#await load($page.params.uuid, $date)}
   <div class="px-10">
     <p class="py-5">Loader organisation...</p>
   </div>

@@ -4,11 +4,15 @@
   import { fetchParentTree } from "$lib/util/parent_tree.js"
   import Node from "$lib/components/org/tree/node.svelte"
   import { success } from "$lib/stores/alert"
+  import { date } from "$lib/stores/date"
 
   // First load from index
-  const fetchOrgTree = async (childUuid?: string | null): Promise<any[]> => {
+  const fetchOrgTree = async (
+    fromDate: string,
+    childUuid?: string | null
+  ): Promise<any[]> => {
     const query = `{
-      org_units(parents: null) {
+      org_units(parents: null, from_date: "${fromDate}") {
         objects {
           name
           uuid
@@ -27,25 +31,29 @@
 
     const uuid = childUuid ? childUuid : $page.params.uuid
     const breadcrumbs = $page.routeId?.startsWith("organisation")
-      ? (await fetchParentTree(uuid)).map((e) => e.uuid).reverse()
+      ? (await fetchParentTree(fromDate, uuid)).map((e) => e.uuid).reverse()
       : []
 
+    console.log("hjælp", breadcrumbs)
     for (let org of json.data.org_units) {
       orgTree.push({
         uuid: org.objects[0].uuid,
         name: org.objects[0].name,
         children: org.objects[0].children,
         breadcrumbs: breadcrumbs,
+        fromDate: fromDate,
       })
     }
     return orgTree
   }
 
-  let refreshableOrgTree = fetchOrgTree()
+  let refreshableOrgTree = fetchOrgTree($date)
+
+  $: refreshableOrgTree = fetchOrgTree($date)
 
   // TODO: Replace with subscriptions when implmented
   $: if ($success.type === "organisation") {
-    refreshableOrgTree = fetchOrgTree($success.uuid)
+    refreshableOrgTree = fetchOrgTree($date, $success.uuid)
   }
 </script>
 

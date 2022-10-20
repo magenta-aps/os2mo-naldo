@@ -3,6 +3,7 @@
   import Node from "$lib/components/org/select_tree/node.svelte"
   import { offset, flip, shift } from "@floating-ui/dom"
   import { createFloatingActions } from "svelte-floating-ui"
+  import { date } from "$lib/stores/date"
 
   export let selectedOrg: { name: string; uuid: string | null }
   export let labelText = "Angiv overenhed"
@@ -13,7 +14,7 @@
 
   const query = `
     query {
-      org_units {
+      org_units (from_date: "${$date}") {
         uuid
         objects {
           name
@@ -40,6 +41,7 @@
             uuid: org.uuid,
             name: org.objects[0].name,
             children: org.objects[0].children,
+            fromDate: $date,
           })
         }
       }
