@@ -94,17 +94,34 @@ interface Error {
   message: string
 }
 
-export const load = async (
-  uuid: string,
-  fromDate: string,
-  toDate?: string
-): Promise<OrganisationUnitElement> => {
-  // const parsedToDate = toDate ? `, to_date: "${toDate}"` : ""
-  // org_units(uuids: "${uuid}", from_date: null, to_date: null) {
+const query = (uuid: string, from: string | null, to: string | null | undefined) => {
+  // const optionalToDate = toDate ? `, to_date: "${toDate}"` : ""
+  let dynamicToDate: string
+
+  switch (typeof to) {
+    case "undefined":
+      dynamicToDate = ""
+      break
+
+    case "object": // null
+      if (to === null) {
+        dynamicToDate = `, to_date: null`
+        break
+      }
+
+    case "string":
+      dynamicToDate = `, to_date: "${to}"`
+      break
+
+    default:
+      throw Error(`Bad toDate: ${typeof to}, ${to}`)
+  }
 
   const query = `
-    query {
-      org_units(uuids: "${uuid}", from_date: "${fromDate}") {
+    {
+      org_units(uuids: "${uuid}", from_date: ${
+    from ? `"${from}"` : from
+  }${dynamicToDate}) {
         objects {
           name
           uuid
@@ -217,10 +234,68 @@ export const load = async (
       }
     }
   `
-  const res = await fetchGraph(query)
+
+  // console.log("hejsa query", query.slice(0, 150))
+  return query
+}
+
+export const load = async (
+  uuid: string,
+  fromDate: string
+): Promise<{
+  past: OrganisationUnitElement[]
+  present: OrganisationUnitElement[]
+  future: OrganisationUnitElement[]
+}> => {
+  const res = await fetchGraph(query(uuid, fromDate, undefined))
   const json: Query = await res.json()
+
   if (json.data) {
-    return json.data.org_units[0].objects[0]
+    // Lorte logik goes here...
+    const past: OrganisationUnitElement[] = []
+    const present: OrganisationUnitElement[] = json.data.org_units[0].objects
+    const future: OrganisationUnitElement[] = []
+
+    const presentTime = json.data.org_units[0].objects[0].validity
+    if (presentTime.to) {
+      const newToDate = new Date(presentTime.to)
+      newToDate.setDate(newToDate.getDate() + 2)
+      presentTime.to = String(newToDate.toISOString().slice(0, 10)) // YYYY-MM-DD
+
+      const futureRes = await fetchGraph(query((uuid = uuid), presentTime.to, null))
+      const futureJson: Query = await futureRes.json()
+
+      if (futureJson.data && futureJson.data.org_units.length) {
+        future.push(...futureJson.data.org_units[0].objects)
+      }
+    }
+
+    const pastRes = await fetchGraph(query(uuid, null, presentTime.from))
+    const pastJson: Query = await pastRes.json()
+
+    if (pastJson.data && pastJson.data.org_units.length) {
+      console.log(pastJson.data)
+      past.push(...pastJson.data.org_units[0].objects)
+    }
+
+    console.log(
+      "past",
+      past.map((v) => v.name)
+    )
+    console.log(
+      "present",
+      present.map((v) => v.name)
+    )
+    console.log(
+      "future",
+      future.map((v) => v.name)
+    )
+    console.log("past", past.length, "present", present.length, "future", future.length)
+    return {
+      past: past,
+      present: present,
+      future: future,
+    }
   } else if (json.errors) {
     throw new Error(json.errors[0].message)
   } else {

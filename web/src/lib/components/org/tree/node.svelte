@@ -49,10 +49,8 @@
   }
 
   const expandToActiveChild = async () => {
-    console.log("hejsa")
     if (breadcrumbs && breadcrumbs[0] === uuid) {
       // Removes used UUID
-      console.log("breadcrumbs", breadcrumbs)
       breadcrumbs = breadcrumbs.slice(1)
       await toggleOpen()
 

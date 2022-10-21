@@ -5,12 +5,12 @@
 <div class="tabs tabs-boxed p-0 bg-base-100 border-primary border rounded my-5 w-fit">
   <div
     class="border-primary border-r text-slate-600 hover:text-secondary tab 
-        {$tenses.past ? 'bg-accent rounded-l text-primary' : ''}"
+        {$tenses.future ? 'bg-accent rounded-l text-primary' : ''}"
     on:click={() => {
-      $tenses.past = !$tenses.past
+      $tenses.future = !$tenses.future
     }}
   >
-    Fortid
+    Fremtid
   </div>
   <div
     class="tab text-slate-600 hover:text-secondary 
@@ -23,11 +23,11 @@
   </div>
   <div
     class="border-primary border-l text-slate-600 hover:text-secondary tab 
-        {$tenses.future ? 'bg-accent rounded-r text-primary' : ''}"
+        {$tenses.past ? 'bg-accent rounded-r text-primary' : ''}"
     on:click={() => {
-      $tenses.future = !$tenses.future
+      $tenses.past = !$tenses.past
     }}
   >
-    Datid
+    Fortid
   </div>
 </div>

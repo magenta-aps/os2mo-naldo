@@ -6,8 +6,6 @@
   export let currentOrg: string
   export let uuid: string
   export let orgSelector: boolean = false
-
-  console.log("bread", $date)
 </script>
 
 {#await fetchParentTree(uuid, $date)}

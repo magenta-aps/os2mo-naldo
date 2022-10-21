@@ -34,7 +34,6 @@
       ? (await fetchParentTree(fromDate, uuid)).map((e) => e.uuid).reverse()
       : []
 
-    console.log("hjælp", breadcrumbs)
     for (let org of json.data.org_units) {
       orgTree.push({
         uuid: org.objects[0].uuid,

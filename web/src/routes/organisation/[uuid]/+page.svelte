@@ -10,9 +10,9 @@
   import { activeOrgTab } from "$lib/stores/tab"
   import { base } from "$app/paths"
   import { load } from "./data"
-  import Icon from "$lib/components/icon.svelte"
-  import { env } from "$env/dynamic/public"
   import { date } from "$lib/stores/date"
+  import UnitDetailTable from "$lib/components/org/tables/unit_detail_table.svelte"
+  import { tenses } from "$lib/stores/tenses"
 
   // Tabs
   // TODO: enum?
@@ -39,58 +39,41 @@
   <div class="px-10">
     <p class="py-5">Loader organisation...</p>
   </div>
-{:then data}
+{:then orgUnits}
   <div class="px-10">
-    <Breadcrumbs currentOrg={data.name} uuid={$page.params.uuid} />
+    <Breadcrumbs currentOrg={orgUnits.present[0].name} uuid={$page.params.uuid} />
     <div class="flex gap-5">
-      <h1 class="pb-4">{data.name}</h1>
-      <CopyToClipboard uuid={$page.params.uuid} name={data.name} />
+      <h1 class="pb-4">{orgUnits.present[0].name}</h1>
+      <CopyToClipboard uuid={$page.params.uuid} name={orgUnits.present[0].name} />
     </div>
     <Tabs {activeItem} {items} on:tabChange={tabChange} />
 
     <TenseTabs />
 
     {#if activeItem === "Enhed"}
-      <DetailTable
-        headers={env.PUBLIC_ENABLE_UNIT_TERMINATE === "true"
-          ? ["Enhed", "Enhedstype", "Enhedsniveau", "Overenhed", "Dato", "", ""]
-          : ["Enhed", "Enhedstype", "Enhedsniveau", "Overenhed", "Dato", ""]}
-      >
-        <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-          <td class="p-4">{data.name}</td>
-          <td class="p-4">{data.unit_type ? data.unit_type.name : "Ikke sat"}</td>
-          <td class="p-4"
-            >{data.org_unit_level ? data.org_unit_level.name : "Ikke sat"}</td
-          >
-          {#if data.parent}
-            <a href="{base}/organisation/{data.parent.uuid}">
-              <td class="p-4">{data.parent.name}</td>
-            </a>
-          {:else}
-            <td class="p-4">Ingen overenhed</td>
-          {/if}
-          <ValidityTableCell validity={data.validity} />
-          <td>
-            <a href="{base}/organisation/{$page.params.uuid}/edit/unit">
-              <Icon type="pen" />
-            </a>
-          </td>
-
-          {#if env.PUBLIC_ENABLE_UNIT_TERMINATE === "true"}
-            <td>
-              <a
-                href="{base}/organisation/{$page.params.uuid}/terminate/unit"
-                class="hover:slate-300"
-              >
-                <Icon type="xmark" size="30" />
-              </a>
-            </td>
-          {/if}
-        </tr>
-      </DetailTable>
+      {#if $tenses.future}
+        <h2 class="mb-4">Fremtid</h2>
+        {#if orgUnits.future.length}
+          <UnitDetailTable orgUnits={orgUnits.future} />
+        {:else}
+          <p class="mb-4">Intet at vise</p>
+        {/if}
+      {/if}
+      {#if $tenses.present}
+        <h2 class="mb-4">Nutid</h2>
+        <UnitDetailTable orgUnits={orgUnits.present} />
+      {/if}
+      {#if $tenses.past}
+        <h2 class="mb-4">Fortid</h2>
+        {#if orgUnits.past.length}
+          <UnitDetailTable orgUnits={orgUnits.past} />
+        {:else}
+          <p>Intet at vise</p>
+        {/if}
+      {/if}
     {:else if activeItem === "Adresser"}
       <DetailTable headers={["Adressetype", "Adresse", "Synlighed", "Dato"]}>
-        {#each data.addresses as address}
+        {#each orgUnits.present[0].addresses as address}
           <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
             <td class="p-4">{address.address_type.name}</td>
             <td class="p-4">{address.name}</td>
@@ -103,7 +86,7 @@
       </DetailTable>
     {:else if activeItem === "Engagementer"}
       <DetailTable headers={["Navn", "Stillingbetegnelse", "Engagementstype", "Dato"]}>
-        {#each data.engagements as engagement}
+        {#each orgUnits.present[0].engagements as engagement}
           <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
             <a href="{base}/employee/{engagement.employee[0].uuid}">
               <td class="p-4">{engagement.employee[0].name}</td>
@@ -116,7 +99,7 @@
       </DetailTable>
     {:else if activeItem === "Tilknytninger"}
       <DetailTable headers={["Navn", "Tilknytningsrolle", "Stedfortræder", "Dato"]}>
-        {#each data.associations as association}
+        {#each orgUnits.present[0].associations as association}
           <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
             <a href="{base}/employee/{association.employee[0].uuid}">
               <td class="p-4">{association.employee[0].name}</td>
@@ -143,7 +126,7 @@
       </DetailTable>
     {:else if activeItem === "IT"}
       <DetailTable headers={["IT system", "Kontornavn", "Dato"]}>
-        {#each data.itusers as ituser}
+        {#each orgUnits.present[0].itusers as ituser}
           <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
             <td class="p-4">{ituser.itsystem.name}</td>
             <td class="p-4">{ituser.user_key}</td>
@@ -153,7 +136,7 @@
       </DetailTable>
     {:else if activeItem === "Roller"}
       <DetailTable headers={["Navn", "Rolletype", "Dato"]}>
-        {#each data.roles as role}
+        {#each orgUnits.present[0].roles as role}
           <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
             <a href="{base}/employee/{role.employee[0].uuid}">
               <td class="p-4">{role.employee[0].name}</td>
@@ -167,7 +150,7 @@
       <DetailTable
         headers={["Navn", "Lederansvar", "Ledertype", "Lederniveau", "Dato"]}
       >
-        {#each data.managers as manager}
+        {#each orgUnits.present[0].managers as manager}
           <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
             <a href="{base}/employee/{manager.employee[0].uuid}">
               <td class="p-4">{manager.employee[0].name}</td>
