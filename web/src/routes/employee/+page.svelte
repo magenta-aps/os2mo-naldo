@@ -12,9 +12,19 @@
       query {
         employees {
           objects {
+            givenname
+            surname
             name
             cpr_no
             uuid
+            engagements {
+              job_function {
+                name
+              }
+              org_unit {
+                name
+              }
+            }
           }
         }
       }
