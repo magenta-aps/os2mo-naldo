@@ -95,7 +95,6 @@ interface Error {
 }
 
 const query = (uuid: string, from: string | null, to: string | null | undefined) => {
-  // const optionalToDate = toDate ? `, to_date: "${toDate}"` : ""
   let dynamicToDate: string
 
   switch (typeof to) {
@@ -234,8 +233,6 @@ const query = (uuid: string, from: string | null, to: string | null | undefined)
       }
     }
   `
-
-  // console.log("hejsa query", query.slice(0, 150))
   return query
 }
 
@@ -251,7 +248,6 @@ export const load = async (
   const json: Query = await res.json()
 
   if (json.data) {
-    // Lorte logik goes here...
     const past: OrganisationUnitElement[] = []
     const present: OrganisationUnitElement[] = json.data.org_units[0].objects
     const future: OrganisationUnitElement[] = []
@@ -274,23 +270,9 @@ export const load = async (
     const pastJson: Query = await pastRes.json()
 
     if (pastJson.data && pastJson.data.org_units.length) {
-      console.log(pastJson.data)
       past.push(...pastJson.data.org_units[0].objects)
     }
 
-    console.log(
-      "past",
-      past.map((v) => v.name)
-    )
-    console.log(
-      "present",
-      present.map((v) => v.name)
-    )
-    console.log(
-      "future",
-      future.map((v) => v.name)
-    )
-    console.log("past", past.length, "present", present.length, "future", future.length)
     return {
       past: past,
       present: present,

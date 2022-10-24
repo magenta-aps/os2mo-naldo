@@ -60,7 +60,6 @@ export const load = async (event: LoadEvent): Promise<Data> => {
       }
       `
 
-  console.log("query", query)
   const token = keycloak ? keycloak.token : "Keycloak disabled"
   const res = await event.fetch(`${env.PUBLIC_BASE_URL}/graphql/v2`, {
     method: "POST",
@@ -73,7 +72,6 @@ export const load = async (event: LoadEvent): Promise<Data> => {
     }),
   })
   const json: Query = await res.json()
-  console.log("json", json)
 
   if (json.data) {
     return json.data
