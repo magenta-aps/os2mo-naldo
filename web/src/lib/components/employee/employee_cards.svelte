@@ -20,10 +20,11 @@
 
 <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8">
   {#each employees as employee}
-    <div
-      class="card bg-slate-100 rounded border border-slate-300 shadow-sm hover:ring-2 flex justify-center"
+    <a
+      class="card bg-slate-100 rounded border border-slate-300 shadow-sm hover:ring-2 flex justify-center hover:no-underline"
+      href={`${base}/employee/${employee.uuid}`}
     >
-      <a class="hover:no-underline" href={`${base}/employee/${employee.uuid}`}>
+      <div>
         <div class="flex justify-center pt-5">
           <div class="avatar placeholder">
             <div
@@ -53,7 +54,7 @@
             {/if}
           {/if}
         </div>
-      </a>
-    </div>
+      </div>
+    </a>
   {/each}
 </div>
