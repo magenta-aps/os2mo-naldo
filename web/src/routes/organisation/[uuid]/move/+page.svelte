@@ -64,6 +64,7 @@
               uuid: result.data.uuid,
               parent: { uuid: result.data.parent },
               validity: { from: result.data.validity.from },
+              clamp: true,
             },
             type: "org_unit",
           })

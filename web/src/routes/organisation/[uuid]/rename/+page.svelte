@@ -33,7 +33,7 @@
     return async ({ result }) => {
       if (result.type === "success") {
         const res = await postRest(`details/edit`, {
-          data: { ...result.data },
+          data: { ...result.data, clamp: true },
           type: "org_unit",
         })
         const json = await res.json()
