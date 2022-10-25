@@ -30,19 +30,30 @@
       }
   `
 
-  const search = async (query: string) => {
-    // TODO: Switch to GraphQL when #51997 is done
-    const res = await fetchRest(`e/autocomplete/?query=${query}`)
-    const json = await res.json()
-    return json.items
+  const search = (employees: Array<any>, input: string) => {
+    if (input.length > 2) {
+      const x = employees.filter(
+        (x) =>
+          x.name.toLowerCase().includes(input.toLowerCase()) | x.cpr_no.includes(input)
+      )
+      return x
+    }
+    return employees
   }
+
+  // const search = async (query: string) => {
+  // TODO: Switch to GraphQL when #51997 is done
+  //   const res = await fetchRest(`e/autocomplete/?query=${query}`)
+  //   const json = await res.json()
+  //   return json.items
+  // }
 
   // Will override itself on input change(triggers a re-render of the #await markdown)
   $: fetchEmployees = async () => {
     // Uses GraphQL if no imput, autocomplete if there is
     // TODO: Switch to all GraphQL when #51997 is done
     if (input) {
-      return await search(input)
+      return search(allEmployees, input)
     }
 
     if (!allEmployees) {
