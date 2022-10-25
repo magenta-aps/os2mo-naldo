@@ -26,10 +26,10 @@
         <div class="flex items-center space-x-3 m-2">
           <div class="avatar placeholder">
             <div
-              class="rounded-full w-12"
+              class="rounded-full w-10"
               style="background-color: {stringToColour(employee.uuid)};"
             >
-              <span class="text-white text-xl"
+              <span class="text-white text-lg"
                 >{employee.givenname[0] + employee.surname[0]}</span
               >
             </div>
@@ -41,7 +41,10 @@
       <td>
         <div class="mx-5">
           <a href={`${base}/employee/${employee.uuid}`}>
-            <button class="btn btn-primary text-base-100 btn-xs">detaljer</button>
+            <button
+              class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+              >Detaljer</button
+            >
           </a>
         </div>
       </td>
