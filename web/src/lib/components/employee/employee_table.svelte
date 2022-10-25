@@ -1,43 +1,50 @@
 <script lang="ts">
   import { base } from "$app/paths"
+  import DetailTable from "$lib/components/shared/detail_table.svelte"
+
+  const stringToColour = (str: string) => {
+    var hash = 0
+    for (var i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash)
+    }
+    var colour = "#"
+    for (var i = 0; i < 3; i++) {
+      var value = (hash >> (i * 8)) & 0xff
+      colour += ("00" + value.toString(16)).substr(-2)
+    }
+    return colour
+  }
 
   // TODO: Get the employee interface from Strawberry
   export let employees: any[]
 </script>
 
-<div class="overflow-x-auto w-full">
-  <table class="table table-zebra w-full">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>CPR</th>
-        <th />
-      </tr>
-    </thead>
-    <tbody>
-      {#each employees as employee}
-        <tr class="hover">
-          <td>
-            <div class="flex items-center space-x-3">
-              <div class="avatar">
-                <div class="mask mask-squircle w-12 h-12">
-                  <img
-                    src="https://placeimg.com/80/80/people"
-                    alt="Avatar Tailwind CSS Component"
-                  />
-                </div>
-              </div>
-              <div class="font-bold">{employee.name}</div>
+<DetailTable headers={["Navn", "CPR", ""]}>
+  {#each employees as employee}
+    <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+      <td>
+        <div class="flex items-center space-x-3 m-2">
+          <div class="avatar placeholder">
+            <div
+              class="rounded-full w-12"
+              style="background-color: {stringToColour(employee.uuid)};"
+            >
+              <span class="text-white text-xl"
+                >{employee.givenname[0] + employee.surname[0]}</span
+              >
             </div>
-          </td>
-          <td>{employee.cpr_no}</td>
-          <th>
-            <a href={`${base}/employee/${employee.uuid}`}>
-              <button class="btn btn-xs">detaljer</button>
-            </a>
-          </th>
-        </tr>
-      {/each}
-    </tbody>
-  </table>
-</div>
+          </div>
+          <div class="font-bold">{employee.name}</div>
+        </div>
+      </td>
+      <td>{employee.cpr_no}</td>
+      <td>
+        <div class="mx-5">
+          <a href={`${base}/employee/${employee.uuid}`}>
+            <button class="btn btn-primary text-base-100 btn-xs">detaljer</button>
+          </a>
+        </div>
+      </td>
+    </tr>
+  {/each}
+</DetailTable>

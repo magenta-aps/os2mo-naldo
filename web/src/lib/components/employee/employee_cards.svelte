@@ -1,9 +1,6 @@
 <script lang="ts">
   import { base } from "$app/paths"
 
-  // TODO: Get the employee interface from Strawberry
-  export let employees: any[]
-
   const stringToColour = (str: string) => {
     var hash = 0
     for (var i = 0; i < str.length; i++) {
@@ -16,6 +13,9 @@
     }
     return colour
   }
+
+  // TODO: Get the employee interface from Strawberry
+  export let employees: any[]
 </script>
 
 <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8">
