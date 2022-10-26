@@ -1,4 +1,5 @@
 import { env } from "$env/dynamic/public"
+import { date } from "$lib/stores/date"
 import { keycloak } from "$lib/util/keycloak"
 import type { LoadEvent } from "@sveltejs/kit"
 
@@ -37,6 +38,9 @@ interface Error {
 }
 
 export const load = async (event: LoadEvent): Promise<Data> => {
+  let fromDate = ""
+  date.subscribe((v) => (fromDate = v))
+
   const query = `
       query {
         facets(user_keys: ["org_unit_level", "org_unit_type"]) {
@@ -47,7 +51,7 @@ export const load = async (event: LoadEvent): Promise<Data> => {
             uuid
           }
         }
-        org_units(uuids: "${event.params.uuid}") {
+        org_units(uuids: "${event.params.uuid}", from_date: "${fromDate}") {
           objects {
             uuid
             name
@@ -68,6 +72,7 @@ export const load = async (event: LoadEvent): Promise<Data> => {
     }),
   })
   const json: Query = await res.json()
+
   if (json.data) {
     return json.data
   } else if (json.errors) {

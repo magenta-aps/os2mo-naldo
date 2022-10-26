@@ -1,5 +1,6 @@
 <script lang="ts">
   import { base } from "$app/paths"
+  import { date } from "$lib/stores/date"
   import { fetchParentTree } from "$lib/util/parent_tree"
 
   export let currentOrg: string
@@ -7,7 +8,7 @@
   export let orgSelector: boolean = false
 </script>
 
-{#await fetchParentTree(uuid)}
+{#await fetchParentTree(uuid, $date)}
   <div class="text-secondary py-5">Loading breadcrumbs...</div>
 {:then parents}
   <div class="text-secondary py-5 breadcrumbs">

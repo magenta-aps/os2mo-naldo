@@ -6,6 +6,7 @@
   export let children: any[] = []
   export let indent = 0
   export let uuid = ""
+  export let fromDate: string
 
   let open = false
   let loading = false
@@ -13,7 +14,7 @@
   const fetchChildren = async (uuid: string) => {
     const findQuery = `
       query {
-        org_units(uuids: "${uuid}") {
+        org_units(uuids: "${uuid}" from_date: "${fromDate}") {
           objects {
             children {
               name

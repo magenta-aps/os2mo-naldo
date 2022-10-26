@@ -10,13 +10,14 @@
   export let uuid = ""
   export let breadcrumbs: string[] = []
   export let open = false
+  export let fromDate: string
 
   let loading = false
 
   const fetchChildren = async (uuid: string) => {
-    const findQuery = `
+    const query = `
       query {
-        org_units(uuids: "${uuid}") {
+        org_units(uuids: "${uuid}", from_date: "${fromDate}") {
           objects {
             children {
               name
@@ -25,7 +26,7 @@
           }
         }
       }`
-    const res = await fetchGraph(findQuery)
+    const res = await fetchGraph(query)
     const json = await res.json()
     if (json.data) {
       return json.data.org_units[0].objects[0].children
@@ -119,6 +120,6 @@
 
 {#if open}
   {#each children as child}
-    <svelte:self {...child} {breadcrumbs} indent={indent + 24} />
+    <svelte:self {...child} {breadcrumbs} {fromDate} indent={indent + 24} />
   {/each}
 {/if}
