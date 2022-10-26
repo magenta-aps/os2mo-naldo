@@ -7,7 +7,6 @@
 
   type ReturnType = `${Return}`
 
-  export let size: string = "sm"
   export let title: string | undefined = undefined
   export let id: string
   export let name = id
@@ -27,7 +26,7 @@
 <select
   {id}
   {name}
-  class="select select-bordered select-{size} text-base text-secondary font-normal w-full rounded active:select-primary focus:select-primary active:outline-offset-0 focus:outline-offset-0"
+  class="select select-bordered select-sm text-base text-secondary font-normal w-full rounded active:select-primary focus:select-primary active:outline-offset-0 focus:outline-offset-0"
   bind:value
   {required}
   {disabled}
