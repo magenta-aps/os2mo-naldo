@@ -38,7 +38,7 @@
           </div>
         </div>
         <div class="card-body items-center text-center">
-          <p>{employee.name}</p>
+          <p>{employee.givenname + " " + employee.surname}</p>
           <p class="text-slate-600 text-xs">{employee.cpr_no}</p>
           {#if employee.engagements[0]}
             <br />

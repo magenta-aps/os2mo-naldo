@@ -2,7 +2,7 @@
   import EmployeeCards from "$lib/components/employee/employee_cards.svelte"
   import EmployeeSearchInput from "$lib/components/employee/employee_search_input.svelte"
   import EmployeeTable from "$lib/components/employee/employee_table.svelte"
-  import { fetchGraph, fetchRest } from "$lib/util/http"
+  import { fetchGraph } from "$lib/util/http"
 
   let cardView = true
   let input: string
@@ -14,7 +14,6 @@
           objects {
             givenname
             surname
-            name
             cpr_no
             uuid
             engagements {
@@ -34,8 +33,10 @@
     if (input.length > 2) {
       return employees.filter(
         (employee) =>
-          employee.name.toLowerCase().includes(input.toLowerCase()) |
-          employee.cpr_no.includes(input)
+          employee.givenname
+            .concat(" ", employee.surname)
+            .toLowerCase()
+            .includes(input.toLowerCase()) | employee.cpr_no.includes(input)
       )
     }
     return employees

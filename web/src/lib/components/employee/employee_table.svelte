@@ -34,7 +34,9 @@
               >
             </div>
           </div>
-          <div class="font-bold">{employee.name}</div>
+          <div class="font-bold">
+            {employee.givenname + " " + employee.surname}
+          </div>
         </div>
       </td>
       <td>{employee.cpr_no}</td>
