@@ -120,6 +120,6 @@
 
 {#if open}
   {#each children as child}
-    <svelte:self {...child} {breadcrumbs} indent={indent + 24} />
+    <svelte:self {...child} {breadcrumbs} {fromDate} indent={indent + 24} />
   {/each}
 {/if}

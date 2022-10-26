@@ -54,7 +54,7 @@ export const fetchParentTree = async (
   uuid: string,
   fromDate: string
 ): Promise<ParentOrganisationUnit[]> => {
-  const parent = await fetchParent(fromDate, uuid)
+  const parent = await fetchParent(uuid, fromDate)
 
   if (!parent) {
     return []
