@@ -40,14 +40,14 @@
         <div class="card-body items-center text-center">
           <p>{employee.givenname + " " + employee.surname}</p>
           <p class="text-slate-600 text-xs">{employee.cpr_no}</p>
-          {#if employee.engagements[0]}
+          {#if employee.engagements.length}
             <br />
             {#if employee.engagements[0].job_function}
               <p class="text-slate-600 text-xs">
                 {employee.engagements[0].job_function.name}
               </p>
             {/if}
-            {#if employee.engagements[0].org_unit}
+            {#if employee.engagements[0].org_unit.length}
               <p class="text-slate-600 text-xs">
                 {employee.engagements[0].org_unit[0].name}
               </p>

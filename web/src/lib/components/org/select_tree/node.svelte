@@ -65,6 +65,6 @@
 
 {#if open}
   {#each children as child}
-    <svelte:self {...child} indent={indent + 24} bind:selectedOrg />
+    <svelte:self {...child} indent={indent + 24} {fromDate} bind:selectedOrg />
   {/each}
 {/if}
