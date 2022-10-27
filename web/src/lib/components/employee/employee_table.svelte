@@ -20,7 +20,8 @@
 </script>
 
 <DetailTable headers={["Navn", "CPR", ""]}>
-  {#each employees as employee}
+  <!-- TODO: Delete slice when pagination is implemented -->
+  {#each employees.slice(0, 200) as employee}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td>
         <div class="flex items-center space-x-3 m-2">
