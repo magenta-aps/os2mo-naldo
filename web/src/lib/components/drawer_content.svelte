@@ -17,29 +17,30 @@
   <!-- Sidebar content here -->
   <li>
     <a
-      class="flex hover:no-underline {$page.url.pathname === SubPath.HOME
+      class="flex text-secondary hover:no-underline {$page.url.pathname === SubPath.HOME
         ? 'bg-accent'
         : ''}"
       href="{base}{SubPath.HOME}"
     >
       <Icon type="house" />
-      <div class="text-secondary">Hjem</div>
+      <p>Hjem</p>
     </a>
   </li>
   <li>
     <a
-      class="flex hover:no-underline {$page.url.pathname === SubPath.EMPLOYEE
+      class="flex text-secondary hover:no-underline {$page.url.pathname ===
+      SubPath.EMPLOYEE
         ? 'bg-accent'
         : ''}"
       href="{base}{SubPath.EMPLOYEE}"
     >
       <Icon type="user" />
-      <div class="text-secondary">Medarbejdere</div>
+      <p>Medarbejdere</p>
     </a>
   </li>
   <li>
     <a
-      class="flex hover:no-underline {$page.url.pathname ===
+      class="flex text-secondary hover:no-underline {$page.url.pathname ===
       SubPath.CONNECTING_ORGANIZATIONS
         ? 'bg-accent'
         : ''}"
@@ -47,7 +48,7 @@
     >
       <Icon type="sitemap" />
       <!-- FIXME: Doesn't exist yet  -->
-      <div class="text-secondary">Organisationssammenkobling</div>
+      <p>Organisationssammenkobling</p>
     </a>
   </li>
 </ul>
