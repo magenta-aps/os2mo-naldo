@@ -44,8 +44,8 @@
     />
     <div
       class="{!cardView
-        ? 'bg-accent'
-        : ''} cursor-pointer border rounded border border-slate-300 p-2"
+        ? 'bg-accent text-secondary'
+        : 'text-slate-600'} cursor-pointer rounded border border-slate-300 p-2"
     >
       <Icon type="bars" />
     </div>
@@ -59,8 +59,8 @@
     />
     <div
       class="{cardView
-        ? 'bg-accent'
-        : ''} cursor-pointer border rounded border border-slate-300 p-2"
+        ? 'bg-accent text-secondary'
+        : 'text-slate-600'} cursor-pointer rounded border border-slate-300 p-2"
     >
       <Icon type="grid" />
     </div>

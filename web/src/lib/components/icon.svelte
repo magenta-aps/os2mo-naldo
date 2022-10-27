@@ -15,12 +15,11 @@
 
   export let type: IconType
   export let size = "20"
-  export let fill = "secondary"
 </script>
 
 {#if type == Icon.HOUSE}
   <svg
-    class="fill-{fill}"
+    fill="currentColor"
     height={size}
     width={size}
     xmlns="http://www.w3.org/2000/svg"
@@ -31,7 +30,7 @@
   >
 {:else if type == Icon.USER}
   <svg
-    class="fill-{fill}"
+    fill="currentColor"
     height={size}
     width={size}
     xmlns="http://www.w3.org/2000/svg"
@@ -42,7 +41,7 @@
   >
 {:else if type == Icon.SITEMAP}
   <svg
-    class="fill-{fill}"
+    fill="currentColor"
     height={size}
     width={size}
     xmlns="http://www.w3.org/2000/svg"
@@ -53,7 +52,7 @@
   >
 {:else if type == Icon.XMARK}
   <svg
-    class="fill-{fill}"
+    fill="currentColor"
     height={size}
     width={size}
     xmlns="http://www.w3.org/2000/svg"
@@ -82,7 +81,7 @@
 {:else if type == Icon.PEN}
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    class="fill-{fill}"
+    fill="currentColor"
     width={size}
     height={size}
     viewBox="0 0 512 512"
@@ -93,7 +92,7 @@
 {:else if type == Icon.BARS}
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    class="fill-{fill}"
+    fill="currentColor"
     width={size}
     height={size}
     viewBox="0 0 448 512"
@@ -104,7 +103,7 @@
 {:else if type == Icon.GRID}
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    class="fill-{fill}"
+    fill="currentColor"
     width={size}
     height={size}
     viewBox="0 0 448 512"
