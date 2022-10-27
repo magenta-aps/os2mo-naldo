@@ -88,10 +88,12 @@
     {/if}
   </div>
 {:else}
-  <input
-    type="text"
-    disabled
-    placeholder="Søg"
-    class="input input-bordered w-80 h-8 text-neutral"
-  />
+  <div use:floatingRef>
+    <input
+      type="text"
+      disabled
+      placeholder="Søg"
+      class="input input-bordered rounded text-base w-80 h-8 text-neutral"
+    />
+  </div>
 {/if}

@@ -58,13 +58,11 @@
 
 {#await refreshableOrgTree}
   <div role="status" class="max-w-sm animate-pulse">
-    <div class="h-12 bg-base-100 rounded dark:bg-accent max-w-4 mb-2.5" />
+    <div class="h-10 bg-base-100 rounded dark:bg-accent max-w-4 mb-2.5" />
     <span class="sr-only">Loading...</span>
   </div>
 {:then orgTree}
-  <ul class="dropdown-content menu rounded-box w-full">
-    {#each orgTree as child}
-      <Node {...child} />
-    {/each}
-  </ul>
+  {#each orgTree as child}
+    <Node {...child} />
+  {/each}
 {/await}

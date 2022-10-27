@@ -27,7 +27,7 @@
   </div>
   <div class="drawer-side">
     <label for="my-drawer-3" class="drawer-overlay" />
-    <ul class="menu overflow-y-auto w-80 bg-base-100 border">
+    <ul class="overflow-y-auto w-80 bg-base-100 border">
       <!-- Sidebar content here -->
       <div class="flex-none">
         <DrawerContent />

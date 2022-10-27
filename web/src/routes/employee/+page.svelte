@@ -32,7 +32,6 @@
   // TODO: Ugly temp search that should be replaced by graphQL autocomplete
   const search = (employees: Array<any>, input: any) => {
     if (!isNaN(input)) {
-      console.log("i was here")
       return employees.filter((employee) => {
         if (employee.cpr_no) {
           return employee.cpr_no.includes(input)

@@ -6,7 +6,7 @@
 
   export let name = ""
   export let children: any[] = []
-  export let indent = 0
+  export let indent = 8
   export let uuid = ""
   export let breadcrumbs: string[] = []
   export let open = false
@@ -77,9 +77,10 @@
 </script>
 
 <a class="hover:no-underline" href={`${base}/organisation/${uuid}`}>
-  <li style="padding-left: {indent}px">
+  <li class="rounded-md {$page.params.uuid === uuid ? 'bg-accent' : ''}">
     <div
-      class={$page.params.uuid === uuid ? "bg-accent" : ""}
+      class="py-2"
+      style="padding-left: {indent}px"
       id={$page.params.uuid === uuid ? "active" : ""}
     >
       {#if loading}
