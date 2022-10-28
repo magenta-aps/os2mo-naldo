@@ -19,7 +19,8 @@
 </script>
 
 <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8">
-  {#each employees as employee}
+  <!-- TODO: Delete slice when pagination is implemented -->
+  {#each employees.slice(0, 200) as employee}
     <a
       class="card bg-slate-100 rounded border border-slate-300 shadow-sm hover:ring-2 flex justify-center hover:no-underline"
       href={`${base}/employee/${employee.uuid}`}

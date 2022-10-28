@@ -13,11 +13,12 @@
   }
 </script>
 
-<ul class="menu p-4 pb-2 overflow-y-auto text-base">
+<ul class="menu p-2 pb-2 overflow-y-auto text-base">
   <!-- Sidebar content here -->
   <li>
     <a
-      class="flex text-secondary hover:no-underline {$page.url.pathname === SubPath.HOME
+      class="flex text-secondary hover:no-underline h-10 {$page.url.pathname ===
+      SubPath.HOME
         ? 'bg-accent'
         : ''}"
       href="{base}{SubPath.HOME}"
@@ -28,7 +29,7 @@
   </li>
   <li>
     <a
-      class="flex text-secondary hover:no-underline {$page.url.pathname ===
+      class="flex text-secondary hover:no-underline h-10 {$page.url.pathname ===
       SubPath.EMPLOYEE
         ? 'bg-accent'
         : ''}"
@@ -40,7 +41,7 @@
   </li>
   <li>
     <a
-      class="flex text-secondary hover:no-underline {$page.url.pathname ===
+      class="flex text-secondary hover:no-underline h-10 {$page.url.pathname ===
       SubPath.CONNECTING_ORGANIZATIONS
         ? 'bg-accent'
         : ''}"

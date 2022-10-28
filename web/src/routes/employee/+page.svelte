@@ -29,17 +29,28 @@
       }
   `
 
-  const search = (employees: Array<any>, input: string) => {
-    if (input.length > 2) {
-      return employees.filter(
-        (employee) =>
-          employee.givenname
-            .concat(" ", employee.surname)
-            .toLowerCase()
-            .includes(input.toLowerCase()) | employee.cpr_no.includes(input)
-      )
+  // TODO: Ugly temp search that should be replaced by graphQL autocomplete
+  const search = (employees: Array<any>, input: any) => {
+    if (!isNaN(input)) {
+      return employees.filter((employee) => {
+        if (employee.cpr_no) {
+          return employee.cpr_no.includes(input)
+        }
+      })
     }
-    return employees
+    return employees.filter((employee) => {
+      return (
+        employee.givenname
+          .concat(" ", employee.surname)
+          .toLowerCase()
+          .includes(input.toLowerCase()) |
+        employee.givenname
+          .split(" ")[0]
+          .concat(" ", employee.surname)
+          .toLowerCase()
+          .includes(input.toLowerCase())
+      )
+    })
   }
 
   // const search = async (query: string) => {
@@ -79,7 +90,7 @@
 
 <div class="h-screen m-auto p-10">
   <EmployeeSearchInput bind:input bind:cardView />
-  <div class="pt-5">
+  <div class="py-5">
     {#await fetchEmployees()}
       <div class="flex justify-center pt-10">
         <div class="animate-spin rounded-full h-32 w-32 border-b-8 border-primary" />
