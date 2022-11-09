@@ -7,11 +7,11 @@
   import Input from "$lib/components/forms/shared/input.svelte"
   import Select from "$lib/components/forms/shared/select.svelte"
   import { enhance } from "$app/forms"
-  import type { Data } from "./+page"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
+  import type { PageData } from "./$types"
 
-  export let data: Data
+  export let data: PageData
 
   let startDate = new Date().toISOString().split("T")[0]
   let endDate: string
