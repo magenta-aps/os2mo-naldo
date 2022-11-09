@@ -4,6 +4,19 @@
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Avatar from "./navbar/avatar.svelte"
   import Search from "$lib/components/search.svelte"
+
+  let selectedDate = $date
+  let timeout: NodeJS.Timeout | undefined
+
+  // Debounces the global date picker to improve performance while scrolling through dates
+  // A lot of components react to changes in $date, such as the org_tree
+  $: if (selectedDate) {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => {
+      $date = selectedDate
+    }, 500)
+  }
+
 </script>
 
 <div class="navbar bg-secondary text-base-100 shadow-xl">
@@ -32,7 +45,7 @@
     <div class="flex gap-2">
       <Search />
       <DateInput
-        bind:value={$date}
+        bind:value={selectedDate}
         id="other-end-date"
         max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
       />
