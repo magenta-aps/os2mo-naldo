@@ -1,13 +1,13 @@
 <script lang="ts">
-  import type { OrganisationUnitElement } from "./+page"
   import { formatDate } from "$lib/util/date"
   import { base } from "$app/paths"
   import { enhance } from "$app/forms"
   import { postRest } from "$lib/util/http"
   import { success, error } from "$lib/stores/alert"
   import { goto } from "$app/navigation"
+  import type { PageData } from "./$types"
 
-  export let data: OrganisationUnitElement
+  export let data: PageData
 </script>
 
 <div class="flex align-center px-6 pt-6 pb-4">

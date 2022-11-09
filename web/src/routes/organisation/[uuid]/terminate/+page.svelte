@@ -7,9 +7,9 @@
   import { enhance } from "$app/forms"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
-  import type { Data } from "./+page"
+  import type {PageData} from "./$types"
 
-  export let data: Data
+  export let data: PageData
 
   let endDate = new Date().toISOString().split("T")[0]
   let org = data.org_units[0].objects[0]

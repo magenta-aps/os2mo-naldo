@@ -1,7 +1,7 @@
 import type { Actions, RequestEvent } from "@sveltejs/kit"
 
 export const actions: Actions = {
-  default: async ({ request, url, params }: RequestEvent): Promise<any> => {
+  default: async ({ request, params }: RequestEvent): Promise<any> => {
     const data = await request.formData()
     const name = data.get("name")
     const parent = data.get("select-org-tree")
