@@ -25,7 +25,7 @@ export const postRest = async (path: string, payload: any) => {
 
 export const fetchGraph = async (query: string | object | any): Promise<Response> => {
   const token = keycloak ? keycloak.token : "Keycloak disabled"
-  return await fetch(`${env.PUBLIC_BASE_URL}/graphql/v2`, {
+  return await fetch(`${env.PUBLIC_BASE_URL}/graphql/v3`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
