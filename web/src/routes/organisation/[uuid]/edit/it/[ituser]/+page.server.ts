@@ -16,17 +16,6 @@ export const actions: Actions = {
         }
       }
     `
-
-    // return {
-    //   query,
-    //   variables: {
-    //     input: {
-    //       uuid: params.uuid,
-    //       validity: { from: startDate, ...(endDate && { to: endDate }) },
-    //       ...(name && { name: name }),
-    //       ...(parent && { parent: parent }),
-    //       ...(orgLevel && { org_unit_level: orgLevel }),
-    //       ...(orgType && { org_unit_type: orgType }),
     return {
       query,
       variables: {

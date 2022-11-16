@@ -10,6 +10,7 @@
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import type { PageData } from "./$types"
+  import { page } from "$app/stores"
 
   export let data: PageData
 
@@ -109,12 +110,11 @@
     </div>
   </div>
   <div class="modal-action p-6 gap-4 bg-slate-100">
-    <button
-      type="button"
+    <a
+      href={`${base}/organisation/${$page.params.uuid}`}
       class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+      >Annullér</a
     >
-      Annullér
-    </button>
     <button
       type="submit"
       class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
