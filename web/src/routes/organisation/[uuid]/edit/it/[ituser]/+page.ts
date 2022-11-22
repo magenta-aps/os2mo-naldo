@@ -1,5 +1,4 @@
 import { env } from "$env/dynamic/public"
-import { date } from "$lib/stores/date"
 import { keycloak } from "$lib/util/keycloak"
 import type { PageLoad } from "./$types"
 
@@ -8,42 +7,68 @@ import type { PageLoad } from "./$types"
 // Fixes being unable to refresh or open this route from a link
 export const ssr = false
 
-interface Query {
+export interface Query {
   data: Data | null
   errors?: Error[]
 }
 
 export interface Data {
-  org_units: OrganisationUnitResponse[]
+  itusers: ITUserResponse[]
+  itsystems: ITSystem[]
 }
 
-interface Class {
+export interface ITSystem {
   name: string
   uuid: null | string
 }
 
-interface OrganisationUnitResponse {
-  objects: Class[]
+export interface ITUserResponse {
+  uuid: string
+  objects: ITUser[]
 }
 
-interface Error {
+export interface ITUser {
+  uuid: null | string
+  itsystem: ITSystem
+  validity: Validity
+  user_key: null | string
+  primary_uuid: string
+}
+
+export interface Validity {
+  from: string
+  to: null | string
+}
+
+export interface Error {
   message: string
 }
 
 export const load: PageLoad = async (event) => {
-  let fromDate = ""
-  date.subscribe((v) => (fromDate = v))
-
   const query = `
-      query {
-        org_units(uuids: "${event.params.uuid}" from_date: "${fromDate}") {
-          objects {
-            uuid
+    query {
+      itusers(uuids: "${event.params.ituser}") {
+        uuid
+        objects {
+          uuid
+          primary_uuid
+          itsystem {
             name
+            uuid
           }
-        }
+          validity {
+            from
+            to
+          }
+          user_key
+        }  
       }
-      `
+      itsystems {
+        name
+        uuid
+      }
+    }
+    `
 
   const token = keycloak ? keycloak.token : "Keycloak disabled"
   const res = await event.fetch(

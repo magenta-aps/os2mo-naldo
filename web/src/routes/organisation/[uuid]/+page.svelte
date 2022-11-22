@@ -13,6 +13,7 @@
   import { date } from "$lib/stores/date"
   import UnitDetailTable from "$lib/components/org/tables/unit_detail_table.svelte"
   import { tenses } from "$lib/stores/tenses"
+  import Icon from "$lib/components/icon.svelte"
 
   // Tabs
   // TODO: enum?
@@ -125,12 +126,23 @@
         {/each}
       </DetailTable>
     {:else if activeItem === "IT"}
-      <DetailTable headers={["IT system", "Kontornavn", "Dato"]}>
+      <DetailTable headers={["IT system", "Kontonavn", "Dato", "", ""]}>
         {#each orgUnits.present[0].itusers as ituser}
           <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
             <td class="p-4">{ituser.itsystem.name}</td>
             <td class="p-4">{ituser.user_key}</td>
             <ValidityTableCell validity={ituser.validity} />
+            <td>
+              <a href="{base}/organisation/{$page.params.uuid}/edit/it/{ituser.uuid}">
+                <Icon type="pen" />
+              </a>
+            </td>
+            <td>
+              <a href="{base}/organisation/{$page.params.uuid}/edit/it/{ituser.uuid}">
+              <a href="{base}/organisation/{$page.params.uuid}/terminate/it/{ituser.uuid}">
+                <Icon type="xmark" size="30" />
+              </a>
+            </td>
           </tr>
         {/each}
       </DetailTable>

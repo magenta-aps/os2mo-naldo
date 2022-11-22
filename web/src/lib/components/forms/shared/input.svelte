@@ -3,7 +3,7 @@
   export let size: string = "sm"
   export let id: string
   export let name = id
-  export let value: string | number
+  export let value: string | number | null
   export let required = false
   export let placeholder: string | undefined = undefined
 </script>

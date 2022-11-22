@@ -68,6 +68,7 @@ interface ITUser {
   itsystem: Class
   validity: Validity
   user_key: null | string
+  uuid: null | string
 }
 
 interface Manager {
@@ -196,6 +197,7 @@ const query = (uuid: string, from: string | null, to: string | null | undefined)
               to
             }
             user_key
+            uuid
           }
           roles {
             employee {
