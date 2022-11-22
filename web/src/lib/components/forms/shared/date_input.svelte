@@ -2,7 +2,7 @@
   export let title: string | undefined = undefined
   export let id: string
   export let name = id
-  export let value: string | number | undefined = undefined
+  export let value: string | number | undefined
   export let required = false
   export let min = "1910-01-01"
   export let max: string | undefined = undefined

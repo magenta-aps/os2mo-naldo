@@ -71,16 +71,19 @@ export const load: PageLoad = async (event) => {
     `
 
   const token = keycloak ? keycloak.token : "Keycloak disabled"
-  const res = await event.fetch(`${env.PUBLIC_BASE_URL}/graphql/v2`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + token,
-    },
-    body: JSON.stringify({
-      query: query,
-    }),
-  })
+  const res = await event.fetch(
+    `${env.PUBLIC_BASE_URL}/${env.PUBLIC_GRAPHQL_VERSION}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      body: JSON.stringify({
+        query: query,
+      }),
+    }
+  )
   const json: Query = await res.json()
   if (json.data) {
     return json.data

@@ -31,7 +31,6 @@
       if (result.type === "success") {
         const res = await fetchGraph(result.data)
         const json = await res.json()
-        console.log(json, result.data)
 
         if (res.status === 200) {
           $success = {

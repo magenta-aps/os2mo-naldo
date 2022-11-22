@@ -8,6 +8,7 @@ services:
       target: prod
     environment:
       PUBLIC_BASE_URL: http://localhost:5000
+      PUBLIC_GRAPHQL_VERSION: graphql/v3
       PUBLIC_ENABLE_UNIT_TERMINATE: "false"
     ports:
       - 4173:3000   # prod - node
@@ -20,6 +21,7 @@ services:
       target: dev
     environment:
       PUBLIC_BASE_URL: http://localhost:5000
+      PUBLIC_GRAPHQL_VERSION: graphql/v3
       PUBLIC_ENABLE_UNIT_TERMINATE: "true"
     ports:
       - 5173:5173   # dev

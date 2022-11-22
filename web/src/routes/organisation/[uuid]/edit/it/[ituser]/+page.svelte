@@ -31,7 +31,6 @@
   use:enhance={() => {
     return async ({ result }) => {
       if (result.type === "success") {
-        console.log(result.data)
         const res = await fetchGraph(result.data)
         const json = await res.json()
 
