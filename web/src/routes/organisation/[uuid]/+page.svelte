@@ -14,6 +14,7 @@
   import UnitDetailTable from "$lib/components/org/tables/unit_detail_table.svelte"
   import { tenses } from "$lib/stores/tenses"
   import Icon from "$lib/components/icon.svelte"
+  import OrgTable from "$lib/components/org/org_table.svelte"
 
   // Tabs
   // TODO: enum?
@@ -49,9 +50,16 @@
     </div>
     <Tabs {activeItem} {items} on:tabChange={tabChange} />
 
-    <TenseTabs />
-
     {#if activeItem === "Enhed"}
+      <div class="flex justify-between">
+        <TenseTabs />
+        <a
+          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
+          href="{$page.url}/create"
+        >
+          Tilføj enhed
+        </a>
+      </div>
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
         {#if orgUnits.future.length}
@@ -73,6 +81,7 @@
         {/if}
       {/if}
     {:else if activeItem === "Adresser"}
+      <TenseTabs />
       <DetailTable headers={["Adressetype", "Adresse", "Synlighed", "Dato"]}>
         {#each orgUnits.present[0].addresses as address}
           <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
@@ -86,6 +95,7 @@
         {/each}
       </DetailTable>
     {:else if activeItem === "Engagementer"}
+      <TenseTabs />
       <DetailTable headers={["Navn", "Stillingbetegnelse", "Engagementstype", "Dato"]}>
         {#each orgUnits.present[0].engagements as engagement}
           <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
@@ -99,6 +109,7 @@
         {/each}
       </DetailTable>
     {:else if activeItem === "Tilknytninger"}
+      <TenseTabs />
       <DetailTable headers={["Navn", "Tilknytningsrolle", "Stedfortræder", "Dato"]}>
         {#each orgUnits.present[0].associations as association}
           <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
@@ -126,6 +137,15 @@
         {/each}
       </DetailTable>
     {:else if activeItem === "IT"}
+      <div class="flex justify-between">
+        <TenseTabs />
+        <a
+          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
+          href="{$page.url}/create/it"
+        >
+          Tilføj IT
+        </a>
+      </div>
       <DetailTable headers={["IT system", "Kontonavn", "Dato", "", ""]}>
         {#each orgUnits.present[0].itusers as ituser}
           <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
@@ -139,14 +159,19 @@
             </td>
             <td>
               <a href="{base}/organisation/{$page.params.uuid}/edit/it/{ituser.uuid}">
-              <a href="{base}/organisation/{$page.params.uuid}/terminate/it/{ituser.uuid}">
-                <Icon type="xmark" size="30" />
-              </a>
-            </td>
+                <a
+                  href="{base}/organisation/{$page.params
+                    .uuid}/terminate/it/{ituser.uuid}"
+                >
+                  <Icon type="xmark" size="30" />
+                </a>
+              </a></td
+            >
           </tr>
         {/each}
       </DetailTable>
     {:else if activeItem === "Roller"}
+      <TenseTabs />
       <DetailTable headers={["Navn", "Rolletype", "Dato"]}>
         {#each orgUnits.present[0].roles as role}
           <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
@@ -159,6 +184,7 @@
         {/each}
       </DetailTable>
     {:else if activeItem === "Ledere"}
+      <TenseTabs />
       <DetailTable
         headers={["Navn", "Lederansvar", "Ledertype", "Lederniveau", "Dato"]}
       >
@@ -187,8 +213,10 @@
         {/each}
       </DetailTable>
     {:else if activeItem === "KLE-opmærkninger"}
+      <TenseTabs />
       TODO
     {:else if activeItem === "Relateret"}
+      <TenseTabs />
       TODO
     {/if}
   </div>
