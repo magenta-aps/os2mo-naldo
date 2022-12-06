@@ -13,7 +13,8 @@
 
   export let data: PageData
 
-  let startDate: string
+  let accountName: string
+  let startDate = new Date().toISOString().split("T")[0]
   let endDate: string
 </script>
 
@@ -31,13 +32,12 @@
   use:enhance={() => {
     return async ({ result }) => {
       if (result.type === "success") {
-        console.log(result.data)
         const res = await fetchGraph(result.data)
         const json = await res.json()
 
         if (res.status === 200) {
           $success = {
-            message: `hest`,
+            message: `${accountName} er blevet oprettet`,
             uuid: $page.params.uuid,
             type: "organisation",
           }
@@ -87,8 +87,10 @@
       </div>
       <div class="basis-1/2">
         <Input
+          bind:value={accountName}
           title="Kontonavn"
           id="user-key"
+          required
         />
       </div>
     </div>
@@ -116,7 +118,7 @@
     <button
       type="submit"
       class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-      >Opret enhed</button
+      >Opret IT bruger</button
     >
   </div>
   <Error />
