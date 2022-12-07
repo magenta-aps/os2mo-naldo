@@ -1,10 +1,5 @@
 <script lang="ts">
   import { page } from "$app/stores"
-  import OrgNavbar from "$lib/components/org/org_navbar.svelte"
-
-  import OrgTable from "$lib/components/org/org_table.svelte"
-  import OrgTree from "$lib/components/org/tree/org_tree.svelte"
-  import DetailTable from "$lib/components/shared/detail_table.svelte"
   import type { PageData } from "./$types"
 
   export let data: PageData
