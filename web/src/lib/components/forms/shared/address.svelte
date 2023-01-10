@@ -111,7 +111,50 @@
         required={true}
       />
     {:else if addressType.name == "Email"}
-      <Input title="Email" id="email" bind:value={input} required={true} />
+      <Input title="Email" id="email" type="email" bind:value={input} required={true} />
+    {:else if addressType.name == "P-nummer"}
+      <Input title="P-nummer" id="email" bind:value={input} required={true} />
+    {:else if addressType.name == "Postadresse"}
+      <Input title="Postadresse" id="postadress" bind:value={input} required={true} />
+    {:else if addressType.name == "Webadresse"}
+      <Input
+        title="Weabdresse"
+        id="webadress"
+        type="url"
+        pattern="^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+\.[a-z]+(\/[a-zA-Z0-9#]+\/?)*$"
+        patternMessage="Indtast en gyldig url"
+        bind:value={input}
+        required={true}
+      />
+    {:else if addressType.name == "Formålskode"}
+      <Input title="Formålskode" id="purpose" bind:value={input} required={true} />
+    {:else if addressType.name == "Lokation"}
+      <Input title="Lokation" id="lokation" bind:value={input} required={true} />
+    {:else if addressType.name == "EAN-nummer"}
+      <Input title="EAN-nummer" id="ean" bind:value={input} required={true} />
+    {:else if addressType.name == "Skolekode"}
+      <Input title="Skolekode" id="skolekode" bind:value={input} required={true} />
+    {:else if addressType.name == "Fax"}
+      <Input title="Fax" id="fax" bind:value={input} required={true} />
+    {:else if addressType.name == "Returadresse"}
+      <Input
+        title="Returadresse"
+        id="returnadress"
+        bind:value={input}
+        required={true}
+      />
+    {:else if addressType.name == "Henvendelsessted"}
+      <Input title="Henvendelsessted" id="inquiry" bind:value={input} required={true} />
+    {:else if addressType.name == "Telefon"}
+      <Input
+        title="Telefon"
+        id="phone"
+        type="tel"
+        pattern="[0-9]+"
+        patternMessage="Kun tal & '+' er tilladt"
+        bind:value={input}
+        required={true}
+      />
     {/if}
   {/if}
 
