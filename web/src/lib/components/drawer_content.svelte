@@ -8,7 +8,7 @@
   enum SubPath {
     HOME = "/",
     EMPLOYEE = "/employee",
-    ORGANIZATION = "/organization",
+    ORGANIZATION = "/organisation",
     CONNECTING_ORGANIZATIONS = "/connecting-organizations",
   }
 </script>
@@ -37,6 +37,18 @@
     >
       <Icon type="user" />
       <p>Medarbejdere</p>
+    </a>
+  </li>
+  <li>
+    <a
+      class="flex text-secondary hover:no-underline h-10 {$page.url.pathname ===
+      SubPath.ORGANIZATION
+        ? 'bg-accent'
+        : ''}"
+      href="{base}{SubPath.ORGANIZATION}"
+    >
+      <Icon type="users" />
+      <p>Organisation</p>
     </a>
   </li>
   <li>
