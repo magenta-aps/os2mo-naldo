@@ -2,6 +2,8 @@ import { fetchGraph } from "$lib/util/http"
 import type { PageLoad } from "./$types"
 import { date } from "$lib/stores/date"
 
+export const ssr = false
+
 interface Query {
   data: Data | null
   errors?: Error[]
@@ -29,6 +31,7 @@ interface Address {
 
 interface Class {
   name: string
+  scope: null | string
 }
 
 interface OrganisationUnitOrganisationUnit {
@@ -51,6 +54,7 @@ export const load: PageLoad = async () => {
           name
           address_type {
             name
+            scope
           }
         }
         name
