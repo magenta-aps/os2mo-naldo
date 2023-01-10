@@ -143,7 +143,7 @@
           class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
           href="{$page.url}/create/it"
         >
-          Tilføj IT
+          Tilføj IT-system
         </a>
       </div>
       <DetailTable headers={["IT system", "Kontonavn", "Dato", "", ""]}>
