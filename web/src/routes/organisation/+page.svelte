@@ -22,16 +22,26 @@
             </a>
           </div>
           <h3 class="mt-7">Kontakt</h3>
-          {#each org_unit.objects[0].addresses.sort((a, b) => (a.address_type.name.localeCompare(b.address_type.name))) as address}
-          <div class="flex">
-              <span class="inline-block min-w-[12rem] font-bold text-slate-600">{address.address_type.name}</span>
-              <span class="text-secondary">{address.name}</span>
+          {#each org_unit.objects[0].addresses.sort( (a, b) => a.address_type.name.localeCompare(b.address_type.name) ) as address}
+            <div class="flex">
+              <span class="inline-block min-w-[12rem] font-bold text-slate-600"
+                >{address.address_type.name}</span
+              >
+              {#if address.address_type.scope === "EMAIL"}
+                <a href="mailto:{address.name}">{address.name}</a>
+              {:else if address.address_type.scope === "WWW"}
+                <a href="https://{address.name}">{address.name}</a>
+              {:else if address.address_type.scope === "PHONE"}
+                <a href="tel:{address.name}">{address.name}</a>
+              {:else}
+                <span class="text-secondary">{address.name}</span>
+              {/if}
             </div>
           {/each}
 
           <h3 class="mt-7">Underenheder</h3>
           <div>
-            {#each org_unit.objects[0].children.sort((a, b) => (a.name.localeCompare(b.name))) as child, i}
+            {#each org_unit.objects[0].children.sort( (a, b) => a.name.localeCompare(b.name) ) as child, i}
               <!-- For the trailing comma problem -->
               {#if i < org_unit.objects[0].children.length - 1}
                 <span class="inline-block mr-1">
