@@ -24,8 +24,8 @@
           <h3 class="mt-7">Kontakt</h3>
           {#each org_unit.objects[0].addresses.sort((a, b) => (a.address_type.name.localeCompare(b.address_type.name))) as address}
           <div class="flex">
-              <span class="inline-block min-w-[10rem]">{address.address_type.name}</span>
-              <span>{address.name}</span>
+              <span class="inline-block min-w-[12rem] font-bold text-slate-600">{address.address_type.name}</span>
+              <span class="text-secondary">{address.name}</span>
             </div>
           {/each}
 
