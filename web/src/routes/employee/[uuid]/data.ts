@@ -13,8 +13,11 @@ interface EmployeeResponse {
   objects: Employee[]
 }
 
-export interface Employee {
+interface Employee {
   name: string
+  validity: Validity
+  nickname: string
+  seniority: null | string
   engagements: EngagementElement[]
   cpr_no: null | string
   addresses: Address[]
@@ -37,7 +40,7 @@ interface Class {
 
 interface Validity {
   to: null | string
-  from: string
+  from: null | string
 }
 
 interface Association {
@@ -90,6 +93,12 @@ export const load = async (uuid: string): Promise<Employee> => {
       employees(uuids: "${uuid}") {
         objects {
           name
+          validity {
+            from
+            to
+          }
+          nickname
+          seniority
           engagements {
             uuid
             org_unit {
