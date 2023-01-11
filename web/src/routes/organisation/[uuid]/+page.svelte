@@ -73,7 +73,7 @@
         {/if}
       {/if}
     {:else if activeItem === "Adresser"}
-      <DetailTable headers={["Adressetype", "Adresse", "Synlighed", "Dato"]}>
+      <DetailTable headers={["Adressetype", "Adresse", "Synlighed", "Dato", "", ""]}>
         {#each orgUnits.present[0].addresses as address}
           <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
             <td class="p-4">{address.address_type.name}</td>
@@ -82,6 +82,17 @@
               >{address.visibility ? address.visibility.name : "Ikke sat"}</td
             >
             <ValidityTableCell validity={address.validity} />
+
+            <td>
+              <a href="{base}/organisation/{$page.params.uuid}/edit/address/{address.uuid}">
+                <Icon type="pen" />
+              </a>
+            </td>
+            <td>
+              <a href="{base}/organisation/{$page.params.uuid}/terminate/address/{address.uuid}">
+                <Icon type="xmark" size="30" />
+              </a>
+            </td>
           </tr>
         {/each}
       </DetailTable>
