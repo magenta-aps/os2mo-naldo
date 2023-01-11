@@ -29,6 +29,7 @@ export interface OrganisationUnitElement {
 }
 
 interface Address {
+  uuid: string
   name: null | string
   address_type: Class
   visibility: Class | null
@@ -143,6 +144,7 @@ const query = (uuid: string, from: string | null, to: string | null | undefined)
             to
           }
           addresses {
+            uuid
             name
             address_type {
               name
