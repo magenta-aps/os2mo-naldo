@@ -16,33 +16,35 @@
   export let returnType: ReturnType = "uuid"
   export let disabled = false
   export let startValue: string | undefined = undefined
+  export let extra_classes = ""
 </script>
-
-{#if title}
-  <label for={id} class="pb-1">
-    <p>{title}</p>
-  </label>
-{/if}
-<select
-  {id}
-  {name}
-  class="select select-bordered select-sm text-base text-secondary font-normal w-full rounded active:select-primary focus:select-primary active:outline-offset-0 focus:outline-offset-0"
-  bind:value
-  {required}
-  {disabled}
->
-  {#if !disabled && iterable}
-    {#if startValue}
-      <option disabled selected>{startValue}</option>
-    {/if}
-    {#each iterable as element}
-      {#if returnType === Return.NAME}
-        <option value={element.name}>{element.name}</option>
-      {:else if returnType === Return.UUID}
-        <option value={element.uuid}>{element.name}</option>
-      {:else if returnType === Return.OBJECT}
-        <option value={element}>{element.name}</option>
-      {/if}
-    {/each}
+<div class="form-control pb-4 {extra_classes}">
+  {#if title}
+    <label for={id} class="text-sm text-secondary pb-1">
+      {title}
+    </label>
   {/if}
-</select>
+  <select
+    {id}
+    {name}
+    class="select select-bordered select-sm text-base text-secondary font-normal w-full rounded active:select-primary focus:select-primary active:outline-offset-0 focus:outline-offset-0"
+    bind:value
+    {required}
+    {disabled}
+  >
+    {#if !disabled && iterable}
+      {#if startValue}
+        <option disabled selected>{startValue}</option>
+      {/if}
+      {#each iterable as element}
+        {#if returnType === Return.NAME}
+          <option value={element.name}>{element.name}</option>
+        {:else if returnType === Return.UUID}
+          <option value={element.uuid}>{element.name}</option>
+        {:else if returnType === Return.OBJECT}
+          <option value={element}>{element.name}</option>
+        {/if}
+      {/each}
+    {/if}
+  </select>
+</div>

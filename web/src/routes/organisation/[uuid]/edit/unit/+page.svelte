@@ -17,10 +17,11 @@
   let startDate = new Date().toISOString().split("T")[0]
   let endDate: string
   let name = data.org_units[0].objects[0].name
-
+  let orgLevel = data.org_units[0].objects[0].org_unit_level?.name
+  let orgType = data.org_units[0].objects[0].unit_type?.name
   let parent = data.org_units[0].objects[0].parent
-    ? data.org_units[0].objects[0].parent
-    : { name: "", uuid: "" }
+  ? data.org_units[0].objects[0].parent
+  : { name: "", uuid: "" }
 </script>
 
 <svelte:head>
@@ -33,7 +34,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-<form method="post"
+<form method="post" class="mx-6"
   use:enhance={() => {
     return async ({ result }) => {
       if (result.type === "success") {
@@ -62,64 +63,65 @@
     }
   }}
 >
-  <div class="flex flex-row gap-6 mx-6 mb-4">
-    <div class="form-control">
-      <DateInput
-        bind:value={startDate}
-        title="Startdato"
-        id="start-date"
-        max={endDate
-          ? endDate
-          : new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
-      />
-    </div>
+  <div class="w-1/2 min-w-fit bg-slate-100 rounded">
+    <div class="p-8">
+      <div class="flex flex-row gap-6">
+        <DateInput
+          bind:value={startDate}
+          title="Startdato"
+          id="start-date"
+          max={endDate
+            ? endDate
+            : new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
+        />
+        <DateInput
+          bind:value={endDate}
+          title="Slutdato"
+          id="end-date"
+          min={startDate}
+          max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
+        />
+      </div>
+      <SelectOrgTree bind:selectedOrg={parent} />
 
-    <div class="form-control">
-      <DateInput
-        bind:value={endDate}
-        title="Slutdato"
-        id="end-date"
-        min={startDate}
-        max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
-      />
-    </div>
-  </div>
-  <div class="form-control mx-6 mb-4">
-    <SelectOrgTree bind:selectedOrg={parent} required={false} />
-  </div>
+      <!-- TODO: Should have a skeleton for the loading stage -->
+      <Input title="Navn" id="name" bind:value={name} required={true} />
 
-  <div class="mx-6">
-    <div class="form-control mb-4">
-      <Input title="Navn" id="name" bind:value={name} />
-    </div>
-    <div class="flex flex-row gap-6 mb-6">
-      <div class="basis-1/2">
+      <div class="flex flex-row gap-6">
         <Select
           title="Enhedsniveau"
           id="org-level"
+          startValue={orgLevel}
+          extra_classes="basis-1/2"
+          bind:value={orgLevel}
           iterable={data.facets[0].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
+          required={true}
         />
-      </div>
-      <div class="basis-1/2">
         <Select
           title="Enhedstype"
           id="org-type"
+          startValue={orgType}
+          extra_classes="basis-1/2"
+          bind:value={orgType}
           iterable={data.facets[1].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
+          required={true}
         />
       </div>
     </div>
   </div>
-  <div class="modal-action p-6 gap-4 bg-slate-100">
-    <a
-      href={`${base}/organisation/${$page.params.uuid}`}
-      class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-      >Annullér</a
-    >
+  <div class="flex py-6 gap-4">
+    <!-- TODO: Make button close modal -->
     <button
       type="submit"
       class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-      >Opret enhed</button
+      >Rediger enhed</button
     >
+    <button
+      type="button"
+      class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+    >
+      Annullér
+    </button>
   </div>
   <Error />
 </form>

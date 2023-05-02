@@ -25,7 +25,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-<form method="post"
+<form method="post" class="mx-6"
   use:enhance={() => {
     return async ({ result }) => {
       if (result.type === "success") {
@@ -59,27 +59,27 @@
     }
   }}
 >
-  <div class="flex flex-row mx-6 mb-3">
-    <div class="form-control">
-      <DateInput bind:value={endDate} title="Slutdato" id="end-date" />
+<div class="w-1/2 min-w-fit bg-slate-100 rounded">
+  <div class="p-8">
+    <div class="flex flex-row gap-6">
+        <DateInput bind:value={endDate} title="Slutdato" id="end-date" />
     </div>
-  </div>
-
-  <div class="form-control mx-6 mb-6">
     <SelectOrgTree bind:selectedOrg={org} labelText="Angiv enhed" />
   </div>
-  <div class="modal-action p-6 gap-4 bg-slate-100">
-    <button
-      type="button"
-      class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-    >
-      Annullér
-    </button>
-    <button
-      type="submit"
-      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-      >Afslut enhed</button
-    >
-  </div>
+</div>
+<div class="flex py-6 gap-4">
+  <!-- TODO: Make button close modal -->
+  <button
+    type="submit"
+    class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+    >Afslut enhed</button
+  >
+  <button
+    type="button"
+    class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+  >
+    Annullér
+  </button>
+</div>
   <Error />
 </form>
