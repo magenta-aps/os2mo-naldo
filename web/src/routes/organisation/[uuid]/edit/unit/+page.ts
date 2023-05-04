@@ -46,6 +46,7 @@ interface Error {
 export const load: PageLoad = async (event) => {
   let fromDate = ""
   date.subscribe((v) => (fromDate = v))
+  console.log(fromDate)
 
   const query = `
       query {

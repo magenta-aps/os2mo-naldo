@@ -1,80 +1,29 @@
-import { fetchGraph } from "$lib/util/http"
+import { graphQLClient } from "$lib/util/http"
 import type { PageLoad } from "./$types"
 import { date } from "$lib/stores/date"
+import { OrgUnitsDocument } from "$lib/graphql/types"
+import { isAuth } from "$lib/stores/auth"
+import { GraphQLClient } from "graphql-request"
+import { keycloak } from "$lib/util/keycloak"
+import { env } from "$env/dynamic/public"
 
 export const ssr = false
-
-interface Query {
-  data: Data | null
-  errors?: Error[]
-}
-
-interface Data {
-  org_units: OrganisationUnitResponse[]
-}
-
-interface OrganisationUnitResponse {
-  objects: OrganisationUnitResponseOrganisationUnit[]
-}
-
-interface OrganisationUnitResponseOrganisationUnit {
-  addresses: Address[]
-  name: string
-  uuid: null | string
-  children: OrganisationUnitOrganisationUnit[]
-}
-
-interface Address {
-  name: null | string
-  address_type: Class
-}
-
-interface Class {
-  name: string
-  scope: null | string
-}
-
-interface OrganisationUnitOrganisationUnit {
-  name: string
-  uuid: null | string
-}
-
-interface Error {
-  message: string
-}
 
 export const load: PageLoad = async () => {
   let fromDate = ""
   date.subscribe((v) => (fromDate = v))
 
-  const query = `{
-    org_units(parents: null, from_date: "${fromDate}") {
-      objects {
-        addresses {
-          name
-          address_type {
-            name
-            scope
-          }
-        }
-        name
-        uuid
-        children {
-          name
-          uuid
-        }
-      }
+  const token = keycloak ? keycloak.token : "Keycloak disabled"
+  console.log(token)
+  const res = await new GraphQLClient(
+    `${env.PUBLIC_BASE_URL}/${env.PUBLIC_GRAPHQL_VERSION}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
     }
-  }`
-
-  const res = await fetchGraph(query)
-  const json: Query = await res.json()
-
-  if (json.data) {
-    return json.data
-  } else if (json.errors) {
-    throw new Error(json.errors[0].message)
-  } else {
-    throw new Error("Unknown error during data fetching")
-  }
+  ).request(OrgUnitsDocument, { fromDate: fromDate })
+  console.log(res)
+  return res
 }

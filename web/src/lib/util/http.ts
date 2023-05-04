@@ -1,5 +1,6 @@
 import { env } from "$env/dynamic/public"
 import { keycloak } from "$lib/util/keycloak"
+import { GraphQLClient } from "graphql-request"
 
 export const fetchRest = async (path: string) => {
   const token = keycloak ? keycloak.token : "Keycloak disabled"
@@ -40,3 +41,14 @@ export const fetchGraph = async (query: string | object | any): Promise<Response
     ),
   })
 }
+
+// HACK: Forced async/await becayse we have to wait initKeycloak() to finish
+export const graphQLClient = new GraphQLClient(
+  `${env.PUBLIC_BASE_URL}/${env.PUBLIC_GRAPHQL_VERSION}`,
+  {
+    headers: {
+      "Content-Type": "application/json",
+      // Authorization: "Bearer " + token,
+    },
+  }
+)

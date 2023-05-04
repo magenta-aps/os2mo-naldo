@@ -7,12 +7,21 @@
     "package": "svelte-kit package",
     "preview": "vite preview",
     "test": "playwright test",
+    "predev": "graphql-codegen",
+    "prebuild": "graphql-codegen",
+    "generate": "graphql-codegen",
+    "prepare": "svelte-kit sync && yarn generate",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --check --plugin-search-dir=. .",
     "format": "prettier --write --plugin-search-dir=. ."
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^3.3.1",
+    "@graphql-codegen/typed-document-node": "^4.0.1",
+    "@graphql-codegen/typescript": "^3.0.4",
+    "@graphql-codegen/typescript-operations": "^3.0.4",
+    "@graphql-typed-document-node/core": "^3.2.0",
     "@playwright/test": "^1.33.0",
     "@sveltejs/kit": "^1.16.0",
     "autoprefixer": "^10.4.14",
@@ -31,6 +40,8 @@
   "dependencies": {
     "@sveltejs/adapter-node": "^1.2.4",
     "daisyui": "^2.51.5",
+    "graphql": "^16.6.0",
+    "graphql-request": "^6.0.0",
     "keycloak-js": "^19.0.3",
     "svelte-floating-ui": "^0.3.2"
   }
