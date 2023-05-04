@@ -36,7 +36,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-<form
+<form method="post"
   use:enhance={() => {
     return async ({ result }) => {
       if (result.type === "success") {
@@ -54,7 +54,6 @@
           $error = { message: json.description }
         }
       } else {
-        JSON.stringify(result)
         $error = {
           message: `Something went wrong with the form: ${JSON.stringify(result)}`,
         }
