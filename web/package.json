@@ -16,7 +16,7 @@
     "@playwright/test": "^1.33.0",
     "@sveltejs/kit": "^1.16.0",
     "autoprefixer": "^10.4.14",
-    "postcss": "^8.4.17",
+    "postcss": "^8.4.23",
     "prettier": "^2.6.2",
     "prettier-plugin-svelte": "^2.8.0",
     "svelte": "^3.58.0",
