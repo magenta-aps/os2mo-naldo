@@ -30,7 +30,7 @@
     const orgTree: any[] = []
 
     const uuid = childUuid ? childUuid : $page.params.uuid
-    const breadcrumbs = $page.routeId?.startsWith("organisation")
+    const breadcrumbs = $page.route.id?.startsWith("organisation")
       ? (await fetchParentTree(uuid, fromDate)).map((e) => e.uuid).reverse()
       : []
 
