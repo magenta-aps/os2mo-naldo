@@ -6,7 +6,9 @@ node_modules
 .env
 .env.*
 !.env.example
+
 /graphql/types.ts
+*.generated.ts
 
 # Ignore files for PNPM, NPM and YARN
 pnpm-lock.yaml
