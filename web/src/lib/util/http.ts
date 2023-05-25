@@ -42,13 +42,12 @@ export const fetchGraph = async (query: string | object | any): Promise<Response
   })
 }
 
-// HACK: Forced async/await becayse we have to wait initKeycloak() to finish
-export const graphQLClient = new GraphQLClient(
-  `${env.PUBLIC_BASE_URL}/${env.PUBLIC_GRAPHQL_VERSION}`,
-  {
+// Is exported as a function to delay evaluation of till the client is ready
+export const graphQLClient = () => {
+  return new GraphQLClient(`${env.PUBLIC_BASE_URL}/${env.PUBLIC_GRAPHQL_VERSION}`, {
     headers: {
       "Content-Type": "application/json",
-      // Authorization: "Bearer " + token,
+      Authorization: "Bearer " + keycloak?.token,
     },
-  }
-)
+  })
+}
