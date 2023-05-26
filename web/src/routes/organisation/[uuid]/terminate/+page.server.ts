@@ -8,10 +8,9 @@ export const actions: Actions = {
 
     return {
       org: org,
-      validity: {
-        // End format YYYY-mm-dd
-        to: endDate,
-      },
+      // Validity
+      // End format YYYY-mm-dd
+      to: endDate,
     }
   },
 }

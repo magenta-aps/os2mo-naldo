@@ -50,7 +50,7 @@
           {
             org_unit: { uuid: result.data.uuid },
             parent: { uuid: result.data.parent },
-            validity: { from: result.data.validity.from },
+            validity: { from: result.data.from },
           }
         )
 
@@ -64,7 +64,7 @@
             data: {
               uuid: result.data.uuid,
               parent: { uuid: result.data.parent },
-              validity: { from: result.data.validity.from },
+              validity: { from: result.data.from },
               clamp: true,
             },
             type: "org_unit",
