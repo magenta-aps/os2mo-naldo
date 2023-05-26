@@ -34,7 +34,14 @@
 
   <!-- Uses the generated version of the query from the script tag -->
   {#await graphQLClient().request(OrgUnitsDocument, { fromDate: $date })}
-    ...
+    <div class="flex items-center justify-center h-screen">
+      <div class="m-auto text-center">
+        <div
+          class="animate-spin rounded-full h-32 w-32 border-b-8 border-primary mb-6"
+        />
+        <span>Loader organisationer...</span>
+      </div>
+    </div>
   {:then data}
     <div class="grid xl:grid-cols-2 gap-8 mt-8">
       {#each data.org_units as org_unit}
