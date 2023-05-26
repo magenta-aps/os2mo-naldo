@@ -1,4 +1,4 @@
-import type * as Types from '../../types';
+import type * as Types from '../../lib/graphql/types';
 
 import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type OrgUnitsQueryVariables = Types.Exact<{
