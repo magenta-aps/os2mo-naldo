@@ -1,5 +1,6 @@
 import { env } from "$env/dynamic/public"
 import { keycloak } from "$lib/util/keycloak"
+import { GraphQLClient } from "graphql-request"
 
 export const fetchRest = async (path: string) => {
   const token = keycloak ? keycloak.token : "Keycloak disabled"
@@ -38,5 +39,15 @@ export const fetchGraph = async (query: string | object | any): Promise<Response
         ? query
         : TypeError("Bad query")
     ),
+  })
+}
+
+// Is exported as a function to delay evaluation of till the client is ready
+export const graphQLClient = () => {
+  return new GraphQLClient(`${env.PUBLIC_BASE_URL}/${env.PUBLIC_GRAPHQL_VERSION}`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + keycloak?.token,
+    },
   })
 }

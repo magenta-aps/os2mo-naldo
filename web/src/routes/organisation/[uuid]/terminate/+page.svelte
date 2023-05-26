@@ -43,7 +43,7 @@
 
         if (res.status === 200) {
           $success = {
-            message: `${org.name} er blevet termineret fra ${result.data.validity.to}`,
+            message: `${org.name} er blevet termineret fra ${result.data.to}`,
             uuid: json,
             type: "organisation",
           }

@@ -10,11 +10,10 @@ export const actions: Actions = {
     return {
       uuid: org,
       parent: parent,
-      validity: {
-        // End format YYYY-mm-dd
-        from: moveDate,
-        to: moveDate,
-      },
+      // Validity
+      // End format YYYY-mm-dd
+      from: moveDate,
+      to: moveDate,
     }
   },
 }
