@@ -65,10 +65,10 @@ export type Address = {
 
 /** Address information for an employee or organisation unit */
 export type AddressAddress_TypeArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -78,9 +78,9 @@ export type AddressAddress_TypeArgs = {
 /** Address information for an employee or organisation unit */
 export type AddressEmployeeArgs = {
   cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
@@ -88,10 +88,10 @@ export type AddressEmployeeArgs = {
 
 /** Address information for an employee or organisation unit */
 export type AddressEngagementArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -100,10 +100,10 @@ export type AddressEngagementArgs = {
 
 /** Address information for an employee or organisation unit */
 export type AddressOrg_UnitArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -112,10 +112,10 @@ export type AddressOrg_UnitArgs = {
 
 /** Address information for an employee or organisation unit */
 export type AddressVisibilityArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -236,10 +236,10 @@ export type Association = {
 
 /** Connects organisation units and employees */
 export type AssociationAssociation_TypeArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -248,10 +248,10 @@ export type AssociationAssociation_TypeArgs = {
 
 /** Connects organisation units and employees */
 export type AssociationDynamic_ClassArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -261,9 +261,9 @@ export type AssociationDynamic_ClassArgs = {
 /** Connects organisation units and employees */
 export type AssociationEmployeeArgs = {
   cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
@@ -271,10 +271,10 @@ export type AssociationEmployeeArgs = {
 
 /** Connects organisation units and employees */
 export type AssociationIt_UserArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -283,10 +283,10 @@ export type AssociationIt_UserArgs = {
 
 /** Connects organisation units and employees */
 export type AssociationJob_FunctionArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -295,10 +295,10 @@ export type AssociationJob_FunctionArgs = {
 
 /** Connects organisation units and employees */
 export type AssociationOrg_UnitArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -307,10 +307,10 @@ export type AssociationOrg_UnitArgs = {
 
 /** Connects organisation units and employees */
 export type AssociationPrimaryArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -320,9 +320,9 @@ export type AssociationPrimaryArgs = {
 /** Connects organisation units and employees */
 export type AssociationSubstituteArgs = {
   cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
@@ -421,10 +421,10 @@ export type Class = {
 
 /** The value component of the class/facet choice setup */
 export type ClassChildrenArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -433,18 +433,20 @@ export type ClassChildrenArgs = {
 
 /** The value component of the class/facet choice setup */
 export type ClassFacetArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** The value component of the class/facet choice setup */
 export type ClassParentArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -473,6 +475,25 @@ export type ClassCreateInput = {
   user_key: Scalars['String']['input'];
   /** UUID to be created. Will be autogenerated if not specified. */
   uuid?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+export type ClassUpdateInput = {
+  /** Example usage. */
+  example?: InputMaybe<Scalars['String']['input']>;
+  /** UUID of the related facet. */
+  facet_uuid: Scalars['UUID']['input'];
+  /** Mo-class name. */
+  name: Scalars['String']['input'];
+  /** Owner of class */
+  owner?: InputMaybe<Scalars['UUID']['input']>;
+  /** UUID of the parent class. */
+  parent_uuid?: InputMaybe<Scalars['UUID']['input']>;
+  /** Published state of the class object. */
+  published?: Scalars['String']['input'];
+  /** Scope of the class. */
+  scope?: InputMaybe<Scalars['String']['input']>;
+  /** Extra info or uuid */
+  user_key: Scalars['String']['input'];
 };
 
 /** A configuration setting */
@@ -536,10 +557,10 @@ export type Employee = {
 export type EmployeeAddressesArgs = {
   address_type_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   address_types?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -551,9 +572,9 @@ export type EmployeeAddressesArgs = {
 export type EmployeeAssociationsArgs = {
   association_type_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   association_types?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -563,10 +584,10 @@ export type EmployeeAssociationsArgs = {
 
 /** Employee/identity specific information */
 export type EmployeeEngagement_AssociationsArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -576,9 +597,9 @@ export type EmployeeEngagement_AssociationsArgs = {
 
 /** Employee/identity specific information */
 export type EmployeeEngagementsArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -588,9 +609,9 @@ export type EmployeeEngagementsArgs = {
 
 /** Employee/identity specific information */
 export type EmployeeItusersArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -600,9 +621,9 @@ export type EmployeeItusersArgs = {
 
 /** Employee/identity specific information */
 export type EmployeeLeavesArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -612,9 +633,9 @@ export type EmployeeLeavesArgs = {
 
 /** Employee/identity specific information */
 export type EmployeeManager_RolesArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -624,9 +645,9 @@ export type EmployeeManager_RolesArgs = {
 
 /** Employee/identity specific information */
 export type EmployeeRolesArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -767,9 +788,9 @@ export type Engagement = {
 /** Employee engagement in an organisation unit */
 export type EngagementEmployeeArgs = {
   cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
@@ -777,10 +798,10 @@ export type EngagementEmployeeArgs = {
 
 /** Employee engagement in an organisation unit */
 export type EngagementEngagement_AssociationsArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -790,10 +811,10 @@ export type EngagementEngagement_AssociationsArgs = {
 
 /** Employee engagement in an organisation unit */
 export type EngagementEngagement_TypeArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -802,10 +823,10 @@ export type EngagementEngagement_TypeArgs = {
 
 /** Employee engagement in an organisation unit */
 export type EngagementJob_FunctionArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -814,10 +835,10 @@ export type EngagementJob_FunctionArgs = {
 
 /** Employee engagement in an organisation unit */
 export type EngagementLeaveArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -826,10 +847,10 @@ export type EngagementLeaveArgs = {
 
 /** Employee engagement in an organisation unit */
 export type EngagementOrg_UnitArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -838,10 +859,10 @@ export type EngagementOrg_UnitArgs = {
 
 /** Employee engagement in an organisation unit */
 export type EngagementPrimaryArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -875,10 +896,10 @@ export type EngagementAssociation = {
 
 /** Employee engagement in an organisation unit */
 export type EngagementAssociationEngagementArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -887,10 +908,10 @@ export type EngagementAssociationEngagementArgs = {
 
 /** Employee engagement in an organisation unit */
 export type EngagementAssociationEngagement_Association_TypeArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -899,10 +920,10 @@ export type EngagementAssociationEngagement_Association_TypeArgs = {
 
 /** Employee engagement in an organisation unit */
 export type EngagementAssociationOrg_UnitArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -1009,9 +1030,9 @@ export type Facet = {
 
 /** The key component of the class/facet choice setup */
 export type FacetClassesArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -1031,6 +1052,13 @@ export type FacetCreateInput = {
   user_key: Scalars['String']['input'];
   /** UUID to be created. Will be autogenerated if not specified. */
   uuid?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+export type FacetUpdateInput = {
+  /** Published state of the facet object. */
+  published?: Scalars['String']['input'];
+  /** Facet name. */
+  user_key: Scalars['String']['input'];
 };
 
 /** Checks whether a specific subsystem is working */
@@ -1125,9 +1153,9 @@ export type ItUser = {
 /** User information related to IT systems */
 export type ItUserEmployeeArgs = {
   cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
@@ -1135,10 +1163,10 @@ export type ItUserEmployeeArgs = {
 
 /** User information related to IT systems */
 export type ItUserEngagementArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -1147,18 +1175,20 @@ export type ItUserEngagementArgs = {
 
 /** User information related to IT systems */
 export type ItUserItsystemArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** User information related to IT systems */
 export type ItUserOrg_UnitArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -1255,10 +1285,10 @@ export type Kle = {
 
 /** Kommunernes Landsforenings Emnesystematik */
 export type KleKle_AspectsArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -1267,10 +1297,10 @@ export type KleKle_AspectsArgs = {
 
 /** Kommunernes Landsforenings Emnesystematik */
 export type KleKle_NumberArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -1279,10 +1309,10 @@ export type KleKle_NumberArgs = {
 
 /** Kommunernes Landsforenings Emnesystematik */
 export type KleOrg_UnitArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -1335,9 +1365,9 @@ export type Leave = {
 /** Leave (e.g. parental leave) for employees */
 export type LeaveEmployeeArgs = {
   cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
@@ -1345,10 +1375,10 @@ export type LeaveEmployeeArgs = {
 
 /** Leave (e.g. parental leave) for employees */
 export type LeaveEngagementArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -1357,10 +1387,10 @@ export type LeaveEngagementArgs = {
 
 /** Leave (e.g. parental leave) for employees */
 export type LeaveLeave_TypeArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -1421,9 +1451,9 @@ export type Manager = {
 /** Managers of organisation units and their connected identities */
 export type ManagerEmployeeArgs = {
   cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
@@ -1431,10 +1461,10 @@ export type ManagerEmployeeArgs = {
 
 /** Managers of organisation units and their connected identities */
 export type ManagerManager_LevelArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -1443,10 +1473,10 @@ export type ManagerManager_LevelArgs = {
 
 /** Managers of organisation units and their connected identities */
 export type ManagerManager_TypeArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -1455,10 +1485,10 @@ export type ManagerManager_TypeArgs = {
 
 /** Managers of organisation units and their connected identities */
 export type ManagerOrg_UnitArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -1467,10 +1497,10 @@ export type ManagerOrg_UnitArgs = {
 
 /** Managers of organisation units and their connected identities */
 export type ManagerResponsibilitiesArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -1561,6 +1591,10 @@ export type Mutation = {
   association_update: AssociationResponse;
   /** Creates a class. */
   class_create: UuidReturn;
+  /** Deletes a class. */
+  class_delete: UuidReturn;
+  /** Updates a class. */
+  class_update: UuidReturn;
   /** Creates an employee. */
   employee_create: EmployeeResponse;
   /** Terminates an employee. */
@@ -1577,6 +1611,10 @@ export type Mutation = {
   engagement_update: EngagementResponse;
   /** Creates a facet. */
   facet_create: UuidReturn;
+  /** Deletes a facet. */
+  facet_delete: UuidReturn;
+  /** Updates a facet. */
+  facet_update: UuidReturn;
   /** Creates an ITSystem. */
   itsystem_create: UuidReturn;
   /** Deletes an ITSystem. */
@@ -1650,6 +1688,17 @@ export type MutationClass_CreateArgs = {
 };
 
 
+export type MutationClass_DeleteArgs = {
+  uuid: Scalars['UUID']['input'];
+};
+
+
+export type MutationClass_UpdateArgs = {
+  input: ClassUpdateInput;
+  uuid: Scalars['UUID']['input'];
+};
+
+
 export type MutationEmployee_CreateArgs = {
   input: EmployeeCreateInput;
 };
@@ -1687,6 +1736,17 @@ export type MutationEngagement_UpdateArgs = {
 
 export type MutationFacet_CreateArgs = {
   input: FacetCreateInput;
+};
+
+
+export type MutationFacet_DeleteArgs = {
+  uuid: Scalars['UUID']['input'];
+};
+
+
+export type MutationFacet_UpdateArgs = {
+  input: FacetUpdateInput;
+  uuid: Scalars['UUID']['input'];
 };
 
 
@@ -1857,11 +1917,11 @@ export type OrganisationUnit = {
 export type OrganisationUnitAddressesArgs = {
   address_type_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   address_types?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -1872,10 +1932,10 @@ export type OrganisationUnitAddressesArgs = {
 export type OrganisationUnitAssociationsArgs = {
   association_type_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   association_types?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -1884,10 +1944,10 @@ export type OrganisationUnitAssociationsArgs = {
 
 /** Hierarchical unit within the organisation tree */
 export type OrganisationUnitChild_CountArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -1896,10 +1956,10 @@ export type OrganisationUnitChild_CountArgs = {
 
 /** Hierarchical unit within the organisation tree */
 export type OrganisationUnitChildrenArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -1908,11 +1968,11 @@ export type OrganisationUnitChildrenArgs = {
 
 /** Hierarchical unit within the organisation tree */
 export type OrganisationUnitEngagement_AssociationsArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -1921,10 +1981,10 @@ export type OrganisationUnitEngagement_AssociationsArgs = {
 
 /** Hierarchical unit within the organisation tree */
 export type OrganisationUnitEngagementsArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -1933,10 +1993,10 @@ export type OrganisationUnitEngagementsArgs = {
 
 /** Hierarchical unit within the organisation tree */
 export type OrganisationUnitItusersArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -1945,9 +2005,9 @@ export type OrganisationUnitItusersArgs = {
 
 /** Hierarchical unit within the organisation tree */
 export type OrganisationUnitKlesArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -1956,10 +2016,10 @@ export type OrganisationUnitKlesArgs = {
 
 /** Hierarchical unit within the organisation tree */
 export type OrganisationUnitLeavesArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -1974,10 +2034,10 @@ export type OrganisationUnitManagersArgs = {
 
 /** Hierarchical unit within the organisation tree */
 export type OrganisationUnitOrg_Unit_Hierarchy_ModelArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -1986,10 +2046,10 @@ export type OrganisationUnitOrg_Unit_Hierarchy_ModelArgs = {
 
 /** Hierarchical unit within the organisation tree */
 export type OrganisationUnitOrg_Unit_LevelArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -1998,10 +2058,10 @@ export type OrganisationUnitOrg_Unit_LevelArgs = {
 
 /** Hierarchical unit within the organisation tree */
 export type OrganisationUnitParentArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -2010,9 +2070,9 @@ export type OrganisationUnitParentArgs = {
 
 /** Hierarchical unit within the organisation tree */
 export type OrganisationUnitRelated_UnitsArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -2021,10 +2081,10 @@ export type OrganisationUnitRelated_UnitsArgs = {
 
 /** Hierarchical unit within the organisation tree */
 export type OrganisationUnitRolesArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -2033,10 +2093,10 @@ export type OrganisationUnitRolesArgs = {
 
 /** Hierarchical unit within the organisation tree */
 export type OrganisationUnitTime_PlanningArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -2045,10 +2105,10 @@ export type OrganisationUnitTime_PlanningArgs = {
 
 /** Hierarchical unit within the organisation tree */
 export type OrganisationUnitUnit_TypeArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -2227,7 +2287,9 @@ export type QueryClassesArgs = {
 
 /** Entrypoint for all read-operations */
 export type QueryConfigurationArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   identifiers?: InputMaybe<Array<Scalars['String']['input']>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -2272,8 +2334,10 @@ export type QueryEngagementsArgs = {
 
 /** Entrypoint for all read-operations */
 export type QueryFacetsArgs = {
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
   offset?: InputMaybe<Scalars['int']['input']>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
@@ -2281,8 +2345,10 @@ export type QueryFacetsArgs = {
 
 /** Entrypoint for all read-operations */
 export type QueryFilesArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   file_names?: InputMaybe<Array<Scalars['String']['input']>>;
   file_store: FileStore;
+  limit?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -2296,8 +2362,10 @@ export type QueryHealthsArgs = {
 
 /** Entrypoint for all read-operations */
 export type QueryItsystemsArgs = {
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
   offset?: InputMaybe<Scalars['int']['input']>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
@@ -2426,10 +2494,10 @@ export type RelatedUnit = {
 
 /** list of related organisation units */
 export type RelatedUnitOrg_UnitsArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -2482,9 +2550,9 @@ export type Role = {
 /** Role an employee has within an organisation unit */
 export type RoleEmployeeArgs = {
   cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
@@ -2492,10 +2560,10 @@ export type RoleEmployeeArgs = {
 
 /** Role an employee has within an organisation unit */
 export type RoleOrg_UnitArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -2504,10 +2572,10 @@ export type RoleOrg_UnitArgs = {
 
 /** Role an employee has within an organisation unit */
 export type RoleRole_TypeArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
