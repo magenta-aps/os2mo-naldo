@@ -4,9 +4,13 @@
   import { base } from "$app/paths"
   import DetailTable from "$lib/components/shared/detail_table.svelte"
   import { activeEmployeeTab } from "$lib/stores/tab"
-  import { load } from "./data"
   import HeadTitle from "$lib/components/shared/head_title.svelte"
   import { page } from "$app/stores"
+  import { gql } from "graphql-request"
+  import { graphQLClient } from "$lib/util/http"
+  import { EmployeeDocument } from "./query.generated"
+  import EmployeeDetailTable from "$lib/components/employee/tables/employee_detail_table.svelte"
+  import EngagementDetailTable from "$lib/components/employee/tables/engagement_detail_table.svelte"
 
   // Tabs
   enum itemCategory {
@@ -24,20 +28,120 @@
 
   let activeItem: string = $activeEmployeeTab
   const tabChange = (e: CustomEvent) => ($activeEmployeeTab = activeItem = e.detail)
+
+  gql`
+    query Employee($uuid: [UUID!]) {
+      employees(uuids: $uuid) {
+        objects {
+          name
+          validity {
+            from
+            to
+          }
+          nickname
+          seniority
+          engagements {
+            uuid
+            org_unit {
+              name
+              uuid
+            }
+            validity {
+              to
+              from
+            }
+            job_function {
+              name
+            }
+          }
+          cpr_no
+          addresses {
+            name
+            address_type {
+              name
+            }
+            visibility {
+              name
+            }
+            validity {
+              from
+              to
+            }
+          }
+          associations {
+            org_unit {
+              name
+              uuid
+            }
+            association_type {
+              name
+            }
+            validity {
+              from
+              to
+            }
+          }
+          roles {
+            role_type {
+              name
+            }
+            org_unit {
+              name
+              uuid
+            }
+            validity {
+              from
+              to
+            }
+          }
+          leaves {
+            validity {
+              from
+              to
+            }
+            leave_type {
+              name
+            }
+            engagement {
+              org_unit {
+                name
+              }
+              job_function {
+                name
+              }
+            }
+          }
+          manager_roles {
+            org_unit {
+              name
+              uuid
+            }
+            validity {
+              from
+              to
+            }
+          }
+        }
+      }
+    }
+  `
 </script>
 
 <HeadTitle type="employee" />
 
-{#await load($page.params.uuid)}
+{#await graphQLClient().request(EmployeeDocument, { uuid: $page.params.uuid })}
   <div class="px-12 pt-6">
     <p>Loader medarbejder...</p>
   </div>
 {:then data}
+  {@const employee = data.employees[0].objects[0]}
   <div class="px-12 pt-6">
     <h1 class="mb-4">
-      {data.name}
+      {employee.name}
       <span class="text-slate-600">
-        {data.cpr_no ? `(${data.cpr_no.slice(4)}-${data.cpr_no.slice(-4)})` : ""}
+        {employee.cpr_no
+          ? `(${employee.cpr_no.slice(4)}-${employee.cpr_no.slice(-4)})`
+          : ""}
       </span>
     </h1>
 
@@ -49,39 +153,12 @@
     <!-- <TenseTabs /> -->
 
     {#if activeItem === itemCategory.EMPLOYEE}
-      <DetailTable headers={["Navn", "Kaldenavn", "Anciennitet", "Dato"]}>
-        <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-          <td class="p-4">
-            {data.name}
-          </td>
-          <td class="p-4">{data.nickname}</td>
-          <td class="p-4">{data.seniority || ""}</td>
-          <ValidityTableCell validity={data.validity} />
-        </tr>
-      </DetailTable>
+      <EmployeeDetailTable uuid={$page.params.uuid} />
     {:else if activeItem === itemCategory.ENGAGEMENTS}
-      <DetailTable headers={["Stillingsbetegnelse", "Enhed", "Dato"]}>
-        {#each data.engagements as engagement, i}
-          <tr
-            class="{i % 2 === 1 ? 'bg-slate-100' : ''} 
-            p-4 leading-5 border-t border-slate-300 text-secondary"
-          >
-            <td class="p-4">
-              {engagement.job_function.name}
-            </td>
-
-            <a href="{base}/organisation/{engagement.org_unit[0].uuid}">
-              <td class="p-4">
-                {engagement.org_unit[0].name}
-              </td>
-            </a>
-            <ValidityTableCell validity={engagement.validity} />
-          </tr>
-        {/each}
-      </DetailTable>
+      <EngagementDetailTable uuid={$page.params.uuid} />
     {:else if activeItem === itemCategory.ADDRESSES}
       <DetailTable headers={["Adressetype", "Adresse", "Synlighed", "Dato"]}>
-        {#each data.addresses as address, i}
+        {#each employee.addresses as address, i}
           <tr
             class="{i % 2 === 1 ? 'bg-slate-100' : ''} 
             p-4 leading-5 border-t border-slate-300 text-secondary"
@@ -101,7 +178,7 @@
       </DetailTable>
     {:else if activeItem === itemCategory.ASSOCIATIONS}
       <DetailTable headers={["Enhed", "Rolle", "Dato"]}>
-        {#each data.associations as association, i}
+        {#each employee.associations as association, i}
           <tr
             class="{i % 2 === 1 ? 'bg-slate-100' : ''} 
             p-4 leading-5 border-t border-slate-300 text-secondary"
@@ -122,7 +199,7 @@
       </DetailTable>
     {:else if activeItem === itemCategory.ROLES}
       <DetailTable headers={["Rolletype", "Enhed", "Dato"]}>
-        {#each data.roles as role, i}
+        {#each employee.roles as role, i}
           <tr
             class="{i % 2 === 1 ? 'bg-slate-100' : ''} 
             p-4 leading-5 border-t border-slate-300 text-secondary"
@@ -145,7 +222,7 @@
       TODO
     {:else if activeItem === itemCategory.LEAVE}
       <DetailTable headers={["Orlovstype", "Engagement", "Dato"]}>
-        {#each data.leaves as leave, i}
+        {#each employee.leaves as leave, i}
           <tr
             class="{i % 2 === 1 ? 'bg-slate-100' : ''} 
             p-4 leading-5 border-t border-slate-300 text-secondary"
@@ -166,7 +243,7 @@
     {:else if activeItem === itemCategory.MANAGER_ROLES}
       <!-- TODO: Needs Lederansvar, Ledertype, Lederniveau -->
       <DetailTable headers={["Enhed", "Dato"]}>
-        {#each data.manager_roles as manager_role, i}
+        {#each employee.manager_roles as manager_role, i}
           <tr
             class="{i % 2 === 1 ? 'bg-slate-100' : ''} 
             p-4 leading-5 border-t border-slate-300 text-secondary"
