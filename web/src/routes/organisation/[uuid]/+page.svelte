@@ -19,6 +19,7 @@
   import EngagementTable from "$lib/components/org/tables/engagement_table.svelte"
   import AssociationTable from "$lib/components/org/tables/association_table.svelte"
   import ItSystemTable from "$lib/components/org/tables/it_system_table.svelte"
+  import RoleTable from "$lib/components/org/tables/role_table.svelte"
 
   // Tabs
   // TODO: enum?
@@ -152,17 +153,20 @@
       {/if}
     {:else if activeItem === "Roller"}
       <TenseTabs />
-      <DetailTable headers={["Navn", "Rolletype", "Dato"]}>
-        {#each orgUnits.present[0].roles as role}
-          <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-            <a href="{base}/employee/{role.employee[0].uuid}">
-              <td class="p-4">{role.employee[0].name}</td>
-            </a>
-            <td class="p-4">{role.role_type.name}</td>
-            <ValidityTableCell validity={role.validity} />
-          </tr>
-        {/each}
-      </DetailTable>
+      <!-- TODO: future and past does not work. 
+      Waiting to see if this can be done through GraphQL -->
+      {#if $tenses.future}
+        <h2 class="mb-4">Fremtid</h2>
+        <RoleTable tense="future" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.present}
+        <h2 class="mb-4">Nutid</h2>
+        <RoleTable tense="present" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.past}
+        <h2 class="mb-4">Fortid</h2>
+        <RoleTable tense="past" uuid={$page.params.uuid} />
+      {/if}
     {:else if activeItem === "Ledere"}
       <TenseTabs />
       <DetailTable
