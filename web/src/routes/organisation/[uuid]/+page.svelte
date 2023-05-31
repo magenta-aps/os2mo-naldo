@@ -15,6 +15,7 @@
   import { tenses } from "$lib/stores/tenses"
   import Icon from "$lib/components/icon.svelte"
   import OrgTable from "$lib/components/org/org_table.svelte"
+  import ItSystemTable from "$lib/components/org/tables/it_system_table.svelte"
 
   // Tabs
   // TODO: enum?
@@ -137,39 +138,22 @@
         {/each}
       </DetailTable>
     {:else if activeItem === "IT"}
-      <div class="flex justify-between">
         <TenseTabs />
-        <a
-          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
-          href="{$page.url}/create/it"
-        >
-          Tilføj IT-system
-        </a>
-      </div>
-      <DetailTable headers={["IT system", "Kontonavn", "Dato", "", ""]}>
-        {#each orgUnits.present[0].itusers as ituser}
-          <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-            <td class="p-4">{ituser.itsystem.name}</td>
-            <td class="p-4">{ituser.user_key}</td>
-            <ValidityTableCell validity={ituser.validity} />
-            <td>
-              <a href="{base}/organisation/{$page.params.uuid}/edit/it/{ituser.uuid}">
-                <Icon type="pen" />
-              </a>
-            </td>
-            <td>
-              <a href="{base}/organisation/{$page.params.uuid}/edit/it/{ituser.uuid}">
-                <a
-                  href="{base}/organisation/{$page.params
-                    .uuid}/terminate/it/{ituser.uuid}"
-                >
-                  <Icon type="xmark" size="30" />
-                </a>
-              </a></td
-            >
-          </tr>
-        {/each}
-      </DetailTable>
+      <!-- TODO: Add 'Add'-button -->
+      <!-- TODO: future and fast does not work. 
+      Waiting to see if this can be done through GraphQL -->
+      {#if $tenses.future}
+        <h2 class="mb-4">Fremtid</h2>
+        <ItSystemTable tense="future" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.present}
+        <h2 class="mb-4">Nutid</h2>
+        <ItSystemTable tense="present" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.past}
+        <h2 class="mb-4">Fortid</h2>
+        <ItSystemTable tense="past" uuid={$page.params.uuid} />
+      {/if}
     {:else if activeItem === "Roller"}
       <TenseTabs />
       <DetailTable headers={["Navn", "Rolletype", "Dato"]}>
