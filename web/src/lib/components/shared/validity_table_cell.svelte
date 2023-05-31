@@ -2,8 +2,8 @@
   import { formatDate } from "$lib/util/date"
 
   interface Validity {
-    from: string | null
-    to: string | null
+    from?: any
+    to?: any
   }
 
   export let validity: Validity

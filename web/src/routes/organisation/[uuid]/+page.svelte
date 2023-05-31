@@ -15,6 +15,7 @@
   import { tenses } from "$lib/stores/tenses"
   import Icon from "$lib/components/icon.svelte"
   import OrgTable from "$lib/components/org/org_table.svelte"
+  import ManagerTable from "$lib/components/org/tables/manager_table.svelte"
 
   // Tabs
   // TODO: enum?
@@ -185,33 +186,20 @@
       </DetailTable>
     {:else if activeItem === "Ledere"}
       <TenseTabs />
-      <DetailTable
-        headers={["Navn", "Lederansvar", "Ledertype", "Lederniveau", "Dato"]}
-      >
-        {#each orgUnits.present[0].managers as manager}
-          <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-            <a href="{base}/employee/{manager.employee[0].uuid}">
-              <td class="p-4">{manager.employee[0].name}</td>
-            </a>
-            <td class="p-4">
-              <ul>
-                {#each manager.responsibilities as responsibility}
-                  <li>
-                    • {responsibility.name}
-                  </li>
-                {/each}
-              </ul>
-            </td>
-            <td class="p-4"
-              >{manager.manager_type ? manager.manager_type.name : "Ikke sat"}</td
-            >
-            <td class="p-4"
-              >{manager.manager_level ? manager.manager_level.name : "Ikke sat"}</td
-            >
-            <ValidityTableCell validity={manager.validity} />
-          </tr>
-        {/each}
-      </DetailTable>
+      <!-- TODO: future and fast does not work. 
+      Waiting to see if this can be done through GraphQL -->
+      {#if $tenses.future}
+        <h2 class="mb-4">Fremtid</h2>
+        <ManagerTable tense="future" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.present}
+        <h2 class="mb-4">Nutid</h2>
+        <ManagerTable tense="present" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.past}
+        <h2 class="mb-4">Fortid</h2>
+        <ManagerTable tense="past" uuid={$page.params.uuid} />
+      {/if}
     {:else if activeItem === "KLE-opmærkninger"}
       <TenseTabs />
       TODO
