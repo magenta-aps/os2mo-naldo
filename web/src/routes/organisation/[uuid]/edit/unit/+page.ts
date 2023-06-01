@@ -13,7 +13,7 @@ interface Query {
   errors?: Error[]
 }
 
-export interface Data {
+interface Data {
   facets: Facet[]
   org_units: OrganisationUnitResponse[]
 }
@@ -37,6 +37,12 @@ interface OrganisationUnit {
   uuid: null | string
   name: string
   parent: Class | null
+  unit_type: UnitTypeClass | null
+  org_unit_level: UnitTypeClass | null
+}
+
+interface UnitTypeClass {
+  name: string
 }
 
 interface Error {
@@ -63,6 +69,12 @@ export const load: PageLoad = async (event) => {
             name
             parent {
               uuid
+              name
+            }
+            unit_type {
+              name
+            }
+            org_unit_level {
               name
             }
           }

@@ -29,7 +29,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-<form method="post"
+<form method="post" class="mx-6"
   use:enhance={() => {
     return async ({ result }) => {
       if (result.type === "success") {
@@ -93,47 +93,48 @@
     }
   }}
 >
-  <div class="flex flex-row mx-6 mb-3">
-    <div class="form-control">
-      <DateInput
-        bind:value={startDate}
-        title="Flyttedato"
-        id="move-date"
-        max={endDate
-          ? endDate
-          : new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
+  <div class="w-1/2 min-w-fit mb-6 bg-slate-100 rounded">
+    <div class="p-8">
+      <div class="flex flex-row gap-6">
+          <DateInput
+            bind:value={startDate}
+            title="Flyttedato"
+            id="move-date"
+            max={endDate
+              ? endDate
+              : new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
+          />
+      </div>
+      <SelectOrgTree bind:selectedOrg={org} labelText="Angiv enhed" />
+
+      {#if org.uuid}
+        <div class="form-control pb-4">
+          ##### Fix me ####
+          ##### Måske skal breadcrumbs også ind i form-control på komponent-niveau? ######
+            <Breadcrumbs bind:currentOrg={org.name} bind:uuid={org.uuid} orgSelector={true} />
+        </div>
+      {/if}
+
+      <SelectOrgTree
+        bind:selectedOrg={parentOrg}
+        id={"select-parent-org-tree"}
+        labelText="Ny overenhed"
       />
     </div>
-    <div class="form-control ml-6 w-full">
-      <SelectOrgTree bind:selectedOrg={org} labelText="Angiv enhed" />
-    </div>
   </div>
-
-  {#if org.uuid}
-    <div class="mx-6 mb-6">
-      <Breadcrumbs bind:currentOrg={org.name} bind:uuid={org.uuid} orgSelector={true} />
-    </div>
-  {/if}
-
-  <div class="form-control mx-6 mb-6">
-    <SelectOrgTree
-      bind:selectedOrg={parentOrg}
-      id={"select-parent-org-tree"}
-      labelText="Ny overenhed"
-    />
-  </div>
-  <div class="modal-action p-6 gap-4 bg-slate-100">
+  <div class="flex py-6 gap-4">
+    <!-- TODO: Make button close modal -->
+    <button
+      type="submit"
+      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+      >Flyt enhed</button
+    >
     <button
       type="button"
       class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
     >
       Annullér
     </button>
-    <button
-      type="submit"
-      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-      >Flyt enhed</button
-    >
   </div>
   <Error />
 </form>

@@ -63,40 +63,44 @@
 </script>
 
 {#await fetchOrgTree(query)}
-  <label for={id} class="label">
-    <p>{labelText}</p>
-    <span class="animate-spin rounded-full h-6 w-6 border-b-4 border-primary" />
-  </label>
-  <input disabled class="input input-bordered input-sm rounded w-full" />
+  <div class="form-control pb-4">
+    <label for={id} class="text-sm text-secondary pb-1">
+      {labelText}
+      <span class="animate-spin rounded-full h-6 w-6 border-b-4 border-primary" />
+    </label>
+    <input disabled class="input input-bordered input-sm rounded w-full" />
+  </div>
 {:then}
-  <label for={id} class="pb-1">
-    <p>{labelText}</p>
-  </label>
-  <div use:floatingRef>
-    <input
-      {id}
-      {required}
-      on:focus={() => {
-        isFocused = true
-      }}
-      bind:value={selectedOrg.name}
-      class="input input-bordered input-sm text-base text-secondary font-normal rounded active:input-primary focus:input-primary w-full active:outline-offset-0 focus:outline-offset-0"
-    />
+  <div class="form-control pb-4">
+    <label for={id} class="text-sm text-secondary pb-1">
+      {labelText}
+    </label>
+    <div use:floatingRef>
+      <input
+        {id}
+        {required}
+        on:focus={() => {
+          isFocused = true
+        }}
+        bind:value={selectedOrg.name}
+        class="input input-bordered input-sm text-base text-secondary font-normal rounded active:input-primary focus:input-primary w-full active:outline-offset-0 focus:outline-offset-0"
+      />
 
-    <!-- Hidden hack to return the UUID while displaying the name -->
-    <input hidden {id} name={id} bind:value={selectedOrg.uuid} />
-    {#if isFocused}
-      <div
-        use:floatingContent
-        class="w-96 max-w-full px-5"
-        on:mouseleave={delayedUnfocus}
-      >
-        <ul class="menu bg-base-200 ">
-          {#each orgTree as child}
-            <Node {...child} bind:selectedOrg />
-          {/each}
-        </ul>
-      </div>
-    {/if}
+      <!-- Hidden hack to return the UUID while displaying the name -->
+      <input hidden {id} name={id} bind:value={selectedOrg.uuid} />
+      {#if isFocused}
+        <div
+          use:floatingContent
+          class="w-96 max-w-full px-5"
+          on:mouseleave={delayedUnfocus}
+        >
+          <ul class="menu bg-base-200 ">
+            {#each orgTree as child}
+              <Node {...child} bind:selectedOrg />
+            {/each}
+          </ul>
+        </div>
+      {/if}
+    </div>
   </div>
 {/await}
