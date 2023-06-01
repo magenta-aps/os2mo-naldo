@@ -14,7 +14,7 @@
   import UnitDetailTable from "$lib/components/org/tables/unit_detail_table.svelte"
   import { tenses } from "$lib/stores/tenses"
   import Icon from "$lib/components/icon.svelte"
-  import OrgTable from "$lib/components/org/org_table.svelte"
+  import AddressTable from "$lib/components/org/tables/address_table.svelte"
 
   // Tabs
   // TODO: enum?
@@ -82,18 +82,20 @@
       {/if}
     {:else if activeItem === "Adresser"}
       <TenseTabs />
-      <DetailTable headers={["Adressetype", "Adresse", "Synlighed", "Dato"]}>
-        {#each orgUnits.present[0].addresses as address}
-          <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-            <td class="p-4">{address.address_type.name}</td>
-            <td class="p-4">{address.name}</td>
-            <td class="p-4"
-              >{address.visibility ? address.visibility.name : "Ikke sat"}</td
-            >
-            <ValidityTableCell validity={address.validity} />
-          </tr>
-        {/each}
-      </DetailTable>
+      <!-- TODO: future and past does not work. 
+      Waiting to see if this can be done through GraphQL -->
+      {#if $tenses.future}
+        <h2 class="mb-4">Fremtid</h2>
+        <AddressTable tense="future" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.present}
+        <h2 class="mb-4">Nutid</h2>
+        <AddressTable tense="present" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.past}
+        <h2 class="mb-4">Fortid</h2>
+        <AddressTable tense="past" uuid={$page.params.uuid} />
+      {/if}
     {:else if activeItem === "Engagementer"}
       <TenseTabs />
       <DetailTable headers={["Navn", "Stillingbetegnelse", "Engagementstype", "Dato"]}>
