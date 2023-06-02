@@ -20,7 +20,7 @@ services:
       dockerfile: docker/web.Dockerfile
       target: dev
     environment:
-      PUBLIC_BASE_URL: http://localhost:5000
+      PUBLIC_BASE_URL: http://127.0.0.1:5001
       PUBLIC_GRAPHQL_VERSION: graphql/v3
       PUBLIC_ENABLE_UNIT_TERMINATE: "true"
     ports:
@@ -28,5 +28,6 @@ services:
       - 24678:24678 # hot module reloading
     volumes:
       - ./web/src:/app/src
+      - ./web/.svelte-kit:/app/.svelte-kit
       - /src/app/node_modules
     restart: on-failure
