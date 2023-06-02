@@ -1,127 +1,171 @@
 <script lang="ts">
-  import { success, error } from "$lib/stores/alert"
-  import { fetchGraph } from "$lib/util/http"
   import SelectOrgTree from "$lib/components/org/select_tree/org_tree.svelte"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
   import Select from "$lib/components/forms/shared/select.svelte"
   import { enhance } from "$app/forms"
+  import type { SubmitFunction } from "./$types"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
-  import type { PageData } from "./$types"
+  import { success, error } from "$lib/stores/alert"
+  import { graphQLClient } from "$lib/util/http"
+  import { GetOrgUnitAndFacetsDocument, UpdateOrgUnitDocument } from "./query.generated"
+  import { gql } from "graphql-request"
   import { page } from "$app/stores"
-
-  export let data: PageData
+  import { date } from "$lib/stores/date"
 
   let startDate = new Date().toISOString().split("T")[0]
   let endDate: string
-  let name = data.org_units[0].objects[0].name
-  let orgLevel = data.org_units[0].objects[0].org_unit_level?.name
-  let orgType = data.org_units[0].objects[0].unit_type?.name
-  let parent = data.org_units[0].objects[0].parent
-  ? data.org_units[0].objects[0].parent
-  : { name: "", uuid: "" }
-</script>
+  let name: string
+  let orgLevel: string
+  let orgType: string
+  let parent: { name: string; uuid?: any | null }
 
-<svelte:head>
-  <title>Rediger {data.org_units[0].objects[0].name} | OS2mo</title>
-</svelte:head>
-
-<div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">Rediger {data.org_units[0].objects[0].name}</h3>
-</div>
-
-<div class="divider p-0 m-0 mb-4 w-full" />
-
-<form method="post" class="mx-6"
-  use:enhance={() => {
-    return async ({ result }) => {
-      if (result.type === "success") {
-        const res = await fetchGraph(result.data)
-        const json = await res.json()
-
-        if (res.status === 200) {
-          $success = {
-            message: `${name} er blevet redigeret`,
-            uuid: json.data.org_unit_update.uuid,
-            type: "organisation",
-          }
-          setTimeout(
-            () => goto(`${base}/organisation/${json.data.org_unit_update.uuid}`),
-            200
-          )
-        } else {
-          $error = { message: json.description }
+  gql`
+    query GetOrgUnitAndFacets($uuid: [UUID!], $fromDate: DateTime) {
+      facets(user_keys: ["org_unit_level", "org_unit_type"]) {
+        uuid
+        user_key
+        classes {
+          name
+          uuid
         }
-      } else {
-        JSON.stringify(result)
-        $error = {
-          message: `Something went wrong with the form: ${JSON.stringify(result)}`,
+      }
+      org_units(uuids: $uuid, from_date: $fromDate) {
+        objects {
+          uuid
+          name
+          parent {
+            uuid
+            name
+          }
+          unit_type {
+            name
+          }
+          org_unit_level {
+            name
+          }
         }
       }
     }
-  }}
->
-  <div class="w-1/2 min-w-fit bg-slate-100 rounded">
-    <div class="p-8">
-      <div class="flex flex-row gap-6">
-        <DateInput
-          bind:value={startDate}
-          title="Startdato"
-          id="start-date"
-          max={endDate
-            ? endDate
-            : new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
-        />
-        <DateInput
-          bind:value={endDate}
-          title="Slutdato"
-          id="end-date"
-          min={startDate}
-          max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
-        />
-      </div>
-      <SelectOrgTree bind:selectedOrg={parent} />
+  `
 
-      <!-- TODO: Should have a skeleton for the loading stage -->
-      <Input title="Navn" id="name" bind:value={name} required={true} />
+  gql`
+    mutation UpdateOrgUnit($input: OrganisationUnitUpdateInput!) {
+      org_unit_update(input: $input) {
+        uuid
+      }
+    }
+  `
 
-      <div class="flex flex-row gap-6">
-        <Select
-          title="Enhedsniveau"
-          id="org-level"
-          startValue={orgLevel}
-          extra_classes="basis-1/2"
-          bind:value={orgLevel}
-          iterable={data.facets[0].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
+  const handler: SubmitFunction =
+    () =>
+    async ({ result }) => {
+      if (result.type === "success" && result.data) {
+        try {
+          const mutation = await graphQLClient().request(UpdateOrgUnitDocument, {
+            input: result.data,
+          })
+
+          $success = {
+            message: `${name} er blevet redigeret`,
+            uuid: mutation.org_unit_update.uuid,
+            type: "organisation",
+          }
+          setTimeout(
+            () => goto(`${base}/organisation/${mutation.org_unit_update.uuid}`),
+            200
+          )
+        } catch (err) {
+          console.error(err)
+          $error = { message: err as string }
+        }
+      }
+    }
+</script>
+
+{#await graphQLClient().request( GetOrgUnitAndFacetsDocument, { uuid: $page.params.uuid, fromDate: $date } )}
+  <!-- TODO: Should have a skeleton for the loading stage -->
+  Henter data...
+{:then data}
+  {@const org_unit = data.org_units[0].objects[0]}
+  <title>Rediger {org_unit?.name} | OS2mo</title>
+  <div class="flex align-center px-6 pt-6 pb-4">
+    <h3 class="flex-1">Rediger {org_unit.name}</h3>
+  </div>
+
+  <div class="divider p-0 m-0 mb-4 w-full" />
+
+  <form method="post" class="mx-6" use:enhance={handler}>
+    <div class="w-1/2 min-w-fit bg-slate-100 rounded">
+      <div class="p-8">
+        <div class="flex flex-row gap-6">
+          <DateInput
+            bind:value={startDate}
+            title="Startdato"
+            id="start-date"
+            max={endDate
+              ? endDate
+              : new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
+          />
+          <DateInput
+            bind:value={endDate}
+            title="Slutdato"
+            id="end-date"
+            min={startDate}
+            max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
+          />
+        </div>
+        <SelectOrgTree
+          bind:selectedOrg={parent}
+          startOrg={org_unit.parent}
+        />
+
+        <Input
+          title="Navn"
+          id="name"
+          bind:value={name}
+          startValue={org_unit.name}
           required={true}
         />
-        <Select
-          title="Enhedstype"
-          id="org-type"
-          startValue={orgType}
-          extra_classes="basis-1/2"
-          bind:value={orgType}
-          iterable={data.facets[1].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
-          required={true}
-        />
+
+        <div class="flex flex-row gap-6">
+          <Select
+            title="Enhedsniveau"
+            id="org-level"
+            startValue={org_unit.org_unit_level?.name}
+            extra_classes="basis-1/2"
+            bind:value={orgLevel}
+            iterable={data.facets[0].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
+            required={true}
+          />
+          <Select
+            title="Enhedstype"
+            id="org-type"
+            startValue={org_unit.unit_type?.name}
+            extra_classes="basis-1/2"
+            bind:value={orgType}
+            iterable={data.facets[1].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
+            required={true}
+          />
+        </div>
       </div>
     </div>
-  </div>
-  <div class="flex py-6 gap-4">
-    <!-- TODO: Make button close modal -->
-    <button
-      type="submit"
-      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-      >Rediger enhed</button
-    >
-    <button
-      type="button"
-      class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-    >
-      Annullér
-    </button>
-  </div>
-  <Error />
-</form>
+    <div class="flex py-6 gap-4">
+      <button
+        type="submit"
+        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+        >Rediger enhed</button
+      >
+      <button
+        type="button"
+        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+        on:click={() => goto(`${base}/organisation/${org_unit.uuid}`)}
+      >
+        Annullér
+      </button>
+    </div>
+    <Error />
+  </form>
+{/await}

@@ -12,8 +12,41 @@
   import { base } from "$app/paths"
   import type { PageData} from "./$types"
   import Icon from "$lib/components/icon.svelte"
+  import { gql } from "graphql-request"
+  import { GetOrgUnitAndFacetsDocument } from "./query.generated"
 
   export let data: PageData
+
+  GetOrgUnitAndFacetsDocument
+
+  gql`
+    query GetOrgUnitAndFacets($uuid: UUID!, $fromDate: DateTime) {
+      facets(user_keys: ["org_unit_level", "org_unit_type"]) {
+        uuid
+        user_key
+        classes {
+          name
+          uuid
+        }
+      }
+      org_units(uuids: $uuid, from_date: $fromDate) {
+        objects {
+          uuid
+          name
+          parent {
+            uuid
+            name
+          }
+          unit_type {
+            name
+          }
+          org_unit_level {
+            name
+          }
+        }
+      }
+    }
+  `
 
   let startDate = new Date().toISOString().split("T")[0]
   let endDate: string
