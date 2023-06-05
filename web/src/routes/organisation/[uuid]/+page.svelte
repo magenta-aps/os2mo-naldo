@@ -17,6 +17,7 @@
   import RoleTable from "$lib/components/org/tables/role_table.svelte"
   import ManagerTable from "$lib/components/org/tables/manager_table.svelte"
   import RelatedTable from "$lib/components/org/tables/related_table.svelte"
+  import { base } from "$app/paths"
 
   // Tabs
   // TODO: enum?
@@ -131,8 +132,15 @@
       <AssociationTable tense="past" uuid={$page.params.uuid} />
     {/if}
   {:else if activeItem === "IT"}
-    <TenseTabs />
-    <!-- TODO: Add 'Add'-button -->
+    <div class="flex justify-between">
+      <TenseTabs />
+      <a
+        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
+        href="{base}/organisation/{$page.params.uuid}/create/it"
+      >
+        Tilføj IT bruger
+      </a>
+    </div>
     <!-- TODO: future and past does not work. 
     Waiting to see if this can be done through GraphQL -->
     {#if $tenses.future}

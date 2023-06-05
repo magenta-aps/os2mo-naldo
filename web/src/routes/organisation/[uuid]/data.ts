@@ -13,7 +13,7 @@ interface OrganisationUnitResponse {
   objects: OrganisationUnitElement[]
 }
 
-interface OrganisationUnitElement {
+export interface OrganisationUnitElement {
   name: string
   uuid: null | string
   unit_type: Class | null
