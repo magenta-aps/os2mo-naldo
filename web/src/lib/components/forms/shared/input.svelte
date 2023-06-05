@@ -9,6 +9,7 @@
   export let required = false
   export let placeholder: string | undefined = undefined
   export let type = "text"
+  export let disabled = false
   export let pattern: string | undefined = undefined
   export let patternMessage: string | undefined = undefined
   export let extra_classes = ""
@@ -34,5 +35,6 @@
     type="text"
     class="input input-bordered input-{size} rounded text-base text-secondary font-normal w-full active:outline-offset-0 active:input-primary focus:outline-offset-0 focus:input-primary"
     {required}
+    {disabled}
   />
 </div> 
