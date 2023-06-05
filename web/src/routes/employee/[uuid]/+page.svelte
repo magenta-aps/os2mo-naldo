@@ -15,6 +15,7 @@
   import LeavesDetailTable from "$lib/components/employee/tables/leaves_detail_table.svelte"
   import TenseTabs from "$lib/components/shared/tense_tabs.svelte"
   import { tenses } from "$lib/stores/tenses"
+  import { base } from "$app/paths"
 
   // Tabs
   enum itemCategory {
@@ -32,6 +33,31 @@
 
   let activeItem: string = $activeEmployeeTab
   const tabChange = (e: CustomEvent) => ($activeEmployeeTab = activeItem = e.detail)
+
+  // Used to make a dynamic create button
+  const subsiteOfCategory = (category: string) => {
+    switch (category) {
+      case itemCategory.EMPLOYEE:
+        return "employee"
+      case itemCategory.ENGAGEMENTS:
+        return "engagement"
+      case itemCategory.ADDRESSES:
+        return "address"
+      case itemCategory.ASSOCIATIONS:
+        return "association"
+      case itemCategory.ROLES:
+        return "roles"
+      case itemCategory.IT:
+        return "it"
+      case itemCategory.LEAVE:
+        return "leave"
+      case itemCategory.MANAGER_ROLES:
+        return "manager_role"
+      default:
+        console.warn("The tab doesn't match a subsite")
+        return
+    }
+  }
 
   gql`
     query Employee($uuid: [UUID!]) {
@@ -66,10 +92,17 @@
     <Tabs {activeItem} {items} on:tabChange={tabChange} />
 
     <div class="mb-8" />
+    <div class="flex justify-between">
+      <TenseTabs />
+      <a
+        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
+        href={`${base}/organisation/${$page.params.uuid}/create/${subsiteOfCategory(activeItem)}`}
+      >
+        Tilføj {activeItem}
+      </a>
+    </div>
 
     <!-- TODO: Implement past present future for employees -->
-    <TenseTabs />
-
     {#if activeItem === itemCategory.EMPLOYEE}
       <!-- TODO: future and past does not work. 
       Waiting to see if this can be done through GraphQL -->
