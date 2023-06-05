@@ -2,10 +2,11 @@
   import DetailTable from "$lib/components/shared/detail_table.svelte"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
-  import { AddressesDetailDocument, EmployeeDetailDocument } from "./query.generated"
+  import { AddressesDetailDocument } from "./query.generated"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
 
   export let uuid: string
+  export let tense: string
 
   gql`
     query AddressesDetail($uuid: [UUID!]) {

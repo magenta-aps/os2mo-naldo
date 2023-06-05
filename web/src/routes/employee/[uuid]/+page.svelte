@@ -1,8 +1,5 @@
 <script lang="ts">
   import Tabs from "$lib/components/shared/tabs.svelte"
-  import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
-  import { base } from "$app/paths"
-  import DetailTable from "$lib/components/shared/detail_table.svelte"
   import { activeEmployeeTab } from "$lib/stores/tab"
   import HeadTitle from "$lib/components/shared/head_title.svelte"
   import { page } from "$app/stores"
@@ -16,6 +13,8 @@
   import RolesDetailTable from "$lib/components/employee/tables/roles_detail_table.svelte"
   import ManagerRolesDetailTable from "$lib/components/employee/tables/manager_roles_detail_table.svelte"
   import LeavesDetailTable from "$lib/components/employee/tables/leaves_detail_table.svelte"
+  import TenseTabs from "$lib/components/shared/tense_tabs.svelte"
+  import { tenses } from "$lib/stores/tenses"
 
   // Tabs
   enum itemCategory {
@@ -69,25 +68,116 @@
     <div class="mb-8" />
 
     <!-- TODO: Implement past present future for employees -->
-    <!-- <TenseTabs /> -->
+    <TenseTabs />
 
     {#if activeItem === itemCategory.EMPLOYEE}
-      <EmployeeDetailTable uuid={$page.params.uuid} />
+      <!-- TODO: future and past does not work. 
+      Waiting to see if this can be done through GraphQL -->
+      {#if $tenses.future}
+        <h2 class="mb-4">Fremtid</h2>
+        <EmployeeDetailTable tense="future" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.present}
+        <h2 class="mb-4">Nutid</h2>
+        <EmployeeDetailTable tense="present" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.past}
+        <h2 class="mb-4">Fortid</h2>
+        <EmployeeDetailTable tense="past" uuid={$page.params.uuid} />
+      {/if}
     {:else if activeItem === itemCategory.ENGAGEMENTS}
-      <EngagementDetailTable uuid={$page.params.uuid} />
+      <!-- TODO: future and past does not work. 
+      Waiting to see if this can be done through GraphQL -->
+      {#if $tenses.future}
+        <h2 class="mb-4">Fremtid</h2>
+        <EngagementDetailTable tense="future" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.present}
+        <h2 class="mb-4">Nutid</h2>
+        <EngagementDetailTable tense="present" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.past}
+        <h2 class="mb-4">Fortid</h2>
+        <EngagementDetailTable tense="past" uuid={$page.params.uuid} />
+      {/if}
     {:else if activeItem === itemCategory.ADDRESSES}
-      <AddressesDetailTable uuid={$page.params.uuid} />
+      <!-- TODO: future and past does not work. 
+      Waiting to see if this can be done through GraphQL -->
+      {#if $tenses.future}
+        <h2 class="mb-4">Fremtid</h2>
+        <AddressesDetailTable tense="future" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.present}
+        <h2 class="mb-4">Nutid</h2>
+        <AddressesDetailTable tense="present" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.past}
+        <h2 class="mb-4">Fortid</h2>
+        <AddressesDetailTable tense="past" uuid={$page.params.uuid} />
+      {/if}
     {:else if activeItem === itemCategory.ASSOCIATIONS}
-      <AssociationsDetailTable uuid={$page.params.uuid} />
+      <!-- TODO: future and past does not work. 
+      Waiting to see if this can be done through GraphQL -->
+      {#if $tenses.future}
+        <h2 class="mb-4">Fremtid</h2>
+        <AssociationsDetailTable tense="future" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.present}
+        <h2 class="mb-4">Nutid</h2>
+        <AssociationsDetailTable tense="present" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.past}
+        <h2 class="mb-4">Fortid</h2>
+        <AssociationsDetailTable tense="past" uuid={$page.params.uuid} />
+      {/if}
     {:else if activeItem === itemCategory.ROLES}
-      <RolesDetailTable uuid={$page.params.uuid} />
+      <!-- TODO: future and past does not work. 
+      Waiting to see if this can be done through GraphQL -->
+      {#if $tenses.future}
+        <h2 class="mb-4">Fremtid</h2>
+        <RolesDetailTable tense="future" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.present}
+        <h2 class="mb-4">Nutid</h2>
+        <RolesDetailTable tense="present" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.past}
+        <h2 class="mb-4">Fortid</h2>
+        <RolesDetailTable tense="past" uuid={$page.params.uuid} />
+      {/if}
     {:else if activeItem === itemCategory.IT}
       <!-- TODO: Missing GraphQL  -->
       TODO
     {:else if activeItem === itemCategory.LEAVE}
-      <LeavesDetailTable uuid={$page.params.uuid} />
+      <!-- TODO: future and past does not work. 
+      Waiting to see if this can be done through GraphQL -->
+      {#if $tenses.future}
+        <h2 class="mb-4">Fremtid</h2>
+        <LeavesDetailTable tense="future" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.present}
+        <h2 class="mb-4">Nutid</h2>
+        <LeavesDetailTable tense="present" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.past}
+        <h2 class="mb-4">Fortid</h2>
+        <LeavesDetailTable tense="past" uuid={$page.params.uuid} />
+      {/if}
     {:else if activeItem === itemCategory.MANAGER_ROLES}
-      <ManagerRolesDetailTable uuid={$page.params.uuid} />
+      <!-- TODO: future and past does not work. 
+      Waiting to see if this can be done through GraphQL -->
+      {#if $tenses.future}
+        <h2 class="mb-4">Fremtid</h2>
+        <ManagerRolesDetailTable tense="future" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.present}
+        <h2 class="mb-4">Nutid</h2>
+        <ManagerRolesDetailTable tense="present" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.past}
+        <h2 class="mb-4">Fortid</h2>
+        <ManagerRolesDetailTable tense="past" uuid={$page.params.uuid} />
+      {/if}
     {/if}
   </div>
 {/await}
