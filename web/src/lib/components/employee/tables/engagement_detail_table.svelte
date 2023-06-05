@@ -3,14 +3,14 @@
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { base } from "$app/paths"
-  import { EngagementDetailDocument } from "./query.generated"
+  import { EmployeeEngagementDocument } from "./query.generated"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
 
   export let uuid: string
   export let tense: string
 
   gql`
-    query EngagementDetail($uuid: [UUID!]) {
+    query EmployeeEngagement($uuid: [UUID!]) {
       employees(uuids: $uuid) {
         objects {
           engagements {
@@ -34,7 +34,7 @@
 </script>
 
 <DetailTable headers={["Stillingsbetegnelse", "Enhed", "Dato"]}>
-  {#await graphQLClient().request(EngagementDetailDocument, { uuid: uuid })}
+  {#await graphQLClient().request(EmployeeEngagementDocument, { uuid: uuid })}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
