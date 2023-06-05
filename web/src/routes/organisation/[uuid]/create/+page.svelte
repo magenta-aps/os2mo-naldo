@@ -17,8 +17,6 @@
 
   export let data: PageData
 
-  GetOrgUnitAndFacetsDocument
-
   gql`
     query GetOrgUnitAndFacets($uuid: UUID!, $fromDate: DateTime) {
       facets(user_keys: ["org_unit_level", "org_unit_type"]) {
