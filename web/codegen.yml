@@ -1,11 +1,11 @@
 schema: "http://127.0.0.1:5001/graphql/v3"
-documents:
-  - "**/*.{graphql,gql,svelte}"
 generates:
   src/lib/graphql/types.ts:
     plugins:
       - typescript
   src/:
+    documents:
+      - "**/*.{svelte,ts}"
     preset: near-operation-file
     presetConfig:
       extension: .generated.ts
