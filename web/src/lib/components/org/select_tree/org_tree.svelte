@@ -5,7 +5,9 @@
   import { createFloatingActions } from "svelte-floating-ui"
   import { date } from "$lib/stores/date"
 
-  export let selectedOrg: { name: string; uuid: string | null }
+  export let selectedOrg: { name: string, uuid?: any | null }
+  export let startOrg: { name: string, uuid?: any | null } | null | undefined = {name: "", uuid: ""}
+  selectedOrg = selectedOrg ?? startOrg  // For flexibility when binding
   export let labelText = "Angiv overenhed"
   export let id = "select-org-tree"
   export let required = true
