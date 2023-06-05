@@ -40,11 +40,8 @@
     </tr>
   {:then data}
     {@const employee = data.employees[0].objects[0]}
-    {#each employee.engagements as engagement, i}
-      <tr
-        class="{i % 2 === 1 ? 'bg-slate-100' : ''} 
-            p-4 leading-5 border-t border-slate-300 text-secondary"
-      >
+    {#each employee.engagements as engagement}
+      <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
         <td class="p-4">
           {engagement.job_function.name}
         </td>
