@@ -5,8 +5,9 @@
   import { base } from "$app/paths"
   import { EmployeeEngagementDocument } from "./query.generated"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
+  import { page } from "$app/stores"
+  import Icon from "$lib/components/icon.svelte"
 
-  export let uuid: string
   export let tense: string
 
   gql`
@@ -33,8 +34,8 @@
   `
 </script>
 
-<DetailTable headers={["Stillingsbetegnelse", "Enhed", "Dato"]}>
-  {#await graphQLClient().request(EmployeeEngagementDocument, { uuid: uuid })}
+<DetailTable headers={["Stillingsbetegnelse", "Enhed", "Dato", "", ""]}>
+  {#await graphQLClient().request(EmployeeEngagementDocument, { uuid: $page.params.uuid })}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
@@ -52,6 +53,16 @@
           </td>
         </a>
         <ValidityTableCell validity={engagement.validity} />
+        <td>
+          <a aria-disabled href="{base}/organisation/{$page.params.uuid}/edit/engagement/{engagement.uuid}">
+            <Icon type="pen" />
+          </a>
+        </td>
+        <td>
+          <a href="{base}/organisation/{$page.params.uuid}/terminate/engagement/{engagement.uuid}">
+            <Icon type="xmark" size="30" />
+          </a></td
+        >
       </tr>
     {/each}
   {/await}

@@ -5,8 +5,9 @@
   import { EmployeeRolesDocument } from "./query.generated"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
   import { base } from "$app/paths"
+  import Icon from "$lib/components/icon.svelte"
+  import { page } from "$app/stores"
 
-  export let uuid: string
   export let tense: string
 
   gql`
@@ -14,6 +15,7 @@
       employees(uuids: $uuid) {
         objects {
           roles {
+            uuid
             role_type {
               name
             }
@@ -32,8 +34,8 @@
   `
 </script>
 
-<DetailTable headers={["Rolletype", "Enhed", "Dato"]}>
-  {#await graphQLClient().request(EmployeeRolesDocument, { uuid: uuid })}
+<DetailTable headers={["Rolletype", "Enhed", "Dato", "", ""]}>
+  {#await graphQLClient().request(EmployeeRolesDocument, { uuid: $page.params.uuid })}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
@@ -51,6 +53,16 @@
           </td>
         </a>
         <ValidityTableCell validity={role.validity} />
+        <td>
+          <a aria-disabled href="{base}/organisation/{$page.params.uuid}/edit/role/{role.uuid}">
+            <Icon type="pen" />
+          </a>
+        </td>
+        <td>
+          <a href="{base}/organisation/{$page.params.uuid}/terminate/role/{role.uuid}">
+            <Icon type="xmark" size="30" />
+          </a></td
+        >
       </tr>
     {/each}
   {/await}

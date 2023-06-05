@@ -4,8 +4,10 @@
   import { gql } from "graphql-request"
   import { EmployeeLeavesDocument } from "./query.generated"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
+  import { page } from "$app/stores"
+  import { base } from "$app/paths"
+  import Icon from "$lib/components/icon.svelte"
 
-  export let uuid: string
   export let tense: string
 
   gql`
@@ -13,6 +15,7 @@
       employees(uuids: $uuid) {
         objects {
           leaves {
+            uuid
             validity {
               from
               to
@@ -35,8 +38,8 @@
   `
 </script>
 
-<DetailTable headers={["Orlovstype", "Engagement", "Dato"]}>
-  {#await graphQLClient().request(EmployeeLeavesDocument, { uuid: uuid })}
+<DetailTable headers={["Orlovstype", "Engagement", "Dato", "", ""]}>
+  {#await graphQLClient().request(EmployeeLeavesDocument, { uuid: $page.params.uuid })}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
@@ -53,6 +56,16 @@
           {/if}
         </td>
         <ValidityTableCell validity={leave.validity} />
+        <td>
+          <a aria-disabled href="{base}/organisation/{$page.params.uuid}/edit/leave/{leave.uuid}">
+            <Icon type="pen" />
+          </a>
+        </td>
+        <td>
+          <a href="{base}/organisation/{$page.params.uuid}/terminate/leave/{leave.uuid}">
+            <Icon type="xmark" size="30" />
+          </a></td
+        >
       </tr>
     {/each}
   {/await}
