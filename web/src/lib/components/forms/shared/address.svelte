@@ -2,29 +2,9 @@
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
   import Select from "$lib/components/forms/shared/select.svelte"
-  import { fetchGraph } from "$lib/util/http"
-
-  interface Query {
-    data: Data | null
-    errors?: Error[]
-  }
-
-  interface Data {
-    facets: Facet[]
-  }
-
-  interface Facet {
-    classes: Class[]
-  }
-
-  interface Class {
-    uuid: null | string
-    name: string
-  }
-
-  interface Error {
-    message: string
-  }
+  import { graphQLClient } from "$lib/util/http"
+  import { gql } from "graphql-request"
+  import { FacetsDocument } from "./query.generated"
 
   export let startDate: string
   export let endDate: string
@@ -33,13 +13,12 @@
   export let extra_classes = ""
   
   let uniqueDate = false
-  let addressType: Class | undefined
+  let addressType: { name: string, uuid?: any | null }
   let input: string | number
   let visibility: string | undefined
 
-  const fetchFacets = async () => {
-    const query = `
-    query MyQuery {
+  gql`
+    query Facets {
       facets(user_keys: ["visibility", "org_unit_address_type"]) {
         classes {
           uuid
@@ -47,18 +26,6 @@
         }
       }
     }`
-
-    const res = await fetchGraph(query)
-    const json: Query = await res.json()
-
-    if (json.data) {
-      return json.data.facets
-    } else if (json.errors) {
-      throw new Error(json.errors[0].message)
-    } else {
-      throw new Error(`Unknown error: ${JSON.stringify(json)}`)
-    }
-  }
 
   // Reactivly keeps addresses up to date while being exported to parent components
   $: addresses = JSON.stringify({
@@ -80,14 +47,22 @@
 <input name="detail-{detailAmount + 1}" hidden bind:value={addresses} />
 
 <div class="p-8 {extra_classes}">
-  {#await fetchFacets()}
+ {#await graphQLClient().request(FacetsDocument)}
     <div class="flex flex-row gap-6">
       <DateInput title="Startdato" id="start-date" bind:value={startDate} disabled={true} />
       <DateInput title="Slutdato" id="end-date" bind:value={endDate} disabled={true} />
     </div>
     <Select title="Synlighed" id="visibility" disabled={true} />
     <Select title="Adressetype" id="address-type" disabled={true} />
-  {:then facets}
+    <Input title="P-nummer" id="email" bind:value={input} disabled={true} />
+    <div class="form-control">
+      <label class="flex justify-between cursor-pointer">
+        <span class="text-sm text-secondary">Vælg anden dato</span>
+        <input type="checkbox" class="toggle" disabled />
+      </label>
+    </div>
+    {:then data}
+    {@const facets = data.facets}
 
     <div class="flex flex-row gap-6">
       <DateInput
