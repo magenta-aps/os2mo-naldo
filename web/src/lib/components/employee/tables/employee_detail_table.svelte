@@ -6,6 +6,7 @@
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
 
   export let uuid: string
+  export let tense: string
 
   gql`
     query EmployeeDetail($uuid: [UUID!]) {
