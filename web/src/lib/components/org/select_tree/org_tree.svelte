@@ -7,7 +7,7 @@
 
   export let selectedOrg: { name: string, uuid?: any | null }
   export let startOrg: { name: string, uuid?: any | null } | null | undefined = {name: "", uuid: ""}
-  selectedOrg = selectedOrg ?? startOrg  // For flexibilty when binding
+  selectedOrg = selectedOrg ?? startOrg  // For flexibility when binding
   export let labelText = "Angiv overenhed"
   export let id = "select-org-tree"
   export let required = true
