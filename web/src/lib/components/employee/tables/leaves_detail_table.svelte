@@ -2,14 +2,14 @@
   import DetailTable from "$lib/components/shared/detail_table.svelte"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
-  import { LeavesDetailDocument } from "./query.generated"
+  import { EmployeeLeavesDocument } from "./query.generated"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
 
   export let uuid: string
   export let tense: string
 
   gql`
-    query LeavesDetail($uuid: [UUID!]) {
+    query EmployeeLeaves($uuid: [UUID!]) {
       employees(uuids: $uuid) {
         objects {
           leaves {
@@ -36,7 +36,7 @@
 </script>
 
 <DetailTable headers={["Orlovstype", "Engagement", "Dato"]}>
-  {#await graphQLClient().request(LeavesDetailDocument, { uuid: uuid })}
+  {#await graphQLClient().request(EmployeeLeavesDocument, { uuid: uuid })}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>

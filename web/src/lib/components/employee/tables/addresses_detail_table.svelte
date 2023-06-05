@@ -2,14 +2,14 @@
   import DetailTable from "$lib/components/shared/detail_table.svelte"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
-  import { AddressesDetailDocument } from "./query.generated"
+  import { EmployeeAddressesDocument } from "./query.generated"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
 
   export let uuid: string
   export let tense: string
 
   gql`
-    query AddressesDetail($uuid: [UUID!]) {
+    query EmployeeAddresses($uuid: [UUID!]) {
       employees(uuids: $uuid) {
         objects {
           addresses {
@@ -32,7 +32,7 @@
 </script>
 
 <DetailTable headers={["Adressetype", "Adresse", "Synlighed", "Dato"]}>
-  {#await graphQLClient().request(AddressesDetailDocument, { uuid: uuid })}
+  {#await graphQLClient().request(EmployeeAddressesDocument, { uuid: uuid })}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>

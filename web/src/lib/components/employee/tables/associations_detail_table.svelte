@@ -2,7 +2,7 @@
   import DetailTable from "$lib/components/shared/detail_table.svelte"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
-  import { AssociationsDetailDocument } from "./query.generated"
+  import { EmployeeAssociationsDocument } from "./query.generated"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
   import { base } from "$app/paths"
 
@@ -10,7 +10,7 @@
   export let tense: string
 
   gql`
-    query AssociationsDetail($uuid: [UUID!]) {
+    query EmployeeAssociations($uuid: [UUID!]) {
       employees(uuids: $uuid) {
         objects {
           associations {
@@ -33,7 +33,7 @@
 </script>
 
 <DetailTable headers={["Enhed", "Rolle", "Dato"]}>
-  {#await graphQLClient().request(AssociationsDetailDocument, { uuid: uuid })}
+  {#await graphQLClient().request(EmployeeAssociationsDocument, { uuid: uuid })}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
