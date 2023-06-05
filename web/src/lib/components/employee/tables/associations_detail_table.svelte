@@ -39,11 +39,8 @@
     </tr>
   {:then data}
     {@const employee = data.employees[0].objects[0]}
-    {#each employee.associations as association, i}
-      <tr
-        class="{i % 2 === 1 ? 'bg-slate-100' : ''} 
-            p-4 leading-5 border-t border-slate-300 text-secondary"
-      >
+    {#each employee.associations as association}
+      <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
         <a href="{base}/organisation/{association.org_unit[0].uuid}">
           <td class="p-4">
             {association.org_unit[0].name}

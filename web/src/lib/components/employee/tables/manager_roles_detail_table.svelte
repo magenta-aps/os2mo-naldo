@@ -38,11 +38,8 @@
   {:then data}
     {@const employee = data.employees[0].objects[0]}
 
-    {#each employee.manager_roles as manager_role, i}
-      <tr
-        class="{i % 2 === 1 ? 'bg-slate-100' : ''} 
-            p-4 leading-5 border-t border-slate-300 text-secondary"
-      >
+    {#each employee.manager_roles as manager_role}
+      <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
         <a href="{base}/organisation/{manager_role.org_unit[0].uuid}">
           <td class="p-4">
             {manager_role.org_unit[0].name}
