@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { fetchGraph } from "$lib/util/http"
+  import { graphQLClient } from "$lib/util/http"
+  import { gql } from "graphql-request"
+  import { OrgChildrenDocument } from "./query.generated"
 
   export let selectedOrg: any
   export let name = ""
@@ -11,10 +13,10 @@
   let open = false
   let loading = false
 
-  const fetchChildren = async (uuid: string) => {
-    const findQuery = `
-      query {
-        org_units(uuids: "${uuid}" from_date: "${fromDate}") {
+  const fetchChildren = async () => {
+    gql`
+      query OrgChildren($uuid: [UUID!], $from_date: DateTime!) {
+        org_units(uuids: $uuid, from_date: $fromDate) {
           objects {
             children {
               name
@@ -23,12 +25,9 @@
           }
         }
       }`
-    const res = await fetchGraph(findQuery)
-    const json = await res.json()
-    if (json.data) {
-      return json.data.org_units[0].objects[0].children
-    } else {
-      throw new Error(json.errors[0].message)
+    const data = await graphQLClient().request(OrgChildrenDocument, {uuid: uuid, from_date: fromDate})
+    if (data.org_units) {
+      return data.org_units[0].objects[0].children
     }
   }
 
@@ -37,7 +36,7 @@
       loading = true
       for (let child of children) {
         if (!child.children) {
-          child.children = await fetchChildren(child.uuid)
+          child.children = await fetchChildren()
         }
       }
       loading = false
