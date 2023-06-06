@@ -17,6 +17,7 @@
         org_units(uuids: $uuid) {
           objects {
             associations {
+              uuid
               employee {
                 uuid
                 name
@@ -68,7 +69,7 @@
         </td>
         <ValidityTableCell validity={association.validity} />
         <td>
-            <a href="{base}/organisation/{$page.params.uuid}/edit/association">
+            <a href="{base}/organisation/{$page.params.uuid}/edit/association/{association.uuid}">
               <Icon type="pen" />
             </a>
           </td>
@@ -76,7 +77,7 @@
           {#if env.PUBLIC_ENABLE_UNIT_TERMINATE === "true"}
             <td>
               <a
-                href="{base}/organisation/{$page.params.uuid}/terminate/unit"
+                href="{base}/organisation/{$page.params.uuid}/terminate/association/{association.uuid}"
                 class="hover:slate-300"
               >
                 <Icon type="xmark" size="30" />

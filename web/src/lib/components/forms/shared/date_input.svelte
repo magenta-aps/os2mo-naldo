@@ -3,6 +3,8 @@
   export let id: string
   export let name = id
   export let value: string | number | undefined
+  export let startValue: string | number | undefined = undefined
+  value ??= startValue
   export let required = false
   export let disabled = false
   export let min = "1910-01-01"
