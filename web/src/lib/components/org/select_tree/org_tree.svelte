@@ -1,9 +1,11 @@
 <script lang="ts">
-  import { fetchGraph } from "$lib/util/http"
+  import { graphQLClient } from "$lib/util/http"
   import Node from "$lib/components/org/select_tree/node.svelte"
   import { offset, flip, shift } from "@floating-ui/dom"
   import { createFloatingActions } from "svelte-floating-ui"
   import { date } from "$lib/stores/date"
+  import { gql } from "graphql-request"
+  import { OrgTreeDocument } from "./query.generated"
 
   export let selectedOrg: { name: string, uuid?: any | null }
   export let startOrg: { name: string, uuid?: any | null } | null | undefined = {name: "", uuid: ""}
@@ -12,11 +14,11 @@
   export let id = "select-org-tree"
   export let required = true
   let orgTree: any[] = []
-  let isFocused = false
-
-  const query = `
-    query {
-      org_units (from_date: "${$date}") {
+  let isFocused = false  
+  
+  gql`
+    query OrgTree ($from_date: DateTime!){
+      org_units (from_date: $from_date) {
         uuid
         objects {
           name
@@ -33,11 +35,10 @@
       }
     }`
 
-  const fetchOrgTree = async (query: string) => {
-    const res = await fetchGraph(query)
-    const json = await res.json()
-    if (json.data) {
-      for (let org of json.data.org_units) {
+  const fetchOrgTree = async () => {
+    const data = await graphQLClient().request(OrgTreeDocument, {from_date: $date})
+    if (data.org_units) {
+      for (let org of data.org_units) {
         if (org.objects[0].parent === null) {
           orgTree.push({
             uuid: org.uuid,
@@ -47,8 +48,6 @@
           })
         }
       }
-    } else {
-      throw new Error(json.errors ? json.errors[0].message : "Unknown error")
     }
   }
 
@@ -64,7 +63,7 @@
   })
 </script>
 
-{#await fetchOrgTree(query)}
+{#await fetchOrgTree()}
   <div class="form-control pb-4">
     <label for={id} class="text-sm text-secondary pb-1">
       {labelText}
