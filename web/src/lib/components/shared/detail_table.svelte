@@ -17,7 +17,7 @@
         </tr>
       </thead>
     {/if}
-    <tbody class="border-slate-300 min-h-64 text-slate-600">
+    <tbody class="[&>*:nth-child(even)]:bg-slate-100 border-slate-300 min-h-64 text-slate-600">
       <slot />
     </tbody>
   </table>
