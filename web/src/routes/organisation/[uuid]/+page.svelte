@@ -56,7 +56,7 @@
         <TenseTabs />
         <a
           class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
-          href="{$page.url}/create"
+          href="{base}/organisation/{$page.params.uuid}/create"
         >
           Tilføj enhed
         </a>
@@ -116,7 +116,15 @@
       <EngagementTable tense="past" uuid={$page.params.uuid} />
     {/if}
   {:else if activeItem === "Tilknytninger"}
-    <TenseTabs />
+    <div class="flex justify-between">
+      <TenseTabs />
+      <a
+        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
+        href="{base}/organisation/{$page.params.uuid}/create/association"
+      >
+        Opret tilknytning
+      </a>
+    </div>
     <!-- TODO: future and past does not work. 
     Waiting to see if this can be done through GraphQL -->
     {#if $tenses.future}
