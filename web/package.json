@@ -37,7 +37,7 @@
   "type": "module",
   "dependencies": {
     "@sveltejs/adapter-node": "^1.2.4",
-    "daisyui": "^2.52.0",
+    "daisyui": "^3.0.5",
     "graphql": "^16.6.0",
     "graphql-request": "^6.0.0",
     "keycloak-js": "^19.0.3",
