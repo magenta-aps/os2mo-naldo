@@ -1,17 +1,14 @@
 <script lang="ts">
   import { base } from "$app/paths"
+  import { Sha256 } from "@aws-crypto/sha256-js"
 
-  const stringToColour = (str: string) => {
-    var hash = 0
-    for (var i = 0; i < str.length; i++) {
-      hash = str.charCodeAt(i) + ((hash << 5) - hash)
-    }
-    var colour = "#"
-    for (var i = 0; i < 3; i++) {
-      var value = (hash >> (i * 8)) & 0xff
-      colour += ("00" + value.toString(16)).substr(-2)
-    }
-    return colour
+  const stringToColour = async (str: string) => {
+    const hash = new Sha256()
+    hash.update(str)
+    const [r, g, b] = await hash.digest()
+    // Divides by 1.5 while rounding down to a whole number 
+    // to make sure the colours don't get too bright
+    return `rgb(${r/1.5 | 1}, ${g/1.5 | 1}, ${b/1.5 | 1})`
   }
 
   // TODO: Get the employee interface from Strawberry
@@ -28,14 +25,13 @@
       <div>
         <div class="flex justify-center pt-5">
           <div class="avatar placeholder">
-            <div
-              class="rounded-full w-16"
-              style="background-color: {stringToColour(employee.uuid)};"
-            >
-              <span class="text-white text-3xl"
-                >{employee.givenname[0] + employee.surname[0]}</span
-              >
-            </div>
+            {#await stringToColour(employee.uuid) then colour}
+              <div class="rounded-full w-16" style="background-color: {colour};">
+                <span class="text-white text-3xl"
+                  >{employee.givenname[0] + employee.surname[0]}</span
+                >
+              </div>
+            {/await}
           </div>
         </div>
         <div class="card-body items-center text-center">
