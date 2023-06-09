@@ -6,7 +6,9 @@
     const hash = new Sha256()
     hash.update(str)
     const [r, g, b] = await hash.digest()
-    return `rgb(${r}, ${g}, ${b})`
+    // Divides by 1.5 while rounding down to a whole number 
+    // to make sure the colours don't get too bright
+    return `rgb(${r/1.5 | 1}, ${g/1.5 | 1}, ${b/1.5 | 1})`
   }
 
   // TODO: Get the employee interface from Strawberry
