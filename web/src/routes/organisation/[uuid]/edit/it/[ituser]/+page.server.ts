@@ -1,7 +1,8 @@
 import type { Actions, RequestEvent } from "@sveltejs/kit"
+import type { ItUserUpdateInput } from "$lib/graphql/types"
 
 export const actions: Actions = {
-  default: async ({ request, params }: RequestEvent): Promise<any> => {
+  default: async ({ request, params }: RequestEvent): Promise<ItUserUpdateInput> => {
     const data = await request.formData()
 
     enum Primary {
@@ -10,28 +11,20 @@ export const actions: Actions = {
     }
 
     const primary = data.get("primary") ? Primary.ENABLED : Primary.DISABLED
+    const fromDate = data.get("from")
+    const toDate = data.get("to")
+    const itsystem = data.get("itsystem")
+    const userKey = data.get("user-key") as string
 
-    const query = `
-      mutation FrontendITUserUpdate($input: ITUserUpdateInput!) {
-        ituser_update(input: $input) {
-          uuid
-        }
-      }
-    `
     return {
-      query,
-      variables: {
-        input: {
-          uuid: params.ituser,
-          primary,
-          validity: {
-            from: data.get("from"),
-            ...(data.get("to") && { to: data.get("to") }),
-          },
-          ...(data.get("itsystem") && { itsystem: data.get("itsystem") }),
-          ...(data.get("user-key") && { user_key: data.get("user-key") }),
-        },
+      uuid: params.ituser,
+      primary,
+      validity: {
+        from: fromDate,
+        ...(toDate && { to: toDate }),
       },
+      ...(itsystem && { itsystem: itsystem }),
+      ...(userKey && { user_key: userKey }),
     }
   },
 }
