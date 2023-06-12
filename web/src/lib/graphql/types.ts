@@ -1502,8 +1502,8 @@ export type ManagerResponsibilitiesArgs = {
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 export type ManagerCreateInput = {
@@ -1514,7 +1514,7 @@ export type ManagerCreateInput = {
   /** UUID of the managers organisation unit. */
   org_unit: Scalars['UUID']['input'];
   /** UUID of the manager as person. */
-  person: Scalars['UUID']['input'];
+  person?: InputMaybe<Scalars['UUID']['input']>;
   /** UUID of the managers responsibilities. */
   responsibility: Array<Scalars['UUID']['input']>;
   /** The object type. */
