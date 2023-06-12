@@ -56,7 +56,7 @@ Pre-commit:
     - pre-commit run --all-files
 
 Svelte-check:
-  image: node:latest
+  image: node:18
   stage: lint
   script:
     - cd web/
@@ -64,7 +64,7 @@ Svelte-check:
     - yarn run check
 
 SvelteKit build:
-  image: node:latest
+  image: node:18
   stage: build
   script:
     - cd web/
