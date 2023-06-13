@@ -108,8 +108,6 @@
             min={minDate}
             max={toDate ? toDate : maxDate}
           />
-          <!-- These inputs needs to change, so their dates 
-            can only be in the registrations of their parent org -->
           <DateInput
             bind:value={toDate}
             title="Slutdato"

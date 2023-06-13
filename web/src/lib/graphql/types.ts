@@ -1422,11 +1422,11 @@ export type Manager = {
   /** UUID of the employee related to the manager. */
   employee_uuid?: Maybe<Scalars['UUID']['output']>;
   /** Manager level */
-  manager_level?: Maybe<Class>;
+  manager_level: Class;
   /** UUID of the manager level. */
   manager_level_uuid?: Maybe<Scalars['UUID']['output']>;
   /** Manager type */
-  manager_type?: Maybe<Class>;
+  manager_type: Class;
   /** UUID of the manager type. */
   manager_type_uuid?: Maybe<Scalars['UUID']['output']>;
   /** Managed organisation unit */
