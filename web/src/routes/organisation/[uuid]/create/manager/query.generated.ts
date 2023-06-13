@@ -7,7 +7,7 @@ export type FacetsAndOrgQueryVariables = Types.Exact<{
 }>;
 
 
-export type FacetsAndOrgQuery = { __typename?: 'Query', facets: Array<{ __typename?: 'Facet', uuid?: any | null, user_key: string, classes: Array<{ __typename?: 'Class', name: string, uuid?: any | null }> }>, org_units: Array<{ __typename?: 'OrganisationUnitResponse', objects: Array<{ __typename?: 'OrganisationUnit', validity: { __typename?: 'Validity', from: any, to?: any | null } }> }> };
+export type FacetsAndOrgQuery = { __typename?: 'Query', facets: Array<{ __typename?: 'Facet', uuid: any, user_key: string, classes: Array<{ __typename?: 'Class', name: string, uuid: any }> }>, org_units: Array<{ __typename?: 'OrganisationUnitResponse', objects: Array<{ __typename?: 'OrganisationUnit', validity: { __typename?: 'Validity', from: any, to?: any | null } }> }> };
 
 export type CreateManagerMutationVariables = Types.Exact<{
   input: Types.ManagerCreateInput;

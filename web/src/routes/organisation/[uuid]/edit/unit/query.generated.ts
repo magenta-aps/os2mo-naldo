@@ -7,7 +7,7 @@ export type GetOrgUnitAndFacetsQueryVariables = Types.Exact<{
 }>;
 
 
-export type GetOrgUnitAndFacetsQuery = { __typename?: 'Query', facets: Array<{ __typename?: 'Facet', uuid?: any | null, user_key: string, classes: Array<{ __typename?: 'Class', name: string, uuid?: any | null }> }>, org_units: Array<{ __typename?: 'OrganisationUnitResponse', objects: Array<{ __typename?: 'OrganisationUnit', uuid?: any | null, name: string, parent?: { __typename?: 'OrganisationUnit', uuid?: any | null, name: string } | null, unit_type?: { __typename?: 'Class', name: string } | null, org_unit_level?: { __typename?: 'Class', name: string } | null }> }> };
+export type GetOrgUnitAndFacetsQuery = { __typename?: 'Query', facets: Array<{ __typename?: 'Facet', uuid: any, user_key: string, classes: Array<{ __typename?: 'Class', name: string, uuid: any }> }>, org_units: Array<{ __typename?: 'OrganisationUnitResponse', objects: Array<{ __typename?: 'OrganisationUnit', uuid: any, name: string, parent?: { __typename?: 'OrganisationUnit', uuid: any, name: string } | null, unit_type?: { __typename?: 'Class', name: string } | null, org_unit_level?: { __typename?: 'Class', name: string } | null }> }> };
 
 export type UpdateOrgUnitMutationVariables = Types.Exact<{
   input: Types.OrganisationUnitUpdateInput;

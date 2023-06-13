@@ -26,7 +26,7 @@
         name
         uuid
       }
-      classes(user_keys: "primary") {
+      classes(user_keys: ["primary", "non-primary"]) {
         uuid
       }
       org_units(uuids: $uuid, from_date: $fromDate) {
@@ -61,7 +61,7 @@
             input: result.data,
           })
           $success = {
-            message: `IT bruger er oprettet ${
+            message: `IT-konto er oprettet ${
               mutation.ituser_create.objects[0]?.employee
                 ? `for ${mutation.ituser_create.objects[0].employee[0].name}`
                 : ""
@@ -83,14 +83,16 @@
   Henter data...
 {:then data}
   {@const itSystems = data.itsystems}
+  <!-- Eeeeh, vi kan vel aldrig være sikre på at klasser kommer i samme rækkefølge på andre servere, fordi de har andre UUID'er rundt omrking.. -->
   {@const primaryUuid = data.classes[0].uuid}
+  {@const nonPrimaryUuid = data.classes[1].uuid}
   {@const minDate = data.org_units[0].objects[0].validity?.from.split("T")[0]}
   {@const maxDate = data.org_units[0].objects[0].validity?.to?.split("T")[0]}
 
-  <title>Opret IT bruger | OS2mo</title>
+  <title>Opret IT-konto | OS2mo</title>
 
   <div class="flex align-center px-6 pt-6 pb-4">
-    <h3 class="flex-1">Opret IT bruger</h3>
+    <h3 class="flex-1">Opret IT-konto</h3>
   </div>
 
   <div class="divider p-0 m-0 mb-4 w-full" />
@@ -140,6 +142,8 @@
             extra_classes="checkbox-primary"
           />
         </div>
+        <!-- Enten skal vi gøre det her, ellers skal vi lave et gql kald i `+page.server.ts`? -->
+        <input hidden name="non-primary" id="non-primary" value={nonPrimaryUuid}>
       </div>
     </div>
     <!-- TODO: Add support for adding more IT users at once -->
@@ -147,7 +151,7 @@
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >Opret IT bruger</button
+        >Opret IT-konto</button
       >
       <button
         type="button"

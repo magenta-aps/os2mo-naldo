@@ -7,14 +7,14 @@ export type OrgChildrenQueryVariables = Types.Exact<{
 }>;
 
 
-export type OrgChildrenQuery = { __typename?: 'Query', org_units: Array<{ __typename?: 'OrganisationUnitResponse', objects: Array<{ __typename?: 'OrganisationUnit', children: Array<{ __typename?: 'OrganisationUnit', name: string, uuid?: any | null }> }> }> };
+export type OrgChildrenQuery = { __typename?: 'Query', org_units: Array<{ __typename?: 'OrganisationUnitResponse', objects: Array<{ __typename?: 'OrganisationUnit', children: Array<{ __typename?: 'OrganisationUnit', name: string, uuid: any }> }> }> };
 
 export type OrgTreeQueryVariables = Types.Exact<{
   from_date: Types.Scalars['DateTime']['input'];
 }>;
 
 
-export type OrgTreeQuery = { __typename?: 'Query', org_units: Array<{ __typename?: 'OrganisationUnitResponse', uuid: any, objects: Array<{ __typename?: 'OrganisationUnit', name: string, uuid?: any | null, parent?: { __typename?: 'OrganisationUnit', name: string, uuid?: any | null } | null, children: Array<{ __typename?: 'OrganisationUnit', name: string, uuid?: any | null }> }> }> };
+export type OrgTreeQuery = { __typename?: 'Query', org_units: Array<{ __typename?: 'OrganisationUnitResponse', uuid: any, objects: Array<{ __typename?: 'OrganisationUnit', name: string, uuid: any, parent?: { __typename?: 'OrganisationUnit', name: string, uuid: any } | null, children: Array<{ __typename?: 'OrganisationUnit', name: string, uuid: any }> }> }> };
 
 
 export const OrgChildrenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"OrgChildren"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"uuid"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"from_date"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"org_units"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"uuids"},"value":{"kind":"Variable","name":{"kind":"Name","value":"uuid"}}},{"kind":"Argument","name":{"kind":"Name","value":"from_date"},"value":{"kind":"Variable","name":{"kind":"Name","value":"fromDate"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"children"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"uuid"}}]}}]}}]}}]}}]} as unknown as DocumentNode<OrgChildrenQuery, OrgChildrenQueryVariables>;
