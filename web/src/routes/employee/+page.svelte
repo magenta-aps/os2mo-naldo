@@ -2,34 +2,36 @@
   import EmployeeCards from "$lib/components/employee/employee_cards.svelte"
   import EmployeeSearchInput from "$lib/components/employee/employee_search_input.svelte"
   import EmployeeTable from "$lib/components/employee/employee_table.svelte"
-  import { fetchGraph } from "$lib/util/http"
+  import { graphQLClient } from "$lib/util/http"
+  import { gql } from "graphql-request"
+  import { EmployeesDocument } from "./query.generated"
 
   let cardView = true
   let input: string
-  let allEmployees: any[] // Acts as a cache for fetchEmployees()
+  let allEmployees: any[] // Used for the temp search implementation
 
-  const query = `
-      query {
-        employees {
-          objects {
-            givenname
-            surname
-            cpr_no
-            uuid
-            engagements {
-              job_function {
-                name
-              }
-              org_unit {
-                name
-              }
+  gql`
+    query Employees {
+      employees(limit: 100) {
+        objects {
+          givenname
+          surname
+          cpr_no
+          uuid
+          engagements {
+            job_function {
+              name
+            }
+            org_unit {
+              name
             }
           }
         }
       }
+    }
   `
 
-  // TODO: Ugly temp search that should be replaced by graphQL autocomplete
+  // FIXME: Ugly temp search that should be replaced by graphQL autocomplete
   const search = (employees: Array<any>, input: any) => {
     if (!isNaN(input)) {
       return employees.filter((employee) => {
@@ -53,31 +55,16 @@
     })
   }
 
-  // const search = async (query: string) => {
-  // TODO: Switch to GraphQL when #51997 is done
-  //   const res = await fetchRest(`e/autocomplete/?query=${query}`)
-  //   const json = await res.json()
-  //   return json.items
-  // }
-
   // Will override itself on input change(triggers a re-render of the #await markdown)
   $: fetchEmployees = async () => {
-    // Uses GraphQL if no imput, autocomplete if there is
+    if (!allEmployees) {
+      const data = await graphQLClient().request(EmployeesDocument)
+      allEmployees = data.employees.map((v) => v.objects[0])
+    }
+
     // TODO: Switch to all GraphQL when #51997 is done
     if (input) {
       return search(allEmployees, input)
-    }
-
-    if (!allEmployees) {
-      const res = await fetchGraph(query)
-      const json = await res.json()
-
-      if (json.data) {
-        // TODO: Use employee interface
-        allEmployees = json.data.employees.map((v: any) => v.objects[0])
-      } else {
-        throw new Error(json.errors[0].message)
-      }
     }
 
     return allEmployees
@@ -88,7 +75,7 @@
   <title>Medarbejder | OS2mo</title>
 </svelte:head>
 
-<div class="h-screen m-auto p-10">
+<div class="h-screen min-w-full p-10">
   <EmployeeSearchInput bind:input bind:cardView />
   <div class="py-5">
     {#await fetchEmployees()}
