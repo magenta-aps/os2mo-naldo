@@ -34,7 +34,7 @@ export type OrgUnitManagerDetailQueryVariables = Types.Exact<{
 }>;
 
 
-export type OrgUnitManagerDetailQuery = { __typename?: 'Query', org_units: Array<{ __typename?: 'OrganisationUnitResponse', objects: Array<{ __typename?: 'OrganisationUnit', managers: Array<{ __typename?: 'Manager', employee?: Array<{ __typename?: 'Employee', name: string, uuid?: any | null }> | null, responsibilities: Array<{ __typename?: 'Class', name: string }>, manager_type?: { __typename?: 'Class', name: string } | null, manager_level?: { __typename?: 'Class', name: string } | null, validity: { __typename?: 'Validity', from: any, to?: any | null } }> }> }> };
+export type OrgUnitManagerDetailQuery = { __typename?: 'Query', org_units: Array<{ __typename?: 'OrganisationUnitResponse', objects: Array<{ __typename?: 'OrganisationUnit', managers: Array<{ __typename?: 'Manager', employee?: Array<{ __typename?: 'Employee', name: string, uuid?: any | null }> | null, responsibilities: Array<{ __typename?: 'Class', name: string }>, manager_type: { __typename?: 'Class', name: string }, manager_level: { __typename?: 'Class', name: string }, validity: { __typename?: 'Validity', from: any, to?: any | null } }> }> }> };
 
 export type OrgUnitRelatedDetailQueryVariables = Types.Exact<{
   uuid?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;

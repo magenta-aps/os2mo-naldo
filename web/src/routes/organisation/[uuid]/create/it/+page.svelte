@@ -1,125 +1,162 @@
 <script lang="ts">
-  import { success, error } from "$lib/stores/alert"
-  import { fetchGraph } from "$lib/util/http"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
   import Select from "$lib/components/forms/shared/select.svelte"
   import { enhance } from "$app/forms"
+  import type { SubmitFunction } from "./$types"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
-  import type { PageData } from "./$types"
+  import { success, error } from "$lib/stores/alert"
+  import { graphQLClient } from "$lib/util/http"
+  import { ItSystemsClassAndOrgDocument, CreateItUserDocument } from "./query.generated"
+  import { gql } from "graphql-request"
   import { page } from "$app/stores"
+  import { date } from "$lib/stores/date"
+  import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
 
-  export let data: PageData
-
+  let fromDate: string
+  let toDate: string
+  let itSystem: string
   let accountName: string
-  let startDate = new Date().toISOString().split("T")[0]
-  let endDate: string
-</script>
 
-<svelte:head>
-  <title>Opret IT | OS2mo</title>
-</svelte:head>
-
-<div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">Opret IT</h3>
-</div>
-
-<div class="divider p-0 m-0 mb-4 w-full" />
-
-<form method="post"
-  use:enhance={() => {
-    return async ({ result }) => {
-      if (result.type === "success") {
-        const res = await fetchGraph(result.data)
-        const json = await res.json()
-
-        if (res.status === 200) {
-          $success = {
-            message: `${accountName} er blevet oprettet`,
-            uuid: $page.params.uuid,
-            type: "organisation",
+  gql`
+    query ItSystemsClassAndOrg($uuid: [UUID!], $fromDate: DateTime) {
+      itsystems {
+        name
+        uuid
+      }
+      classes(user_keys: "primary") {
+        uuid
+      }
+      org_units(uuids: $uuid, from_date: $fromDate) {
+        objects {
+          validity {
+            from
+            to
           }
-          setTimeout(() => goto(`${base}/organisation/${$page.params.uuid}`), 200)
-        } else {
-          $error = { message: json.description }
-        }
-      } else {
-        $error = {
-          message: `Something went wrong with the form: ${JSON.stringify(result)}`,
         }
       }
     }
-  }}
->
-  <div class="flex flex-row gap-6 mx-6 mb-4">
-    <div class="form-control">
-      <DateInput
-        bind:value={startDate}
-        title="Startdato"
-        id="from"
-        max={endDate
-          ? endDate
-          : new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
-      />
-    </div>
-    <div class="form-control">
-      <DateInput
-        bind:value={endDate}
-        title="Slutdato"
-        id="to"
-        min={startDate}
-        max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
-      />
-    </div>
+
+    mutation CreateItUser($input: ITUserCreateInput!) {
+      ituser_create(input: $input) {
+        objects {
+          employee {
+            name
+          }
+          itsystem {
+            name
+          }
+        }
+      }
+    }
+  `
+  const handler: SubmitFunction =
+    () =>
+    async ({ result }) => {
+      if (result.type === "success" && result.data) {
+        try {
+          const mutation = await graphQLClient().request(CreateItUserDocument, {
+            input: result.data,
+          })
+          $success = {
+            message: `IT bruger er oprettet ${
+              mutation.ituser_create.objects[0]?.employee
+                ? `for ${mutation.ituser_create.objects[0].employee[0].name}`
+                : ""
+            }`,
+            uuid: $page.params.uuid,
+            type: "organisation",
+          }
+          setTimeout(() => goto(`${base}/organisation/${$page.params.uuid}/`), 200)
+        } catch (err) {
+          console.error(err)
+          $error = { message: err as string }
+        }
+      }
+    }
+</script>
+
+{#await graphQLClient().request( ItSystemsClassAndOrgDocument, { uuid: $page.params.uuid, fromDate: $date } )}
+  <!-- TODO: Should have a skeleton for the loading stage -->
+  Henter data...
+{:then data}
+  {@const itSystems = data.itsystems}
+  {@const primaryUuid = data.classes[0].uuid}
+  {@const minDate = data.org_units[0].objects[0].validity?.from.split("T")[0]}
+  {@const maxDate = data.org_units[0].objects[0].validity?.to?.split("T")[0]}
+
+  <title>Opret IT bruger | OS2mo</title>
+
+  <div class="flex align-center px-6 pt-6 pb-4">
+    <h3 class="flex-1">Opret IT bruger</h3>
   </div>
 
-  <!-- TODO: Should have the current value as default -->
-  <div class="mx-6">
-    <div class="flex flex-row gap-6 mb-6">
-      <div class="basis-1/2">
-        <Select
-          title="IT-systemer"
-          id="itsystem"
-          iterable={data.itsystems.sort((a, b) => (a.name > b.name ? 1 : -1))}
-        />
-      </div>
-      <div class="basis-1/2">
-        <Input
-          bind:value={accountName}
-          title="Kontonavn"
-          id="user-key"
-          required
-        />
-      </div>
-    </div>
-    <div class="form-control">
-      <div class="flex">
-        <label class="label cursor-pointer gap-4">
-          <input
-            type="checkbox"
-            id="primary"
-            name="primary"
-            checked={false}
-            class="checkbox checkbox-primary rounded normal-case font-normal text-base text-base-100"
+  <div class="divider p-0 m-0 mb-4 w-full" />
+
+  <form method="post" class="mx-6" use:enhance={handler}>
+    <div class="w-1/2 min-w-fit bg-slate-100 rounded">
+      <div class="p-8">
+        <div class="flex flex-row gap-6">
+          <DateInput
+            bind:value={fromDate}
+            startValue={$date}
+            title="Startdato"
+            id="from"
+            min={minDate}
+            max={toDate ? toDate : maxDate}
           />
-          <p>Primary</p>
-        </label>
+          <DateInput
+            bind:value={toDate}
+            title="Slutdato"
+            id="to"
+            min={fromDate ? fromDate : minDate}
+            max={maxDate}
+          />
+        </div>
+        <div class="flex flex-row gap-6">
+          <Select
+            title="IT-system"
+            id="it-system"
+            bind:value={itSystem}
+            iterable={itSystems.sort((a, b) => (a.name > b.name ? 1 : -1))}
+            extra_classes="basis-1/2"
+            required={true}
+          />
+          <Input
+            extra_classes="basis-1/2"
+            title="Kontonavn"
+            id="account-name"
+            bind:value={accountName}
+            required={true}
+          />
+        </div>
+        <div class="flex">
+          <Checkbox
+            title="Primær"
+            id="primary"
+            value={primaryUuid}
+            extra_classes="checkbox-primary"
+          />
+        </div>
       </div>
     </div>
-  </div>
-  <div class="modal-action p-6 gap-4 bg-slate-100">
-    <a
-      href={`${base}/organisation/${$page.params.uuid}`}
-      class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-      >Annullér</a
-    >
-    <button
-      type="submit"
-      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-      >Opret IT bruger</button
-    >
-  </div>
-  <Error />
-</form>
+    <!-- TODO: Add support for adding more IT users at once -->
+    <div class="flex py-6 gap-4">
+      <button
+        type="submit"
+        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+        >Opret IT bruger</button
+      >
+      <button
+        type="button"
+        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+        on:click={() => goto(`${base}/organisation/${$page.params.uuid}`)}
+      >
+        Annullér
+      </button>
+    </div>
+    <Error />
+  </form>
+{/await}
