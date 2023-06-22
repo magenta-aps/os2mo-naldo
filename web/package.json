@@ -40,7 +40,7 @@
     "@babel/core": "^7.0.0",
     "@sveltejs/adapter-node": "^1.2.4",
     "daisyui": "^2.52.0",
-    "graphql": "^16.6.0",
+    "graphql": "^16.7.0",
     "graphql-request": "^6.0.0",
     "keycloak-js": "^19.0.3",
     "svelte-floating-ui": "^1.5.3",
