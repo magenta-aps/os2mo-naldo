@@ -1,77 +1,116 @@
 <script lang="ts">
-  import { success, error } from "$lib/stores/alert"
-  import { fetchGraph } from "$lib/util/http"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import { enhance } from "$app/forms"
+  import type { SubmitFunction } from "./$types"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
-  import type { PageData } from "./$types"
+  import { success, error } from "$lib/stores/alert"
+  import { graphQLClient } from "$lib/util/http"
+  import { ItUserAndOrgDocument, TerminateItUserDocument } from "./query.generated"
+  import { gql } from "graphql-request"
   import { page } from "$app/stores"
+  import { date } from "$lib/stores/date"
 
-  export let data: PageData
+  let toDate: string
 
-  let startDate = data.itusers[0].objects[0].validity.from.split("T")[0]
-  let endDate = data.itusers[0].objects[0].validity.to?.split("T")[0]
-</script>
+  gql`
+    query ITUserAndOrg($uuid: [UUID!], $fromDate: DateTime!, $org_unit_uuid: [UUID!]) {
+      itusers(uuids: $uuid, from_date: $fromDate) {
+        objects {
+          user_key
+          uuid
+          employee {
+            name
+          }
+          validity {
+            from
+            to
+          }
+        }
+      }
+      org_units(uuids: $org_unit_uuid, from_date: $fromDate) {
+        objects {
+          validity {
+            from
+            to
+          }
+        }
+      }
+    }
 
-<svelte:head>
-  <title>Afslut {data.itusers[0].objects[0].itsystem.name} | OS2mo</title>
-</svelte:head>
+    mutation TerminateITUser($input: ITUserTerminateInput!) {
+      ituser_terminate(input: $input) {
+        uuid
+      }
+    }
+  `
+  const handler: SubmitFunction =
+    () =>
+    async ({ result }) => {
+      if (result.type === "success" && result.data) {
+        try {
+          const mutation = await graphQLClient().request(TerminateItUserDocument, {
+            input: result.data,
+          })
 
-<div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">Afslut {data.itusers[0].objects[0].itsystem.name}</h3>
-</div>
-
-<div class="divider p-0 m-0 mb-4 w-full" />
-
-<form method="post"
-  use:enhance={() => {
-    return async ({ result }) => {
-      if (result.type === "success") {
-        const res = await fetchGraph(result.data)
-        const json = await res.json()
-
-        if (res.status === 200) {
           $success = {
-            message: `${data.itusers[0].objects[0].user_key} er bliver afsluttet d. ${endDate}`,
+            message: `${name} afsluttes d. INDSÆT DATO`,
             uuid: $page.params.uuid,
             type: "organisation",
           }
           setTimeout(() => goto(`${base}/organisation/${$page.params.uuid}`), 200)
-        } else {
-          $error = { message: json.description }
-        }
-      } else {
-        $error = {
-          message: `Something went wrong with the form: ${JSON.stringify(result)}`,
+        } catch (err) {
+          console.error(err)
+          $error = { message: err as string }
         }
       }
     }
-  }}
->
-  <div class="flex flex-row gap-6 mx-6 mb-4">
-    <div class="form-control">
-      <DateInput
-        title="Slutdato"
-        bind:value={endDate}
-        id="to"
-        min={startDate}
-        max={endDate ? endDate : new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
-      />
+</script>
+
+{#await graphQLClient().request( ItUserAndOrgDocument, { uuid: $page.params.ituser, fromDate: $date } )}
+  <!-- TODO: Should have a skeleton for the loading stage -->
+  Henter data...
+{:then data}
+  {@const ituser = data.itusers[0].objects[0]}
+  {@const minDate = data.org_units[0].objects[0].validity.from.split("T")[0]}
+  {@const maxDate = data.org_units[0].objects[0].validity.to?.split("T")[0]}
+
+  <title>Afslut IT-konto: {ituser.user_key} | OS2mo</title>
+
+  <div class="flex align-center px-6 pt-6 pb-4">
+    <h3 class="flex-1">Afslut IT-konto: {ituser.user_key}</h3>
+  </div>
+
+  <div class="divider p-0 m-0 mb-4 w-full" />
+
+  <form method="post" class="mx-6" use:enhance={handler}>
+    <div class="w-1/2 min-w-fit bg-slate-100 rounded">
+      <div class="p-8">
+        <DateInput
+          bind:value={toDate}
+          startValue={ituser.validity.to
+            ? ituser.validity.to.split("T")[0]
+            : null}
+          title="Slutdato"
+          id="to"
+          min={minDate}
+          max={maxDate ? maxDate : null}
+        />
+      </div>
     </div>
-  </div>
-  <div class="modal-action p-6 gap-4 bg-slate-100">
-    <a
-      href={`${base}/organisation/${$page.params.uuid}`}
-      class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-      >Annullér</a
-    >
-    <button
-      type="submit"
-      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-      >Afslut IT</button
-    >
-  </div>
-  <Error />
-</form>
+    <div class="flex py-6 gap-4">
+      <button
+        type="submit"
+        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+        >Afslut IT-konto</button
+      >
+      <a
+        href={`${base}/organisation/${$page.params.uuid}`}
+        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+        >Annullér</a
+      >
+    </div>
+    <Error />
+  </form>
+{/await}

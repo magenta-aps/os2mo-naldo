@@ -10,15 +10,27 @@
   import { base } from "$app/paths"
   import { page } from "$app/stores"
   import { gql } from "graphql-request"
-  import { ItUsersDocument, UpdateItUserDocument } from "./query.generated"
+  import {
+    ItUserItSystemsOrgAndPrimaryDocument,
+    UpdateItUserDocument,
+  } from "./query.generated"
   import type { SubmitFunction } from "./$types"
+  import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
+  import { date } from "$lib/stores/date"
+
+
+  let fromDate: string
+  let toDate: string
+  let itSystem: string
+  let accountName: string
 
   gql`
-    query ITUsers($uuid: [UUID!]) {
-      itusers(uuids: $uuid) {
+    query ITUserItSystemsOrgAndPrimary($uuid: [UUID!], $fromDate: DateTime, $org_uuid: [UUID!]) {
+      itusers(uuids: $uuid, from_date: $fromDate) {
         uuid
         objects {
           uuid
+          user_key
           primary_uuid
           itsystem {
             name
@@ -28,11 +40,21 @@
             from
             to
           }
-          user_key
         }
       }
       itsystems {
         name
+        uuid
+      }
+      org_units(uuids: $org_uuid) {
+        objects {
+          validity {
+            from
+            to
+          }
+        }
+      }
+      classes(user_keys: ["primary", "non-primary"]) {
         uuid
       }
     }
@@ -44,7 +66,6 @@
     }
   `
 
-
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
@@ -55,31 +76,27 @@
           })
 
           $success = {
-            message: "IT brugeren er blevet redigeret",
+            message: "IT kontoen er blevet redigeret",
             uuid: $page.params.uuid,
             type: "organisation",
           }
-          setTimeout(
-            () => goto(`${base}/organisation/${$page.params.uuid}`),
-            200
-          )
+          setTimeout(() => goto(`${base}/organisation/${$page.params.uuid}`), 200)
         } catch (err) {
           console.error(err)
           $error = { message: err as string }
         }
       }
     }
-
-  let fromDate: string
-  let toDate: string
 </script>
 
-{#await graphQLClient().request(ItUsersDocument, { uuid: $page.params.ituser })}
+{#await graphQLClient().request( ItUserItSystemsOrgAndPrimaryDocument, { uuid: $page.params.ituser, fromDate: $date, org_uuid: $page.params.uuid } )}
   Henter data...
 {:then data}
   {@const it_user = data.itusers[0].objects[0]}
-  {@const minDate = it_user.validity.from.split("T")[0]}
-  {@const maxDate = it_user.validity.to?.split("T")[0]}
+  {@const primaryUuid = data.classes[0].uuid}
+  {@const nonPrimaryUuid = data.classes[1].uuid}
+  {@const minDate = data.org_units[0].objects[0].validity.from.split("T")[0]}
+  {@const maxDate = data.org_units[0].objects[0].validity.to?.split("T")[0]}
 
   <title>Rediger {it_user.itsystem.name} | OS2mo</title>
 
@@ -89,79 +106,76 @@
 
   <div class="divider p-0 m-0 mb-4 w-full" />
 
-  <form
-    method="post"
-    use:enhance={handler}
-  >
-    <div class="flex flex-row gap-6 mx-6 mb-4">
-      <div class="form-control">
-        <DateInput
-          bind:value={fromDate}
-          startValue={minDate}
-          title="Startdato"
-          id="from"
-          max={maxDate
-            ? maxDate
-            : new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
-        />
-      </div>
-      <div class="form-control">
-        <DateInput
-          bind:value={toDate}
-          startValue={maxDate}
-          title="Slutdato"
-          id="to"
-          min={minDate}
-          max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
-        />
-      </div>
-    </div>
+  <form method="post" class="mx-6" use:enhance={handler}>
+    <div class="w-1/2 min-w-fit bg-slate-100 rounded">
+      <div class="p-8">
+        <div class="flex flex-row gap-6">
+          <DateInput
+            bind:value={fromDate}
+            startValue={$date}
+            title="Startdato"
+            id="from"
+            min={minDate}
+            max={toDate ? toDate : maxDate}
+          />
+          <DateInput
+            bind:value={toDate}
+            startValue={it_user.validity.to
+              ? it_user.validity.to.split("T")[0]
+              : null}
+            title="Slutdato"
+            id="to"
+            min={fromDate ? fromDate : minDate}
+            max={maxDate}
+          />
+        </div>
 
-    <!-- TODO: Should have the current value as default -->
-    <div class="mx-6">
-      <div class="flex flex-row gap-6 mb-6">
-        <div class="basis-1/2">
+        <!-- TODO: Should have the current value as default -->
+        <div class="flex flex-row gap-6">
           <Select
             title="IT-systemer"
-            id="itsystem"
+            id="it-system"
+            startValue={it_user.itsystem.name}
+            bind:value={itSystem}
+            extra_classes="basis-1/2"
             iterable={data.itsystems.sort((a, b) => (a.name > b.name ? 1 : -1))}
+            required={true}
           />
-        </div>
-        <div class="basis-1/2">
           <Input
             title="Kontonavn"
-            id="user-key"
-            value={it_user.user_key}
+            id="account-name"
+            extra_classes="basis-1/2"
+            startValue={it_user.user_key}
+            bind:value={accountName}
+            required={true}
           />
         </div>
-      </div>
-      <div class="form-control">
         <div class="flex">
-          <label class="label cursor-pointer gap-4">
-            <input
-              type="checkbox"
-              id="primary"
-              name="primary"
-              checked={it_user.primary_uuid ===
-                "0644cd06-b84b-42e0-95fe-ce131c21fbe6"}
-              class="checkbox checkbox-primary rounded normal-case font-normal text-base text-base-100"
-            />
-            <p>Primary</p>
-          </label>
+          <Checkbox
+            title="Primær"
+            id="primary"
+            startValue={it_user.primary_uuid}
+            value={primaryUuid}
+            extra_classes="checkbox-primary"
+          />
         </div>
+        <!-- Enten skal vi gøre det her, ellers skal vi lave et gql kald i `+page.server.ts`? -->
+        <input hidden name="non-primary" id="non-primary" value={nonPrimaryUuid}>
       </div>
     </div>
-    <div class="modal-action p-6 gap-4 bg-slate-100">
-      <a
-        href={`${base}/organisation/${$page.params.uuid}`}
-        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        >Annullér</a
-      >
+    <div class="flex py-6 gap-4">
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >Rediger IT bruger</button
+        >Rediger IT-konto</button
       >
+      <button
+        type="button"
+        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+        on:click={() => goto(`${base}/organisation/${$page.params.uuid}`)}
+      >
+        Annullér
+      </button>
     </div>
     <Error />
   </form>

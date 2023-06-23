@@ -2,7 +2,7 @@
   export let title: string | undefined = undefined
   export let id: string
   export let value: string
-  export let startValue: string | null = null
+  export let startValue: string | undefined = undefined
   export let extra_classes = ""
 </script>
 

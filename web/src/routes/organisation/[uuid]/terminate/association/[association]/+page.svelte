@@ -23,9 +23,6 @@
             uuid
             name
           }
-          association_type {
-            name
-          }
           validity {
             from
             to
@@ -101,16 +98,15 @@
       </div>
     </div>
     <div class="flex py-6 gap-4">
-      <!-- TODO: Make button close modal -->
-      <a
-        href={`${base}/organisation/${$page.params.uuid}`}
-        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >Annullér</a
-      >
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
         >Afslut tilknytning</button
+      >
+      <a
+        href={`${base}/organisation/${$page.params.uuid}`}
+        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+        >Annullér</a
       >
     </div>
     <Error />

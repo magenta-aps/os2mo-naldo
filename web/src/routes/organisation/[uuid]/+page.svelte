@@ -146,7 +146,7 @@
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
         href="{base}/organisation/{$page.params.uuid}/create/it"
       >
-        Tilføj IT bruger
+        Opret IT-konto
       </a>
     </div>
     <!-- TODO: future and past does not work. 
