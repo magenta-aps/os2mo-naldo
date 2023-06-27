@@ -7,7 +7,7 @@ export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> =
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string | number; output: string; }
+  ID: { input: string; output: string; }
   String: { input: string; output: string; }
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
@@ -1112,9 +1112,9 @@ export type ClassChildrenArgs = {
  */
 export type ClassFacetArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
@@ -1328,6 +1328,14 @@ export type Employee = {
    *
    * Addresses for the employee.
    *
+   * Commonly contain addresses such as, their:
+   * * Work location
+   * * Office number
+   * * Work phone number
+   * * Work email
+   * * Personal phone number
+   * * Personal email
+   *
    */
   addresses: Array<Address>;
   /**
@@ -1343,10 +1351,10 @@ export type Employee = {
   /** Engagement associations */
   engagement_associations: Array<EngagementAssociation>;
   /**
-   * "
-   *             Engagements for the employee.
    *
-   *             May be an empty list if the employee is not employeed.
+   * Engagements for the employee.
+   *
+   * May be an empty list if the employee is not employeed.
    *
    */
   engagements: Array<Engagement>;
@@ -2487,10 +2495,32 @@ export type EngagementUpdateInput = {
 /** The key component of the class/facet choice setup */
 export type Facet = {
   __typename?: 'Facet';
+  /**
+   *
+   * Facet children.
+   *
+   * Almost always an empty list as facet hierarchies are rare.
+   * Currently mostly used to describe (trade) union hierachies.
+   *
+   * The inverse operation of `parent`.
+   *
+   */
+  children: Array<Facet>;
   /** Associated classes */
   classes: Array<Class>;
-  /** Description of the facet object. */
-  description: Scalars['String']['output'];
+  /**
+   *
+   * Description of the facet object.
+   *
+   * Almost always `""`.
+   *
+   * @deprecated
+   * Will be removed in a future version of GraphQL.
+   * This field is almost never used, and serves no real purpose.
+   * May be reintroduced in the future if the demand for it increases.
+   *
+   */
+  description?: Maybe<Scalars['String']['output']>;
   /**
    * UUID of the related organisation.
    * @deprecated
@@ -2498,7 +2528,24 @@ export type Facet = {
    *
    */
   org_uuid: Scalars['UUID']['output'];
-  /** UUID of the parent facet. */
+  /**
+   *
+   * Parent facet.
+   *
+   * Almost always `null` as facet hierarchies are rare.
+   * Currently mostly used to describe (trade) union hierachies.
+   *
+   * The inverse operation of `children`.
+   *
+   */
+  parent?: Maybe<Facet>;
+  /**
+   * UUID of the parent facet.
+   * @deprecated
+   * Will be removed in a future version of GraphQL.
+   * Use `parent {uuid}` instead.
+   *
+   */
   parent_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
    *
@@ -2538,6 +2585,16 @@ export type Facet = {
 
 
 /** The key component of the class/facet choice setup */
+export type FacetChildrenArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+
+/** The key component of the class/facet choice setup */
 export type FacetClassesArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -2546,6 +2603,16 @@ export type FacetClassesArgs = {
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+
+/** The key component of the class/facet choice setup */
+export type FacetParentArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 export type FacetCreateInput = {
@@ -3962,6 +4029,8 @@ export type Manager = {
    *
    * Employee fulfilling the managerial position.
    *
+   * May be empty in which case the managerial position is unfilfilled (vacant).
+   *
    *
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
@@ -4769,7 +4838,16 @@ export type Organisation = {
 /** Organisation unit within the organisation tree */
 export type OrganisationUnit = {
   __typename?: 'OrganisationUnit';
-  /** Related addresses */
+  /**
+   *
+   * Addresses for the organisation unit.
+   *
+   * Commonly contain addresses such as, their:
+   * * Location
+   * * Contact phone number
+   * * Contact email
+   *
+   */
   addresses: Array<Address>;
   /**
    *
@@ -4780,7 +4858,14 @@ export type OrganisationUnit = {
    *
    */
   ancestors: Array<OrganisationUnit>;
-  /** Related associations */
+  /**
+   *
+   * Associations for the organistion unit.
+   *
+   * May be an empty list if the organistion unit is purely hierarchical.
+   * This situation may occur especially in the middle or the organisation tree.
+   *
+   */
   associations: Array<Association>;
   /**
    * Children count of the organisation unit.
@@ -4798,21 +4883,46 @@ export type OrganisationUnit = {
   children: Array<OrganisationUnit>;
   /** Engagement associations for the organisational unit */
   engagement_associations: Array<EngagementAssociation>;
-  /** Related engagements */
+  /**
+   *
+   * Engagements for the organistion unit.
+   *
+   * May be an empty list if the organistion unit does not have any people employeed.
+   * This situation may occur especially in the middle or the organisation tree.
+   *
+   */
   engagements: Array<Engagement>;
   /**
    *
    * IT (service) accounts.
    *
    * May be an empty list if the organistion unit does not have any IT (service) accounts whatsoever.
+   * This situation may occur especially in the middle or the organisation tree.
    *
    */
   itusers: Array<ItUser>;
-  /** KLE responsibilities for the organisation unit */
+  /**
+   *
+   * KLE responsibilities for the organisation unit.
+   *
+   * Can help out with regards to GDPR by identifying which organisational units operate with sensitive tasks.
+   *
+   */
   kles: Array<Kle>;
-  /** Related leaves */
+  /**
+   *
+   * Connection to employees leaves of absence relevant for the organisation unit.
+   *
+   */
   leaves: Array<Leave>;
-  /** Managers of the organisation unit */
+  /**
+   *
+   * Managerial roles for the organisation unit.
+   *
+   * May be empty in which case managers are usually inherited from parents.
+   * See the `inherit`-flag for details.
+   *
+   */
   managers: Array<Manager>;
   /**
    *
@@ -4835,9 +4945,33 @@ export type OrganisationUnit = {
    *
    */
   org_unit_hierarchy?: Maybe<Scalars['UUID']['output']>;
-  /** Organisation unit hierarchy */
+  /**
+   *
+   * Organisation unit hierarchy.
+   *
+   * Can be used to label an organisational structure to belong to a certain subset of the organisation tree.
+   *
+   * Examples of user-keys:
+   * * `"Line-management"`
+   * * `"Self-owned institution"`
+   * * `"Outside organisation"`
+   * * `"Hidden"`
+   *
+   * Note:
+   * The organisation-gatekeeper integration is one option to keep hierarchy labels up-to-date.
+   *
+   */
   org_unit_hierarchy_model?: Maybe<Class>;
-  /** Organisation unit level */
+  /**
+   *
+   * Organisation unit level.
+   *
+   * Examples of user-keys:
+   * * `"N1"`
+   * * `"N5"`
+   * * `"N7"`
+   *
+   */
   org_unit_level?: Maybe<Class>;
   /**
    * UUID of the organisation unit level.
@@ -4861,11 +4995,26 @@ export type OrganisationUnit = {
    *
    */
   parent_uuid?: Maybe<Scalars['UUID']['output']>;
-  /** Related units for the organisational unit */
+  /**
+   *
+   * Related units for the organisational unit.
+   *
+   */
   related_units: Array<RelatedUnit>;
-  /** Related roles */
+  /**
+   *
+   * Roles being fulfilled within the organisational unit.
+   *
+   * May be an empty list if the organistion unit is purely hierarchical.
+   * This situation may occur especially in the middle or the organisation tree.
+   *
+   */
   roles: Array<Role>;
-  /** Time planning strategy */
+  /**
+   *
+   * Time planning strategy.
+   *
+   */
   time_planning?: Maybe<Class>;
   /**
    * UUID of the time planning object.
@@ -4887,7 +5036,26 @@ export type OrganisationUnit = {
    *
    */
   type: Scalars['String']['output'];
-  /** Organisation unit type */
+  /**
+   *
+   * Organisation unit type.
+   *
+   * Organisation units can represent a lot of different classes of hierarchical structures.
+   * Sometimes they represent cooperations, governments, NGOs or other true organisation types.
+   * Oftentimes they represent the inner structure of these organisations.
+   * Othertimes they represent project management structures such as project or teams.
+   *
+   * This field is used to distriguish all these different types of organisations.
+   *
+   * Examples of user-keys:
+   * * `"Private Company"`
+   * * `"Educational Institution"`
+   * * `"Activity Center"`
+   * * `"Daycare"`
+   * * `"Team"`
+   * * `"Project"`
+   *
+   */
   unit_type?: Maybe<Class>;
   /**
    * UUID of the organisation unit type.
@@ -5455,10 +5623,10 @@ export type QueryEngagementsArgs = {
 
 /** Entrypoint for all read-operations */
 export type QueryFacetsArgs = {
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: InputMaybe<Scalars['int']['input']>;
   offset?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
