@@ -37,7 +37,7 @@
   "type": "module",
   "dependencies": {
     "@aws-crypto/sha256-js": "^4.0.0",
-    "@babel/core": "^7.0.0",
+    "@babel/core": "^7.22.8",
     "@sveltejs/adapter-node": "^1.2.4",
     "daisyui": "^2.52.0",
     "graphql": "^16.7.1",
