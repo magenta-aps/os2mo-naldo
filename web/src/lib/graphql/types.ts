@@ -7,7 +7,7 @@ export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> =
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string; }
+  ID: { input: string | number; output: string; }
   String: { input: string; output: string; }
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
@@ -1543,6 +1543,10 @@ export type EmployeeCreateInput = {
   cpr_number?: InputMaybe<Scalars['String']['input']>;
   /** Givenname (firstname) of the employee. */
   givenname: Scalars['String']['input'];
+  /** Nickname givenname (firstname) of the employee. */
+  nickname_given_name?: InputMaybe<Scalars['String']['input']>;
+  /** Nickname surname (lastname) of the employee. */
+  nickname_surname?: InputMaybe<Scalars['String']['input']>;
   /** Surname (lastname) of the employee. */
   surname: Scalars['String']['input'];
   /** Extra info or uuid. */
@@ -5294,7 +5298,7 @@ export type OrganisationUnitCreateInput = {
   /** UUID of unit level. */
   org_unit_level?: InputMaybe<Scalars['UUID']['input']>;
   /** UUID of the type. */
-  org_unit_type?: InputMaybe<Scalars['UUID']['input']>;
+  org_unit_type: Scalars['UUID']['input'];
   /** UUID of the related parent. */
   parent?: InputMaybe<Scalars['UUID']['input']>;
   /** UUID of time planning. */
