@@ -39,7 +39,7 @@
     "@aws-crypto/sha256-js": "^4.0.0",
     "@babel/core": "^7.0.0",
     "@sveltejs/adapter-node": "^1.2.4",
-    "daisyui": "^2.52.0",
+    "daisyui": "^3.2.1",
     "graphql": "^16.7.1",
     "graphql-request": "^6.0.0",
     "keycloak-js": "^19.0.3",
