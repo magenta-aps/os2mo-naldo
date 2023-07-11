@@ -50,14 +50,10 @@
           </a>
         </td>
         <td>
-          <a href="{base}/organisation/{$page.params.uuid}/edit/it/{ituser.uuid}">
-            <a
-              href="{base}/organisation/{$page.params
-                .uuid}/terminate/it/{ituser.uuid}"
-            >
-              <Icon type="xmark" size="30" />
-            </a>
-          </a></td
+          <a href="{base}/organisation/{$page.params.uuid}/terminate/it/{ituser.uuid}">
+            <Icon type="xmark" size="30" />
+          </a>
+        </td
         >
       </tr>
       {/each}

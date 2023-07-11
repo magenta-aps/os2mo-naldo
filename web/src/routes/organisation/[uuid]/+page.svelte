@@ -18,6 +18,7 @@
   import ManagerTable from "$lib/components/org/tables/manager_table.svelte"
   import RelatedTable from "$lib/components/org/tables/related_table.svelte"
   import { base } from "$app/paths"
+  import KleTable from "$lib/components/org/tables/kle_table.svelte"
 
   // Tabs
   // TODO: enum?
@@ -211,7 +212,18 @@
     {/if}
   {:else if activeItem === "KLE-opmærkninger"}
     <TenseTabs />
-    TODO
+    {#if $tenses.future}
+      <h2 class="mb-4">Fremtid</h2>
+      <KleTable tense="future" uuid={$page.params.uuid} />
+    {/if}
+    {#if $tenses.present}
+      <h2 class="mb-4">Nutid</h2>
+      <KleTable tense="present" uuid={$page.params.uuid} />
+    {/if}
+    {#if $tenses.past}
+      <h2 class="mb-4">Fortid</h2>
+      <KleTable tense="past" uuid={$page.params.uuid} />
+    {/if}
   {:else if activeItem === "Relateret"}
     <TenseTabs />
     <!-- TODO: future and past does not work. 
