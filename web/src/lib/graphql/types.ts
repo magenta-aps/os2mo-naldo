@@ -22,14 +22,12 @@ export type Scalars = {
 };
 
 /**
- *
  * Address information for either an employee or organisational unit
  *
  */
 export type Address = {
   __typename?: 'Address';
   /**
-   *
    * The address category or type.
    *
    * In OS2mo addresses can be of a variety of different types:
@@ -49,19 +47,16 @@ export type Address = {
   address_type: Class;
   /**
    * UUID of the address type class.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `address_type {uuid}` instead.
    *
    */
   address_type_uuid: Scalars['UUID']['output'];
   /**
-   *
    * Connected employee.
    *
    * Note:
    * This field is mutually exclusive with the `org_unit` field.
-   *
    *
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
@@ -70,14 +65,12 @@ export type Address = {
   employee?: Maybe<Array<Employee>>;
   /**
    * UUID of the employee related to the address.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `employee {uuid}` instead.
    *
    */
   employee_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * Connected engagement.
    *
    * Note:
@@ -87,14 +80,12 @@ export type Address = {
   engagement?: Maybe<Array<Engagement>>;
   /**
    * Optional UUID of an associated engagement.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `engagement {uuid}` instead.
    *
    */
   engagement_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * Hypertext Reference of the address.
    *
    * The `href` field makes a hyperlink from the address value, such that the link can be included in user interfaces.
@@ -112,7 +103,6 @@ export type Address = {
    */
   href?: Maybe<Scalars['String']['output']>;
   /**
-   *
    * Human readable name of the address.
    *
    * Name is *usually* equal to `value`, but may differ if `value` is not human readable.
@@ -132,7 +122,6 @@ export type Address = {
    */
   name?: Maybe<Scalars['String']['output']>;
   /**
-   *
    * Connected organisation unit.
    *
    * Note:
@@ -142,26 +131,22 @@ export type Address = {
   org_unit?: Maybe<Array<OrganisationUnit>>;
   /**
    * UUID of the organisation unit related to the address.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `org_unit {uuid}` instead.
    *
    */
   org_unit_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * The object type.
    *
    * Always contains the string `address`.
    *
-   * @deprecated
-   * Unintentionally exposed implementation detail.
+   * @deprecated Unintentionally exposed implementation detail.
    * Provides no value whatsoever.
    *
    */
   type: Scalars['String']['output'];
   /**
-   *
    * Short unique key.
    *
    * Usually set to the `value` provided on object creation.
@@ -179,7 +164,6 @@ export type Address = {
   /** Validity of the address object. */
   validity: Validity;
   /**
-   *
    * Machine processable value of the address.
    *
    * The value of the address, which may or may not be fit for human consumption.
@@ -194,7 +178,6 @@ export type Address = {
    */
   value: Scalars['String']['output'];
   /**
-   *
    * Optional second machine processable value of the address.
    *
    * This value is `null` for most address types, but may be utilized by some address-types for extra information.
@@ -207,7 +190,6 @@ export type Address = {
    */
   value2?: Maybe<Scalars['String']['output']>;
   /**
-   *
    * Determines who can see the address and how it is exported.
    *
    * In OS2mo addresses can be of a variety of privacy classes.
@@ -229,8 +211,7 @@ export type Address = {
   visibility?: Maybe<Class>;
   /**
    * UUID of the visibility class of the address.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `visibility {uuid}` instead.
    *
    */
@@ -239,7 +220,6 @@ export type Address = {
 
 
 /**
- *
  * Address information for either an employee or organisational unit
  *
  */
@@ -255,7 +235,6 @@ export type AddressAddress_TypeArgs = {
 
 
 /**
- *
  * Address information for either an employee or organisational unit
  *
  */
@@ -270,7 +249,6 @@ export type AddressEmployeeArgs = {
 
 
 /**
- *
  * Address information for either an employee or organisational unit
  *
  */
@@ -286,7 +264,6 @@ export type AddressEngagementArgs = {
 
 
 /**
- *
  * Address information for either an employee or organisational unit
  *
  */
@@ -302,7 +279,6 @@ export type AddressOrg_UnitArgs = {
 
 
 /**
- *
  * Address information for either an employee or organisational unit
  *
  */
@@ -336,7 +312,6 @@ export type AddressCreateInput = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -357,7 +332,6 @@ export type AddressCreateInput = {
 export type AddressResponse = {
   __typename?: 'AddressResponse';
   /**
-   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -370,7 +344,6 @@ export type AddressResponse = {
    */
   current?: Maybe<Address>;
   /**
-   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -384,7 +357,6 @@ export type AddressResponse = {
    */
   objects: Array<Address>;
   /**
-   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -408,7 +380,6 @@ export type AddressResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -468,7 +439,6 @@ export type AddressUpdateInput = {
 export type Association = {
   __typename?: 'Association';
   /**
-   *
    * The type of connection that the employee has to the organisation unit.
    *
    * Examples:
@@ -480,37 +450,31 @@ export type Association = {
   association_type?: Maybe<Class>;
   /**
    * UUID of the association type.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `association_type {uuid}` instead.
    *
    */
   association_type_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * List of arbitrary classes.
    *
    * The purpose of this field is ill-defined.
    * It is currently mainly used for (trade) union specification.
    *
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Currently no replacement is in place, but specialized fields will probably arive in the future.
    *
    */
   dynamic_class?: Maybe<Class>;
   /**
    * UUID of the dynamically attached class.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `dynamic_class {uuid}` instead.
    *
    */
   dynamic_class_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * Associated employee.
-   *
    *
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
@@ -519,16 +483,13 @@ export type Association = {
   employee: Array<Employee>;
   /**
    * UUID of the employee related to the association.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `employee {uuid}` instead.
    *
    */
   employee_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * The IT-user utilized by the employee when fulfilling the association responsibilities.
-   *
    *
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
@@ -537,14 +498,12 @@ export type Association = {
   it_user: Array<ItUser>;
   /**
    * UUID of an 'ITUser' model, only defined for 'IT associations.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `it_user {uuid}` instead.
    *
    */
   it_user_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * The position held by the employee in the organisation unit.
    *
    * Examples of user-keys:
@@ -556,16 +515,13 @@ export type Association = {
   job_function?: Maybe<Class>;
   /**
    * UUID of a job function class, only defined for 'IT associations.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `job_function {uuid}` instead.
    *
    */
   job_function_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * Associated organisation unit.
-   *
    *
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
@@ -574,14 +530,12 @@ export type Association = {
   org_unit: Array<OrganisationUnit>;
   /**
    * UUID of the organisation unit related to the association.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `org_unit {uuid}` instead.
    *
    */
   org_unit_uuid: Scalars['UUID']['output'];
   /**
-   *
    * Marks which association is primary.
    *
    * When exporting data from OS2mo to external systems, that only support a single engagement or associations, this field can be used to export the primary one.
@@ -603,16 +557,13 @@ export type Association = {
   primary?: Maybe<Class>;
   /**
    * UUID of the primary type of the association.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `primary {uuid}` instead.
    *
    */
   primary_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * Optional subsitute if `employee` is unavailable.
-   *
    *
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
@@ -621,26 +572,22 @@ export type Association = {
   substitute: Array<Employee>;
   /**
    * UUID of the substitute for the employee in the association.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `subsitute {uuid}` instead.
    *
    */
   substitute_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * The object type.
    *
    * Always contains the string `association`.
    *
-   * @deprecated
-   * Unintentionally exposed implementation detail.
+   * @deprecated Unintentionally exposed implementation detail.
    * Provides no value whatsoever.
    *
    */
   type: Scalars['String']['output'];
   /**
-   *
    * Short unique key.
    *
    * Usually set to be set to the key used in external systems.
@@ -764,7 +711,6 @@ export type AssociationCreateInput = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -785,7 +731,6 @@ export type AssociationCreateInput = {
 export type AssociationResponse = {
   __typename?: 'AssociationResponse';
   /**
-   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -798,7 +743,6 @@ export type AssociationResponse = {
    */
   current?: Maybe<Association>;
   /**
-   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -812,7 +756,6 @@ export type AssociationResponse = {
    */
   objects: Array<Association>;
   /**
-   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -836,7 +779,6 @@ export type AssociationResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -887,7 +829,6 @@ export type AssociationUpdateInput = {
 };
 
 /**
- *
  * A value in the facet sample space.
  *
  * Classes can also be thought of as the value component of the facet/class key-value setup.
@@ -896,7 +837,6 @@ export type AssociationUpdateInput = {
 export type Class = {
   __typename?: 'Class';
   /**
-   *
    * Class children.
    *
    * Almost always an empty list as class hierarchies are rare.
@@ -907,20 +847,17 @@ export type Class = {
    */
   children: Array<Class>;
   /**
-   *
    * Example usage.
    *
    * Almost always `null`.
    *
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * This field is almost never used, and serves no real purpose.
    * May be reintroduced in the future if the demand for it increases.
    *
    */
   example?: Maybe<Scalars['String']['output']>;
   /**
-   *
    * Facet this class is defined under.
    *
    * Examples of user-keys:
@@ -932,24 +869,20 @@ export type Class = {
   facet: Facet;
   /**
    * UUID of the related facet.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `facet {uuid}` instead.
    *
    */
   facet_uuid: Scalars['UUID']['output'];
   /**
-   *
    * Full name of the class, exactly the same as `name`.
    *
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Returns exactly the same as `name`, use that instead.
    *
    */
   full_name: Scalars['String']['output'];
   /**
-   *
    * Human readable name of the class.
    *
    * This is the value that should be shown to users in UIs.
@@ -964,15 +897,13 @@ export type Class = {
   name: Scalars['String']['output'];
   /**
    * UUID of the related organisation.
-   * @deprecated
-   * The root organisation concept will be removed in a future version of OS2mo.
+   * @deprecated The root organisation concept will be removed in a future version of OS2mo.
    *
    */
   org_uuid: Scalars['UUID']['output'];
   /** Owner of class */
   owner?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * Parent class.
    *
    * Almost always `null` as class hierarchies are rare.
@@ -984,14 +915,12 @@ export type Class = {
   parent?: Maybe<Class>;
   /**
    * UUID of the employee related to the address.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `parent {uuid}` instead.
    *
    */
   parent_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * Published state of the class object.
    *
    * Whether the class is published or not, aka. if it should be shown.
@@ -1009,7 +938,6 @@ export type Class = {
    */
   published?: Maybe<Scalars['String']['output']>;
   /**
-   *
    * Scope of the class.
    *
    * The scope of the class describes the kind of values that can be contained when using the class.
@@ -1036,7 +964,6 @@ export type Class = {
    */
   scope?: Maybe<Scalars['String']['output']>;
   /**
-   *
    * Facet of this class's upmost parent.
    *
    * The result of following `parent` until `parent` becomes `null`, then calling `facet`.
@@ -1044,27 +971,23 @@ export type Class = {
    * Almost always the same as `facet` as class hierarchies are rare.
    * Currently mostly used to describe (trade) union hierachies.
    *
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Will either be replaced by client-side recursion, an ancestor field or a recursive schema directive.
    * For now client-side recursion is the preferred replacement.
    *
    */
   top_level_facet: Facet;
   /**
-   *
    * The object type.
    *
    * Always contains the string `class`.
    *
-   * @deprecated
-   * Unintentionally exposed implementation detail.
+   * @deprecated Unintentionally exposed implementation detail.
    * Provides no value whatsoever.
    *
    */
   type: Scalars['String']['output'];
   /**
-   *
    * Short unique key.
    *
    * Usually set to the `name` provided on object creation.
@@ -1086,7 +1009,6 @@ export type Class = {
 
 
 /**
- *
  * A value in the facet sample space.
  *
  * Classes can also be thought of as the value component of the facet/class key-value setup.
@@ -1104,7 +1026,6 @@ export type ClassChildrenArgs = {
 
 
 /**
- *
  * A value in the facet sample space.
  *
  * Classes can also be thought of as the value component of the facet/class key-value setup.
@@ -1120,7 +1041,6 @@ export type ClassFacetArgs = {
 
 
 /**
- *
  * A value in the facet sample space.
  *
  * Classes can also be thought of as the value component of the facet/class key-value setup.
@@ -1162,7 +1082,6 @@ export type ClassCreateInput = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -1183,7 +1102,6 @@ export type ClassCreateInput = {
 export type ClassResponse = {
   __typename?: 'ClassResponse';
   /**
-   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -1196,7 +1114,6 @@ export type ClassResponse = {
    */
   current?: Maybe<Class>;
   /**
-   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -1210,7 +1127,6 @@ export type ClassResponse = {
    */
   objects: Array<Class>;
   /**
-   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -1234,7 +1150,6 @@ export type ClassResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -1285,7 +1200,6 @@ export type ClassUpdateInput = {
 export type Configuration = {
   __typename?: 'Configuration';
   /**
-   *
    * JSONified settings value.
    *
    * Examples:
@@ -1297,7 +1211,6 @@ export type Configuration = {
    */
   jsonified_value: Scalars['String']['output'];
   /**
-   *
    * The unique settings identifier.
    *
    * Examples:
@@ -1308,7 +1221,6 @@ export type Configuration = {
    */
   key: Scalars['String']['output'];
   /**
-   *
    * Stringified settings value.
    *
    * Examples:
@@ -1325,7 +1237,6 @@ export type Configuration = {
 export type Employee = {
   __typename?: 'Employee';
   /**
-   *
    * Addresses for the employee.
    *
    * Commonly contain addresses such as, their:
@@ -1339,7 +1250,6 @@ export type Employee = {
    */
   addresses: Array<Address>;
   /**
-   *
    * Associations for the employee.
    *
    * May be an empty list if the employee is not associated with projects, etc.
@@ -1351,7 +1261,6 @@ export type Employee = {
   /** Engagement associations */
   engagement_associations: Array<EngagementAssociation>;
   /**
-   *
    * Engagements for the employee.
    *
    * May be an empty list if the employee is not employeed.
@@ -1361,7 +1270,6 @@ export type Employee = {
   /** Given name of the employee. */
   givenname: Scalars['String']['output'];
   /**
-   *
    * IT accounts for the employee.
    *
    * May be an empty list if the employee does not have any IT-access whatsoever.
@@ -1369,7 +1277,6 @@ export type Employee = {
    */
   itusers: Array<ItUser>;
   /**
-   *
    * Leaves of absence for the employee.
    *
    * Usually empty as most employees are not on leaves of absence.
@@ -1377,7 +1284,6 @@ export type Employee = {
    */
   leaves: Array<Leave>;
   /**
-   *
    * Managerial roles for the employee.
    *
    * Usually an empty list as most employees are not managers.
@@ -1393,7 +1299,6 @@ export type Employee = {
   /** Surname part of nickname of the employee. */
   nickname_surname?: Maybe<Scalars['String']['output']>;
   /**
-   *
    * Roles the employee has within the organisation.
    *
    * May be an empty list if the employee does not fulfill any roles in the organisation.
@@ -1405,19 +1310,16 @@ export type Employee = {
   /** Surname of the employee. */
   surname: Scalars['String']['output'];
   /**
-   *
    * The object type.
    *
    * Always contains the string `employee`.
    *
-   * @deprecated
-   * Unintentionally exposed implementation detail.
+   * @deprecated Unintentionally exposed implementation detail.
    * Provides no value whatsoever.
    *
    */
   type: Scalars['String']['output'];
   /**
-   *
    * Short unique key.
    *
    * Usually set to be set to the key used in external systems.
@@ -1556,7 +1458,6 @@ export type EmployeeCreateInput = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -1577,7 +1478,6 @@ export type EmployeeCreateInput = {
 export type EmployeeResponse = {
   __typename?: 'EmployeeResponse';
   /**
-   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -1590,7 +1490,6 @@ export type EmployeeResponse = {
    */
   current?: Maybe<Employee>;
   /**
-   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -1604,7 +1503,6 @@ export type EmployeeResponse = {
    */
   objects: Array<Employee>;
   /**
-   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -1628,7 +1526,6 @@ export type EmployeeResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -1694,9 +1591,7 @@ export type EmployeeUpdateInput = {
 export type Engagement = {
   __typename?: 'Engagement';
   /**
-   *
    * The employee fulfilling the engagement.
-   *
    *
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
@@ -1705,8 +1600,7 @@ export type Engagement = {
   employee: Array<Employee>;
   /**
    * UUID of the employee related to the engagement.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `employee {uuid}` instead.
    *
    */
@@ -1714,7 +1608,6 @@ export type Engagement = {
   /** Engagement associations */
   engagement_associations: Array<EngagementAssociation>;
   /**
-   *
    * Describes the employee's affiliation to an organisation unit
    *
    * Examples:
@@ -1726,8 +1619,7 @@ export type Engagement = {
   engagement_type: Class;
   /**
    * UUID of the engagement type class.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `engagement_type {uuid}` instead.
    *
    */
@@ -1755,7 +1647,6 @@ export type Engagement = {
   /** Indication of contribution to the collection of engagements for the given employee. */
   fraction?: Maybe<Scalars['Int']['output']>;
   /**
-   *
    * Whether this engagement is the primary engagement.
    *
    * Checks if the `primary` field contains either a class with user-key: `"primary"` or `"explicitly-primary"`.
@@ -1763,7 +1654,6 @@ export type Engagement = {
    */
   is_primary: Scalars['Boolean']['output'];
   /**
-   *
    * Describes the position of the employee in the organisation unit
    *
    * Examples:
@@ -1775,8 +1665,7 @@ export type Engagement = {
   job_function: Class;
   /**
    * UUID of the job function class.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `job_function {uuid}` instead.
    *
    */
@@ -1785,16 +1674,13 @@ export type Engagement = {
   leave?: Maybe<Leave>;
   /**
    * UUID of the leave related to the engagement.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `leave {uuid}` instead.
    *
    */
   leave_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * The organisation unit where the engagement is being fulfilled.
-   *
    *
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
@@ -1803,14 +1689,12 @@ export type Engagement = {
   org_unit: Array<OrganisationUnit>;
   /**
    * UUID of the organisation unit related to the engagement.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `org_unit {uuid}` instead.
    *
    */
   org_unit_uuid: Scalars['UUID']['output'];
   /**
-   *
    * Marks which engagement is primary.
    *
    * When exporting data from OS2mo to external systems, that only support a single engagement or associations, this field can be used to export the primary one.
@@ -1832,26 +1716,22 @@ export type Engagement = {
   primary?: Maybe<Class>;
   /**
    * UUID of the primary klasse of the engagement.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `primary {uuid}` instead.
    *
    */
   primary_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * The object type.
    *
    * Always contains the string `engagement`.
    *
-   * @deprecated
-   * Unintentionally exposed implementation detail.
+   * @deprecated Unintentionally exposed implementation detail.
    * Provides no value whatsoever.
    *
    */
   type: Scalars['String']['output'];
   /**
-   *
    * Short unique key.
    *
    * Usually set to the `id` used in external systems.
@@ -1956,9 +1836,7 @@ export type EngagementPrimaryArgs = {
 export type EngagementAssociation = {
   __typename?: 'EngagementAssociation';
   /**
-   *
    * Related engagement.
-   *
    *
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
@@ -1969,24 +1847,20 @@ export type EngagementAssociation = {
   engagement_association_type: Class;
   /**
    * UUID of the engagement association type class.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `engagement_association_type {uuid}` instead.
    *
    */
   engagement_association_type_uuid: Scalars['UUID']['output'];
   /**
    * UUID of the engagement related to the engagement association.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `engagement {uuid}` instead.
    *
    */
   engagement_uuid: Scalars['UUID']['output'];
   /**
-   *
    * Connected organisation unit.
-   *
    *
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
@@ -1995,20 +1869,17 @@ export type EngagementAssociation = {
   org_unit: Array<OrganisationUnit>;
   /**
    * UUID of the organisation unit related to the engagement association.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `org_unit {uuid}` instead.
    *
    */
   org_unit_uuid: Scalars['UUID']['output'];
   /**
-   *
    * The object type.
    *
    * Always contains the string `engagement_association`.
    *
-   * @deprecated
-   * Unintentionally exposed implementation detail.
+   * @deprecated Unintentionally exposed implementation detail.
    * Provides no value whatsoever.
    *
    */
@@ -2058,7 +1929,6 @@ export type EngagementAssociationOrg_UnitArgs = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -2079,7 +1949,6 @@ export type EngagementAssociationOrg_UnitArgs = {
 export type EngagementAssociationResponse = {
   __typename?: 'EngagementAssociationResponse';
   /**
-   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -2092,7 +1961,6 @@ export type EngagementAssociationResponse = {
    */
   current?: Maybe<EngagementAssociation>;
   /**
-   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -2106,7 +1974,6 @@ export type EngagementAssociationResponse = {
    */
   objects: Array<EngagementAssociation>;
   /**
-   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -2130,7 +1997,6 @@ export type EngagementAssociationResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -2161,7 +2027,6 @@ export type EngagementCreateInput = {
   employee: Scalars['UUID']['input'];
   engagement_type: Scalars['UUID']['input'];
   /**
-   *
    * Arbitrary value extension fields.
    *
    * A collection of field for storing arbitrary extra data.
@@ -2171,7 +2036,6 @@ export type EngagementCreateInput = {
    */
   extension_1?: InputMaybe<Scalars['String']['input']>;
   /**
-   *
    * Arbitrary value extension fields.
    *
    * A collection of field for storing arbitrary extra data.
@@ -2181,7 +2045,6 @@ export type EngagementCreateInput = {
    */
   extension_2?: InputMaybe<Scalars['String']['input']>;
   /**
-   *
    * Arbitrary value extension fields.
    *
    * A collection of field for storing arbitrary extra data.
@@ -2191,7 +2054,6 @@ export type EngagementCreateInput = {
    */
   extension_3?: InputMaybe<Scalars['String']['input']>;
   /**
-   *
    * Arbitrary value extension fields.
    *
    * A collection of field for storing arbitrary extra data.
@@ -2201,7 +2063,6 @@ export type EngagementCreateInput = {
    */
   extension_4?: InputMaybe<Scalars['String']['input']>;
   /**
-   *
    * Arbitrary value extension fields.
    *
    * A collection of field for storing arbitrary extra data.
@@ -2211,7 +2072,6 @@ export type EngagementCreateInput = {
    */
   extension_5?: InputMaybe<Scalars['String']['input']>;
   /**
-   *
    * Arbitrary value extension fields.
    *
    * A collection of field for storing arbitrary extra data.
@@ -2221,7 +2081,6 @@ export type EngagementCreateInput = {
    */
   extension_6?: InputMaybe<Scalars['String']['input']>;
   /**
-   *
    * Arbitrary value extension fields.
    *
    * A collection of field for storing arbitrary extra data.
@@ -2231,7 +2090,6 @@ export type EngagementCreateInput = {
    */
   extension_7?: InputMaybe<Scalars['String']['input']>;
   /**
-   *
    * Arbitrary value extension fields.
    *
    * A collection of field for storing arbitrary extra data.
@@ -2241,7 +2099,6 @@ export type EngagementCreateInput = {
    */
   extension_8?: InputMaybe<Scalars['String']['input']>;
   /**
-   *
    * Arbitrary value extension fields.
    *
    * A collection of field for storing arbitrary extra data.
@@ -2251,7 +2108,6 @@ export type EngagementCreateInput = {
    */
   extension_9?: InputMaybe<Scalars['String']['input']>;
   /**
-   *
    * Arbitrary value extension fields.
    *
    * A collection of field for storing arbitrary extra data.
@@ -2272,7 +2128,6 @@ export type EngagementCreateInput = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -2293,7 +2148,6 @@ export type EngagementCreateInput = {
 export type EngagementResponse = {
   __typename?: 'EngagementResponse';
   /**
-   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -2306,7 +2160,6 @@ export type EngagementResponse = {
    */
   current?: Maybe<Engagement>;
   /**
-   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -2320,7 +2173,6 @@ export type EngagementResponse = {
    */
   objects: Array<Engagement>;
   /**
-   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -2344,7 +2196,6 @@ export type EngagementResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -2385,7 +2236,6 @@ export type EngagementUpdateInput = {
   /** UUID of the engagement type. */
   engagement_type?: InputMaybe<Scalars['UUID']['input']>;
   /**
-   *
    * Arbitrary value extension fields.
    *
    * A collection of field for storing arbitrary extra data.
@@ -2395,7 +2245,6 @@ export type EngagementUpdateInput = {
    */
   extension_1?: InputMaybe<Scalars['String']['input']>;
   /**
-   *
    * Arbitrary value extension fields.
    *
    * A collection of field for storing arbitrary extra data.
@@ -2405,7 +2254,6 @@ export type EngagementUpdateInput = {
    */
   extension_2?: InputMaybe<Scalars['String']['input']>;
   /**
-   *
    * Arbitrary value extension fields.
    *
    * A collection of field for storing arbitrary extra data.
@@ -2415,7 +2263,6 @@ export type EngagementUpdateInput = {
    */
   extension_3?: InputMaybe<Scalars['String']['input']>;
   /**
-   *
    * Arbitrary value extension fields.
    *
    * A collection of field for storing arbitrary extra data.
@@ -2425,7 +2272,6 @@ export type EngagementUpdateInput = {
    */
   extension_4?: InputMaybe<Scalars['String']['input']>;
   /**
-   *
    * Arbitrary value extension fields.
    *
    * A collection of field for storing arbitrary extra data.
@@ -2435,7 +2281,6 @@ export type EngagementUpdateInput = {
    */
   extension_5?: InputMaybe<Scalars['String']['input']>;
   /**
-   *
    * Arbitrary value extension fields.
    *
    * A collection of field for storing arbitrary extra data.
@@ -2445,7 +2290,6 @@ export type EngagementUpdateInput = {
    */
   extension_6?: InputMaybe<Scalars['String']['input']>;
   /**
-   *
    * Arbitrary value extension fields.
    *
    * A collection of field for storing arbitrary extra data.
@@ -2455,7 +2299,6 @@ export type EngagementUpdateInput = {
    */
   extension_7?: InputMaybe<Scalars['String']['input']>;
   /**
-   *
    * Arbitrary value extension fields.
    *
    * A collection of field for storing arbitrary extra data.
@@ -2465,7 +2308,6 @@ export type EngagementUpdateInput = {
    */
   extension_8?: InputMaybe<Scalars['String']['input']>;
   /**
-   *
    * Arbitrary value extension fields.
    *
    * A collection of field for storing arbitrary extra data.
@@ -2475,7 +2317,6 @@ export type EngagementUpdateInput = {
    */
   extension_9?: InputMaybe<Scalars['String']['input']>;
   /**
-   *
    * Arbitrary value extension fields.
    *
    * A collection of field for storing arbitrary extra data.
@@ -2500,7 +2341,6 @@ export type EngagementUpdateInput = {
 export type Facet = {
   __typename?: 'Facet';
   /**
-   *
    * Facet children.
    *
    * Almost always an empty list as facet hierarchies are rare.
@@ -2513,13 +2353,11 @@ export type Facet = {
   /** Associated classes */
   classes: Array<Class>;
   /**
-   *
    * Description of the facet object.
    *
    * Almost always `""`.
    *
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * This field is almost never used, and serves no real purpose.
    * May be reintroduced in the future if the demand for it increases.
    *
@@ -2527,13 +2365,11 @@ export type Facet = {
   description?: Maybe<Scalars['String']['output']>;
   /**
    * UUID of the related organisation.
-   * @deprecated
-   * The root organisation concept will be removed in a future version of OS2mo.
+   * @deprecated The root organisation concept will be removed in a future version of OS2mo.
    *
    */
   org_uuid: Scalars['UUID']['output'];
   /**
-   *
    * Parent facet.
    *
    * Almost always `null` as facet hierarchies are rare.
@@ -2545,14 +2381,12 @@ export type Facet = {
   parent?: Maybe<Facet>;
   /**
    * UUID of the parent facet.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `parent {uuid}` instead.
    *
    */
   parent_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * Published state of the facet object.
    *
    * Whether the facet is published or not, aka. if it should be shown.
@@ -2570,13 +2404,11 @@ export type Facet = {
    */
   published?: Maybe<Scalars['String']['output']>;
   /**
-   *
    * The object type.
    *
    * Always contains the string `facet`.
    *
-   * @deprecated
-   * Unintentionally exposed implementation detail.
+   * @deprecated Unintentionally exposed implementation detail.
    * Provides no value whatsoever.
    *
    */
@@ -2635,7 +2467,6 @@ export type FacetCreateInput = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -2656,7 +2487,6 @@ export type FacetCreateInput = {
 export type FacetResponse = {
   __typename?: 'FacetResponse';
   /**
-   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -2669,7 +2499,6 @@ export type FacetResponse = {
    */
   current?: Maybe<Facet>;
   /**
-   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -2683,7 +2512,6 @@ export type FacetResponse = {
    */
   objects: Array<Facet>;
   /**
-   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -2707,7 +2535,6 @@ export type FacetResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -2744,7 +2571,6 @@ export type FacetUpdateInput = {
 export type File = {
   __typename?: 'File';
   /**
-   *
    * The base64 encoded contents of the file.
    *
    * Examples:
@@ -2765,7 +2591,6 @@ export type File = {
    */
   base64_contents: Scalars['String']['output'];
   /**
-   *
    * Name of the file.
    *
    * Examples:
@@ -2775,7 +2600,6 @@ export type File = {
    */
   file_name: Scalars['String']['output'];
   /**
-   *
    * The store the file is in.
    *
    * The FileStore type lists all possible enum values.
@@ -2783,7 +2607,6 @@ export type File = {
    */
   file_store: FileStore;
   /**
-   *
    * The textual contents of the file.
    *
    * Examples:
@@ -2811,7 +2634,6 @@ export type File = {
 };
 
 /**
- *
  * Enum for all the supported file stores.
  *
  * File stores can be thought of a separate folders or drives in desktop computing.
@@ -2819,7 +2641,6 @@ export type File = {
  */
 export enum FileStore {
   /**
-   *
    * The exports file store.
    *
    * Used to hold files uploaded by export jobs.
@@ -2827,7 +2648,6 @@ export enum FileStore {
    */
   Exports = 'EXPORTS',
   /**
-   *
    * The insights file store.
    *
    * Used to hold data-files supporting the insights functionality in OS2mo.
@@ -2840,7 +2660,6 @@ export enum FileStore {
 export type Health = {
   __typename?: 'Health';
   /**
-   *
    * Healthcheck identifier.
    *
    * Examples:
@@ -2851,7 +2670,6 @@ export type Health = {
    */
   identifier: Scalars['String']['output'];
   /**
-   *
    * Healthcheck status.
    *
    * Returns:
@@ -2871,7 +2689,6 @@ export type Health = {
 export type HealthPaged = {
   __typename?: 'HealthPaged';
   /**
-   *
    * List of results.
    *
    * The number of elements is defined by the `limit` argument.
@@ -2879,7 +2696,6 @@ export type HealthPaged = {
    */
   objects: Array<Health>;
   /**
-   *
    * Container for page information.
    *
    * Contains the cursors necessary to fetch other pages.
@@ -2893,7 +2709,6 @@ export type HealthPaged = {
 export type ItSystem = {
   __typename?: 'ITSystem';
   /**
-   *
    * Human readable name of the itsystem.
    *
    * This is the value that should be shown to users in UIs.
@@ -2908,19 +2723,16 @@ export type ItSystem = {
   /** The ITSystem type. */
   system_type?: Maybe<Scalars['String']['output']>;
   /**
-   *
    * The object type.
    *
    * Always contains the string `itsystem`.
    *
-   * @deprecated
-   * Unintentionally exposed implementation detail.
+   * @deprecated Unintentionally exposed implementation detail.
    * Provides no value whatsoever.
    *
    */
   type: Scalars['String']['output'];
   /**
-   *
    * Short unique key.
    *
    * Usually set to be set to the key used in external systems.
@@ -2948,7 +2760,6 @@ export type ItSystemCreateInput = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -2969,7 +2780,6 @@ export type ItSystemCreateInput = {
 export type ItSystemResponse = {
   __typename?: 'ITSystemResponse';
   /**
-   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -2982,7 +2792,6 @@ export type ItSystemResponse = {
    */
   current?: Maybe<ItSystem>;
   /**
-   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -2996,7 +2805,6 @@ export type ItSystemResponse = {
    */
   objects: Array<ItSystem>;
   /**
-   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -3020,7 +2828,6 @@ export type ItSystemResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -3047,7 +2854,6 @@ export type ItSystemResponseRegistrationsArgs = {
 };
 
 /**
- *
  * User information related to IT systems.
  *
  * This is commonly used to map out IT accounts or IT service accounts.
@@ -3057,12 +2863,10 @@ export type ItSystemResponseRegistrationsArgs = {
 export type ItUser = {
   __typename?: 'ITUser';
   /**
-   *
    * Employee using the IT account.
    *
    * Note:
    * This field is mutually exclusive with the `org_unit` field.
-   *
    *
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
@@ -3071,19 +2875,16 @@ export type ItUser = {
   employee?: Maybe<Array<Employee>>;
   /**
    * UUID of the employee related to the user.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `employee {uuid}` instead.
    *
    */
   employee_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * Engagement scoping of the account.
    *
    * A person may have multiple IT accounts with each account being relevant for only a single engagement.
    * This field allows scoping IT accounts such that it is obvious which engagement has given which it-access.
-   *
    *
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
@@ -3092,35 +2893,30 @@ export type ItUser = {
   engagement?: Maybe<Array<Engagement>>;
   /**
    * UUID of the engagement related to the user.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `engagement {uuid}` instead.
    *
    */
   engagement_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * ITSystem this account is for.
    *
    */
   itsystem: ItSystem;
   /**
    * UUID of the ITSystem related to the user.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `itsystem {uuid}` instead.
    *
    */
   itsystem_uuid: Scalars['UUID']['output'];
   /**
-   *
    * Organisation unit using the IT account.
    *
    * This is mostly set for service accounts.
    *
    * Note:
    * This field is mutually exclusive with the `org_unit` field.
-   *
    *
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
@@ -3129,14 +2925,12 @@ export type ItUser = {
   org_unit?: Maybe<Array<OrganisationUnit>>;
   /**
    * UUID of the organisation unit related to the user.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `org_unit {uuid}` instead.
    *
    */
   org_unit_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * Marks which IT account is primary.
    *
    * When exporting data from OS2mo to external systems, that only support a single IT account, this field can be used to export the primary one.
@@ -3155,26 +2949,22 @@ export type ItUser = {
   primary?: Maybe<Class>;
   /**
    * UUID of the primary klasse of the user.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `primary {uuid}` instead.
    *
    */
   primary_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * The object type.
    *
    * Always contains the string `it`.
    *
-   * @deprecated
-   * Unintentionally exposed implementation detail.
+   * @deprecated Unintentionally exposed implementation detail.
    * Provides no value whatsoever.
    *
    */
   type: Scalars['String']['output'];
   /**
-   *
    * Short unique key.
    *
    * Usually set to the key used in external systems.
@@ -3195,7 +2985,6 @@ export type ItUser = {
 
 
 /**
- *
  * User information related to IT systems.
  *
  * This is commonly used to map out IT accounts or IT service accounts.
@@ -3213,7 +3002,6 @@ export type ItUserEmployeeArgs = {
 
 
 /**
- *
  * User information related to IT systems.
  *
  * This is commonly used to map out IT accounts or IT service accounts.
@@ -3232,7 +3020,6 @@ export type ItUserEngagementArgs = {
 
 
 /**
- *
  * User information related to IT systems.
  *
  * This is commonly used to map out IT accounts or IT service accounts.
@@ -3249,7 +3036,6 @@ export type ItUserItsystemArgs = {
 
 
 /**
- *
  * User information related to IT systems.
  *
  * This is commonly used to map out IT accounts or IT service accounts.
@@ -3268,7 +3054,6 @@ export type ItUserOrg_UnitArgs = {
 
 
 /**
- *
  * User information related to IT systems.
  *
  * This is commonly used to map out IT accounts or IT service accounts.
@@ -3307,7 +3092,6 @@ export type ItUserCreateInput = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -3328,7 +3112,6 @@ export type ItUserCreateInput = {
 export type ItUserResponse = {
   __typename?: 'ITUserResponse';
   /**
-   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -3341,7 +3124,6 @@ export type ItUserResponse = {
    */
   current?: Maybe<ItUser>;
   /**
-   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -3355,7 +3137,6 @@ export type ItUserResponse = {
    */
   objects: Array<ItUser>;
   /**
-   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -3379,7 +3160,6 @@ export type ItUserResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -3430,7 +3210,6 @@ export type ItUserUpdateInput = {
 };
 
 /**
- *
  * KLE responsibility mapping.
  *
  * KLE stands for "Kommunernes Landsforenings Emnesystematik" which is a municipality taxonomy for mapping out municipality tasks.
@@ -3468,14 +3247,12 @@ export type Kle = {
   __typename?: 'KLE';
   /**
    * List of UUIDs of the KLE aspect.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `kle_aspects {uuid}` instead.
    *
    */
   kle_aspect_uuids: Array<Scalars['UUID']['output']>;
   /**
-   *
    * KLE Aspects.
    *
    * The KLE aspect describes the kind of relationship the organisation unit has with the responsibility given by the KLE number.
@@ -3488,7 +3265,6 @@ export type Kle = {
    */
   kle_aspects: Array<Class>;
   /**
-   *
    * The KLE number specifies the responsibility.
    *
    * For more details read the `KLE` description.
@@ -3497,40 +3273,34 @@ export type Kle = {
   kle_number: Class;
   /**
    * UUID of the KLE number.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `kle_number {uuid}` instead.
    *
    */
   kle_number_uuid: Scalars['UUID']['output'];
   /**
-   *
    * The organisation unit the responsibility is mapped to.
    *
    */
-  org_unit?: Maybe<Array<OrganisationUnit>>;
+  org_unit: Array<OrganisationUnit>;
   /**
    * UUID of the organisation unit related to the KLE.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `org_unit {uuid}` instead.
    *
    */
-  org_unit_uuid?: Maybe<Scalars['UUID']['output']>;
+  org_unit_uuid: Scalars['UUID']['output'];
   /**
-   *
    * The object type.
    *
    * Always contains the string `kle`.
    *
-   * @deprecated
-   * Unintentionally exposed implementation detail.
+   * @deprecated Unintentionally exposed implementation detail.
    * Provides no value whatsoever.
    *
    */
   type: Scalars['String']['output'];
   /**
-   *
    * Short unique key.
    *
    * Usually set to be set to the kle number itself.
@@ -3550,7 +3320,6 @@ export type Kle = {
 
 
 /**
- *
  * KLE responsibility mapping.
  *
  * KLE stands for "Kommunernes Landsforenings Emnesystematik" which is a municipality taxonomy for mapping out municipality tasks.
@@ -3596,7 +3365,6 @@ export type KleKle_AspectsArgs = {
 
 
 /**
- *
  * KLE responsibility mapping.
  *
  * KLE stands for "Kommunernes Landsforenings Emnesystematik" which is a municipality taxonomy for mapping out municipality tasks.
@@ -3642,7 +3410,6 @@ export type KleKle_NumberArgs = {
 
 
 /**
- *
  * KLE responsibility mapping.
  *
  * KLE stands for "Kommunernes Landsforenings Emnesystematik" which is a municipality taxonomy for mapping out municipality tasks.
@@ -3702,7 +3469,6 @@ export type KleCreateInput = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -3723,7 +3489,6 @@ export type KleCreateInput = {
 export type KleResponse = {
   __typename?: 'KLEResponse';
   /**
-   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -3736,7 +3501,6 @@ export type KleResponse = {
    */
   current?: Maybe<Kle>;
   /**
-   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -3750,7 +3514,6 @@ export type KleResponse = {
    */
   objects: Array<Kle>;
   /**
-   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -3774,7 +3537,6 @@ export type KleResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -3800,8 +3562,31 @@ export type KleResponseRegistrationsArgs = {
   start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
+export type KleTerminateInput = {
+  /** Start date of the validity. */
+  from?: InputMaybe<Scalars['DateTime']['input']>;
+  /** When the validity should end - required when terminating */
+  to: Scalars['DateTime']['input'];
+  /** UUID of the manager we want to terminate. */
+  uuid: Scalars['UUID']['input'];
+};
+
+export type KleUpdateInput = {
+  /** UUID of the managers responsibilities to be updated. */
+  kle_aspects?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** UUID of the manager as person to be updated. */
+  kle_number?: InputMaybe<Scalars['UUID']['input']>;
+  /** UUID of the managers organisation unit to be updated. */
+  org_unit?: InputMaybe<Scalars['UUID']['input']>;
+  /** Extra info or uuid. */
+  user_key?: InputMaybe<Scalars['String']['input']>;
+  /** UUID of the manager to be updated. */
+  uuid: Scalars['UUID']['input'];
+  /** Validity range for the manager to be updated. */
+  validity: RaValidityInput;
+};
+
 /**
- *
  * A leave of absence for an employee.
  *
  * Can be everything from a pregnancy or maternity leave to a furlough or a garden leave.
@@ -3811,9 +3596,7 @@ export type KleResponseRegistrationsArgs = {
 export type Leave = {
   __typename?: 'Leave';
   /**
-   *
    * The absent employee.
-   *
    *
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
@@ -3822,28 +3605,24 @@ export type Leave = {
   employee: Array<Employee>;
   /**
    * UUID of the KLE number.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `employee {uuid}` instead.
    *
    */
   employee_uuid: Scalars['UUID']['output'];
   /**
-   *
    * The engagement the employee is absent from.
    *
    */
   engagement?: Maybe<Engagement>;
   /**
    * UUID of the KLE number.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `engagement {uuid}` instead.
    *
    */
   engagement_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * The kind of leave of absence.
    *
    * Examples:
@@ -3856,20 +3635,17 @@ export type Leave = {
   leave_type: Class;
   /**
    * UUID of the KLE number.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `leave_type {uuid}` instead.
    *
    */
   leave_type_uuid: Scalars['UUID']['output'];
   /**
-   *
    * The object type.
    *
    * Always contains the string `leave`.
    *
-   * @deprecated
-   * Unintentionally exposed implementation detail.
+   * @deprecated Unintentionally exposed implementation detail.
    * Provides no value whatsoever.
    *
    */
@@ -3884,7 +3660,6 @@ export type Leave = {
 
 
 /**
- *
  * A leave of absence for an employee.
  *
  * Can be everything from a pregnancy or maternity leave to a furlough or a garden leave.
@@ -3902,7 +3677,6 @@ export type LeaveEmployeeArgs = {
 
 
 /**
- *
  * A leave of absence for an employee.
  *
  * Can be everything from a pregnancy or maternity leave to a furlough or a garden leave.
@@ -3921,7 +3695,6 @@ export type LeaveEngagementArgs = {
 
 
 /**
- *
  * A leave of absence for an employee.
  *
  * Can be everything from a pregnancy or maternity leave to a furlough or a garden leave.
@@ -3939,7 +3712,6 @@ export type LeaveLeave_TypeArgs = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -3960,7 +3732,6 @@ export type LeaveLeave_TypeArgs = {
 export type LeaveResponse = {
   __typename?: 'LeaveResponse';
   /**
-   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -3973,7 +3744,6 @@ export type LeaveResponse = {
    */
   current?: Maybe<Leave>;
   /**
-   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -3987,7 +3757,6 @@ export type LeaveResponse = {
    */
   objects: Array<Leave>;
   /**
-   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -4011,7 +3780,6 @@ export type LeaveResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -4038,18 +3806,15 @@ export type LeaveResponseRegistrationsArgs = {
 };
 
 /**
- *
  * Managers of organisation units and their connected identities.
  *
  */
 export type Manager = {
   __typename?: 'Manager';
   /**
-   *
    * Employee fulfilling the managerial position.
    *
    * May be empty in which case the managerial position is unfilfilled (vacant).
-   *
    *
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
@@ -4058,14 +3823,12 @@ export type Manager = {
   employee?: Maybe<Array<Employee>>;
   /**
    * UUID of the employee related to the manager.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `employee {uuid}` instead.
    *
    */
   employee_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * Hierarchical level of the manager.
    *
    * Examples:
@@ -4077,14 +3840,12 @@ export type Manager = {
   manager_level: Class;
   /**
    * UUID of the manager level.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `manager_level {uuid}` instead.
    *
    */
   manager_level_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * Title of the manager.
    *
    * Examples:
@@ -4096,16 +3857,13 @@ export type Manager = {
   manager_type: Class;
   /**
    * UUID of the manager type.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `manager_type {uuid}` instead.
    *
    */
   manager_type_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * Organisation unit being managed.
-   *
    *
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
@@ -4114,14 +3872,12 @@ export type Manager = {
   org_unit: Array<OrganisationUnit>;
   /**
    * UUID of the organisation unit related to the manager.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `org_unit {uuid}` instead.
    *
    */
   org_unit_uuid: Scalars['UUID']['output'];
   /**
-   *
    * Responsibilities that the manager takes care of.
    *
    * Examples:
@@ -4133,20 +3889,17 @@ export type Manager = {
   responsibilities: Array<Class>;
   /**
    * List of UUID's of the responsibilities.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `responsibilities {uuid}` instead.
    *
    */
   responsibility_uuids?: Maybe<Array<Scalars['UUID']['output']>>;
   /**
-   *
    * The object type.
    *
    * Always contains the string `manager`.
    *
-   * @deprecated
-   * Unintentionally exposed implementation detail.
+   * @deprecated Unintentionally exposed implementation detail.
    * Provides no value whatsoever.
    *
    */
@@ -4161,7 +3914,6 @@ export type Manager = {
 
 
 /**
- *
  * Managers of organisation units and their connected identities.
  *
  */
@@ -4176,7 +3928,6 @@ export type ManagerEmployeeArgs = {
 
 
 /**
- *
  * Managers of organisation units and their connected identities.
  *
  */
@@ -4192,7 +3943,6 @@ export type ManagerManager_LevelArgs = {
 
 
 /**
- *
  * Managers of organisation units and their connected identities.
  *
  */
@@ -4208,7 +3958,6 @@ export type ManagerManager_TypeArgs = {
 
 
 /**
- *
  * Managers of organisation units and their connected identities.
  *
  */
@@ -4224,7 +3973,6 @@ export type ManagerOrg_UnitArgs = {
 
 
 /**
- *
  * Managers of organisation units and their connected identities.
  *
  */
@@ -4260,7 +4008,6 @@ export type ManagerCreateInput = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -4281,7 +4028,6 @@ export type ManagerCreateInput = {
 export type ManagerResponse = {
   __typename?: 'ManagerResponse';
   /**
-   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -4294,7 +4040,6 @@ export type ManagerResponse = {
    */
   current?: Maybe<Manager>;
   /**
-   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -4308,7 +4053,6 @@ export type ManagerResponse = {
    */
   objects: Array<Manager>;
   /**
-   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -4332,7 +4076,6 @@ export type ManagerResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -4392,7 +4135,6 @@ export type Mutation = {
   address_create: AddressResponse;
   /**
    * Deletes an address.
-   *
    * **Warning**:
    * This mutator does bitemporal deletion, **not** temporal termination.
    * Do **not** use this mutator **unless** you **fully understand** its implications.
@@ -4424,7 +4166,6 @@ export type Mutation = {
   class_create: UuidReturn;
   /**
    * Deletes a class.
-   *
    * **Warning**:
    * This mutator does bitemporal deletion, **not** temporal termination.
    * Do **not** use this mutator **unless** you **fully understand** its implications.
@@ -4454,7 +4195,6 @@ export type Mutation = {
   engagement_create: EngagementResponse;
   /**
    * Deletes an engagement.
-   *
    * **Warning**:
    * This mutator does bitemporal deletion, **not** temporal termination.
    * Do **not** use this mutator **unless** you **fully understand** its implications.
@@ -4480,7 +4220,6 @@ export type Mutation = {
   facet_create: UuidReturn;
   /**
    * Deletes a facet.
-   *
    * **Warning**:
    * This mutator does bitemporal deletion, **not** temporal termination.
    * Do **not** use this mutator **unless** you **fully understand** its implications.
@@ -4504,7 +4243,6 @@ export type Mutation = {
   itsystem_create: ItSystemResponse;
   /**
    * Deletes an ITSystem.
-   *
    * **Warning**:
    * This mutator does bitemporal deletion, **not** temporal termination.
    * Do **not** use this mutator **unless** you **fully understand** its implications.
@@ -4528,7 +4266,6 @@ export type Mutation = {
   ituser_create: ItUserResponse;
   /**
    * Deletes an IT-User.
-   *
    * **Warning**:
    * This mutator does bitemporal deletion, **not** temporal termination.
    * Do **not** use this mutator **unless** you **fully understand** its implications.
@@ -4552,6 +4289,10 @@ export type Mutation = {
   ituser_update: ItUserResponse;
   /** Creates a KLE annotation. */
   kle_create: KleResponse;
+  /** Terminates a KLE annotation. */
+  kle_terminate: KleResponse;
+  /** Updates a KLE annotation. */
+  kle_update: KleResponse;
   /** Creates a manager relation. */
   manager_create: ManagerResponse;
   /** Terminates a manager relation. */
@@ -4575,7 +4316,6 @@ export type Mutation = {
   /** Updates an organisation unit. */
   org_unit_update: OrganisationUnitResponse;
   /**
-   *
    * Upload a file.
    *
    * File upload must be done via multipart form-data.
@@ -4754,6 +4494,16 @@ export type MutationKle_CreateArgs = {
 };
 
 
+export type MutationKle_TerminateArgs = {
+  input: KleTerminateInput;
+};
+
+
+export type MutationKle_UpdateArgs = {
+  input: KleUpdateInput;
+};
+
+
 export type MutationManager_CreateArgs = {
   input: ManagerCreateInput;
 };
@@ -4813,7 +4563,6 @@ export type OpenValidity = {
 export type Organisation = {
   __typename?: 'Organisation';
   /**
-   *
    * The municipality code.
    *
    * In Denmark; a 3 digit number uniquely identifying a municipality.
@@ -4832,7 +4581,6 @@ export type Organisation = {
    */
   municipality_code?: Maybe<Scalars['Int']['output']>;
   /**
-   *
    * Name of the organisation.
    *
    * Examples:
@@ -4843,19 +4591,16 @@ export type Organisation = {
    */
   name: Scalars['String']['output'];
   /**
-   *
    * The object type.
    *
    * Always contains the string `organisation`.
    *
-   * @deprecated
-   * Unintentionally exposed implementation detail.
+   * @deprecated Unintentionally exposed implementation detail.
    * Provides no value whatsoever.
    *
    */
   type: Scalars['String']['output'];
   /**
-   *
    * Short unique key.
    *
    * Examples:
@@ -4873,7 +4618,6 @@ export type Organisation = {
 
 export type OrganisationCreate = {
   /**
-   *
    * The municipality code.
    *
    * In Denmark; a 3 digit number uniquely identifying a municipality.
@@ -4897,7 +4641,6 @@ export type OrganisationCreate = {
 export type OrganisationUnit = {
   __typename?: 'OrganisationUnit';
   /**
-   *
    * Addresses for the organisation unit.
    *
    * Commonly contain addresses such as, their:
@@ -4908,7 +4651,6 @@ export type OrganisationUnit = {
    */
   addresses: Array<Address>;
   /**
-   *
    * All ancestor organisational units in the organisation tree.
    *
    * The result of collecting organisational units by following `parent` until `parent` becomes `null`.
@@ -4917,7 +4659,6 @@ export type OrganisationUnit = {
    */
   ancestors: Array<OrganisationUnit>;
   /**
-   *
    * Associations for the organistion unit.
    *
    * May be an empty list if the organistion unit is purely hierarchical.
@@ -4927,14 +4668,12 @@ export type OrganisationUnit = {
   associations: Array<Association>;
   /**
    * Children count of the organisation unit.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Count the elements returned by `children {{uuid}}` instead.
    *
    */
   child_count: Scalars['Int']['output'];
   /**
-   *
    * The immediate descendants in the organisation tree
    *
    */
@@ -4942,7 +4681,6 @@ export type OrganisationUnit = {
   /** Engagement associations for the organisational unit */
   engagement_associations: Array<EngagementAssociation>;
   /**
-   *
    * Engagements for the organistion unit.
    *
    * May be an empty list if the organistion unit does not have any people employeed.
@@ -4951,7 +4689,6 @@ export type OrganisationUnit = {
    */
   engagements: Array<Engagement>;
   /**
-   *
    * IT (service) accounts.
    *
    * May be an empty list if the organistion unit does not have any IT (service) accounts whatsoever.
@@ -4960,7 +4697,6 @@ export type OrganisationUnit = {
    */
   itusers: Array<ItUser>;
   /**
-   *
    * KLE responsibilities for the organisation unit.
    *
    * Can help out with regards to GDPR by identifying which organisational units operate with sensitive tasks.
@@ -4968,13 +4704,11 @@ export type OrganisationUnit = {
    */
   kles: Array<Kle>;
   /**
-   *
    * Connection to employees leaves of absence relevant for the organisation unit.
    *
    */
   leaves: Array<Leave>;
   /**
-   *
    * Managerial roles for the organisation unit.
    *
    * May be empty in which case managers are usually inherited from parents.
@@ -4983,7 +4717,6 @@ export type OrganisationUnit = {
    */
   managers: Array<Manager>;
   /**
-   *
    * Human readable name of the organisation unit.
    *
    * This is the value that should be shown to users in UIs.
@@ -4997,14 +4730,12 @@ export type OrganisationUnit = {
   name: Scalars['String']['output'];
   /**
    * UUID of the parent organisation unit.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `org_unit_hierarchy_model {uuid}` instead.
    *
    */
   org_unit_hierarchy?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * Organisation unit hierarchy.
    *
    * Can be used to label an organisational structure to belong to a certain subset of the organisation tree.
@@ -5021,7 +4752,6 @@ export type OrganisationUnit = {
    */
   org_unit_hierarchy_model?: Maybe<Class>;
   /**
-   *
    * Organisation unit level.
    *
    * Examples of user-keys:
@@ -5033,34 +4763,35 @@ export type OrganisationUnit = {
   org_unit_level?: Maybe<Class>;
   /**
    * UUID of the organisation unit level.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `org_unit_level {uuid}` instead.
    *
    */
   org_unit_level_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
    *
+   * Owners of the organisation unit.
+   *
+   */
+  owners: Array<Owner>;
+  /**
    * The parent organisation unit in the organisation tree.
    *
    */
   parent?: Maybe<OrganisationUnit>;
   /**
    * UUID of the parent organisation unit.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `parent {uuid}` instead.
    *
    */
   parent_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * Related units for the organisational unit.
    *
    */
   related_units: Array<RelatedUnit>;
   /**
-   *
    * Roles being fulfilled within the organisational unit.
    *
    * May be an empty list if the organistion unit is purely hierarchical.
@@ -5069,33 +4800,28 @@ export type OrganisationUnit = {
    */
   roles: Array<Role>;
   /**
-   *
    * Time planning strategy.
    *
    */
   time_planning?: Maybe<Class>;
   /**
    * UUID of the time planning object.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `time_planning {uuid}` instead.
    *
    */
   time_planning_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * The object type.
    *
    * Always contains the string `org_unit`.
    *
-   * @deprecated
-   * Unintentionally exposed implementation detail.
+   * @deprecated Unintentionally exposed implementation detail.
    * Provides no value whatsoever.
    *
    */
   type: Scalars['String']['output'];
   /**
-   *
    * Organisation unit type.
    *
    * Organisation units can represent a lot of different classes of hierarchical structures.
@@ -5117,14 +4843,12 @@ export type OrganisationUnit = {
   unit_type?: Maybe<Class>;
   /**
    * UUID of the organisation unit type.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `unit_type {uuid}` instead.
    *
    */
   unit_type_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
-   *
    * Short unique key.
    *
    * Usually set to be set to the key used in external systems.
@@ -5287,6 +5011,18 @@ export type OrganisationUnitOrg_Unit_LevelArgs = {
 
 
 /** Organisation unit within the organisation tree */
+export type OrganisationUnitOwnersArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+
+/** Organisation unit within the organisation tree */
 export type OrganisationUnitParentArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
@@ -5375,7 +5111,6 @@ export type OrganisationUnitRefresh = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -5396,7 +5131,6 @@ export type OrganisationUnitRefresh = {
 export type OrganisationUnitResponse = {
   __typename?: 'OrganisationUnitResponse';
   /**
-   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -5409,7 +5143,6 @@ export type OrganisationUnitResponse = {
    */
   current?: Maybe<OrganisationUnit>;
   /**
-   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -5423,7 +5156,6 @@ export type OrganisationUnitResponse = {
    */
   objects: Array<OrganisationUnit>;
   /**
-   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -5447,7 +5179,6 @@ export type OrganisationUnitResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -5505,6 +5236,160 @@ export type OrganisationUnitUpdateInput = {
 
 /**
  *
+ * Owner of organisation units and their connected identities.
+ *
+ */
+export type Owner = {
+  __typename?: 'Owner';
+  /**
+   * UUID of the employee related to the owner.
+   * @deprecated Will be removed in a future version of GraphQL.
+   * Use `employee {uuid}` instead.
+   *
+   */
+  employee_uuid?: Maybe<Scalars['UUID']['output']>;
+  /**
+   * UUID of the organisation unit related to the owner.
+   * @deprecated Will be removed in a future version of GraphQL.
+   * Use `org_unit {uuid}` instead.
+   *
+   */
+  org_unit_uuid?: Maybe<Scalars['UUID']['output']>;
+  /**
+   *
+   * The object type.
+   *
+   * Always contains the string `owner`.
+   *
+   * @deprecated
+   * Unintentionally exposed implementation detail.
+   * Provides no value whatsoever.
+   *
+   */
+  type: Scalars['String']['output'];
+  /** Short, unique key. Defaults to object UUID. */
+  user_key: Scalars['String']['output'];
+  /** UUID of the entity */
+  uuid: Scalars['UUID']['output'];
+  /** Validity of the owner object. */
+  validity: Validity;
+};
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type OwnerResponse = {
+  __typename?: 'OwnerResponse';
+  /**
+   * Actual / current state entrypoint.
+   *
+   * Returns the state of the object at current validity and current assertion time.
+   *
+   * A single object is returned as only one validity can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint is appropriate to use for actual-state integrations and UIs.
+   *
+   */
+  current?: Maybe<Owner>;
+  /**
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  objects: Array<Owner>;
+  /**
+   * Bitemporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and varying assertion times.
+   *
+   * A list of bitemporal container objects are returned, each containing many different validity intervals.
+   *
+   * Note:
+   * This the entrypoint should only be used for bitemporal integrations and UIs, such as for auditing purposes.
+   * For temporal integration, please consider using `objects` instead.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   * **Warning**:
+   * This entrypoint should **not** be used to implement event-driven integrations.
+   * Such integration should rather utilize the AMQP-based event-system.
+   *
+   */
+  registrations: Array<Registration>;
+  /** UUID of the bitemporal object */
+  uuid: Scalars['UUID']['output'];
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type OwnerResponseRegistrationsArgs = {
+  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+/** Result page in cursor-based pagination. */
+export type OwnerResponsePaged = {
+  __typename?: 'OwnerResponsePaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<OwnerResponse>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
+};
+
+/**
  * Container for page information.
  *
  * Contains the cursors necessary to fetch other pages.
@@ -5514,7 +5399,6 @@ export type OrganisationUnitUpdateInput = {
 export type PageInfo = {
   __typename?: 'PageInfo';
   /**
-   *
    * Cursor for the next page of results.
    *
    * Should be provided to the `cursor` argument to iterate forwards.
@@ -5557,7 +5441,6 @@ export type Query = {
   /** Get a list of all managers, optionally by uuid(s) */
   managers: Array<ManagerResponse>;
   /**
-   *
    * Get the root organisation.
    *
    * This endpoint fails if not exactly one exists in LoRa.
@@ -5567,8 +5450,9 @@ export type Query = {
   org: Organisation;
   /** Get a list of all organisation units, optionally by uuid(s) */
   org_units: Array<OrganisationUnitResponse>;
+  /** Get owners. */
+  owners: OwnerResponsePaged;
   /**
-   *
    * Get a list of registrations.
    *
    * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
@@ -5783,6 +5667,19 @@ export type QueryOrg_UnitsArgs = {
 
 
 /** Entrypoint for all read-operations */
+export type QueryOwnersArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+
+/** Entrypoint for all read-operations */
 export type QueryRegistrationsArgs = {
   actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
@@ -5826,7 +5723,6 @@ export type RaValidityInput = {
 };
 
 /**
- *
  * Bitemporal container.
  *
  * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
@@ -5842,7 +5738,6 @@ export type RaValidityInput = {
 export type Registration = {
   __typename?: 'Registration';
   /**
-   *
    * UUID of the actor (integration or user) who changed the data.
    *
    * Note:
@@ -5852,7 +5747,6 @@ export type Registration = {
    */
   actor: Scalars['UUID']['output'];
   /**
-   *
    * End of the bitemporal interval.
    *
    * `null` indicates the open interval, aka. infinity.
@@ -5865,7 +5759,6 @@ export type Registration = {
    */
   end?: Maybe<Scalars['DateTime']['output']>;
   /**
-   *
    * Model of the modified entity.
    *
    * Examples:
@@ -5876,16 +5769,13 @@ export type Registration = {
    */
   model: Scalars['String']['output'];
   /**
-   *
    * Internal registration ID for the registration.
    *
-   * @deprecated
-   * May be removed in the future once the bitemporal scheme is finished.
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
    *
    */
   registration_id: Scalars['Int']['output'];
   /**
-   *
    * Start of the bitemporal interval.
    *
    * Examples:
@@ -5895,7 +5785,6 @@ export type Registration = {
    */
   start: Scalars['DateTime']['output'];
   /**
-   *
    * UUID of the modified entity.
    *
    */
@@ -5906,7 +5795,6 @@ export type Registration = {
 export type RegistrationPaged = {
   __typename?: 'RegistrationPaged';
   /**
-   *
    * List of results.
    *
    * The number of elements is defined by the `limit` argument.
@@ -5914,7 +5802,6 @@ export type RegistrationPaged = {
    */
   objects: Array<Registration>;
   /**
-   *
    * Container for page information.
    *
    * Contains the cursors necessary to fetch other pages.
@@ -5929,14 +5816,12 @@ export type RelatedUnit = {
   __typename?: 'RelatedUnit';
   /**
    * UUIDs of the related organisation units.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `org_units {uuid}` instead.
    *
    */
   org_unit_uuids: Array<Scalars['UUID']['output']>;
   /**
-   *
    * Related organisation units.
    *
    * Examples of user-keys:
@@ -5950,19 +5835,16 @@ export type RelatedUnit = {
    */
   org_units: Array<OrganisationUnit>;
   /**
-   *
    * The object type.
    *
    * Always contains the string `related_units`.
    *
-   * @deprecated
-   * Unintentionally exposed implementation detail.
+   * @deprecated Unintentionally exposed implementation detail.
    * Provides no value whatsoever.
    *
    */
   type: Scalars['String']['output'];
   /**
-   *
    * User-key of the entity.
    *
    * Usually constructed from the user-keys of our organisation units at creation time.
@@ -5993,7 +5875,6 @@ export type RelatedUnitOrg_UnitsArgs = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -6014,7 +5895,6 @@ export type RelatedUnitOrg_UnitsArgs = {
 export type RelatedUnitResponse = {
   __typename?: 'RelatedUnitResponse';
   /**
-   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -6027,7 +5907,6 @@ export type RelatedUnitResponse = {
    */
   current?: Maybe<RelatedUnit>;
   /**
-   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -6041,7 +5920,6 @@ export type RelatedUnitResponse = {
    */
   objects: Array<RelatedUnit>;
   /**
-   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -6065,7 +5943,6 @@ export type RelatedUnitResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -6095,9 +5972,7 @@ export type RelatedUnitResponseRegistrationsArgs = {
 export type Role = {
   __typename?: 'Role';
   /**
-   *
    * The person fulfilling the role.
-   *
    *
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
@@ -6106,16 +5981,13 @@ export type Role = {
   employee: Array<Employee>;
   /**
    * UUID of the employee related to the role.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `employee {uuid}` instead.
    *
    */
   employee_uuid: Scalars['UUID']['output'];
   /**
-   *
    * The organisational unit in which the role is being fulfilled.
-   *
    *
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
@@ -6124,14 +5996,12 @@ export type Role = {
   org_unit: Array<OrganisationUnit>;
   /**
    * UUID of the organisation unit related to the association.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `org_unit {uuid}` instead.
    *
    */
   org_unit_uuid: Scalars['UUID']['output'];
   /**
-   *
    * The role that is being fulfilled.
    *
    * Examples of user-keys:
@@ -6143,20 +6013,17 @@ export type Role = {
   role_type: Class;
   /**
    * UUID of the role type class.
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
+   * @deprecated Will be removed in a future version of GraphQL.
    * Use `role_type {uuid}` instead.
    *
    */
   role_type_uuid: Scalars['UUID']['output'];
   /**
-   *
    * The object type.
    *
    * Always contains the string `role`.
    *
-   * @deprecated
-   * Unintentionally exposed implementation detail.
+   * @deprecated Unintentionally exposed implementation detail.
    * Provides no value whatsoever.
    *
    */
@@ -6205,7 +6072,6 @@ export type RoleRole_TypeArgs = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -6226,7 +6092,6 @@ export type RoleRole_TypeArgs = {
 export type RoleResponse = {
   __typename?: 'RoleResponse';
   /**
-   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -6239,7 +6104,6 @@ export type RoleResponse = {
    */
   current?: Maybe<Role>;
   /**
-   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -6253,7 +6117,6 @@ export type RoleResponse = {
    */
   objects: Array<Role>;
   /**
-   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -6277,7 +6140,6 @@ export type RoleResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -6304,7 +6166,6 @@ export type RoleResponseRegistrationsArgs = {
 };
 
 /**
- *
  * Wrapper model around a single UUID.
  *
  * The purpose of this model is to allow for future non-breaking expansion of the return type.
@@ -6328,7 +6189,6 @@ export type Validity = {
 export type Version = {
   __typename?: 'Version';
   /**
-   *
    * DIPEX version.
    *
    * Contains a [semantic version](https://semver.org/) if configured.
@@ -6347,7 +6207,6 @@ export type Version = {
    */
   lora_version?: Maybe<Scalars['String']['output']>;
   /**
-   *
    * OS2mo commit hash.
    *
    * Contains a git hash on released versions of OS2mo.
@@ -6361,7 +6220,6 @@ export type Version = {
    */
   mo_hash?: Maybe<Scalars['String']['output']>;
   /**
-   *
    * OS2mo Version.
    *
    * Contains a [semantic version](https://semver.org/) on released versions of OS2mo.
