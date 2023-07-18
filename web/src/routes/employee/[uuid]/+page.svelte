@@ -96,7 +96,7 @@
       <TenseTabs />
       <a
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
-        href={`${base}/organisation/${$page.params.uuid}/create/${subsiteOfCategory(activeItem)}`}
+        href={`${base}/employee/${$page.params.uuid}/create/${subsiteOfCategory(activeItem)}`}
       >
         Tilføj {activeItem}
       </a>
