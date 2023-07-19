@@ -211,7 +211,15 @@
       <ManagerTable tense="past" uuid={$page.params.uuid} />
     {/if}
   {:else if activeItem === "KLE-opmærkninger"}
+  <div class="flex justify-between">
     <TenseTabs />
+    <a
+      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
+      href="{base}/organisation/{$page.params.uuid}/create/kle"
+    >
+      Opret KLE opmærkning
+    </a>
+  </div>
     {#if $tenses.future}
       <h2 class="mb-4">Fremtid</h2>
       <KleTable tense="future" uuid={$page.params.uuid} />
