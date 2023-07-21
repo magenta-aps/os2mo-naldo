@@ -84,7 +84,7 @@
       {employee.name}
       <span class="text-slate-600">
         {employee.cpr_no
-          ? `(${employee.cpr_no.slice(4)}-${employee.cpr_no.slice(-4)})`
+          ? `(${employee.cpr_no.slice(0,6)}-${employee.cpr_no.slice(-4)})`
           : ""}
       </span>
     </h1>

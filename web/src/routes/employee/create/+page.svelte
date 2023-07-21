@@ -1,5 +1,4 @@
 <script lang="ts">
-  import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
   import { enhance } from "$app/forms"
@@ -64,11 +63,7 @@
 <form method="post" class="mx-6" use:enhance={handler}>
   <div class="w-1/2 min-w-fit bg-slate-100 rounded">
     <div class="p-8">
-      <Input
-        title="CPR nummer"
-        id="cpr-number"
-        bind:value={cprNumber}
-      />
+      <Input title="CPR nummer" id="cpr-number" bind:value={cprNumber} />
       <div class="flex flex-row gap-6">
         <Input
           title="Navn"

@@ -2,6 +2,7 @@
   import DetailTable from "$lib/components/shared/detail_table.svelte"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
+  import { date } from "$lib/stores/date"
   import { EmployeeDocument } from "./query.generated"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
   import { page } from "$app/stores"
@@ -11,8 +12,8 @@
   export let tense: string
 
   gql`
-    query Employee($uuid: [UUID!]) {
-      employees(uuids: $uuid) {
+    query Employee($uuid: [UUID!], $fromDate: DateTime) {
+      employees(uuids: $uuid, from_date: $fromDate) {
         objects {
           name
           uuid
@@ -29,7 +30,7 @@
 </script>
 
 <DetailTable headers={["Navn", "Kaldenavn", "Anciennitet", "Dato", "", ""]}>
-  {#await graphQLClient().request(EmployeeDocument, { uuid: $page.params.uuid })}
+  {#await graphQLClient().request(EmployeeDocument, { uuid: $page.params.uuid, fromDate: $date })}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
@@ -43,12 +44,12 @@
       <td class="p-4">{employee.seniority || ""}</td>
       <ValidityTableCell validity={employee.validity} />
         <td>
-          <a aria-disabled href="{base}/employee/{$page.params.uuid}/edit/employee">
+          <a aria-disabled href="{base}/employee/{$page.params.uuid}/edit">
             <Icon type="pen" />
           </a>
         </td>
         <td>
-          <a href="{base}/employee/{$page.params.uuid}/terminate/employee">
+          <a href="{base}/employee/{$page.params.uuid}/terminate">
             <Icon type="xmark" size="30" />
           </a></td
         >
