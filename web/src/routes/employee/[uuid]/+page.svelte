@@ -94,12 +94,14 @@
     <div class="mb-8" />
     <div class="flex justify-between">
       <TenseTabs />
+      {#if activeItem !== itemCategory.EMPLOYEE}
       <a
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
         href={`${base}/employee/${$page.params.uuid}/create/${subsiteOfCategory(activeItem)}`}
       >
         Tilføj {activeItem}
       </a>
+      {/if}
     </div>
 
     <!-- TODO: Implement past present future for employees -->
