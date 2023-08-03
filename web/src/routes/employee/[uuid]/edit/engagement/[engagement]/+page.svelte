@@ -25,6 +25,7 @@
   let jobFunction: string
   let engagementType: string
 
+  // TODO: Move facets to its own query to not have the datetime overwritten
   gql`
     query EngagementAndFacet($uuid: [UUID!], $fromDate: DateTime) {
       facets(
@@ -91,11 +92,11 @@
             input: result.data,
           })
           $success = {
-            message: `FIXME`,
+            message: `${mutation.engagement_update.objects[0].employee[0].name} er blevet redigeret`,
             uuid: $page.params.uuid,
             type: "organisation",
           }
-          setTimeout(() => goto(`${base}/organisation/${$page.params.uuid}/`), 200)
+          setTimeout(() => goto(`${base}/employee/${$page.params.uuid}/`), 200)
         } catch (err) {
           console.error(err)
           $error = { message: err as string }

@@ -39,7 +39,12 @@
 
     mutation TerminateEngagement($input: EngagementTerminateInput!) {
       engagement_terminate(input: $input) {
-        uuid
+        objects {
+          uuid
+          employee {
+            name
+          }
+        }
       }
     }
   `
@@ -53,7 +58,7 @@
           })
 
           $success = {
-            message: `${name} afsluttes d. INDSÆT DATO`,
+            message: `${mutation.engagement_terminate.objects[0].employee[0].name} afsluttes d. ${toDate}`,
             uuid: $page.params.uuid,
             type: "organisation",
           }
