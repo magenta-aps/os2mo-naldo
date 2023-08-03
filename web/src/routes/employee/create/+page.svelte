@@ -58,7 +58,7 @@
 <title>Opret Medarbejder | OS2mo</title>
 
 <div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">Opret leder</h3>
+  <h3 class="flex-1">Opret ny medarbejder</h3>
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
@@ -77,13 +77,14 @@
           id="first-name"
           bind:value={firstName}
           required={true}
+          extra_classes="basis-1/2"
         />
         <Input
           id="last-name"
           placeholder="Efternavn"
           bind:value={lastName}
           required={true}
-          extra_classes="pt-6"
+          extra_classes="pt-6 basis-1/2"
         />
       </div>
       <div class="flex flex-row gap-6">
@@ -92,12 +93,13 @@
           id="nickname-first-name"
           placeholder="Fornavn"
           bind:value={nicknameFirstName}
+          extra_classes="basis-1/2"
         />
         <Input
           id="nickname-last-name"
           placeholder="Efternavn"
           bind:value={nicknameLastName}
-          extra_classes="pt-6"
+          extra_classes="pt-6 basis-1/2"
         />
       </div>
       <DateInput
