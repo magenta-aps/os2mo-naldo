@@ -64,11 +64,7 @@
 <form method="post" class="mx-6" use:enhance={handler}>
   <div class="w-1/2 min-w-fit bg-slate-100 rounded">
     <div class="p-8">
-      <Input
-        title="CPR nummer"
-        id="cpr-number"
-        bind:value={cprNumber}
-      />
+      <Input title="CPR nummer" id="cpr-number" bind:value={cprNumber} />
       <div class="flex flex-row gap-6">
         <Input
           title="Navn"
@@ -112,7 +108,7 @@
     <button
       type="button"
       class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-      on:click={() => goto(`${base}/employee/${$page.params.uuid}`)}
+      on:click={() => history.back()}
     >
       Annullér
     </button>
