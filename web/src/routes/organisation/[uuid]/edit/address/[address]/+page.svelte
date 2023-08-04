@@ -62,7 +62,7 @@
     mutation UpdateAddress($input: AddressUpdateInput!) {
       address_update(input: $input) {
         objects {
-          uuid
+          name
         }
       }
     }
@@ -77,7 +77,7 @@
             input: result.data,
           })
           $success = {
-            message: `Adressen er blevet redigeret`,
+            message: `${mutation.address_update.objects[0].name} er blevet redigeret`,
             uuid: $page.params.uuid,
             type: "organisation",
           }
@@ -98,7 +98,6 @@
   {@const facets = data.facets}
   {@const minDate = data.org_units[0].objects[0].validity.from.split("T")[0]}
   {@const maxDate = data.org_units[0].objects[0].validity.to?.split("T")[0]}
-  {console.log(address)}
 
   <title>Rediger adresse | OS2mo</title>
 

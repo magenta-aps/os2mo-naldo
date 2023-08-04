@@ -1449,8 +1449,6 @@ export type EmployeeCreateInput = {
   nickname_given_name?: InputMaybe<Scalars['String']['input']>;
   /** Nickname surname (lastname) of the employee. */
   nickname_surname?: InputMaybe<Scalars['String']['input']>;
-  /** Seniority value of the employee. */
-  seniority?: InputMaybe<Scalars['Date']['input']>;
   /** Surname (lastname) of the employee. */
   surname: Scalars['String']['input'];
   /** Extra info or uuid. */
