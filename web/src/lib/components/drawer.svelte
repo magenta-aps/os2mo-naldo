@@ -5,7 +5,7 @@
   let drawerToggled: boolean
 </script>
 
-<div class="drawer drawer-mobile">
+<div class="drawer lg:drawer-open">
   <input
     id="my-drawer-3"
     type="checkbox"
@@ -27,7 +27,7 @@
   </div>
   <div class="drawer-side">
     <label for="my-drawer-3" class="drawer-overlay" />
-    <ul class="overflow-y-auto w-80 bg-base-100 border">
+    <ul class="overflow-y-auto h-full w-80 bg-base-100 border">
       <!-- Sidebar content here -->
       <div class="flex-none">
         <DrawerContent />
