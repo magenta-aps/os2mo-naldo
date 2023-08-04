@@ -1,4 +1,5 @@
 <script lang="ts">
+  import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
   import { enhance } from "$app/forms"
@@ -107,7 +108,7 @@
     <button
       type="button"
       class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-      on:click={() => goto(`${base}/employee/${$page.params.uuid}`)}
+      on:click={() => history.back()}
     >
       Annullér
     </button>
