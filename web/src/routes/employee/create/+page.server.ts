@@ -2,9 +2,9 @@ import type { Actions, RequestEvent } from "@sveltejs/kit"
 import type { EmployeeCreateInput } from "$lib/graphql/types"
 
 export const actions: Actions = {
-  default: async ({ request, params }: RequestEvent): Promise<EmployeeCreateInput> => {
+  default: async ({ request }: RequestEvent): Promise<EmployeeCreateInput> => {
     const data = await request.formData()
-    const CprNumber = data.get("cpr-number") as string
+    const cprNumber = data.get("cpr-number") as string
     const firstName = data.get("first-name") as string
     const lastName = data.get("last-name") as string
     const nicknameFirstName = data.get("nickname-first-name") as string
@@ -14,7 +14,7 @@ export const actions: Actions = {
     return {
       givenname: firstName,
       surname: lastName,
-      ...(CprNumber && { cpr_number: CprNumber }),
+      ...(cprNumber && { cpr_number: cprNumber }),
       ...(nicknameFirstName && { nickname_given_name: nicknameFirstName }),
       ...(nicknameLastName && { nickname_surname: nicknameLastName }),
       ...(seniority && { seniority: seniority }),

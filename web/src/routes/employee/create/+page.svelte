@@ -12,12 +12,11 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
 
-  let CprNumber: string
+  let cprNumber: string
   let firstName: string
   let lastName: string
   let nicknameFirstName: string
   let nicknameLastName: string
-  let seniority: string
 
   gql`
     mutation CreateEmployee($input: EmployeeCreateInput!) {
@@ -68,7 +67,7 @@
       <Input
         title="CPR nummer"
         id="cpr-number"
-        bind:value={CprNumber}
+        bind:value={cprNumber}
       />
       <div class="flex flex-row gap-6">
         <Input
@@ -102,11 +101,6 @@
           extra_classes="pt-6 basis-1/2"
         />
       </div>
-      <DateInput
-        bind:value={seniority}
-        title="Anciennitet"
-        id="seniority"
-      />
     </div>
   </div>
   <div class="flex py-6 gap-4">
