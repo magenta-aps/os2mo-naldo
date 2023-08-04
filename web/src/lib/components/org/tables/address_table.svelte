@@ -18,6 +18,7 @@
         objects {
           addresses {
             name
+            uuid
             address_type {
               name
             }
@@ -49,7 +50,7 @@
         <td class="p-4">{address.visibility ? address.visibility.name : "Ikke sat"}</td>
         <ValidityTableCell validity={address.validity} />
         <td>
-          <a href="{base}/organisation/{$page.params.uuid}/edit/unit">
+          <a href="{base}/organisation/{$page.params.uuid}/edit/address/{address.uuid}">
             <Icon type="pen" />
           </a>
         </td>
@@ -57,7 +58,7 @@
         {#if env.PUBLIC_ENABLE_UNIT_TERMINATE === "true"}
           <td>
             <a
-              href="{base}/organisation/{$page.params.uuid}/terminate/unit"
+              href="{base}/organisation/{$page.params.uuid}/terminate/address/{address.uuid}"
               class="hover:slate-300"
             >
               <Icon type="xmark" size="30" />

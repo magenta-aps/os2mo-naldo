@@ -33,16 +33,13 @@
     {disabled}
   >
     {#if !disabled && iterable}
-      {#if startValue}
-        <option disabled selected>{startValue}</option>
-      {/if}
       {#each iterable as element}
         {#if returnType === Return.NAME}
-          <option value={element.name}>{element.name}</option>
+          <option selected={element.name === startValue} value={element.name}>{element.name}</option>
         {:else if returnType === Return.UUID}
-          <option value={element.uuid}>{element.name}</option>
+          <option selected={element.name === startValue} value={element.uuid}>{element.name}</option>
         {:else if returnType === Return.OBJECT}
-          <option value={element}>{element.name}</option>
+          <option selected={element.name === startValue} value={element}>{element.name}</option>
         {/if}
       {/each}
     {/if}

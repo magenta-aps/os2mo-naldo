@@ -43,12 +43,12 @@
       <td class="p-4">{employee.seniority || ""}</td>
       <ValidityTableCell validity={employee.validity} />
         <td>
-          <a aria-disabled href="{base}/organisation/{$page.params.uuid}/edit/employee/{employee.uuid}">
+          <a aria-disabled href="{base}/employee/{$page.params.uuid}/edit/employee/{employee.uuid}">
             <Icon type="pen" />
           </a>
         </td>
         <td>
-          <a href="{base}/organisation/{$page.params.uuid}/terminate/employee/{employee.uuid}">
+          <a href="{base}/employee/{$page.params.uuid}/terminate/employee/{employee.uuid}">
             <Icon type="xmark" size="30" />
           </a></td
         >
