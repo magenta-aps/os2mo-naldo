@@ -2,6 +2,7 @@
   import EmployeeCards from "$lib/components/employee/employee_cards.svelte"
   import EmployeeSearchInput from "$lib/components/employee/employee_search_input.svelte"
   import EmployeeTable from "$lib/components/employee/employee_table.svelte"
+  import EmployeeNavbar from "$lib/components/employee/employee_navbar.svelte"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { EmployeesDocument } from "./query.generated"
@@ -75,6 +76,7 @@
   <title>Medarbejder | OS2mo</title>
 </svelte:head>
 
+<EmployeeNavbar/>
 <div class="h-screen min-w-full p-10">
   <EmployeeSearchInput bind:input bind:cardView />
   <div class="py-5">

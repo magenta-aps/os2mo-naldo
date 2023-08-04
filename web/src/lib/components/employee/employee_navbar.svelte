@@ -1,8 +1,20 @@
+<script lang="ts">
+  import { base } from "$app/paths"
+  import { page } from "$app/stores"
+
+  enum Form {
+    CREATE = "create",
+    RENAME = "rename",
+    MOVE = "move",
+    TERMINATE = "terminate",
+  }
+</script>
+
 <div class="navbar bg-primary min-h-8 h-8 py-5 text-base-100">
   <div class="flex-1 z-10">
-    <label
+    <a
+      href="{base}/employee/{Form.CREATE}"
       class="btn btn-sm btn-primary text-base-100 normal-case font-normal"
-      for="create-org-modal"
     >
       <span class="inline-block align-middle pr-2">
         <svg
@@ -17,7 +29,7 @@
         >
       </span>
       <p class="text-base-100">Ny medarbejder</p>
-    </label>
+    </a>
     <label class="btn btn-sm btn-primary text-base-100 normal-case font-normal" for="">
       <span class="inline-block align-middle pr-2">
         <svg
