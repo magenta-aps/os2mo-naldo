@@ -7,7 +7,7 @@
   import { graphQLClient } from "$lib/util/http"
   import { EmployeeDocument } from "./query.generated"
   import EmployeeDetailTable from "$lib/components/employee/tables/employee_detail_table.svelte"
-  import EngagementDetailTable from "$lib/components/employee/tables/engagement_detail_table.svelte"
+  import EngagementDetailTable from "$lib/components/shared/detail_tables/engagement_detail_table.svelte"
   import AddressesDetailTable from "$lib/components/employee/tables/addresses_detail_table.svelte"
   import AssociationsDetailTable from "$lib/components/employee/tables/associations_detail_table.svelte"
   import RolesDetailTable from "$lib/components/employee/tables/roles_detail_table.svelte"
@@ -125,15 +125,15 @@
       Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
-        <EngagementDetailTable tense="future" />
+        <EngagementDetailTable tense="future" uuid={$page.params.uuid}  />
       {/if}
       {#if $tenses.present}
         <h2 class="mb-4">Nutid</h2>
-        <EngagementDetailTable tense="present" />
+        <EngagementDetailTable tense="present" uuid={$page.params.uuid} />
       {/if}
       {#if $tenses.past}
         <h2 class="mb-4">Fortid</h2>
-        <EngagementDetailTable tense="past" />
+        <EngagementDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
     {:else if activeItem === itemCategory.ADDRESSES}
       <!-- TODO: future and past does not work. 
