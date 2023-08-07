@@ -11,7 +11,7 @@
   import UnitDetailTable from "$lib/components/org/tables/unit_detail_table.svelte"
   import { tenses } from "$lib/stores/tenses"
   import AddressTable from "$lib/components/org/tables/address_table.svelte"
-  import EngagementTable from "$lib/components/org/tables/engagement_table.svelte"
+  import EngagementDetailTable from "$lib/components/shared/detail_tables/engagement_detail_table.svelte"
   import AssociationTable from "$lib/components/org/tables/association_table.svelte"
   import ItSystemTable from "$lib/components/org/tables/it_system_table.svelte"
   import RoleTable from "$lib/components/org/tables/role_table.svelte"
@@ -112,15 +112,15 @@
     Waiting to see if this can be done through GraphQL -->
     {#if $tenses.future}
       <h2 class="mb-4">Fremtid</h2>
-      <EngagementTable tense="future" uuid={$page.params.uuid} />
+      <EngagementDetailTable tense="future" uuid={$page.params.uuid} />
     {/if}
     {#if $tenses.present}
       <h2 class="mb-4">Nutid</h2>
-      <EngagementTable tense="present" uuid={$page.params.uuid} />
+      <EngagementDetailTable tense="present" uuid={$page.params.uuid} />
     {/if}
     {#if $tenses.past}
       <h2 class="mb-4">Fortid</h2>
-      <EngagementTable tense="past" uuid={$page.params.uuid} />
+      <EngagementDetailTable tense="past" uuid={$page.params.uuid} />
     {/if}
   {:else if activeItem === "Tilknytninger"}
     <div class="flex justify-between">
