@@ -59,10 +59,6 @@
             uuid: mutation.employee_update.objects[0].uuid,
             type: "employee",
           }
-          setTimeout(
-            () => goto(`${base}/employee/${mutation.employee_update.objects[0].uuid}/`),
-            200
-          )
         } catch (err) {
           console.error(err)
           $error = { message: err as string }

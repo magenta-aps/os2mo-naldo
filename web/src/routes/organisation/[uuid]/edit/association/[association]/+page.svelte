@@ -19,7 +19,6 @@
 
   let fromDate: string
   let toDate: string
-  let name: string
   let employeeUuid: string
   let associationType: string
 
@@ -84,7 +83,6 @@
             uuid: $page.params.uuid,
             type: "organisation",
           }
-          setTimeout(() => goto(`${base}/organisation/${$page.params.uuid}/`), 200)
         } catch (err) {
           console.error(err)
           $error = { message: err as string }

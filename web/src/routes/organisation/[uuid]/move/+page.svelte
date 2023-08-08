@@ -78,7 +78,6 @@
               uuid: json,
               type: "organisation",
             }
-            setTimeout(() => goto(`${base}/organisation/${json}`), 200)
           }
         } else {
           $error = {

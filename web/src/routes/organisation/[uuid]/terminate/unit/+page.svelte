@@ -1,10 +1,8 @@
 <script lang="ts">
   import { formatDate } from "$lib/util/date"
-  import { base } from "$app/paths"
   import { enhance } from "$app/forms"
   import { postRest } from "$lib/util/http"
   import { success, error } from "$lib/stores/alert"
-  import { goto } from "$app/navigation"
   import type { PageData } from "./$types"
 
   export let data: PageData
@@ -31,9 +29,6 @@
       const json = await res.json()
 
       if (res.status === 200) {
-        if (data.parent && data.parent.uuid) {
-          goto(`${base}/organisation/${data.parent.uuid}`)
-        }
         $success = {
           message: `${data.name} er blevet afsluttet`,
           uuid: data?.parent?.uuid,

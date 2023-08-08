@@ -57,9 +57,8 @@
             $success = {
               message: `${mutation.employee_terminate.objects[0].name} afsluttes d. ${toDate}`,
               uuid: $page.params.uuid,
-              type: "organisation",
+              type: "employee",
             }
-            setTimeout(() => goto(`${base}/employee/${$page.params.uuid}`), 200)
           } catch (err) {
             console.error(err)
             $error = { message: err as string }
