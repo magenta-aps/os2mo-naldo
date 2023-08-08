@@ -40,12 +40,8 @@
           $success = {
             message: `Medarbejderen ${mutation.employee_create.objects[0].name} er blevet oprettet.`,
             uuid: mutation.employee_create.objects[0].uuid,
-            type: "organisation",
+            type: "employee",
           }
-          setTimeout(
-            () => goto(`${base}/employee/${mutation.employee_create.objects[0].uuid}/`),
-            200
-          )
         } catch (err) {
           console.error(err)
           $error = { message: err as string }

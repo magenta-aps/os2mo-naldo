@@ -2,6 +2,8 @@
   import { slide } from "svelte/transition"
   import { success } from "$lib/stores/alert"
   import Icon from "$lib/components/icon.svelte"
+  import { goto } from "$app/navigation"
+  import { page } from "$app/stores"
 
   const startTimeout = () => {
     setTimeout(
@@ -10,6 +12,14 @@
       },
       $success.timeOutTime ? $success.timeOutTime : 5000
     )
+
+
+    // Will redirect if the successful action was on an organisation or employee
+    if ($success.type == "organisation" || $success.type == "employee") {
+      setTimeout(() => {
+        setTimeout(() => goto(`/${$success.type}/${$success.uuid}`), 200)
+      }, 200)
+    }
   }
 
   $: if ($success.message) {

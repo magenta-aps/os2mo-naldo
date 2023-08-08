@@ -73,10 +73,6 @@
             uuid: mutation.org_unit_update.uuid,
             type: "organisation",
           }
-          setTimeout(
-            () => goto(`${base}/organisation/${mutation.org_unit_update.uuid}`),
-            200
-          )
         } catch (err) {
           console.error(err)
           $error = { message: err as string }
