@@ -73,23 +73,25 @@
 </script>
 
 <svelte:head>
-  <title>Medarbejder | OS2mo</title>
+  <title>Medarbejdere | OS2mo</title>
 </svelte:head>
 
-<EmployeeNavbar/>
-<div class="h-screen min-w-full p-10">
-  <EmployeeSearchInput bind:input bind:cardView />
-  <div class="py-5">
-    {#await fetchEmployees()}
-      <div class="flex justify-center pt-10">
-        <div class="animate-spin rounded-full h-32 w-32 border-b-8 border-primary" />
-      </div>
-    {:then employees}
-      {#if cardView}
-        <EmployeeCards {employees} />
-      {:else}
-        <EmployeeTable {employees} />
-      {/if}
-    {/await}
+<div class="m-12">
+  <h1>Medarbejdere</h1>
+  <div class="h-screen min-w-full mt-8">
+    <EmployeeSearchInput bind:input bind:cardView />
+    <div class="py-5">
+      {#await fetchEmployees()}
+        <div class="flex justify-center pt-10">
+          <div class="animate-spin rounded-full h-32 w-32 border-b-8 border-primary" />
+        </div>
+      {:then employees}
+        {#if cardView}
+          <EmployeeCards {employees} />
+        {:else}
+          <EmployeeTable {employees} />
+        {/if}
+      {/await}
+    </div>
   </div>
 </div>
