@@ -5029,11 +5029,9 @@ export type OrganisationUnitOwnersArgs = {
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitParentArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 

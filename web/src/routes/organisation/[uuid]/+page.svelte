@@ -12,6 +12,7 @@
   import { tenses } from "$lib/stores/tenses"
   import AddressTable from "$lib/components/org/tables/address_table.svelte"
   import EngagementDetailTable from "$lib/components/shared/detail_tables/engagement_detail_table.svelte"
+  import ItUserDetailTable from "$lib/components/shared/detail_tables/ituser_detail_table.svelte"
   import AssociationTable from "$lib/components/org/tables/association_table.svelte"
   import ItSystemTable from "$lib/components/org/tables/it_system_table.svelte"
   import RoleTable from "$lib/components/org/tables/role_table.svelte"
@@ -160,15 +161,15 @@
     Waiting to see if this can be done through GraphQL -->
     {#if $tenses.future}
       <h2 class="mb-4">Fremtid</h2>
-      <ItSystemTable tense="future" uuid={$page.params.uuid} />
+      <ItUserDetailTable tense="future" uuid={$page.params.uuid} />
     {/if}
     {#if $tenses.present}
       <h2 class="mb-4">Nutid</h2>
-      <ItSystemTable tense="present" uuid={$page.params.uuid} />
+      <ItUserDetailTable tense="present" uuid={$page.params.uuid} />
     {/if}
     {#if $tenses.past}
       <h2 class="mb-4">Fortid</h2>
-      <ItSystemTable tense="past" uuid={$page.params.uuid} />
+      <ItUserDetailTable tense="past" uuid={$page.params.uuid} />
     {/if}
   {:else if activeItem === "Roller"}
     <TenseTabs />
