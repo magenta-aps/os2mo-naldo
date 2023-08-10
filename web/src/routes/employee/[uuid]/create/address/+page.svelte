@@ -28,8 +28,9 @@
           uuid
           user_key
           classes {
-            name
             uuid
+            user_key
+            name
           }
         }
         employees(uuids: $uuid, from_date: $fromDate) {

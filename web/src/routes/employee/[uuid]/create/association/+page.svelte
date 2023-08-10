@@ -9,17 +9,20 @@
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
-  import { FacetAndEmployeeDocument, CreateAssociationDocument } from "./query.generated"
+  import {
+    FacetAndEmployeeDocument,
+    CreateAssociationDocument,
+  } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import { getClassesByFacetUserKey, getClassUuidByUserKey } from "$lib/util/get_classes"
-  import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
+  import { getClassesByFacetUserKey } from "$lib/util/get_classes"
 
   let fromDate: string
   let toDate: string
   let orgUnitUuid: string
   let associationType: string
+  let primary: string
 
   gql`
     query FacetAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
@@ -32,7 +35,7 @@
           uuid
         }
       }
-      employees (uuids: $uuid, from_date: $fromDate) {
+      employees(uuids: $uuid, from_date: $fromDate) {
         objects {
           uuid
           name
@@ -81,7 +84,6 @@
   Henter data...
 {:then data}
   {@const facets = data.facets}
-  {@const primary_facet = getClassesByFacetUserKey(facets, "primary_type")}
   {@const employeeName = data.employees[0].objects[0].name}
   {@const minDate = data.employees[0].objects[0].validity.from.split("T")[0]}
 
@@ -108,12 +110,7 @@
             can only be in the registrations of their parent org -->
           <!-- And I guess they also need to be dynamic, so they change depending
           which org_unit has been chosen -->
-          <DateInput
-            bind:value={toDate}
-            title="Slutdato"
-            id="to"
-            min={fromDate}
-          />
+          <DateInput bind:value={toDate} title="Slutdato" id="to" min={fromDate} />
         </div>
         <!-- We need some sort of input, to choose an employee.
           Hopefully we can do it with GraphQL soon :copium: -->
@@ -124,6 +121,12 @@
           value={undefined}
           disabled
         />
+        <Input
+          title="Organisationsenhed UUID"
+          id="org-unit-uuid"
+          bind:value={orgUnitUuid}
+          required={true}
+        />
         <div class="flex flex-row gap-6">
           <Select
             title="Tilknytningsrolle"
@@ -133,23 +136,14 @@
             required={true}
             extra_classes="basis-1/2"
           />
-          <Input
-            title="Organisationsenhed UUID"
-            id="org-unit-uuid"
-            bind:value={orgUnitUuid}
-            required={true}
+          <Select
+            title="Primær"
+            id="primary"
+            bind:value={primary}
+            iterable={getClassesByFacetUserKey(facets, "primary_type")}
             extra_classes="basis-1/2"
           />
         </div>
-        <div class="flex">
-          <Checkbox
-            title="Primær"
-            id="primary"
-            value={getClassUuidByUserKey(primary_facet, "primary")}
-            extra_classes="checkbox-primary"
-          />
-        </div>
-        <input hidden name="non-primary" id="non-primary" value={getClassUuidByUserKey(primary_facet, "non-primary")}>
       </div>
     </div>
     <div class="flex py-6 gap-4">

@@ -32,8 +32,9 @@
         uuid
         user_key
         classes {
-          name
           uuid
+          user_key
+          name
         }
       }
       addresses(uuids: $uuid, from_date: $fromDate) {

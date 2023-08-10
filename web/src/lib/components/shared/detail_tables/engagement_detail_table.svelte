@@ -16,7 +16,7 @@
   const org_unit = isOrg ? $page.params.uuid : null
   const headers = isOrg
     ? ["Navn", "Stillingbetegnelse", "Engagementstype", "Primær", "Dato"]
-    : ["Enhed", "Stillingbetegnelse", "Engagementstype", "Primær", "Dato"]
+    : ["Enhed", "Stillingbetegnelse", "Engagementstype", "Primær", "Dato", "", ""]
 
   // Bør vi ikke tilføje noget tid til de her queries?
   gql`
