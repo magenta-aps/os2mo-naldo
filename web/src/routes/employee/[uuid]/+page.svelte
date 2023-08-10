@@ -8,6 +8,7 @@
   import { EmployeeDocument } from "./query.generated"
   import EmployeeDetailTable from "$lib/components/employee/tables/employee_detail_table.svelte"
   import EngagementDetailTable from "$lib/components/shared/detail_tables/engagement_detail_table.svelte"
+  import ItUserDetailTable from "$lib/components/shared/detail_tables/ituser_detail_table.svelte"
   import AddressesDetailTable from "$lib/components/employee/tables/addresses_detail_table.svelte"
   import AssociationsDetailTable from "$lib/components/employee/tables/associations_detail_table.svelte"
   import RolesDetailTable from "$lib/components/employee/tables/roles_detail_table.svelte"
@@ -84,23 +85,24 @@
       {employee.name}
       <span class="text-slate-600">
         {employee.cpr_no
-          ? `(${employee.cpr_no.slice(0,6)}-${employee.cpr_no.slice(-4)})`
+          ? `(${employee.cpr_no.slice(0, 6)}-${employee.cpr_no.slice(-4)})`
           : ""}
       </span>
     </h1>
 
     <Tabs {activeItem} {items} on:tabChange={tabChange} />
 
-    <div class="mb-8" />
     <div class="flex justify-between">
       <TenseTabs />
       {#if activeItem !== itemCategory.EMPLOYEE}
-      <a
-        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
-        href={`${base}/employee/${$page.params.uuid}/create/${subsiteOfCategory(activeItem)}`}
-      >
-        Tilføj {activeItem}
-      </a>
+        <a
+          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
+          href={`${base}/employee/${$page.params.uuid}/create/${subsiteOfCategory(
+            activeItem
+          )}`}
+        >
+          Tilføj {activeItem}
+        </a>
       {/if}
     </div>
 
@@ -125,7 +127,7 @@
       Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
-        <EngagementDetailTable tense="future" uuid={$page.params.uuid}  />
+        <EngagementDetailTable tense="future" uuid={$page.params.uuid} />
       {/if}
       {#if $tenses.present}
         <h2 class="mb-4">Nutid</h2>
@@ -181,8 +183,18 @@
         <RolesDetailTable tense="past" />
       {/if}
     {:else if activeItem === itemCategory.IT}
-      <!-- TODO: Missing GraphQL  -->
-      TODO
+      {#if $tenses.future}
+        <h2 class="mb-4">Fremtid</h2>
+        <ItUserDetailTable tense="future" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.present}
+        <h2 class="mb-4">Nutid</h2>
+        <ItUserDetailTable tense="present" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.past}
+        <h2 class="mb-4">Fortid</h2>
+        <ItUserDetailTable tense="past" uuid={$page.params.uuid} />
+      {/if}
     {:else if activeItem === itemCategory.LEAVE}
       <!-- TODO: future and past does not work. 
       Waiting to see if this can be done through GraphQL -->
