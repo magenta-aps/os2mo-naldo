@@ -13,8 +13,7 @@
   import AddressTable from "$lib/components/org/tables/address_table.svelte"
   import EngagementDetailTable from "$lib/components/shared/detail_tables/engagement_detail_table.svelte"
   import ItUserDetailTable from "$lib/components/shared/detail_tables/ituser_detail_table.svelte"
-  import AssociationTable from "$lib/components/org/tables/association_table.svelte"
-  import ItSystemTable from "$lib/components/org/tables/it_system_table.svelte"
+  import AssociationDetailTable from "$lib/components/shared/detail_tables/association_detail_table.svelte"
   import RoleTable from "$lib/components/org/tables/role_table.svelte"
   import ManagerTable from "$lib/components/org/tables/manager_table.svelte"
   import RelatedTable from "$lib/components/org/tables/related_table.svelte"
@@ -42,11 +41,10 @@
 
 <HeadTitle type="organization" />
 
-<div class="px-10">
+<div class="px-12 pt-6">
   {#await load($page.params.uuid, $date)}
     <p class="py-5">Loader organisation...</p>
   {:then orgUnits}
-    <Breadcrumbs currentOrg={orgUnits.present[0].name} uuid={$page.params.uuid} />
     <div class="flex gap-5">
       <h1 class="pb-4">{orgUnits.present[0].name}</h1>
       <CopyToClipboard uuid={$page.params.uuid} name={orgUnits.present[0].name} />
@@ -137,15 +135,15 @@
     Waiting to see if this can be done through GraphQL -->
     {#if $tenses.future}
       <h2 class="mb-4">Fremtid</h2>
-      <AssociationTable tense="future" uuid={$page.params.uuid} />
+      <AssociationDetailTable tense="future" uuid={$page.params.uuid}/>
     {/if}
     {#if $tenses.present}
       <h2 class="mb-4">Nutid</h2>
-      <AssociationTable tense="present" uuid={$page.params.uuid} />
+      <AssociationDetailTable tense="present" uuid={$page.params.uuid} />
     {/if}
     {#if $tenses.past}
       <h2 class="mb-4">Fortid</h2>
-      <AssociationTable tense="past" uuid={$page.params.uuid} />
+      <AssociationDetailTable tense="past" uuid={$page.params.uuid} />
     {/if}
   {:else if activeItem === "IT"}
     <div class="flex justify-between">
