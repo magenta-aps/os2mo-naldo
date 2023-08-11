@@ -44,6 +44,6 @@
     "graphql-request": "^6.0.0",
     "keycloak-js": "^22.0.1",
     "svelte-floating-ui": "^1.5.3",
-    "svelte2tsx": "^0.6.19"
+    "svelte2tsx": "^0.6.20"
   }
 }
