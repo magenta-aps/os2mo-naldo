@@ -18,6 +18,7 @@
     ? ["Navn", "Stillingbetegnelse", "Engagementstype", "Primær", "Dato"]
     : ["Enhed", "Stillingbetegnelse", "Engagementstype", "Primær", "Dato", "", ""]
 
+  // Bør vi ikke tilføje noget tid til de her queries?
   gql`
     query Engagements($employee: [UUID!], $org_unit: [UUID!]) {
       engagements(employees: $employee, org_units: $org_unit) {
@@ -77,13 +78,17 @@
           <td class="p-4">{engagement.primary ? engagement.primary.name : ""}</td>
           <ValidityTableCell validity={engagement.validity} />
           <td>
-            <a href="{base}/employee/{$page.params.uuid}/edit/engagement/{engagement.uuid}">
+            <a
+              href="{base}/employee/{$page.params
+                .uuid}/edit/engagement/{engagement.uuid}"
+            >
               <Icon type="pen" />
             </a>
           </td>
           <td>
             <a
-              href="{base}/employee/{$page.params.uuid}/terminate/engagement/{engagement.uuid}"
+              href="{base}/employee/{$page.params
+                .uuid}/terminate/engagement/{engagement.uuid}"
             >
               <Icon type="xmark" size="30" />
             </a>

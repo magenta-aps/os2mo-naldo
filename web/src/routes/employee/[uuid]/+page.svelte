@@ -9,8 +9,8 @@
   import EmployeeDetailTable from "$lib/components/employee/tables/employee_detail_table.svelte"
   import EngagementDetailTable from "$lib/components/shared/detail_tables/engagement_detail_table.svelte"
   import ItUserDetailTable from "$lib/components/shared/detail_tables/ituser_detail_table.svelte"
+  import AssociationDetailTable from "$lib/components/shared/detail_tables/association_detail_table.svelte"
   import AddressesDetailTable from "$lib/components/employee/tables/addresses_detail_table.svelte"
-  import AssociationsDetailTable from "$lib/components/employee/tables/associations_detail_table.svelte"
   import RolesDetailTable from "$lib/components/employee/tables/roles_detail_table.svelte"
   import ManagerRolesDetailTable from "$lib/components/employee/tables/manager_roles_detail_table.svelte"
   import LeavesDetailTable from "$lib/components/employee/tables/leaves_detail_table.svelte"
@@ -74,13 +74,11 @@
 
 <HeadTitle type="employee" />
 
-{#await graphQLClient().request(EmployeeDocument, { uuid: $page.params.uuid })}
-  <div class="px-12 pt-6">
+<div class="px-12 pt-6">
+  {#await graphQLClient().request(EmployeeDocument, { uuid: $page.params.uuid })}
     <p>Loader medarbejder...</p>
-  </div>
-{:then data}
-  {@const employee = data.employees[0].objects[0]}
-  <div class="px-12 pt-6">
+  {:then data}
+    {@const employee = data.employees[0].objects[0]}
     <h1 class="mb-4">
       {employee.name}
       <span class="text-slate-600">
@@ -157,15 +155,15 @@
       Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
-        <AssociationsDetailTable tense="future" />
+        <AssociationDetailTable tense="future" uuid={$page.params.uuid} />
       {/if}
       {#if $tenses.present}
         <h2 class="mb-4">Nutid</h2>
-        <AssociationsDetailTable tense="present" />
+        <AssociationDetailTable tense="present" uuid={$page.params.uuid} />
       {/if}
       {#if $tenses.past}
         <h2 class="mb-4">Fortid</h2>
-        <AssociationsDetailTable tense="past" />
+        <AssociationDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
     {:else if activeItem === itemCategory.ROLES}
       <!-- TODO: future and past does not work. 
@@ -226,5 +224,5 @@
         <ManagerRolesDetailTable tense="past" />
       {/if}
     {/if}
-  </div>
-{/await}
+  {/await}
+</div>

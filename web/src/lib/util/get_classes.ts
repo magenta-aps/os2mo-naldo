@@ -1,7 +1,7 @@
 type Facet = {
   uuid: any
   user_key: string
-  classes: Array<{ __typename?: "Class"; name: string; uuid: any }>
+  classes: Array<{ __typename?: "Class"; name: string; uuid: any; user_key: string }>
 }
 
 export const getClassesByFacetUserKey = (facets: Facet[], user_key: string) => {
@@ -11,9 +11,11 @@ export const getClassesByFacetUserKey = (facets: Facet[], user_key: string) => {
   }
   return foundFacet.classes.sort((a, b) => (a.name > b.name ? 1 : -1))
 }
+
 type Class = {
   uuid: any
   user_key: string
+  name?: string
 }
 
 export const getClassUuidByUserKey = (classes: Class[], user_key: string) => {
