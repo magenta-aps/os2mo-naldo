@@ -11,7 +11,7 @@
   import { page } from "$app/stores"
   import { gql } from "graphql-request"
   import {
-    ItUserItSystemsOrgAndPrimaryDocument,
+    ItUserItSystemsAndPrimaryDocument,
     UpdateItUserDocument,
   } from "./query.generated"
   import type { SubmitFunction } from "./$types"
@@ -26,7 +26,7 @@
   let accountName: string
 
   gql`
-    query ITUserItSystemsOrgAndPrimary($uuid: [UUID!], $fromDate: DateTime, $org_uuid: [UUID!]) {
+    query ITUserItSystemsAndPrimary($uuid: [UUID!], $fromDate: DateTime, $employee_uuid: [UUID!]) {
       itusers(uuids: $uuid, from_date: $fromDate) {
         uuid
         objects {
@@ -43,17 +43,17 @@
           }
         }
       }
-      itsystems {
-        name
-        uuid
-      }
-      org_units(uuids: $org_uuid) {
+      employees(uuids: $employee_uuid) {
         objects {
           validity {
             from
             to
           }
         }
+      }
+      itsystems {
+        name
+        uuid
       }
       classes(user_keys: ["primary", "non-primary"]) {
         uuid
@@ -80,7 +80,7 @@
           $success = {
             message: "IT kontoen er blevet redigeret",
             uuid: $page.params.uuid,
-            type: "organisation",
+            type: "employee",
           }
         } catch (err) {
           console.error(err)
@@ -90,14 +90,13 @@
     }
 </script>
 
-{#await graphQLClient().request( ItUserItSystemsOrgAndPrimaryDocument, { uuid: $page.params.ituser, fromDate: $date, org_uuid: $page.params.uuid } )}
+{#await graphQLClient().request( ItUserItSystemsAndPrimaryDocument, { uuid: $page.params.ituser, fromDate: $date, employee_uuid: $page.params.uuid } )}
   Henter data...
 {:then data}
   {@const itUser = data.itusers[0].objects[0]}
   {@const classes = data.classes}
-  {@const minDate = data.org_units[0].objects[0].validity.from.split("T")[0]}
-  {@const maxDate = data.org_units[0].objects[0].validity.to?.split("T")[0]}
-  
+  {@const minDate = data.employees[0].objects[0].validity.from.split("T")[0]}
+
   <title>Rediger {itUser.itsystem.name} | OS2mo</title>
 
   <div class="flex align-center px-6 pt-6 pb-4">
@@ -116,7 +115,6 @@
             title="Startdato"
             id="from"
             min={minDate}
-            max={toDate ? toDate : maxDate}
           />
           <DateInput
             bind:value={toDate}
@@ -126,11 +124,8 @@
             title="Slutdato"
             id="to"
             min={fromDate ? fromDate : minDate}
-            max={maxDate}
           />
         </div>
-
-        <!-- TODO: Should have the current value as default -->
         <div class="flex flex-row gap-6">
           <Select
             title="IT-systemer"
@@ -159,7 +154,6 @@
             extra_classes="checkbox-primary"
           />
         </div>
-        <!-- Enten skal vi gøre det her, ellers skal vi lave et gql kald i `+page.server.ts`? -->
         <input hidden name="non-primary" id="non-primary" value={getClassUuidByUserKey(classes, "non-primary")}>
       </div>
     </div>
@@ -172,7 +166,7 @@
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        on:click={() => goto(`${base}/organisation/${$page.params.uuid}`)}
+        on:click={() => goto(`${base}/employee/${$page.params.uuid}`)}
       >
         Annullér
       </button>
