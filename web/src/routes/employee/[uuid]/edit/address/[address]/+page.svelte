@@ -8,7 +8,11 @@
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
-  import { AddressAndFacetsDocument, UpdateAddressDocument } from "./query.generated"
+  import {
+    AddressDocument,
+    FacetsDocument,
+    UpdateAddressDocument,
+  } from "./query.generated"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
@@ -23,20 +27,7 @@
   let input: string | number
 
   gql`
-    query AddressAndFacets(
-      $uuid: [UUID!]
-      $fromDate: DateTime
-      $employee_uuid: [UUID!]
-    ) {
-      facets(user_keys: ["employee_address_type", "visibility"]) {
-        uuid
-        user_key
-        classes {
-          uuid
-          user_key
-          name
-        }
-      }
+    query Address($uuid: [UUID!], $fromDate: DateTime, $employee_uuid: [UUID!]) {
       addresses(uuids: $uuid, from_date: $fromDate) {
         objects {
           uuid
@@ -64,6 +55,18 @@
       }
     }
 
+    query Facets {
+      facets(user_keys: ["employee_address_type", "visibility"]) {
+        uuid
+        user_key
+        classes {
+          uuid
+          user_key
+          name
+        }
+      }
+    }
+
     mutation UpdateAddress($input: AddressUpdateInput!) {
       address_update(input: $input) {
         objects {
@@ -85,7 +88,7 @@
             input: result.data,
           })
           $success = {
-            message: `Adresse redigeret`,
+            message: `Adresse for ${mutation.address_update.objects[0].employee} er redigeret`,
             uuid: $page.params.uuid,
             type: "employee",
           }
@@ -97,12 +100,11 @@
     }
 </script>
 
-{#await graphQLClient().request( AddressAndFacetsDocument, { uuid: $page.params.address, fromDate: $date, employee_uuid: $page.params.uuid } )}
+{#await graphQLClient().request( AddressDocument, { uuid: $page.params.address, fromDate: $date, employee_uuid: $page.params.uuid } )}
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
   {@const address = data.addresses[0].objects[0]}
-  {@const facets = data.facets}
   {@const minDate = data.employees[0].objects[0].validity?.from.split("T")[0]}
   {@const maxDate = data.employees[0].objects[0].validity?.to?.split("T")[0]}
 
@@ -136,25 +138,30 @@
           />
         </div>
         <div class="flex flex-row gap-6">
-          <Select
-            title="Synlighed"
-            id="visibility"
-            bind:value={visibility}
-            startValue={address.visibility?.name}
-            iterable={getClassesByFacetUserKey(facets, "visibility")}
-            extra_classes="basis-1/2"
-            required={true}
-          />
-          <Select
-            title="Adressetype"
-            id="address-type"
-            bind:value={addressType}
-            startValue={address.address_type.name}
-            iterable={getClassesByFacetUserKey(facets, "employee_address_type")}
-            required={true}
-            extra_classes="basis-1/2"
-            returnType="object"
-          />
+          {#await graphQLClient().request(FacetsDocument)}
+            <Select disabled={true} id="visibility" extra_classes="basis-1/2" />
+            <Select disabled={true} id="address-type" extra_classes="basis-1/2" />
+          {:then data}
+            <Select
+              title="Synlighed"
+              id="visibility"
+              bind:value={visibility}
+              startValue={address.visibility?.name}
+              iterable={getClassesByFacetUserKey(data.facets, "visibility")}
+              extra_classes="basis-1/2"
+              required={true}
+            />
+            <Select
+              title="Adressetype"
+              id="address-type"
+              bind:value={addressType}
+              startValue={address.address_type.name}
+              iterable={getClassesByFacetUserKey(data.facets, "employee_address_type")}
+              required={true}
+              extra_classes="basis-1/2"
+              returnType="object"
+            />
+          {/await}
           <input hidden name="address-type-uuid" bind:value={addressUuid} />
         </div>
         {#if addressType}
