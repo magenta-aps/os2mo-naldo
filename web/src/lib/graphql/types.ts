@@ -61,6 +61,7 @@ export type Address = {
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
    *
+   * @deprecated Use 'person' instead. Will be removed in a future version of OS2mo.
    */
   employee?: Maybe<Array<Employee>>;
   /**
@@ -136,6 +137,17 @@ export type Address = {
    *
    */
   org_unit_uuid?: Maybe<Scalars['UUID']['output']>;
+  /**
+   * Connected person.
+   *
+   * Note:
+   * This field is mutually exclusive with the `org_unit` field.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  person?: Maybe<Array<Employee>>;
   /**
    * The object type.
    *
@@ -273,6 +285,20 @@ export type AddressOrg_UnitArgs = {
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+
+/**
+ * Address information for either an employee or organisational unit
+ *
+ */
+export type AddressPersonArgs = {
+  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  limit?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
@@ -491,6 +517,7 @@ export type Association = {
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
    *
+   * @deprecated Use 'person' instead. Will be removed in a future version of OS2mo.
    */
   employee: Array<Employee>;
   /**
@@ -547,6 +574,14 @@ export type Association = {
    *
    */
   org_unit_uuid: Scalars['UUID']['output'];
+  /**
+   * Associated person.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  person: Array<Employee>;
   /**
    * Marks which association is primary.
    *
@@ -683,6 +718,17 @@ export type AssociationOrg_UnitArgs = {
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+
+/** Connects organisation units and employees */
+export type AssociationPersonArgs = {
+  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  limit?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
@@ -1686,6 +1732,7 @@ export type Engagement = {
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
    *
+   * @deprecated Use 'person' instead. Will be removed in a future version of OS2mo.
    */
   employee: Array<Employee>;
   /**
@@ -1784,6 +1831,14 @@ export type Engagement = {
    *
    */
   org_unit_uuid: Scalars['UUID']['output'];
+  /**
+   * The person fulfilling the engagement.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  person: Array<Employee>;
   /**
    * Marks which engagement is primary.
    *
@@ -1906,6 +1961,17 @@ export type EngagementOrg_UnitArgs = {
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+
+/** Employee engagement in an organisation unit */
+export type EngagementPersonArgs = {
+  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  limit?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
@@ -2113,8 +2179,11 @@ export type EngagementAssociationResponseRegistrationsArgs = {
 };
 
 export type EngagementCreateInput = {
-  /** UUID of the related employee. */
-  employee: Scalars['UUID']['input'];
+  /**
+   * UUID of the related employee.
+   * @deprecated Use 'person' instead. Will be removed in a future version of OS2mo.
+   */
+  employee?: InputMaybe<Scalars['UUID']['input']>;
   engagement_type: Scalars['UUID']['input'];
   /**
    * Arbitrary value extension fields.
@@ -2209,6 +2278,8 @@ export type EngagementCreateInput = {
   job_function: Scalars['UUID']['input'];
   /** The related org-unit object. */
   org_unit: Scalars['UUID']['input'];
+  /** UUID of the related employee. */
+  person?: InputMaybe<Scalars['UUID']['input']>;
   /** Primary field of the engagement */
   primary?: InputMaybe<Scalars['UUID']['input']>;
   /** Name or UUID of the related engagement. */
@@ -2323,7 +2394,10 @@ export type EngagementTerminateInput = {
 };
 
 export type EngagementUpdateInput = {
-  /** UUID of the related employee. */
+  /**
+   * UUID of the related employee.
+   * @deprecated Use 'person' instead. Will be removed in a future version of OS2mo.
+   */
   employee?: InputMaybe<Scalars['UUID']['input']>;
   /** UUID of the engagement type. */
   engagement_type?: InputMaybe<Scalars['UUID']['input']>;
@@ -2421,6 +2495,8 @@ export type EngagementUpdateInput = {
   job_function?: InputMaybe<Scalars['UUID']['input']>;
   /** The related org-unit object. */
   org_unit?: InputMaybe<Scalars['UUID']['input']>;
+  /** UUID of the related employee. */
+  person?: InputMaybe<Scalars['UUID']['input']>;
   /** Primary field of the engagement */
   primary?: InputMaybe<Scalars['UUID']['input']>;
   /** Name or UUID of the related engagement. */
@@ -2967,6 +3043,7 @@ export type ItUser = {
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
    *
+   * @deprecated Use 'person' instead. Will be removed in a future version of OS2mo.
    */
   employee?: Maybe<Array<Employee>>;
   /**
@@ -3026,6 +3103,17 @@ export type ItUser = {
    *
    */
   org_unit_uuid?: Maybe<Scalars['UUID']['output']>;
+  /**
+   * Person using the IT account.
+   *
+   * Note:
+   * This field is mutually exclusive with the `org_unit` field.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  person?: Maybe<Array<Employee>>;
   /**
    * Marks which IT account is primary.
    *
@@ -3144,6 +3232,23 @@ export type ItUserOrg_UnitArgs = {
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+
+/**
+ * User information related to IT systems.
+ *
+ * This is commonly used to map out IT accounts or IT service accounts.
+ * It is however also used to hold IT system specific identifiers for correlation purposes.
+ *
+ */
+export type ItUserPersonArgs = {
+  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  limit?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
@@ -3291,10 +3396,14 @@ export type ItUserTerminateInput = {
 };
 
 export type ItUserUpdateInput = {
-  /** Optional reference to an engagement. */
+  /** Reference to the engagement of the IT user (if any). */
   engagement?: InputMaybe<Scalars['UUID']['input']>;
   /** Reference to the IT system for the IT user. */
   itsystem?: InputMaybe<Scalars['UUID']['input']>;
+  /** Reference to the organisation unit of the IT user (if any). */
+  org_unit?: InputMaybe<Scalars['UUID']['input']>;
+  /** Reference to the employee for the IT user (if any). */
+  person?: InputMaybe<Scalars['UUID']['input']>;
   /** Primary field of the IT user object */
   primary?: InputMaybe<Scalars['UUID']['input']>;
   /** The IT user account name. */
@@ -3697,6 +3806,7 @@ export type Leave = {
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
    *
+   * @deprecated Use 'person' instead. Will be removed in a future version of OS2mo.
    */
   employee: Array<Employee>;
   /**
@@ -3736,6 +3846,14 @@ export type Leave = {
    *
    */
   leave_type_uuid: Scalars['UUID']['output'];
+  /**
+   * The absent person.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  person: Array<Employee>;
   /**
    * The object type.
    *
@@ -3804,6 +3922,23 @@ export type LeaveLeave_TypeArgs = {
   limit?: InputMaybe<Scalars['int']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+
+/**
+ * A leave of absence for an employee.
+ *
+ * Can be everything from a pregnancy or maternity leave to a furlough or a garden leave.
+ * The `leave_type` can be used to determine the type of leave in question.
+ *
+ */
+export type LeavePersonArgs = {
+  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
@@ -3928,6 +4063,7 @@ export type Manager = {
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
    *
+   * @deprecated Use 'person' instead. Will be removed in a future version of OS2mo.
    */
   employee?: Maybe<Array<Employee>>;
   /**
@@ -3986,6 +4122,16 @@ export type Manager = {
    *
    */
   org_unit_uuid: Scalars['UUID']['output'];
+  /**
+   * Person fulfilling the managerial position.
+   *
+   * May be empty in which case the managerial position is unfilfilled (vacant).
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  person?: Maybe<Array<Employee>>;
   /**
    * Responsibilities that the manager takes care of.
    *
@@ -4076,6 +4222,20 @@ export type ManagerOrg_UnitArgs = {
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+
+/**
+ * Managers of organisation units and their connected identities.
+ *
+ */
+export type ManagerPersonArgs = {
+  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  limit?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
@@ -6098,6 +6258,7 @@ export type Role = {
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
    *
+   * @deprecated Use 'person' instead. Will be removed in a future version of OS2mo.
    */
   employee: Array<Employee>;
   /**
@@ -6122,6 +6283,14 @@ export type Role = {
    *
    */
   org_unit_uuid: Scalars['UUID']['output'];
+  /**
+   * The person fulfilling the role.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  person: Array<Employee>;
   /**
    * The role that is being fulfilled.
    *
@@ -6176,6 +6345,17 @@ export type RoleOrg_UnitArgs = {
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
   limit?: InputMaybe<Scalars['int']['input']>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+
+/** The role a person has within an organisation unit */
+export type RolePersonArgs = {
+  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  limit?: InputMaybe<Scalars['int']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };

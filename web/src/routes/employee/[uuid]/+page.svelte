@@ -10,9 +10,9 @@
   import EngagementDetailTable from "$lib/components/shared/detail_tables/engagement_detail_table.svelte"
   import ItUserDetailTable from "$lib/components/shared/detail_tables/ituser_detail_table.svelte"
   import AssociationDetailTable from "$lib/components/shared/detail_tables/association_detail_table.svelte"
+  import ManagerDetailTable from "$lib/components/shared/detail_tables/manager_detail_table.svelte"
   import AddressesDetailTable from "$lib/components/employee/tables/addresses_detail_table.svelte"
   import RolesDetailTable from "$lib/components/employee/tables/roles_detail_table.svelte"
-  import ManagerRolesDetailTable from "$lib/components/employee/tables/manager_roles_detail_table.svelte"
   import LeavesDetailTable from "$lib/components/employee/tables/leaves_detail_table.svelte"
   import TenseTabs from "$lib/components/shared/tense_tabs.svelte"
   import { tenses } from "$lib/stores/tenses"
@@ -27,7 +27,7 @@
     ROLES = "Roller",
     IT = "IT",
     LEAVE = "Orlov",
-    MANAGER_ROLES = "Ledere",
+    MANAGER = "Ledere",
   }
 
   let items = Object.values(itemCategory)
@@ -52,8 +52,8 @@
         return "it"
       case itemCategory.LEAVE:
         return "leave"
-      case itemCategory.MANAGER_ROLES:
-        return "manager_role"
+      case itemCategory.MANAGER:
+        return "manager"
       default:
         console.warn("The tab doesn't match a subsite")
         return
@@ -208,20 +208,20 @@
         <h2 class="mb-4">Fortid</h2>
         <LeavesDetailTable tense="past" />
       {/if}
-    {:else if activeItem === itemCategory.MANAGER_ROLES}
+    {:else if activeItem === itemCategory.MANAGER}
       <!-- TODO: future and past does not work. 
       Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
-        <ManagerRolesDetailTable tense="future" />
+        <ManagerDetailTable tense="future" uuid={$page.params.uuid} />
       {/if}
       {#if $tenses.present}
         <h2 class="mb-4">Nutid</h2>
-        <ManagerRolesDetailTable tense="present" />
+        <ManagerDetailTable tense="present" uuid={$page.params.uuid} />
       {/if}
       {#if $tenses.past}
         <h2 class="mb-4">Fortid</h2>
-        <ManagerRolesDetailTable tense="past" />
+        <ManagerDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
     {/if}
   {/await}
