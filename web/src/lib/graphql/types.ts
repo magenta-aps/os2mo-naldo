@@ -7,7 +7,7 @@ export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> =
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string; }
+  ID: { input: string | number; output: string; }
   String: { input: string; output: string; }
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
@@ -6085,10 +6085,10 @@ export type RoleRole_TypeArgs = {
 };
 
 export type RoleCreateInput = {
-  /** UUID of the person */
-  employee: Scalars['UUID']['input'];
   /** UUID of the org_unit */
   org_unit: Scalars['UUID']['input'];
+  /** UUID of the person */
+  person: Scalars['UUID']['input'];
   /** UUID of the role type */
   role_type: Scalars['UUID']['input'];
   /** Extra info or uuid. */

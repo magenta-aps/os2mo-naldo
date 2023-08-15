@@ -3,7 +3,6 @@
   import Error from "$lib/components/alerts/error.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
-  import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
@@ -59,7 +58,7 @@
           $success = {
             message: `Tilknytningen for ${mutation.association_terminate.objects[0].employee[0].name} afsluttes d. ${toDate}`,
             uuid: $page.params.uuid,
-            type: "organisation",
+            type: "employee",
           }
         } catch (err) {
           console.error(err)
@@ -105,7 +104,7 @@
         >Afslut tilknytning</button
       >
       <a
-        href={`${base}/organisation/${$page.params.uuid}`}
+        href={`${base}/employee/${$page.params.uuid}`}
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         >Annullér</a
       >
