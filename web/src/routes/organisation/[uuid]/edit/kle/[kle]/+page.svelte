@@ -15,6 +15,7 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
+  import { getClassesByFacetUserKey } from "$lib/util/get_classes"
 
   let fromDate: string
   let toDate: string
@@ -29,6 +30,7 @@
         classes {
           name
           uuid
+          user_key
         }
       }
       kles(uuids: $uuid, from_date: $fromDate) {
@@ -129,7 +131,7 @@
             startValue={kle.kle_number.name}
             bind:value={kleNumber}
             extra_classes="basis-1/2"
-            iterable={facets[1].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
+            iterable={getClassesByFacetUserKey(facets, "kle_number")}
             required={true}
           />
           <Select
@@ -138,7 +140,7 @@
             startValue={kle.kle_aspects[0].name}
             bind:value={kleAspect}
             extra_classes="basis-1/2"
-            iterable={facets[0].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
+            iterable={getClassesByFacetUserKey(facets, "kle_aspect")}
             required={true}
           />
         </div>

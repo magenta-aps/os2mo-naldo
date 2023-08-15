@@ -11,12 +11,14 @@ export const actions: Actions = {
     const employeeUuid = data.get("employee-uuid")
     const startDate = data.get("from")
     const endDate = data.get("to")
+    const primary = data.get("primary")
 
     return {
       uuid: params.association,
       org_unit: params.uuid,
-      employee: employeeUuid,
+      person: employeeUuid,
       association_type: associationType,
+      primary: primary,
       validity: { from: startDate, ...(endDate && { to: endDate }) },
     }
   },

@@ -13,6 +13,7 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import type { SubmitFunction } from "./$types"
+  import { getClassesByFacetUserKey } from "$lib/util/get_classes"
 
   let fromDate: string
   let toDate: string
@@ -30,6 +31,7 @@
         classes {
           name
           uuid
+          user_key
         }
       }
       addresses(uuids: $uuid, from_date: $fromDate) {
@@ -135,7 +137,7 @@
             id="visibility"
             bind:value={visibility}
             startValue={address.visibility?.name}
-            iterable={facets[0].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
+            iterable={getClassesByFacetUserKey(facets, "visibility")}
             extra_classes="basis-1/2"
             required={true}
           />
@@ -144,7 +146,7 @@
             id="address-type"
             bind:value={addressType}
             startValue={address.address_type.name}
-            iterable={facets[1].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
+            iterable={getClassesByFacetUserKey(facets, "org_unit_address_type")}
             required={true}
             extra_classes="basis-1/2"
             returnType="object"

@@ -16,20 +16,23 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
+  import { getClassesByFacetUserKey } from "$lib/util/get_classes"
 
   let fromDate: string
   let toDate: string
   let employeeUuid: string
   let associationType: string
+  let primary: string
 
   gql`
     query AssociationAndFacet($uuid: [UUID!], $fromDate: DateTime) {
-      facets(user_keys: "association_type") {
+      facets(user_keys: ["association_type", "primary_type"]) {
         uuid
         user_key
         classes {
           name
           uuid
+          user_key
         }
       }
       associations(uuids: $uuid, from_date: $fromDate) {
@@ -40,6 +43,10 @@
             name
           }
           association_type {
+            name
+          }
+          primary {
+            uuid
             name
           }
           validity {
@@ -96,6 +103,7 @@
   Henter data...
 {:then data}
   {@const association = data.associations[0].objects[0]}
+  {@const facets = data.facets}
   {@const minDate = association.org_unit[0].validity.from.split("T")[0]}
   {@const maxDate = association.org_unit[0].validity.to?.split("T")[0]}
 
@@ -141,14 +149,25 @@
           startValue={association.employee[0].uuid}
           required={true}
         />
-        <Select
-          title="Tilknytningsrolle"
-          id="association-type"
-          startValue={association.association_type?.name}
-          bind:value={associationType}
-          iterable={data.facets[0].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
-          required={true}
-        />
+        <div class="flex flex-row gap-6">
+          <Select
+            title="Tilknytningsrolle"
+            id="association-type"
+            startValue={association.association_type?.name}
+            bind:value={associationType}
+            iterable={getClassesByFacetUserKey(facets, "association_type")}
+            required={true}
+            extra_classes="basis-1/2"
+          />
+          <Select
+            title="Primær"
+            id="primary"
+            startValue={association.primary?.name}
+            bind:value={primary}
+            iterable={getClassesByFacetUserKey(facets, "primary_type")}
+            extra_classes="basis-1/2"
+          />
+        </div>
       </div>
     </div>
     <div class="flex py-6 gap-4">

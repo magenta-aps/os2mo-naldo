@@ -87,9 +87,7 @@
       <div class="p-8">
         <DateInput
           bind:value={toDate}
-          startValue={kle.validity.to
-            ? kle.validity.to.split("T")[0]
-            : null}
+          startValue={$date}
           title="Slutdato"
           id="to"
           min={minDate}

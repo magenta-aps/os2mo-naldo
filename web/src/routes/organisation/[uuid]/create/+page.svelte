@@ -14,9 +14,9 @@
   import Icon from "$lib/components/icon.svelte"
   import { gql } from "graphql-request"
   import { GetOrgUnitAndFacetsDocument } from "./query.generated"
-  import { onMount } from "svelte"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
+  import { getClassesByFacetUserKey } from "$lib/util/get_classes"
 
   export let data: PageData
 
@@ -28,6 +28,7 @@
         classes {
           name
           uuid
+          user_key
         }
       }
       org_units(uuids: $uuid, from_date: $fromDate) {
@@ -103,12 +104,8 @@
     Henter data...
   {:then data}
     {@const org_unit = data.org_units[0].objects[0]}
-    {@const sortedOrgTypes = data.facets[0].classes.sort((a, b) =>
-      a.name > b.name ? 1 : -1
-    )}
-    {@const sortedOrgLevels = data.facets[1].classes.sort((a, b) =>
-      a.name > b.name ? 1 : -1
-    )}
+    {@const facets = data.facets}
+
     <div class="w-1/2 min-w-fit mb-6 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
@@ -135,7 +132,7 @@
           title="Enhedstype"
           id="org-type"
           bind:value={orgType}
-          iterable={sortedOrgTypes}
+          iterable={getClassesByFacetUserKey(facets, "org_unit_type")}
           required={true}
         />
 
@@ -145,7 +142,7 @@
             id="org-level"
             extra_classes="basis-1/2"
             bind:value={orgLevel}
-            iterable={sortedOrgLevels}
+            iterable={getClassesByFacetUserKey(facets, "org_unit_level")}
             required={true}
           />
           <Input

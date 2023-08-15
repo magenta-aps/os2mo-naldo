@@ -7,7 +7,7 @@ export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> =
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string; }
+  ID: { input: string | number; output: string; }
   String: { input: string; output: string; }
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
@@ -1285,8 +1285,13 @@ export type Employee = {
    *
    */
   associations: Array<Association>;
-  /** CPR number of the employee. */
+  /**
+   * CPR number of the employee.
+   * @deprecated Use 'cpr_number' instead. Will be removed in a future version of OS2mo.
+   */
   cpr_no?: Maybe<Scalars['CPR']['output']>;
+  /** CPR number of the employee. */
+  cpr_number?: Maybe<Scalars['CPR']['output']>;
   /** Engagement associations */
   engagement_associations: Array<EngagementAssociation>;
   /**
@@ -1297,6 +1302,11 @@ export type Employee = {
    */
   engagements: Array<Engagement>;
   /** Given name of the employee. */
+  given_name: Scalars['String']['output'];
+  /**
+   * Given name of the employee.
+   * @deprecated Use 'given_name' instead. Will be removed in a future version of OS2mo.
+   */
   givenname: Scalars['String']['output'];
   /**
    * IT accounts for the employee.
@@ -1324,6 +1334,11 @@ export type Employee = {
   /** Full nickname of the employee */
   nickname: Scalars['String']['output'];
   /** Given name part of nickname of the employee. */
+  nickname_given_name?: Maybe<Scalars['String']['output']>;
+  /**
+   * Given name part of nickname of the employee.
+   * @deprecated Use 'nickname_given_name' instead. Will be removed in a future version of OS2mo.
+   */
   nickname_givenname?: Maybe<Scalars['String']['output']>;
   /** Surname part of nickname of the employee. */
   nickname_surname?: Maybe<Scalars['String']['output']>;
@@ -1484,7 +1499,10 @@ export type EmployeeCreateInput = {
    * @deprecated Use 'given_name' instead. Will be removed in a future version of OS2mo.
    */
   givenname?: InputMaybe<Scalars['String']['input']>;
-  /** @deprecated Use 'given_name' and 'surname' instead. Will be removed in a future version of OS2mo. */
+  /**
+   * Combined name of the employee
+   * @deprecated Use 'given_name' and 'surname' instead. Will be removed in a future version of OS2mo.
+   */
   name?: InputMaybe<Scalars['String']['input']>;
   /**
    * Nickname (combined) of the employee.
@@ -1616,8 +1634,11 @@ export type EmployeeUpdateInput = {
   cpr_no?: InputMaybe<Scalars['CPR']['input']>;
   /** Danish CPR number of the employee. */
   cpr_number?: InputMaybe<Scalars['String']['input']>;
-  /** Start date of the validity. */
-  from: Scalars['DateTime']['input'];
+  /**
+   * Start date of the validity.
+   * @deprecated Use 'validity.from_date' instead. Will be removed in a future version of OS2mo.
+   */
+  from?: InputMaybe<Scalars['DateTime']['input']>;
   /** New first-name value of the employee nickname. */
   given_name?: InputMaybe<Scalars['String']['input']>;
   /**
@@ -1625,6 +1646,10 @@ export type EmployeeUpdateInput = {
    * @deprecated Use 'given_name' instead. Will be removed in a future version of OS2mo.
    */
   givenname?: InputMaybe<Scalars['String']['input']>;
+  /**
+   * Combined name of the employee
+   * @deprecated Use 'given_name' and 'surname' instead. Will be removed in a future version of OS2mo.
+   */
   name?: InputMaybe<Scalars['String']['input']>;
   /**
    * Nickname (combined) of the employee.
@@ -1639,14 +1664,17 @@ export type EmployeeUpdateInput = {
   seniority?: InputMaybe<Scalars['Date']['input']>;
   /** New last-name value of the employee nickname. */
   surname?: InputMaybe<Scalars['String']['input']>;
-  /** @deprecated Use 'nickname_given_name' and 'nickname_surname' instead. Will be removed in a future version of OS2mo. */
-  test_should_be_deprecated?: InputMaybe<Scalars['String']['input']>;
-  /** End date of the validity, if applicable. */
+  /**
+   * End date of the validity, if applicable.
+   * @deprecated Use 'validity.to_date' instead. Will be removed in a future version of OS2mo.
+   */
   to?: InputMaybe<Scalars['DateTime']['input']>;
   /** Short, unique key for the employee (defaults to object UUID on creation). */
   user_key?: InputMaybe<Scalars['String']['input']>;
   /** UUID of the employee to be updated. */
   uuid: Scalars['UUID']['input'];
+  /** Validity range for the change. */
+  validity?: InputMaybe<RaValidityInput>;
 };
 
 /** Employee engagement in an organisation unit */
@@ -2790,8 +2818,6 @@ export type ItSystem = {
   name: Scalars['String']['output'];
   /** The ITSystem type. */
   system_type?: Maybe<Scalars['String']['output']>;
-  /** @deprecated Use 'nickname_given_name' and 'nickname_surname' instead. Will be removed in a future version of OS2mo. */
-  test_should_be_deprecated?: Maybe<Scalars['String']['output']>;
   /**
    * The object type.
    *

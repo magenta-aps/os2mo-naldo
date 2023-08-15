@@ -15,7 +15,8 @@
 
   let fromDate: string
   let toDate: string
-  let name: string
+  let firstName: string
+  let lastName: string
   let nicknameFirstName: string
   let nicknameLastName: string
   let seniority: string
@@ -24,7 +25,8 @@
     query Employee($uuid: [UUID!], $fromDate: DateTime) {
       employees(uuids: $uuid, from_date: $fromDate) {
         objects {
-          name
+          given_name
+          surname
           nickname_givenname
           nickname_surname
           cpr_no
@@ -99,13 +101,21 @@
           id="to"
         />
       </div>
-      <Input
-        title="Navn"
-        id="name"
-        bind:value={name}
-        startValue={employee.name}
-        required={true}
-      />
+      <div class="flex flex-row gap-6">
+        <Input
+          title="Navn"
+          id="first-name"
+          bind:value={firstName}
+          startValue={employee.given_name}
+          extra_classes="basis-1/2"
+          />
+        <Input
+          id="last-name"
+          bind:value={lastName}
+          startValue={employee.surname}
+          extra_classes="basis-1/2 pt-6"
+          />
+      </div>
       <div class="flex flex-row gap-6">
         <Input
           title="Kaldenavn"
