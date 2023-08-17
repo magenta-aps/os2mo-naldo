@@ -14,6 +14,8 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
+  import { getClassUuidByUserKey } from "$lib/util/get_classes"
+
 
   let fromDate: string
   let toDate: string
@@ -28,6 +30,7 @@
       }
       classes(user_keys: ["primary", "non-primary"]) {
         uuid
+        user_key
       }
       org_units(uuids: $uuid, from_date: $fromDate) {
         objects {
@@ -82,9 +85,7 @@
   Henter data...
 {:then data}
   {@const itSystems = data.itsystems}
-  <!-- Eeeeh, vi kan vel aldrig være sikre på at klasser kommer i samme rækkefølge på andre servere, fordi de har andre UUID'er rundt omrking.. -->
-  {@const primaryUuid = data.classes[0].uuid}
-  {@const nonPrimaryUuid = data.classes[1].uuid}
+  {@const classes = data.classes}
   {@const minDate = data.org_units[0].objects[0].validity?.from.split("T")[0]}
   {@const maxDate = data.org_units[0].objects[0].validity?.to?.split("T")[0]}
 
@@ -137,12 +138,11 @@
           <Checkbox
             title="Primær"
             id="primary"
-            value={primaryUuid}
+            value={getClassUuidByUserKey(classes, "primary")}
             extra_classes="checkbox-primary"
           />
         </div>
-        <!-- Enten skal vi gøre det her, ellers skal vi lave et gql kald i `+page.server.ts`? -->
-        <input hidden name="non-primary" id="non-primary" value={nonPrimaryUuid}>
+        <input hidden name="non-primary" id="non-primary" value={getClassUuidByUserKey(classes, "non-primary")}>
       </div>
     </div>
     <!-- TODO: Add support for adding more IT users at once -->

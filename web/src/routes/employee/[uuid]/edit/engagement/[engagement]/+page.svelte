@@ -17,6 +17,7 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
+  import { getClassesByFacetUserKey } from "$lib/util/get_classes"
 
   let fromDate: string
   let toDate: string
@@ -24,6 +25,7 @@
   let user_key: string
   let jobFunction: string
   let engagementType: string
+  let primary: string
 
   // TODO: Move facets to its own query to not have the datetime overwritten
   gql`
@@ -36,6 +38,7 @@
         classes {
           name
           uuid
+          user_key
         }
       }
       engagements(uuids: $uuid, from_date: $fromDate) {
@@ -54,6 +57,7 @@
           }
           primary {
             uuid
+            name
           }
           validity {
             from
@@ -110,8 +114,6 @@
 {:then data}
   {@const engagement = data.engagements[0].objects[0]}
   {@const facets = data.facets}
-  {@const primaryUuid = facets[1].classes[0].uuid}
-  {@const nonPrimaryUuid = facets[1].classes[2].uuid}
   {@const minDate = engagement.org_unit[0].validity.from.split("T")[0]}
   {@const maxDate = engagement.org_unit[0].validity.to?.split("T")[0]}
 
@@ -146,15 +148,15 @@
             max={maxDate ? maxDate : null}
           />
         </div>
+        <Input
+          title="Organisationsenhed UUID"
+          id="org-unit-uuid"
+          bind:value={orgUnitUuid}
+          startValue={engagement.org_unit[0].uuid}
+          required={true}
+          extra_classes="basis-1/2"
+        />
         <div class="flex flex-row gap-6">
-          <Input
-            title="Organisationsenhed UUID"
-            id="org-unit-uuid"
-            bind:value={orgUnitUuid}
-            startValue={engagement.org_unit[0].uuid}
-            required={true}
-            extra_classes="basis-1/2"
-          />
           <Input
             title="ID"
             id="user-key"
@@ -162,35 +164,35 @@
             startValue={engagement.user_key}
             extra_classes="basis-1/2"
           />
-        </div>
-        <div class="flex flex-row gap-6">
           <Select
             title="Stillingsbetegnelse"
             id="job-function"
             bind:value={jobFunction}
-            iterable={facets[2].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
+            startValue={engagement.job_function.name}
+            iterable={getClassesByFacetUserKey(facets, "engagement_job_function")}
             required={true}
             extra_classes="basis-1/2"
           />
+        </div>
+        <div class="flex flex-row gap-6">
           <Select
             title="Engagementstype"
             id="engagement-type"
             bind:value={engagementType}
-            iterable={facets[0].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
+            startValue={engagement.engagement_type.name}
+            iterable={getClassesByFacetUserKey(facets, "engagement_type")}
             required={true}
             extra_classes="basis-1/2"
           />
-        </div>
-        <div class="flex">
-          <Checkbox
+          <Select
             title="Primær"
             id="primary"
-            startValue={engagement.primary?.uuid}
-            value={primaryUuid}
-            extra_classes="checkbox-primary"
+            bind:value={primary}
+            startValue={engagement.primary?.name}
+            iterable={getClassesByFacetUserKey(facets, "primary_type")}
+            extra_classes="basis-1/2"
           />
         </div>
-        <input hidden name="non-primary" id="non-primary" value={nonPrimaryUuid} />
       </div>
     </div>
     <div class="flex py-6 gap-4">

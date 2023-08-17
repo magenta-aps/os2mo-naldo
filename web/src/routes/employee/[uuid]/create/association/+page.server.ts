@@ -14,7 +14,7 @@ export const actions: Actions = {
     const endDate = data.get("to")
 
     return {
-      employee: params.uuid,
+      person: params.uuid,
       org_unit: orgUnitUuid,
       association_type: associationType,
       primary: primary,

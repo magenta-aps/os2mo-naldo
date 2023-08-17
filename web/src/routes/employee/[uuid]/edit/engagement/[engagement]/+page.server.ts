@@ -11,7 +11,7 @@ export const actions: Actions = {
     const userKey = data.get("user-key") as string
     const engagementType = data.get("engagement-type")
     const jobFunction = data.get("job-function")
-    const primary = data.get("primary") ? data.get("primary") : data.get("non-primary")
+    const primary = data.get("primary")
     const startDate = data.get("from")
     const endDate = data.get("to")
 
@@ -21,7 +21,7 @@ export const actions: Actions = {
       ...(userKey && { user_key: userKey }),
       ...(engagementType && { engagement_type: engagementType }),
       ...(jobFunction && { job_function: jobFunction }),
-      primary: primary,
+      ...(primary && { primary: primary }),
       validity: { from: startDate, ...(endDate && { to: endDate }) },
     }
   },

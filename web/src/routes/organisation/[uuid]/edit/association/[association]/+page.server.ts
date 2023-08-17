@@ -9,6 +9,7 @@ export const actions: Actions = {
     const data = await request.formData()
     const associationType = data.get("association-type")
     const employeeUuid = data.get("employee-uuid")
+    const primary = data.get("primary")
     const startDate = data.get("from")
     const endDate = data.get("to")
 
@@ -17,6 +18,7 @@ export const actions: Actions = {
       validity: { from: startDate, ...(endDate && { to: endDate }) },
       ...(associationType && { association_type: associationType }),
       ...(employeeUuid && { employee: employeeUuid }),
+      ...(primary && { primary: primary }),
     }
   },
 }

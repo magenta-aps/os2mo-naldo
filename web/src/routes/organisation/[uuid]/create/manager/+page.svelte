@@ -13,6 +13,7 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
+  import { getClassesByFacetUserKey } from "$lib/util/get_classes"
 
   let fromDate: string
   let toDate: string
@@ -29,6 +30,7 @@
         classes {
           name
           uuid
+          user_key
         }
       }
       org_units(uuids: $uuid, from_date: $fromDate) {
@@ -123,7 +125,7 @@
             title="Ledertype"
             id="manager-type"
             bind:value={managerType}
-            iterable={facets[2].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
+            iterable={getClassesByFacetUserKey(facets, "manager_type")}
             extra_classes="basis-1/2"
             required={true}
           />
@@ -131,7 +133,7 @@
             title="Lederniveau"
             id="manager-level"
             bind:value={managerLevel}
-            iterable={facets[0].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
+            iterable={getClassesByFacetUserKey(facets, "manager_level")}
             extra_classes="basis-1/2"
             required={true}
           />
@@ -140,10 +142,9 @@
           title="Lederansvar"
           id="responsibility"
           bind:value={responsibility}
-          iterable={facets[1].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
+          iterable={getClassesByFacetUserKey(facets, "responsibility")}
           required={true}
         />
-        <!-- Insert substitute field? -->
       </div>
     </div>
     <div class="flex py-6 gap-4">

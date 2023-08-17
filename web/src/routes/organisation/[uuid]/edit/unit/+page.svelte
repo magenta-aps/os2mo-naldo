@@ -14,6 +14,7 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
+  import { getClassesByFacetUserKey } from "$lib/util/get_classes"
 
   let startDate = new Date().toISOString().split("T")[0]
   let endDate: string
@@ -30,6 +31,7 @@
         classes {
           name
           uuid
+          user_key
         }
       }
       org_units(uuids: $uuid, from_date: $fromDate) {
@@ -45,6 +47,10 @@
           }
           org_unit_level {
             name
+          }
+          validity {
+            from
+            to
           }
         }
       }
@@ -86,7 +92,10 @@
   Henter data...
 {:then data}
   {@const org_unit = data.org_units[0].objects[0]}
+  {@const facets = data.facets}
+
   <title>Rediger {org_unit?.name} | OS2mo</title>
+
   <div class="flex align-center px-6 pt-6 pb-4">
     <h3 class="flex-1">Rediger {org_unit.name}</h3>
   </div>
@@ -99,6 +108,7 @@
         <div class="flex flex-row gap-6">
           <DateInput
             bind:value={startDate}
+            startValue={$date}
             title="Startdato"
             id="start-date"
             max={endDate
@@ -108,6 +118,9 @@
           <DateInput
             bind:value={endDate}
             title="Slutdato"
+            startValue={org_unit.validity.to
+              ? org_unit.validity.to.split("T")[0]
+              : null}
             id="end-date"
             min={startDate}
             max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
@@ -133,7 +146,7 @@
             startValue={org_unit.org_unit_level?.name}
             extra_classes="basis-1/2"
             bind:value={orgLevel}
-            iterable={data.facets[0].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
+            iterable={getClassesByFacetUserKey(facets, "org_unit_level")}
             required={true}
           />
           <Select
@@ -142,7 +155,7 @@
             startValue={org_unit.unit_type?.name}
             extra_classes="basis-1/2"
             bind:value={orgType}
-            iterable={data.facets[1].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
+            iterable={getClassesByFacetUserKey(facets, "org_unit_type")}
             required={true}
           />
         </div>

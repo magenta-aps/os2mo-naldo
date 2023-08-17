@@ -6,7 +6,7 @@ export const actions: Actions = {
     const data = await request.formData()
     const itSystem = data.get("it-system")
     const accountName = data.get("account-name") as string
-    const primary = data.get("primary") ? data.get("primary") : data.get("non-primary")
+    const primary = data.get("primary")
     const startDate = data.get("from")
     const endDate = data.get("to")
 

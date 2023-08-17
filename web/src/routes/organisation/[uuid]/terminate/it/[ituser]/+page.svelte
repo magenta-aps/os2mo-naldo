@@ -89,9 +89,7 @@
       <div class="p-8">
         <DateInput
           bind:value={toDate}
-          startValue={ituser.validity.to
-            ? ituser.validity.to.split("T")[0]
-            : null}
+          startValue={$date}
           title="Slutdato"
           id="to"
           min={minDate}

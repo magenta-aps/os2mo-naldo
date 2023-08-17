@@ -14,6 +14,7 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import type { SubmitFunction } from "./$types"
+  import { getClassesByFacetUserKey } from "$lib/util/get_classes"
 
   let fromDate: string
   let toDate: string
@@ -21,6 +22,7 @@
   let user_key: string
   let jobFunction: string
   let engagementType: string
+  let primary: string
 
   gql`
     query FacetAndOrg($uuid: [UUID!], $fromDate: DateTime) {
@@ -30,6 +32,7 @@
         classes {
           name
           uuid
+          user_key
         }
       }
       employees(uuids: $uuid, from_date: $fromDate) {
@@ -63,7 +66,7 @@
           $success = {
             message: `Engagement til ${mutation.engagement_create.objects[0].employee[0].name} er blevet oprettet`,
             uuid: $page.params.uuid,
-            type: "organisation",
+            type: "employee",
           }
         } catch (err) {
           console.error(err)
@@ -78,8 +81,6 @@
   Henter data...
 {:then data}
   {@const facets = data.facets}
-  {@const primaryUuid = facets[1].classes[0].uuid}
-  {@const nonPrimaryUuid = facets[1].classes[2].uuid}
   {@const minDate = data.employees[0].objects[0].validity?.from.split("T")[0]}
   {@const maxDate = data.employees[0].objects[0].validity?.to?.split("T")[0]}
 
@@ -112,50 +113,48 @@
             max={maxDate}
           />
         </div>
+        <!-- We need some sort of input, to choose an org_unit.
+          Hopefully we can do it with GraphQL soon :copium: -->
+        <Input
+          title="Organisationsenhed UUID"
+          id="org-unit-uuid"
+          bind:value={orgUnitUuid}
+          required={true}
+          extra_classes="basis-1/2"
+        />
         <div class="flex flex-row gap-6">
-          <!-- We need some sort of input, to choose an org_unit.
-            Hopefully we can do it with GraphQL soon :copium: -->
-          <Input
-            title="Organisationsenhed UUID"
-            id="org-unit-uuid"
-            bind:value={orgUnitUuid}
-            required={true}
-            extra_classes="basis-1/2"
-          />
           <Input
             title="ID"
             id="user-key"
             bind:value={user_key}
             extra_classes="basis-1/2"
-          />
-        </div>
-        <div class="flex flex-row gap-6">
+            />
           <Select
             title="Stillingsbetegnelse"
             id="job-function"
             bind:value={jobFunction}
-            iterable={facets[2].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
+            iterable={getClassesByFacetUserKey(facets, "engagement_job_function")}
             required={true}
             extra_classes="basis-1/2"
           />
+        </div>
+        <div class="flex flex-row gap-6">
           <Select
             title="Engagementstype"
             id="engagement-type"
             bind:value={engagementType}
-            iterable={facets[0].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
+            iterable={getClassesByFacetUserKey(facets, "engagement_type")}
             required={true}
             extra_classes="basis-1/2"
           />
-        </div>
-        <div class="flex">
-          <Checkbox
+          <Select
             title="Primær"
             id="primary"
-            value={primaryUuid}
-            extra_classes="checkbox-primary"
+            bind:value={primary}
+            iterable={getClassesByFacetUserKey(facets, "primary_type")}
+            extra_classes="basis-1/2"
           />
         </div>
-        <input hidden name="non-primary" id="non-primary" value={nonPrimaryUuid}>
       </div>
     </div>
     <div class="flex py-6 gap-4">

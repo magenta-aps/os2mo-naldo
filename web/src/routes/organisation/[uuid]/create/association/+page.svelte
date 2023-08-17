@@ -13,21 +13,24 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
+  import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+
 
   let fromDate: string
   let toDate: string
-  let name: string
   let employeeUuid: string
   let associationType: string
+  let primary: string
 
   gql`
     query FacetAndOrg($uuid: [UUID!], $fromDate: DateTime) {
-      facets(user_keys: "association_type") {
+      facets(user_keys: ["association_type", "primary_type"]) {
         uuid
         user_key
         classes {
           name
           uuid
+          user_key
         }
       }
       org_units(uuids: $uuid, from_date: $fromDate) {
@@ -76,7 +79,7 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const facet = data.facets[0].classes}
+  {@const facets = data.facets}
   {@const minDate = data.org_units[0].objects[0].validity?.from.split("T")[0]}
   {@const maxDate = data.org_units[0].objects[0].validity?.to?.split("T")[0]}
 
@@ -122,14 +125,23 @@
           bind:value={employeeUuid}
           required={true}
         />
-        <Select
-          title="Tilknytningsrolle"
-          id="association-type"
-          bind:value={associationType}
-          iterable={facet.sort((a, b) => (a.name > b.name ? 1 : -1))}
-          required={true}
-        />
-        <!-- Insert substitute field? -->
+        <div class="flex flex-row gap-6">
+          <Select
+            title="Tilknytningsrolle"
+            id="association-type"
+            bind:value={associationType}
+            iterable={getClassesByFacetUserKey(facets, "association_type")}
+            required={true}
+            extra_classes="basis-1/2"
+          />
+          <Select
+            title="Primær"
+            id="primary"
+            bind:value={primary}
+            iterable={getClassesByFacetUserKey(facets, "primary_type")}
+            extra_classes="basis-1/2"
+          />
+        </div>
       </div>
     </div>
     <div class="flex py-6 gap-4">
