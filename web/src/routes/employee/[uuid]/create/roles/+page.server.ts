@@ -10,7 +10,7 @@ export const actions: Actions = {
     const endDate = data.get("to")
 
     return {
-      employee: params.uuid,
+      person: params.uuid,
       org_unit: orgUnitUuid,
       role_type: roleType,
       validity: { from: startDate, ...(endDate && { to: endDate }) },
