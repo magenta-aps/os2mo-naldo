@@ -4,6 +4,7 @@
   import Icon from "$lib/components/icon.svelte"
   import { goto } from "$app/navigation"
   import { page } from "$app/stores"
+  import { base } from "$app/paths"
 
   const startTimeout = () => {
     setTimeout(
@@ -17,7 +18,7 @@
     // Will redirect if the successful action was on an organisation or employee
     if ($success.type == "organisation" || $success.type == "employee") {
       setTimeout(() => {
-        setTimeout(() => goto(`/${$success.type}/${$success.uuid}`), 200)
+        setTimeout(() => goto(`${base}/${$success.type}/${$success.uuid}`), 200)
       }, 200)
     }
   }
