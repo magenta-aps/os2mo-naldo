@@ -14,8 +14,8 @@
   import EngagementDetailTable from "$lib/components/shared/detail_tables/engagement_detail_table.svelte"
   import ItUserDetailTable from "$lib/components/shared/detail_tables/ituser_detail_table.svelte"
   import AssociationDetailTable from "$lib/components/shared/detail_tables/association_detail_table.svelte"
+  import ManagerDetailTable from "$lib/components/shared/detail_tables/manager_detail_table.svelte"
   import RoleTable from "$lib/components/org/tables/role_table.svelte"
-  import ManagerTable from "$lib/components/org/tables/manager_table.svelte"
   import RelatedTable from "$lib/components/org/tables/related_table.svelte"
   import { base } from "$app/paths"
   import KleTable from "$lib/components/org/tables/kle_table.svelte"
@@ -199,15 +199,15 @@
     Waiting to see if this can be done through GraphQL -->
     {#if $tenses.future}
       <h2 class="mb-4">Fremtid</h2>
-      <ManagerTable tense="future" uuid={$page.params.uuid} />
+      <ManagerDetailTable tense="future" uuid={$page.params.uuid} />
     {/if}
     {#if $tenses.present}
       <h2 class="mb-4">Nutid</h2>
-      <ManagerTable tense="present" uuid={$page.params.uuid} />
+      <ManagerDetailTable tense="present" uuid={$page.params.uuid} />
     {/if}
     {#if $tenses.past}
       <h2 class="mb-4">Fortid</h2>
-      <ManagerTable tense="past" uuid={$page.params.uuid} />
+      <ManagerDetailTable tense="past" uuid={$page.params.uuid} />
     {/if}
   {:else if activeItem === "KLE-opmærkninger"}
   <div class="flex justify-between">
