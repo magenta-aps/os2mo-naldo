@@ -1,9 +1,7 @@
 <script lang="ts">
     import DetailTable from "$lib/components/shared/detail_table.svelte"
     import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
-    import Icon from "$lib/components/icon.svelte"
     import { base } from "$app/paths"
-    import { page } from "$app/stores"
     import { graphQLClient } from "$lib/util/http"
     import { OrgUnitRoleDetailDocument } from "./query.generated"
     import { gql } from "graphql-request"
