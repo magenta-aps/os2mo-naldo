@@ -13,7 +13,7 @@
 
   gql`
     query Employees {
-      employees(limit: 100) {
+      employees(limit: 20) {
         objects {
           givenname
           surname
