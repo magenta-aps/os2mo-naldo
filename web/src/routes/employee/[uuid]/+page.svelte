@@ -12,7 +12,7 @@
   import AssociationDetailTable from "$lib/components/shared/detail_tables/association_detail_table.svelte"
   import ManagerDetailTable from "$lib/components/shared/detail_tables/manager_detail_table.svelte"
   import AddressesDetailTable from "$lib/components/employee/tables/addresses_detail_table.svelte"
-  import RolesDetailTable from "$lib/components/employee/tables/roles_detail_table.svelte"
+  import RolesDetailTable from "$lib/components/shared/detail_tables/roles_detail_table.svelte"
   import LeavesDetailTable from "$lib/components/employee/tables/leaves_detail_table.svelte"
   import TenseTabs from "$lib/components/shared/tense_tabs.svelte"
   import { tenses } from "$lib/stores/tenses"
@@ -170,15 +170,15 @@
       Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
-        <RolesDetailTable tense="future" />
+        <RolesDetailTable tense="future" uuid={$page.params.uuid} />
       {/if}
       {#if $tenses.present}
         <h2 class="mb-4">Nutid</h2>
-        <RolesDetailTable tense="present" />
+        <RolesDetailTable tense="present" uuid={$page.params.uuid} />
       {/if}
       {#if $tenses.past}
         <h2 class="mb-4">Fortid</h2>
-        <RolesDetailTable tense="past" />
+        <RolesDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
     {:else if activeItem === itemCategory.IT}
       {#if $tenses.future}

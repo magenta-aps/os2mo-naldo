@@ -2,7 +2,6 @@
   import { page } from "$app/stores"
   import Tabs from "$lib/components/shared/tabs.svelte"
   import HeadTitle from "$lib/components/shared/head_title.svelte"
-  import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
   import CopyToClipboard from "$lib/components/copy_to_clipboard.svelte"
   import TenseTabs from "$lib/components/shared/tense_tabs.svelte"
   import { activeOrgTab } from "$lib/stores/tab"
@@ -15,10 +14,10 @@
   import ItUserDetailTable from "$lib/components/shared/detail_tables/ituser_detail_table.svelte"
   import AssociationDetailTable from "$lib/components/shared/detail_tables/association_detail_table.svelte"
   import ManagerDetailTable from "$lib/components/shared/detail_tables/manager_detail_table.svelte"
-  import RoleTable from "$lib/components/org/tables/role_table.svelte"
   import RelatedTable from "$lib/components/org/tables/related_table.svelte"
   import { base } from "$app/paths"
   import KleTable from "$lib/components/org/tables/kle_table.svelte"
+  import RolesDetailTable from "$lib/components/shared/detail_tables/roles_detail_table.svelte"
 
   // Tabs
   // TODO: enum?
@@ -175,15 +174,15 @@
     Waiting to see if this can be done through GraphQL -->
     {#if $tenses.future}
       <h2 class="mb-4">Fremtid</h2>
-      <RoleTable tense="future" uuid={$page.params.uuid} />
+      <RolesDetailTable tense="future" uuid={$page.params.uuid} />
     {/if}
     {#if $tenses.present}
       <h2 class="mb-4">Nutid</h2>
-      <RoleTable tense="present" uuid={$page.params.uuid} />
+      <RolesDetailTable tense="present" uuid={$page.params.uuid} />
     {/if}
     {#if $tenses.past}
       <h2 class="mb-4">Fortid</h2>
-      <RoleTable tense="past" uuid={$page.params.uuid} />
+      <RolesDetailTable tense="past" uuid={$page.params.uuid} />
     {/if}
   {:else if activeItem === "Ledere"}
   <div class="flex justify-between">
