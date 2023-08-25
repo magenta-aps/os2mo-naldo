@@ -11,7 +11,7 @@
 </script>
 
 <div class="navbar bg-primary min-h-8 h-8 py-5 text-base-100">
-  <div class="flex-1 z-10">
+  <div class="flex-1">
     <a
       href="{base}/employee/{Form.CREATE}"
       class="btn btn-sm btn-primary text-base-100 normal-case font-normal"

@@ -12,7 +12,7 @@
   }
 </script>
 
-<div class="tooltip tooltip-bottom z-10" data-tip="Kopier {name} uuid">
+<div class="tooltip tooltip-bottom" data-tip="Kopier {name} uuid">
   <button
     on:click={copyToClipboard}
     class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"

@@ -21,7 +21,7 @@
 
 <div class="navbar bg-secondary text-base-100 shadow-xl">
   <div class="navbar-start">
-    <label for="my-drawer-3" class="btn btn-square btn-ghost lg:hidden">
+    <label for="drawer" class="btn btn-square btn-ghost lg:hidden">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
