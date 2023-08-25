@@ -1,17 +1,10 @@
 <script lang="ts">
   import { isAuth } from "$lib/stores/auth"
   import DrawerContent from "$lib/components/drawer_content.svelte"
-
-  let drawerToggled: boolean
 </script>
 
-<div class="drawer drawer-mobile">
-  <input
-    id="my-drawer-3"
-    type="checkbox"
-    class="drawer-toggle"
-    bind:checked={drawerToggled}
-  />
+<div class="drawer lg:drawer-open">
+  <input id="drawer" type="checkbox" class="drawer-toggle" />
   <div class="drawer-content flex flex-col h-auto">
     <!-- Page content here -->
     {#if $isAuth}
@@ -26,8 +19,8 @@
     {/if}
   </div>
   <div class="drawer-side">
-    <label for="my-drawer-3" class="drawer-overlay" />
-    <ul class="overflow-y-auto w-80 bg-base-100 border">
+    <label for="drawer" class="drawer-overlay" />
+    <ul class="overflow-y-auto w-80 bg-base-100 min-h-screen border">
       <!-- Sidebar content here -->
       <div class="flex-none">
         <DrawerContent />
