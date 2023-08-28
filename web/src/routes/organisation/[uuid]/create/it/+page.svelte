@@ -15,6 +15,7 @@
   import { date } from "$lib/stores/date"
   import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
   import { getClassUuidByUserKey } from "$lib/util/get_classes"
+  import {activeOrgTab} from "$lib/stores/tab";
 
 
   let fromDate: string
@@ -71,6 +72,7 @@
             }`,
             uuid: $page.params.uuid,
             type: "organisation",
+            tab: $activeOrgTab,
           }
         } catch (err) {
           console.error(err)

@@ -5,7 +5,7 @@ interface SuccessAlert {
   uuid?: string | null
   type?: "employee" | "organisation" | "clipboard"
   timeOutTime?: number
-  tab: string
+  tab?: string
 }
 
 interface ErrorAlert {

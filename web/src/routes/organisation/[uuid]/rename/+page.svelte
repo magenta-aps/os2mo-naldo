@@ -9,6 +9,7 @@
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import type { PageData } from "./$types"
+  import {activeOrgTab} from "$lib/stores/tab";
 
   export let data: PageData
 
@@ -43,6 +44,7 @@
             message: `${org.name} er blevet omdøbt`,
             uuid: json,
             type: "organisation",
+            tab: $activeOrgTab,
           }
         } else {
           $error = { message: json.description }

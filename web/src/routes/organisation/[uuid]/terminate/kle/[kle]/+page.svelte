@@ -11,6 +11,7 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
+  import {activeOrgTab} from "$lib/stores/tab";
 
   let toDate: string
 
@@ -57,6 +58,7 @@
             message: `KLE-opmærkningen afsluttes ${mutation.kle_terminate.objects[0].validity.to.split("T")[0]}`,
             uuid: $page.params.uuid,
             type: "organisation",
+            tab: $activeOrgTab,
           }
         } catch (err) {
           console.error(err)

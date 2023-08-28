@@ -17,6 +17,7 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import {activeOrgTab} from "$lib/stores/tab";
 
   let fromDate: string
   let toDate: string
@@ -89,6 +90,7 @@
             message: `Tilknytning for ${mutation.association_update.objects[0].employee[0].name} er blevet redigeret`,
             uuid: $page.params.uuid,
             type: "organisation",
+            tab: $activeOrgTab,
           }
         } catch (err) {
           console.error(err)

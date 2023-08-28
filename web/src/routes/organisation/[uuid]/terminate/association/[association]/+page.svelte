@@ -11,6 +11,7 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
+  import {activeOrgTab} from "$lib/stores/tab";
 
   let toDate: string
 
@@ -60,6 +61,7 @@
             message: `Tilknytningen for ${mutation.association_terminate.objects[0].employee[0].name} afsluttes d. ${toDate}`,
             uuid: $page.params.uuid,
             type: "organisation",
+            tab: $activeOrgTab,
           }
         } catch (err) {
           console.error(err)

@@ -4,6 +4,7 @@
   import { postRest } from "$lib/util/http"
   import { success, error } from "$lib/stores/alert"
   import type { PageData } from "./$types"
+  import {activeOrgTab} from "$lib/stores/tab";
 
   export let data: PageData
 </script>
@@ -33,6 +34,7 @@
           message: `${data.name} er blevet afsluttet`,
           uuid: data?.parent?.uuid,
           type: "organisation",
+          tab: $activeOrgTab,
         }
       } else {
         $error = { message: json.description }

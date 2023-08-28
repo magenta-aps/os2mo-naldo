@@ -11,6 +11,7 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
+  import {activeOrgTab} from "$lib/stores/tab";
 
   let toDate: string
 
@@ -59,6 +60,7 @@
             message: `${name} afsluttes d. INDSÆT DATO`,
             uuid: $page.params.uuid,
             type: "organisation",
+            tab: $activeOrgTab,
           }
         } catch (err) {
           console.error(err)

@@ -15,6 +15,7 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import {activeOrgTab} from "$lib/stores/tab";
 
   let startDate = new Date().toISOString().split("T")[0]
   let endDate: string
@@ -78,6 +79,7 @@
             message: `${name} er blevet redigeret`,
             uuid: mutation.org_unit_update.uuid,
             type: "organisation",
+            tab: $activeOrgTab,
           }
         } catch (err) {
           console.error(err)
