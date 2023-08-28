@@ -10,6 +10,7 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import type { SubmitFunction } from "./$types"
+  import {activeEmployeeTab} from "$lib/stores/tab";
 
   let toDate: string
 
@@ -58,6 +59,7 @@
             message: `Adressen afsluttes d. ${mutation.address_terminate.objects[0].validity.to.split("T")[0]}`,
             uuid: $page.params.uuid,
             type: "employee",
+            tab: $activeEmployeeTab,
           }
         } catch (err) {
           console.error(err)

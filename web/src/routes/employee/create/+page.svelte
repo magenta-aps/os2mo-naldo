@@ -11,6 +11,7 @@
   import { CreateEmployeeDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
+  import {activeEmployeeTab} from "$lib/stores/tab";
 
   let cprNumber: string
   let firstName: string
@@ -41,6 +42,7 @@
             message: `Medarbejderen ${mutation.employee_create.objects[0].name} er blevet oprettet.`,
             uuid: mutation.employee_create.objects[0].uuid,
             type: "employee",
+            tab: $activeEmployeeTab,
           }
         } catch (err) {
           console.error(err)

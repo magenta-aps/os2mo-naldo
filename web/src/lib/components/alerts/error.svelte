@@ -5,7 +5,7 @@
   const startTimeout = () => {
     setTimeout(
       () => {
-        $error = { message: "" }
+        $error = { message: "", tab: $error.tab }
       },
       $error.timeOutTime ? $error.timeOutTime : 5000
     )

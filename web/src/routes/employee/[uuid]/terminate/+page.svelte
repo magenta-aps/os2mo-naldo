@@ -11,6 +11,7 @@
     import { gql } from "graphql-request"
     import { page } from "$app/stores"
     import { date } from "$lib/stores/date"
+    import {activeEmployeeTab} from "$lib/stores/tab";
   
     let toDate: string
   
@@ -58,6 +59,7 @@
               message: `${mutation.employee_terminate.objects[0].name} afsluttes d. ${toDate}`,
               uuid: $page.params.uuid,
               type: "employee",
+              tab: $activeEmployeeTab,
             }
           } catch (err) {
             console.error(err)

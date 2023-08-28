@@ -5,6 +5,7 @@ interface SuccessAlert {
   uuid?: string | null
   type?: "employee" | "organisation" | "clipboard"
   timeOutTime?: number
+  tab: string
 }
 
 interface ErrorAlert {
@@ -12,7 +13,7 @@ interface ErrorAlert {
   timeOutTime?: number
 }
 
-const defaultSuccessAlert: SuccessAlert = { message: "" }
+const defaultSuccessAlert: SuccessAlert = { message: "", tab: "" }
 const defaultErrorAlert: ErrorAlert = { message: "" }
 
 export const success = writable(defaultSuccessAlert)

@@ -14,6 +14,8 @@
   import { date } from "$lib/stores/date"
   import type { SubmitFunction } from "./$types"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import {activeOrgTab} from "$lib/stores/tab";
+
 
   let fromDate: string
   let toDate: string
@@ -82,6 +84,7 @@
             message: `${mutation.address_update.objects[0].name} er blevet redigeret`,
             uuid: $page.params.uuid,
             type: "organisation",
+            tab: $activeOrgTab,
           }
         } catch (err) {
           console.error(err)
@@ -237,7 +240,7 @@
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        on:click={() => goto(`${base}/organisation/${$page.params.uuid}`)}
+        on:click={() => goto(`${base}/organisation/${$page.params.uuid}#${$activeOrgTab}`)}
       >
         Annullér
       </button>

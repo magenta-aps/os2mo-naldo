@@ -18,6 +18,7 @@
   import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
   import { date } from "$lib/stores/date"
   import { getClassUuidByUserKey } from "$lib/util/get_classes"
+  import {activeEmployeeTab} from "$lib/stores/tab";
 
 
   let fromDate: string
@@ -81,6 +82,7 @@
             message: "IT kontoen er blevet redigeret",
             uuid: $page.params.uuid,
             type: "employee",
+            tab: $activeEmployeeTab,
           }
         } catch (err) {
           console.error(err)

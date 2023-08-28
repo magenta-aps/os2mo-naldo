@@ -17,6 +17,7 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import {activeOrgTab} from "$lib/stores/tab";
 
   export let data: PageData
 
@@ -87,6 +88,7 @@
             message: `${name} er blevet oprettet`,
             uuid: json,
             type: "organisation",
+            tab: $activeOrgTab,
           }
         } else {
           $error = { message: json.description }

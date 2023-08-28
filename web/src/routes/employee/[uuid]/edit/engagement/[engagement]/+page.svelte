@@ -18,6 +18,7 @@
   import { date } from "$lib/stores/date"
   import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import {activeEmployeeTab} from "$lib/stores/tab";
 
   let fromDate: string
   let toDate: string
@@ -99,6 +100,7 @@
             message: `${mutation.engagement_update.objects[0].employee[0].name} er blevet redigeret`,
             uuid: $page.params.uuid,
             type: "employee",
+            tab: $activeEmployeeTab,
           }
         } catch (err) {
           console.error(err)

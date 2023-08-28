@@ -12,6 +12,7 @@
   import { UpdateEmployeeDocument, EmployeeDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
+  import {activeEmployeeTab} from "$lib/stores/tab";
 
   let fromDate: string
   let toDate: string
@@ -60,6 +61,7 @@
             message: `Medarbejderen ${mutation.employee_update.objects[0].name} er blevet redigeret.`,
             uuid: mutation.employee_update.objects[0].uuid,
             type: "employee",
+            tab: $activeEmployeeTab,
           }
         } catch (err) {
           console.error(err)

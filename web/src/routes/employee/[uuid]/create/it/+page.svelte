@@ -15,6 +15,7 @@
   import { date } from "$lib/stores/date"
   import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
   import { getClassUuidByUserKey } from "$lib/util/get_classes"
+  import {activeEmployeeTab} from "$lib/stores/tab";
 
   let fromDate: string
   let toDate: string
@@ -70,6 +71,7 @@
             }`,
             uuid: $page.params.uuid,
             type: "employee",
+            tab: $activeEmployeeTab,
           }
         } catch (err) {
           console.error(err)

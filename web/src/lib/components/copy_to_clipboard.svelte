@@ -7,7 +7,7 @@
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(uuid).then(() => {
-      $success = { message: `${name} blev kopieret`, type: "clipboard" }
+      $success = { message: `${name} blev kopieret`, type: "clipboard", tab: "" }
     })
   }
 </script>

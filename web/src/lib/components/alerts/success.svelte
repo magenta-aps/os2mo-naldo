@@ -9,7 +9,7 @@
   const startTimeout = () => {
     setTimeout(
       () => {
-        $success = { message: "" }
+        $success = { message: "", tab: $success.tab }
       },
       $success.timeOutTime ? $success.timeOutTime : 5000
     )
@@ -18,7 +18,7 @@
     // Will redirect if the successful action was on an organisation or employee
     if ($success.type == "organisation" || $success.type == "employee") {
       setTimeout(() => {
-        setTimeout(() => goto(`${base}/${$success.type}/${$success.uuid}`), 200)
+        setTimeout(() => goto(`${base}/${$success.type}/${$success.uuid}#${$success.tab}`), 200)
       }, 200)
     }
   }
@@ -32,7 +32,7 @@
   <div class="toast toast-end" transition:slide>
     {#if $success.type == "organisation" || $success.type == "employee"}
       <a
-        href={`/${$success.type}/${$success.uuid}`}
+        href={`/${$success.type}/${$success.uuid}#${$success.tab}`}
         class="alert alert-success shadow-lg"
       >
         <div>

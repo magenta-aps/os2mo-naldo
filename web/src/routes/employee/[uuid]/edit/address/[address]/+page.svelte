@@ -14,6 +14,7 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import type { SubmitFunction } from "./$types"
+  import {activeEmployeeTab} from "$lib/stores/tab";
 
   let fromDate: string
   let toDate: string
@@ -88,6 +89,7 @@
             message: `Adresse redigeret`,
             uuid: $page.params.uuid,
             type: "employee",
+            tab: $activeEmployeeTab,
           }
         } catch (err) {
           console.error(err)

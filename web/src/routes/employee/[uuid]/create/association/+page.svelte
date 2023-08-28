@@ -17,6 +17,7 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import {activeEmployeeTab} from "$lib/stores/tab";
 
   let fromDate: string
   let toDate: string
@@ -70,6 +71,7 @@
             message: `Tilknytning til ${mutation.association_create.objects[0].employee[0].name} er blevet oprettet`,
             uuid: $page.params.uuid,
             type: "employee",
+            tab: $activeEmployeeTab
           }
         } catch (err) {
           console.error(err)

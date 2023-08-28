@@ -13,6 +13,7 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import type { SubmitFunction } from "./$types"
+  import {activeOrgTab} from "$lib/stores/tab";
 
   let fromDate: string
   let toDate: string
@@ -60,6 +61,7 @@
             message: `Tilknytning til FIX ME er blevet oprettet`,
             uuid: $page.params.uuid,
             type: "organisation",
+            tab: $activeOrgTab,
           }
         } catch (err) {
           console.error(err)
