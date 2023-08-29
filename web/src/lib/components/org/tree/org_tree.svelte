@@ -1,10 +1,11 @@
 <script lang="ts">
-  import { page } from "$app/stores"
+  import { navigating, page } from "$app/stores"
   import { fetchGraph } from "$lib/util/http"
   import { fetchParentTree } from "$lib/util/parent_tree.js"
   import Node from "$lib/components/org/tree/node.svelte"
   import { success } from "$lib/stores/alert"
   import { date } from "$lib/stores/date"
+  import { globalNavigation } from "$lib/stores/navigation"
 
   // First load from index
   const fetchOrgTree = async (
@@ -53,6 +54,11 @@
   // TODO: Replace with subscriptions when implmented
   $: if ($success.type === "organisation") {
     refreshableOrgTree = fetchOrgTree($date, $success.uuid)
+  }
+
+  // Triggered when using the global navigation to find an organisation
+  $: if ($globalNavigation) {
+    refreshableOrgTree = fetchOrgTree($date, $globalNavigation.uuid)
   }
 </script>
 

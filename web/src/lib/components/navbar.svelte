@@ -2,8 +2,11 @@
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
-  import Avatar from "./navbar/avatar.svelte"
+  import Avatar from "$lib/components/navbar/avatar.svelte"
   import Search from "$lib/components/search.svelte"
+  import Icon from "$lib/components/icon.svelte"
+
+  let orgChecked: boolean
 
   let selectedDate = $date
   let timeout: NodeJS.Timeout | undefined
@@ -16,11 +19,10 @@
       $date = selectedDate
     }, 500)
   }
-
 </script>
 
-<div class="navbar bg-secondary text-base-100 shadow-xl">
-  <div class="navbar-start">
+<div class="navbar bg-secondary shadow-xl">
+  <div class="navbar-start text-base-100">
     <label for="drawer" class="btn btn-square btn-ghost lg:hidden">
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -42,13 +44,31 @@
   </div>
 
   <div class="navbar-center">
-    <div class="flex gap-2">
-      <Search />
-      <DateInput
-        bind:value={selectedDate}
-        id="other-end-date"
-        max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
-      />
+    <div class="flex gap-1 items-center justify-center">
+      <div class="text-base-100">
+        <Icon type="user" />
+      </div>
+      <input type="checkbox" class="toggle" bind:checked={orgChecked} />
+
+      <div class="text-base-100 pr-2">
+        <Icon type="users" />
+      </div>
+      <div class="w-96 flex items-center justify-center">
+        {#if orgChecked}
+          <Search action="goto" type={"organisation"} />
+        {:else}
+          <Search action="goto" type={"employee"} wantedAttrs={["Email"]} />
+        {/if}
+        }
+      </div>
+      <div class="pl-4">
+        <DateInput
+          bind:value={selectedDate}
+          id="other-end-date"
+          max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
+          padding=""
+        />
+      </div>
     </div>
   </div>
 
