@@ -174,7 +174,7 @@
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        on:click={() => goto(`${base}/organisation/${$page.params.uuid}`)}
+        on:click={() => goto(`${base}/organisation/${$page.params.uuid}#${$activeOrgTab}`)}
       >
         Annullér
       </button>
