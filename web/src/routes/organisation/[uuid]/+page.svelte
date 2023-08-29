@@ -18,6 +18,7 @@
   import { base } from "$app/paths"
   import KleTable from "$lib/components/org/tables/kle_table.svelte"
   import RolesDetailTable from "$lib/components/shared/detail_tables/roles_detail_table.svelte"
+  import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
 
   // Tabs
   // TODO: enum?
@@ -44,6 +45,11 @@
   {#await load($page.params.uuid, $date)}
     <p class="py-5">Loader organisation...</p>
   {:then orgUnits}
+    <Breadcrumbs
+      currentOrg={orgUnits.present[0].name}
+      bind:uuid={$page.params.uuid}
+      orgSelector={false}
+    />
     <div class="flex gap-5">
       <h1 class="pb-4">{orgUnits.present[0].name}</h1>
       <CopyToClipboard uuid={$page.params.uuid} name={orgUnits.present[0].name} />
@@ -134,7 +140,7 @@
     Waiting to see if this can be done through GraphQL -->
     {#if $tenses.future}
       <h2 class="mb-4">Fremtid</h2>
-      <AssociationDetailTable tense="future" uuid={$page.params.uuid}/>
+      <AssociationDetailTable tense="future" uuid={$page.params.uuid} />
     {/if}
     {#if $tenses.present}
       <h2 class="mb-4">Nutid</h2>
@@ -185,15 +191,15 @@
       <RolesDetailTable tense="past" uuid={$page.params.uuid} />
     {/if}
   {:else if activeItem === "Ledere"}
-  <div class="flex justify-between">
-    <TenseTabs />
-    <a
-      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
-      href="{base}/organisation/{$page.params.uuid}/create/manager"
-    >
-      Tilføj Leder
-    </a>
-  </div>
+    <div class="flex justify-between">
+      <TenseTabs />
+      <a
+        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
+        href="{base}/organisation/{$page.params.uuid}/create/manager"
+      >
+        Tilføj Leder
+      </a>
+    </div>
     <!-- TODO: future and past does not work. 
     Waiting to see if this can be done through GraphQL -->
     {#if $tenses.future}
@@ -209,15 +215,15 @@
       <ManagerDetailTable tense="past" uuid={$page.params.uuid} />
     {/if}
   {:else if activeItem === "KLE-opmærkninger"}
-  <div class="flex justify-between">
-    <TenseTabs />
-    <a
-      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
-      href="{base}/organisation/{$page.params.uuid}/create/kle"
-    >
-      Opret KLE opmærkning
-    </a>
-  </div>
+    <div class="flex justify-between">
+      <TenseTabs />
+      <a
+        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
+        href="{base}/organisation/{$page.params.uuid}/create/kle"
+      >
+        Opret KLE opmærkning
+      </a>
+    </div>
     {#if $tenses.future}
       <h2 class="mb-4">Fremtid</h2>
       <KleTable tense="future" uuid={$page.params.uuid} />
