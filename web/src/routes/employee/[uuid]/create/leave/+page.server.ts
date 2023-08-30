@@ -11,7 +11,6 @@ export const actions: Actions = {
         const engagementUuid = data.get("engagement-uuid");
         const leaveTypeUuid = data.get("leave-type-uuid");
         const personUuid = data.get("person-uuid");
-        const optionalUuid = data.get("optional-uuid");
         const startDate = data.get("from");
         const endDate = data.get("to");
 
@@ -19,7 +18,6 @@ export const actions: Actions = {
             engagement: engagementUuid,
             leave_type: leaveTypeUuid,
             person: personUuid,
-            ...(optionalUuid && { uuid: optionalUuid }),
             validity: { from: startDate, ...(endDate && { to: endDate }) },
         };
     },

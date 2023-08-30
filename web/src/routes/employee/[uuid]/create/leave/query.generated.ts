@@ -1,33 +1,21 @@
 import type * as Types from '../../../../../lib/graphql/types';
 
 import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
-
-export type LeaveDetailsQueryVariables = Types.Exact<{
-    uuid?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
-    fromDate?: Types.InputMaybe<Types.Scalars['DateTime']['input']>;
+export type LeaveAndEmployeeQueryVariables = Types.Exact<{
+  uuid?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
+  fromDate?: Types.InputMaybe<Types.Scalars['DateTime']['input']>;
 }>;
 
-export type LeaveDetailsQuery = {
-    __typename?: 'Query',
-    leaveTypes: Array<{ __typename?: 'LeaveType', name: string, uuid: any }>,
-    employees: Array<{ __typename?: 'EmployeeResponse', objects: Array<{ __typename?: 'Employee', validity: { __typename?: 'OpenValidity', from?: any | null, to?: any | null } }> }>
-};
+
+export type LeaveAndEmployeeQuery = { __typename?: 'Query', facets: Array<{ __typename?: 'Facet', uuid: any, user_key: string, classes: Array<{ __typename?: 'Class', user_key: string, name: string, uuid: any }> }>, employees: Array<{ __typename?: 'EmployeeResponse', objects: Array<{ __typename?: 'Employee', uuid: any, name: string, validity: { __typename?: 'OpenValidity', from?: any | null, to?: any | null } }> }> };
 
 export type CreateLeaveMutationVariables = Types.Exact<{
-    input: Types.LeaveCreateInput;
+  input: Types.LeaveCreateInput;
 }>;
 
-export type CreateLeaveMutation = {
-    __typename?: 'Mutation',
-    leave_create: {
-        __typename?: 'LeaveResponse',
-        objects: Array<{
-            __typename?: 'Leave',
-            employee?: Array<{ __typename?: 'Employee', name: string }> | null,
-            leaveType: { __typename?: 'LeaveType', name: string }
-        }>
-    }
-};
 
-export const LeaveDetailsDocument = {/*TODO*/} as unknown as DocumentNode<LeaveDetailsQuery, LeaveDetailsQueryVariables>;
-export const CreateLeaveDocument = {/* TODO*/} as unknown as DocumentNode<CreateLeaveMutation, CreateLeaveMutationVariables>;
+export type CreateLeaveMutation = { __typename?: 'Mutation', leave_create: { __typename?: 'LeaveResponse', objects: Array<{ __typename?: 'Leave', employee: Array<{ __typename?: 'Employee', name: string }> }> } };
+
+
+export const LeaveAndEmployeeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"LeaveAndEmployee"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"uuid"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"fromDate"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"facets"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"user_keys"},"value":{"kind":"ListValue","values":[{"kind":"StringValue","value":"leave_type","block":false},{"kind":"StringValue","value":"engagement_type","block":false}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"uuid"}},{"kind":"Field","name":{"kind":"Name","value":"user_key"}},{"kind":"Field","name":{"kind":"Name","value":"classes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user_key"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"uuid"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"employees"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"uuids"},"value":{"kind":"Variable","name":{"kind":"Name","value":"uuid"}}},{"kind":"Argument","name":{"kind":"Name","value":"from_date"},"value":{"kind":"Variable","name":{"kind":"Name","value":"fromDate"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"uuid"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"validity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}}]}}]}}]}}]}}]} as unknown as DocumentNode<LeaveAndEmployeeQuery, LeaveAndEmployeeQueryVariables>;
+export const CreateLeaveDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateLeave"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"LeaveCreateInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"leave_create"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"employee"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]} as unknown as DocumentNode<CreateLeaveMutation, CreateLeaveMutationVariables>;
