@@ -8,7 +8,6 @@
     import { base } from "$app/paths";
     import { success, error } from "$lib/stores/alert";
     import { graphQLClient } from "$lib/util/http";
-
     import { gql } from "graphql-request";
     import { page } from "$app/stores";
     import { date } from "$lib/stores/date";
@@ -16,34 +15,35 @@
     import { activeEmployeeTab } from "$lib/stores/tab";
     import {CreateLeaveDocument, LeaveAndEmployeeDocument} from "./query.generated";
 
+
     let fromDate: string;
     let toDate: string;
     let leaveType: string;
-    let selectedEngagement: string;
+    let engagementUuid: string;
 
     gql`
-    query LeaveAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
-      facets(user_keys: ["leave_type", "engagement_type"]) {
+    employees(uuids: $uuid, from_date: $fromDate) {
+    objects {
+      name
+      engagements {
         uuid
-        user_key
-        classes {
-          user_key
+        job_function {
           name
-          uuid
         }
       }
-      employees(uuids: $uuid, from_date: $fromDate) {
-        objects {
+      leaves {
+        validity {
+          from
+          to
+        }
+        leave_type {
           uuid
           name
-          validity {
-            from
-            to
-          }
         }
       }
     }
-
+  }
+}
     mutation CreateLeave($input: LeaveCreateInput!) {
       leave_create(input: $input) {
         objects {
@@ -54,6 +54,7 @@
       }
     }
   `;
+
 
     const handler: SubmitFunction = () => async ({ result }) => {
         if (result.type === "success" && result.data) {
@@ -73,15 +74,20 @@
             }
         }
     };
+
+
 </script>
 
 {#await graphQLClient().request( LeaveAndEmployeeDocument, { uuid: $page.params.uuid, fromDate: $date })}
     <!-- TODO: Should have a skeleton for the loading stage -->
     Henter data...
 {:then data}
+    {console.log(data)}
     {@const facets = data.facets}
     {@const minDate = data.employees[0].objects[0].validity.from.split("T")[0]}
     {@const maxDate = data.employees[0].objects[0].validity?.to?.split("T")[0]}
+
+
 
     <title>Opret orlov | OS2mo</title>
 
@@ -115,14 +121,14 @@
                     <Select
                             bind:value={leaveType}
                             title="orlovstype"
-                            id="leave-type"
+                            id="leave-type-uuid"
                             iterable={getClassesByFacetUserKey(facets, "leave_type")}
                             required={true}
                     />
                     <Select
-                            bind:value={selectedEngagement}
+                            bind:value={engagementUuid}
                             title="Engagementer"
-                            id="engagements"
+                            id="engagement-uuid"
                             iterable={getClassesByFacetUserKey(facets, "engagement_type")}
                             required={true}
                             extra_classes="basis-1/2"
@@ -134,7 +140,7 @@
             <button
                     type="submit"
                     class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-            >Opret engagement</button>
+            >Opret orlov</button>
             <button
                     type="button"
                     class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
