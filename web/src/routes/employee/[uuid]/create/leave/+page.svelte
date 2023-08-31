@@ -22,24 +22,34 @@
     let engagementUuid: string;
 
     gql`
-    employees(uuids: $uuid, from_date: $fromDate) {
+ query LeaveAndEmployee ($uuid: [UUID!], $fromDate: DateTime) {
+         facets(user_keys: ["leave_type"]) {
+    uuid
+    user_key
+    classes {
+      uuid
+      user_key
+      name
+    }
+  }
+  employees(uuids: $uuid, from_date: $fromDate) {
     objects {
+      uuid
       name
       engagements {
+        org_unit {
+          name
+          user_key
+        }
         uuid
         job_function {
+          user_key
           name
         }
       }
-      leaves {
-        validity {
-          from
-          to
-        }
-        leave_type {
-          uuid
-          name
-        }
+      validity {
+        from
+        to
       }
     }
   }
@@ -75,6 +85,18 @@
         }
     };
 
+    type EngagementTitleAndUuid = {
+        uuid: string;
+        job_function: { name: string };
+        org_unit: { name: string }[];
+    };
+
+    const getEngagementTitlesAndUuid = (engagements: EngagementTitleAndUuid[]): { uuid: string; name: string }[] => {
+        return engagements.map(engagement => ({
+            "uuid": engagement.uuid,
+            "name": engagement.job_function.name + ", " + engagement.org_unit[0].name
+        }));
+    }
 
 </script>
 
@@ -82,12 +104,10 @@
     <!-- TODO: Should have a skeleton for the loading stage -->
     Henter data...
 {:then data}
-    {console.log(data)}
     {@const facets = data.facets}
     {@const minDate = data.employees[0].objects[0].validity.from.split("T")[0]}
     {@const maxDate = data.employees[0].objects[0].validity?.to?.split("T")[0]}
-
-
+    {@const engagements=data.employees[0].objects[0].engagements}
 
     <title>Opret orlov | OS2mo</title>
 
@@ -120,7 +140,7 @@
                 <div class="flex flex-row gap-6">
                     <Select
                             bind:value={leaveType}
-                            title="orlovstype"
+                            title="Orlovstype"
                             id="leave-type-uuid"
                             iterable={getClassesByFacetUserKey(facets, "leave_type")}
                             required={true}
@@ -129,7 +149,7 @@
                             bind:value={engagementUuid}
                             title="Engagementer"
                             id="engagement-uuid"
-                            iterable={getClassesByFacetUserKey(facets, "engagement_type")}
+                            iterable={getEngagementTitlesAndUuid(engagements)}
                             required={true}
                             extra_classes="basis-1/2"
                     />

@@ -10,7 +10,6 @@ export const actions: Actions = {
 
         const engagementUuid = data.get("engagement-uuid");
         const leaveTypeUuid = data.get("leave-type-uuid");
-       /* const personUuid = data.get("person-uuid");*/
         const startDate = data.get("from");
         const endDate = data.get("to");
 
