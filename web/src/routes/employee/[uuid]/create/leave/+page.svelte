@@ -123,8 +123,8 @@
                 <div class="flex flex-row gap-6">
                     <DateInput
                             bind:value={fromDate}
-                            startValue={$date}
                             title="Startdato"
+                            startValue={$date}
                             id="from"
                             min={minDate}
                             max={toDate ? toDate : maxDate}
