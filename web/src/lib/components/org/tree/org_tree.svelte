@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { navigating, page } from "$app/stores"
+  import { page } from "$app/stores"
   import { fetchGraph } from "$lib/util/http"
   import { fetchParentTree } from "$lib/util/parent_tree.js"
   import Node from "$lib/components/org/tree/node.svelte"

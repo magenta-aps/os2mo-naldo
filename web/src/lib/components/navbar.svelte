@@ -44,7 +44,7 @@
   </div>
 
   <div class="navbar-center">
-    <div class="flex gap-1 items-center justify-center">
+    <div class="flex gap-2 items-center justify-center">
       <div class="text-base-100">
         <Icon type="user" />
       </div>
@@ -59,9 +59,8 @@
         {:else}
           <Search action="goto" type={"employee"} wantedAttrs={["Email"]} />
         {/if}
-        }
       </div>
-      <div class="pl-4">
+      <div>
         <DateInput
           bind:value={selectedDate}
           id="other-end-date"

@@ -12,16 +12,18 @@
   export let action: "select" | "goto" = "select" // Redirect for navigation, select for forms
   export let wantedAttrs: string[] = [] // Names of attributes you want shown next the to the name ("Email", ect.)
   export let title: string = ""
+  export let id = "autocomplete"
 
   const itemId = "uuid" // Used by the component to differentiate between items
   const url = type === "employee" ? "e/autocomplete/?query=" : "ou/autocomplete/?query="
 
-  const fetchAutocomplete = async (filterText: string): Promise<Autocomplete | []> => {
+  const fetchAutocomplete = async (filterText: string): Promise<Autocomplete[]> => {
     if (!filterText.length) return []
     if (filterText.length < 4) return []
 
     const res = await fetchRest(url + filterText + "&at=" + $date)
     const json = await res.json()
+    json.items.sort((a: any, b: any) => (a.name > b.name ? 1 : -1))
     return json.items
   }
 </script>
@@ -35,26 +37,27 @@
   <SvelteSelect
     --font-size="1rem"
     --height="2rem"
-    --loading-height="1.75rem"
-    --loading-width="1.75rem"
-    --spinner-height="1.75rem"
-    --spinner-width="1.75rem"
-    --item-height="2rem"
-    --item-padding="0 0 0 0.75rem"
-    --chevron-height="2rem"
-    --clear-select-height="1.75rem"
-    --clear-select-width="1.75rem"
+    --loading-height="1.5rem"
+    --loading-width="1.5rem"
+    --spinner-height="1.5rem"
+    --spinner-width="1.5rem"
+    --item-padding="0.25rem 0.75rem 0.25rem 0.75rem"
+    --item-height="auto"
+    --item-line-height="auto"
+    --clear-select-height="1.5rem"
+    --clear-select-width="1.5rem"
     --value-container-padding="0rem"
     --border-radius="0.25rem"
     --placeholder-color="#00244E"
     --icons-color="#00244E"
-    --border-focused="solid 2px #1053AB"
+    --border-focused="solid 0px"
     --padding="0 0 0 0.75rem"
     id="autocomplete"
     listAutoWidth={false}
     loadOptions={fetchAutocomplete}
     {itemId}
     bind:value
+    hideEmptyState={true}
     placeholder={`Søg efter ${type === "employee" ? "person" : "organisation"}`}
     on:select={() => {
       if (action === "goto" && value) {
@@ -72,7 +75,17 @@
     </div>
 
     <div slot="selection" let:selection>
-      <SearchItem item={selection} {wantedAttrs} />
+      <SearchItem item={selection} showAttrs={false} {wantedAttrs} />
     </div>
   </SvelteSelect>
 </div>
+
+{#if action === "select" && value}
+  <input hidden {id} name={id} bind:value={value.uuid} />
+{/if}
+
+<style>
+  :global(.svelte-select.focused) {
+    box-shadow: 0px 0px 0px 3px #1053ab;
+  }
+</style>
