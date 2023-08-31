@@ -43,6 +43,7 @@
           /></svg
         >
       </span>
+<!--      TODO: hvad skal "Orlov" linke til hvis den skal blive i nav-->
       <p class="text-base-100">Orlov</p>
     </label>
     <label class="btn btn-sm btn-primary text-base-100 normal-case font-normal" for="">
