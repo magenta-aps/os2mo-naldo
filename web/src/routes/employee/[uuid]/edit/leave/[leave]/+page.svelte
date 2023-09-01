@@ -13,7 +13,9 @@
     import { date } from "$lib/stores/date";
     import { getClassesByFacetUserKey } from "$lib/util/get_classes";
     import { activeEmployeeTab } from "$lib/stores/tab";
-    import {CreateLeaveDocument, LeaveAndEmployeeDocument} from "./query.generated";
+    import Input from "$lib/components/forms/shared/input.svelte";
+
+
 
 
     let fromDate: string;
@@ -21,59 +23,56 @@
     let leaveType: string;
     let engagementUuid: string;
 
-    gql`
- query LeaveAndEmployee ($uuid: [UUID!], $fromDate: DateTime) {
-         facets(user_keys: ["leave_type"]) {
-    uuid
-    user_key
-    classes {
-      uuid
-      user_key
-      name
-    }
-  }
+
+
+    gql`query LeaveAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
   employees(uuids: $uuid, from_date: $fromDate) {
     objects {
-      uuid
       name
       engagements {
         org_unit {
           name
-          user_key
         }
-        uuid
         job_function {
-          user_key
           name
         }
       }
-      validity {
-        from
-        to
+      leaves {
+        uuid
+        validity {
+          from
+          to
+        }
+        leave_type {
+          uuid
+          user_key
+        }
       }
     }
   }
 }
-    mutation CreateLeave($input: LeaveCreateInput!) {
-      leave_create(input: $input) {
-        objects {
-          employee {
-            name
-          }
-        }
+
+mutation UpdateLeave($input: LeaveUpdateInput!) {
+  leave_update(input: $input) {
+    objects {
+      person {
+        name
       }
     }
+  }
+}
+
   `;
 
 
     const handler: SubmitFunction = () => async ({ result }) => {
         if (result.type === "success" && result.data) {
             try {
-                const mutation = await graphQLClient().request(CreateLeaveDocument, {
+                const mutation = await graphQLClient().request(UpdateLeaveDocument, {
                     input: result.data
                 });
                 $success = {
-                    message: `Orlov til ${mutation.leave_create.objects[0].employee[0].name} er blevet oprettet`,
+                    message: `Orlov for ${mutation.leave_create.objects[0].employee[0].name} er blevet redigeret`,
                     uuid: $page.params.uuid,
                     type: "employee",
                     tab: $activeEmployeeTab
@@ -104,15 +103,16 @@
     <!-- TODO: Should have a skeleton for the loading stage -->
     Henter data...
 {:then data}
+    {@const leave = data.leaves[0].objects[0]}
     {@const facets = data.facets}
     {@const minDate = data.employees[0].objects[0].validity.from.split("T")[0]}
     {@const maxDate = data.employees[0].objects[0].validity?.to?.split("T")[0]}
     {@const engagements=data.employees[0].objects[0].engagements}
 
-    <title>Opret orlov | OS2mo</title>
+    <title>Rediger {leave?.employee[0].name} | OS2mo</title>
 
     <div class="flex align-center px-6 pt-6 pb-4">
-        <h3 class="flex-1">Opret orlov</h3>
+        <h3 class="flex-1">Rediger {leave?.employee[0].name} </h3>
     </div>
 
     <div class="divider p-0 m-0 mb-4 w-full" />
@@ -123,7 +123,9 @@
                 <div class="flex flex-row gap-6">
                     <DateInput
                             bind:value={fromDate}
-                            startValue={$date}
+                            startValue={leave.validity.from
+              ? leave.validity.from.split("T")[0]
+              : null}
                             title="Startdato"
                             id="from"
                             min={minDate}
@@ -131,6 +133,9 @@
                     />
                     <DateInput
                             bind:value={toDate}
+                            startValue={leave.validity.to
+              ? leave.validity.to.split("T")[0]
+              : null}
                             title="Slutdato"
                             id="to"
                             min={fromDate ? fromDate : minDate}
@@ -140,6 +145,7 @@
                 <div class="flex flex-row gap-6">
                     <Select
                             bind:value={leaveType}
+                            startValue={leave.leave_type[0].uuid}
                             title="Orlovstype"
                             id="leave-type-uuid"
                             iterable={getClassesByFacetUserKey(facets, "leave_type")}
@@ -149,6 +155,7 @@
                             bind:value={engagementUuid}
                             title="Engagementer"
                             id="engagement-uuid"
+                            startValue={leave.engagement_uuid[0].uuid}
                             iterable={getEngagementTitlesAndUuid(engagements)}
                             required={true}
                             extra_classes="basis-1/2"
@@ -160,7 +167,7 @@
             <button
                     type="submit"
                     class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-            >Opret orlov</button>
+            >Rediger orlov</button>
             <button
                     type="button"
                     class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
