@@ -9,8 +9,9 @@
   export let disabled = false
   export let min = "1910-01-01"
   export let max: string | undefined = undefined
+  export let padding: string = "pb-4"
 </script>
-<div class="form-control basis-1/2 pb-4">
+<div class="form-control basis-1/2 {padding}">
   {#if title}
     <label for={id} class="text-sm text-secondary pb-1">{title}</label>
   {/if}

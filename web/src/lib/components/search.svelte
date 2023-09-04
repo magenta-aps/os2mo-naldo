@@ -1,99 +1,91 @@
 <script lang="ts">
-  import { isAuth } from "$lib/stores/auth"
-  import { fetchRest } from "$lib/util/http"
+  import SvelteSelect from "svelte-select"
   import { goto } from "$app/navigation"
-  import { offset, flip, shift } from "@floating-ui/dom"
-  import { createFloatingActions } from "svelte-floating-ui"
   import { base } from "$app/paths"
+  import SearchItem from "./search_item.svelte"
+  import { fetchRest } from "$lib/util/http"
+  import { date } from "$lib/stores/date"
+  import { globalNavigation } from "$lib/stores/navigation"
 
-  const [floatingRef, floatingContent] = createFloatingActions({
-    strategy: "absolute",
-    placement: "bottom",
-    middleware: [offset(6), flip(), shift()],
-  })
+  export let value: Autocomplete | undefined = undefined
+  export let type: "employee" | "organisation" = "employee"
+  export let action: "select" | "goto" = "select" // Redirect for navigation, select for forms
+  export let wantedAttrs: string[] = [] // Names of attributes you want shown next the to the name ("Email", ect.)
+  export let title: string = ""
+  export let id = "autocomplete"
 
-  let input = ""
-  let isFocused = false
+  const itemId = "uuid" // Used by the component to differentiate between items
+  const url = type === "employee" ? "e/autocomplete/?query=" : "ou/autocomplete/?query="
 
-  const delayedUnfocus = () => {
-    // Stupid hack to make the floatingContent be clickable before it disappears
-    setTimeout(() => (isFocused = false), 250)
-  }
+  const fetchAutocomplete = async (filterText: string): Promise<Autocomplete[]> => {
+    if (!filterText.length) return []
+    if (filterText.length < 4) return []
 
-  const search = async (query: string) => {
-    const res = await fetchRest(`e/autocomplete/?query=${query}`)
+    const res = await fetchRest(url + filterText + "&at=" + $date)
     const json = await res.json()
+    json.items.sort((a: any, b: any) => (a.name > b.name ? 1 : -1))
     return json.items
   }
 </script>
 
-{#if $isAuth}
-  <div use:floatingRef>
-    <input
-      bind:value={input}
-      on:focus={() => (isFocused = true)}
-      on:blur={delayedUnfocus}
-      type="text"
-      placeholder="Søg"
-      class="input input-bordered rounded text-base w-80 h-8 text-neutral"
-    />
-    {#if isFocused && input}
-      <div use:floatingContent>
-        <div class="overflow-x-auto shadow-lg w-80 max-h-96">
-          <table class="table table-compact w-full text-neutral">
-            {#await search(input)}
-              <tbody>
-                <tr>
-                  <th class="flex justify-center">Loading...</th>
-                </tr>
-              </tbody>
-            {:then results}
-              {#if results.length}
-                <tbody>
-                  {#each results as result}
-                    <tr
-                      class="hover cursor-pointer"
-                      on:click={() => {
-                        goto(`${base}/employee/${result.uuid}`)
-                        input = ""
-                      }}
-                    >
-                      <th class="text-neutral">
-                        <a
-                          class="text-base text-secondary"
-                          href={`${base}/employee/${result.uuid}`}
-                        >
-                          {result.name}
-                        </a>
-                      </th>
-                    </tr>
-                  {/each}
-                </tbody>
-              {:else}
-                <tbody>
-                  <tr>
-                    <th class="flex justify-center text-neutral">Ingen resultater </th>
-                  </tr>
-                </tbody>
-              {/if}
-              <tfoot>
-                <tr>
-                  <th class="flex justify-center">{results.length}</th>
-                </tr>
-              </tfoot>
-            {/await}
-          </table>
-        </div>
-      </div>
-    {/if}
-  </div>
-{:else}
-  <div use:floatingRef>
-    <input
-      type="text"
-      disabled
-      placeholder="Søg"
-      class="input input-bordered rounded text-base w-80 h-8 text-neutral"
-    />
-  </div>
+<div class="w-full {title ? 'pb-4' : ''}">
+  {#if title}
+    <label for="autocomplete" class="text-sm text-secondary pb-1">
+      {title}
+    </label>
+  {/if}
+  <SvelteSelect
+    --font-size="1rem"
+    --height="2rem"
+    --loading-height="1.5rem"
+    --loading-width="1.5rem"
+    --spinner-height="1.5rem"
+    --spinner-width="1.5rem"
+    --item-padding="0.25rem 0.75rem 0.25rem 0.75rem"
+    --item-height="auto"
+    --item-line-height="auto"
+    --clear-select-height="1.5rem"
+    --clear-select-width="1.5rem"
+    --value-container-padding="0rem"
+    --border-radius="0.25rem"
+    --placeholder-color="#00244E"
+    --icons-color="#00244E"
+    --border-focused="solid 0px"
+    --padding="0 0 0 0.75rem"
+    id="autocomplete"
+    listAutoWidth={false}
+    loadOptions={fetchAutocomplete}
+    {itemId}
+    bind:value
+    hideEmptyState={true}
+    placeholder={`Søg efter ${type === "employee" ? "person" : "organisation"}`}
+    on:select={() => {
+      if (action === "goto" && value) {
+        goto(`${base}/${type}/${value.uuid}`)
+        if (type === "organisation") {
+          $globalNavigation.uuid = value.uuid
+        }
+        // Removes lingering/distracting value from staying after being redirected
+        value = undefined
+      }
+    }}
+  >
+    <div slot="item" let:item>
+      <SearchItem {item} {wantedAttrs} />
+    </div>
+
+    <div slot="selection" let:selection>
+      <SearchItem item={selection} showAttrs={false} {wantedAttrs} />
+    </div>
+  </SvelteSelect>
+</div>
+
+{#if action === "select" && value}
+  <input hidden {id} name={id} bind:value={value.uuid} />
 {/if}
+
+<style>
+  :global(.svelte-select.focused) {
+    box-shadow: 0px 0px 0px 3px #1053ab;
+  }
+</style>
