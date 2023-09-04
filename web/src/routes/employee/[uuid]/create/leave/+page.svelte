@@ -76,7 +76,6 @@
                     message: `Orlov til ${mutation.leave_create.objects[0].employee[0].name} er blevet oprettet`,
                     uuid: $page.params.uuid,
                     type: "employee",
-                    tab: $activeEmployeeTab
                 };
             } catch (err) {
                 console.error(err);
