@@ -17,7 +17,7 @@
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
   const headers = isOrg
-    ? ["Navn", "Rolletype", "Dato", "", ""]
+    ? ["Navn", "Rolletype", "Dato"]
     : ["Enhed", "Rolletype", "Dato", "", ""]
 
   gql`
@@ -58,30 +58,34 @@
           <a href="{base}/employee/{role.objects[0].employee[0].uuid}">
             <td class="p-4">{role.objects[0].employee[0].name}</td>
           </a>
+          <td class="p-4">{role.objects[0].role_type.name}</td>
+          <ValidityTableCell validity={role.objects[0].validity} />
         {:else}
           <a href="{base}/organisation/{role.objects[0].org_unit[0].uuid}">
             <td class="p-4">
               {role.objects[0].org_unit[0].name}
             </td>
           </a>
+          <td class="p-4">{role.objects[0].role_type.name}</td>
+          <ValidityTableCell validity={role.objects[0].validity} />
+          <td>
+            <a
+              aria-disabled
+              href="{base}/employee/{uuid}/edit/role/{role
+                .objects[0].uuid}"
+            >
+              <Icon type="pen" />
+            </a>
+          </td>
+          <td>
+            <a
+              href="{base}/employee/{uuid}/terminate/role/{role
+                .objects[0].uuid}"
+            >
+              <Icon type="xmark" size="30" />
+            </a></td
+          >
         {/if}
-        <td class="p-4">{role.objects[0].role_type.name}</td>
-        <ValidityTableCell validity={role.objects[0].validity} />
-        <td>
-          <a
-            aria-disabled
-            href="{base}/{$page.route.id?.split('/')[1]}/{uuid}/edit/roles/{role.objects[0].uuid}"
-          >
-            <Icon type="pen" />
-          </a>
-        </td>
-        <td>
-          <a
-            href="{base}/{$page.route.id?.split('/')[1]}/{uuid}/terminate/roles/{role.objects[0].uuid}"
-          >
-            <Icon type="xmark" size="30" />
-          </a></td
-        >
       </tr>
     {/each}
   {/await}
