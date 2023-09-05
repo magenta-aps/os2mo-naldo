@@ -10,6 +10,8 @@
     import { gql } from "graphql-request"
   
     export let uuid: string
+    // TODO: Blocked by #57396
+    // svelte-ignore unused-export-let
     export let tense: string
   
     gql`
@@ -69,7 +71,7 @@
         </td>
         <ValidityTableCell validity={association.validity} />
         <td>
-            <a href="{base}/organisation/{$page.params.uuid}/edit/association/{association.uuid}">
+            <a href="{base}/organisation/{uuid}/edit/association/{association.uuid}">
               <Icon type="pen" />
             </a>
           </td>
@@ -77,7 +79,7 @@
           {#if env.PUBLIC_ENABLE_UNIT_TERMINATE === "true"}
             <td>
               <a
-                href="{base}/organisation/{$page.params.uuid}/terminate/association/{association.uuid}"
+                href="{base}/organisation/{uuid}/terminate/association/{association.uuid}"
                 class="hover:slate-300"
               >
                 <Icon type="xmark" size="30" />

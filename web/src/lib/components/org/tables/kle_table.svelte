@@ -9,6 +9,8 @@
   import { gql } from "graphql-request"
 
   export let uuid: string
+  // TODO: Blocked by #57396
+  // svelte-ignore unused-export-let
   export let tense: string
 
   gql`

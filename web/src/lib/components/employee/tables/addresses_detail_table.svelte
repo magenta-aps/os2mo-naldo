@@ -8,6 +8,9 @@
   import Icon from "$lib/components/icon.svelte"
   import { page } from "$app/stores"
 
+  export let uuid: string
+  // TODO: Blocked by #57396
+  // svelte-ignore unused-export-let
   export let tense: string
 
   gql`
@@ -35,7 +38,7 @@
 </script>
 
 <DetailTable headers={["Adressetype", "Adresse", "Synlighed", "Dato", "", ""]}>
-  {#await graphQLClient().request( EmployeeAddressesDocument, { uuid: $page.params.uuid } )}
+  {#await graphQLClient().request( EmployeeAddressesDocument, { uuid: uuid } )}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>

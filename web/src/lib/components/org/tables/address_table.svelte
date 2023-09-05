@@ -10,6 +10,8 @@
   import { gql } from "graphql-request"
 
   export let uuid: string
+  // TODO: Blocked by #57396
+  // svelte-ignore unused-export-let
   export let tense: string
 
   gql`
@@ -58,7 +60,7 @@
         {#if env.PUBLIC_ENABLE_UNIT_TERMINATE === "true"}
           <td>
             <a
-              href="{base}/organisation/{$page.params.uuid}/terminate/address/{address.uuid}"
+              href="{base}/organisation/{uuid}/terminate/address/{address.uuid}"
               class="hover:slate-300"
             >
               <Icon type="xmark" size="30" />

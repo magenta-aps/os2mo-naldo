@@ -110,15 +110,15 @@
       Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
-        <EmployeeDetailTable tense="future" />
+        <EmployeeDetailTable tense="future" uuid={$page.params.uuid}/>
       {/if}
       {#if $tenses.present}
         <h2 class="mb-4">Nutid</h2>
-        <EmployeeDetailTable tense="present" />
+        <EmployeeDetailTable tense="present" uuid={$page.params.uuid}/>
       {/if}
       {#if $tenses.past}
         <h2 class="mb-4">Fortid</h2>
-        <EmployeeDetailTable tense="past" />
+        <EmployeeDetailTable tense="past" uuid={$page.params.uuid}/>
       {/if}
     {:else if activeItem === itemCategory.ENGAGEMENTS}
       <!-- TODO: future and past does not work. 
@@ -140,15 +140,15 @@
       Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
-        <AddressesDetailTable tense="future" />
+        <AddressesDetailTable tense="future" uuid={$page.params.uuid}/>
       {/if}
       {#if $tenses.present}
         <h2 class="mb-4">Nutid</h2>
-        <AddressesDetailTable tense="present" />
+        <AddressesDetailTable tense="present" uuid={$page.params.uuid}/>
       {/if}
       {#if $tenses.past}
         <h2 class="mb-4">Fortid</h2>
-        <AddressesDetailTable tense="past" />
+        <AddressesDetailTable tense="past" uuid={$page.params.uuid}/>
       {/if}
     {:else if activeItem === itemCategory.ASSOCIATIONS}
       <!-- TODO: future and past does not work. 
@@ -198,15 +198,15 @@
       Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
-        <LeavesDetailTable tense="future" />
+        <LeavesDetailTable tense="future" uuid={$page.params.uuid}/>
       {/if}
       {#if $tenses.present}
         <h2 class="mb-4">Nutid</h2>
-        <LeavesDetailTable tense="present" />
+        <LeavesDetailTable tense="present" uuid={$page.params.uuid}/>
       {/if}
       {#if $tenses.past}
         <h2 class="mb-4">Fortid</h2>
-        <LeavesDetailTable tense="past" />
+        <LeavesDetailTable tense="past" uuid={$page.params.uuid}/>
       {/if}
     {:else if activeItem === itemCategory.MANAGER}
       <!-- TODO: future and past does not work. 

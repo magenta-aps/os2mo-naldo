@@ -10,15 +10,12 @@
   import { enhance } from "$app/forms"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
-  import type { PageData } from "./$types"
   import Icon from "$lib/components/icon.svelte"
   import { gql } from "graphql-request"
   import { GetOrgUnitAndFacetsDocument } from "./query.generated"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
-
-  export let data: PageData
 
   gql`
     query GetOrgUnitAndFacets($uuid: [UUID!], $fromDate: DateTime) {
