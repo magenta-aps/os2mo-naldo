@@ -9,11 +9,13 @@
   import { ItUsersDocument } from "./query.generated"
 
   export let uuid: string
+  // TODO: Blocked by #57396
+  // svelte-ignore unused-export-let
   export let tense: string
 
   const isOrg = $page.route.id?.startsWith("/organisation")
-  const employee = isOrg ? null : $page.params.uuid
-  const org_unit = isOrg ? $page.params.uuid : null
+  const employee = isOrg ? null : uuid
+  const org_unit = isOrg ? uuid : null
   const headers = ["IT system", "Kontonavn", "Primær", "Dato", "", ""]
 
   gql`
@@ -54,17 +56,15 @@
         <td class="p-4">{ituser.primary ? ituser.primary.name : ""}</td>
         <ValidityTableCell validity={ituser.validity} />
         <td>
-          <a
-            href="{base}/{$page.route.id?.split('/')[1]}/{$page.params
-              .uuid}/edit/it/{ituser.uuid}"
-          >
+          <a href="{base}/{$page.route.id?.split('/')[1]}/{uuid}/edit/it/{ituser.uuid}">
             <Icon type="pen" />
           </a>
         </td>
         <td>
           <a
-            href="{base}/{$page.route.id?.split('/')[1]}/{$page.params
-              .uuid}/terminate/it/{ituser.uuid}"
+            href="{base}/{$page.route.id?.split(
+              '/'
+            )[1]}/{uuid}/terminate/it/{ituser.uuid}"
           >
             <Icon type="xmark" size="30" />
           </a>
