@@ -18,6 +18,7 @@
   import TenseTabs from "$lib/components/shared/tense_tabs.svelte"
   import { tenses } from "$lib/stores/tenses"
   import { base } from "$app/paths"
+  import { date } from "$lib/stores/date"
 
   // Tabs
   enum itemCategory {
@@ -65,8 +66,8 @@
   }
 
   gql`
-    query Employee($uuid: [UUID!]) {
-      employees(uuids: $uuid) {
+    query Employee($uuid: [UUID!], $fromDate: DateTime) {
+      employees(uuids: $uuid, from_date: $fromDate) {
         objects {
           name
           cpr_no
@@ -79,7 +80,7 @@
 <HeadTitle type="employee" />
 
 <div class="px-12 pt-6">
-  {#await graphQLClient().request(EmployeeDocument, { uuid: $page.params.uuid })}
+  {#await graphQLClient().request(EmployeeDocument, { uuid: $page.params.uuid, fromDate: $date })}
     <p>Loader medarbejder...</p>
   {:then data}
     {@const employee = data.employees[0].objects[0]}

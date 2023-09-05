@@ -4,9 +4,9 @@
   import { gql } from "graphql-request"
   import { EmployeeLeavesDocument } from "./query.generated"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
-  import { page } from "$app/stores"
   import { base } from "$app/paths"
   import Icon from "$lib/components/icon.svelte"
+  import { date } from "$lib/stores/date"
 
   export let uuid: string
   // TODO: Blocked by #57396
@@ -14,8 +14,8 @@
   export let tense: string
 
   gql`
-    query EmployeeLeaves($uuid: [UUID!]) {
-      employees(uuids: $uuid) {
+    query EmployeeLeaves($uuid: [UUID!], $fromDate: DateTime) {
+      employees(uuids: $uuid, from_date: $fromDate) {
         objects {
           leaves {
             uuid
@@ -42,7 +42,7 @@
 </script>
 
 <DetailTable headers={["Orlovstype", "Engagement", "Dato", "", ""]}>
-  {#await graphQLClient().request(EmployeeLeavesDocument, { uuid: uuid })}
+  {#await graphQLClient().request(EmployeeLeavesDocument, { uuid: uuid, fromDate: $date })}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>

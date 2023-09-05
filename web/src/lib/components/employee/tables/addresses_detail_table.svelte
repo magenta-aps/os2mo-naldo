@@ -7,6 +7,7 @@
   import { base } from "$app/paths"
   import Icon from "$lib/components/icon.svelte"
   import { page } from "$app/stores"
+  import { date } from "$lib/stores/date"
 
   export let uuid: string
   // TODO: Blocked by #57396
@@ -14,8 +15,8 @@
   export let tense: string
 
   gql`
-    query EmployeeAddresses($uuid: [UUID!]) {
-      employees(uuids: $uuid) {
+    query EmployeeAddresses($uuid: [UUID!], $fromDate: DateTime) {
+      employees(uuids: $uuid, from_date: $fromDate) {
         objects {
           addresses {
             name
@@ -38,7 +39,7 @@
 </script>
 
 <DetailTable headers={["Adressetype", "Adresse", "Synlighed", "Dato", "", ""]}>
-  {#await graphQLClient().request( EmployeeAddressesDocument, { uuid: uuid } )}
+  {#await graphQLClient().request( EmployeeAddressesDocument, { uuid: uuid, fromDate: $date } )}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>

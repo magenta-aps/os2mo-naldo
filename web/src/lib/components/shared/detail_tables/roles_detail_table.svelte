@@ -7,6 +7,7 @@
   import { page } from "$app/stores"
   import { EmployeeAndOrgRolesDocument } from "./query.generated"
   import Icon from "$lib/components/icon.svelte"
+  import { date } from "$lib/stores/date"
 
   export let uuid: string
   // TODO: Blocked by #57396
@@ -21,8 +22,8 @@
     : ["Enhed", "Rolletype", "Dato", "", ""]
 
   gql`
-    query EmployeeAndOrgRoles($employee_uuid: [UUID!], $org_uuid: [UUID!]) {
-      roles(employees: $employee_uuid, org_units: $org_uuid) {
+    query EmployeeAndOrgRoles($employee_uuid: [UUID!], $org_uuid: [UUID!], $fromDate: DateTime) {
+      roles(employees: $employee_uuid, org_units: $org_uuid, from_date: $fromDate) {
         objects {
           uuid
           role_type {
@@ -47,7 +48,7 @@
 </script>
 
 <DetailTable {headers}>
-  {#await graphQLClient().request( EmployeeAndOrgRolesDocument, { org_uuid: org_unit, employee_uuid: employee } )}
+  {#await graphQLClient().request( EmployeeAndOrgRolesDocument, { org_uuid: org_unit, employee_uuid: employee, fromDate: $date } )}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>

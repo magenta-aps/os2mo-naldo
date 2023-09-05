@@ -6,6 +6,7 @@
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
   import { base } from "$app/paths"
   import Icon from "$lib/components/icon.svelte"
+  import { date } from "$lib/stores/date"
 
   export let uuid: string
   // TODO: Blocked by #57396
@@ -13,8 +14,8 @@
   export let tense: string
 
   gql`
-    query ITAssociations($employee: [UUID!]) {
-      associations(employees: $employee, it_association: true) {
+    query ITAssociations($employee: [UUID!], $fromDate: DateTime) {
+      associations(employees: $employee, it_association: true, from_date: $fromDate) {
         objects {
           uuid
           org_unit {
@@ -55,7 +56,7 @@
     "",
   ]}
 >
-  {#await graphQLClient().request( ItAssociationsDocument, { employee: uuid } )}
+  {#await graphQLClient().request( ItAssociationsDocument, { employee: uuid, fromDate: $date } )}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
