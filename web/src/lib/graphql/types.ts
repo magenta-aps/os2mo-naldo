@@ -2897,6 +2897,32 @@ export type ItAssociationCreateInput = {
   validity: RaValidityInput;
 };
 
+export type ItAssociationTerminateInput = {
+  /** Start date of the validity. */
+  from?: InputMaybe<Scalars['DateTime']['input']>;
+  /** When the validity should end - required when terminating */
+  to: Scalars['DateTime']['input'];
+  /** UUID for the ITAssociation we want to terminate. */
+  uuid: Scalars['UUID']['input'];
+};
+
+export type ItAssociationUpdateInput = {
+  /** IT-user UUID */
+  it_user?: InputMaybe<Scalars['UUID']['input']>;
+  /** Job function UUID */
+  job_function?: InputMaybe<Scalars['UUID']['input']>;
+  /** org-unit uuid. */
+  org_unit?: InputMaybe<Scalars['UUID']['input']>;
+  /** Primary field of the association */
+  primary?: InputMaybe<Scalars['UUID']['input']>;
+  /** Extra info or uuid. */
+  user_key?: InputMaybe<Scalars['String']['input']>;
+  /** UUID of the ITAssociation you want to update. */
+  uuid: Scalars['UUID']['input'];
+  /** Validity range for the org-unit. */
+  validity: RaValidityInput;
+};
+
 /** Systems that IT users are connected to */
 export type ItSystem = {
   __typename?: 'ITSystem';
@@ -4552,6 +4578,10 @@ export type Mutation = {
   facet_update: FacetResponse;
   /** Creates an IT-Association. */
   itassociation_create: AssociationResponse;
+  /** Terminates an ITAssociation. */
+  itassociation_terminate: AssociationResponse;
+  /** Updates an IT-Association. */
+  itassociation_update: AssociationResponse;
   /** Creates an ITSystem. */
   itsystem_create: ItSystemResponse;
   /**
@@ -4780,6 +4810,16 @@ export type MutationFacet_UpdateArgs = {
 
 export type MutationItassociation_CreateArgs = {
   input: ItAssociationCreateInput;
+};
+
+
+export type MutationItassociation_TerminateArgs = {
+  input: ItAssociationTerminateInput;
+};
+
+
+export type MutationItassociation_UpdateArgs = {
+  input: ItAssociationUpdateInput;
 };
 
 
