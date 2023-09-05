@@ -8,6 +8,9 @@
   import { base } from "$app/paths"
   import Icon from "$lib/components/icon.svelte"
 
+  export let uuid: string
+  // TODO: Blocked by #57396
+  // svelte-ignore unused-export-let
   export let tense: string
 
   gql`
@@ -39,7 +42,7 @@
 </script>
 
 <DetailTable headers={["Orlovstype", "Engagement", "Dato", "", ""]}>
-  {#await graphQLClient().request(EmployeeLeavesDocument, { uuid: $page.params.uuid })}
+  {#await graphQLClient().request(EmployeeLeavesDocument, { uuid: uuid })}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
@@ -57,12 +60,12 @@
         </td>
         <ValidityTableCell validity={leave.validity} />
         <td>
-          <a aria-disabled href="{base}/organisation/{$page.params.uuid}/edit/leave/{leave.uuid}">
+          <a aria-disabled href="{base}/organisation/{uuid}/edit/leave/{leave.uuid}">
             <Icon type="pen" />
           </a>
         </td>
         <td>
-          <a href="{base}/organisation/{$page.params.uuid}/terminate/leave/{leave.uuid}">
+          <a href="{base}/organisation/{uuid}/terminate/leave/{leave.uuid}">
             <Icon type="xmark" size="30" />
           </a></td
         >

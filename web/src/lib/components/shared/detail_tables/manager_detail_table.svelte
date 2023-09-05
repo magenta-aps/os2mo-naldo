@@ -9,11 +9,13 @@
   import { ManagersDocument } from "./query.generated"
 
   export let uuid: string
+  // TODO: Blocked by #57396
+  // svelte-ignore unused-export-let
   export let tense: string
 
   const isOrg = $page.route.id?.startsWith("/organisation")
-  const employee = isOrg ? null : $page.params.uuid
-  const org_unit = isOrg ? $page.params.uuid : null
+  const employee = isOrg ? null : uuid
+  const org_unit = isOrg ? uuid : null
   const headers = isOrg
     ? ["Navn", "Lederansvar", "Ledertype", "Lederniveau", "Dato", "", ""]
     : ["Enhed", "Lederansvar", "Ledertype", "Lederniveau", "Dato", "", ""]

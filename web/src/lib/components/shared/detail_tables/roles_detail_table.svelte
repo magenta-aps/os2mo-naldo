@@ -9,11 +9,13 @@
   import Icon from "$lib/components/icon.svelte"
 
   export let uuid: string
+  // TODO: Blocked by #57396
+  // svelte-ignore unused-export-let
   export let tense: string
 
   const isOrg = $page.route.id?.startsWith("/organisation")
-  const employee = isOrg ? null : $page.params.uuid
-  const org_unit = isOrg ? $page.params.uuid : null
+  const employee = isOrg ? null : uuid
+  const org_unit = isOrg ? uuid : null
   const headers = isOrg
     ? ["Navn", "Rolletype", "Dato", "", ""]
     : ["Enhed", "Rolletype", "Dato", "", ""]
@@ -68,16 +70,14 @@
         <td>
           <a
             aria-disabled
-            href="{base}/{$page.route.id?.split('/')[1]}/{$page.params
-              .uuid}/edit/roles/{role.objects[0].uuid}"
+            href="{base}/{$page.route.id?.split('/')[1]}/{uuid}/edit/roles/{role.objects[0].uuid}"
           >
             <Icon type="pen" />
           </a>
         </td>
         <td>
           <a
-            href="{base}/{$page.route.id?.split('/')[1]}/{$page.params
-              .uuid}/terminate/roles/{role.objects[0].uuid}"
+            href="{base}/{$page.route.id?.split('/')[1]}/{uuid}/terminate/roles/{role.objects[0].uuid}"
           >
             <Icon type="xmark" size="30" />
           </a></td

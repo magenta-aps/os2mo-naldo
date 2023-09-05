@@ -3,12 +3,13 @@
     import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
     import Icon from "$lib/components/icon.svelte"
     import { base } from "$app/paths"
-    import { page } from "$app/stores"
     import { graphQLClient } from "$lib/util/http"
     import { OrgUnitItSystemDetailDocument } from "./query.generated"
     import { gql } from "graphql-request"
   
     export let uuid: string
+    // TODO: Blocked by #57396
+    // svelte-ignore unused-export-let
     export let tense: string
   
     gql`
@@ -45,12 +46,12 @@
         <td class="p-4">{ituser.user_key}</td>
         <ValidityTableCell validity={ituser.validity} />
         <td>
-          <a href="{base}/organisation/{$page.params.uuid}/edit/it/{ituser.uuid}">
+          <a href="{base}/organisation/{uuid}/edit/it/{ituser.uuid}">
             <Icon type="pen" />
           </a>
         </td>
         <td>
-          <a href="{base}/organisation/{$page.params.uuid}/terminate/it/{ituser.uuid}">
+          <a href="{base}/organisation/{uuid}/terminate/it/{ituser.uuid}">
             <Icon type="xmark" size="30" />
           </a>
         </td
