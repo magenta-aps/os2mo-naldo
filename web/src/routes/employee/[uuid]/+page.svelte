@@ -7,6 +7,7 @@
   import { graphQLClient } from "$lib/util/http"
   import { EmployeeDocument } from "./query.generated"
   import EmployeeDetailTable from "$lib/components/employee/tables/employee_detail_table.svelte"
+  import ITAssociationDetailTable from "$lib/components/employee/tables/itassociation_detail_table.svelte"
   import EngagementDetailTable from "$lib/components/shared/detail_tables/engagement_detail_table.svelte"
   import ItUserDetailTable from "$lib/components/shared/detail_tables/ituser_detail_table.svelte"
   import AssociationDetailTable from "$lib/components/shared/detail_tables/association_detail_table.svelte"
@@ -24,6 +25,7 @@
     ENGAGEMENTS = "Engagementer",
     ADDRESSES = "Adresser",
     ASSOCIATIONS = "Tilknytninger",
+    ITASSOCIATIONS = "IT-Tilknytninger",
     ROLES = "Roller",
     IT = "IT",
     LEAVE = "Orlov",
@@ -46,6 +48,8 @@
         return "address"
       case itemCategory.ASSOCIATIONS:
         return "association"
+      case itemCategory.ITASSOCIATIONS:
+        return "itassociation"
       case itemCategory.ROLES:
         return "roles"
       case itemCategory.IT:
@@ -164,6 +168,21 @@
       {#if $tenses.past}
         <h2 class="mb-4">Fortid</h2>
         <AssociationDetailTable tense="past" uuid={$page.params.uuid} />
+      {/if}
+    {:else if activeItem === itemCategory.ITASSOCIATIONS}
+      <!-- TODO: future and past does not work. 
+      Waiting to see if this can be done through GraphQL -->
+      {#if $tenses.future}
+        <h2 class="mb-4">Fremtid</h2>
+        <ITAssociationDetailTable tense="future" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.present}
+        <h2 class="mb-4">Nutid</h2>
+        <ITAssociationDetailTable tense="present" uuid={$page.params.uuid} />
+      {/if}
+      {#if $tenses.past}
+        <h2 class="mb-4">Fortid</h2>
+        <ITAssociationDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
     {:else if activeItem === itemCategory.ROLES}
       <!-- TODO: future and past does not work. 
