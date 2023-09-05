@@ -51,7 +51,7 @@
       case itemCategory.ITASSOCIATIONS:
         return "itassociation"
       case itemCategory.ROLES:
-        return "roles"
+        return "role"
       case itemCategory.IT:
         return "it"
       case itemCategory.LEAVE:
