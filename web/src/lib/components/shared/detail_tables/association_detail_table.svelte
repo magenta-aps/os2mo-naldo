@@ -7,6 +7,7 @@
     import { gql } from "graphql-request"
     import { page } from "$app/stores"
     import { AssociationsDocument } from "./query.generated"
+    import { date } from "$lib/stores/date"
   
     export let uuid: string
     // TODO: Blocked by #57396
@@ -19,8 +20,8 @@
     const headers = isOrg ? ["Navn", "Tilknytningsrolle", "Primær", "Dato", "", ""] : ["Enhed", "Rolle", "Primær", "Dato", "", ""]
 
     gql`
-      query Associations($employee: [UUID!], $org_unit: [UUID!]) {
-        associations(employees: $employee, org_units: $org_unit) {
+      query Associations($employee: [UUID!], $org_unit: [UUID!], $fromDate: DateTime) {
+        associations(employees: $employee, org_units: $org_unit, from_date: $fromDate) {
           objects {
             uuid
             org_unit {
@@ -48,7 +49,7 @@
   </script>
   
   <DetailTable {headers}>
-    {#await graphQLClient().request( AssociationsDocument, { org_unit: org_unit, employee: employee } )}
+    {#await graphQLClient().request( AssociationsDocument, { org_unit: org_unit, employee: employee, fromDate: $date } )}
       <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
         <td class="p-4">Henter data...</td>
       </tr>

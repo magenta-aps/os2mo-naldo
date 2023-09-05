@@ -7,6 +7,7 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { ManagersDocument } from "./query.generated"
+  import { date } from "$lib/stores/date"
 
   export let uuid: string
   // TODO: Blocked by #57396
@@ -22,8 +23,8 @@
 
   // Bør vi ikke tilføje noget tid til de her queries?
   gql`
-    query Managers($employee: [UUID!], $org_unit: [UUID!]) {
-      managers(employees: $employee, org_units: $org_unit) {
+    query Managers($employee: [UUID!], $org_unit: [UUID!], $fromDate: DateTime) {
+      managers(employees: $employee, org_units: $org_unit, from_date: $fromDate) {
         objects {
           uuid
           employee {
@@ -54,7 +55,7 @@
 </script>
 
 <DetailTable {headers}>
-  {#await graphQLClient().request( ManagersDocument, { org_unit: org_unit, employee: employee } )}
+  {#await graphQLClient().request( ManagersDocument, { org_unit: org_unit, employee: employee, fromDate: $date } )}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
