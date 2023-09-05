@@ -1,73 +1,73 @@
 <script lang="ts">
-    import DateInput from "$lib/components/forms/shared/date_input.svelte"
-    import Error from "$lib/components/alerts/error.svelte"
-    import { enhance } from "$app/forms"
-    import type { SubmitFunction } from "./$types"
-    import { goto } from "$app/navigation"
-    import { base } from "$app/paths"
-    import { success, error } from "$lib/stores/alert"
-    import { graphQLClient } from "$lib/util/http"
-    import { EmployeeDocument, TerminateEmployeeDocument } from "./query.generated"
-    import { gql } from "graphql-request"
-    import { page } from "$app/stores"
-    import { date } from "$lib/stores/date"
-  
-    let toDate: string
-  
-    gql`
-      query Employee($uuid: [UUID!], $fromDate: DateTime!) {
-        employees(uuids: $uuid, from_date: $fromDate) {
-          objects {
-            uuid
-            name
-            validity {
-              from
-              to
-            }
-            engagements {
-              org_unit {
-                validity {
-                  from
-                  to
-                }
+  import DateInput from "$lib/components/forms/shared/date_input.svelte"
+  import Error from "$lib/components/alerts/error.svelte"
+  import { enhance } from "$app/forms"
+  import type { SubmitFunction } from "./$types"
+  import { goto } from "$app/navigation"
+  import { base } from "$app/paths"
+  import { success, error } from "$lib/stores/alert"
+  import { graphQLClient } from "$lib/util/http"
+  import { EmployeeDocument, TerminateEmployeeDocument } from "./query.generated"
+  import { gql } from "graphql-request"
+  import { page } from "$app/stores"
+  import { date } from "$lib/stores/date"
+
+  let toDate: string
+
+  gql`
+    query Employee($uuid: [UUID!], $fromDate: DateTime!) {
+      employees(uuids: $uuid, from_date: $fromDate) {
+        objects {
+          uuid
+          name
+          validity {
+            from
+            to
+          }
+          engagements {
+            org_unit {
+              validity {
+                from
+                to
               }
             }
           }
         }
       }
-  
-      mutation TerminateEmployee($input: EmployeeTerminateInput!) {
-        employee_terminate(input: $input) {
-          objects {
-            uuid
-            name
-          }
+    }
+
+    mutation TerminateEmployee($input: EmployeeTerminateInput!) {
+      employee_terminate(input: $input) {
+        objects {
+          uuid
+          name
         }
       }
-    `
-    const handler: SubmitFunction =
-      () =>
-      async ({ result }) => {
-        if (result.type === "success" && result.data) {
-          try {
-            const mutation = await graphQLClient().request(TerminateEmployeeDocument, {
-              input: result.data,
-            })
-  
-            $success = {
-              message: `${mutation.employee_terminate.objects[0].name} afsluttes d. ${toDate}`,
-              uuid: $page.params.uuid,
-              type: "employee",
-            }
-          } catch (err) {
-            console.error(err)
-            $error = { message: err as string }
+    }
+  `
+  const handler: SubmitFunction =
+    () =>
+    async ({ result }) => {
+      if (result.type === "success" && result.data) {
+        try {
+          const mutation = await graphQLClient().request(TerminateEmployeeDocument, {
+            input: result.data,
+          })
+
+          $success = {
+            message: `${mutation.employee_terminate.objects[0].name} afsluttes d. ${toDate}`,
+            uuid: $page.params.uuid,
+            type: "employee",
           }
+        } catch (err) {
+          console.error(err)
+          $error = { message: err as string }
         }
       }
-  </script>
-  
-  {#await graphQLClient().request( EmployeeDocument, { uuid: $page.params.uuid, fromDate: $date } )}
+    }
+</script>
+
+{#await graphQLClient().request( EmployeeDocument, { uuid: $page.params.uuid, fromDate: $date } )}
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}

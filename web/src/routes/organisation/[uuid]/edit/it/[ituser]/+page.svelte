@@ -19,14 +19,17 @@
   import { date } from "$lib/stores/date"
   import { getClassUuidByUserKey } from "$lib/util/get_classes"
 
-
   let fromDate: string
   let toDate: string
   let itSystem: string
   let accountName: string
 
   gql`
-    query ITUserItSystemsOrgAndPrimary($uuid: [UUID!], $fromDate: DateTime, $org_uuid: [UUID!]) {
+    query ITUserItSystemsOrgAndPrimary(
+      $uuid: [UUID!]
+      $fromDate: DateTime
+      $org_uuid: [UUID!]
+    ) {
       itusers(uuids: $uuid, from_date: $fromDate) {
         uuid
         objects {
@@ -97,7 +100,7 @@
   {@const classes = data.classes}
   {@const minDate = data.org_units[0].objects[0].validity.from.split("T")[0]}
   {@const maxDate = data.org_units[0].objects[0].validity.to?.split("T")[0]}
-  
+
   <title>Rediger {itUser.itsystem.name} | OS2mo</title>
 
   <div class="flex align-center px-6 pt-6 pb-4">
@@ -120,9 +123,7 @@
           />
           <DateInput
             bind:value={toDate}
-            startValue={itUser.validity.to
-              ? itUser.validity.to.split("T")[0]
-              : null}
+            startValue={itUser.validity.to ? itUser.validity.to.split("T")[0] : null}
             title="Slutdato"
             id="to"
             min={fromDate ? fromDate : minDate}
@@ -160,7 +161,12 @@
           />
         </div>
         <!-- Enten skal vi gøre det her, ellers skal vi lave et gql kald i `+page.server.ts`? -->
-        <input hidden name="non-primary" id="non-primary" value={getClassUuidByUserKey(classes, "non-primary")}>
+        <input
+          hidden
+          name="non-primary"
+          id="non-primary"
+          value={getClassUuidByUserKey(classes, "non-primary")}
+        />
       </div>
     </div>
     <div class="flex py-6 gap-4">

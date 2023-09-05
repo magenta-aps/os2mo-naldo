@@ -58,12 +58,17 @@
         </td>
         <ValidityTableCell validity={address.validity} />
         <td>
-          <a aria-disabled href="{base}/employee/{$page.params.uuid}/edit/address/{address.uuid}">
+          <a
+            aria-disabled
+            href="{base}/employee/{$page.params.uuid}/edit/address/{address.uuid}"
+          >
             <Icon type="pen" />
           </a>
         </td>
         <td>
-          <a href="{base}/employee/{$page.params.uuid}/terminate/address/{address.uuid}">
+          <a
+            href="{base}/employee/{$page.params.uuid}/terminate/address/{address.uuid}"
+          >
             <Icon type="xmark" size="30" />
           </a></td
         >

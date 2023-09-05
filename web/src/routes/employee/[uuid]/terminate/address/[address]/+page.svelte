@@ -13,7 +13,7 @@
 
   let toDate: string
 
-  // TODO: When updating GraphQL remember to change `address_terminate` `at` to `input`, 
+  // TODO: When updating GraphQL remember to change `address_terminate` `at` to `input`,
   // which was changed in v8
   gql`
     query Address($uuid: [UUID!], $fromDate: DateTime!) {
@@ -55,7 +55,9 @@
           })
 
           $success = {
-            message: `Adressen afsluttes d. ${mutation.address_terminate.objects[0].validity.to.split("T")[0]}`,
+            message: `Adressen afsluttes d. ${
+              mutation.address_terminate.objects[0].validity.to.split("T")[0]
+            }`,
             uuid: $page.params.uuid,
             type: "employee",
           }
@@ -67,18 +69,21 @@
     }
 </script>
 
-{#await graphQLClient().request( AddressDocument, { uuid: $page.params.address, fromDate: $date} )}
+{#await graphQLClient().request( AddressDocument, { uuid: $page.params.address, fromDate: $date } )}
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
   {@const address = data.addresses[0].objects[0]}
   {@const minDate = address.validity.from.split("T")[0]}
-  {@const addressValue = address.address_type.scope === "DAR" ? address.name : address.value}
+  {@const addressValue =
+    address.address_type.scope === "DAR" ? address.name : address.value}
 
   <title>Afslut adresse | OS2mo</title>
 
   <div class="flex align-center px-6 pt-6 pb-4">
-    <h3 class="flex-1">Afslut adressen - {address.address_type.name}: {addressValue}</h3>
+    <h3 class="flex-1">
+      Afslut adressen - {address.address_type.name}: {addressValue}
+    </h3>
   </div>
 
   <div class="divider p-0 m-0 mb-4 w-full" />

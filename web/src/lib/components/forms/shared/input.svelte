@@ -5,7 +5,7 @@
   export let name = id
   export let value: string | number | null | undefined
   export let startValue: string | number | null | undefined = undefined
-  value = value ?? startValue  // For flexibility when binding
+  value = value ?? startValue // For flexibility when binding
   export let required = false
   export let placeholder: string | undefined = undefined
   export let type = "text"
@@ -13,11 +13,12 @@
   export let pattern: string | undefined = undefined
   export let patternMessage: string | undefined = undefined
   export let extra_classes = ""
-  
+
   const typeAction = (node: any) => {
     node.type = type
   }
 </script>
+
 <div class="form-control pb-4 {extra_classes}">
   {#if title}
     <label for={id} class="text-sm text-secondary pb-1">
@@ -37,4 +38,4 @@
     {required}
     {disabled}
   />
-</div> 
+</div>

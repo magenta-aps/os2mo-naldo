@@ -126,10 +126,7 @@
             max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
           />
         </div>
-        <SelectOrgTree
-          bind:selectedOrg={parent}
-          startOrg={org_unit.parent}
-        />
+        <SelectOrgTree bind:selectedOrg={parent} startOrg={org_unit.parent} />
 
         <Input
           title="Navn"

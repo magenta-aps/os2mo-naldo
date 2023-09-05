@@ -24,7 +24,11 @@
 
   // TODO: Split queries, so the date doesn't get reset because of facets
   gql`
-    query AddressAndFacets($uuid: [UUID!], $org_unit_uuid: [UUID!] $fromDate: DateTime) {
+    query AddressAndFacets(
+      $uuid: [UUID!]
+      $org_unit_uuid: [UUID!]
+      $fromDate: DateTime
+    ) {
       facets(user_keys: ["org_unit_address_type", "visibility"]) {
         uuid
         user_key
@@ -122,9 +126,7 @@
           />
           <DateInput
             bind:value={toDate}
-            startValue={address.validity.to
-              ? address.validity.to.split("T")[0]
-              : null}
+            startValue={address.validity.to ? address.validity.to.split("T")[0] : null}
             title="Slutdato"
             id="to"
             min={fromDate}
@@ -154,10 +156,10 @@
           <input hidden name="address-type-uuid" bind:value={addressUuid} />
         </div>
         {#if addressType}
-        <!-- FIXME: -->
-        <!-- Kan vi på en eller anden måde sørge for at det kun er den "rigtige" value der får startvalue? -->
-        <!-- Denne løsning gør at alle input-felter får adress.value, selvom valuen ikke passer til adressetypen -->
-        <!-- I praksis gør det bare at der ikke automatisk kommer et tomt felt, når man skifter adressetype -->
+          <!-- FIXME: -->
+          <!-- Kan vi på en eller anden måde sørge for at det kun er den "rigtige" value der får startvalue? -->
+          <!-- Denne løsning gør at alle input-felter får adress.value, selvom valuen ikke passer til adressetypen -->
+          <!-- I praksis gør det bare at der ikke automatisk kommer et tomt felt, når man skifter adressetype -->
           {#if addressType.name == "Afdelingskode"}
             <Input
               title="Afdelingskode"
@@ -176,10 +178,22 @@
               required={true}
             />
           {:else if addressType.name == "P-nummer"}
-            <Input title="P-nummer" id="value" bind:value={input} required={true} startValue={address.name} />
+            <Input
+              title="P-nummer"
+              id="value"
+              bind:value={input}
+              required={true}
+              startValue={address.name}
+            />
           {:else if addressType.name == "Postadresse"}
             <!-- TODO: DAR input field? -->
-            <Input title="Postadresse" id="value" bind:value={input} required={true} startValue={address.name} />
+            <Input
+              title="Postadresse"
+              id="value"
+              bind:value={input}
+              required={true}
+              startValue={address.name}
+            />
           {:else if addressType.name == "Webadresse"}
             <Input
               title="Weabdresse"
@@ -192,18 +206,54 @@
               required={true}
             />
           {:else if addressType.name == "Formålskode"}
-            <Input title="Formålskode" id="value" bind:value={input} startValue={address.name} required={true} />
+            <Input
+              title="Formålskode"
+              id="value"
+              bind:value={input}
+              startValue={address.name}
+              required={true}
+            />
           {:else if addressType.name == "Lokation"}
-            <Input title="Lokation" id="value" bind:value={input} startValue={address.name} required={true} />
+            <Input
+              title="Lokation"
+              id="value"
+              bind:value={input}
+              startValue={address.name}
+              required={true}
+            />
           {:else if addressType.name == "EAN-nummer"}
-            <Input title="EAN-nummer" id="value" bind:value={input} startValue={address.name} required={true} />
+            <Input
+              title="EAN-nummer"
+              id="value"
+              bind:value={input}
+              startValue={address.name}
+              required={true}
+            />
           {:else if addressType.name == "Skolekode"}
-            <Input title="Skolekode" id="value" bind:value={input} startValue={address.name} required={true} />
+            <Input
+              title="Skolekode"
+              id="value"
+              bind:value={input}
+              startValue={address.name}
+              required={true}
+            />
           {:else if addressType.name == "Fax"}
-            <Input title="Fax" id="value" bind:value={input} startValue={address.name} required={true} />
+            <Input
+              title="Fax"
+              id="value"
+              bind:value={input}
+              startValue={address.name}
+              required={true}
+            />
           {:else if addressType.name == "Returadresse"}
             <!-- TODO: DAR input field? -->
-            <Input title="Returadresse" id="value" bind:value={input} startValue={address.name} required={true} />
+            <Input
+              title="Returadresse"
+              id="value"
+              bind:value={input}
+              startValue={address.name}
+              required={true}
+            />
           {:else if addressType.name == "Henvendelsessted"}
             <!-- TODO: DAR input field? -->
             <Input

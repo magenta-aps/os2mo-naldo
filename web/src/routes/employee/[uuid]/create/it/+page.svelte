@@ -9,7 +9,10 @@
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
-  import { ItSystemsClassAndEmployeeDocument, CreateItUserDocument } from "./query.generated"
+  import {
+    ItSystemsClassAndEmployeeDocument,
+    CreateItUserDocument,
+  } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
@@ -138,7 +141,12 @@
             extra_classes="checkbox-primary"
           />
         </div>
-        <input hidden name="non-primary" id="non-primary" value={getClassUuidByUserKey(classes, "non-primary")}>
+        <input
+          hidden
+          name="non-primary"
+          id="non-primary"
+          value={getClassUuidByUserKey(classes, "non-primary")}
+        />
       </div>
     </div>
     <!-- TODO: Add support for adding more IT users at once -->

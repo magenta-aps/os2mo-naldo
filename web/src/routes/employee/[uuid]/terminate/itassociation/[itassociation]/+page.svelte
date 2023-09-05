@@ -6,7 +6,10 @@
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
-  import { ItAssociationDocument, TerminateItAssociationDocument } from "./query.generated"
+  import {
+    ItAssociationDocument,
+    TerminateItAssociationDocument,
+  } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
@@ -16,7 +19,7 @@
 
   gql`
     query ITAssociation($uuid: [UUID!], $fromDate: DateTime!) {
-      associations(uuids: $uuid, from_date: $fromDate ) {
+      associations(uuids: $uuid, from_date: $fromDate) {
         objects {
           uuid
           employee {
@@ -60,9 +63,12 @@
     async ({ result }) => {
       if (result.type === "success" && result.data) {
         try {
-          const mutation = await graphQLClient().request(TerminateItAssociationDocument, {
-            input: result.data,
-          })
+          const mutation = await graphQLClient().request(
+            TerminateItAssociationDocument,
+            {
+              input: result.data,
+            }
+          )
           $success = {
             message: `IT-tilknytningen for ${mutation.itassociation_terminate.objects[0].employee[0].name} afsluttes d. ${toDate}`,
             uuid: $page.params.uuid,

@@ -7,18 +7,21 @@
   import { gql } from "graphql-request"
   import { OrgTreeDocument } from "./query.generated"
 
-  export let selectedOrg: { name: string, uuid?: any | null }
-  export let startOrg: { name: string, uuid?: any | null } | null | undefined = {name: "", uuid: ""}
-  selectedOrg = selectedOrg ?? startOrg  // For flexibility when binding
+  export let selectedOrg: { name: string; uuid?: any | null }
+  export let startOrg: { name: string; uuid?: any | null } | null | undefined = {
+    name: "",
+    uuid: "",
+  }
+  selectedOrg = selectedOrg ?? startOrg // For flexibility when binding
   export let labelText = "Angiv overenhed"
   export let id = "select-org-tree"
   export let required = true
   let orgTree: any[] = []
-  let isFocused = false  
-  
+  let isFocused = false
+
   gql`
-    query OrgTree ($from_date: DateTime!){
-      org_units (from_date: $from_date) {
+    query OrgTree($from_date: DateTime!) {
+      org_units(from_date: $from_date) {
         uuid
         objects {
           name
@@ -33,10 +36,11 @@
           }
         }
       }
-    }`
+    }
+  `
 
   const fetchOrgTree = async () => {
-    const data = await graphQLClient().request(OrgTreeDocument, {from_date: $date})
+    const data = await graphQLClient().request(OrgTreeDocument, { from_date: $date })
     if (data.org_units) {
       for (let org of data.org_units) {
         if (org.objects[0].parent === null) {
@@ -95,7 +99,7 @@
           class="w-96 max-w-full px-5"
           on:mouseleave={delayedUnfocus}
         >
-          <ul class="menu bg-base-200 ">
+          <ul class="menu bg-base-200">
             {#each orgTree as child}
               <Node {...child} bind:selectedOrg />
             {/each}

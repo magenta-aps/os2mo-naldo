@@ -13,10 +13,7 @@
   import { date } from "$lib/stores/date"
   import type { SubmitFunction } from "./$types"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
-  import {
-    FacetsAndRoleDocument,
-    UpdateRoleDocument,
-  } from "./query.generated"
+  import { FacetsAndRoleDocument, UpdateRoleDocument } from "./query.generated"
 
   let fromDate: string
   let toDate: string

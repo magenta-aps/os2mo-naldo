@@ -8,10 +8,7 @@
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
-  import {
-    KleAndFacetDocument,
-    UpdateKleDocument,
-  } from "./query.generated"
+  import { KleAndFacetDocument, UpdateKleDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
@@ -115,9 +112,7 @@
           />
           <DateInput
             bind:value={toDate}
-            startValue={kle.validity.to
-              ? kle.validity.to.split("T")[0]
-              : null}
+            startValue={kle.validity.to ? kle.validity.to.split("T")[0] : null}
             title="Slutdato"
             id="to"
             min={fromDate}

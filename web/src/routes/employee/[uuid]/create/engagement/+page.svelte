@@ -26,7 +26,9 @@
 
   gql`
     query FacetAndOrg($uuid: [UUID!], $fromDate: DateTime) {
-      facets(user_keys: ["engagement_type", "engagement_job_function", "primary_type"]) {
+      facets(
+        user_keys: ["engagement_type", "engagement_job_function", "primary_type"]
+      ) {
         uuid
         user_key
         classes {
@@ -128,7 +130,7 @@
             id="user-key"
             bind:value={user_key}
             extra_classes="basis-1/2"
-            />
+          />
           <Select
             title="Stillingsbetegnelse"
             id="job-function"
