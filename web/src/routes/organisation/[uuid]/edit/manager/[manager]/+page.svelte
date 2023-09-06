@@ -17,6 +17,7 @@
 
   let fromDate: string
   let toDate: string
+  let employeeUuid: string
   let orgUnitUuid: string
   let managerType: string
   let managerLevel: string
@@ -41,15 +42,12 @@
             name
           }
           manager_type {
-            uuid
             name
           }
           manager_level {
-            uuid
             name
           }
           responsibilities {
-            uuid
             name
           }
           validity {
@@ -71,9 +69,6 @@
       manager_update(input: $input) {
         objects {
           uuid
-          employee {
-            name
-          }
         }
       }
     }
@@ -88,17 +83,16 @@
             input: result.data,
           })
           $success = {
-            message: `Tilknytning for ${
-              mutation.manager_update.objects[0].employee
-                ? mutation.manager_update.objects[0].employee
-                : ""
-            } er blevet redigeret`,
+            message: `Lederrollen er blevet redigeret`,
             uuid: $page.params.uuid,
-            type: "employee",
+            type: "organisation",
           }
-        } catch (err) {
+        } catch (err: any) {
           console.error(err)
-          $error = { message: err as string }
+          $error = {
+            message: err.response.errors[0].extensions.error_context
+              .description as string,
+          }
         }
       }
     }
@@ -149,6 +143,12 @@
           startValue={manager.org_unit[0].uuid}
           required={true}
         />
+        <Input
+          title="Medarbejder UUID"
+          id="employee-uuid"
+          bind:value={employeeUuid}
+          startValue={manager.employee ? manager.employee[0].uuid : null}
+        />
         <div class="flex flex-row gap-6">
           <Select
             title="Ledertype"
@@ -185,7 +185,7 @@
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        on:click={() => goto(`${base}/employee/${$page.params.uuid}`)}
+        on:click={() => goto(`${base}/organisation/${$page.params.uuid}`)}
       >
         Annullér
       </button>
