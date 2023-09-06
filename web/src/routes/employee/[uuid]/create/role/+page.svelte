@@ -68,7 +68,8 @@
           $success = {
             message: `Rolle til ${mutation.role_create.objects[0].employee[0].name} er blevet oprettet`,
             uuid: $page.params.uuid,
-            }
+            type: "employee",
+          }
         } catch (err) {
           console.error(err)
           $error = { message: err as string }
