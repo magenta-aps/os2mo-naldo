@@ -60,8 +60,7 @@
             type: "organisation",
           }
         } catch (err) {
-          console.error(err)
-          $error = { message: err as string }
+          $error = { message: err }
         }
       }
     }

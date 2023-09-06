@@ -8,7 +8,7 @@ interface SuccessAlert {
 }
 
 interface ErrorAlert {
-  message: string
+  message: any
   timeOutTime?: number
 }
 

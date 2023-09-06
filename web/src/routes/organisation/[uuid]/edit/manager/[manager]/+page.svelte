@@ -94,12 +94,8 @@
             uuid: $page.params.uuid,
             type: "organisation",
           }
-        } catch (err: any) {
-          console.error(err)
-          $error = {
-            message: err.response.errors[0].extensions.error_context
-              .description as string,
-          }
+        } catch (err) {
+          $error = { message: err }
         }
       }
     }
