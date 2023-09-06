@@ -33,7 +33,7 @@
 </script>
 
 <DetailTable headers={["Navn", "Kaldenavn", "Anciennitet", "Dato", "", ""]}>
-  {#await graphQLClient().request( EmployeeDocument, { uuid: uuid, fromDate: $date } )}
+  {#await graphQLClient().request(EmployeeDocument, { uuid: uuid, fromDate: $date })}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>

@@ -54,7 +54,9 @@
           })
 
           $success = {
-            message: `KLE-opmærkningen afsluttes ${mutation.kle_terminate.objects[0].validity.to.split("T")[0]}`,
+            message: `KLE-opmærkningen afsluttes ${
+              mutation.kle_terminate.objects[0].validity.to.split("T")[0]
+            }`,
             uuid: $page.params.uuid,
             type: "organisation",
           }

@@ -15,7 +15,7 @@
   let toDate: string
 
   gql`
-    query ITUser($uuid: [UUID!], $fromDate: DateTime!, , $employee_uuid: [UUID!]) {
+    query ITUser($uuid: [UUID!], $fromDate: DateTime!, $employee_uuid: [UUID!]) {
       itusers(uuids: $uuid, from_date: $fromDate) {
         objects {
           user_key

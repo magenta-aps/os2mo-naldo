@@ -22,7 +22,11 @@
     : ["Enhed", "Rolletype", "Dato", "", ""]
 
   gql`
-    query EmployeeAndOrgRoles($employee_uuid: [UUID!], $org_uuid: [UUID!], $fromDate: DateTime) {
+    query EmployeeAndOrgRoles(
+      $employee_uuid: [UUID!]
+      $org_uuid: [UUID!]
+      $fromDate: DateTime
+    ) {
       roles(employees: $employee_uuid, org_units: $org_uuid, from_date: $fromDate) {
         objects {
           uuid
@@ -72,17 +76,13 @@
           <td>
             <a
               aria-disabled
-              href="{base}/employee/{uuid}/edit/role/{role
-                .objects[0].uuid}"
+              href="{base}/employee/{uuid}/edit/role/{role.objects[0].uuid}"
             >
               <Icon type="pen" />
             </a>
           </td>
           <td>
-            <a
-              href="{base}/employee/{uuid}/terminate/role/{role
-                .objects[0].uuid}"
-            >
+            <a href="{base}/employee/{uuid}/terminate/role/{role.objects[0].uuid}">
               <Icon type="xmark" size="30" />
             </a></td
           >

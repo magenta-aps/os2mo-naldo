@@ -3,5 +3,11 @@
   "semi": false,
   "singleQuote": false,
   "printWidth": 88,
-  "trailingComma": "es5"
+  "trailingComma": "es5",
+  "overrides": [
+    {
+      "files": ["*.svelte", "*.ts", "*.js", "*.html", "*.css"],
+      "excludeFiles": ["types.ts", "query.generated.ts"]
+    }
+  ]
 }

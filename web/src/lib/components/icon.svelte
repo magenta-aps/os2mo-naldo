@@ -22,7 +22,7 @@
 
 {#if type == Icon.HOUSE}
   <svg
-    fill={fill}
+    {fill}
     height={size}
     width={size}
     xmlns="http://www.w3.org/2000/svg"
@@ -33,7 +33,7 @@
   >
 {:else if type == Icon.USER}
   <svg
-    fill={fill}
+    {fill}
     height={size}
     width={size}
     xmlns="http://www.w3.org/2000/svg"
@@ -44,7 +44,7 @@
   >
 {:else if type == Icon.USERS}
   <svg
-    fill={fill}
+    {fill}
     height={size}
     width={size}
     xmlns="http://www.w3.org/2000/svg"
@@ -55,7 +55,7 @@
   >
 {:else if type == Icon.SITEMAP}
   <svg
-    fill={fill}
+    {fill}
     height={size}
     width={size}
     xmlns="http://www.w3.org/2000/svg"
@@ -66,7 +66,7 @@
   >
 {:else if type == Icon.XMARK}
   <svg
-    fill={fill}
+    {fill}
     height={size}
     width={size}
     xmlns="http://www.w3.org/2000/svg"
@@ -76,7 +76,7 @@
     /></svg
   >
 {:else if type == Icon.CLIPBOARD}
-  <svg fill={fill} width={size} height={size} xmlns="http://www.w3.org/2000/svg"
+  <svg {fill} width={size} height={size} xmlns="http://www.w3.org/2000/svg"
     ><path
       d="M20 24h-20v-22h3c1.229 0 2.18-1.084 3-2h8c.82.916 1.771 2 3 2h3v9h-2v-7h-4l-2 2h-3.898l-2.102-2h-4v18h16v-5h2v7zm-10-4h-6v-1h6v1zm0-2h-6v-1h6v1zm6-5h8v2h-8v3l-5-4 5-4v3zm-6 3h-6v-1h6v1zm0-2h-6v-1h6v1zm0-2h-6v-1h6v1zm0-2h-6v-1h6v1zm-1-7c0 .552.448 1 1 1s1-.448 1-1-.448-1-1-1-1 .448-1 1z"
     /></svg
@@ -84,7 +84,7 @@
 {:else if type == Icon.SUCCESS}
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    fill={fill}
+    {fill}
     width={size}
     height={size}
     viewBox="0 0 24 24"
@@ -95,7 +95,7 @@
 {:else if type == Icon.PEN}
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    fill={fill}
+    {fill}
     width={size}
     height={size}
     viewBox="0 0 512 512"
@@ -106,7 +106,7 @@
 {:else if type == Icon.BARS}
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    fill={fill}
+    {fill}
     width={size}
     height={size}
     viewBox="0 0 448 512"
@@ -117,7 +117,7 @@
 {:else if type == Icon.GRID}
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    fill={fill}
+    {fill}
     width={size}
     height={size}
     viewBox="0 0 448 512"
@@ -126,13 +126,14 @@
     /></svg
   >
 {:else if type == Icon.PLUS}
-  <svg 
+  <svg
     xmlns="http://www.w3.org/2000/svg"
-    fill={fill}
+    {fill}
     width={size}
     height={size}
-    viewBox="0 0 448 512">
-    <!--! Font Awesome Pro 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path 
+    viewBox="0 0 448 512"
+  >
+    <!--! Font Awesome Pro 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path
       d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"
     /></svg
   >

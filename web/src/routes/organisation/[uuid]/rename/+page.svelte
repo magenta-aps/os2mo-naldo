@@ -28,7 +28,9 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-<form method="post" class="mx-6"
+<form
+  method="post"
+  class="mx-6"
   use:enhance={() => {
     return async ({ result }) => {
       if (result.type === "success") {

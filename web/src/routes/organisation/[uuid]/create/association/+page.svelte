@@ -15,7 +15,6 @@
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
 
-
   let fromDate: string
   let toDate: string
   let employeeUuid: string

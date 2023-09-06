@@ -10,7 +10,6 @@
   import { base } from "$app/paths"
   import type { PageData } from "./$types"
 
-
   export let data: PageData
 
   let startDate = new Date().toISOString().split("T")[0]
@@ -29,7 +28,9 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-<form method="post" class="mx-6"
+<form
+  method="post"
+  class="mx-6"
   use:enhance={() => {
     return async ({ result }) => {
       if (result.type === "success") {
@@ -95,22 +96,26 @@
   <div class="w-1/2 min-w-fit mb-6 bg-slate-100 rounded">
     <div class="p-8">
       <div class="flex flex-row gap-6">
-          <DateInput
-            bind:value={startDate}
-            title="Flyttedato"
-            id="move-date"
-            max={endDate
-              ? endDate
-              : new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
-          />
+        <DateInput
+          bind:value={startDate}
+          title="Flyttedato"
+          id="move-date"
+          max={endDate
+            ? endDate
+            : new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
+        />
       </div>
       <SelectOrgTree bind:selectedOrg={org} labelText="Angiv enhed" />
 
       {#if org.uuid}
         <div class="form-control pb-4">
-          ##### Fix me ####
-          ##### Måske skal breadcrumbs også ind i form-control på komponent-niveau? ######
-            <Breadcrumbs bind:currentOrg={org.name} bind:uuid={org.uuid} orgSelector={true} />
+          ##### Fix me #### ##### Måske skal breadcrumbs også ind i form-control på
+          komponent-niveau? ######
+          <Breadcrumbs
+            bind:currentOrg={org.name}
+            bind:uuid={org.uuid}
+            orgSelector={true}
+          />
         </div>
       {/if}
 

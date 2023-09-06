@@ -14,7 +14,7 @@
 
   let toDate: string
 
-  // TODO: When updating GraphQL remember to change `address_terminate` `at` to `input`, 
+  // TODO: When updating GraphQL remember to change `address_terminate` `at` to `input`,
   // which was changed in v8
   gql`
     query Address($uuid: [UUID!], $fromDate: DateTime!, $org_unit_uuid: [UUID!]) {
@@ -62,7 +62,9 @@
           })
 
           $success = {
-            message: `Adressen afsluttes d. ${mutation.address_terminate.objects[0].validity.to.split("T")[0]}`,
+            message: `Adressen afsluttes d. ${
+              mutation.address_terminate.objects[0].validity.to.split("T")[0]
+            }`,
             uuid: $page.params.uuid,
             type: "organisation",
           }
@@ -84,7 +86,9 @@
   <title>Afslut adresse | OS2mo</title>
 
   <div class="flex align-center px-6 pt-6 pb-4">
-    <h3 class="flex-1">Afslut adressen - {address.address_type.name}:{address.value}</h3>
+    <h3 class="flex-1">
+      Afslut adressen - {address.address_type.name}:{address.value}
+    </h3>
   </div>
 
   <div class="divider p-0 m-0 mb-4 w-full" />

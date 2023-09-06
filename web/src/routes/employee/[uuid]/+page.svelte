@@ -80,7 +80,7 @@
 <HeadTitle type="employee" />
 
 <div class="px-12 pt-6">
-  {#await graphQLClient().request(EmployeeDocument, { uuid: $page.params.uuid, fromDate: $date })}
+  {#await graphQLClient().request( EmployeeDocument, { uuid: $page.params.uuid, fromDate: $date } )}
     <p>Loader medarbejder...</p>
   {:then data}
     {@const employee = data.employees[0].objects[0]}
@@ -115,15 +115,15 @@
       Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
-        <EmployeeDetailTable tense="future" uuid={$page.params.uuid}/>
+        <EmployeeDetailTable tense="future" uuid={$page.params.uuid} />
       {/if}
       {#if $tenses.present}
         <h2 class="mb-4">Nutid</h2>
-        <EmployeeDetailTable tense="present" uuid={$page.params.uuid}/>
+        <EmployeeDetailTable tense="present" uuid={$page.params.uuid} />
       {/if}
       {#if $tenses.past}
         <h2 class="mb-4">Fortid</h2>
-        <EmployeeDetailTable tense="past" uuid={$page.params.uuid}/>
+        <EmployeeDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
     {:else if activeItem === itemCategory.ENGAGEMENTS}
       <!-- TODO: future and past does not work. 
@@ -145,15 +145,15 @@
       Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
-        <AddressesDetailTable tense="future" uuid={$page.params.uuid}/>
+        <AddressesDetailTable tense="future" uuid={$page.params.uuid} />
       {/if}
       {#if $tenses.present}
         <h2 class="mb-4">Nutid</h2>
-        <AddressesDetailTable tense="present" uuid={$page.params.uuid}/>
+        <AddressesDetailTable tense="present" uuid={$page.params.uuid} />
       {/if}
       {#if $tenses.past}
         <h2 class="mb-4">Fortid</h2>
-        <AddressesDetailTable tense="past" uuid={$page.params.uuid}/>
+        <AddressesDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
     {:else if activeItem === itemCategory.ASSOCIATIONS}
       <!-- TODO: future and past does not work. 
@@ -218,15 +218,15 @@
       Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
-        <LeavesDetailTable tense="future" uuid={$page.params.uuid}/>
+        <LeavesDetailTable tense="future" uuid={$page.params.uuid} />
       {/if}
       {#if $tenses.present}
         <h2 class="mb-4">Nutid</h2>
-        <LeavesDetailTable tense="present" uuid={$page.params.uuid}/>
+        <LeavesDetailTable tense="present" uuid={$page.params.uuid} />
       {/if}
       {#if $tenses.past}
         <h2 class="mb-4">Fortid</h2>
-        <LeavesDetailTable tense="past" uuid={$page.params.uuid}/>
+        <LeavesDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
     {:else if activeItem === itemCategory.MANAGER}
       <!-- TODO: future and past does not work. 

@@ -75,84 +75,84 @@
 {:then data}
   {@const employee = data.employees[0].objects[0]}
 
-<title>Redigér Medarbejder | OS2mo</title>
+  <title>Redigér Medarbejder | OS2mo</title>
 
-<div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">Redigér medarbejder</h3>
-</div>
+  <div class="flex align-center px-6 pt-6 pb-4">
+    <h3 class="flex-1">Redigér medarbejder</h3>
+  </div>
 
-<div class="divider p-0 m-0 mb-4 w-full" />
-<form method="post" class="mx-6" use:enhance={handler}>
-  <div class="w-1/2 min-w-fit bg-slate-100 rounded">
-    <div class="p-8">
-      <div class="flex flex-row gap-6">
+  <div class="divider p-0 m-0 mb-4 w-full" />
+  <form method="post" class="mx-6" use:enhance={handler}>
+    <div class="w-1/2 min-w-fit bg-slate-100 rounded">
+      <div class="p-8">
+        <div class="flex flex-row gap-6">
+          <DateInput
+            bind:value={fromDate}
+            startValue={$date}
+            title="Startdato"
+            id="from"
+          />
+          <DateInput
+            bind:value={toDate}
+            startValue={employee.validity.to
+              ? employee.validity.to.split("T")[0]
+              : null}
+            title="Slutdato"
+            id="to"
+          />
+        </div>
+        <div class="flex flex-row gap-6">
+          <Input
+            title="Navn"
+            id="first-name"
+            bind:value={firstName}
+            startValue={employee.given_name}
+            extra_classes="basis-1/2"
+          />
+          <Input
+            id="last-name"
+            bind:value={lastName}
+            startValue={employee.surname}
+            extra_classes="basis-1/2 pt-6"
+          />
+        </div>
+        <div class="flex flex-row gap-6">
+          <Input
+            title="Kaldenavn"
+            id="nickname-first-name"
+            bind:value={nicknameFirstName}
+            startValue={employee.nickname_givenname}
+            extra_classes="basis-1/2"
+          />
+          <Input
+            id="nickname-last-name"
+            bind:value={nicknameLastName}
+            startValue={employee.nickname_surname}
+            extra_classes="basis-1/2 pt-6"
+          />
+        </div>
         <DateInput
-          bind:value={fromDate}
-          startValue={$date}
-          title="Startdato"
-          id="from"
-        />
-        <DateInput
-          bind:value={toDate}
-          startValue={employee.validity.to
-            ? employee.validity.to.split("T")[0]
-            : null}
-          title="Slutdato"
-          id="to"
+          bind:value={seniority}
+          title="Anciennitet"
+          id="seniority"
+          startValue={employee.seniority}
         />
       </div>
-      <div class="flex flex-row gap-6">
-        <Input
-          title="Navn"
-          id="first-name"
-          bind:value={firstName}
-          startValue={employee.given_name}
-          extra_classes="basis-1/2"
-          />
-        <Input
-          id="last-name"
-          bind:value={lastName}
-          startValue={employee.surname}
-          extra_classes="basis-1/2 pt-6"
-          />
-      </div>
-      <div class="flex flex-row gap-6">
-        <Input
-          title="Kaldenavn"
-          id="nickname-first-name"
-          bind:value={nicknameFirstName}
-          startValue={employee.nickname_givenname}
-          extra_classes="basis-1/2"
-          />
-        <Input
-          id="nickname-last-name"
-          bind:value={nicknameLastName}
-          startValue={employee.nickname_surname}
-          extra_classes="basis-1/2 pt-6"
-          />
-      </div>
-      <DateInput
-        bind:value={seniority}
-        title="Anciennitet"
-        id="seniority"
-        startValue={employee.seniority}
-      />
     </div>
-  </div>
-  <div class="flex py-6 gap-4">
-    <button
-      type="submit"
-      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-      >Redigér medarbejder</button
-    >
-    <button
-      type="button"
-      class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-      on:click={() => goto(`${base}/employee/${$page.params.uuid}`)}
-    >
-      Annullér
-    </button>
-  </div>
-  <Error />
-</form>
+    <div class="flex py-6 gap-4">
+      <button
+        type="submit"
+        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+        >Redigér medarbejder</button
+      >
+      <button
+        type="button"
+        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+        on:click={() => goto(`${base}/employee/${$page.params.uuid}`)}
+      >
+        Annullér
+      </button>
+    </div>
+    <Error />
+  </form>
 {/await}

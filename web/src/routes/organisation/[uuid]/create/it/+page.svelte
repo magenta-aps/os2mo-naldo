@@ -16,7 +16,6 @@
   import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
   import { getClassUuidByUserKey } from "$lib/util/get_classes"
 
-
   let fromDate: string
   let toDate: string
   let itSystem: string
@@ -142,7 +141,12 @@
             extra_classes="checkbox-primary"
           />
         </div>
-        <input hidden name="non-primary" id="non-primary" value={getClassUuidByUserKey(classes, "non-primary")}>
+        <input
+          hidden
+          name="non-primary"
+          id="non-primary"
+          value={getClassUuidByUserKey(classes, "non-primary")}
+        />
       </div>
     </div>
     <!-- TODO: Add support for adding more IT users at once -->

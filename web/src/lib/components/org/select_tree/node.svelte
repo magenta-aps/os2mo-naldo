@@ -24,8 +24,12 @@
             }
           }
         }
-      }`
-    const data = await graphQLClient().request(OrgChildrenDocument, {uuid: uuid, from_date: fromDate})
+      }
+    `
+    const data = await graphQLClient().request(OrgChildrenDocument, {
+      uuid: uuid,
+      from_date: fromDate,
+    })
     if (data.org_units) {
       return data.org_units[0].objects[0].children
     }

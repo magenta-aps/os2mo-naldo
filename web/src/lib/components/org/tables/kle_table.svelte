@@ -49,13 +49,18 @@
         <td class="p-4">{kle.objects[0].kle_number.name}</td>
         <ValidityTableCell validity={kle.objects[0].validity} />
         <td>
-          <a href="{base}/organisation/{$page.params.uuid}/edit/kle/{kle.objects[0].uuid}">
+          <a
+            href="{base}/organisation/{$page.params.uuid}/edit/kle/{kle.objects[0]
+              .uuid}"
+          >
             <Icon type="pen" />
           </a>
         </td>
         <td>
-          
-          <a href="{base}/organisation/{$page.params.uuid}/terminate/kle/{kle.objects[0].uuid}">
+          <a
+            href="{base}/organisation/{$page.params.uuid}/terminate/kle/{kle.objects[0]
+              .uuid}"
+          >
             <Icon type="xmark" size="30" />
           </a>
         </td>

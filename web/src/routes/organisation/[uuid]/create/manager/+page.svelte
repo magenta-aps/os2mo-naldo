@@ -66,7 +66,8 @@
             input: result.data,
           })
           $success = {
-            message: `Lederrolle er oprettet ${mutation.manager_create.objects[0]?.employee
+            message: `Lederrolle er oprettet ${
+              mutation.manager_create.objects[0]?.employee
                 ? `for ${mutation.manager_create.objects[0].employee[0].name}`
                 : ""
             }`,

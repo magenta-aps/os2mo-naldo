@@ -14,7 +14,6 @@
       $success.timeOutTime ? $success.timeOutTime : 5000
     )
 
-
     // Will redirect if the successful action was on an organisation or employee
     if ($success.type == "organisation" || $success.type == "employee") {
       setTimeout(() => {

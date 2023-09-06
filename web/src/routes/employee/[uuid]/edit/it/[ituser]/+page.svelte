@@ -19,14 +19,17 @@
   import { date } from "$lib/stores/date"
   import { getClassUuidByUserKey } from "$lib/util/get_classes"
 
-
   let fromDate: string
   let toDate: string
   let itSystem: string
   let accountName: string
 
   gql`
-    query ITUserItSystemsAndPrimary($uuid: [UUID!], $fromDate: DateTime, $employee_uuid: [UUID!]) {
+    query ITUserItSystemsAndPrimary(
+      $uuid: [UUID!]
+      $fromDate: DateTime
+      $employee_uuid: [UUID!]
+    ) {
       itusers(uuids: $uuid, from_date: $fromDate) {
         uuid
         objects {
@@ -118,9 +121,7 @@
           />
           <DateInput
             bind:value={toDate}
-            startValue={itUser.validity.to
-              ? itUser.validity.to.split("T")[0]
-              : null}
+            startValue={itUser.validity.to ? itUser.validity.to.split("T")[0] : null}
             title="Slutdato"
             id="to"
             min={fromDate ? fromDate : minDate}
@@ -154,7 +155,12 @@
             extra_classes="checkbox-primary"
           />
         </div>
-        <input hidden name="non-primary" id="non-primary" value={getClassUuidByUserKey(classes, "non-primary")}>
+        <input
+          hidden
+          name="non-primary"
+          id="non-primary"
+          value={getClassUuidByUserKey(classes, "non-primary")}
+        />
       </div>
     </div>
     <div class="flex py-6 gap-4">

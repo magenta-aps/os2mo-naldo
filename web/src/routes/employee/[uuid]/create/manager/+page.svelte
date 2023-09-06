@@ -66,7 +66,8 @@
             input: result.data,
           })
           $success = {
-            message: `Lederrolle er oprettet ${mutation.manager_create.objects[0]?.employee
+            message: `Lederrolle er oprettet ${
+              mutation.manager_create.objects[0]?.employee
                 ? `for ${mutation.manager_create.objects[0].employee[0].name}`
                 : ""
             }`,
@@ -117,7 +118,11 @@
             max={maxDate}
           />
         </div>
-        <Input title="Organisationsenhed UUID" id="org-unit-uuid" bind:value={orgUnitUuid} />
+        <Input
+          title="Organisationsenhed UUID"
+          id="org-unit-uuid"
+          bind:value={orgUnitUuid}
+        />
         <div class="flex flex-row gap-6">
           <Select
             title="Ledertype"

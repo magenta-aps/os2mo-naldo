@@ -18,6 +18,7 @@
   export let startValue: string | undefined = undefined
   export let extra_classes = ""
 </script>
+
 <div class="form-control pb-4 {extra_classes}">
   {#if title}
     <label for={id} class="text-sm text-secondary pb-1">
@@ -35,11 +36,17 @@
     {#if !disabled && iterable}
       {#each iterable as element}
         {#if returnType === Return.NAME}
-          <option selected={element.name === startValue} value={element.name}>{element.name}</option>
+          <option selected={element.name === startValue} value={element.name}
+            >{element.name}</option
+          >
         {:else if returnType === Return.UUID}
-          <option selected={element.name === startValue} value={element.uuid}>{element.name}</option>
+          <option selected={element.name === startValue} value={element.uuid}
+            >{element.name}</option
+          >
         {:else if returnType === Return.OBJECT}
-          <option selected={element.name === startValue} value={element}>{element.name}</option>
+          <option selected={element.name === startValue} value={element}
+            >{element.name}</option
+          >
         {/if}
       {/each}
     {/if}

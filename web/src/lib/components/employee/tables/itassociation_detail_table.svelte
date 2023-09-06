@@ -74,16 +74,12 @@
         <td class="p-4">{itassociation.primary ? itassociation.primary?.name : ""}</td>
         <ValidityTableCell validity={itassociation.validity} />
         <td>
-          <a
-            href="{base}/employee/{uuid}/edit/itassociation/{itassociation.uuid}"
-          >
+          <a href="{base}/employee/{uuid}/edit/itassociation/{itassociation.uuid}">
             <Icon type="pen" />
           </a>
         </td>
         <td>
-          <a
-            href="{base}/employee/{uuid}/terminate/itassociation/{itassociation.uuid}"
-          >
+          <a href="{base}/employee/{uuid}/terminate/itassociation/{itassociation.uuid}">
             <Icon type="xmark" size="30" />
           </a>
         </td>
