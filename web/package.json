@@ -20,7 +20,7 @@
     "@graphql-codegen/typescript": "^4.0.1",
     "@graphql-codegen/typescript-operations": "^4.0.1",
     "@graphql-typed-document-node/core": "^3.2.0",
-    "@playwright/test": "^1.37.0",
+    "@playwright/test": "^1.37.1",
     "@sveltejs/kit": "^1.24.1",
     "autoprefixer": "^10.4.15",
     "postcss": "^8.4.27",
