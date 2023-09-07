@@ -19,14 +19,15 @@ type EngagementTitleAndUuid = {
 }
 
 export const getEngagementTitlesAndUuid = (
-  engagements: EngagementTitleAndUuid[]
+  engagements: EngagementTitleAndUuid | EngagementTitleAndUuid[]
 ): { uuid: string; name: string }[] => {
-  return engagements.map((engagement) => {
-    return {
-      uuid: engagement.uuid,
-      name: `${engagement.job_function.name}, ${engagement.org_unit[0].name}`,
-    }
-  })
+  if (!Array.isArray(engagements)) {
+    engagements = [engagements]
+  }
+  return engagements.map((engagement) => ({
+    uuid: engagement.uuid,
+    name: `${engagement.job_function.name}, ${engagement.org_unit[0].name}`,
+  }))
 }
 
 type ITSystem = {

@@ -117,6 +117,9 @@
   {@const maxDate = leave.validity?.to?.split("T")[0]}
   {@const engagements = leave.employee[0].engagements}
   {@const employeeName = leave.employee[0].name}
+  {@const engagementStartValue = leave.engagement
+    ? getEngagementTitlesAndUuid(leave.engagement)[0]
+    : null}
 
   <title>Rediger orlov | OS2mo</title>
 
@@ -132,7 +135,7 @@
         <div class="flex flex-row gap-6">
           <DateInput
             bind:value={fromDate}
-            startValue={leave.validity.from ? leave.validity.from.split("T")[0] : null}
+            startValue={$date}
             title="Startdato"
             id="from"
             min={minDate}
@@ -169,12 +172,7 @@
           bind:value={engagementUuid}
           title="Engagementer"
           id="engagement-uuid"
-          startValue={leave &&
-          leave.engagement &&
-          leave.engagement.job_function &&
-          leave.engagement.org_unit
-            ? `${leave.engagement.job_function.name}, ${leave.engagement.org_unit[0].name}`
-            : ""}
+          startValue={engagementStartValue ? engagementStartValue.name : ""}
           iterable={getEngagementTitlesAndUuid(engagements)}
           required={true}
         />
