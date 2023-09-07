@@ -172,7 +172,7 @@
           bind:value={engagementUuid}
           title="Engagementer"
           id="engagement-uuid"
-          startValue={engagementStartValue ? engagementStartValue.name : ""}
+          startValue={engagementStartValue?.name}
           iterable={getEngagementTitlesAndUuid(engagements)}
           required={true}
         />
