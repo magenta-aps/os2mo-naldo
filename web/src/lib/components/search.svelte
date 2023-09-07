@@ -7,12 +7,16 @@
   import { date } from "$lib/stores/date"
   import { globalNavigation } from "$lib/stores/navigation"
 
-  export let value: Autocomplete | undefined = undefined
-  export let type: "employee" | "organisation" = "employee"
+  export let startValue: Autocomplete | undefined = undefined
+  export let value: Autocomplete | undefined = startValue || undefined
+  export let type: "employee" | "org-unit"
   export let action: "select" | "goto" = "select" // Redirect for navigation, select for forms
   export let wantedAttrs: string[] = [] // Names of attributes you want shown next the to the name ("Email", ect.)
-  export let title: string = ""
-  export let id = "autocomplete"
+  export let title: string = `Søg efter ${
+    type === "employee" ? "person" : "organisation"
+  }`
+  export let id = `${type}-uuid`
+  export let required = true
 
   const itemId = "uuid" // Used by the component to differentiate between items
   const url = type === "employee" ? "e/autocomplete/?query=" : "ou/autocomplete/?query="
@@ -26,10 +30,15 @@
     json.items.sort((a: any, b: any) => (a.name > b.name ? 1 : -1))
     return json.items
   }
+
+  const floatingConfig = {
+    placement: "bottom-start",
+    strategy: "fixed",
+  }
 </script>
 
-<div class="w-full {title ? 'pb-4' : ''}">
-  {#if title}
+<div class="w-full {action === 'select' ? 'pb-4' : ''}">
+  {#if action === "select"}
     <label for="autocomplete" class="text-sm text-secondary pb-1">
       {title}
     </label>
@@ -55,6 +64,8 @@
     id="autocomplete"
     listAutoWidth={false}
     loadOptions={fetchAutocomplete}
+    {floatingConfig}
+    {required}
     {itemId}
     bind:value
     hideEmptyState={true}
@@ -62,7 +73,7 @@
     on:select={() => {
       if (action === "goto" && value) {
         goto(`${base}/${type}/${value.uuid}`)
-        if (type === "organisation") {
+        if (type === "org-unit") {
           $globalNavigation.uuid = value.uuid
         }
         // Removes lingering/distracting value from staying after being redirected

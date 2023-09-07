@@ -17,10 +17,10 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import Search from "$lib/components/search.svelte"
 
   let fromDate: string
   let toDate: string
-  let employeeUuid: string
   let associationType: string
   let primary: string
 
@@ -140,14 +140,14 @@
             max={maxDate ? maxDate : null}
           />
         </div>
-        <!-- We need some sort of input, to choose an employee.
-        Hopefully we can do it with GraphQL soon :copium: -->
-        <Input
-          title="Medarbejder UUID"
-          id="employee-uuid"
-          bind:value={employeeUuid}
-          startValue={association.employee[0].uuid}
-          required={true}
+        <Search
+          type="employee"
+          startValue={{
+            uuid: association.employee[0].uuid,
+            name: association.employee[0].name,
+            attrs: [],
+          }}
+          wantedAttrs={["Email"]}
         />
         <div class="flex flex-row gap-6">
           <Select

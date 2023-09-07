@@ -55,7 +55,7 @@
       </div>
       <div class="w-96 flex items-center justify-center">
         {#if orgChecked}
-          <Search action="goto" type={"organisation"} />
+          <Search action="goto" type={"org-unit"} />
         {:else}
           <Search action="goto" type={"employee"} wantedAttrs={["Email"]} />
         {/if}

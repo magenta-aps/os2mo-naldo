@@ -17,10 +17,10 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import Search from "$lib/components/search.svelte"
 
   let fromDate: string
   let toDate: string
-  let orgUnitUuid: string
   let associationType: string
   let primary: string
 
@@ -121,12 +121,7 @@
           value={undefined}
           disabled
         />
-        <Input
-          title="Organisationsenhed UUID"
-          id="org-unit-uuid"
-          bind:value={orgUnitUuid}
-          required={true}
-        />
+        <Search type="org-unit" />
         <div class="flex flex-row gap-6">
           <Select
             title="Tilknytningsrolle"
