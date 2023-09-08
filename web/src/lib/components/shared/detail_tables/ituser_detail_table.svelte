@@ -8,11 +8,10 @@
   import { page } from "$app/stores"
   import { ItUsersDocument } from "./query.generated"
   import { date } from "$lib/stores/date"
+  import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
 
   export let uuid: string
-  // TODO: Blocked by #57396
-  // svelte-ignore unused-export-let
-  export let tense: string
+  export let tense: Tense
 
   const isOrg = $page.route.id?.startsWith("/organisation")
   const employee = isOrg ? null : uuid
@@ -20,9 +19,19 @@
   const headers = ["IT system", "Kontonavn", "Primær", "Dato", "", ""]
 
   gql`
-    query ITUsers($employee: [UUID!], $org_unit: [UUID!], $fromDate: DateTime) {
+    query ITUsers(
+      $employee: [UUID!]
+      $org_unit: [UUID!]
+      $fromDate: DateTime
+      $toDate: DateTime
+    ) {
       itusers(
-        filter: { employees: $employee, org_units: $org_unit, from_date: $fromDate }
+        filter: {
+          employees: $employee
+          org_units: $org_unit
+          from_date: $fromDate
+          to_date: $toDate
+        }
       ) {
         objects {
           objects {
@@ -47,34 +56,38 @@
 </script>
 
 <DetailTable {headers}>
-  {#await graphQLClient().request( ItUsersDocument, { org_unit: org_unit, employee: employee, fromDate: $date } )}
+  {#await graphQLClient().request( ItUsersDocument, { org_unit: org_unit, employee: employee, ...tenseToValidity(tense, $date) } )}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
   {:then data}
-    {@const itusers = data.itusers.objects}
-    {#each itusers as it}
-      {@const ituser = it.objects[0]}
-      <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-        <td class="p-4">{ituser.itsystem.name}</td>
-        <td class="p-4">{ituser.user_key}</td>
-        <td class="p-4">{ituser.primary ? ituser.primary.name : ""}</td>
-        <ValidityTableCell validity={ituser.validity} />
-        <td>
-          <a href="{base}/{$page.route.id?.split('/')[1]}/{uuid}/edit/it/{ituser.uuid}">
-            <Icon type="pen" />
-          </a>
-        </td>
-        <td>
-          <a
-            href="{base}/{$page.route.id?.split(
-              '/'
-            )[1]}/{uuid}/terminate/it/{ituser.uuid}"
-          >
-            <Icon type="xmark" size="30" />
-          </a>
-        </td>
-      </tr>
+    {#each data.itusers.objects as outer}
+      <!-- TODO: Remove when GraphQL is able to do this for us -->
+      {@const filteredObjects = outer.objects.filter((obj) => tenseFilter(obj, tense))}
+      {#each filteredObjects as ituser}
+        <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+          <td class="p-4">{ituser.itsystem.name}</td>
+          <td class="p-4">{ituser.user_key}</td>
+          <td class="p-4">{ituser.primary ? ituser.primary.name : ""}</td>
+          <ValidityTableCell validity={ituser.validity} />
+          <td>
+            <a
+              href="{base}/{$page.route.id?.split('/')[1]}/{uuid}/edit/it/{ituser.uuid}"
+            >
+              <Icon type="pen" />
+            </a>
+          </td>
+          <td>
+            <a
+              href="{base}/{$page.route.id?.split(
+                '/'
+              )[1]}/{uuid}/terminate/it/{ituser.uuid}"
+            >
+              <Icon type="xmark" size="30" />
+            </a>
+          </td>
+        </tr>
+      {/each}
     {/each}
   {/await}
 </DetailTable>

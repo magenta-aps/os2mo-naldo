@@ -1,3 +1,33 @@
+import type { Validity } from "$lib/graphql/types"
+import { date } from "$lib/stores/date"
+import { get } from "svelte/store"
+
+export const tenseToValidity = (
+  tense: Tense,
+  date: string
+): { fromDate: string | null; toDate: string | null } | {} => {
+  switch (tense) {
+    case "past":
+      return { fromDate: null, toDate: date }
+    case "present":
+      return {}
+    case "future":
+      return { fromDate: date, toDate: null }
+  }
+}
+
+export const tenseFilter = (obj: { validity: Validity }, tense: Tense) => {
+  const globalDate = get(date)
+  switch (tense) {
+    case "past":
+      return globalDate > obj.validity.to?.split("T")[0]
+    case "present":
+      return true
+    case "future":
+      return globalDate < obj.validity.from.split("T")[0]
+  }
+}
+
 type ITUserITSystemName = {
   uuid: string
   user_key: string

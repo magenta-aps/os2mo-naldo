@@ -8,11 +8,10 @@
   import { page } from "$app/stores"
   import { EngagementsDocument } from "./query.generated"
   import { date } from "$lib/stores/date"
+  import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
 
   export let uuid: string
-  // TODO: Blocked by #57396
-  // svelte-ignore unused-export-let
-  export let tense: string
+  export let tense: Tense
 
   const isOrg = $page.route.id?.startsWith("/organisation")
   const employee = isOrg ? null : uuid
@@ -23,9 +22,19 @@
 
   // Bør vi ikke tilføje noget tid til de her queries?
   gql`
-    query Engagements($employee: [UUID!], $org_unit: [UUID!], $fromDate: DateTime) {
+    query Engagements(
+      $employee: [UUID!]
+      $org_unit: [UUID!]
+      $fromDate: DateTime
+      $toDate: DateTime
+    ) {
       engagements(
-        filter: { employees: $employee, org_units: $org_unit, from_date: $fromDate }
+        filter: {
+          employees: $employee
+          org_units: $org_unit
+          from_date: $fromDate
+          to_date: $toDate
+        }
       ) {
         objects {
           objects {
@@ -59,49 +68,45 @@
 </script>
 
 <DetailTable {headers}>
-  {#await graphQLClient().request( EngagementsDocument, { org_unit: org_unit, employee: employee, fromDate: $date } )}
+  {#await graphQLClient().request( EngagementsDocument, { org_unit: org_unit, employee: employee, ...tenseToValidity(tense, $date) } )}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
   {:then data}
-    {@const engagements = data.engagements.objects}
-    {#each engagements as eng}
-      {@const engagement = eng.objects[0]}
-      <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
-        {#if isOrg}
-          <a href="{base}/employee/{engagement.employee[0].uuid}">
-            <td class="p-4">{engagement.employee[0].name}</td>
-          </a>
-          <td class="p-4">{engagement.job_function.name}</td>
-          <td class="p-4">{engagement.engagement_type.name}</td>
-          <td class="p-4">{engagement.primary ? engagement.primary.name : ""}</td>
-          <ValidityTableCell validity={engagement.validity} />
-        {:else}
-          <a href="{base}/organisation/{engagement.org_unit[0].uuid}">
-            <td class="p-4">{engagement.org_unit[0].name}</td>
-          </a>
-          <td class="p-4">{engagement.job_function.name}</td>
-          <td class="p-4">{engagement.engagement_type.name}</td>
-          <td class="p-4">{engagement.primary ? engagement.primary.name : ""}</td>
-          <ValidityTableCell validity={engagement.validity} />
-          <td>
-            <a
-              href="{base}/employee/{$page.params
-                .uuid}/edit/engagement/{engagement.uuid}"
-            >
-              <Icon type="pen" />
+    {#each data.engagements.objects as outer}
+      <!-- TODO: Remove when GraphQL is able to do this for us -->
+      {@const filteredObjects = outer.objects.filter((obj) => tenseFilter(obj, tense))}
+      {#each filteredObjects as engagement}
+        <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
+          {#if isOrg}
+            <a href="{base}/employee/{engagement.employee[0].uuid}">
+              <td class="p-4">{engagement.employee[0].name}</td>
             </a>
-          </td>
-          <td>
-            <a
-              href="{base}/employee/{$page.params
-                .uuid}/terminate/engagement/{engagement.uuid}"
-            >
-              <Icon type="xmark" size="30" />
+            <td class="p-4">{engagement.job_function.name}</td>
+            <td class="p-4">{engagement.engagement_type.name}</td>
+            <td class="p-4">{engagement.primary ? engagement.primary.name : ""}</td>
+            <ValidityTableCell validity={engagement.validity} />
+          {:else}
+            <a href="{base}/organisation/{engagement.org_unit[0].uuid}">
+              <td class="p-4">{engagement.org_unit[0].name}</td>
             </a>
-          </td>
-        {/if}
-      </tr>
+            <td class="p-4">{engagement.job_function.name}</td>
+            <td class="p-4">{engagement.engagement_type.name}</td>
+            <td class="p-4">{engagement.primary ? engagement.primary.name : ""}</td>
+            <ValidityTableCell validity={engagement.validity} />
+            <td>
+              <a href="{base}/employee/{uuid}/edit/engagement/{engagement.uuid}">
+                <Icon type="pen" />
+              </a>
+            </td>
+            <td>
+              <a href="{base}/employee/{uuid}/terminate/engagement/{engagement.uuid}">
+                <Icon type="xmark" size="30" />
+              </a>
+            </td>
+          {/if}
+        </tr>
+      {/each}
     {/each}
   {/await}
 </DetailTable>

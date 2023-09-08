@@ -4,20 +4,20 @@
   import Icon from "$lib/components/icon.svelte"
   import { base } from "$app/paths"
   import { env } from "$env/dynamic/public"
-  import { page } from "$app/stores"
   import { graphQLClient } from "$lib/util/http"
-  import { AddressDocument } from "./query.generated"
   import { gql } from "graphql-request"
+  import { tenseToValidity, tenseFilter } from "$lib/util/helpers"
   import { date } from "$lib/stores/date"
+  import { AddressDocument } from "./query.generated"
 
   export let uuid: string
-  // TODO: Blocked by #57396
-  // svelte-ignore unused-export-let
-  export let tense: string
+  export let tense: Tense
 
   gql`
-    query Address($org_unit: [UUID!], $fromDate: DateTime) {
-      addresses(filter: { org_units: $org_unit, from_date: $fromDate }) {
+    query Address($org_unit: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+      addresses(
+        filter: { org_units: $org_unit, from_date: $fromDate, to_date: $toDate }
+      ) {
         objects {
           objects {
             name
@@ -40,36 +40,40 @@
 </script>
 
 <DetailTable headers={["Adressetype", "Adresse", "Synlighed", "Dato", "", ""]}>
-  {#await graphQLClient().request(AddressDocument, { org_unit: uuid, fromDate: $date })}
+  {#await graphQLClient().request( AddressDocument, { org_unit: uuid, ...tenseToValidity(tense, $date) } )}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
   {:then data}
-    {@const addresses = data.addresses.objects}
-    {#each addresses as addr}
-      {@const address = addr.objects[0]}
-      <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-        <td class="p-4">{address.address_type.name}</td>
-        <td class="p-4">{address.name}</td>
-        <td class="p-4">{address.visibility ? address.visibility.name : "Ikke sat"}</td>
-        <ValidityTableCell validity={address.validity} />
-        <td>
-          <a href="{base}/organisation/{$page.params.uuid}/edit/address/{address.uuid}">
-            <Icon type="pen" />
-          </a>
-        </td>
-
-        {#if env.PUBLIC_ENABLE_UNIT_TERMINATE === "true"}
+    {#each data.addresses.objects as outer}
+      <!-- TODO: Remove when GraphQL is able to do this for us -->
+      {@const filteredObjects = outer.objects.filter((obj) => tenseFilter(obj, tense))}
+      {#each filteredObjects as address}
+        <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+          <td class="p-4">{address.address_type.name}</td>
+          <td class="p-4">{address.name}</td>
+          <td class="p-4"
+            >{address.visibility ? address.visibility.name : "Ikke sat"}</td
+          >
+          <ValidityTableCell validity={address.validity} />
           <td>
-            <a
-              href="{base}/organisation/{uuid}/terminate/address/{address.uuid}"
-              class="hover:slate-300"
-            >
-              <Icon type="xmark" size="30" />
+            <a href="{base}/organisation/{uuid}/edit/address/{address.uuid}">
+              <Icon type="pen" />
             </a>
           </td>
-        {/if}
-      </tr>
+
+          {#if env.PUBLIC_ENABLE_UNIT_TERMINATE === "true"}
+            <td>
+              <a
+                href="{base}/organisation/{uuid}/terminate/address/{address.uuid}"
+                class="hover:slate-300"
+              >
+                <Icon type="xmark" size="30" />
+              </a>
+            </td>
+          {/if}
+        </tr>
+      {/each}
     {/each}
   {/await}
 </DetailTable>
