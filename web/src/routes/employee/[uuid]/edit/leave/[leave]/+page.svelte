@@ -115,7 +115,7 @@
   {@const maxDate = leave.validity?.to?.split("T")[0]}
   {@const engagements = leave.employee.engagements}
   {@const employeeName = leave.employee.name}
-  {@const engagementStartValue = getEngagementTitlesAndUuid([leave.engagement])[0]}
+  {@const engagementStartValue = getEngagementTitlesAndUuid([leave.engagement])}
 
   <title>Rediger orlov | OS2mo</title>
 
