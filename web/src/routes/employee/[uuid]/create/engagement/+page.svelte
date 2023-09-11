@@ -27,21 +27,29 @@
   gql`
     query FacetAndOrg($uuid: [UUID!], $fromDate: DateTime) {
       facets(
-        user_keys: ["engagement_type", "engagement_job_function", "primary_type"]
+        filter: {
+          user_keys: ["engagement_type", "engagement_job_function", "primary_type"]
+        }
       ) {
-        uuid
-        user_key
-        classes {
-          name
-          uuid
-          user_key
+        objects {
+          objects {
+            uuid
+            user_key
+            classes {
+              name
+              uuid
+              user_key
+            }
+          }
         }
       }
-      employees(uuids: $uuid, from_date: $fromDate) {
+      employees(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          validity {
-            from
-            to
+          objects {
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -82,9 +90,9 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const facets = data.facets}
-  {@const minDate = data.employees[0].objects[0].validity?.from.split("T")[0]}
-  {@const maxDate = data.employees[0].objects[0].validity?.to?.split("T")[0]}
+  {@const facets = data.facets.objects}
+  {@const minDate = data.employees.objects[0].objects[0].validity?.from.split("T")[0]}
+  {@const maxDate = data.employees.objects[0].objects[0].validity?.to?.split("T")[0]}
 
   <title>Opret engagement | OS2mo</title>
 

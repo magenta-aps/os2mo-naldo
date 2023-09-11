@@ -16,15 +16,17 @@
 
   gql`
     query Employee($uuid: [UUID!], $fromDate: DateTime) {
-      employees(uuids: $uuid, from_date: $fromDate) {
+      employees(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          name
-          uuid
-          nickname
-          seniority
-          validity {
-            from
-            to
+          objects {
+            name
+            uuid
+            nickname
+            seniority
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -38,7 +40,7 @@
       <td class="p-4">Henter data...</td>
     </tr>
   {:then data}
-    {@const employee = data.employees[0].objects[0]}
+    {@const employee = data.employees.objects[0].objects[0]}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">
         {employee.name}

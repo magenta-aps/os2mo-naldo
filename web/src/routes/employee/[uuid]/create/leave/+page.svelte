@@ -23,33 +23,39 @@
 
   gql`
     query LeaveAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
-      facets(user_keys: ["leave_type"]) {
-        uuid
-        user_key
-        classes {
-          uuid
-          user_key
-          name
-        }
-      }
-      employees(uuids: $uuid, from_date: $fromDate) {
+      facets(filter: { user_keys: ["leave_type"] }) {
         objects {
-          uuid
-          name
-          engagements {
-            org_unit {
-              name
-              user_key
-            }
+          objects {
             uuid
-            job_function {
+            user_key
+            classes {
+              uuid
               user_key
               name
             }
           }
-          validity {
-            from
-            to
+        }
+      }
+      employees(filter: { uuids: $uuid, from_date: $fromDate }) {
+        objects {
+          objects {
+            uuid
+            name
+            engagements {
+              org_unit {
+                name
+                user_key
+              }
+              uuid
+              job_function {
+                user_key
+                name
+              }
+            }
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -93,11 +99,12 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const facets = data.facets}
-  {@const minDate = data.employees[0].objects[0].validity.from.split("T")[0]}
-  {@const maxDate = data.employees[0].objects[0].validity?.to?.split("T")[0]}
-  {@const engagements = data.employees[0].objects[0].engagements}
-  {@const employeeName = data.employees[0].objects[0].name}
+  {@const facets = data.facets.objects}
+  {@const employee = data.employees.objects[0].objects[0]}
+  {@const minDate = employee.validity.from.split("T")[0]}
+  {@const maxDate = employee.validity?.to?.split("T")[0]}
+  {@const engagements = employee.engagements}
+  {@const employeeName = employee.name}
 
   <title>Opret orlov | OS2mo</title>
 

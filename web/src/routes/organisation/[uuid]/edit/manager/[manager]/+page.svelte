@@ -23,41 +23,49 @@
 
   gql`
     query ManagerAndFacets($uuid: [UUID!], $fromDate: DateTime) {
-      facets(user_keys: ["manager_type", "manager_level", "responsibility"]) {
-        uuid
-        user_key
-        classes {
-          name
-          uuid
-          user_key
+      facets(
+        filter: { user_keys: ["manager_type", "manager_level", "responsibility"] }
+      ) {
+        objects {
+          objects {
+            uuid
+            user_key
+            classes {
+              name
+              uuid
+              user_key
+            }
+          }
         }
       }
-      managers(uuids: $uuid, from_date: $fromDate) {
+      managers(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          uuid
-          employee {
+          objects {
             uuid
-            name
-          }
-          manager_type {
-            name
-          }
-          manager_level {
-            name
-          }
-          responsibilities {
-            name
-          }
-          validity {
-            from
-            to
-          }
-          org_unit {
-            uuid
-            name
+            employee {
+              uuid
+              name
+            }
+            manager_type {
+              name
+            }
+            manager_level {
+              name
+            }
+            responsibilities {
+              name
+            }
             validity {
               from
               to
+            }
+            org_unit {
+              uuid
+              name
+              validity {
+                from
+                to
+              }
             }
           }
         }
@@ -101,10 +109,10 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const manager = data.managers[0].objects[0]}
-  {@const facets = data.facets}
-  {@const minDate = data.managers[0].objects[0].org_unit[0].validity.from.split("T")[0]}
-  {@const maxDate = data.managers[0].objects[0].org_unit[0].validity?.to?.split("T")[0]}
+  {@const manager = data.managers.objects[0].objects[0]}
+  {@const facets = data.facets.objects}
+  {@const minDate = manager.org_unit[0].validity.from.split("T")[0]}
+  {@const maxDate = manager.org_unit[0].validity?.to?.split("T")[0]}
 
   <title>Redigér Leder | OS2mo</title>
 
@@ -136,6 +144,7 @@
         </div>
         <Search
           type="org-unit"
+          disabled={true}
           startValue={{
             uuid: manager.org_unit[0].uuid,
             name: manager.org_unit[0].name,

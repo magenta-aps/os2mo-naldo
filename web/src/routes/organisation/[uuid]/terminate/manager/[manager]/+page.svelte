@@ -15,21 +15,23 @@
 
   gql`
     query Manager($uuid: [UUID!], $fromDate: DateTime!) {
-      managers(uuids: $uuid, from_date: $fromDate) {
+      managers(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          uuid
-          employee {
+          objects {
             uuid
-            name
-          }
-          validity {
-            from
-            to
-          }
-          org_unit {
+            employee {
+              uuid
+              name
+            }
             validity {
               from
               to
+            }
+            org_unit {
+              validity {
+                from
+                to
+              }
             }
           }
         }
@@ -80,7 +82,7 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const manager = data.managers[0].objects[0]}
+  {@const manager = data.managers.objects[0].objects[0]}
   {@const minDate = manager.org_unit[0].validity.from.split("T")[0]}
   {@const maxDate = manager.org_unit[0].validity.to?.split("T")[0]}
 

@@ -1,43 +1,47 @@
 import { fetchGraph } from "$lib/util/http"
 
-interface Query {
+export interface Query {
   data: Data | null
   errors?: Error[]
 }
 
-interface Data {
-  org_units: OrganisationUnitResponse[]
+export interface Data {
+  org_units: OrganisationUnitResponsePaged
 }
 
-interface OrganisationUnitResponse {
+export interface OrganisationUnitResponsePaged {
+  objects: OrganisationUnitResponse[]
+}
+
+export interface OrganisationUnitResponse {
   objects: OrganisationUnitElement[]
 }
 
 export interface OrganisationUnitElement {
   name: string
-  uuid: null | string
+  uuid: string
   unit_type: Class | null
   org_unit_level: Class | null
   parent: ParentOrganisationUnit | null
   validity: Validity
 }
 
-interface Class {
+export interface Class {
   name: string
 }
 
-interface ParentOrganisationUnit {
+export interface ParentOrganisationUnit {
   name: string
-  uuid: null | string
+  uuid: string
   parent: Class | null
 }
 
-interface Validity {
+export interface Validity {
   from: string
   to: null | string
 }
 
-interface Error {
+export interface Error {
   message: string
 }
 
@@ -65,28 +69,30 @@ const query = (uuid: string, from: string | null, to: string | null | undefined)
 
   const query = `
     {
-      org_units(uuids: "${uuid}", from_date: ${
+      org_units(filter: {uuids: "${uuid}", from_date: ${
     from ? `"${from}"` : from
-  }${dynamicToDate}) {
+  }${dynamicToDate}}) {
         objects {
-          name
-          uuid
-          unit_type {
-            name
-          }
-          org_unit_level {
-            name
-          }
-          parent {
+          objects {
             name
             uuid
-            parent {
+            unit_type {
               name
             }
-          }
-          validity {
-            from
-            to
+            org_unit_level {
+              name
+            }
+            parent {
+              name
+              uuid
+              parent {
+                name
+              }
+            }
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -108,10 +114,10 @@ export const load = async (
 
   if (json.data) {
     const past: OrganisationUnitElement[] = []
-    const present: OrganisationUnitElement[] = json.data.org_units[0].objects
+    const present: OrganisationUnitElement[] = json.data.org_units.objects[0].objects
     const future: OrganisationUnitElement[] = []
 
-    const presentTime = json.data.org_units[0].objects[0].validity
+    const presentTime = json.data.org_units.objects[0].objects[0].validity
     if (presentTime.to) {
       const newToDate = new Date(presentTime.to)
       newToDate.setDate(newToDate.getDate() + 2)
@@ -120,16 +126,16 @@ export const load = async (
       const futureRes = await fetchGraph(query((uuid = uuid), presentTime.to, null))
       const futureJson: Query = await futureRes.json()
 
-      if (futureJson.data && futureJson.data.org_units.length) {
-        future.push(...futureJson.data.org_units[0].objects)
+      if (futureJson.data && futureJson.data.org_units.objects.length) {
+        future.push(...futureJson.data.org_units.objects[0].objects)
       }
     }
 
     const pastRes = await fetchGraph(query(uuid, null, presentTime.from))
     const pastJson: Query = await pastRes.json()
 
-    if (pastJson.data && pastJson.data.org_units.length) {
-      past.push(...pastJson.data.org_units[0].objects)
+    if (pastJson.data && pastJson.data.org_units.objects.length) {
+      past.push(...pastJson.data.org_units.objects[0].objects)
     }
 
     return {

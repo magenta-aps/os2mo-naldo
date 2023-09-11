@@ -16,22 +16,26 @@
 
   gql`
     query ITUser($uuid: [UUID!], $fromDate: DateTime!, $employee_uuid: [UUID!]) {
-      itusers(uuids: $uuid, from_date: $fromDate) {
+      itusers(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          user_key
-          uuid
-          validity {
-            from
-            to
+          objects {
+            user_key
+            uuid
+            validity {
+              from
+              to
+            }
           }
         }
       }
-      employees(uuids: $employee_uuid) {
+      employees(filter: { uuids: $employee_uuid }) {
         objects {
-          name
-          validity {
-            from
-            to
+          objects {
+            name
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -72,8 +76,8 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const ituser = data.itusers[0].objects[0]}
-  {@const minDate = data.employees[0].objects[0].validity.from.split("T")[0]}
+  {@const ituser = data.itusers.objects[0].objects[0]}
+  {@const minDate = data.employees.objects[0].objects[0].validity.from.split("T")[0]}
 
   <title>Afslut IT-konto: {ituser.user_key} | OS2mo</title>
 

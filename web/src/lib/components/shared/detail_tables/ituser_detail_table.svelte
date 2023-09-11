@@ -21,20 +21,24 @@
 
   gql`
     query ITUsers($employee: [UUID!], $org_unit: [UUID!], $fromDate: DateTime) {
-      itusers(employees: $employee, org_units: $org_unit, from_date: $fromDate) {
+      itusers(
+        filter: { employees: $employee, org_units: $org_unit, from_date: $fromDate }
+      ) {
         objects {
-          user_key
-          uuid
-          itsystem {
-            name
-          }
-          validity {
-            from
-            to
-          }
-          primary {
+          objects {
+            user_key
             uuid
-            name
+            itsystem {
+              name
+            }
+            validity {
+              from
+              to
+            }
+            primary {
+              uuid
+              name
+            }
           }
         }
       }
@@ -48,7 +52,7 @@
       <td class="p-4">Henter data...</td>
     </tr>
   {:then data}
-    {@const itusers = data.itusers}
+    {@const itusers = data.itusers.objects}
     {#each itusers as it}
       {@const ituser = it.objects[0]}
       <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">

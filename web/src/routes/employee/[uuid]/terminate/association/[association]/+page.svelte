@@ -15,21 +15,23 @@
 
   gql`
     query Association($uuid: [UUID!], $fromDate: DateTime!) {
-      associations(uuids: $uuid, from_date: $fromDate) {
+      associations(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          uuid
-          employee {
+          objects {
             uuid
-            name
-          }
-          validity {
-            from
-            to
-          }
-          org_unit {
+            employee {
+              uuid
+              name
+            }
             validity {
               from
               to
+            }
+            org_unit {
+              validity {
+                from
+                to
+              }
             }
           }
         }
@@ -72,7 +74,7 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const association = data.associations[0].objects[0]}
+  {@const association = data.associations.objects[0].objects[0]}
   {@const minDate = association.org_unit[0].validity.from.split("T")[0]}
   {@const maxDate = association.org_unit[0].validity.to?.split("T")[0]}
 

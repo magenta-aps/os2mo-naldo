@@ -67,10 +67,12 @@
 
   gql`
     query Employee($uuid: [UUID!], $fromDate: DateTime) {
-      employees(uuids: $uuid, from_date: $fromDate) {
+      employees(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          name
-          cpr_no
+          objects {
+            name
+            cpr_no
+          }
         }
       }
     }
@@ -83,7 +85,7 @@
   {#await graphQLClient().request( EmployeeDocument, { uuid: $page.params.uuid, fromDate: $date } )}
     <p>Loader medarbejder...</p>
   {:then data}
-    {@const employee = data.employees[0].objects[0]}
+    {@const employee = data.employees.objects[0].objects[0]}
     <h1 class="mb-4">
       {employee.name}
       <span class="text-slate-600">

@@ -6,8 +6,9 @@
   import { env } from "$env/dynamic/public"
   import { page } from "$app/stores"
   import { graphQLClient } from "$lib/util/http"
-  import { OrgUnitAddressDetailDocument } from "./query.generated"
+  import { AddressDocument } from "./query.generated"
   import { gql } from "graphql-request"
+  import { date } from "$lib/stores/date"
 
   export let uuid: string
   // TODO: Blocked by #57396
@@ -15,10 +16,10 @@
   export let tense: string
 
   gql`
-    query OrgUnitAddressDetail($uuid: [UUID!]) {
-      org_units(uuids: $uuid) {
+    query Address($org_unit: [UUID!], $fromDate: DateTime) {
+      addresses(filter: { org_units: $org_unit, from_date: $fromDate }) {
         objects {
-          addresses {
+          objects {
             name
             uuid
             address_type {
@@ -39,13 +40,14 @@
 </script>
 
 <DetailTable headers={["Adressetype", "Adresse", "Synlighed", "Dato", "", ""]}>
-  {#await graphQLClient().request(OrgUnitAddressDetailDocument, { uuid: uuid })}
+  {#await graphQLClient().request(AddressDocument, { org_unit: uuid, fromDate: $date })}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
   {:then data}
-    {@const addresses = data.org_units[0].objects[0].addresses}
-    {#each addresses as address}
+    {@const addresses = data.addresses.objects}
+    {#each addresses as addr}
+      {@const address = addr.objects[0]}
       <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
         <td class="p-4">{address.address_type.name}</td>
         <td class="p-4">{address.name}</td>

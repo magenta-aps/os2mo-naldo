@@ -9,6 +9,7 @@
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
   import { FacetsAndOrgDocument, CreateAddressDocument } from "./query.generated"
+  import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
@@ -23,19 +24,26 @@
 
   gql`
     query FacetsAndOrg($uuid: [UUID!], $fromDate: DateTime) {
-      facets(user_keys: ["org_unit_address_type", "visibility"]) {
-        uuid
-        user_key
-        classes {
-          name
-          uuid
+      facets(filter: { user_keys: ["org_unit_address_type", "visibility"] }) {
+        objects {
+          objects {
+            uuid
+            user_key
+            classes {
+              name
+              uuid
+              user_key
+            }
+          }
         }
       }
-      org_units(uuids: $uuid, from_date: $fromDate) {
+      org_units(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          validity {
-            from
-            to
+          objects {
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -73,9 +81,10 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const facets = data.facets}
-  {@const minDate = data.org_units[0].objects[0].validity?.from.split("T")[0]}
-  {@const maxDate = data.org_units[0].objects[0].validity?.to?.split("T")[0]}
+  {@const facets = data.facets.objects}
+  {console.log(facets)}
+  {@const minDate = data.org_units.objects[0].objects[0].validity?.from.split("T")[0]}
+  {@const maxDate = data.org_units.objects[0].objects[0].validity?.to?.split("T")[0]}
 
   <title>Opret adresse | OS2mo</title>
 
@@ -110,7 +119,7 @@
             title="Synlighed"
             id="visibility"
             bind:value={visibility}
-            iterable={facets[0].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
+            iterable={getClassesByFacetUserKey(facets, "visibility")}
             extra_classes="basis-1/2"
             required={true}
           />
@@ -118,7 +127,7 @@
             title="Adressetype"
             id="address-type"
             bind:value={addressType}
-            iterable={facets[1].classes.sort((a, b) => (a.name > b.name ? 1 : -1))}
+            iterable={getClassesByFacetUserKey(facets, "org_unit_address_type")}
             required={true}
             extra_classes="basis-1/2"
             returnType="object"

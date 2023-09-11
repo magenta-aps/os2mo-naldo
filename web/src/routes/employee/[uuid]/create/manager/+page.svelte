@@ -18,27 +18,34 @@
 
   let fromDate: string
   let toDate: string
-  let orgUnitUuid: string
   let managerType: string
   let managerLevel: string
   let responsibility: string
 
   gql`
     query FacetsAndOrg($uuid: [UUID!], $fromDate: DateTime) {
-      facets(user_keys: ["manager_type", "manager_level", "responsibility"]) {
-        uuid
-        user_key
-        classes {
-          name
-          uuid
-          user_key
+      facets(
+        filter: { user_keys: ["manager_type", "manager_level", "responsibility"] }
+      ) {
+        objects {
+          objects {
+            uuid
+            user_key
+            classes {
+              name
+              uuid
+              user_key
+            }
+          }
         }
       }
-      employees(uuids: $uuid, from_date: $fromDate) {
+      employees(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          validity {
-            from
-            to
+          objects {
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -87,9 +94,9 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const facets = data.facets}
-  {@const minDate = data.employees[0].objects[0].validity?.from.split("T")[0]}
-  {@const maxDate = data.employees[0].objects[0].validity?.to?.split("T")[0]}
+  {@const facets = data.facets.objects}
+  {@const minDate = data.employees.objects[0].objects[0].validity?.from.split("T")[0]}
+  {@const maxDate = data.employees.objects[0].objects[0].validity?.to?.split("T")[0]}
 
   <title>Opret Leder | OS2mo</title>
 

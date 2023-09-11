@@ -28,3 +28,18 @@ export const getEngagementTitlesAndUuid = (
     }
   })
 }
+
+type ITSystem = {
+  objects: {
+    uuid: string
+    name: string
+  }[]
+}
+
+export const getITSystemNames = (itsystems: ITSystem[]) => {
+  const ITSystems = itsystems.map((itsystem) => ({
+    uuid: itsystem.objects[0].uuid,
+    name: itsystem.objects[0].name,
+  }))
+  return ITSystems.sort((a, b) => (a.name > b.name ? 1 : -1))
+}
