@@ -14,6 +14,7 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import Search from "$lib/components/search.svelte"
 
   let fromDate: string
   let toDate: string
@@ -34,6 +35,8 @@
       }
       org_units(uuids: $uuid, from_date: $fromDate) {
         objects {
+          name
+          uuid
           validity {
             from
             to
@@ -79,6 +82,7 @@
   Henter data...
 {:then data}
   {@const facets = data.facets}
+  {@const orgUnit = data.org_units[0].objects[0]}
   {@const minDate = data.org_units[0].objects[0].validity?.from.split("T")[0]}
   {@const maxDate = data.org_units[0].objects[0].validity?.to?.split("T")[0]}
 
@@ -116,14 +120,7 @@
               : new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
           />
         </div>
-        <!-- We need some sort of input, to choose an employee.
-          Hopefully we can do it with GraphQL soon :copium: -->
-        <Input
-          title="Medarbejder UUID"
-          id="employee-uuid"
-          bind:value={employeeUuid}
-          required={true}
-        />
+        <Search type="employee" wantedAttrs={["Email"]} />
         <div class="flex flex-row gap-6">
           <Select
             title="Tilknytningsrolle"

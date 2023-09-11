@@ -14,6 +14,7 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import Search from "$lib/components/search.svelte"
 
   let fromDate: string
   let toDate: string
@@ -149,6 +150,7 @@
           startValue={manager.org_unit[0].uuid}
           required={true}
         />
+        <Search type="org-unit" />
         <div class="flex flex-row gap-6">
           <Select
             title="Ledertype"

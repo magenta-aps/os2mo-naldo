@@ -1,7 +1,6 @@
 <script lang="ts">
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import Input from "$lib/components/forms/shared/input.svelte"
   import Select from "$lib/components/forms/shared/select.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
@@ -14,11 +13,10 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import Search from "$lib/components/search.svelte"
 
   let fromDate: string
   let toDate: string
-  let employeeUuid: string
-  let orgUnitUuid: string
   let managerType: string
   let managerLevel: string
   let responsibility: string
@@ -56,6 +54,7 @@
           }
           org_unit {
             uuid
+            name
             validity {
               from
               to
@@ -135,19 +134,25 @@
             max={maxDate}
           />
         </div>
-        <!-- We need some sort of input, to choose an org_unit. !-->
-        <Input
-          title="Organisationsenhed UUID"
-          id="org-unit-uuid"
-          bind:value={orgUnitUuid}
-          startValue={manager.org_unit[0].uuid}
-          required={true}
+        <Search
+          type="org-unit"
+          startValue={{
+            uuid: manager.org_unit[0].uuid,
+            name: manager.org_unit[0].name,
+            attrs: [],
+          }}
         />
-        <Input
-          title="Medarbejder UUID"
-          id="employee-uuid"
-          bind:value={employeeUuid}
-          startValue={manager.employee ? manager.employee[0].uuid : null}
+        <Search
+          type="employee"
+          startValue={manager.employee
+            ? {
+                uuid: manager.employee[0].uuid,
+                name: manager.employee[0].name,
+                attrs: [],
+              }
+            : undefined}
+          wantedAttrs={["Email"]}
+          required={false}
         />
         <div class="flex flex-row gap-6">
           <Select
