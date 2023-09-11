@@ -4,20 +4,21 @@ export function toUrlFriendly(str: string): string {
     .replace(/æ/g, "ae")
     .replace(/ø/g, "oe")
     .replace(/å/g, "aa")
-    .replace(/[^a-z0-9_\-]/g, "") // accept "-"
-    .replace(/\s+/g, "_") // replace space with underscore
+    .replace(/[^a-z0-9_\-]+/g, "_") // accept "-" and replace invalid characters and spaces with underscore
 }
 
 export function fromUrlFriendly(urlString: string, tabNames: string[]): string {
-  const str = urlString.replace(/_/g, " ").replace("#", "")
+  const cleanedUrlString = urlString.startsWith("#") ? urlString.slice(1) : urlString
+  const str = cleanedUrlString.replace(/_/g, " ")
+  console.log("Cleaned and converted string:", str)
   for (let tab of tabNames) {
-    if (toUrlFriendly(tab).toLowerCase() === str.toLowerCase()) return tab
+    if (toUrlFriendly(tab).toLowerCase() === str) return tab
   }
   return ""
 }
 
 export function getHash(): string {
-  return window.location.hash.replace("#", "")
+  return window.location.hash.slice(1)
 }
 
 export function setHash(value: string): void {
@@ -26,8 +27,5 @@ export function setHash(value: string): void {
 
 export function addUrlChangeListener(listener: () => void) {
   window.addEventListener("popstate", listener)
-
-  return () => {
-    window.removeEventListener("popstate", listener)
-  }
+  return () => window.removeEventListener("popstate", listener)
 }
