@@ -15,16 +15,18 @@
     query Employees {
       employees(limit: 20) {
         objects {
-          givenname
-          surname
-          cpr_no
-          uuid
-          engagements {
-            job_function {
-              name
-            }
-            org_unit {
-              name
+          objects {
+            givenname
+            surname
+            cpr_no
+            uuid
+            engagements {
+              job_function {
+                name
+              }
+              org_unit {
+                name
+              }
             }
           }
         }
@@ -60,7 +62,7 @@
   $: fetchEmployees = async () => {
     if (!allEmployees) {
       const data = await graphQLClient().request(EmployeesDocument)
-      allEmployees = data.employees.map((v) => v.objects[0])
+      allEmployees = data.employees.objects.map((v) => v.objects[0])
     }
 
     // TODO: Switch to all GraphQL when #51997 is done

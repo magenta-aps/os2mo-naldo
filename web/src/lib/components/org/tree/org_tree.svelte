@@ -13,13 +13,15 @@
     childUuid?: string | null
   ): Promise<any[]> => {
     const query = `{
-      org_units(parents: null, from_date: "${fromDate}") {
+      org_units(filter: { parents: null, from_date: "${fromDate}" }) {
         objects {
-          name
-          uuid
-          children {
+          objects {
             name
             uuid
+            children {
+              name
+              uuid
+            }
           }
         }
       }
@@ -35,7 +37,7 @@
       ? (await fetchParentTree(uuid, fromDate)).map((e) => e.uuid).reverse()
       : []
 
-    for (let org of json.data.org_units) {
+    for (let org of json.data.org_units.objects) {
       orgTree.push({
         uuid: org.objects[0].uuid,
         name: org.objects[0].name,

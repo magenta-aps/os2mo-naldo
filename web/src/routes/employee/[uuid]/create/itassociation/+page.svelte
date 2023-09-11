@@ -31,33 +31,43 @@
 
   gql`
     query FacetClassesAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
-      facets(user_keys: "engagement_job_function") {
-        uuid
-        user_key
-        classes {
-          user_key
-          name
-          uuid
+      facets(filter: { user_keys: "engagement_job_function" }) {
+        objects {
+          objects {
+            uuid
+            user_key
+            classes {
+              user_key
+              name
+              uuid
+            }
+          }
         }
       }
-      classes(user_keys: ["primary", "non-primary"]) {
-        uuid
-        user_key
-      }
-      employees(uuids: $uuid, from_date: $fromDate) {
+      classes(filter: { user_keys: ["primary", "non-primary"] }) {
         objects {
-          uuid
-          name
-          itusers {
-            itsystem {
-              name
-            }
-            user_key
+          objects {
             uuid
+            user_key
           }
-          validity {
-            from
-            to
+        }
+      }
+      employees(filter: { uuids: $uuid, from_date: $fromDate }) {
+        objects {
+          objects {
+            uuid
+            name
+            itusers {
+              itsystem {
+                name
+              }
+              user_key
+              uuid
+            }
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -99,11 +109,11 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const facets = data.facets}
-  {@const itusers = data.employees[0].objects[0].itusers}
-  {@const primaryClasses = data.classes}
-  {@const employeeName = data.employees[0].objects[0].name}
-  {@const minDate = data.employees[0].objects[0].validity.from.split("T")[0]}
+  {@const facets = data.facets.objects}
+  {@const itusers = data.employees.objects[0].objects[0].itusers}
+  {@const primaryClasses = data.classes.objects}
+  {@const employeeName = data.employees.objects[0].objects[0].name}
+  {@const minDate = data.employees.objects[0].objects[0].validity.from.split("T")[0]}
 
   <title>Opret IT-tilknytning | OS2mo</title>
 

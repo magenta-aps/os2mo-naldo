@@ -22,35 +22,41 @@
 
   gql`
     query FacetsAndRole($uuid: [UUID!], $fromDate: DateTime) {
-      facets(user_keys: "role_type") {
-        uuid
-        user_key
-        classes {
-          uuid
-          user_key
-          name
+      facets(filter: { user_keys: "role_type" }) {
+        objects {
+          objects {
+            uuid
+            user_key
+            classes {
+              uuid
+              user_key
+              name
+            }
+          }
         }
       }
-      roles(uuids: $uuid, from_date: $fromDate) {
+      roles(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          employee {
-            name
+          objects {
+            employee {
+              name
+              validity {
+                from
+                to
+              }
+            }
+            org_unit {
+              name
+              uuid
+            }
+            role_type {
+              name
+              uuid
+            }
             validity {
               from
               to
             }
-          }
-          org_unit {
-            name
-            uuid
-          }
-          role_type {
-            name
-            uuid
-          }
-          validity {
-            from
-            to
           }
         }
       }
@@ -91,11 +97,13 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const facets = data.facets}
-  {@const role = data.roles[0].objects[0]}
-  {@const org_unit = data.roles[0].objects[0].org_unit[0]}
-  {@const minDate = data.roles[0].objects[0].employee[0].validity?.from?.split("T")[0]}
-  {@const maxDate = data.roles[0].objects[0].employee[0].validity?.to?.split("T")[0]}
+  {@const facets = data.facets.objects}
+  {@const role = data.roles.objects[0].objects[0]}
+  {@const org_unit = data.roles.objects[0].objects[0].org_unit[0]}
+  {@const minDate =
+    data.roles.objects[0].objects[0].employee[0].validity?.from?.split("T")[0]}
+  {@const maxDate =
+    data.roles.objects[0].objects[0].employee[0].validity?.to?.split("T")[0]}
 
   <title>Rediger rolle | OS2mo</title>
 

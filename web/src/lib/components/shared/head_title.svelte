@@ -16,27 +16,31 @@
     switch (type) {
       case Title.ORGANIZATION:
         query = `{
-          org_units(uuids: "${uuid}") {
+          org_units(filter: { uuids: "${uuid}" }) {
             objects {
-              name
+              objects {
+                name
+              }
             }
           }
         }`
         return fetchGraph(query)
           .then((res) => res.json())
-          .then((json) => json.data.org_units[0].objects[0].name)
+          .then((json) => json.data.org_units.objects[0].objects[0].name)
 
       case Title.EMPLOYEE:
         query = `{
-          employees(uuids: "${uuid}") {
+          employees(filter: { uuids: "${uuid}" }) {
             objects {
-              name
+              objects {
+                name
+              }
             }
           }
         }`
         return fetchGraph(query)
           .then((res) => res.json())
-          .then((json) => json.data.employees[0].objects[0].name)
+          .then((json) => json.data.employees.objects[0].objects[0].name)
 
       default:
         throw TypeError("Wrong or no title type used")

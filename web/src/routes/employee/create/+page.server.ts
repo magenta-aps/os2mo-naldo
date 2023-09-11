@@ -12,7 +12,7 @@ export const actions: Actions = {
     const seniority = data.get("seniority")
 
     return {
-      givenname: firstName,
+      given_name: firstName,
       surname: lastName,
       ...(cprNumber && { cpr_number: cprNumber }),
       ...(nicknameFirstName && { nickname_given_name: nicknameFirstName }),

@@ -22,20 +22,26 @@
 
   gql`
     query FacetsAndOrg($uuid: [UUID!], $fromDate: DateTime) {
-      facets(user_keys: ["kle_aspect", "kle_number"]) {
-        uuid
-        user_key
-        classes {
-          name
-          uuid
-          user_key
+      facets(filter: { user_keys: ["kle_aspect", "kle_number"] }) {
+        objects {
+          objects {
+            uuid
+            user_key
+            classes {
+              name
+              uuid
+              user_key
+            }
+          }
         }
       }
-      org_units(uuids: $uuid, from_date: $fromDate) {
+      org_units(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          validity {
-            from
-            to
+          objects {
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -73,9 +79,9 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const facets = data.facets}
-  {@const minDate = data.org_units[0].objects[0].validity?.from.split("T")[0]}
-  {@const maxDate = data.org_units[0].objects[0].validity?.to?.split("T")[0]}
+  {@const facets = data.facets.objects}
+  {@const minDate = data.org_units.objects[0].objects[0].validity?.from.split("T")[0]}
+  {@const maxDate = data.org_units.objects[0].objects[0].validity?.to?.split("T")[0]}
 
   <title>Opret KLE opmærkning | OS2mo</title>
 

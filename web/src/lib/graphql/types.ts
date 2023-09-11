@@ -237,12 +237,8 @@ export type Address = {
  */
 export type AddressAddress_TypeArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
@@ -251,12 +247,9 @@ export type AddressAddress_TypeArgs = {
  *
  */
 export type AddressEmployeeArgs = {
-  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<UuidsBoundEmployeeFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
@@ -266,12 +259,8 @@ export type AddressEmployeeArgs = {
  */
 export type AddressEngagementArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<UuidsBoundEngagementFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
@@ -281,12 +270,8 @@ export type AddressEngagementArgs = {
  */
 export type AddressOrg_UnitArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
-  hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundOrganisationUnitFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
@@ -295,12 +280,9 @@ export type AddressOrg_UnitArgs = {
  *
  */
 export type AddressPersonArgs = {
-  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<UuidsBoundEmployeeFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
@@ -310,12 +292,8 @@ export type AddressPersonArgs = {
  */
 export type AddressVisibilityArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 export type AddressCreateInput = {
@@ -342,6 +320,119 @@ export type AddressCreateInput = {
   value: Scalars['String']['input'];
   /** Visibility for the address. */
   visibility?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+/** Address filter. */
+export type AddressFilter = {
+  /**
+   * Address type user-key filter limiting which entries are returned.
+   *
+   * | `address_type_user_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  address_type_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * Address type UUID filter limiting which entries are returned.
+   *
+   * | `address_types`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  address_types?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Employee UUID filter limiting which entries are returned.
+   *
+   * | `employees`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Engagement UUID filter limiting which entries are returned.
+   *
+   * | `engagements`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their starting validity. */
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Organisational Unit UUID filter limiting which entries are returned.
+   *
+   * | `org_units`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * User-key filter limiting which entries are returned.
+   *
+   * | `user_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * UUID filter limiting which entries are returned.
+   *
+   * | `uuids`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 /**
@@ -431,11 +522,29 @@ export type AddressResponse = {
  *
  */
 export type AddressResponseRegistrationsArgs = {
-  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  end?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+/** Result page in cursor-based pagination. */
+export type AddressResponsePaged = {
+  __typename?: 'AddressResponsePaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<AddressResponse>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
 };
 
 export type AddressTerminateInput = {
@@ -655,105 +764,72 @@ export type Association = {
 /** Connects organisation units and employees */
 export type AssociationAssociation_TypeArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** Connects organisation units and employees */
 export type AssociationDynamic_ClassArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** Connects organisation units and employees */
 export type AssociationEmployeeArgs = {
-  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<UuidsBoundEmployeeFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** Connects organisation units and employees */
 export type AssociationIt_UserArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<UuidsBoundItUserFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** Connects organisation units and employees */
 export type AssociationJob_FunctionArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** Connects organisation units and employees */
 export type AssociationOrg_UnitArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
-  hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundOrganisationUnitFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** Connects organisation units and employees */
 export type AssociationPersonArgs = {
-  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<UuidsBoundEmployeeFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** Connects organisation units and employees */
 export type AssociationPrimaryArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** Connects organisation units and employees */
 export type AssociationSubstituteArgs = {
-  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<UuidsBoundEmployeeFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 export type AssociationCreateInput = {
@@ -776,6 +852,112 @@ export type AssociationCreateInput = {
   uuid?: InputMaybe<Scalars['UUID']['input']>;
   /** Validity range for the org-unit. */
   validity: RaValidityInput;
+};
+
+/** Association filter. */
+export type AssociationFilter = {
+  /**
+   * Association type user-key filter limiting which entries are returned.
+   *
+   * | `association_type_user_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  association_type_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * Association type UUID filter limiting which entries are returned.
+   *
+   * | `association_types`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  association_types?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Employee UUID filter limiting which entries are returned.
+   *
+   * | `employees`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their starting validity. */
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Query for either IT-Associations or "normal" Associations. `None` returns all.
+   *
+   * This field is needed to replicate the functionality in the service API:
+   * `?it=1`
+   *
+   */
+  it_association?: InputMaybe<Scalars['Boolean']['input']>;
+  /**
+   * Organisational Unit UUID filter limiting which entries are returned.
+   *
+   * | `org_units`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * User-key filter limiting which entries are returned.
+   *
+   * | `user_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * UUID filter limiting which entries are returned.
+   *
+   * | `uuids`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 /**
@@ -865,11 +1047,29 @@ export type AssociationResponse = {
  *
  */
 export type AssociationResponseRegistrationsArgs = {
-  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  end?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+/** Result page in cursor-based pagination. */
+export type AssociationResponsePaged = {
+  __typename?: 'AssociationResponsePaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<AssociationResponse>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
 };
 
 export type AssociationTerminateInput = {
@@ -901,6 +1101,43 @@ export type AssociationUpdateInput = {
   uuid: Scalars['UUID']['input'];
   /** Validity range for the org-unit. */
   validity: RaValidityInput;
+};
+
+export type BaseFilter = {
+  /** Limit the elements returned by their starting validity. */
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /** Limit the elements returned by their ending validity. */
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * User-key filter limiting which entries are returned.
+   *
+   * | `user_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * UUID filter limiting which entries are returned.
+   *
+   * | `uuids`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 /**
@@ -1091,12 +1328,8 @@ export type Class = {
  */
 export type ClassChildrenArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<ParentsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
@@ -1108,10 +1341,8 @@ export type ClassChildrenArgs = {
  */
 export type ClassFacetArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<UuidsBoundFacetFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
@@ -1123,12 +1354,8 @@ export type ClassFacetArgs = {
  */
 export type ClassParentArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 export type ClassCreateInput = {
@@ -1138,22 +1365,112 @@ export type ClassCreateInput = {
   facet_uuid: Scalars['UUID']['input'];
   /** Mo-class name. */
   name: Scalars['String']['input'];
-  /** UUID of the related organisation. */
-  org_uuid: Scalars['UUID']['input'];
   /** Owner of class */
   owner?: InputMaybe<Scalars['UUID']['input']>;
   /** UUID of the parent class. */
   parent_uuid?: InputMaybe<Scalars['UUID']['input']>;
   /** Published state of the class object. */
-  published?: InputMaybe<Scalars['String']['input']>;
+  published?: Scalars['String']['input'];
   /** Scope of the class. */
   scope?: InputMaybe<Scalars['String']['input']>;
-  /** The object type */
-  type?: Scalars['String']['input'];
   /** Extra info or uuid */
   user_key: Scalars['String']['input'];
   /** UUID to be created. Will be autogenerated if not specified. */
   uuid?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+/** Class filter. */
+export type ClassFilter = {
+  /**
+   * Facet user-key filter limiting which entries are returned.
+   *
+   * | `facet_user_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * Facet UUID filter limiting which entries are returned.
+   *
+   * | `facets`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Parent user-key filter limiting which entries are returned.
+   *
+   * | `parent_user_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * Parent UUID filter limiting which entries are returned.
+   *
+   * | `parents`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * User-key filter limiting which entries are returned.
+   *
+   * | `user_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * UUID filter limiting which entries are returned.
+   *
+   * | `uuids`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 /**
@@ -1243,11 +1560,29 @@ export type ClassResponse = {
  *
  */
 export type ClassResponseRegistrationsArgs = {
-  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  end?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+/** Result page in cursor-based pagination. */
+export type ClassResponsePaged = {
+  __typename?: 'ClassResponsePaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<ClassResponse>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
 };
 
 export type ClassUpdateInput = {
@@ -1306,6 +1641,45 @@ export type Configuration = {
    *
    */
   stringified_value: Scalars['String']['output'];
+};
+
+/** Configuration filter. */
+export type ConfigurationFilter = {
+  /**
+   * Key filter limiting which entries are returned.
+   *
+   * | `identifiers`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  identifiers?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+/** Result page in cursor-based pagination. */
+export type ConfigurationPaged = {
+  __typename?: 'ConfigurationPaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<Configuration>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
 };
 
 /** Employee/identity specific information */
@@ -1431,131 +1805,72 @@ export type Employee = {
 
 /** Employee/identity specific information */
 export type EmployeeAddressesArgs = {
-  address_type_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  address_types?: InputMaybe<Array<Scalars['UUID']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<EmployeesBoundAddressFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Employee/identity specific information */
 export type EmployeeAssociationsArgs = {
-  association_type_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  association_types?: InputMaybe<Array<Scalars['UUID']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
-  it_association?: InputMaybe<Scalars['Boolean']['input']>;
+  filter?: InputMaybe<EmployeesBoundAssociationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Employee/identity specific information */
 export type EmployeeEngagement_AssociationsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<EmployeesBoundEngagementAssociationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Employee/identity specific information */
 export type EmployeeEngagementsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<EmployeesBoundEngagementFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Employee/identity specific information */
 export type EmployeeItusersArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<EmployeesBoundItUserFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Employee/identity specific information */
 export type EmployeeLeavesArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<EmployeesBoundLeaveFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Employee/identity specific information */
 export type EmployeeManager_RolesArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<EmployeesBoundManagerFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Employee/identity specific information */
 export type EmployeeRolesArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<EmployeesBoundRoleFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 export type EmployeeCreateInput = {
-  /**
-   * New danish CPR No. of the employee.
-   * @deprecated Use 'cpr_number' instead. Will be removed in a future version of OS2mo.
-   */
-  cpr_no?: InputMaybe<Scalars['CPR']['input']>;
   /** Danish CPR number of the employee. */
   cpr_number?: InputMaybe<Scalars['CPR']['input']>;
   /** Givenname (firstname) of the employee. */
-  given_name?: InputMaybe<Scalars['String']['input']>;
-  /**
-   * Givenname (firstname) of the employee.
-   * @deprecated Use 'given_name' instead. Will be removed in a future version of OS2mo.
-   */
-  givenname?: InputMaybe<Scalars['String']['input']>;
-  /**
-   * Combined name of the employee
-   * @deprecated Use 'given_name' and 'surname' instead. Will be removed in a future version of OS2mo.
-   */
-  name?: InputMaybe<Scalars['String']['input']>;
-  /**
-   * Nickname (combined) of the employee.
-   * @deprecated Use 'nickname_given_name' and 'nickname_surname' instead. Will be removed in a future version of OS2mo.
-   */
-  nickname?: InputMaybe<Scalars['String']['input']>;
+  given_name: Scalars['String']['input'];
   /** Nickname givenname (firstname) of the employee. */
   nickname_given_name?: InputMaybe<Scalars['String']['input']>;
   /** Nickname surname (lastname) of the employee. */
@@ -1563,11 +1878,64 @@ export type EmployeeCreateInput = {
   /** New seniority value of the employee. */
   seniority?: InputMaybe<Scalars['Date']['input']>;
   /** Surname (lastname) of the employee. */
-  surname?: InputMaybe<Scalars['String']['input']>;
+  surname: Scalars['String']['input'];
   /** Short, unique key for the employee (defaults to object UUID on creation). */
   user_key?: InputMaybe<Scalars['String']['input']>;
   /** UUID to be created. Will be autogenerated if not specified. */
   uuid?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+/** Employee filter. */
+export type EmployeeFilter = {
+  /**
+   * CPR number filter limiting which entries are returned.
+   *
+   * | `cpr_numbers`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
+  /** Limit the elements returned by their starting validity. */
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /** Limit the elements returned by their ending validity. */
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * User-key filter limiting which entries are returned.
+   *
+   * | `user_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * UUID filter limiting which entries are returned.
+   *
+   * | `uuids`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 /**
@@ -1657,11 +2025,29 @@ export type EmployeeResponse = {
  *
  */
 export type EmployeeResponseRegistrationsArgs = {
-  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  end?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+/** Result page in cursor-based pagination. */
+export type EmployeeResponsePaged = {
+  __typename?: 'EmployeeResponsePaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<EmployeeResponse>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
 };
 
 export type EmployeeTerminateInput = {
@@ -1674,35 +2060,10 @@ export type EmployeeTerminateInput = {
 };
 
 export type EmployeeUpdateInput = {
-  /**
-   * New danish CPR No. of the employee.
-   * @deprecated Use 'cpr_number' instead. Will be removed in a future version of OS2mo.
-   */
-  cpr_no?: InputMaybe<Scalars['CPR']['input']>;
   /** Danish CPR number of the employee. */
   cpr_number?: InputMaybe<Scalars['CPR']['input']>;
-  /**
-   * Start date of the validity.
-   * @deprecated Use 'validity.from_date' instead. Will be removed in a future version of OS2mo.
-   */
-  from?: InputMaybe<Scalars['DateTime']['input']>;
   /** New first-name value of the employee nickname. */
   given_name?: InputMaybe<Scalars['String']['input']>;
-  /**
-   * Givenname (firstname) of the employee.
-   * @deprecated Use 'given_name' instead. Will be removed in a future version of OS2mo.
-   */
-  givenname?: InputMaybe<Scalars['String']['input']>;
-  /**
-   * Combined name of the employee
-   * @deprecated Use 'given_name' and 'surname' instead. Will be removed in a future version of OS2mo.
-   */
-  name?: InputMaybe<Scalars['String']['input']>;
-  /**
-   * Nickname (combined) of the employee.
-   * @deprecated Use 'nickname_given_name' and 'nickname_surname' instead. Will be removed in a future version of OS2mo.
-   */
-  nickname?: InputMaybe<Scalars['String']['input']>;
   /** Nickname givenname (firstname) of the employee. */
   nickname_given_name?: InputMaybe<Scalars['String']['input']>;
   /** Nickname surname (lastname) of the employee. */
@@ -1711,17 +2072,83 @@ export type EmployeeUpdateInput = {
   seniority?: InputMaybe<Scalars['Date']['input']>;
   /** New last-name value of the employee nickname. */
   surname?: InputMaybe<Scalars['String']['input']>;
-  /**
-   * End date of the validity, if applicable.
-   * @deprecated Use 'validity.to_date' instead. Will be removed in a future version of OS2mo.
-   */
-  to?: InputMaybe<Scalars['DateTime']['input']>;
   /** Short, unique key for the employee (defaults to object UUID on creation). */
   user_key?: InputMaybe<Scalars['String']['input']>;
   /** UUID of the employee to be updated. */
   uuid: Scalars['UUID']['input'];
   /** Validity range for the change. */
-  validity?: InputMaybe<RaValidityInput>;
+  validity: RaValidityInput;
+};
+
+export type EmployeesBoundAddressFilter = {
+  address_type_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  address_types?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+export type EmployeesBoundAssociationFilter = {
+  association_type_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  association_types?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  it_association?: InputMaybe<Scalars['Boolean']['input']>;
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+export type EmployeesBoundEngagementAssociationFilter = {
+  engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+export type EmployeesBoundEngagementFilter = {
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+export type EmployeesBoundItUserFilter = {
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+export type EmployeesBoundLeaveFilter = {
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+export type EmployeesBoundManagerFilter = {
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+export type EmployeesBoundRoleFilter = {
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 /** Employee engagement in an organisation unit */
@@ -1897,96 +2324,65 @@ export type Engagement = {
 
 /** Employee engagement in an organisation unit */
 export type EngagementEmployeeArgs = {
-  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<UuidsBoundEmployeeFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** Employee engagement in an organisation unit */
 export type EngagementEngagement_AssociationsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<EngagementsBoundEngagementAssociationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Employee engagement in an organisation unit */
 export type EngagementEngagement_TypeArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** Employee engagement in an organisation unit */
 export type EngagementJob_FunctionArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** Employee engagement in an organisation unit */
 export type EngagementLeaveArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<UuidsBoundLeaveFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** Employee engagement in an organisation unit */
 export type EngagementOrg_UnitArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
-  hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundOrganisationUnitFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** Employee engagement in an organisation unit */
 export type EngagementPersonArgs = {
-  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<UuidsBoundEmployeeFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** Employee engagement in an organisation unit */
 export type EngagementPrimaryArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 /** Employee engagement in an organisation unit */
@@ -2053,36 +2449,107 @@ export type EngagementAssociation = {
 /** Employee engagement in an organisation unit */
 export type EngagementAssociationEngagementArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<UuidsBoundEngagementFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** Employee engagement in an organisation unit */
 export type EngagementAssociationEngagement_Association_TypeArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** Employee engagement in an organisation unit */
 export type EngagementAssociationOrg_UnitArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
-  hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundOrganisationUnitFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+/** Engagement association filter. */
+export type EngagementAssociationFilter = {
+  /**
+   * Employee UUID filter limiting which entries are returned.
+   *
+   * | `employees`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Engagement UUID filter limiting which entries are returned.
+   *
+   * | `engagements`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their starting validity. */
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Organisational Unit UUID filter limiting which entries are returned.
+   *
+   * | `org_units`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * User-key filter limiting which entries are returned.
+   *
+   * | `user_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * UUID filter limiting which entries are returned.
+   *
+   * | `uuids`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 /**
@@ -2172,11 +2639,29 @@ export type EngagementAssociationResponse = {
  *
  */
 export type EngagementAssociationResponseRegistrationsArgs = {
-  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  end?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+/** Result page in cursor-based pagination. */
+export type EngagementAssociationResponsePaged = {
+  __typename?: 'EngagementAssociationResponsePaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<EngagementAssociationResponse>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
 };
 
 export type EngagementCreateInput = {
@@ -2291,6 +2776,74 @@ export type EngagementCreateInput = {
   validity: RaValidityInput;
 };
 
+/** Engagement filter. */
+export type EngagementFilter = {
+  /**
+   * Employee UUID filter limiting which entries are returned.
+   *
+   * | `employees`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their starting validity. */
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Organisational Unit UUID filter limiting which entries are returned.
+   *
+   * | `org_units`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * User-key filter limiting which entries are returned.
+   *
+   * | `user_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * UUID filter limiting which entries are returned.
+   *
+   * | `uuids`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
 /**
  * Top-level container for (bi)-temporal and actual state data access.
  *
@@ -2378,11 +2931,29 @@ export type EngagementResponse = {
  *
  */
 export type EngagementResponseRegistrationsArgs = {
-  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  end?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+/** Result page in cursor-based pagination. */
+export type EngagementResponsePaged = {
+  __typename?: 'EngagementResponsePaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<EngagementResponse>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
 };
 
 export type EngagementTerminateInput = {
@@ -2508,6 +3079,15 @@ export type EngagementUpdateInput = {
   validity: RaValidityInput;
 };
 
+export type EngagementsBoundEngagementAssociationFilter = {
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
 /** The key component of the class/facet choice setup */
 export type Facet = {
   __typename?: 'Facet';
@@ -2594,47 +3174,95 @@ export type Facet = {
 /** The key component of the class/facet choice setup */
 export type FacetChildrenArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<ParentsBoundFacetFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** The key component of the class/facet choice setup */
 export type FacetClassesArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  filter?: InputMaybe<FacetsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** The key component of the class/facet choice setup */
 export type FacetParentArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<UuidsBoundFacetFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 export type FacetCreateInput = {
-  /** UUID of the related organisation. */
-  org_uuid: Scalars['UUID']['input'];
-  /** UUID of the parent facet. */
-  parent_uuid?: InputMaybe<Scalars['UUID']['input']>;
   /** Published state of the facet object. */
-  published?: InputMaybe<Scalars['String']['input']>;
-  /** The object type */
-  type?: Scalars['String']['input'];
+  published?: Scalars['String']['input'];
   /** Facet name. */
   user_key: Scalars['String']['input'];
-  /** UUID to be created. Will be autogenerated if not specified. */
-  uuid?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+/** Facet filter. */
+export type FacetFilter = {
+  /**
+   * Parent user-key filter limiting which entries are returned.
+   *
+   * | `parent_user_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * Parent UUID filter limiting which entries are returned.
+   *
+   * | `parents`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * User-key filter limiting which entries are returned.
+   *
+   * | `user_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * UUID filter limiting which entries are returned.
+   *
+   * | `uuids`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 /**
@@ -2724,11 +3352,29 @@ export type FacetResponse = {
  *
  */
 export type FacetResponseRegistrationsArgs = {
-  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  end?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+/** Result page in cursor-based pagination. */
+export type FacetResponsePaged = {
+  __typename?: 'FacetResponsePaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<FacetResponse>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
 };
 
 export type FacetUpdateInput = {
@@ -2738,6 +3384,14 @@ export type FacetUpdateInput = {
   user_key: Scalars['String']['input'];
   /** UUID of the facet to update. */
   uuid: Scalars['UUID']['input'];
+};
+
+export type FacetsBoundClassFilter = {
+  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 /** A stored file available for download. */
@@ -2806,6 +3460,47 @@ export type File = {
   text_contents: Scalars['String']['output'];
 };
 
+/** File filter. */
+export type FileFilter = {
+  /**
+   * Filename filter limiting which entries are returned.
+   *
+   * | `file_names`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  file_names?: InputMaybe<Array<Scalars['String']['input']>>;
+  /** File Store enum deciding which file-store to fetch files from. */
+  file_store: FileStore;
+};
+
+/** Result page in cursor-based pagination. */
+export type FilePaged = {
+  __typename?: 'FilePaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<File>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
+};
+
 /**
  * Enum for all the supported file stores.
  *
@@ -2856,6 +3551,25 @@ export type Health = {
    *
    */
   status?: Maybe<Scalars['Boolean']['output']>;
+};
+
+/** Health filter. */
+export type HealthFilter = {
+  /**
+   * Healthcheck identifiers filter limiting which entries are returned.
+   *
+   * | `identifiers`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  identifiers?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 /** Result page in cursor-based pagination. */
@@ -3064,11 +3778,29 @@ export type ItSystemResponse = {
  *
  */
 export type ItSystemResponseRegistrationsArgs = {
-  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  end?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+/** Result page in cursor-based pagination. */
+export type ItSystemResponsePaged = {
+  __typename?: 'ITSystemResponsePaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<ItSystemResponse>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
 };
 
 /**
@@ -3222,12 +3954,9 @@ export type ItUser = {
  *
  */
 export type ItUserEmployeeArgs = {
-  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<UuidsBoundEmployeeFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
@@ -3240,12 +3969,8 @@ export type ItUserEmployeeArgs = {
  */
 export type ItUserEngagementArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<UuidsBoundEngagementFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
@@ -3258,10 +3983,8 @@ export type ItUserEngagementArgs = {
  */
 export type ItUserItsystemArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<UuidsBoundBaseFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
@@ -3274,12 +3997,8 @@ export type ItUserItsystemArgs = {
  */
 export type ItUserOrg_UnitArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
-  hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundOrganisationUnitFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
@@ -3291,12 +4010,9 @@ export type ItUserOrg_UnitArgs = {
  *
  */
 export type ItUserPersonArgs = {
-  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<UuidsBoundEmployeeFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
@@ -3309,12 +4025,8 @@ export type ItUserPersonArgs = {
  */
 export type ItUserPrimaryArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 export type ItUserCreateInput = {
@@ -3328,14 +4040,80 @@ export type ItUserCreateInput = {
   person?: InputMaybe<Scalars['UUID']['input']>;
   /** Primary field of the IT user object */
   primary?: InputMaybe<Scalars['UUID']['input']>;
-  /** The object type. */
-  type?: Scalars['String']['input'];
   /** The IT user account name. */
   user_key: Scalars['String']['input'];
   /** UUID to be created. Will be autogenerated if not specified. */
   uuid?: InputMaybe<Scalars['UUID']['input']>;
   /** Validity of the created IT user object. */
   validity: RaValidityInput;
+};
+
+/** IT user filter. */
+export type ItUserFilter = {
+  /**
+   * Employee UUID filter limiting which entries are returned.
+   *
+   * | `employees`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their starting validity. */
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Organisational Unit UUID filter limiting which entries are returned.
+   *
+   * | `org_units`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * User-key filter limiting which entries are returned.
+   *
+   * | `user_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * UUID filter limiting which entries are returned.
+   *
+   * | `uuids`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 /**
@@ -3425,11 +4203,29 @@ export type ItUserResponse = {
  *
  */
 export type ItUserResponseRegistrationsArgs = {
-  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  end?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+/** Result page in cursor-based pagination. */
+export type ItUserResponsePaged = {
+  __typename?: 'ITUserResponsePaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<ItUserResponse>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
 };
 
 export type ItUserTerminateInput = {
@@ -3606,12 +4402,8 @@ export type Kle = {
  */
 export type KleKle_AspectsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
@@ -3651,12 +4443,8 @@ export type KleKle_AspectsArgs = {
  */
 export type KleKle_NumberArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
@@ -3696,12 +4484,8 @@ export type KleKle_NumberArgs = {
  */
 export type KleOrg_UnitArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
-  hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundOrganisationUnitFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 export type KleCreateInput = {
@@ -3717,6 +4501,59 @@ export type KleCreateInput = {
   uuid?: InputMaybe<Scalars['UUID']['input']>;
   /** Validity range for the KLE. */
   validity: RaValidityInput;
+};
+
+/** KLE filter. */
+export type KleFilter = {
+  /** Limit the elements returned by their starting validity. */
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Organisational Unit UUID filter limiting which entries are returned.
+   *
+   * | `org_units`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * User-key filter limiting which entries are returned.
+   *
+   * | `user_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * UUID filter limiting which entries are returned.
+   *
+   * | `uuids`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 /**
@@ -3806,11 +4643,29 @@ export type KleResponse = {
  *
  */
 export type KleResponseRegistrationsArgs = {
-  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  end?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+/** Result page in cursor-based pagination. */
+export type KleResponsePaged = {
+  __typename?: 'KLEResponsePaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<KleResponse>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
 };
 
 export type KleTerminateInput = {
@@ -3866,14 +4721,14 @@ export type Leave = {
    * The engagement the employee is absent from.
    *
    */
-  engagement?: Maybe<Engagement>;
+  engagement: Engagement;
   /**
    * UUID of the KLE number.
    * @deprecated Will be removed in a future version of GraphQL.
    * Use `engagement {uuid}` instead.
    *
    */
-  engagement_uuid?: Maybe<Scalars['UUID']['output']>;
+  engagement_uuid: Scalars['UUID']['output'];
   /**
    * The kind of leave of absence.
    *
@@ -3927,12 +4782,9 @@ export type Leave = {
  *
  */
 export type LeaveEmployeeArgs = {
-  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<UuidsBoundEmployeeFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
@@ -3945,12 +4797,8 @@ export type LeaveEmployeeArgs = {
  */
 export type LeaveEngagementArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<UuidsBoundEngagementFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
@@ -3963,12 +4811,8 @@ export type LeaveEngagementArgs = {
  */
 export type LeaveLeave_TypeArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
@@ -3980,12 +4824,9 @@ export type LeaveLeave_TypeArgs = {
  *
  */
 export type LeavePersonArgs = {
-  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<UuidsBoundEmployeeFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 export type LeaveCreateInput = {
@@ -3999,6 +4840,74 @@ export type LeaveCreateInput = {
   uuid?: InputMaybe<Scalars['UUID']['input']>;
   /** Validity range for the leave. */
   validity: RaValidityInput;
+};
+
+/** Leave filter. */
+export type LeaveFilter = {
+  /**
+   * Employee UUID filter limiting which entries are returned.
+   *
+   * | `employees`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their starting validity. */
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Organisational Unit UUID filter limiting which entries are returned.
+   *
+   * | `org_units`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * User-key filter limiting which entries are returned.
+   *
+   * | `user_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * UUID filter limiting which entries are returned.
+   *
+   * | `uuids`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 /**
@@ -4088,11 +4997,29 @@ export type LeaveResponse = {
  *
  */
 export type LeaveResponseRegistrationsArgs = {
-  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  end?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+/** Result page in cursor-based pagination. */
+export type LeaveResponsePaged = {
+  __typename?: 'LeaveResponsePaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<LeaveResponse>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
 };
 
 export type LeaveTerminateInput = {
@@ -4241,12 +5168,9 @@ export type Manager = {
  *
  */
 export type ManagerEmployeeArgs = {
-  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<UuidsBoundEmployeeFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
@@ -4256,12 +5180,8 @@ export type ManagerEmployeeArgs = {
  */
 export type ManagerManager_LevelArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
@@ -4271,12 +5191,8 @@ export type ManagerManager_LevelArgs = {
  */
 export type ManagerManager_TypeArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
@@ -4286,12 +5202,8 @@ export type ManagerManager_TypeArgs = {
  */
 export type ManagerOrg_UnitArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
-  hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundOrganisationUnitFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
@@ -4300,12 +5212,9 @@ export type ManagerOrg_UnitArgs = {
  *
  */
 export type ManagerPersonArgs = {
-  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<UuidsBoundEmployeeFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
@@ -4315,12 +5224,8 @@ export type ManagerPersonArgs = {
  */
 export type ManagerResponsibilitiesArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 export type ManagerCreateInput = {
@@ -4334,14 +5239,80 @@ export type ManagerCreateInput = {
   person?: InputMaybe<Scalars['UUID']['input']>;
   /** UUID of the managers responsibilities. */
   responsibility: Array<Scalars['UUID']['input']>;
-  /** The object type. */
-  type?: Scalars['String']['input'];
   /** Extra info or uuid. */
   user_key?: InputMaybe<Scalars['String']['input']>;
   /** UUID to be created. Will be autogenerated if not specified. */
   uuid?: InputMaybe<Scalars['UUID']['input']>;
   /** Validity range for the manager. */
   validity: RaValidityInput;
+};
+
+/** Manager filter. */
+export type ManagerFilter = {
+  /**
+   * Employee UUID filter limiting which entries are returned.
+   *
+   * | `employees`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their starting validity. */
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Organisational Unit UUID filter limiting which entries are returned.
+   *
+   * | `org_units`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * User-key filter limiting which entries are returned.
+   *
+   * | `user_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * UUID filter limiting which entries are returned.
+   *
+   * | `uuids`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 /**
@@ -4431,11 +5402,29 @@ export type ManagerResponse = {
  *
  */
 export type ManagerResponseRegistrationsArgs = {
-  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  end?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+/** Result page in cursor-based pagination. */
+export type ManagerResponsePaged = {
+  __typename?: 'ManagerResponsePaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<ManagerResponse>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
 };
 
 export type ManagerTerminateInput = {
@@ -4466,6 +5455,19 @@ export type ManagerUpdateInput = {
   validity: RaValidityInput;
 };
 
+export type ModelsUuidsBoundRegistrationFilter = {
+  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type Mutation = {
   __typename?: 'Mutation';
   /** Creates an address. */
@@ -4500,7 +5502,7 @@ export type Mutation = {
   /** Updates an association. */
   association_update: AssociationResponse;
   /** Creates a class. */
-  class_create: UuidReturn;
+  class_create: ClassResponse;
   /**
    * Deletes a class.
    * **Warning**:
@@ -4554,7 +5556,7 @@ export type Mutation = {
   /** Updates an engagement. */
   engagement_update: EngagementResponse;
   /** Creates a facet. */
-  facet_create: UuidReturn;
+  facet_create: FacetResponse;
   /**
    * Deletes a facet.
    * **Warning**:
@@ -4655,11 +5657,6 @@ export type Mutation = {
   org_create: Organisation;
   /** Creates an organisation unit. */
   org_unit_create: OrganisationUnitResponse;
-  /**
-   * Trigger refresh for an organisation unit
-   * @deprecated The mutator will be removed in a future version of OS2mo
-   */
-  org_unit_refresh: OrganisationUnitRefresh;
   /** Terminates an organization unit. */
   org_unit_terminate: OrganisationUnitResponse;
   /** Updates an organisation unit. */
@@ -4706,244 +5703,565 @@ export type Mutation = {
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationAddress_CreateArgs = {
   input: AddressCreateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationAddress_DeleteArgs = {
   uuid: Scalars['UUID']['input'];
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationAddress_TerminateArgs = {
-  at: AddressTerminateInput;
+  input: AddressTerminateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationAddress_UpdateArgs = {
   input: AddressUpdateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationAssociation_CreateArgs = {
   input: AssociationCreateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationAssociation_TerminateArgs = {
   input: AssociationTerminateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationAssociation_UpdateArgs = {
   input: AssociationUpdateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationClass_CreateArgs = {
   input: ClassCreateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationClass_DeleteArgs = {
   uuid: Scalars['UUID']['input'];
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationClass_UpdateArgs = {
   input: ClassUpdateInput;
-  uuid: Scalars['UUID']['input'];
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationEmployee_CreateArgs = {
   input: EmployeeCreateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationEmployee_TerminateArgs = {
   input: EmployeeTerminateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationEmployee_UpdateArgs = {
   input: EmployeeUpdateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationEngagement_CreateArgs = {
   input: EngagementCreateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationEngagement_DeleteArgs = {
   uuid: Scalars['UUID']['input'];
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationEngagement_TerminateArgs = {
   input: EngagementTerminateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationEngagement_UpdateArgs = {
   input: EngagementUpdateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationFacet_CreateArgs = {
   input: FacetCreateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationFacet_DeleteArgs = {
   uuid: Scalars['UUID']['input'];
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationFacet_UpdateArgs = {
   input: FacetUpdateInput;
-  uuid: Scalars['UUID']['input'];
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationItassociation_CreateArgs = {
   input: ItAssociationCreateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationItassociation_TerminateArgs = {
   input: ItAssociationTerminateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationItassociation_UpdateArgs = {
   input: ItAssociationUpdateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationItsystem_CreateArgs = {
   input: ItSystemCreateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationItsystem_DeleteArgs = {
   uuid: Scalars['UUID']['input'];
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationItsystem_UpdateArgs = {
   input: ItSystemCreateInput;
-  uuid: Scalars['UUID']['input'];
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationItuser_CreateArgs = {
   input: ItUserCreateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationItuser_DeleteArgs = {
   uuid: Scalars['UUID']['input'];
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationItuser_TerminateArgs = {
   input: ItUserTerminateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationItuser_UpdateArgs = {
   input: ItUserUpdateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationKle_CreateArgs = {
   input: KleCreateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationKle_TerminateArgs = {
   input: KleTerminateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationKle_UpdateArgs = {
   input: KleUpdateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationLeave_CreateArgs = {
   input: LeaveCreateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationLeave_TerminateArgs = {
   input: LeaveTerminateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationLeave_UpdateArgs = {
   input: LeaveUpdateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationManager_CreateArgs = {
   input: ManagerCreateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationManager_TerminateArgs = {
   input: ManagerTerminateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationManager_UpdateArgs = {
   input: ManagerUpdateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationOrg_CreateArgs = {
   input: OrganisationCreate;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationOrg_Unit_CreateArgs = {
   input: OrganisationUnitCreateInput;
 };
 
 
-export type MutationOrg_Unit_RefreshArgs = {
-  uuid: Scalars['UUID']['input'];
-};
-
-
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationOrg_Unit_TerminateArgs = {
-  unit: OrganisationUnitTerminateInput;
+  input: OrganisationUnitTerminateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationOrg_Unit_UpdateArgs = {
   input: OrganisationUnitUpdateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationRole_CreateArgs = {
   input: RoleCreateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationRole_TerminateArgs = {
   input: RoleTerminateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationRole_UpdateArgs = {
   input: RoleUpdateInput;
 };
 
 
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationUpload_FileArgs = {
   file: Scalars['Upload']['input'];
   file_store: FileStore;
@@ -4957,6 +6275,91 @@ export type OpenValidity = {
   from?: Maybe<Scalars['DateTime']['output']>;
   /** End date of the validity, if applicable. */
   to?: Maybe<Scalars['DateTime']['output']>;
+};
+
+export type OrgUnitsboundaddressfilter = {
+  address_type_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  address_types?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+export type OrgUnitsboundassociationfilter = {
+  association_type_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  association_types?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  it_association?: InputMaybe<Scalars['Boolean']['input']>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+export type OrgUnitsboundengagementassociationfilter = {
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+export type OrgUnitsboundengagementfilter = {
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+export type OrgUnitsboundituserfilter = {
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+export type OrgUnitsboundklefilter = {
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+export type OrgUnitsboundleavefilter = {
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+export type OrgUnitsboundownerfilter = {
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+export type OrgUnitsboundrelatedunitfilter = {
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+export type OrgUnitsboundrolefilter = {
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 /** Root organisation - one and only one of these can exist */
@@ -5278,115 +6681,73 @@ export type OrganisationUnit = {
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitAddressesArgs = {
-  address_type_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  address_types?: InputMaybe<Array<Scalars['UUID']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<OrgUnitsboundaddressfilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitAssociationsArgs = {
-  association_type_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  association_types?: InputMaybe<Array<Scalars['UUID']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
-  it_association?: InputMaybe<Scalars['Boolean']['input']>;
+  filter?: InputMaybe<OrgUnitsboundassociationfilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitChild_CountArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
-  hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<ParentsBoundOrganisationUnitFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitChildrenArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
-  hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<ParentsBoundOrganisationUnitFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitEngagement_AssociationsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<OrgUnitsboundengagementassociationfilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitEngagementsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<OrgUnitsboundengagementfilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitItusersArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<OrgUnitsboundituserfilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitKlesArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<OrgUnitsboundklefilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitLeavesArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<OrgUnitsboundleavefilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
@@ -5399,95 +6760,64 @@ export type OrganisationUnitManagersArgs = {
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitOrg_Unit_Hierarchy_ModelArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitOrg_Unit_LevelArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitOwnersArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<OrgUnitsboundownerfilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitParentArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
-  hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundOrganisationUnitFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitRelated_UnitsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<OrgUnitsboundrelatedunitfilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitRolesArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<OrgUnitsboundrolefilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitTime_PlanningArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitUnit_TypeArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 export type OrganisationUnitCreateInput = {
@@ -5511,13 +6841,83 @@ export type OrganisationUnitCreateInput = {
   validity: RaValidityInput;
 };
 
-/** Response model for Organisation Unit refresh event. */
-export type OrganisationUnitRefresh = {
-  __typename?: 'OrganisationUnitRefresh';
-  /** Refresh message containing trigger responses. */
-  message: Scalars['String']['output'];
-  user_key: Scalars['String']['output'];
-  uuid: Scalars['UUID']['output'];
+/** Organisation unit filter. */
+export type OrganisationUnitFilter = {
+  /** Limit the elements returned by their starting validity. */
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Filter organisation units by their organisational hierarchy labels.
+   *
+   * Can be used to extract a subset of the organisational structure.
+   *
+   * Examples of user-keys:
+   * * `"Line-management"`
+   * * `"Self-owned institution"`
+   * * `"Outside organisation"`
+   * * `"Hidden"`
+   *
+   * Note:
+   * The organisation-gatekeeper integration is one option to keep hierarchy labels up-to-date.
+   *
+   * | `hierarchies`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Parent UUID filter limiting which entries are returned.
+   *
+   * | `parents`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * User-key filter limiting which entries are returned.
+   *
+   * | `user_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * UUID filter limiting which entries are returned.
+   *
+   * | `uuids`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 /**
@@ -5607,11 +7007,29 @@ export type OrganisationUnitResponse = {
  *
  */
 export type OrganisationUnitResponseRegistrationsArgs = {
-  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  end?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+/** Result page in cursor-based pagination. */
+export type OrganisationUnitResponsePaged = {
+  __typename?: 'OrganisationUnitResponsePaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<OrganisationUnitResponse>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
 };
 
 export type OrganisationUnitTerminateInput = {
@@ -5683,6 +7101,74 @@ export type Owner = {
   uuid: Scalars['UUID']['output'];
   /** Validity of the owner object. */
   validity: Validity;
+};
+
+/** Owner filter. */
+export type OwnerFilter = {
+  /**
+   * Employee UUID filter limiting which entries are returned.
+   *
+   * | `employees`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their starting validity. */
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Organisational Unit UUID filter limiting which entries are returned.
+   *
+   * | `org_units`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * User-key filter limiting which entries are returned.
+   *
+   * | `user_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * UUID filter limiting which entries are returned.
+   *
+   * | `uuids`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 /**
@@ -5772,11 +7258,9 @@ export type OwnerResponse = {
  *
  */
 export type OwnerResponseRegistrationsArgs = {
-  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  end?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /** Result page in cursor-based pagination. */
@@ -5817,39 +7301,64 @@ export type PageInfo = {
   next_cursor?: Maybe<Scalars['Cursor']['output']>;
 };
 
+export type ParentsBoundClassFilter = {
+  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+export type ParentsBoundFacetFilter = {
+  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+export type ParentsBoundOrganisationUnitFilter = {
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
 /** Entrypoint for all read-operations */
 export type Query = {
   __typename?: 'Query';
-  /** Get a list of all addresses, optionally by uuid(s) */
-  addresses: Array<AddressResponse>;
-  /** Get a list of all Associations, optionally by uuid(s) */
-  associations: Array<AssociationResponse>;
-  /** Get a list of all classes, optionally by uuid(s) */
-  classes: Array<Class>;
-  /** Get a list of configuration variables. */
-  configuration: Array<Configuration>;
-  /** Get a list of all employees, optionally by uuid(s) */
-  employees: Array<EmployeeResponse>;
-  /** Get a list of engagement associations */
-  engagement_associations: Array<EngagementAssociationResponse>;
-  /** Get a list of all engagements, optionally by uuid(s) */
-  engagements: Array<EngagementResponse>;
-  /** Get a list of all facets, optionally by uuid(s) */
-  facets: Array<Facet>;
-  /** Get a list of all files, optionally by filename(s) */
-  files: Array<File>;
-  /** Get a list of all health checks, optionally by identifier(s) */
+  /** Get addresses. */
+  addresses: AddressResponsePaged;
+  /** Get associations. */
+  associations: AssociationResponsePaged;
+  /** Get classes. */
+  classes: ClassResponsePaged;
+  /** Get configuration variables. */
+  configuration: ConfigurationPaged;
+  /** Get employees. */
+  employees: EmployeeResponsePaged;
+  /** Get engagement associations. */
+  engagement_associations: EngagementAssociationResponsePaged;
+  /** Get engagements. */
+  engagements: EngagementResponsePaged;
+  /** Get facets. */
+  facets: FacetResponsePaged;
+  /**
+   * Fetch files from the configured file backend (if any).
+   * @deprecated The file-store functionality will be removed in a future version of OS2mo.
+   */
+  files: FilePaged;
+  /** Query healthcheck status. */
   healths: HealthPaged;
-  /** Get a list of all ITSystems, optionally by uuid(s) */
-  itsystems: Array<ItSystem>;
-  /** Get a list of all ITUsers, optionally by uuid(s) */
-  itusers: Array<ItUserResponse>;
-  /** Get a list of all KLE's, optionally by uuid(s) */
-  kles: Array<KleResponse>;
-  /** Get a list of all leaves, optionally by uuid(s) */
-  leaves: Array<LeaveResponse>;
-  /** Get a list of all managers, optionally by uuid(s) */
-  managers: Array<ManagerResponse>;
+  /** Get it-systems. */
+  itsystems: ItSystemResponsePaged;
+  /** Get it-users. */
+  itusers: ItUserResponsePaged;
+  /** Get kles. */
+  kles: KleResponsePaged;
+  /** Get leaves. */
+  leaves: LeaveResponsePaged;
+  /** Get manager roles. */
+  managers: ManagerResponsePaged;
   /**
    * Get the root organisation.
    *
@@ -5858,8 +7367,8 @@ export type Query = {
    * @deprecated The root organisation concept will be removed in a future version of OS2mo.
    */
   org: Organisation;
-  /** Get a list of all organisation units, optionally by uuid(s) */
-  org_units: Array<OrganisationUnitResponse>;
+  /** Get organisation units. */
+  org_units: OrganisationUnitResponsePaged;
   /** Get owners. */
   owners: OwnerResponsePaged;
   /**
@@ -5873,10 +7382,10 @@ export type Query = {
    *
    */
   registrations: RegistrationPaged;
-  /** Get a list of related organisation units, optionally by uuid(s) */
-  related_units: Array<RelatedUnitResponse>;
-  /** Get a list of all roles, optionally by uuid(s) */
-  roles: Array<RoleResponse>;
+  /** Get related organisation units. */
+  related_units: RelatedUnitResponsePaged;
+  /** Get role-mappings. */
+  roles: RoleResponsePaged;
   /** Get component versions of OS2mo. */
   version: Version;
 };
@@ -5884,112 +7393,72 @@ export type Query = {
 
 /** Entrypoint for all read-operations */
 export type QueryAddressesArgs = {
-  address_type_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  address_types?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<AddressFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Entrypoint for all read-operations */
 export type QueryAssociationsArgs = {
-  association_type_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  association_types?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
-  it_association?: InputMaybe<Scalars['Boolean']['input']>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<AssociationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Entrypoint for all read-operations */
 export type QueryClassesArgs = {
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<ClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Entrypoint for all read-operations */
 export type QueryConfigurationArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  identifiers?: InputMaybe<Array<Scalars['String']['input']>>;
+  filter?: InputMaybe<ConfigurationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
 };
 
 
 /** Entrypoint for all read-operations */
 export type QueryEmployeesArgs = {
-  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<EmployeeFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Entrypoint for all read-operations */
 export type QueryEngagement_AssociationsArgs = {
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<EngagementAssociationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Entrypoint for all read-operations */
 export type QueryEngagementsArgs = {
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<EngagementFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Entrypoint for all read-operations */
 export type QueryFacetsArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<FacetFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Entrypoint for all read-operations */
 export type QueryFilesArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  file_names?: InputMaybe<Array<Scalars['String']['input']>>;
-  file_store: FileStore;
+  filter: FileFilter;
   limit?: InputMaybe<Scalars['int']['input']>;
 };
 
@@ -5997,133 +7466,88 @@ export type QueryFilesArgs = {
 /** Entrypoint for all read-operations */
 export type QueryHealthsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  identifiers?: InputMaybe<Array<Scalars['String']['input']>>;
+  filter?: InputMaybe<HealthFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
 };
 
 
 /** Entrypoint for all read-operations */
 export type QueryItsystemsArgs = {
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<BaseFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Entrypoint for all read-operations */
 export type QueryItusersArgs = {
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<ItUserFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Entrypoint for all read-operations */
 export type QueryKlesArgs = {
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<KleFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Entrypoint for all read-operations */
 export type QueryLeavesArgs = {
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<LeaveFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Entrypoint for all read-operations */
 export type QueryManagersArgs = {
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<ManagerFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Entrypoint for all read-operations */
 export type QueryOrg_UnitsArgs = {
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
-  hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<OrganisationUnitFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Entrypoint for all read-operations */
 export type QueryOwnersArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<OwnerFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Entrypoint for all read-operations */
 export type QueryRegistrationsArgs = {
-  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  end?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<RegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  models?: InputMaybe<Array<Scalars['String']['input']>>;
-  start?: InputMaybe<Scalars['DateTime']['input']>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Entrypoint for all read-operations */
 export type QueryRelated_UnitsArgs = {
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<RelatedUnitFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 
 /** Entrypoint for all read-operations */
 export type QueryRolesArgs = {
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<RoleFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  offset?: InputMaybe<Scalars['int']['input']>;
-  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 export type RaValidityInput = {
@@ -6202,6 +7626,63 @@ export type Registration = {
   uuid: Scalars['UUID']['output'];
 };
 
+/** Registration filter. */
+export type RegistrationFilter = {
+  /**
+   * Filter registrations by their changing actor.
+   *
+   * Can be used to select all changes made by a particular user or integration.
+   *
+   * | `actors`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Filter registrations by their model type.
+   *
+   * Can be used to select all changes of a type.
+   *
+   * | `models`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  models?: InputMaybe<Array<Scalars['String']['input']>>;
+  /** Limit the elements returned by their starting validity. */
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * UUID filter limiting which entries are returned.
+   *
+   * | `uuids`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
 /** Result page in cursor-based pagination. */
 export type RegistrationPaged = {
   __typename?: 'RegistrationPaged';
@@ -6277,12 +7758,61 @@ export type RelatedUnit = {
 /** An organisation unit relation mapping */
 export type RelatedUnitOrg_UnitsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
-  hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundOrganisationUnitFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+/** Related unit filter. */
+export type RelatedUnitFilter = {
+  /** Limit the elements returned by their starting validity. */
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Organisational Unit UUID filter limiting which entries are returned.
+   *
+   * | `org_units`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * User-key filter limiting which entries are returned.
+   *
+   * | `user_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * UUID filter limiting which entries are returned.
+   *
+   * | `uuids`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 /**
@@ -6372,11 +7902,29 @@ export type RelatedUnitResponse = {
  *
  */
 export type RelatedUnitResponseRegistrationsArgs = {
-  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  end?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+/** Result page in cursor-based pagination. */
+export type RelatedUnitResponsePaged = {
+  __typename?: 'RelatedUnitResponsePaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<RelatedUnitResponse>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
 };
 
 /** The role a person has within an organisation unit */
@@ -6459,47 +8007,33 @@ export type Role = {
 
 /** The role a person has within an organisation unit */
 export type RoleEmployeeArgs = {
-  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<UuidsBoundEmployeeFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** The role a person has within an organisation unit */
 export type RoleOrg_UnitArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
-  hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundOrganisationUnitFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** The role a person has within an organisation unit */
 export type RolePersonArgs = {
-  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<UuidsBoundEmployeeFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 /** The role a person has within an organisation unit */
 export type RoleRole_TypeArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 export type RoleCreateInput = {
@@ -6515,6 +8049,74 @@ export type RoleCreateInput = {
   uuid?: InputMaybe<Scalars['UUID']['input']>;
   /** Validity range for the role. */
   validity: RaValidityInput;
+};
+
+/** Role filter. */
+export type RoleFilter = {
+  /**
+   * Employee UUID filter limiting which entries are returned.
+   *
+   * | `employees`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their starting validity. */
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Organisational Unit UUID filter limiting which entries are returned.
+   *
+   * | `org_units`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * User-key filter limiting which entries are returned.
+   *
+   * | `user_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * UUID filter limiting which entries are returned.
+   *
+   * | `uuids`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 /**
@@ -6604,11 +8206,29 @@ export type RoleResponse = {
  *
  */
 export type RoleResponseRegistrationsArgs = {
-  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  end?: InputMaybe<Scalars['DateTime']['input']>;
+  filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
-  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+/** Result page in cursor-based pagination. */
+export type RoleResponsePaged = {
+  __typename?: 'RoleResponsePaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<RoleResponse>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
 };
 
 export type RoleTerminateInput = {
@@ -6633,15 +8253,63 @@ export type RoleUpdateInput = {
   validity: RaValidityInput;
 };
 
-/**
- * Wrapper model around a single UUID.
- *
- * The purpose of this model is to allow for future non-breaking expansion of the return type.
- *
- */
-export type UuidReturn = {
-  __typename?: 'UUIDReturn';
-  uuid: Scalars['UUID']['output'];
+export type UuidsBoundBaseFilter = {
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+export type UuidsBoundClassFilter = {
+  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+export type UuidsBoundEmployeeFilter = {
+  cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+export type UuidsBoundEngagementFilter = {
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+export type UuidsBoundFacetFilter = {
+  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+export type UuidsBoundItUserFilter = {
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+export type UuidsBoundLeaveFilter = {
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+export type UuidsBoundOrganisationUnitFilter = {
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 /** Validity of objects with required from date */

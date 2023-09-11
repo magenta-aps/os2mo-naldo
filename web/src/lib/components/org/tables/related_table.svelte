@@ -4,8 +4,9 @@
   import { page } from "$app/stores"
   import { base } from "$app/paths"
   import { graphQLClient } from "$lib/util/http"
-  import { OrgUnitRelatedDetailDocument } from "./query.generated"
+  import { RelatedUnitsDocument } from "./query.generated"
   import { gql } from "graphql-request"
+  import { date } from "$lib/stores/date"
 
   export let uuid: string
   // TODO: Blocked by #57396
@@ -13,10 +14,10 @@
   export let tense: string
 
   gql`
-    query OrgUnitRelatedDetail($uuid: [UUID!]) {
-      org_units(uuids: $uuid) {
+    query RelatedUnits($org_unit: [UUID!], $fromDate: DateTime) {
+      related_units(filter: { org_units: $org_unit, from_date: $fromDate }) {
         objects {
-          related_units {
+          objects {
             org_units {
               name
               uuid
@@ -35,13 +36,14 @@
 <!-- 2x related unit seems confusing, idk if we can get away with just having
     1 field for the related unit. But if we have to have both, I think we should rename them -->
 <DetailTable headers={["Relateret enhed", "Dato"]}>
-  {#await graphQLClient().request(OrgUnitRelatedDetailDocument, { uuid: uuid })}
+  {#await graphQLClient().request( RelatedUnitsDocument, { org_unit: uuid, fromDate: $date } )}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
   {:then data}
-    {@const related_units = data.org_units[0].objects[0].related_units}
-    {#each related_units as related_unit}
+    {@const related_units = data.related_units.objects}
+    {#each related_units as related}
+      {@const related_unit = related.objects[0]}
       <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
         {#if related_unit.org_units[0].uuid == $page.params.uuid}
           <a href="{base}/organisation/{related_unit.org_units[1].uuid}">

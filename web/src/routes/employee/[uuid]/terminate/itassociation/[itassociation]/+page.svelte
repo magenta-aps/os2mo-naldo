@@ -19,28 +19,30 @@
 
   gql`
     query ITAssociation($uuid: [UUID!], $fromDate: DateTime!) {
-      associations(uuids: $uuid, from_date: $fromDate) {
+      associations(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          uuid
-          employee {
+          objects {
             uuid
-            name
-          }
-          validity {
-            from
-            to
-          }
-          it_user {
-            itsystem {
+            employee {
+              uuid
               name
             }
-            uuid
-            user_key
-          }
-          org_unit {
             validity {
               from
               to
+            }
+            it_user {
+              itsystem {
+                name
+              }
+              uuid
+              user_key
+            }
+            org_unit {
+              validity {
+                from
+                to
+              }
             }
           }
         }
@@ -86,7 +88,7 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const itassociation = data.associations[0].objects[0]}
+  {@const itassociation = data.associations.objects[0].objects[0]}
   {@const ituser = getITUserITSystemName(itassociation.it_user)}
   {@const minDate = itassociation.org_unit[0].validity.from.split("T")[0]}
   {@const maxDate = itassociation.org_unit[0].validity.to?.split("T")[0]}

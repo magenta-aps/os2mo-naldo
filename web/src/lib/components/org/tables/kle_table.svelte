@@ -7,6 +7,7 @@
   import { graphQLClient } from "$lib/util/http"
   import { KleDocument } from "./query.generated"
   import { gql } from "graphql-request"
+  import { date } from "$lib/stores/date"
 
   export let uuid: string
   // TODO: Blocked by #57396
@@ -14,21 +15,23 @@
   export let tense: string
 
   gql`
-    query Kle($uuid: [UUID!]) {
-      kles(org_units: $uuid) {
+    query Kle($org_unit: [UUID!], $fromDate: DateTime) {
+      kles(filter: { org_units: $org_unit, from_date: $fromDate }) {
         objects {
-          uuid
-          kle_number {
-            name
+          objects {
             uuid
-          }
-          kle_aspects {
-            name
-            uuid
-          }
-          validity {
-            from
-            to
+            kle_number {
+              name
+              uuid
+            }
+            kle_aspects {
+              name
+              uuid
+            }
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -37,30 +40,25 @@
 </script>
 
 <DetailTable headers={["KLE aspekt", "KLE nummer", "Dato", "", ""]}>
-  {#await graphQLClient().request(KleDocument, { uuid: uuid })}
+  {#await graphQLClient().request(KleDocument, { org_unit: uuid, fromDate: $date })}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
   {:then data}
-    {@const kles = data.kles}
-    {#each kles as kle}
+    {@const kles = data.kles.objects}
+    {#each kles as k}
+      {@const kle = k.objects[0]}
       <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-        <td class="p-4">{kle.objects[0].kle_aspects[0].name}</td>
-        <td class="p-4">{kle.objects[0].kle_number.name}</td>
-        <ValidityTableCell validity={kle.objects[0].validity} />
+        <td class="p-4">{kle.kle_aspects[0].name}</td>
+        <td class="p-4">{kle.kle_number.name}</td>
+        <ValidityTableCell validity={kle.validity} />
         <td>
-          <a
-            href="{base}/organisation/{$page.params.uuid}/edit/kle/{kle.objects[0]
-              .uuid}"
-          >
+          <a href="{base}/organisation/{$page.params.uuid}/edit/kle/{kle.uuid}">
             <Icon type="pen" />
           </a>
         </td>
         <td>
-          <a
-            href="{base}/organisation/{$page.params.uuid}/terminate/kle/{kle.objects[0]
-              .uuid}"
-          >
+          <a href="{base}/organisation/{$page.params.uuid}/terminate/kle/{kle.uuid}">
             <Icon type="xmark" size="30" />
           </a>
         </td>

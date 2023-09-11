@@ -23,17 +23,19 @@
 
   gql`
     query Employee($uuid: [UUID!], $fromDate: DateTime) {
-      employees(uuids: $uuid, from_date: $fromDate) {
+      employees(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          given_name
-          surname
-          nickname_givenname
-          nickname_surname
-          cpr_no
-          seniority
-          validity {
-            from
-            to
+          objects {
+            given_name
+            surname
+            nickname_givenname
+            nickname_surname
+            cpr_no
+            seniority
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -73,7 +75,7 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const employee = data.employees[0].objects[0]}
+  {@const employee = data.employees.objects[0].objects[0]}
 
   <title>Redigér Medarbejder | OS2mo</title>
 

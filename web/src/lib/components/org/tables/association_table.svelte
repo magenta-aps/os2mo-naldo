@@ -3,11 +3,11 @@
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
   import Icon from "$lib/components/icon.svelte"
   import { env } from "$env/dynamic/public"
-  import { page } from "$app/stores"
   import { base } from "$app/paths"
   import { graphQLClient } from "$lib/util/http"
-  import { OrgUnitAssociationDetailDocument } from "./query.generated"
+  import { AssociationDocument } from "./query.generated"
   import { gql } from "graphql-request"
+  import { date } from "$lib/stores/date"
 
   export let uuid: string
   // TODO: Blocked by #57396
@@ -15,10 +15,10 @@
   export let tense: string
 
   gql`
-    query OrgUnitAssociationDetail($uuid: [UUID!]) {
-      org_units(uuids: $uuid) {
+    query Association($org_unit: [UUID!], $fromDate: DateTime) {
+      associations(filter: { org_units: $org_unit, from_date: $fromDate }) {
         objects {
-          associations {
+          objects {
             uuid
             employee {
               uuid
@@ -42,13 +42,14 @@
 </script>
 
 <DetailTable headers={["Navn", "Tilknytningsrolle", "Stedfortræder", "Dato", "", ""]}>
-  {#await graphQLClient().request(OrgUnitAssociationDetailDocument, { uuid: uuid })}
+  {#await graphQLClient().request( AssociationDocument, { org_unit: uuid, fromDate: $date } )}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
   {:then data}
-    {@const associations = data.org_units[0].objects[0].associations}
-    {#each associations as association}
+    {@const associations = data.associations.objects}
+    {#each associations as assoc}
+      {@const association = assoc.objects[0]}
       <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
         <a href="{base}/employee/{association.employee[0].uuid}">
           <td class="p-4">{association.employee[0].name}</td>

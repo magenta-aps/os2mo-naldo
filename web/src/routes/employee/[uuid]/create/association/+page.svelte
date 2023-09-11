@@ -26,22 +26,28 @@
 
   gql`
     query FacetAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
-      facets(user_keys: ["association_type", "primary_type"]) {
-        uuid
-        user_key
-        classes {
-          user_key
-          name
-          uuid
+      facets(filter: { user_keys: ["association_type", "primary_type"] }) {
+        objects {
+          objects {
+            uuid
+            user_key
+            classes {
+              user_key
+              name
+              uuid
+            }
+          }
         }
       }
-      employees(uuids: $uuid, from_date: $fromDate) {
+      employees(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          uuid
-          name
-          validity {
-            from
-            to
+          objects {
+            uuid
+            name
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -83,9 +89,9 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const facets = data.facets}
-  {@const employeeName = data.employees[0].objects[0].name}
-  {@const minDate = data.employees[0].objects[0].validity.from.split("T")[0]}
+  {@const facets = data.facets.objects}
+  {@const employeeName = data.employees.objects[0].objects[0].name}
+  {@const minDate = data.employees.objects[0].objects[0].validity.from.split("T")[0]}
 
   <title>Opret tilknytning | OS2mo</title>
 

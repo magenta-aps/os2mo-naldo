@@ -24,29 +24,33 @@
   // Bør vi ikke tilføje noget tid til de her queries?
   gql`
     query Engagements($employee: [UUID!], $org_unit: [UUID!], $fromDate: DateTime) {
-      engagements(employees: $employee, org_units: $org_unit, from_date: $fromDate) {
+      engagements(
+        filter: { employees: $employee, org_units: $org_unit, from_date: $fromDate }
+      ) {
         objects {
-          uuid
-          employee {
+          objects {
             uuid
-            name
-          }
-          job_function {
-            name
-          }
-          engagement_type {
-            name
-          }
-          org_unit {
-            name
-            uuid
-          }
-          validity {
-            from
-            to
-          }
-          primary {
-            name
+            employee {
+              uuid
+              name
+            }
+            job_function {
+              name
+            }
+            engagement_type {
+              name
+            }
+            org_unit {
+              name
+              uuid
+            }
+            validity {
+              from
+              to
+            }
+            primary {
+              name
+            }
           }
         }
       }
@@ -60,7 +64,7 @@
       <td class="p-4">Henter data...</td>
     </tr>
   {:then data}
-    {@const engagements = data.engagements}
+    {@const engagements = data.engagements.objects}
     {#each engagements as eng}
       {@const engagement = eng.objects[0]}
       <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">

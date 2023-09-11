@@ -31,44 +31,52 @@
   gql`
     query EngagementAndFacet($uuid: [UUID!], $fromDate: DateTime) {
       facets(
-        user_keys: ["engagement_type", "engagement_job_function", "primary_type"]
+        filter: {
+          user_keys: ["engagement_type", "engagement_job_function", "primary_type"]
+        }
       ) {
-        uuid
-        user_key
-        classes {
-          name
-          uuid
-          user_key
+        objects {
+          objects {
+            uuid
+            user_key
+            classes {
+              name
+              uuid
+              user_key
+            }
+          }
         }
       }
-      engagements(uuids: $uuid, from_date: $fromDate) {
+      engagements(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          uuid
-          user_key
-          employee {
+          objects {
             uuid
-            name
-          }
-          engagement_type {
-            name
-          }
-          job_function {
-            name
-          }
-          primary {
-            uuid
-            name
-          }
-          validity {
-            from
-            to
-          }
-          org_unit {
-            uuid
-            name
+            user_key
+            employee {
+              uuid
+              name
+            }
+            engagement_type {
+              name
+            }
+            job_function {
+              name
+            }
+            primary {
+              uuid
+              name
+            }
             validity {
               from
               to
+            }
+            org_unit {
+              uuid
+              name
+              validity {
+                from
+                to
+              }
             }
           }
         }
@@ -112,8 +120,8 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const engagement = data.engagements[0].objects[0]}
-  {@const facets = data.facets}
+  {@const engagement = data.engagements.objects[0].objects[0]}
+  {@const facets = data.facets.objects}
   {@const minDate = engagement.org_unit[0].validity.from.split("T")[0]}
   {@const maxDate = engagement.org_unit[0].validity.to?.split("T")[0]}
 

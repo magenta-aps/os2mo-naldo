@@ -15,6 +15,7 @@
   import { date } from "$lib/stores/date"
   import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
   import { getClassUuidByUserKey } from "$lib/util/get_classes"
+  import { getITSystemNames } from "$lib/util/helpers"
 
   let fromDate: string
   let toDate: string
@@ -24,18 +25,28 @@
   gql`
     query ItSystemsClassAndOrg($uuid: [UUID!], $fromDate: DateTime) {
       itsystems {
-        name
-        uuid
-      }
-      classes(user_keys: ["primary", "non-primary"]) {
-        uuid
-        user_key
-      }
-      org_units(uuids: $uuid, from_date: $fromDate) {
         objects {
-          validity {
-            from
-            to
+          objects {
+            name
+            uuid
+          }
+        }
+      }
+      classes(filter: { user_keys: ["primary", "non-primary"] }) {
+        objects {
+          objects {
+            uuid
+            user_key
+          }
+        }
+      }
+      org_units(filter: { uuids: $uuid, from_date: $fromDate }) {
+        objects {
+          objects {
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -83,10 +94,10 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const itSystems = data.itsystems}
-  {@const classes = data.classes}
-  {@const minDate = data.org_units[0].objects[0].validity?.from.split("T")[0]}
-  {@const maxDate = data.org_units[0].objects[0].validity?.to?.split("T")[0]}
+  {@const itSystems = data.itsystems.objects}
+  {@const classes = data.classes.objects}
+  {@const minDate = data.org_units.objects[0].objects[0].validity?.from.split("T")[0]}
+  {@const maxDate = data.org_units.objects[0].objects[0].validity?.to?.split("T")[0]}
 
   <title>Opret IT-konto | OS2mo</title>
 
@@ -121,7 +132,7 @@
             title="IT-system"
             id="it-system"
             bind:value={itSystem}
-            iterable={itSystems.sort((a, b) => (a.name > b.name ? 1 : -1))}
+            iterable={getITSystemNames(itSystems)}
             extra_classes="basis-1/2"
             required={true}
           />
