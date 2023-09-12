@@ -35,6 +35,10 @@
       leaves(uuids: $uuid, from_date: $fromDate) {
         objects {
           engagement {
+            validity {
+              from
+              to
+            }
             uuid
             org_unit {
               name
@@ -93,7 +97,7 @@
             input: result.data,
           })
           $success = {
-            message: `Orlov for ${mutation.leave_update.objects[0].person.name} er blevet redigeret`,
+            message: `Orlov for ${mutation.leave_update.objects[0].person[0].name} er blevet redigeret`,
             uuid: $page.params.uuid,
             type: "employee",
           }
@@ -111,10 +115,10 @@
 {:then data}
   {@const leave = data.leaves[0].objects[0]}
   {@const facets = data.facets}
-  {@const minDate = leave.validity.from.split("T")[0]}
-  {@const maxDate = leave.validity?.to?.split("T")[0]}
-  {@const engagements = leave.employee.engagements}
-  {@const employeeName = leave.employee.name}
+  {@const minDate = leave.engagement.validity.from.split("T")[0]}
+  {@const maxDate = leave.engagement.validity?.to?.split("T")[0]}
+  {@const engagements = leave.employee[0].engagements}
+  {@const employeeName = leave.employee[0].name}
   {@const engagementStartValue = getEngagementTitlesAndUuid([leave.engagement])[0]}
 
   <title>Rediger orlov | OS2mo</title>
