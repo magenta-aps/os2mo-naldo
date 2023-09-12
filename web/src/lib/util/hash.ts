@@ -10,7 +10,6 @@ export function toUrlFriendly(str: string): string {
 export function fromUrlFriendly(urlString: string, tabNames: string[]): string {
   const cleanedUrlString = urlString.startsWith("#") ? urlString.slice(1) : urlString
   const str = cleanedUrlString.replace(/_/g, " ")
-  console.log("Cleaned and converted string:", str)
   for (let tab of tabNames) {
     if (toUrlFriendly(tab).toLowerCase() === str) return tab
   }
