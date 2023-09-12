@@ -83,7 +83,7 @@
             input: result.data,
           })
           $success = {
-            message: `${mutation.leave_create.objects[0].leave_type.name} til ${mutation.leave_create.objects[0].employee.name} er blevet oprettet`,
+            message: `${mutation.leave_create.objects[0].leave_type.name} til ${mutation.leave_create.objects[0].employee[0].name} er blevet oprettet`,
             uuid: $page.params.uuid,
             type: "employee",
           }
