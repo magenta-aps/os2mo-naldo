@@ -23,50 +23,57 @@
 
   gql`
     query LeaveAndFacet($uuid: [UUID!], $fromDate: DateTime) {
-      facets(user_keys: ["leave_type"]) {
-        uuid
-        user_key
-        classes {
-          uuid
-          user_key
-          name
+      facets(filter: { user_keys: ["leave_type"] }) {
+        objects {
+          objects {
+            uuid
+            user_key
+            classes {
+              uuid
+              user_key
+              name
+            }
+          }
         }
       }
-      leaves(uuids: $uuid, from_date: $fromDate) {
+      leaves(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          engagement {
+          objects {
+            engagement {
+              uuid
+              validity {
+                from
+                to
+              }
+              uuid
+              org_unit {
+                name
+              }
+              job_function {
+                name
+              }
+            }
+            leave_type {
+              user_key
+              uuid
+            }
             validity {
               from
               to
             }
-            uuid
-            org_unit {
-              name
-            }
-            job_function {
-              name
-            }
-          }
-          leave_type {
-            user_key
-            uuid
-          }
-          validity {
-            from
-            to
-          }
-          employee {
-            uuid
-            name
-            engagements {
+            person {
               uuid
-              org_unit {
+              name
+              engagements {
                 uuid
-                name
-              }
-              job_function {
-                uuid
-                name
+                org_unit {
+                  uuid
+                  name
+                }
+                job_function {
+                  uuid
+                  name
+                }
               }
             }
           }
@@ -113,12 +120,12 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const leave = data.leaves[0].objects[0]}
-  {@const facets = data.facets}
+  {@const leave = data.leaves.objects[0].objects[0]}
+  {@const facets = data.facets.objects}
   {@const minDate = leave.engagement.validity.from.split("T")[0]}
   {@const maxDate = leave.engagement.validity?.to?.split("T")[0]}
-  {@const engagements = leave.employee[0].engagements}
-  {@const employeeName = leave.employee[0].name}
+  {@const engagements = leave.person[0].engagements}
+  {@const employeeName = leave.person[0].name}
   {@const engagementStartValue = getEngagementTitlesAndUuid([leave.engagement])[0]}
 
   <title>Rediger orlov | OS2mo</title>
