@@ -15,21 +15,23 @@
 
   gql`
     query Role($uuid: [UUID!], $fromDate: DateTime!) {
-      roles(uuids: $uuid, from_date: $fromDate) {
+      roles(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          uuid
-          employee {
+          objects {
             uuid
-            name
-          }
-          validity {
-            from
-            to
-          }
-          org_unit {
+            employee {
+              uuid
+              name
+            }
             validity {
               from
               to
+            }
+            org_unit {
+              validity {
+                from
+                to
+              }
             }
           }
         }
@@ -73,7 +75,7 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const role = data.roles[0].objects[0]}
+  {@const role = data.roles.objects[0].objects[0]}
   {@const minDate = role.org_unit[0].validity.from.split("T")[0]}
   {@const maxDate = role.org_unit[0].validity.to?.split("T")[0]}
 

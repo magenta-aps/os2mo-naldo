@@ -14,19 +14,21 @@
 
   gql`
     query EmployeeAssociations($uuid: [UUID!]) {
-      employees(uuids: $uuid) {
+      employees(filter: { uuids: $uuid }) {
         objects {
-          associations {
-            org_unit {
-              name
-              uuid
-            }
-            association_type {
-              name
-            }
-            validity {
-              from
-              to
+          objects {
+            associations {
+              org_unit {
+                name
+                uuid
+              }
+              association_type {
+                name
+              }
+              validity {
+                from
+                to
+              }
             }
           }
         }
@@ -41,7 +43,7 @@
       <td class="p-4">Henter data...</td>
     </tr>
   {:then data}
-    {@const employee = data.employees[0].objects[0]}
+    {@const employee = data.employees.objects[0].objects[0]}
     {#each employee.associations as association}
       <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
         <a href="{base}/organisation/{association.org_unit[0].uuid}">

@@ -36,10 +36,12 @@ export const load: PageLoad = async (event) => {
 
   const query = `
       query {
-        org_units(uuids: "${event.params.uuid}" from_date: "${fromDate}") {
+        org_units(filter: { uuids: "${event.params.uuid}" from_date: "${fromDate}" }) {
           objects {
-            uuid
-            name
+            objects {
+              uuid
+              name
+            }
           }
         }
       }

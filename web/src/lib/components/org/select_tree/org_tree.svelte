@@ -21,18 +21,20 @@
 
   gql`
     query OrgTree($from_date: DateTime!) {
-      org_units(from_date: $from_date) {
-        uuid
+      org_units(filter: { from_date: $from_date }) {
         objects {
-          name
           uuid
-          parent {
+          objects {
             name
             uuid
-          }
-          children {
-            name
-            uuid
+            parent {
+              name
+              uuid
+            }
+            children {
+              name
+              uuid
+            }
           }
         }
       }
@@ -42,7 +44,7 @@
   const fetchOrgTree = async () => {
     const data = await graphQLClient().request(OrgTreeDocument, { from_date: $date })
     if (data.org_units) {
-      for (let org of data.org_units) {
+      for (let org of data.org_units.objects) {
         if (org.objects[0].parent === null) {
           orgTree.push({
             uuid: org.uuid,

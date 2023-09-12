@@ -18,24 +18,28 @@
   // which was changed in v8
   gql`
     query Address($uuid: [UUID!], $fromDate: DateTime!, $org_unit_uuid: [UUID!]) {
-      addresses(uuids: $uuid, from_date: $fromDate) {
+      addresses(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          uuid
-          value
-          address_type {
-            name
-          }
-          validity {
-            from
-            to
+          objects {
+            uuid
+            value
+            address_type {
+              name
+            }
+            validity {
+              from
+              to
+            }
           }
         }
       }
-      org_units(uuids: $org_unit_uuid) {
+      org_units(filter: { uuids: $org_unit_uuid }) {
         objects {
-          validity {
-            from
-            to
+          objects {
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -80,9 +84,9 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const address = data.addresses[0].objects[0]}
-  {@const minDate = data.org_units[0].objects[0].validity.from.split("T")[0]}
-  {@const maxDate = data.org_units[0].objects[0].validity.to?.split("T")[0]}
+  {@const address = data.addresses.objects[0].objects[0]}
+  {@const minDate = data.org_units.objects[0].objects[0].validity.from.split("T")[0]}
+  {@const maxDate = data.org_units.objects[0].objects[0].validity.to?.split("T")[0]}
   <title>Afslut adresse | OS2mo</title>
 
   <div class="flex align-center px-6 pt-6 pb-4">

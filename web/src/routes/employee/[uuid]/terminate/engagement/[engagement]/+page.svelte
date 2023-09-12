@@ -16,21 +16,23 @@
 
   gql`
     query Engagement($uuid: [UUID!], $fromDate: DateTime!) {
-      engagements(uuids: $uuid, from_date: $fromDate) {
+      engagements(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          uuid
-          employee {
+          objects {
             uuid
-            name
-          }
-          validity {
-            from
-            to
-          }
-          org_unit {
+            employee {
+              uuid
+              name
+            }
             validity {
               from
               to
+            }
+            org_unit {
+              validity {
+                from
+                to
+              }
             }
           }
         }
@@ -74,7 +76,7 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const engagement = data.engagements[0].objects[0]}
+  {@const engagement = data.engagements.objects[0].objects[0]}
   {@const minDate = engagement.org_unit[0].validity.from.split("T")[0]}
   {@const maxDate = engagement.org_unit[0].validity.to?.split("T")[0]}
 

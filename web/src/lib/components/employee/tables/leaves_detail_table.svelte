@@ -14,10 +14,10 @@
   export let tense: string
 
   gql`
-    query EmployeeLeaves($uuid: [UUID!], $fromDate: DateTime) {
-      employees(uuids: $uuid, from_date: $fromDate) {
+    query EmployeeLeaves($employee_uuid: [UUID!], $fromDate: DateTime) {
+      leaves(filter: { employees: $employee_uuid, from_date: $fromDate }) {
         objects {
-          leaves {
+          objects {
             uuid
             validity {
               from
@@ -42,13 +42,14 @@
 </script>
 
 <DetailTable headers={["Orlovstype", "Engagement", "Dato", "", ""]}>
-  {#await graphQLClient().request( EmployeeLeavesDocument, { uuid: uuid, fromDate: $date } )}
+  {#await graphQLClient().request( EmployeeLeavesDocument, { employee_uuid: uuid, fromDate: $date } )}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
   {:then data}
-    {@const employee = data.employees[0].objects[0]}
-    {#each employee.leaves as leave}
+    {@const leaves = data.leaves.objects}
+    {#each leaves as lve}
+      {@const leave = lve.objects[0]}
       <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
         <td class="p-4">
           {leave.leave_type.name}

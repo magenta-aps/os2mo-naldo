@@ -24,22 +24,28 @@
 
   gql`
     query FacetAndOrg($uuid: [UUID!], $fromDate: DateTime) {
-      facets(user_keys: ["association_type", "primary_type"]) {
-        uuid
-        user_key
-        classes {
-          name
-          uuid
-          user_key
+      facets(filter: { user_keys: ["association_type", "primary_type"] }) {
+        objects {
+          objects {
+            uuid
+            user_key
+            classes {
+              name
+              uuid
+              user_key
+            }
+          }
         }
       }
-      org_units(uuids: $uuid, from_date: $fromDate) {
+      org_units(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          name
-          uuid
-          validity {
-            from
-            to
+          objects {
+            name
+            uuid
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -81,10 +87,10 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const facets = data.facets}
-  {@const orgUnit = data.org_units[0].objects[0]}
-  {@const minDate = data.org_units[0].objects[0].validity?.from.split("T")[0]}
-  {@const maxDate = data.org_units[0].objects[0].validity?.to?.split("T")[0]}
+  {@const facets = data.facets.objects}
+  {@const orgUnit = data.org_units.objects[0].objects[0]}
+  {@const minDate = orgUnit.validity?.from.split("T")[0]}
+  {@const maxDate = orgUnit.validity?.to?.split("T")[0]}
 
   <title>Opret tilknytning | OS2mo</title>
 

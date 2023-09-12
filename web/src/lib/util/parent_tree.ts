@@ -1,35 +1,18 @@
-import { fetchGraph } from "$lib/util/http"
+import { enhance } from "$app/forms"
+import { graphQLClient } from "$lib/util/http"
+import { goto } from "$app/navigation"
+import { base } from "$app/paths"
+import { success, error } from "$lib/stores/alert"
+import { GetParentDocument } from "./query.generated"
+import { gql } from "graphql-request"
+import { page } from "$app/stores"
+import { date } from "$lib/stores/date"
+import { getClassesByFacetUserKey } from "$lib/util/get_classes"
 
-interface Query {
-  data: Data | null
-  errors?: Error[]
-}
-
-interface Data {
-  org_units: OrganisationUnitResponse[]
-}
-
-interface OrganisationUnitResponse {
-  objects: OrganisationUnitElement[]
-}
-
-interface OrganisationUnitElement {
-  parent: ParentOrganisationUnit | null
-}
-
-interface ParentOrganisationUnit {
-  name: string
-  uuid: string
-}
-
-interface Error {
-  message: string
-}
-
-const query = (uuid: string, fromDate: string): string => {
-  return `
-      query {
-        org_units(uuids: "${uuid}", from_date: "${fromDate}") {
+gql`
+  query GetParent($uuid: [UUID!], $fromDate: DateTime) {
+    org_units(filter: { uuids: $uuid, from_date: $fromDate }) {
+      objects {
         objects {
           parent {
             name
@@ -37,23 +20,23 @@ const query = (uuid: string, fromDate: string): string => {
           }
         }
       }
-    }`
-}
+    }
+  }
+`
 
-const fetchParent = async (
-  uuid: string,
-  fromDate: string
-): Promise<ParentOrganisationUnit | undefined | null> => {
-  const res = await fetchGraph(query(uuid, fromDate))
-  const json: Query = await res.json()
+const fetchParent = async (uuid: string, fromDate: string) => {
+  const res = await graphQLClient().request(GetParentDocument, {
+    uuid: uuid,
+    fromDate: fromDate,
+  })
 
-  return json.data?.org_units[0].objects[0].parent
+  return res.org_units.objects[0].objects[0].parent
 }
 
 export const fetchParentTree = async (
   uuid: string,
   fromDate: string
-): Promise<ParentOrganisationUnit[]> => {
+): Promise<{ name: string; uuid: any | null }[]> => {
   const parent = await fetchParent(uuid, fromDate)
 
   if (!parent) {

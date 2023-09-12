@@ -8,20 +8,22 @@
   // Will generate an interface with the query name + Document to be used with the client
   gql`
     query OrgUnits($fromDate: DateTime) {
-      org_units(parents: null, from_date: $fromDate) {
+      org_units(filter: { parents: null, from_date: $fromDate }) {
         objects {
-          addresses {
-            name
-            address_type {
+          objects {
+            addresses {
               name
-              scope
+              address_type {
+                name
+                scope
+              }
             }
-          }
-          name
-          uuid
-          children {
             name
             uuid
+            children {
+              name
+              uuid
+            }
           }
         }
       }
@@ -44,7 +46,7 @@
     </div>
   {:then data}
     <div class="grid xl:grid-cols-2 gap-8 mt-8">
-      {#each data.org_units as org_unit}
+      {#each data.org_units.objects as org_unit}
         <div class="card w-auto bg-slate-100 rounded-lg">
           <div class="card-body">
             <div class="flex justify-between">

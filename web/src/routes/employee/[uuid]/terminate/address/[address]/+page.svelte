@@ -17,18 +17,20 @@
   // which was changed in v8
   gql`
     query Address($uuid: [UUID!], $fromDate: DateTime!) {
-      addresses(uuids: $uuid, from_date: $fromDate) {
+      addresses(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          uuid
-          value
-          name
-          address_type {
+          objects {
+            uuid
+            value
             name
-            scope
-          }
-          validity {
-            from
-            to
+            address_type {
+              name
+              scope
+            }
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -73,7 +75,7 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const address = data.addresses[0].objects[0]}
+  {@const address = data.addresses.objects[0].objects[0]}
   {@const minDate = address.validity.from.split("T")[0]}
   {@const addressValue =
     address.address_type.scope === "DAR" ? address.name : address.value}

@@ -27,40 +27,46 @@
 
   gql`
     query AssociationAndFacets($uuid: [UUID!], $fromDate: DateTime) {
-      facets(user_keys: ["association_type", "primary_type"]) {
-        uuid
-        user_key
-        classes {
-          uuid
-          user_key
-          name
+      facets(filter: { user_keys: ["association_type", "primary_type"] }) {
+        objects {
+          objects {
+            uuid
+            user_key
+            classes {
+              uuid
+              user_key
+              name
+            }
+          }
         }
       }
-      associations(uuids: $uuid, from_date: $fromDate) {
+      associations(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          uuid
-          employee {
+          objects {
             uuid
-            name
+            employee {
+              uuid
+              name
+              validity {
+                from
+                to
+              }
+            }
+            org_unit {
+              uuid
+              name
+            }
+            association_type {
+              name
+            }
+            primary {
+              uuid
+              name
+            }
             validity {
               from
               to
             }
-          }
-          org_unit {
-            uuid
-            name
-          }
-          association_type {
-            name
-          }
-          primary {
-            uuid
-            name
-          }
-          validity {
-            from
-            to
           }
         }
       }
@@ -103,8 +109,8 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const association = data.associations[0].objects[0]}
-  {@const facets = data.facets}
+  {@const association = data.associations.objects[0].objects[0]}
+  {@const facets = data.facets.objects}
   {@const minDate = association.employee[0].validity.from.split("T")[0]}
 
   <title>Rediger {association?.employee[0].name} | OS2mo</title>

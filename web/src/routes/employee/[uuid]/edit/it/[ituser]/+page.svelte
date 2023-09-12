@@ -18,6 +18,7 @@
   import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
   import { date } from "$lib/stores/date"
   import { getClassUuidByUserKey } from "$lib/util/get_classes"
+  import { getITSystemNames } from "$lib/util/helpers"
 
   let fromDate: string
   let toDate: string
@@ -30,37 +31,49 @@
       $fromDate: DateTime
       $employee_uuid: [UUID!]
     ) {
-      itusers(uuids: $uuid, from_date: $fromDate) {
-        uuid
+      itusers(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
           uuid
-          user_key
-          primary_uuid
-          itsystem {
-            name
+          objects {
             uuid
-          }
-          validity {
-            from
-            to
+            user_key
+            primary_uuid
+            itsystem {
+              name
+              uuid
+            }
+            validity {
+              from
+              to
+            }
           }
         }
       }
-      employees(uuids: $employee_uuid) {
+      employees(filter: { uuids: $employee_uuid }) {
         objects {
-          validity {
-            from
-            to
+          objects {
+            validity {
+              from
+              to
+            }
           }
         }
       }
       itsystems {
-        name
-        uuid
+        objects {
+          objects {
+            name
+            uuid
+          }
+        }
       }
-      classes(user_keys: ["primary", "non-primary"]) {
-        uuid
-        user_key
+      classes(filter: { user_keys: ["primary", "non-primary"] }) {
+        objects {
+          objects {
+            uuid
+            user_key
+          }
+        }
       }
     }
 
@@ -96,9 +109,10 @@
 {#await graphQLClient().request( ItUserItSystemsAndPrimaryDocument, { uuid: $page.params.ituser, fromDate: $date, employee_uuid: $page.params.uuid } )}
   Henter data...
 {:then data}
-  {@const itUser = data.itusers[0].objects[0]}
-  {@const classes = data.classes}
-  {@const minDate = data.employees[0].objects[0].validity.from.split("T")[0]}
+  {@const itUser = data.itusers.objects[0].objects[0]}
+  {@const classes = data.classes.objects}
+  {@const itSystems = data.itsystems.objects}
+  {@const minDate = data.employees.objects[0].objects[0].validity.from.split("T")[0]}
 
   <title>Rediger {itUser.itsystem.name} | OS2mo</title>
 
@@ -134,7 +148,7 @@
             startValue={itUser.itsystem.name}
             bind:value={itSystem}
             extra_classes="basis-1/2"
-            iterable={data.itsystems.sort((a, b) => (a.name > b.name ? 1 : -1))}
+            iterable={getITSystemNames(itSystems)}
             required={true}
           />
           <Input

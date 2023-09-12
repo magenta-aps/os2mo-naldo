@@ -25,32 +25,38 @@
 
   gql`
     query GetOrgUnitAndFacets($uuid: [UUID!], $fromDate: DateTime) {
-      facets(user_keys: ["org_unit_level", "org_unit_type"]) {
-        uuid
-        user_key
-        classes {
-          name
-          uuid
-          user_key
+      facets(filter: { user_keys: ["org_unit_level", "org_unit_type"] }) {
+        objects {
+          objects {
+            uuid
+            user_key
+            classes {
+              name
+              uuid
+              user_key
+            }
+          }
         }
       }
-      org_units(uuids: $uuid, from_date: $fromDate) {
+      org_units(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          uuid
-          name
-          parent {
+          objects {
             uuid
             name
-          }
-          unit_type {
-            name
-          }
-          org_unit_level {
-            name
-          }
-          validity {
-            from
-            to
+            parent {
+              uuid
+              name
+            }
+            unit_type {
+              name
+            }
+            org_unit_level {
+              name
+            }
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -91,10 +97,10 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const org_unit = data.org_units[0].objects[0]}
-  {@const facets = data.facets}
+  {@const org_unit = data.org_units.objects[0].objects[0]}
+  {@const facets = data.facets.objects}
 
-  <title>Rediger {org_unit?.name} | OS2mo</title>
+  <title>Rediger {org_unit.name} | OS2mo</title>
 
   <div class="flex align-center px-6 pt-6 pb-4">
     <h3 class="flex-1">Rediger {org_unit.name}</h3>

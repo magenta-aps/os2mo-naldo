@@ -17,6 +17,7 @@
   }`
   export let id = `${type}-uuid`
   export let required = true
+  export let disabled = false
 
   const itemId = "uuid" // Used by the component to differentiate between items
   const url = type === "employee" ? "e/autocomplete/?query=" : "ou/autocomplete/?query="
@@ -66,13 +67,16 @@
     loadOptions={fetchAutocomplete}
     {floatingConfig}
     {required}
+    {disabled}
     {itemId}
     bind:value
     hideEmptyState={true}
     placeholder={`Søg efter ${type === "employee" ? "person" : "organisation"}`}
     on:select={() => {
       if (action === "goto" && value) {
-        goto(`${base}/${type}/${value.uuid}`)
+        goto(
+          `${base}/${type === "employee" ? "employee" : "organisation"}/${value.uuid}`
+        )
         if (type === "org-unit") {
           $globalNavigation.uuid = value.uuid
         }

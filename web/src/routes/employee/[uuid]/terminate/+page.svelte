@@ -16,19 +16,21 @@
 
   gql`
     query Employee($uuid: [UUID!], $fromDate: DateTime!) {
-      employees(uuids: $uuid, from_date: $fromDate) {
+      employees(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          uuid
-          name
-          validity {
-            from
-            to
-          }
-          engagements {
-            org_unit {
-              validity {
-                from
-                to
+          objects {
+            uuid
+            name
+            validity {
+              from
+              to
+            }
+            engagements {
+              org_unit {
+                validity {
+                  from
+                  to
+                }
               }
             }
           }
@@ -71,7 +73,7 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const employee = data.employees[0].objects[0]}
+  {@const employee = data.employees.objects[0].objects[0]}
   {@const minDate = employee.validity.from.split("T")[0]}
   {@const maxDate = employee.engagements[0]?.org_unit[0].validity.to?.split("T")[0]}
   <title>Opsig {employee.name} | OS2mo</title>

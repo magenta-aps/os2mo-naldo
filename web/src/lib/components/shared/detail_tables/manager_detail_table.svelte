@@ -21,32 +21,35 @@
     ? ["Navn", "Lederansvar", "Ledertype", "Lederniveau", "Dato", "", ""]
     : ["Enhed", "Lederansvar", "Ledertype", "Lederniveau", "Dato", "", ""]
 
-  // Bør vi ikke tilføje noget tid til de her queries?
   gql`
     query Managers($employee: [UUID!], $org_unit: [UUID!], $fromDate: DateTime) {
-      managers(employees: $employee, org_units: $org_unit, from_date: $fromDate) {
+      managers(
+        filter: { employees: $employee, org_units: $org_unit, from_date: $fromDate }
+      ) {
         objects {
-          uuid
-          employee {
+          objects {
             uuid
-            name
-          }
-          org_unit {
-            name
-            uuid
-          }
-          manager_level {
-            name
-          }
-          manager_type {
-            name
-          }
-          responsibilities {
-            name
-          }
-          validity {
-            from
-            to
+            employee {
+              uuid
+              name
+            }
+            org_unit {
+              name
+              uuid
+            }
+            manager_level {
+              name
+            }
+            manager_type {
+              name
+            }
+            responsibilities {
+              name
+            }
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -60,7 +63,7 @@
       <td class="p-4">Henter data...</td>
     </tr>
   {:then data}
-    {@const managers = data.managers}
+    {@const managers = data.managers.objects}
     {#each managers as man}
       {@const manager = man.objects[0]}
       <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">

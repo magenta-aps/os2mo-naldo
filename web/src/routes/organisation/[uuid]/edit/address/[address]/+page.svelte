@@ -29,37 +29,45 @@
       $org_unit_uuid: [UUID!]
       $fromDate: DateTime
     ) {
-      facets(user_keys: ["org_unit_address_type", "visibility"]) {
-        uuid
-        user_key
-        classes {
-          name
-          uuid
-          user_key
-        }
-      }
-      addresses(uuids: $uuid, from_date: $fromDate) {
+      facets(filter: { user_keys: ["org_unit_address_type", "visibility"] }) {
         objects {
-          uuid
-          address_type {
-            name
+          objects {
             uuid
-          }
-          name
-          visibility {
-            name
-          }
-          validity {
-            from
-            to
+            user_key
+            classes {
+              name
+              uuid
+              user_key
+            }
           }
         }
       }
-      org_units(uuids: $org_unit_uuid) {
+      addresses(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          validity {
-            from
-            to
+          objects {
+            uuid
+            address_type {
+              name
+              uuid
+            }
+            name
+            visibility {
+              name
+            }
+            validity {
+              from
+              to
+            }
+          }
+        }
+      }
+      org_units(filter: { uuids: $org_unit_uuid }) {
+        objects {
+          objects {
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -99,10 +107,10 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const address = data.addresses[0].objects[0]}
-  {@const facets = data.facets}
-  {@const minDate = data.org_units[0].objects[0].validity.from.split("T")[0]}
-  {@const maxDate = data.org_units[0].objects[0].validity.to?.split("T")[0]}
+  {@const address = data.addresses.objects[0].objects[0]}
+  {@const facets = data.facets.objects}
+  {@const minDate = data.org_units.objects[0].objects[0].validity.from.split("T")[0]}
+  {@const maxDate = data.org_units.objects[0].objects[0].validity.to?.split("T")[0]}
 
   <title>Rediger adresse | OS2mo</title>
 

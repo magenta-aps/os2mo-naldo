@@ -21,32 +21,38 @@
 
   gql`
     query KLEAndFacet($uuid: [UUID!], $fromDate: DateTime) {
-      facets(user_keys: ["kle_aspect", "kle_number"]) {
-        uuid
-        user_key
-        classes {
-          name
-          uuid
-          user_key
+      facets(filter: { user_keys: ["kle_aspect", "kle_number"] }) {
+        objects {
+          objects {
+            uuid
+            user_key
+            classes {
+              name
+              uuid
+              user_key
+            }
+          }
         }
       }
-      kles(uuids: $uuid, from_date: $fromDate) {
+      kles(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          uuid
-          kle_aspects {
-            name
-          }
-          kle_number {
-            name
-          }
-          validity {
-            from
-            to
-          }
-          org_unit {
+          objects {
+            uuid
+            kle_aspects {
+              name
+            }
+            kle_number {
+              name
+            }
             validity {
               from
               to
+            }
+            org_unit {
+              validity {
+                from
+                to
+              }
             }
           }
         }
@@ -85,8 +91,8 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const kle = data.kles[0].objects[0]}
-  {@const facets = data.facets}
+  {@const kle = data.kles.objects[0].objects[0]}
+  {@const facets = data.facets.objects}
   {@const minDate = kle.org_unit[0].validity.from.split("T")[0]}
   {@const maxDate = kle.org_unit[0].validity.to?.split("T")[0]}
 

@@ -27,23 +27,31 @@
       $org_uuid: [UUID!]
       $fromDate: DateTime
     ) {
-      roles(employees: $employee_uuid, org_units: $org_uuid, from_date: $fromDate) {
+      roles(
+        filter: {
+          employees: $employee_uuid
+          org_units: $org_uuid
+          from_date: $fromDate
+        }
+      ) {
         objects {
-          uuid
-          role_type {
-            name
-          }
-          validity {
-            from
-            to
-          }
-          employee {
-            name
+          objects {
             uuid
-          }
-          org_unit {
-            name
-            uuid
+            role_type {
+              name
+            }
+            validity {
+              from
+              to
+            }
+            employee {
+              name
+              uuid
+            }
+            org_unit {
+              name
+              uuid
+            }
           }
         }
       }
@@ -57,7 +65,8 @@
       <td class="p-4">Henter data...</td>
     </tr>
   {:then data}
-    {#each data.roles as role}
+    {@const roles = data.roles.objects}
+    {#each roles as role}
       <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
         {#if isOrg}
           <a href="{base}/employee/{role.objects[0].employee[0].uuid}">

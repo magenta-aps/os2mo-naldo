@@ -5,6 +5,7 @@
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { FacetsDocument } from "./query.generated"
+  import { getClassesByFacetUserKey } from "$lib/util/get_classes"
 
   export let startDate: string
   export let endDate: string
@@ -19,10 +20,17 @@
 
   gql`
     query Facets {
-      facets(user_keys: ["visibility", "org_unit_address_type"]) {
-        classes {
-          uuid
-          name
+      facets(filter: { user_keys: ["visibility", "org_unit_address_type"] }) {
+        objects {
+          objects {
+            uuid
+            user_key
+            classes {
+              user_key
+              uuid
+              name
+            }
+          }
         }
       }
     }
@@ -68,7 +76,7 @@
       </label>
     </div>
   {:then data}
-    {@const facets = data.facets}
+    {@const facets = data.facets.objects}
 
     <div class="flex flex-row gap-6">
       <DateInput
@@ -92,13 +100,13 @@
       title="Synlighed"
       id="visibility"
       bind:value={visibility}
-      iterable={facets[0].classes}
+      iterable={getClassesByFacetUserKey(facets, "visibility")}
     />
     <Select
       title="Adressetype"
       id="address-type"
       bind:value={addressType}
-      iterable={facets[1].classes}
+      iterable={getClassesByFacetUserKey(facets, "org_unit_address_type")}
       returnType="object"
     />
 

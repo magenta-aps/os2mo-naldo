@@ -16,17 +16,19 @@
 
   gql`
     query KLE($uuid: [UUID!], $fromDate: DateTime!) {
-      kles(uuids: $uuid, from_date: $fromDate) {
+      kles(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          uuid
-          validity {
-            from
-            to
-          }
-          org_unit {
+          objects {
+            uuid
             validity {
               from
               to
+            }
+            org_unit {
+              validity {
+                from
+                to
+              }
             }
           }
         }
@@ -72,7 +74,7 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const kle = data.kles[0].objects[0]}
+  {@const kle = data.kles.objects[0].objects[0]}
   {@const minDate = kle.org_unit[0].validity.from.split("T")[0]}
   {@const maxDate = kle.org_unit[0].validity.to?.split("T")[0]}
 

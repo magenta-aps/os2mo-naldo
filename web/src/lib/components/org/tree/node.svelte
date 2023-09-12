@@ -17,11 +17,13 @@
   const fetchChildren = async (uuid: string) => {
     const query = `
       query {
-        org_units(uuids: "${uuid}", from_date: "${fromDate}") {
+        org_units(filter: {uuids: "${uuid}", from_date: "${fromDate}"}) {
           objects {
-            children {
-              name
-              uuid
+            objects {
+              children {
+                name
+                uuid
+              }
             }
           }
         }
@@ -29,7 +31,7 @@
     const res = await fetchGraph(query)
     const json = await res.json()
     if (json.data) {
-      return json.data.org_units[0].objects[0].children
+      return json.data.org_units.objects[0].objects[0].children
     } else {
       throw new Error(json.errors[0].message)
     }

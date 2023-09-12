@@ -15,28 +15,32 @@
 
   gql`
     query ITAssociations($employee: [UUID!], $fromDate: DateTime) {
-      associations(employees: $employee, it_association: true, from_date: $fromDate) {
+      associations(
+        filter: { employees: $employee, it_association: true, from_date: $fromDate }
+      ) {
         objects {
-          uuid
-          org_unit {
-            name
+          objects {
             uuid
-          }
-          job_function {
-            name
-          }
-          primary {
-            name
-          }
-          it_user {
-            itsystem {
+            org_unit {
+              name
+              uuid
+            }
+            job_function {
               name
             }
-            user_key
-          }
-          validity {
-            from
-            to
+            primary {
+              name
+            }
+            it_user {
+              itsystem {
+                name
+              }
+              user_key
+            }
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -61,7 +65,7 @@
       <td class="p-4">Henter data...</td>
     </tr>
   {:then data}
-    {@const itassociations = data.associations}
+    {@const itassociations = data.associations.objects}
     {#each itassociations as itassoc}
       {@const itassociation = itassoc.objects[0]}
       <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">

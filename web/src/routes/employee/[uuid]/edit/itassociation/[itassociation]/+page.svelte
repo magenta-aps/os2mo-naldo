@@ -32,56 +32,68 @@
 
   gql`
     query ITAssociationAndFacets($uuid: [UUID!], $fromDate: DateTime) {
-      facets(user_keys: "engagement_job_function") {
-        uuid
-        user_key
-        classes {
-          user_key
-          name
-          uuid
+      facets(filter: { user_keys: "engagement_job_function" }) {
+        objects {
+          objects {
+            uuid
+            user_key
+            classes {
+              user_key
+              name
+              uuid
+            }
+          }
         }
       }
-      classes(user_keys: ["primary", "non-primary"]) {
-        uuid
-        user_key
-      }
-      associations(uuids: $uuid, from_date: $fromDate, it_association: true) {
+      classes(filter: { user_keys: ["primary", "non-primary"] }) {
         objects {
-          uuid
-          employee {
+          objects {
             uuid
-            name
-            itusers {
+            user_key
+          }
+        }
+      }
+      associations(
+        filter: { uuids: $uuid, from_date: $fromDate, it_association: true }
+      ) {
+        objects {
+          objects {
+            uuid
+            employee {
+              uuid
+              name
+              itusers {
+                itsystem {
+                  name
+                }
+                user_key
+                uuid
+              }
+              validity {
+                from
+                to
+              }
+            }
+            org_unit {
+              uuid
+            }
+            it_user {
               itsystem {
                 name
               }
+              uuid
               user_key
+            }
+            job_function {
+              name
+            }
+            primary {
               uuid
             }
             validity {
               from
               to
             }
-          }
-          org_unit {
-            uuid
-          }
-          it_user {
-            itsystem {
-              name
-            }
-            uuid
-            user_key
-          }
-          job_function {
-            name
-          }
-          primary {
-            uuid
-          }
-          validity {
-            from
-            to
           }
         }
       }
@@ -124,10 +136,10 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const itassociation = data.associations[0].objects[0]}
+  {@const itassociation = data.associations.objects[0].objects[0]}
   {@const itusers = itassociation.employee[0].itusers}
-  {@const facets = data.facets}
-  {@const classes = data.classes}
+  {@const facets = data.facets.objects}
+  {@const classes = data.classes.objects}
   {@const minDate = itassociation.employee[0].validity.from.split("T")[0]}
   {@const itUserStartValue = getITUserITSystemName(itassociation.it_user)}
 

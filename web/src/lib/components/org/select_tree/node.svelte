@@ -16,11 +16,13 @@
   const fetchChildren = async () => {
     gql`
       query OrgChildren($uuid: [UUID!], $from_date: DateTime!) {
-        org_units(uuids: $uuid, from_date: $fromDate) {
+        org_units(filter: { uuids: $uuid, from_date: $fromDate }) {
           objects {
-            children {
-              name
-              uuid
+            objects {
+              children {
+                name
+                uuid
+              }
             }
           }
         }
@@ -31,7 +33,7 @@
       from_date: fromDate,
     })
     if (data.org_units) {
-      return data.org_units[0].objects[0].children
+      return data.org_units.objects[0].objects[0].children
     }
   }
 
