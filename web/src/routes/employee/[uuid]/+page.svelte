@@ -6,19 +6,19 @@
   import { gql } from "graphql-request"
   import { graphQLClient } from "$lib/util/http"
   import { EmployeeDocument } from "./query.generated"
-  import EmployeeDetailTable from "$lib/components/employee/tables/employee_detail_table.svelte"
-  import ITAssociationDetailTable from "$lib/components/employee/tables/itassociation_detail_table.svelte"
-  import EngagementDetailTable from "$lib/components/shared/detail_tables/engagement_detail_table.svelte"
-  import ItUserDetailTable from "$lib/components/shared/detail_tables/ituser_detail_table.svelte"
-  import AssociationDetailTable from "$lib/components/shared/detail_tables/association_detail_table.svelte"
-  import ManagerDetailTable from "$lib/components/shared/detail_tables/manager_detail_table.svelte"
-  import AddressesDetailTable from "$lib/components/employee/tables/addresses_detail_table.svelte"
-  import RolesDetailTable from "$lib/components/shared/detail_tables/roles_detail_table.svelte"
-  import LeavesDetailTable from "$lib/components/employee/tables/leaves_detail_table.svelte"
   import TenseTabs from "$lib/components/shared/tense_tabs.svelte"
   import { tenses } from "$lib/stores/tenses"
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
+  import AddressDetailTable from "$lib/components/shared/detail_tables/address_detail_table.svelte"
+  import AssociationDetailTable from "$lib/components/shared/detail_tables/association_detail_table.svelte"
+  import EmployeeDetailTable from "$lib/components/employee/tables/employee_detail_table.svelte"
+  import EngagementDetailTable from "$lib/components/shared/detail_tables/engagement_detail_table.svelte"
+  import ItAssociationDetailTable from "$lib/components/employee/tables/itassociation_detail_table.svelte"
+  import ItUserDetailTable from "$lib/components/shared/detail_tables/ituser_detail_table.svelte"
+  import LeavesDetailTable from "$lib/components/employee/tables/leaves_detail_table.svelte"
+  import ManagerDetailTable from "$lib/components/shared/detail_tables/manager_detail_table.svelte"
+  import RolesDetailTable from "$lib/components/shared/detail_tables/roles_detail_table.svelte"
 
   // Tabs
   enum itemCategory {
@@ -147,15 +147,15 @@
       Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
-        <AddressesDetailTable tense="future" uuid={$page.params.uuid} />
+        <AddressDetailTable tense="future" uuid={$page.params.uuid} />
       {/if}
       {#if $tenses.present}
         <h2 class="mb-4">Nutid</h2>
-        <AddressesDetailTable tense="present" uuid={$page.params.uuid} />
+        <AddressDetailTable tense="present" uuid={$page.params.uuid} />
       {/if}
       {#if $tenses.past}
         <h2 class="mb-4">Fortid</h2>
-        <AddressesDetailTable tense="past" uuid={$page.params.uuid} />
+        <AddressDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
     {:else if activeItem === itemCategory.ASSOCIATIONS}
       <!-- TODO: future and past does not work. 
@@ -177,15 +177,15 @@
       Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
-        <ITAssociationDetailTable tense="future" uuid={$page.params.uuid} />
+        <ItAssociationDetailTable tense="future" uuid={$page.params.uuid} />
       {/if}
       {#if $tenses.present}
         <h2 class="mb-4">Nutid</h2>
-        <ITAssociationDetailTable tense="present" uuid={$page.params.uuid} />
+        <ItAssociationDetailTable tense="present" uuid={$page.params.uuid} />
       {/if}
       {#if $tenses.past}
         <h2 class="mb-4">Fortid</h2>
-        <ITAssociationDetailTable tense="past" uuid={$page.params.uuid} />
+        <ItAssociationDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
     {:else if activeItem === itemCategory.ROLES}
       <!-- TODO: future and past does not work. 

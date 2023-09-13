@@ -7,15 +7,20 @@
   import { base } from "$app/paths"
   import Icon from "$lib/components/icon.svelte"
   import { date } from "$lib/stores/date"
+  import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
 
   export let uuid: string
-  // TODO: Blocked by #57396
-  // svelte-ignore unused-export-let
-  export let tense: string
+  export let tense: Tense
 
   gql`
-    query EmployeeLeaves($employee_uuid: [UUID!], $fromDate: DateTime) {
-      leaves(filter: { employees: $employee_uuid, from_date: $fromDate }) {
+    query EmployeeLeaves(
+      $employee_uuid: [UUID!]
+      $fromDate: DateTime
+      $toDate: DateTime
+    ) {
+      leaves(
+        filter: { employees: $employee_uuid, from_date: $fromDate, to_date: $toDate }
+      ) {
         objects {
           objects {
             uuid
@@ -42,35 +47,37 @@
 </script>
 
 <DetailTable headers={["Orlovstype", "Engagement", "Dato", "", ""]}>
-  {#await graphQLClient().request( EmployeeLeavesDocument, { employee_uuid: uuid, fromDate: $date } )}
+  {#await graphQLClient().request( EmployeeLeavesDocument, { employee_uuid: uuid, ...tenseToValidity(tense, $date) } )}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
   {:then data}
-    {@const leaves = data.leaves.objects}
-    {#each leaves as lve}
-      {@const leave = lve.objects[0]}
-      <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-        <td class="p-4">
-          {leave.leave_type.name}
-        </td>
-        <td class="p-4">
-          {#if leave.engagement}
-            {leave.engagement.job_function.name}, {leave.engagement.org_unit[0].name}
-          {/if}
-        </td>
-        <ValidityTableCell validity={leave.validity} />
-        <td>
-          <a aria-disabled href="{base}/employee/{uuid}/edit/leave/{leave.uuid}">
-            <Icon type="pen" />
-          </a>
-        </td>
-        <td>
-          <a href="{base}/employee/{uuid}/terminate/leave/{leave.uuid}">
-            <Icon type="xmark" size="30" />
-          </a></td
-        >
-      </tr>
+    {#each data.leaves.objects as outer}
+      <!-- TODO: Remove when GraphQL is able to do this for us -->
+      {@const filteredObjects = outer.objects.filter((obj) => tenseFilter(obj, tense))}
+      {#each filteredObjects as leave}
+        <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+          <td class="p-4">
+            {leave.leave_type.name}
+          </td>
+          <td class="p-4">
+            {#if leave.engagement}
+              {leave.engagement.job_function.name}, {leave.engagement.org_unit[0].name}
+            {/if}
+          </td>
+          <ValidityTableCell validity={leave.validity} />
+          <td>
+            <a aria-disabled href="{base}/organisation/{uuid}/edit/leave/{leave.uuid}">
+              <Icon type="pen" />
+            </a>
+          </td>
+          <td>
+            <a href="{base}/organisation/{uuid}/terminate/leave/{leave.uuid}">
+              <Icon type="xmark" size="30" />
+            </a></td
+          >
+        </tr>
+      {/each}
     {/each}
   {/await}
 </DetailTable>

@@ -8,15 +8,14 @@
   import { page } from "$app/stores"
   import Icon from "$lib/components/icon.svelte"
   import { base } from "$app/paths"
+  import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
 
   export let uuid: string
-  // TODO: Blocked by #57396
-  // svelte-ignore unused-export-let
-  export let tense: string
+  export let tense: Tense
 
   gql`
-    query Employee($uuid: [UUID!], $fromDate: DateTime) {
-      employees(filter: { uuids: $uuid, from_date: $fromDate }) {
+    query Employee($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+      employees(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
           objects {
             name
@@ -35,29 +34,34 @@
 </script>
 
 <DetailTable headers={["Navn", "Kaldenavn", "Anciennitet", "Dato", "", ""]}>
-  {#await graphQLClient().request(EmployeeDocument, { uuid: uuid, fromDate: $date })}
+  {#await graphQLClient().request( EmployeeDocument, { uuid: uuid, ...tenseToValidity(tense, $date) } )}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
   {:then data}
-    {@const employee = data.employees.objects[0].objects[0]}
-    <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-      <td class="p-4">
-        {employee.name}
-      </td>
-      <td class="p-4">{employee.nickname}</td>
-      <td class="p-4">{employee.seniority || ""}</td>
-      <ValidityTableCell validity={employee.validity} />
-      <td>
-        <a aria-disabled href="{base}/employee/{uuid}/edit">
-          <Icon type="pen" />
-        </a>
-      </td>
-      <td>
-        <a href="{base}/employee/{uuid}/terminate">
-          <Icon type="xmark" size="30" />
-        </a></td
-      >
-    </tr>
+    <!-- Den her er broken fordi employee har `OpenValidity` som betyder at både from og to er optional. -->
+    {@const filteredObjects = data.employees.objects[0].objects.filter((obj) =>
+      tenseFilter(obj, tense)
+    )}
+    {#each filteredObjects as employee}
+      <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+        <td class="p-4">
+          {employee.name}
+        </td>
+        <td class="p-4">{employee.nickname}</td>
+        <td class="p-4">{employee.seniority || ""}</td>
+        <ValidityTableCell validity={employee.validity} />
+        <td>
+          <a aria-disabled href="{base}/employee/{uuid}/edit">
+            <Icon type="pen" />
+          </a>
+        </td>
+        <td>
+          <a href="{base}/employee/{uuid}/terminate">
+            <Icon type="xmark" size="30" />
+          </a></td
+        >
+      </tr>
+    {/each}
   {/await}
 </DetailTable>
