@@ -15,28 +15,28 @@
 
   gql`
     query Leave($uuid: [UUID!], $fromDate: DateTime) {
-      leaves(uuids: $uuid, from_date: $fromDate) {
+      leaves(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          engagement {
-            uuid
-
-            validity {
-              from
-              to
-            }
-            employee {
+          objects {
+            engagement {
               uuid
-              name
+              validity {
+                from
+                to
+              }
+              person {
+                uuid
+                name
+              }
             }
           }
         }
       }
     }
-
     mutation TerminateLeave($input: LeaveTerminateInput!) {
       leave_terminate(input: $input) {
         objects {
-          employee {
+          person {
             name
           }
         }
@@ -53,7 +53,7 @@
             input: result.data,
           })
           $success = {
-            message: `Afsluttede orlov for ${mutation.leave_terminate.objects[0].employee[0].name} `,
+            message: `Afsluttede orlov for ${mutation.leave_terminate.objects[0].person[0].name} `,
             uuid: $page.params.uuid,
             type: "employee",
           }
@@ -69,10 +69,10 @@
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const leave = data.leaves[0].objects[0]}
-  {@const minDate = leave.validity.from.split("T")[0]}
-  {@const maxDate = leave.validity?.to?.split("T")[0]}
-  {@const employeeName = leave.employee[0].name}
+  {@const leave = data.leaves.objects[0].objects[0]}
+  {@const minDate = leave.engagement.validity.from.split("T")[0]}
+  {@const maxDate = leave.engagement.validity?.to?.split("T")[0]}
+  {@const employeeName = leave.engagement.person[0].name}
 
   <title>Afslut orlov for {employeeName} | OS2mo</title>
 
