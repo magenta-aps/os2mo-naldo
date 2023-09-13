@@ -3,66 +3,59 @@
   import Error from "$lib/components/alerts/error.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
-  import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
-  import { EngagementDocument, TerminateEngagementDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
+  import { LeaveDocument, TerminateLeaveDocument } from "./query.generated"
 
   let toDate: string
 
   gql`
-    query Engagement($uuid: [UUID!], $fromDate: DateTime!) {
-      engagements(filter: { uuids: $uuid, from_date: $fromDate }) {
+    query Leave($uuid: [UUID!], $fromDate: DateTime) {
+      leaves(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
           objects {
-            uuid
-            employee {
+            engagement {
               uuid
-              name
-            }
-            validity {
-              from
-              to
-            }
-            org_unit {
               validity {
                 from
                 to
+              }
+              person {
+                uuid
+                name
               }
             }
           }
         }
       }
     }
-
-    mutation TerminateEngagement($input: EngagementTerminateInput!) {
-      engagement_terminate(input: $input) {
+    mutation TerminateLeave($input: LeaveTerminateInput!) {
+      leave_terminate(input: $input) {
         objects {
-          uuid
-          employee {
+          person {
             name
           }
         }
       }
     }
   `
+
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
       if (result.type === "success" && result.data) {
         try {
-          const mutation = await graphQLClient().request(TerminateEngagementDocument, {
+          const mutation = await graphQLClient().request(TerminateLeaveDocument, {
             input: result.data,
           })
-
           $success = {
-            message: `${mutation.engagement_terminate.objects[0].employee[0].name} afsluttes d. ${toDate}`,
+            message: `Afsluttede orlov for ${mutation.leave_terminate.objects[0].person[0].name} `,
             uuid: $page.params.uuid,
-            type: "employee"
+            type: "employee",
           }
         } catch (err) {
           console.error(err)
@@ -72,18 +65,19 @@
     }
 </script>
 
-{#await graphQLClient().request( EngagementDocument, { uuid: $page.params.engagement, fromDate: $date } )}
+{#await graphQLClient().request( LeaveDocument, { uuid: $page.params.leave, fromDate: $date } )}
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
-  {@const engagement = data.engagements.objects[0].objects[0]}
-  {@const minDate = engagement.org_unit[0].validity.from.split("T")[0]}
-  {@const maxDate = engagement.org_unit[0].validity.to?.split("T")[0]}
+  {@const leave = data.leaves.objects[0].objects[0]}
+  {@const minDate = leave.engagement.validity.from.split("T")[0]}
+  {@const maxDate = leave.engagement.validity?.to?.split("T")[0]}
+  {@const employeeName = leave.engagement.person[0].name}
 
-  <title>Afslut engagement for {engagement?.employee[0].name} | OS2mo</title>
+  <title>Afslut orlov for {employeeName} | OS2mo</title>
 
   <div class="flex align-center px-6 pt-6 pb-4">
-    <h3 class="flex-1">Afslut engagement for {engagement?.employee[0].name}</h3>
+    <h3 class="flex-1">Afslut orlov for {employeeName}</h3>
   </div>
 
   <div class="divider p-0 m-0 mb-4 w-full" />
@@ -105,8 +99,8 @@
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >Afslut engagement</button
-      >
+        >Afslut orlov
+      </button>
       <a
         href={`${base}/employee/${$page.params.uuid}`}
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
