@@ -61,12 +61,12 @@
         </td>
         <ValidityTableCell validity={leave.validity} />
         <td>
-          <a aria-disabled href="{base}/organisation/{uuid}/edit/leave/{leave.uuid}">
+          <a aria-disabled href="{base}/employee/{uuid}/edit/leave/{leave.uuid}">
             <Icon type="pen" />
           </a>
         </td>
         <td>
-          <a href="{base}/organisation/{uuid}/terminate/leave/{leave.uuid}">
+          <a href="{base}/employee/{uuid}/terminate/leave/{leave.uuid}">
             <Icon type="xmark" size="30" />
           </a></td
         >
