@@ -66,7 +66,7 @@ export const load: PageLoad = async (event) => {
       `
 
   const token = keycloak ? keycloak.token : "Keycloak disabled"
-  const res = await event.fetch(`${env.PUBLIC_BASE_URL}/graphql/v2`, {
+  const res = await event.fetch(`${env.PUBLIC_BASE_URL}/graphql/v14`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

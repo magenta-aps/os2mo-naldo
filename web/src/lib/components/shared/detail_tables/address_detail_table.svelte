@@ -3,12 +3,13 @@
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
   import Icon from "$lib/components/icon.svelte"
   import { base } from "$app/paths"
+  import { env } from "$env/dynamic/public"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
+  import { tenseToValidity, tenseFilter } from "$lib/util/helpers"
   import { page } from "$app/stores"
-  import { ItUsersDocument } from "./query.generated"
   import { date } from "$lib/stores/date"
-  import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
+  import { AddressDocument } from "./query.generated"
 
   export let uuid: string
   export let tense: Tense
@@ -16,37 +17,36 @@
   const isOrg = $page.route.id?.startsWith("/organisation")
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
-  const headers = ["IT system", "Kontonavn", "Primær", "Dato", "", ""]
+  const headers = ["Adressetype", "Adresse", "Synlighed", "Dato", "", ""]
 
   gql`
-    query ITUsers(
-      $employee: [UUID!]
+    query Address(
       $org_unit: [UUID!]
+      $employee: [UUID!]
       $fromDate: DateTime
       $toDate: DateTime
     ) {
-      itusers(
+      addresses(
         filter: {
-          employees: $employee
           org_units: $org_unit
+          employees: $employee
           from_date: $fromDate
           to_date: $toDate
         }
       ) {
         objects {
           objects {
-            user_key
+            name
             uuid
-            itsystem {
+            address_type {
+              name
+            }
+            visibility {
               name
             }
             validity {
               from
               to
-            }
-            primary {
-              uuid
-              name
             }
           }
         }
@@ -55,37 +55,45 @@
   `
 </script>
 
-<DetailTable {headers}>
-  {#await graphQLClient().request( ItUsersDocument, { org_unit: org_unit, employee: employee, ...tenseToValidity(tense, $date) } )}
+<DetailTable headers={["Adressetype", "Adresse", "Synlighed", "Dato", "", ""]}>
+  {#await graphQLClient().request( AddressDocument, { org_unit: org_unit, employee: employee, ...tenseToValidity(tense, $date) } )}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
   {:then data}
-    {#each data.itusers.objects as outer}
+    {#each data.addresses.objects as outer}
       <!-- TODO: Remove when GraphQL is able to do this for us -->
       {@const filteredObjects = outer.objects.filter((obj) => tenseFilter(obj, tense))}
-      {#each filteredObjects as ituser}
+      {#each filteredObjects as address}
         <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-          <td class="p-4">{ituser.itsystem.name}</td>
-          <td class="p-4">{ituser.user_key}</td>
-          <td class="p-4">{ituser.primary ? ituser.primary.name : ""}</td>
-          <ValidityTableCell validity={ituser.validity} />
-          <td>
-            <a
-              href="{base}/{$page.route.id?.split('/')[1]}/{uuid}/edit/it/{ituser.uuid}"
-            >
-              <Icon type="pen" />
-            </a>
-          </td>
+          <td class="p-4">{address.address_type.name}</td>
+          <td class="p-4">{address.name}</td>
+          <td class="p-4"
+            >{address.visibility ? address.visibility.name : "Ikke sat"}</td
+          >
+          <ValidityTableCell validity={address.validity} />
           <td>
             <a
               href="{base}/{$page.route.id?.split(
                 '/'
-              )[1]}/{uuid}/terminate/it/{ituser.uuid}"
+              )[1]}/{uuid}/edit/address/{address.uuid}"
             >
-              <Icon type="xmark" size="30" />
+              <Icon type="pen" />
             </a>
           </td>
+
+          {#if env.PUBLIC_ENABLE_UNIT_TERMINATE === "true"}
+            <td>
+              <a
+                href="{base}/{$page.route.id?.split(
+                  '/'
+                )[1]}/{uuid}/terminate/address/{address.uuid}"
+                class="hover:slate-300"
+              >
+                <Icon type="xmark" size="30" />
+              </a>
+            </td>
+          {/if}
         </tr>
       {/each}
     {/each}

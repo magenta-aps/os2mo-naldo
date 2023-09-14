@@ -8,11 +8,10 @@
   import { EmployeeAndOrgRolesDocument } from "./query.generated"
   import Icon from "$lib/components/icon.svelte"
   import { date } from "$lib/stores/date"
+  import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
 
   export let uuid: string
-  // TODO: Blocked by #57396
-  // svelte-ignore unused-export-let
-  export let tense: string
+  export let tense: Tense
 
   const isOrg = $page.route.id?.startsWith("/organisation")
   const employee = isOrg ? null : uuid
@@ -26,12 +25,14 @@
       $employee_uuid: [UUID!]
       $org_uuid: [UUID!]
       $fromDate: DateTime
+      $toDate: DateTime
     ) {
       roles(
         filter: {
           employees: $employee_uuid
           org_units: $org_uuid
           from_date: $fromDate
+          to_date: $toDate
         }
       ) {
         objects {
@@ -60,43 +61,43 @@
 </script>
 
 <DetailTable {headers}>
-  {#await graphQLClient().request( EmployeeAndOrgRolesDocument, { org_uuid: org_unit, employee_uuid: employee, fromDate: $date } )}
+  {#await graphQLClient().request( EmployeeAndOrgRolesDocument, { org_uuid: org_unit, employee_uuid: employee, ...tenseToValidity(tense, $date) } )}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
   {:then data}
-    {@const roles = data.roles.objects}
-    {#each roles as role}
-      <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-        {#if isOrg}
-          <a href="{base}/employee/{role.objects[0].employee[0].uuid}">
-            <td class="p-4">{role.objects[0].employee[0].name}</td>
-          </a>
-          <td class="p-4">{role.objects[0].role_type.name}</td>
-          <ValidityTableCell validity={role.objects[0].validity} />
-        {:else}
-          <a href="{base}/organisation/{role.objects[0].org_unit[0].uuid}">
-            <td class="p-4">
-              {role.objects[0].org_unit[0].name}
-            </td>
-          </a>
-          <td class="p-4">{role.objects[0].role_type.name}</td>
-          <ValidityTableCell validity={role.objects[0].validity} />
-          <td>
-            <a
-              aria-disabled
-              href="{base}/employee/{uuid}/edit/role/{role.objects[0].uuid}"
-            >
-              <Icon type="pen" />
+    {#each data.roles.objects as outer}
+      <!-- TODO: Remove when GraphQL is able to do this for us -->
+      {@const filteredObjects = outer.objects.filter((obj) => tenseFilter(obj, tense))}
+      {#each filteredObjects as role}
+        <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+          {#if isOrg}
+            <a href="{base}/employee/{role.employee[0].uuid}">
+              <td class="p-4">{role.employee[0].name}</td>
             </a>
-          </td>
-          <td>
-            <a href="{base}/employee/{uuid}/terminate/role/{role.objects[0].uuid}">
-              <Icon type="xmark" size="30" />
-            </a></td
-          >
-        {/if}
-      </tr>
+            <td class="p-4">{role.role_type.name}</td>
+            <ValidityTableCell validity={role.validity} />
+          {:else}
+            <a href="{base}/organisation/{role.org_unit[0].uuid}">
+              <td class="p-4">
+                {role.org_unit[0].name}
+              </td>
+            </a>
+            <td class="p-4">{role.role_type.name}</td>
+            <ValidityTableCell validity={role.validity} />
+            <td>
+              <a aria-disabled href="{base}/employee/{uuid}/edit/role/{role.uuid}">
+                <Icon type="pen" />
+              </a>
+            </td>
+            <td>
+              <a href="{base}/employee/{uuid}/terminate/role/{role.uuid}">
+                <Icon type="xmark" size="30" />
+              </a></td
+            >
+          {/if}
+        </tr>
+      {/each}
     {/each}
   {/await}
 </DetailTable>

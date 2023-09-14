@@ -1,63 +1,51 @@
 <script lang="ts">
   import Tabs from "$lib/components/shared/tabs.svelte"
-  import { activeEmployeeTab } from "$lib/stores/tab"
+  import { EmployeeTab, activeEmployeeTab } from "$lib/stores/tab"
   import HeadTitle from "$lib/components/shared/head_title.svelte"
   import { page } from "$app/stores"
   import { gql } from "graphql-request"
   import { graphQLClient } from "$lib/util/http"
   import { EmployeeDocument } from "./query.generated"
-  import EmployeeDetailTable from "$lib/components/employee/tables/employee_detail_table.svelte"
-  import ITAssociationDetailTable from "$lib/components/employee/tables/itassociation_detail_table.svelte"
-  import EngagementDetailTable from "$lib/components/shared/detail_tables/engagement_detail_table.svelte"
-  import ItUserDetailTable from "$lib/components/shared/detail_tables/ituser_detail_table.svelte"
-  import AssociationDetailTable from "$lib/components/shared/detail_tables/association_detail_table.svelte"
-  import ManagerDetailTable from "$lib/components/shared/detail_tables/manager_detail_table.svelte"
-  import AddressesDetailTable from "$lib/components/employee/tables/addresses_detail_table.svelte"
-  import RolesDetailTable from "$lib/components/shared/detail_tables/roles_detail_table.svelte"
-  import LeavesDetailTable from "$lib/components/employee/tables/leaves_detail_table.svelte"
   import TenseTabs from "$lib/components/shared/tense_tabs.svelte"
   import { tenses } from "$lib/stores/tenses"
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
+  import AddressDetailTable from "$lib/components/shared/detail_tables/address_detail_table.svelte"
+  import AssociationDetailTable from "$lib/components/shared/detail_tables/association_detail_table.svelte"
+  import EmployeeDetailTable from "$lib/components/employee/tables/employee_detail_table.svelte"
+  import EngagementDetailTable from "$lib/components/shared/detail_tables/engagement_detail_table.svelte"
+  import ItAssociationDetailTable from "$lib/components/employee/tables/itassociation_detail_table.svelte"
+  import ItUserDetailTable from "$lib/components/shared/detail_tables/ituser_detail_table.svelte"
+  import LeavesDetailTable from "$lib/components/employee/tables/leaves_detail_table.svelte"
+  import ManagerDetailTable from "$lib/components/shared/detail_tables/manager_detail_table.svelte"
+  import RolesDetailTable from "$lib/components/shared/detail_tables/roles_detail_table.svelte"
 
   // Tabs
-  enum itemCategory {
-    EMPLOYEE = "Medarbejder",
-    ENGAGEMENTS = "Engagementer",
-    ADDRESSES = "Adresser",
-    ASSOCIATIONS = "Tilknytninger",
-    ITASSOCIATIONS = "IT-Tilknytninger",
-    ROLES = "Roller",
-    IT = "IT",
-    LEAVE = "Orlov",
-    MANAGER = "Ledere",
-  }
+  let items = Object.values(EmployeeTab)
 
-  let items = Object.values(itemCategory)
-
-  let activeItem: string = $activeEmployeeTab
+  let activeItem = $activeEmployeeTab
   const tabChange = (e: CustomEvent) => ($activeEmployeeTab = activeItem = e.detail)
 
   // Used to make a dynamic create button
-  const subsiteOfCategory = (category: string) => {
+  const subsiteOfCategory = (category: EmployeeTab) => {
     switch (category) {
-      case itemCategory.EMPLOYEE:
+      case EmployeeTab.EMPLOYEE:
         return "employee"
-      case itemCategory.ENGAGEMENTS:
+      case EmployeeTab.ENGAGEMENT:
         return "engagement"
-      case itemCategory.ADDRESSES:
+      case EmployeeTab.ADDRESS:
         return "address"
-      case itemCategory.ASSOCIATIONS:
+      case EmployeeTab.ASSOCIATION:
         return "association"
-      case itemCategory.ITASSOCIATIONS:
+      case EmployeeTab.ITASSOCIATION:
         return "itassociation"
-      case itemCategory.ROLES:
+      case EmployeeTab.ROLE:
         return "role"
-      case itemCategory.IT:
+      case EmployeeTab.IT:
         return "it"
-      case itemCategory.LEAVE:
+      case EmployeeTab.LEAVE:
         return "leave"
-      case itemCategory.MANAGER:
+      case EmployeeTab.MANAGER:
         return "manager"
       default:
         console.warn("The tab doesn't match a subsite")
@@ -99,7 +87,7 @@
 
     <div class="flex justify-between">
       <TenseTabs />
-      {#if activeItem !== itemCategory.EMPLOYEE}
+      {#if activeItem !== EmployeeTab.EMPLOYEE}
         <a
           class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
           href={`${base}/employee/${$page.params.uuid}/create/${subsiteOfCategory(
@@ -112,7 +100,7 @@
     </div>
 
     <!-- TODO: Implement past present future for employees -->
-    {#if activeItem === itemCategory.EMPLOYEE}
+    {#if activeItem === EmployeeTab.EMPLOYEE}
       <!-- TODO: future and past does not work. 
       Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
@@ -127,7 +115,7 @@
         <h2 class="mb-4">Fortid</h2>
         <EmployeeDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
-    {:else if activeItem === itemCategory.ENGAGEMENTS}
+    {:else if activeItem === EmployeeTab.ENGAGEMENT}
       <!-- TODO: future and past does not work. 
       Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
@@ -142,22 +130,22 @@
         <h2 class="mb-4">Fortid</h2>
         <EngagementDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
-    {:else if activeItem === itemCategory.ADDRESSES}
+    {:else if activeItem === EmployeeTab.ADDRESS}
       <!-- TODO: future and past does not work. 
       Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
-        <AddressesDetailTable tense="future" uuid={$page.params.uuid} />
+        <AddressDetailTable tense="future" uuid={$page.params.uuid} />
       {/if}
       {#if $tenses.present}
         <h2 class="mb-4">Nutid</h2>
-        <AddressesDetailTable tense="present" uuid={$page.params.uuid} />
+        <AddressDetailTable tense="present" uuid={$page.params.uuid} />
       {/if}
       {#if $tenses.past}
         <h2 class="mb-4">Fortid</h2>
-        <AddressesDetailTable tense="past" uuid={$page.params.uuid} />
+        <AddressDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
-    {:else if activeItem === itemCategory.ASSOCIATIONS}
+    {:else if activeItem === EmployeeTab.ASSOCIATION}
       <!-- TODO: future and past does not work. 
       Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
@@ -172,22 +160,22 @@
         <h2 class="mb-4">Fortid</h2>
         <AssociationDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
-    {:else if activeItem === itemCategory.ITASSOCIATIONS}
+    {:else if activeItem === EmployeeTab.ITASSOCIATION}
       <!-- TODO: future and past does not work. 
       Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
-        <ITAssociationDetailTable tense="future" uuid={$page.params.uuid} />
+        <ItAssociationDetailTable tense="future" uuid={$page.params.uuid} />
       {/if}
       {#if $tenses.present}
         <h2 class="mb-4">Nutid</h2>
-        <ITAssociationDetailTable tense="present" uuid={$page.params.uuid} />
+        <ItAssociationDetailTable tense="present" uuid={$page.params.uuid} />
       {/if}
       {#if $tenses.past}
         <h2 class="mb-4">Fortid</h2>
-        <ITAssociationDetailTable tense="past" uuid={$page.params.uuid} />
+        <ItAssociationDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
-    {:else if activeItem === itemCategory.ROLES}
+    {:else if activeItem === EmployeeTab.ROLE}
       <!-- TODO: future and past does not work. 
       Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
@@ -202,7 +190,7 @@
         <h2 class="mb-4">Fortid</h2>
         <RolesDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
-    {:else if activeItem === itemCategory.IT}
+    {:else if activeItem === EmployeeTab.IT}
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
         <ItUserDetailTable tense="future" uuid={$page.params.uuid} />
@@ -215,7 +203,7 @@
         <h2 class="mb-4">Fortid</h2>
         <ItUserDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
-    {:else if activeItem === itemCategory.LEAVE}
+    {:else if activeItem === EmployeeTab.LEAVE}
       <!-- TODO: future and past does not work. 
       Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
@@ -230,7 +218,7 @@
         <h2 class="mb-4">Fortid</h2>
         <LeavesDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
-    {:else if activeItem === itemCategory.MANAGER}
+    {:else if activeItem === EmployeeTab.MANAGER}
       <!-- TODO: future and past does not work. 
       Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}

@@ -8,3 +8,5 @@ interface Autocomplete {
   }[]
   path?: string[]
 }
+
+type Tense = "past" | "present" | "future"
