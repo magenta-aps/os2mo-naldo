@@ -3,7 +3,7 @@
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import SearchItem from "./search_item.svelte"
-  import { fetchRest } from "$lib/util/http"
+  import { fetchInternal } from "$lib/util/http"
   import { date } from "$lib/stores/date"
   import { globalNavigation } from "$lib/stores/navigation"
 
@@ -26,7 +26,7 @@
     if (!filterText.length) return []
     if (filterText.length < 4) return []
 
-    const res = await fetchRest(url + filterText + "&at=" + $date)
+    const res = await fetchInternal(url + filterText + "&at=" + $date)
     const json = await res.json()
     json.items.sort((a: any, b: any) => (a.name > b.name ? 1 : -1))
     return json.items
@@ -63,7 +63,6 @@
     --border-focused="solid 0px"
     --padding="0 0 0 0.75rem"
     id="autocomplete"
-    listAutoWidth={false}
     loadOptions={fetchAutocomplete}
     {floatingConfig}
     {required}
