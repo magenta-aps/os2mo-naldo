@@ -5,8 +5,6 @@
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import { enhance } from "$app/forms"
-  import { goto } from "$app/navigation"
-  import { base } from "$app/paths"
   import type { PageData } from "./$types"
 
   export let data: PageData

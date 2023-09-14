@@ -9,9 +9,6 @@
   import { date } from "$lib/stores/date"
 
   export let uuid: string
-  // TODO: Blocked by #57396
-  // svelte-ignore unused-export-let
-  export let tense: string
 
   gql`
     query RelatedUnits($org_unit: [UUID!], $fromDate: DateTime) {
@@ -33,8 +30,6 @@
   `
 </script>
 
-<!-- 2x related unit seems confusing, idk if we can get away with just having
-    1 field for the related unit. But if we have to have both, I think we should rename them -->
 <DetailTable headers={["Relateret enhed", "Dato"]}>
   {#await graphQLClient().request( RelatedUnitsDocument, { org_unit: uuid, fromDate: $date } )}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
