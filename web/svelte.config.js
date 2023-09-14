@@ -18,6 +18,9 @@ const config = {
       assets: isDev ? "static" : "static/new",
     },
   },
+  vitePlugin: {
+    inspector: true,
+  },
 }
 
 export default config
