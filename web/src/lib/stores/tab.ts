@@ -1,4 +1,29 @@
 import { writable } from "svelte/store"
 
-export const activeOrgTab = writable("Enhed")
-export const activeEmployeeTab = writable("Medarbejder")
+export enum OrgTab {
+  ORG_UNIT = "Enhed",
+  ADDRESS = "Adresser",
+  ENGAGEMENT = "Engagementer",
+  ASSOCIATION = "Tilknytninger",
+  IT = "IT",
+  ROLE = "Roller",
+  MANAGER = "Ledere",
+  KLE = "KLE-opmærkninger",
+  RELATED_UNIT = "Relateret",
+}
+
+export const activeOrgTab = writable(OrgTab.ORG_UNIT)
+
+export enum EmployeeTab {
+  EMPLOYEE = "Medarbejder",
+  ENGAGEMENT = "Engagementer",
+  ADDRESS = "Adresser",
+  ASSOCIATION = "Tilknytninger",
+  ITASSOCIATION = "IT-Tilknytninger",
+  ROLE = "Roller",
+  IT = "IT",
+  LEAVE = "Orlov",
+  MANAGER = "Ledere",
+}
+
+export const activeEmployeeTab = writable(EmployeeTab.EMPLOYEE)

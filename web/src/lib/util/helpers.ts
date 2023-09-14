@@ -1,4 +1,4 @@
-import type { Validity } from "$lib/graphql/types"
+import type { OpenValidity, Validity } from "$lib/graphql/types"
 import { date } from "$lib/stores/date"
 import { get } from "svelte/store"
 
@@ -16,7 +16,10 @@ export const tenseToValidity = (
   }
 }
 
-export const tenseFilter = (obj: { validity: Validity }, tense: Tense) => {
+export const tenseFilter = (
+  obj: { validity: Validity | OpenValidity },
+  tense: Tense
+) => {
   const globalDate = get(date)
   switch (tense) {
     case "past":

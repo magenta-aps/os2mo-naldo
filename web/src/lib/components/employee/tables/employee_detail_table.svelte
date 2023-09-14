@@ -39,7 +39,6 @@
       <td class="p-4">Henter data...</td>
     </tr>
   {:then data}
-    <!-- Den her er broken fordi employee har `OpenValidity` som betyder at både from og to er optional. -->
     {@const filteredObjects = data.employees.objects[0].objects.filter((obj) =>
       tenseFilter(obj, tense)
     )}

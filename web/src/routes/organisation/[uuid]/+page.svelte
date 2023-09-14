@@ -4,7 +4,7 @@
   import HeadTitle from "$lib/components/shared/head_title.svelte"
   import CopyToClipboard from "$lib/components/copy_to_clipboard.svelte"
   import TenseTabs from "$lib/components/shared/tense_tabs.svelte"
-  import { activeOrgTab } from "$lib/stores/tab"
+  import { OrgTab, activeOrgTab } from "$lib/stores/tab"
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
   import { gql } from "graphql-request"
@@ -22,46 +22,31 @@
   import { OrgUnitDocument } from "./query.generated"
 
   // Tabs
-  // Nogle af de her tabs er lidt sus med endelser. Maybe fix, ville bare ikke blande ALT for meget..
-  // Det gælder også employee
+  let items = Object.values(OrgTab)
 
-  enum itemCategory {
-    ORG_UNIT = "Enhed",
-    ADDRESSES = "Adresser",
-    ENGAGEMENTS = "Engagementer",
-    ASSOCIATIONS = "Tilknytninger",
-    IT = "IT",
-    ROLES = "Roller",
-    MANAGER = "Ledere",
-    KLE = "KLE-opmærkninger",
-    RELATED_UNITS = "Relateret",
-  }
-
-  let items = Object.values(itemCategory)
-
-  let activeItem: string = $activeOrgTab
+  let activeItem = $activeOrgTab
   const tabChange = (e: CustomEvent) => ($activeOrgTab = activeItem = e.detail)
 
   // Used to make a dynamic create button
-  const subsiteOfCategory = (category: string) => {
+  const subsiteOfCategory = (category: OrgTab) => {
     switch (category) {
-      case itemCategory.ORG_UNIT:
+      case OrgTab.ORG_UNIT:
         return "org_unit"
-      case itemCategory.ADDRESSES:
+      case OrgTab.ADDRESS:
         return "address"
-      case itemCategory.ENGAGEMENTS:
+      case OrgTab.ENGAGEMENT:
         return "engagement"
-      case itemCategory.ASSOCIATIONS:
+      case OrgTab.ASSOCIATION:
         return "association"
-      case itemCategory.IT:
+      case OrgTab.IT:
         return "it"
-      case itemCategory.ROLES:
+      case OrgTab.ROLE:
         return "role"
-      case itemCategory.MANAGER:
+      case OrgTab.MANAGER:
         return "manager"
-      case itemCategory.KLE:
+      case OrgTab.KLE:
         return "kle"
-      case itemCategory.RELATED_UNITS:
+      case OrgTab.RELATED_UNIT:
         return "related_units"
       default:
         console.warn("The tab doesn't match a subsite")
@@ -100,8 +85,8 @@
 
     <div class="flex justify-between">
       <TenseTabs />
-      <!-- FIXME: I don't know how to do `if activeItem !== (itemCategory.ORG_UNIT || itemCategory.ENGAGEMENTS || etc.)  -->
-      {#if activeItem !== itemCategory.ENGAGEMENTS}
+      <!-- We wont show the create button on these tabs -->
+      {#if ![OrgTab.ENGAGEMENT, OrgTab.ROLE, OrgTab.RELATED_UNIT].includes(activeItem)}
         <a
           class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
           href={`${base}/organisation/${$page.params.uuid}/create/${subsiteOfCategory(
@@ -113,7 +98,7 @@
       {/if}
     </div>
 
-    {#if activeItem === itemCategory.ORG_UNIT}
+    {#if activeItem === OrgTab.ORG_UNIT}
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
         <OrgUnitDetailTable tense="future" uuid={$page.params.uuid} />
@@ -126,7 +111,7 @@
         <h2 class="mb-4">Fortid</h2>
         <OrgUnitDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
-    {:else if activeItem === itemCategory.ADDRESSES}
+    {:else if activeItem === OrgTab.ADDRESS}
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
         <AddressDetailTable tense="future" uuid={$page.params.uuid} />
@@ -139,7 +124,7 @@
         <h2 class="mb-4">Fortid</h2>
         <AddressDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
-    {:else if activeItem === itemCategory.ENGAGEMENTS}
+    {:else if activeItem === OrgTab.ENGAGEMENT}
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
         <EngagementDetailTable tense="future" uuid={$page.params.uuid} />
@@ -152,7 +137,7 @@
         <h2 class="mb-4">Fortid</h2>
         <EngagementDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
-    {:else if activeItem === itemCategory.ASSOCIATIONS}
+    {:else if activeItem === OrgTab.ASSOCIATION}
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
         <AssociationDetailTable tense="future" uuid={$page.params.uuid} />
@@ -165,7 +150,7 @@
         <h2 class="mb-4">Fortid</h2>
         <AssociationDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
-    {:else if activeItem === itemCategory.IT}
+    {:else if activeItem === OrgTab.IT}
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
         <ItUserDetailTable tense="future" uuid={$page.params.uuid} />
@@ -178,7 +163,7 @@
         <h2 class="mb-4">Fortid</h2>
         <ItUserDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
-    {:else if activeItem === itemCategory.ROLES}
+    {:else if activeItem === OrgTab.ROLE}
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
         <RolesDetailTable tense="future" uuid={$page.params.uuid} />
@@ -191,7 +176,7 @@
         <h2 class="mb-4">Fortid</h2>
         <RolesDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
-    {:else if activeItem === itemCategory.MANAGER}
+    {:else if activeItem === OrgTab.MANAGER}
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
         <ManagerDetailTable tense="future" uuid={$page.params.uuid} />
@@ -204,7 +189,7 @@
         <h2 class="mb-4">Fortid</h2>
         <ManagerDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
-    {:else if activeItem === itemCategory.KLE}
+    {:else if activeItem === OrgTab.KLE}
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
         <KleDetailTable tense="future" uuid={$page.params.uuid} />
@@ -217,7 +202,7 @@
         <h2 class="mb-4">Fortid</h2>
         <KleDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
-    {:else if activeItem === itemCategory.RELATED_UNITS}
+    {:else if activeItem === OrgTab.RELATED_UNIT}
       {#if $tenses.present}
         <h2 class="my-4">Nutid</h2>
         <RelatedUnitsDetailTable uuid={$page.params.uuid} />
