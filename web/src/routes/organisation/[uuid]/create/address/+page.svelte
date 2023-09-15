@@ -14,6 +14,7 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import type { SubmitFunction } from "./$types"
+  import DarSearch from "$lib/components/DARSearch.svelte"
 
   let fromDate: string
   let toDate: string
@@ -82,7 +83,6 @@
   Henter data...
 {:then data}
   {@const facets = data.facets.objects}
-  {console.log(facets)}
   {@const minDate = data.org_units.objects[0].objects[0].validity?.from.split("T")[0]}
   {@const maxDate = data.org_units.objects[0].objects[0].validity?.to?.split("T")[0]}
 
@@ -153,7 +153,7 @@
           {:else if addressType.name == "P-nummer"}
             <Input title="P-nummer" id="value" bind:value={input} required={true} />
           {:else if addressType.name == "Postadresse"}
-            <Input title="Postadresse" id="value" bind:value={input} required={true} />
+            <DarSearch title="Postadresse" />
           {:else if addressType.name == "Webadresse"}
             <Input
               title="Weabdresse"
@@ -175,14 +175,9 @@
           {:else if addressType.name == "Fax"}
             <Input title="Fax" id="value" bind:value={input} required={true} />
           {:else if addressType.name == "Returadresse"}
-            <Input title="Returadresse" id="value" bind:value={input} required={true} />
+            <DarSearch title="Returadresse" />
           {:else if addressType.name == "Henvendelsessted"}
-            <Input
-              title="Henvendelsessted"
-              id="value"
-              bind:value={input}
-              required={true}
-            />
+            <DarSearch title="Henvendelsessted" />
           {:else if addressType.name == "Telefon"}
             <Input
               title="Telefon"

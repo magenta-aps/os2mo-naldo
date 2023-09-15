@@ -9,4 +9,15 @@ interface Autocomplete {
   path?: string[]
 }
 
+interface DarAddressResponse {
+  tekst: string | null | undefined
+  adresse: {
+    id: string
+  }
+  adgangsadresse: {
+    id: string
+  }
+}
+;[]
+
 type Tense = "past" | "present" | "future"

@@ -14,6 +14,7 @@
   import { date } from "$lib/stores/date"
   import type { SubmitFunction } from "./$types"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import DarSearch from "$lib/components/DARSearch.svelte"
 
   let fromDate: string
   let toDate: string
@@ -46,11 +47,12 @@
         objects {
           objects {
             uuid
+            value
+            name
             address_type {
               name
               uuid
             }
-            name
             visibility {
               name
             }
@@ -195,12 +197,13 @@
             />
           {:else if addressType.name == "Postadresse"}
             <!-- TODO: DAR input field? -->
-            <Input
+            <DarSearch
               title="Postadresse"
-              id="value"
-              bind:value={input}
-              required={true}
-              startValue={address.name}
+              startValue={{
+                tekst: address.name,
+                adresse: { id: address.value },
+                adgangsadresse: { id: address.value },
+              }}
             />
           {:else if addressType.name == "Webadresse"}
             <Input
@@ -255,21 +258,23 @@
             />
           {:else if addressType.name == "Returadresse"}
             <!-- TODO: DAR input field? -->
-            <Input
+            <DarSearch
               title="Returadresse"
-              id="value"
-              bind:value={input}
-              startValue={address.name}
-              required={true}
+              startValue={{
+                tekst: address.name,
+                adresse: { id: address.value },
+                adgangsadresse: { id: address.value },
+              }}
             />
           {:else if addressType.name == "Henvendelsessted"}
             <!-- TODO: DAR input field? -->
-            <Input
+            <DarSearch
               title="Henvendelsessted"
-              id="value"
-              bind:value={input}
-              startValue={address.name}
-              required={true}
+              startValue={{
+                tekst: address.name,
+                adresse: { id: address.value },
+                adgangsadresse: { id: address.value },
+              }}
             />
           {:else if addressType.name == "Telefon"}
             <Input
