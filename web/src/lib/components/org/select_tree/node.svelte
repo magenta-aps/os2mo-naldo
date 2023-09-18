@@ -15,7 +15,7 @@
 
   const fetchChildren = async () => {
     gql`
-      query OrgChildren($uuid: [UUID!], $from_date: DateTime!) {
+      query OrgChildren($uuid: [UUID!], $fromDate: DateTime) {
         org_units(filter: { uuids: $uuid, from_date: $fromDate }) {
           objects {
             objects {
@@ -30,7 +30,7 @@
     `
     const data = await graphQLClient().request(OrgChildrenDocument, {
       uuid: uuid,
-      from_date: fromDate,
+      fromDate: fromDate,
     })
     if (data.org_units) {
       return data.org_units.objects[0].objects[0].children
