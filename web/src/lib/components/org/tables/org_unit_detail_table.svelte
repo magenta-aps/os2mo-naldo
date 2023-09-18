@@ -71,7 +71,7 @@
           {/if}
           <ValidityTableCell validity={org_unit.validity} />
           <td>
-            <a href="{base}/organisation/{$page.params.uuid}/edit/unit">
+            <a href="{base}/organisation/{$page.params.uuid}/edit">
               <Icon type="pen" />
             </a>
           </td>

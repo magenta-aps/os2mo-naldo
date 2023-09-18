@@ -16,8 +16,8 @@
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
 
-  let startDate = new Date().toISOString().split("T")[0]
-  let endDate: string
+  let fromDate: string
+  let toDate: string
   let name: string
   let orgLevel: string
   let orgType: string
@@ -46,6 +46,10 @@
             parent {
               uuid
               name
+              validity {
+                from
+                to
+              }
             }
             unit_type {
               name
@@ -99,6 +103,8 @@
 {:then data}
   {@const org_unit = data.org_units.objects[0].objects[0]}
   {@const facets = data.facets.objects}
+  {@const minDate = org_unit.parent?.validity.from.split("T")[0]}
+  {@const maxDate = org_unit.parent?.validity.to?.split("T")[0]}
 
   <title>Rediger {org_unit.name} | OS2mo</title>
 
@@ -113,23 +119,22 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            bind:value={startDate}
+            bind:value={fromDate}
             startValue={$date}
             title="Startdato"
-            id="start-date"
-            max={endDate
-              ? endDate
-              : new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
+            id="from"
+            min={minDate}
+            max={maxDate ? maxDate : null}
           />
           <DateInput
-            bind:value={endDate}
+            bind:value={toDate}
             title="Slutdato"
             startValue={org_unit.validity.to
               ? org_unit.validity.to.split("T")[0]
               : null}
-            id="end-date"
-            min={startDate}
-            max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
+            id="to"
+            min={fromDate}
+            max={maxDate ? maxDate : null}
           />
         </div>
         <SelectOrgTree bind:selectedOrg={parent} startOrg={org_unit.parent} />
