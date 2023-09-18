@@ -9,7 +9,7 @@
     if (keycloak && keycloak.idTokenParsed) {
       return keycloak.idTokenParsed.name
     }
-    return "Ghost user"
+    return "No Auth"
   }
 
   $: nameBadge = (): string => {
@@ -17,11 +17,15 @@
       return ""
     }
     if (keycloak && keycloak.idTokenParsed) {
-      return (
-        keycloak.idTokenParsed.given_name[0] + keycloak.idTokenParsed.family_name[0]
-      )
+      let initials =
+        (keycloak.idTokenParsed.firstname ? keycloak.idTokenParsed.firstname[0] : "") +
+        (keycloak.idTokenParsed.lastname ? keycloak.idTokenParsed.lastname[0] : "")
+      if (!initials) {
+        initials = "??"
+      }
+      return initials
     }
-    return "??"
+    return "No Auth"
   }
 </script>
 
