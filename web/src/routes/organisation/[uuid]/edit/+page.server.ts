@@ -11,8 +11,8 @@ export const actions: Actions = {
     const parent = data.get("select-org-tree")
     const orgLevel = data.get("org-level")
     const orgType = data.get("org-type")
-    const startDate = data.get("start-date")
-    const endDate = data.get("end-date")
+    const startDate = data.get("from")
+    const endDate = data.get("to")
 
     return {
       uuid: params.uuid,

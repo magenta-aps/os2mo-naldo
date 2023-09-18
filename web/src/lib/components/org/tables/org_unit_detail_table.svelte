@@ -76,7 +76,7 @@
           {/if}
           <ValidityTableCell validity={org_unit.validity} />
           <td>
-            <a href="{base}/organisation/{$page.params.uuid}/edit/unit">
+            <a href="{base}/organisation/{$page.params.uuid}/edit">
               <Icon type="pen" />
             </a>
           </td>
@@ -84,7 +84,7 @@
           {#if env.PUBLIC_ENABLE_UNIT_TERMINATE === "true"}
             <td>
               <a
-                href="{base}/organisation/{$page.params.uuid}/terminate/unit"
+                href="{base}/organisation/{$page.params.uuid}/terminate"
                 class="hover:slate-300"
               >
                 <Icon type="xmark" size="30" />
