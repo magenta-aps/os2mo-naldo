@@ -84,7 +84,7 @@
           {#if env.PUBLIC_ENABLE_UNIT_TERMINATE === "true"}
             <td>
               <a
-                href="{base}/organisation/{$page.params.uuid}/terminate"
+                href="{base}/organisation/{$page.params.uuid}/terminate/unit"
                 class="hover:slate-300"
               >
                 <Icon type="xmark" size="30" />

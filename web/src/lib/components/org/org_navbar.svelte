@@ -66,7 +66,7 @@
       <p class="text-base-100">Flyt enhed</p>
     </a>
     <a
-      href="{base}/organisation/{$page.params.uuid}/{Form.TERMINATE}"
+      href="{base}/organisation/{Form.TERMINATE}"
       class="btn btn-sm btn-primary text-base-100 normal-case font-normal"
     >
       <span class="inline-block align-middle pr-2">
