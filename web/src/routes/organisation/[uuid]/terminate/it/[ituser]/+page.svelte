@@ -72,7 +72,7 @@
     }
 </script>
 
-{#await graphQLClient().request( ItUserAndOrgDocument, { uuid: $page.params.ituser, fromDate: $date } )}
+{#await graphQLClient().request( ItUserAndOrgDocument, { uuid: $page.params.ituser, fromDate: $date, org_unit_uuid: $page.params.uuid } )}
   <!-- TODO: Should have a skeleton for the loading stage -->
   Henter data...
 {:then data}
