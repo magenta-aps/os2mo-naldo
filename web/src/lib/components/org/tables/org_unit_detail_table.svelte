@@ -3,7 +3,6 @@
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
   import Icon from "$lib/components/icon.svelte"
   import { base } from "$app/paths"
-  import { env } from "$env/dynamic/public"
   import { page } from "$app/stores"
   import { graphQLClient } from "$lib/util/http"
   import { OrgUnitDocument } from "./query.generated"
@@ -45,11 +44,7 @@
   `
 </script>
 
-<DetailTable
-  headers={env.PUBLIC_ENABLE_UNIT_TERMINATE === "true"
-    ? ["Enhed", "Enhedstype", "Enhedsniveau", "Overenhed", "Dato", "", ""]
-    : ["Enhed", "Enhedstype", "Enhedsniveau", "Overenhed", "Dato", ""]}
->
+<DetailTable headers={["Enhed", "Enhedstype", "Enhedsniveau", "Overenhed", "Dato", ""]}>
   {#await graphQLClient().request( OrgUnitDocument, { uuid: uuid, ...tenseToValidity(tense, $date) } )}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
@@ -80,17 +75,6 @@
               <Icon type="pen" />
             </a>
           </td>
-
-          {#if env.PUBLIC_ENABLE_UNIT_TERMINATE === "true"}
-            <td>
-              <a
-                href="{base}/organisation/{$page.params.uuid}/terminate/unit"
-                class="hover:slate-300"
-              >
-                <Icon type="xmark" size="30" />
-              </a>
-            </td>
-          {/if}
         </tr>
       {/each}
     {/each}

@@ -81,19 +81,16 @@
               <Icon type="pen" />
             </a>
           </td>
-
-          {#if env.PUBLIC_ENABLE_UNIT_TERMINATE === "true"}
-            <td>
-              <a
-                href="{base}/{$page.route.id?.split(
-                  '/'
-                )[1]}/{uuid}/terminate/address/{address.uuid}"
-                class="hover:slate-300"
-              >
-                <Icon type="xmark" size="30" />
-              </a>
-            </td>
-          {/if}
+          <td>
+            <a
+              href="{base}/{$page.route.id?.split(
+                '/'
+              )[1]}/{uuid}/terminate/address/{address.uuid}"
+              class="hover:slate-300"
+            >
+              <Icon type="xmark" size="30" />
+            </a>
+          </td>
         </tr>
       {/each}
     {/each}
