@@ -1839,12 +1839,30 @@ export type Employee = {
    */
   addresses: Array<Address>;
   /**
+   * Same as addresses(), but with HACKs to enable validities.
+   *
+   * @deprecated Should only be used to query addresses when validity dates have been specified, "
+   * "ex from_date & to_date."
+   * "Will be removed when sub-query date handling is implemented.
+   *
+   */
+  addresses_validity: Array<Address>;
+  /**
    * Associations for the employee.
    *
    * May be an empty list if the employee is not associated with projects, etc.
    *
    */
   associations: Array<Association>;
+  /**
+   * Same as associations(), but with HACKs to enable validities.
+   *
+   * @deprecated Should only be used to query associations when validity dates have been specified, "
+   * "ex from_date & to_date."
+   * "Will be removed when sub-query date handling is implemented.
+   *
+   */
+  associations_validity: Array<Association>;
   /**
    * CPR number of the employee.
    * @deprecated Use 'cpr_number' instead. Will be removed in a future version of OS2mo.
@@ -1859,6 +1877,15 @@ export type Employee = {
    *
    */
   engagements: Array<Engagement>;
+  /**
+   * Same as engagements(), but with HACKs to enable validities.
+   *
+   * @deprecated Should only be used to query engagements when validity dates have been specified, "
+   * "ex from_date & to_date."
+   * "Will be removed when sub-query date handling is implemented.
+   *
+   */
+  engagements_validity: Array<Engagement>;
   /** Given name of the employee. */
   given_name: Scalars['String']['output'];
   /**
@@ -1873,6 +1900,15 @@ export type Employee = {
    *
    */
   itusers: Array<ItUser>;
+  /**
+   * Same as itusers(), but with HACKs to enable validities.
+   *
+   * @deprecated Should only be used to query itusers when validity dates have been specified, "
+   * "ex from_date & to_date."
+   * "Will be removed when sub-query date handling is implemented.
+   *
+   */
+  itusers_validity: Array<ItUser>;
   /**
    * Leaves of absence for the employee.
    *
@@ -5314,12 +5350,16 @@ export type Mutation = {
    *
    */
   address_delete: AddressResponse;
+  /** Refresh addresses. */
+  address_refresh: Array<Scalars['UUID']['output']>;
   /** Terminates an address. */
   address_terminate: AddressResponse;
   /** Updates an address. */
   address_update: AddressResponse;
   /** Creates an association. */
   association_create: AssociationResponse;
+  /** Refresh associations. */
+  association_refresh: Array<Scalars['UUID']['output']>;
   /** Terminates an association */
   association_terminate: AssociationResponse;
   /** Updates an association. */
@@ -5345,10 +5385,14 @@ export type Mutation = {
    *
    */
   class_delete: ClassResponse;
+  /** Refresh classes. */
+  class_refresh: Array<Scalars['UUID']['output']>;
   /** Updates a class. */
   class_update: ClassResponse;
   /** Creates an employee. */
   employee_create: EmployeeResponse;
+  /** Refresh employees. */
+  employee_refresh: Array<Scalars['UUID']['output']>;
   /** Terminates an employee. */
   employee_terminate: EmployeeResponse;
   /** Updates an employee. */
@@ -5374,6 +5418,8 @@ export type Mutation = {
    *
    */
   engagement_delete: EngagementResponse;
+  /** Refresh engagements. */
+  engagement_refresh: Array<Scalars['UUID']['output']>;
   /** Terminates an engagement. */
   engagement_terminate: EngagementResponse;
   /** Updates an engagement. */
@@ -5399,6 +5445,8 @@ export type Mutation = {
    *
    */
   facet_delete: FacetResponse;
+  /** Refresh facets. */
+  facet_refresh: Array<Scalars['UUID']['output']>;
   /** Updates a facet. */
   facet_update: FacetResponse;
   /** Creates an IT-Association. */
@@ -5428,6 +5476,8 @@ export type Mutation = {
    *
    */
   itsystem_delete: ItSystemResponse;
+  /** Refresh ITSystems. */
+  itsystem_refresh: Array<Scalars['UUID']['output']>;
   /** Updates an ITSystem. */
   itsystem_update: ItSystemResponse;
   /** Creates an IT-User. */
@@ -5451,24 +5501,32 @@ export type Mutation = {
    *
    */
   ituser_delete: ItUserResponse;
+  /** Refresh IT-Users. */
+  ituser_refresh: Array<Scalars['UUID']['output']>;
   /** Terminates IT-User. */
   ituser_terminate: ItUserResponse;
   /** Updates an IT-User. */
   ituser_update: ItUserResponse;
   /** Creates a KLE annotation. */
   kle_create: KleResponse;
+  /** Refresh KLEs. */
+  kle_refresh: Array<Scalars['UUID']['output']>;
   /** Terminates a KLE annotation. */
   kle_terminate: KleResponse;
   /** Updates a KLE annotation. */
   kle_update: KleResponse;
   /** Creates a leave. */
   leave_create: LeaveResponse;
+  /** Refresh leaves. */
+  leave_refresh: Array<Scalars['UUID']['output']>;
   /** Terminates a leave. */
   leave_terminate: LeaveResponse;
   /** Updates a leave. */
   leave_update: LeaveResponse;
   /** Creates a manager relation. */
   manager_create: ManagerResponse;
+  /** Refresh managers. */
+  manager_refresh: Array<Scalars['UUID']['output']>;
   /** Terminates a manager relation. */
   manager_terminate: ManagerResponse;
   /** Updates a manager relation. */
@@ -5480,12 +5538,20 @@ export type Mutation = {
   org_create: Organisation;
   /** Creates an organisation unit. */
   org_unit_create: OrganisationUnitResponse;
+  /** Refresh organization units. */
+  org_unit_refresh: Array<Scalars['UUID']['output']>;
   /** Terminates an organization unit. */
   org_unit_terminate: OrganisationUnitResponse;
   /** Updates an organisation unit. */
   org_unit_update: OrganisationUnitResponse;
+  /** Refresh owners. */
+  owner_refresh: Array<Scalars['UUID']['output']>;
+  /** Refresh a related unit. */
+  related_unit_refresh: Array<Scalars['UUID']['output']>;
   /** Creates a role. */
   role_create: RoleResponse;
+  /** Refresh roles. */
+  role_refresh: Array<Scalars['UUID']['output']>;
   /** Terminates a role. */
   role_terminate: RoleResponse;
   /** Updates a role. */
@@ -5557,6 +5623,19 @@ export type MutationAddress_DeleteArgs = {
  * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
  *
  */
+export type MutationAddress_RefreshArgs = {
+  filter?: InputMaybe<AddressFilter>;
+  queue?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationAddress_TerminateArgs = {
   input: AddressTerminateInput;
 };
@@ -5583,6 +5662,19 @@ export type MutationAddress_UpdateArgs = {
  */
 export type MutationAssociation_CreateArgs = {
   input: AssociationCreateInput;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationAssociation_RefreshArgs = {
+  filter?: InputMaybe<AssociationFilter>;
+  queue?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -5641,6 +5733,19 @@ export type MutationClass_DeleteArgs = {
  * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
  *
  */
+export type MutationClass_RefreshArgs = {
+  filter?: InputMaybe<ClassFilter>;
+  queue?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationClass_UpdateArgs = {
   input: ClassUpdateInput;
 };
@@ -5655,6 +5760,19 @@ export type MutationClass_UpdateArgs = {
  */
 export type MutationEmployee_CreateArgs = {
   input: EmployeeCreateInput;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationEmployee_RefreshArgs = {
+  filter?: InputMaybe<EmployeeFilter>;
+  queue?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -5713,6 +5831,19 @@ export type MutationEngagement_DeleteArgs = {
  * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
  *
  */
+export type MutationEngagement_RefreshArgs = {
+  filter?: InputMaybe<EngagementFilter>;
+  queue?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationEngagement_TerminateArgs = {
   input: EngagementTerminateInput;
 };
@@ -5751,6 +5882,19 @@ export type MutationFacet_CreateArgs = {
  */
 export type MutationFacet_DeleteArgs = {
   uuid: Scalars['UUID']['input'];
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationFacet_RefreshArgs = {
+  filter?: InputMaybe<FacetFilter>;
+  queue?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -5833,6 +5977,19 @@ export type MutationItsystem_DeleteArgs = {
  * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
  *
  */
+export type MutationItsystem_RefreshArgs = {
+  filter?: InputMaybe<BaseFilter>;
+  queue?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationItsystem_UpdateArgs = {
   input: ItSystemCreateInput;
 };
@@ -5859,6 +6016,19 @@ export type MutationItuser_CreateArgs = {
  */
 export type MutationItuser_DeleteArgs = {
   uuid: Scalars['UUID']['input'];
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationItuser_RefreshArgs = {
+  filter?: InputMaybe<ItUserFilter>;
+  queue?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -5905,6 +6075,19 @@ export type MutationKle_CreateArgs = {
  * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
  *
  */
+export type MutationKle_RefreshArgs = {
+  filter?: InputMaybe<KleFilter>;
+  queue?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationKle_TerminateArgs = {
   input: KleTerminateInput;
 };
@@ -5941,6 +6124,19 @@ export type MutationLeave_CreateArgs = {
  * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
  *
  */
+export type MutationLeave_RefreshArgs = {
+  filter?: InputMaybe<LeaveFilter>;
+  queue?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationLeave_TerminateArgs = {
   input: LeaveTerminateInput;
 };
@@ -5967,6 +6163,19 @@ export type MutationLeave_UpdateArgs = {
  */
 export type MutationManager_CreateArgs = {
   input: ManagerCreateInput;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationManager_RefreshArgs = {
+  filter?: InputMaybe<ManagerFilter>;
+  queue?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -6025,6 +6234,19 @@ export type MutationOrg_Unit_CreateArgs = {
  * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
  *
  */
+export type MutationOrg_Unit_RefreshArgs = {
+  filter?: InputMaybe<OrganisationUnitFilter>;
+  queue?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationOrg_Unit_TerminateArgs = {
   input: OrganisationUnitTerminateInput;
 };
@@ -6049,8 +6271,47 @@ export type MutationOrg_Unit_UpdateArgs = {
  * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
  *
  */
+export type MutationOwner_RefreshArgs = {
+  filter?: InputMaybe<OwnerFilter>;
+  queue?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationRelated_Unit_RefreshArgs = {
+  filter?: InputMaybe<RelatedUnitFilter>;
+  queue?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationRole_CreateArgs = {
   input: RoleCreateInput;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationRole_RefreshArgs = {
+  filter?: InputMaybe<RoleFilter>;
+  queue?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -6268,6 +6529,15 @@ export type OrganisationUnit = {
    */
   addresses: Array<Address>;
   /**
+   * Same as addresses(), but with HACKs to enable validities.
+   *
+   * @deprecated Should only be used to query addresses when validity dates have been specified, "
+   * "ex from_date & to_date."
+   * "Will be removed when sub-query date handling is implemented.
+   *
+   */
+  addresses_validity: Array<Address>;
+  /**
    * All ancestor organisational units in the organisation tree.
    *
    * The result of collecting organisational units by following `parent` until `parent` becomes `null`.
@@ -6292,6 +6562,15 @@ export type OrganisationUnit = {
    *
    */
   associations: Array<Association>;
+  /**
+   * Same as associations(), but with HACKs to enable validities.
+   *
+   * @deprecated Should only be used to query associations when validity dates have been specified, "
+   * "ex from_date & to_date."
+   * "Will be removed when sub-query date handling is implemented.
+   *
+   */
+  associations_validity: Array<Association>;
   /**
    * Children count of the organisation unit.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -6320,6 +6599,15 @@ export type OrganisationUnit = {
    *
    */
   itusers: Array<ItUser>;
+  /**
+   * Same as itusers(), but with HACKs to enable validities.
+   *
+   * @deprecated Should only be used to query itusers when validity dates have been specified, "
+   * "ex from_date & to_date."
+   * "Will be removed when sub-query date handling is implemented.
+   *
+   */
+  itusers_validity: Array<ItUser>;
   /**
    * KLE responsibilities for the organisation unit.
    *
