@@ -5,11 +5,12 @@
   import type { SubmitFunction } from "./$types"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
-  import { UpdateOrgUnitDocument } from "./query.generated"
+  import { OrgUnitDocument, UpdateOrgUnitDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { date } from "$lib/stores/date"
   import Search from "$lib/components/search.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
+  import { page } from "$app/stores"
 
   let fromDate: string
   let orgUnit: {
@@ -18,8 +19,19 @@
     attrs: []
   }
   let name: string
+  const urlHashOrgUnitUuid = $page.url.hash.split("&")[0].substring(1)
 
   gql`
+    query OrgUnit($uuid: [UUID!], $fromDate: DateTime) {
+      org_units(filter: { uuids: $uuid, from_date: $fromDate }) {
+        objects {
+          objects {
+            name
+            uuid
+          }
+        }
+      }
+    }
     mutation UpdateOrgUnit($input: OrganisationUnitUpdateInput!) {
       org_unit_update(input: $input) {
         uuid
@@ -72,13 +84,43 @@
           max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
         />
       </div>
-      <Search
-        type="org-unit"
-        title="Angiv enhed"
-        bind:value={orgUnit}
-        on:change={() => (name = orgUnit.name)}
-      />
-      <Input title="Nyt navn" id="name" bind:value={name} />
+      {#if urlHashOrgUnitUuid}
+        {#await graphQLClient().request( OrgUnitDocument, { uuid: urlHashOrgUnitUuid, fromDate: $date } )}
+          <Input
+            title="Angiv enhed"
+            id="organisation-uuid"
+            disabled
+            placeholder="Henter organisation..."
+          />
+        {:then data}
+          {@const orgUnitUuidFromHash = data.org_units.objects[0].objects[0]}
+          <Search
+            title="Angiv enhed"
+            type="org-unit"
+            startValue={{
+              uuid: orgUnitUuidFromHash.uuid,
+              name: orgUnitUuidFromHash.name,
+              attrs: [],
+            }}
+            bind:value={orgUnit}
+            on:change={() => (name = orgUnit.name)}
+          />
+          <Input
+            title="Nyt navn"
+            id="name"
+            startValue={orgUnitUuidFromHash.name}
+            bind:value={name}
+          />
+        {/await}
+      {:else}
+        <Search
+          type="org-unit"
+          title="Angiv enhed"
+          bind:value={orgUnit}
+          on:change={() => (name = orgUnit.name)}
+        />
+        <Input title="Nyt navn" id="name" bind:value={name} />
+      {/if}
     </div>
   </div>
   <div class="flex py-6 gap-4">
