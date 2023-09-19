@@ -10,7 +10,7 @@ export const tenseToValidity = (
     case "past":
       return { fromDate: null, toDate: date }
     case "present":
-      return {}
+      return { fromDate: date }
     case "future":
       return { fromDate: date, toDate: null }
   }
