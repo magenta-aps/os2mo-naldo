@@ -49,7 +49,7 @@
       <p class="text-base-100">Omdøb enhed</p>
     </a>
     <a
-      href="{base}/organisation/{$page.params.uuid}/{Form.MOVE}"
+      href="{base}/organisation/{Form.MOVE}"
       class="btn btn-sm btn-primary text-base-100 normal-case font-normal"
     >
       <span class="inline-block align-middle pr-2">
