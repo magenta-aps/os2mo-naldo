@@ -125,17 +125,19 @@
     Henter data...
   {:then data}
     {@const startValueEmployee = data.employees?.objects[0].objects[0]}
-    {@const minDate = startValueEmployee?.engagements[0].validity.from}
+    {@const minDate = startValueEmployee?.engagements[0]?.validity.from}
 
     <div class="w-1/2 min-w-fit bg-slate-100 rounded">
       <div class="p-8">
-        <DateInput
-          bind:value={fromDate}
-          startValue={$date}
-          title="Flyttedato"
-          id="from"
-          min={minDate ? minDate : null}
-        />
+        <div class="flex flex-row gap-6">
+          <DateInput
+            bind:value={fromDate}
+            startValue={$date}
+            title="Flyttedato"
+            id="from"
+            min={minDate ? minDate : null}
+          />
+        </div>
         <Search
           type="employee"
           title="Medarbejder"
