@@ -1,0 +1,185 @@
+<script lang="ts">
+  import Error from "$lib/components/alerts/error.svelte"
+  import Select from "$lib/components/forms/shared/select.svelte"
+  import { enhance } from "$app/forms"
+  import { success, error } from "$lib/stores/alert"
+  import { graphQLClient } from "$lib/util/http"
+  import type { SubmitFunction } from "./$types"
+  import { EngagementsDocument, UpdateEngagementDocument } from "./query.generated"
+  import { gql } from "graphql-request"
+  import { page } from "$app/stores"
+  import { date } from "$lib/stores/date"
+  import Search from "$lib/components/search.svelte"
+  import { getEngagementTitlesAndUuid } from "$lib/util/helpers"
+  import { onMount } from "svelte"
+  import DateInput from "$lib/components/forms/shared/date_input.svelte"
+
+  type EngagementTitleAndUuid = {
+    uuid: string
+    job_function: { name: string }
+    org_unit: { name: string }[]
+  }
+
+  let employee: {
+    uuid: string
+    name: string
+    attrs: []
+  }
+  let engagements: EngagementTitleAndUuid[] | undefined
+  let fromDate: string
+
+  const urlHashEmployeeUuid = $page.url.hash.split("&")[0].substring(1) || null
+  const includeEmployee = urlHashEmployeeUuid ? true : false
+
+  gql`
+    query Engagements(
+      $uuid: [UUID!]
+      $fromDate: DateTime!
+      $includeEngagement: Boolean!
+    ) {
+      ...getEngagements
+    }
+
+    fragment getEngagements on Query {
+      employees(filter: { uuids: $uuid, from_date: $fromDate })
+        @include(if: $includeEngagement) {
+        objects {
+          objects {
+            uuid
+            name
+            engagements {
+              uuid
+              org_unit {
+                name
+              }
+              job_function {
+                name
+              }
+              validity {
+                from
+                to
+              }
+            }
+          }
+        }
+      }
+    }
+
+    mutation UpdateEngagement($input: EngagementUpdateInput!) {
+      engagement_update(input: $input) {
+        objects {
+          uuid
+          employee {
+            name
+            uuid
+          }
+        }
+      }
+    }
+  `
+
+  const handler: SubmitFunction =
+    () =>
+    async ({ result }) => {
+      if (result.type === "success" && result.data) {
+        try {
+          const mutation = await graphQLClient().request(UpdateEngagementDocument, {
+            input: result.data,
+          })
+          $success = {
+            message: `${mutation.engagement_update.objects[0].employee[0].name} er blevet redigeret`,
+            uuid: mutation.engagement_update.objects[0].employee[0].uuid,
+            type: "employee",
+          }
+        } catch (err) {
+          console.error(err)
+          $error = { message: err as string }
+        }
+      }
+    }
+  async function updateEngagements(employeeUuid: string | null) {
+    const res = await graphQLClient().request(EngagementsDocument, {
+      uuid: employeeUuid,
+      fromDate: $date,
+      includeEngagement: employeeUuid ? true : false,
+    })
+    engagements = res.employees?.objects[0].objects[0].engagements
+  }
+
+  onMount(async () => {
+    await updateEngagements(urlHashEmployeeUuid)
+  })
+</script>
+
+<title>Flyt engagement | OS2mo</title>
+
+<div class="flex align-center px-6 pt-6 pb-4">
+  <h3 class="flex-1">Flyt engagement</h3>
+</div>
+
+<div class="divider p-0 m-0 mb-4 w-full" />
+
+<form method="post" class="mx-6" use:enhance={handler}>
+  {#await graphQLClient().request( EngagementsDocument, { uuid: urlHashEmployeeUuid, fromDate: $date, includeEngagement: includeEmployee } )}
+    <!-- TODO: Should have a skeleton for the loading stage -->
+    Henter data...
+  {:then data}
+    {@const startValueEmployee = data.employees?.objects[0].objects[0]}
+    {@const minDate = startValueEmployee?.engagements[0].validity.from}
+
+    <div class="w-1/2 min-w-fit bg-slate-100 rounded">
+      <div class="p-8">
+        <DateInput
+          bind:value={fromDate}
+          startValue={$date}
+          title="Flyttedato"
+          id="from"
+          min={minDate ? minDate : null}
+        />
+        <Search
+          type="employee"
+          title="Medarbejder"
+          startValue={startValueEmployee
+            ? {
+                uuid: startValueEmployee.uuid,
+                name: startValueEmployee.name,
+                attrs: [],
+              }
+            : undefined}
+          bind:value={employee}
+          on:change={() => updateEngagements(employee.uuid)}
+          on:clear={() => (engagements = undefined)}
+        />
+        {#if engagements && engagements.length}
+          {#key engagements}
+            <Select
+              title="Engagementer"
+              id="engagement-uuid"
+              startValue={getEngagementTitlesAndUuid(engagements)[0].name}
+              iterable={getEngagementTitlesAndUuid(engagements)}
+              required={true}
+            />
+          {/key}
+        {:else}
+          <Select title="Engagementer" id="engagement-uuid" disabled />
+        {/if}
+        <Search type="org-unit" title="Flyt til" />
+      </div>
+    </div>
+    <div class="flex py-6 gap-4">
+      <button
+        type="submit"
+        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+        >Flyt engagement</button
+      >
+      <button
+        type="button"
+        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+        on:click={() => history.back()}
+      >
+        Annullér
+      </button>
+    </div>
+    <Error />
+  {/await}
+</form>

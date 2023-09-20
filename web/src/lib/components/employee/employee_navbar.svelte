@@ -4,7 +4,6 @@
 
   enum Form {
     CREATE = "create",
-    RENAME = "rename",
     MOVE = "move",
     TERMINATE = "terminate",
   }
@@ -14,7 +13,7 @@
   <div class="flex-1">
     <a
       href="{base}/employee/{Form.CREATE}"
-      class="btn btn-sm btn-primary text-base-100 normal-case font-normal"
+      class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <span class="inline-block align-middle pr-2">
         <svg
@@ -43,10 +42,14 @@
           /></svg
         >
       </span>
-<!--      TODO: hvad skal "Orlov" linke til hvis den skal blive i nav-->
       <p class="text-base-100">Orlov</p>
     </label>
-    <label class="btn btn-sm btn-primary text-base-100 normal-case font-normal" for="">
+    <a
+      href={`${base}/employee/${Form.MOVE}${
+        $page.params.uuid ? `#${$page.params.uuid}` : ""
+      }`}
+      class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
+    >
       <span class="inline-block align-middle pr-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -59,7 +62,7 @@
         >
       </span>
       <p class="text-base-100">Flyt engagement</p>
-    </label>
+    </a>
     <label class="btn btn-sm btn-primary text-base-100 normal-case font-normal" for="">
       <span class="inline-block align-middle pr-2">
         <svg

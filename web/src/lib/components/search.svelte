@@ -72,6 +72,7 @@
     hideEmptyState={true}
     placeholder={`Søg efter ${type === "employee" ? "person" : "organisation"}`}
     on:change
+    on:clear
     on:select={() => {
       if (action === "goto" && value) {
         goto(
