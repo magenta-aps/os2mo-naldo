@@ -9,10 +9,24 @@
   import { gql } from "graphql-request"
   import { date } from "$lib/stores/date"
   import Search from "$lib/components/search.svelte"
+  import { page } from "$app/stores"
+  import { OrgUnitDocument } from "./query.generated"
+  import Input from "$lib/components/forms/shared/input.svelte"
 
   let fromDate: string
+  const urlHashOrgUnitUuid = $page.url.hash.split("&")[0].substring(1)
 
   gql`
+    query OrgUnit($uuid: [UUID!], $fromDate: DateTime) {
+      org_units(filter: { uuids: $uuid, from_date: $fromDate }) {
+        objects {
+          objects {
+            name
+            uuid
+          }
+        }
+      }
+    }
     mutation UpdateOrgUnit($input: OrganisationUnitUpdateInput!) {
       org_unit_update(input: $input) {
         uuid
@@ -74,7 +88,29 @@
           max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
         />
       </div>
-      <Search type="org-unit" title="Angiv enhed" />
+      {#if urlHashOrgUnitUuid}
+        {#await graphQLClient().request( OrgUnitDocument, { uuid: urlHashOrgUnitUuid, fromDate: $date } )}
+          <Input
+            title="Angiv enhed"
+            id="organisation-uuid"
+            disabled
+            placeholder="Henter organisation..."
+          />
+        {:then data}
+          {@const orgUnit = data.org_units.objects[0].objects[0]}
+          <Search
+            title="Angiv enhed"
+            type="org-unit"
+            startValue={{
+              uuid: orgUnit.uuid,
+              name: orgUnit.name,
+              attrs: [],
+            }}
+          />
+        {/await}
+      {:else}
+        <Search type="org-unit" title="Angiv enhed" />
+      {/if}
       <Search type="org-unit" id="select-parent-org-tree" title="Angiv ny overenhed" />
     </div>
   </div>

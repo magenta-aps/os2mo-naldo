@@ -14,7 +14,7 @@
   <div class="flex-1">
     <a
       href="{base}/organisation/{$page.params.uuid}/{Form.CREATE}"
-      class="btn btn-sm btn-primary text-base-100 normal-case font-normal"
+      class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <span class="inline-block align-middle pr-2">
         <svg
@@ -31,8 +31,10 @@
       <p class="text-base-100">Opret enhed</p>
     </a>
     <a
-      href="{base}/organisation/{Form.RENAME}"
-      class="btn btn-sm btn-primary text-base-100 normal-case font-normal"
+      href={`${base}/organisation/${Form.RENAME}${
+        $page.params.uuid ? `#${$page.params.uuid}` : ""
+      }`}
+      class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <span class="inline-block align-middle pr-2">
         <svg
@@ -49,8 +51,10 @@
       <p class="text-base-100">Omdøb enhed</p>
     </a>
     <a
-      href="{base}/organisation/{Form.MOVE}"
-      class="btn btn-sm btn-primary text-base-100 normal-case font-normal"
+      href={`${base}/organisation/${Form.MOVE}${
+        $page.params.uuid ? `#${$page.params.uuid}` : ""
+      }`}
+      class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <span class="inline-block align-middle pr-2">
         <svg
@@ -66,8 +70,10 @@
       <p class="text-base-100">Flyt enhed</p>
     </a>
     <a
-      href="{base}/organisation/{Form.TERMINATE}"
-      class="btn btn-sm btn-primary text-base-100 normal-case font-normal"
+      href={`${base}/organisation/${Form.TERMINATE}${
+        $page.params.uuid ? `#${$page.params.uuid}` : ""
+      }`}
+      class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <span class="inline-block align-middle pr-2">
         <svg

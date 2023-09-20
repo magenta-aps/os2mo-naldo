@@ -3,7 +3,7 @@
   export let size: string = "sm"
   export let id: string
   export let name = id
-  export let value: string | number | null | undefined
+  export let value: string | number | null | undefined = undefined
   export let startValue: string | number | null | undefined = undefined
   value = value ?? startValue // For flexibility when binding
   export let required = false

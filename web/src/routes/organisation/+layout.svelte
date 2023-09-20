@@ -3,7 +3,4 @@
 </script>
 
 <OrgNavbar />
-
-<div class="overflow-auto">
-  <slot />
-</div>
+<slot />
