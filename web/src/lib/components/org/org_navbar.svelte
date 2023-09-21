@@ -13,7 +13,9 @@
 <div class="navbar bg-primary min-h-8 h-8 py-5 text-base-100">
   <div class="flex-1">
     <a
-      href="{base}/organisation/{$page.params.uuid}/{Form.CREATE}"
+      href={`${base}/organisation/${Form.CREATE}${
+        $page.params.uuid ? `#${$page.params.uuid}` : ""
+      }`}
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <span class="inline-block align-middle pr-2">
