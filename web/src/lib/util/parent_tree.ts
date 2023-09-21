@@ -1,13 +1,6 @@
-import { enhance } from "$app/forms"
 import { graphQLClient } from "$lib/util/http"
-import { goto } from "$app/navigation"
-import { base } from "$app/paths"
-import { success, error } from "$lib/stores/alert"
 import { GetParentDocument } from "./query.generated"
 import { gql } from "graphql-request"
-import { page } from "$app/stores"
-import { date } from "$lib/stores/date"
-import { getClassesByFacetUserKey } from "$lib/util/get_classes"
 
 gql`
   query GetParent($uuid: [UUID!], $fromDate: DateTime) {

@@ -1,8 +1,10 @@
 <script lang="ts">
   import { base } from "$app/paths"
   import { page } from "$app/stores"
-  import { fetchGraph } from "$lib/util/http"
+  import { graphQLClient } from "$lib/util/http"
+  import { gql } from "graphql-request"
   import { onMount } from "svelte"
+  import { OrgUnitChildrenDocument } from "./query.generated"
 
   export let name = ""
   export let children: any[] = []
@@ -14,27 +16,28 @@
 
   let loading = false
 
-  const fetchChildren = async (uuid: string) => {
-    const query = `
-      query {
-        org_units(filter: {uuids: "${uuid}", from_date: "${fromDate}"}) {
+  gql`
+    query OrgUnitChildren($uuid: [UUID!], $fromDate: DateTime) {
+      org_units(filter: { uuids: $uuid, from_date: $fromDate }) {
+        objects {
           objects {
-            objects {
-              children {
-                name
-                uuid
-              }
+            children {
+              name
+              uuid
             }
           }
         }
-      }`
-    const res = await fetchGraph(query)
-    const json = await res.json()
-    if (json.data) {
-      return json.data.org_units.objects[0].objects[0].children
-    } else {
-      throw new Error(json.errors[0].message)
+      }
     }
+  `
+
+  const fetchChildren = async (uuid: string) => {
+    const res = await graphQLClient().request(OrgUnitChildrenDocument, {
+      uuid: uuid,
+      fromDate: fromDate,
+    })
+
+    return res.org_units?.objects[0].objects[0].children
   }
 
   const toggleOpen = async () => {
@@ -89,7 +92,7 @@
         <div class="animate-spin rounded-full h-4 w-4 border-b-4 border-secondary" />
       {:else if children.length}
         {#if open}
-          <div class="h-4 w-4" on:click|preventDefault={toggleOpen}>
+          <button class="h-4 w-4" on:click|preventDefault={toggleOpen}>
             <svg
               class="fill-secondary"
               xmlns="http://www.w3.org/2000/svg"
@@ -98,9 +101,9 @@
                 d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"
               /></svg
             >
-          </div>
+          </button>
         {:else}
-          <div class="h-4 w-4" on:click|preventDefault={toggleOpen}>
+          <button class="h-4 w-4" on:click|preventDefault={toggleOpen}>
             <svg
               class="fill-secondary"
               xmlns="http://www.w3.org/2000/svg"
@@ -109,7 +112,7 @@
                 d="M342.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L274.7 256 105.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"
               /></svg
             >
-          </div>
+          </button>
         {/if}
       {:else}
         <div class="h-4 w-4" />

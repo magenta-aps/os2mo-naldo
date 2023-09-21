@@ -1,43 +1,49 @@
 <script lang="ts">
   import { page } from "$app/stores"
-  import { fetchGraph } from "$lib/util/http"
+  import { graphQLClient } from "$lib/util/http"
   import { fetchParentTree } from "$lib/util/parent_tree.js"
   import Node from "$lib/components/org/tree/node.svelte"
   import { success } from "$lib/stores/alert"
   import { date } from "$lib/stores/date"
   import { globalNavigation } from "$lib/stores/navigation"
+  import { gql } from "graphql-request"
+  import { OrgUnitsWithChildrenDocument } from "./query.generated"
 
   // First load from index
-  const fetchOrgTree = async (
-    fromDate: string,
-    childUuid?: string | null
-  ): Promise<any[]> => {
-    const query = `{
-      org_units(filter: { parents: null, from_date: "${fromDate}" }) {
-        objects {
+  const fetchOrgTree = async (fromDate: string, childUuid?: string | null) => {
+    gql`
+      query OrgUnitsWithChildren($fromDate: DateTime) {
+        org_units(filter: { parents: null, from_date: $fromDate }) {
           objects {
-            name
-            uuid
-            children {
+            objects {
               name
               uuid
+              children {
+                name
+                uuid
+              }
             }
           }
         }
       }
-    }`
+    `
 
-    // breadcrumbs
-    const res = await fetchGraph(query)
-    const json = await res.json()
-    const orgTree: any[] = []
+    // Breadcrumbs
+    const res = await graphQLClient().request(OrgUnitsWithChildrenDocument, {
+      fromDate: fromDate,
+    })
 
+    const orgTree = []
     const uuid = childUuid ? childUuid : $page.params.uuid
-    const breadcrumbs = $page.route.id?.startsWith("/organisation")
-      ? (await fetchParentTree(uuid, fromDate)).map((e) => e.uuid).reverse()
-      : []
 
-    for (let org of json.data.org_units.objects) {
+    // Will return an empty list of "breadcrumbs" if the route isn't under organisation
+    // or it doesn't have UUID
+    const breadcrumbs =
+      $page.route.id?.startsWith("/organisation") && uuid
+        ? (await fetchParentTree(uuid, fromDate)).map((e) => e.uuid).reverse()
+        : []
+
+    for (let org of res.org_units.objects) {
       orgTree.push({
         uuid: org.objects[0].uuid,
         name: org.objects[0].name,
