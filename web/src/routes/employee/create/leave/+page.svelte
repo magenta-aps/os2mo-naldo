@@ -12,17 +12,33 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
-  import { CreateLeaveDocument, LeaveAndEmployeeDocument } from "./query.generated"
-  import Input from "$lib/components/forms/shared/input.svelte"
-  import { getEngagementTitlesAndUuid } from "$lib/util/helpers"
+  import {
+    CreateLeaveDocument,
+    LeaveTypeAndEmployeeDocument,
+    GetEmployeeDocument,
+  } from "./query.generated"
+  import {
+    getEngagementTitlesAndUuid,
+    type EngagementTitleAndUuid,
+  } from "$lib/util/helpers"
+  import Search from "$lib/components/search.svelte"
+  import { onMount } from "svelte"
 
+  let employee: {
+    uuid: string
+    name: string
+    attrs: []
+  }
+  let engagements: EngagementTitleAndUuid[] | undefined
   let fromDate: string
   let toDate: string
-  let leaveType: string
-  let engagementUuid: string
 
   gql`
-    query LeaveAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
+    query LeaveTypeAndEmployee(
+      $uuid: [UUID!]
+      $fromDate: DateTime
+      $includeEmployee: Boolean!
+    ) {
       facets(filter: { user_keys: ["leave_type"] }) {
         objects {
           objects {
@@ -36,7 +52,20 @@
           }
         }
       }
-      employees(filter: { uuids: $uuid, from_date: $fromDate }) {
+      employees(filter: { uuids: $uuid, from_date: $fromDate })
+        @include(if: $includeEmployee) {
+        objects {
+          objects {
+            uuid
+            name
+          }
+        }
+      }
+    }
+
+    query GetEmployee($uuid: [UUID!], $fromDate: DateTime, $includeEmployee: Boolean!) {
+      employees(filter: { uuids: $uuid, from_date: $fromDate })
+        @include(if: $includeEmployee) {
         objects {
           objects {
             uuid
@@ -60,11 +89,13 @@
         }
       }
     }
+
     mutation CreateLeave($input: LeaveCreateInput!) {
       leave_create(input: $input) {
         objects {
           employee {
             name
+            uuid
           }
           leave_type {
             name
@@ -84,7 +115,7 @@
           })
           $success = {
             message: `${mutation.leave_create.objects[0].leave_type.name} til ${mutation.leave_create.objects[0].employee[0].name} er blevet oprettet`,
-            uuid: $page.params.uuid,
+            uuid: mutation.leave_create.objects[0].employee[0].uuid,
             type: "employee",
           }
         } catch (err) {
@@ -93,28 +124,40 @@
         }
       }
     }
+
+  const urlHashEmployeeUuid = $page.url.hash.split("&")[0].substring(1) || null
+  const includeEmployee = urlHashEmployeeUuid ? true : false
+
+  async function updateEngagements(employeeUuid: string | null) {
+    const res = await graphQLClient().request(GetEmployeeDocument, {
+      uuid: employeeUuid,
+      fromDate: $date,
+      includeEmployee: employeeUuid ? true : false,
+    })
+    engagements = res.employees?.objects[0].objects[0].engagements
+  }
+
+  onMount(async () => {
+    await updateEngagements(urlHashEmployeeUuid)
+  })
 </script>
 
-{#await graphQLClient().request( LeaveAndEmployeeDocument, { uuid: $page.params.uuid, fromDate: $date } )}
-  <!-- TODO: Should have a skeleton for the loading stage -->
-  Henter data...
-{:then data}
-  {@const facets = data.facets.objects}
-  {@const employee = data.employees.objects[0].objects[0]}
-  {@const minDate = employee.validity.from.split("T")[0]}
-  {@const maxDate = employee.validity?.to?.split("T")[0]}
-  {@const engagements = employee.engagements}
-  {@const employeeName = employee.name}
+<title>Opret orlov | OS2mo</title>
 
-  <title>Opretssssssssss orlov | OS2mo</title>
+<div class="flex align-center px-6 pt-6 pb-4">
+  <h3 class="flex-1">Opret orlov</h3>
+</div>
 
-  <div class="flex align-center px-6 pt-6 pb-4">
-    <h3 class="flex-1">Opretssssssssssss orlov</h3>
-  </div>
+<div class="divider p-0 m-0 mb-4 w-full" />
 
-  <div class="divider p-0 m-0 mb-4 w-full" />
+<form method="post" class="mx-6" use:enhance={handler}>
+  {#await graphQLClient().request( LeaveTypeAndEmployeeDocument, { uuid: urlHashEmployeeUuid, fromDate: $date, includeEmployee: includeEmployee } )}
+    <!-- TODO: Should have a skeleton for the loading stage -->
+    Henter data...
+  {:then data}
+    {@const facets = data.facets.objects}
+    {@const startValueEmployee = data.employees?.objects[0].objects[0]}
 
-  <form method="post" class="mx-6" use:enhance={handler}>
     <div class="w-1/2 min-w-fit bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
@@ -123,39 +166,43 @@
             startValue={$date}
             title="Startdato"
             id="from"
-            min={minDate}
-            max={toDate ? toDate : maxDate}
           />
-          <DateInput
-            bind:value={toDate}
-            title="Slutdato"
-            id="to"
-            min={fromDate ? fromDate : minDate}
-            max={maxDate}
-          />
+          <DateInput bind:value={toDate} title="Slutdato" id="to" />
         </div>
 
         <Select
-          bind:value={leaveType}
           title="Orlovstype"
           id="leave-type-uuid"
           iterable={getClassesByFacetUserKey(facets, "leave_type")}
           required={true}
         />
-        <Input
+        <Search
           title="Medarbejder"
-          id="employee-uuid"
-          startValue={employeeName}
-          value={undefined}
-          disabled
+          type="employee"
+          startValue={startValueEmployee
+            ? {
+                uuid: startValueEmployee.uuid,
+                name: startValueEmployee.name,
+                attrs: [],
+              }
+            : undefined}
+          bind:value={employee}
+          on:change={() => updateEngagements(employee.uuid)}
+          on:clear={() => (engagements = undefined)}
         />
-        <Select
-          bind:value={engagementUuid}
-          title="Engagementer"
-          id="engagement-uuid"
-          iterable={getEngagementTitlesAndUuid(engagements)}
-          required={true}
-        />
+        {#if engagements && engagements.length}
+          {#key engagements}
+            <Select
+              title="Engagementer"
+              id="engagement-uuid"
+              startValue={getEngagementTitlesAndUuid(engagements)[0].name}
+              iterable={getEngagementTitlesAndUuid(engagements)}
+              required={true}
+            />
+          {/key}
+        {:else}
+          <Select title="Engagementer" id="engagement-uuid" disabled />
+        {/if}
       </div>
     </div>
     <div class="flex py-6 gap-4">
@@ -167,11 +214,11 @@
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        on:click={() => goto(`${base}/employee/${$page.params.uuid}`)}
+        on:click={() => history.back()}
       >
         Annullér
       </button>
     </div>
     <Error />
-  </form>
-{/await}
+  {/await}
+</form>

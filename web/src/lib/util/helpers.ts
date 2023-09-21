@@ -45,7 +45,7 @@ export const getITUserITSystemName = (itusers: ITUserITSystemName[]) => {
 }
 
 // Used to display both job_function-name and org-name on a single line, for example, in a dropdown select.
-type EngagementTitleAndUuid = {
+export type EngagementTitleAndUuid = {
   uuid: string
   job_function: { name: string }
   org_unit: { name: string }[]

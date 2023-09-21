@@ -3,7 +3,4 @@
 </script>
 
 <EmployeeNavbar />
-
-<div class="overflow-auto">
-  <slot />
-</div>
+<slot />
