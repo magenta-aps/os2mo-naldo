@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from "$app/stores"
+  import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
@@ -53,7 +53,7 @@
               <h2>{org_unit.objects[0].name}</h2>
               <a
                 class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-                href="{$page.url}/{org_unit.objects[0].uuid}"
+                href="{base}/organisation/{org_unit.objects[0].uuid}"
               >
                 Gå til enhed
               </a>
@@ -82,11 +82,11 @@
                 <!-- For the trailing comma problem -->
                 {#if i < org_unit.objects[0].children.length - 1}
                   <span class="inline-block mr-1">
-                    <a href="{$page.url}/{child.uuid}">{child.name},</a>
+                    <a href="{base}/organisation/{child.uuid}">{child.name},</a>
                   </span>
                 {:else}
                   <span>
-                    <a href="{$page.url}/{child.uuid}">{child.name}</a>
+                    <a href="{base}/organisation/{child.uuid}">{child.name}</a>
                   </span>
                 {/if}
               {/each}
