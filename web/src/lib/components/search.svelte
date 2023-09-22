@@ -61,7 +61,7 @@
     --placeholder-color="#00244E"
     --icons-color="#00244E"
     --border-focused="solid 0px"
-    --padding="0 0 0 0.75rem"
+    --padding="0 0.75rem 0 0.75rem"
     id="autocomplete"
     loadOptions={fetchAutocomplete}
     {floatingConfig}
