@@ -15,10 +15,16 @@
 
   let toDate: string
   const urlHashOrgUnitUuid = getUuidFromHash($page.url.hash)
+  const includeOrgUnit = urlHashOrgUnitUuid ? true : false
 
   gql`
-    query OrgUnit($uuid: [UUID!], $fromDate: DateTime!) {
-      org_units(filter: { uuids: $uuid, from_date: $fromDate }) {
+    query OrgUnit($uuid: [UUID!], $fromDate: DateTime!, $includeOrgUnit: Boolean!) {
+      ...getOrgUnitData
+    }
+
+    fragment getOrgUnitData on Query {
+      org_units(filter: { uuids: $uuid, from_date: $fromDate })
+        @include(if: $includeOrgUnit) {
         objects {
           objects {
             uuid
@@ -81,14 +87,14 @@
 <div class="divider p-0 m-0 mb-4 w-full" />
 
 <form method="post" class="mx-6" use:enhance={handler}>
-  {#await graphQLClient().request( OrgUnitDocument, { uuid: $page.params.uuid, fromDate: $date } )}
+  {#await graphQLClient().request( OrgUnitDocument, { uuid: urlHashOrgUnitUuid, fromDate: $date, includeOrgUnit: includeOrgUnit } )}
     <!-- TODO: Should have a skeleton for the loading stage -->
     Henter data...
   {:then data}
-    {@const org_unit = data.org_units.objects[0].objects[0]}
+    {@const orgUnit = data.org_units?.objects[0].objects[0]}
     <!-- De her dates skal opdateres afhængig af hvilken org_unit man vælger, nu når det ikke skal loades ind -->
-    {@const minDate = org_unit.parent?.validity.from.split("T")[0]}
-    {@const maxDate = org_unit.parent?.validity.to?.split("T")[0]}
+    {@const minDate = orgUnit?.parent?.validity.from.split("T")[0]}
+    {@const maxDate = orgUnit?.parent?.validity.to?.split("T")[0]}
 
     <div class="w-1/2 min-w-fit bg-slate-100 rounded">
       <div class="p-8">
@@ -100,28 +106,18 @@
           min={minDate}
           max={maxDate ? maxDate : null}
         />
-        {#if urlHashOrgUnitUuid}
-          {#await graphQLClient().request( OrgUnitDocument, { uuid: urlHashOrgUnitUuid, fromDate: $date } )}
-            <Input
-              title="Angiv enhed"
-              id="organisation-uuid"
-              disabled
-              placeholder="Henter organisation..."
-            />
-          {:then data}
-            {@const orgUnit = data.org_units.objects[0].objects[0]}
-            <Search
-              title="Angiv enhed"
-              type="org-unit"
-              startValue={{
-                uuid: orgUnit.uuid,
-                name: orgUnit.name,
-                attrs: [],
-              }}
-            />
-          {/await}
+        {#if orgUnit}
+          <Search
+            type="org-unit"
+            title="Angiv enhed"
+            startValue={{
+              uuid: orgUnit.uuid,
+              name: orgUnit.name,
+              attrs: [],
+            }}
+          />
         {:else}
-          <Search type="org-unit" title="Angiv enhed" />
+          <Search type="org-unit" title="Angiv overenhed" id="parent-uuid" />
         {/if}
       </div>
     </div>
