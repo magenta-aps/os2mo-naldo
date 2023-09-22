@@ -8,8 +8,8 @@
   enum SubPath {
     HOME = "/",
     EMPLOYEE = "/employee",
-    ORGANIZATION = "/organisation",
-    CONNECTING_ORGANIZATIONS = "/connecting-organizations",
+    ORGANISATION = "/organisation",
+    CONNECTING_ORGANISATIONS = "/connecting-organisations",
   }
 </script>
 
@@ -42,10 +42,10 @@
   <li>
     <a
       class="flex text-secondary hover:no-underline h-10 {$page.url.pathname ===
-      SubPath.ORGANIZATION
+      SubPath.ORGANISATION
         ? 'bg-accent'
         : ''}"
-      href="{base}{SubPath.ORGANIZATION}"
+      href="{base}{SubPath.ORGANISATION}"
     >
       <Icon type="users" />
       <p>Organisation</p>
@@ -54,10 +54,10 @@
   <li>
     <a
       class="flex text-secondary hover:no-underline h-10 {$page.url.pathname ===
-      SubPath.CONNECTING_ORGANIZATIONS
+      SubPath.CONNECTING_ORGANISATIONS
         ? 'bg-accent'
         : ''}"
-      href="{base}{SubPath.CONNECTING_ORGANIZATIONS}"
+      href="{base}{SubPath.CONNECTING_ORGANISATIONS}"
     >
       <Icon type="sitemap" />
       <!-- FIXME: Doesn't exist yet  -->

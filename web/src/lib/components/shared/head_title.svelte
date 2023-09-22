@@ -3,7 +3,7 @@
   import { fetchGraph } from "$lib/util/http"
 
   enum Title {
-    ORGANIZATION = "organization",
+    ORGANISATION = "organisation",
     EMPLOYEE = "employee",
   }
 
@@ -14,7 +14,7 @@
     let query: string
 
     switch (type) {
-      case Title.ORGANIZATION:
+      case Title.ORGANISATION:
         query = `{
           org_units(filter: { uuids: "${uuid}" }) {
             objects {
