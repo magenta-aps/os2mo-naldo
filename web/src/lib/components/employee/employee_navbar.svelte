@@ -29,7 +29,12 @@
       </span>
       <p class="text-base-100">Ny medarbejder</p>
     </a>
-    <label class="btn btn-sm btn-primary text-base-100 normal-case font-normal" for="">
+    <a
+      href={`${base}/employee/${Form.CREATE}/leave/${
+        $page.params.uuid ? `#${$page.params.uuid}` : ""
+      }`}
+      class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
+    >
       <span class="inline-block align-middle pr-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -43,7 +48,7 @@
         >
       </span>
       <p class="text-base-100">Orlov</p>
-    </label>
+    </a>
     <a
       href={`${base}/employee/${Form.MOVE}${
         $page.params.uuid ? `#${$page.params.uuid}` : ""

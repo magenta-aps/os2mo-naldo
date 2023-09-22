@@ -10,15 +10,12 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import Search from "$lib/components/search.svelte"
-  import { getEngagementTitlesAndUuid } from "$lib/util/helpers"
+  import {
+    getEngagementTitlesAndUuid,
+    type EngagementTitleAndUuid,
+  } from "$lib/util/helpers"
   import { onMount } from "svelte"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
-
-  type EngagementTitleAndUuid = {
-    uuid: string
-    job_function: { name: string }
-    org_unit: { name: string }[]
-  }
 
   let employee: {
     uuid: string
