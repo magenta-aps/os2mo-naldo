@@ -67,11 +67,11 @@
   `
 </script>
 
-<HeadTitle type="organization" />
+<HeadTitle type="organisation" />
 
 <div class="px-12 pt-6">
   {#await graphQLClient().request( OrgUnitDocument, { uuid: $page.params.uuid, fromDate: $date } )}
-    <p>Loader medarbejder...</p>
+    <p>Loader organisation...</p>
   {:then data}
     <div class="flex gap-5">
       <h1 class="pb-4">{data.org_units.objects[0].objects[0].name}</h1>

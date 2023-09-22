@@ -2,8 +2,8 @@
   enum Icon {
     HOUSE = "house", // Used for the home nagivation
     USER = "user", // Used for the employee navigation
-    USERS = "users", // Used for the organization navigation
-    SITEMAP = "sitemap", // Used for the connecting organizations navigation
+    USERS = "users", // Used for the organisation navigation
+    SITEMAP = "sitemap", // Used for the connecting organisations navigation
     XMARK = "xmark", // Used for closing
     CLIPBOARD = "clipboard", // Used for clipboard
     SUCCESS = "success", // Used for success messages
