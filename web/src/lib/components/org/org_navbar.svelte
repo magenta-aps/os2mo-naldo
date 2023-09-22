@@ -14,7 +14,7 @@
   <div class="flex-1">
     <a
       href={`${base}/organisation/${Form.CREATE}${
-        $page.params.uuid ? `#${$page.params.uuid}` : ""
+        $page.params.uuid ? `#uuid=${$page.params.uuid}` : ""
       }`}
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
@@ -34,7 +34,7 @@
     </a>
     <a
       href={`${base}/organisation/${Form.RENAME}${
-        $page.params.uuid ? `#${$page.params.uuid}` : ""
+        $page.params.uuid ? `#uuid=${$page.params.uuid}` : ""
       }`}
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
@@ -54,7 +54,7 @@
     </a>
     <a
       href={`${base}/organisation/${Form.MOVE}${
-        $page.params.uuid ? `#${$page.params.uuid}` : ""
+        $page.params.uuid ? `#uuid=${$page.params.uuid}` : ""
       }`}
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
@@ -73,7 +73,7 @@
     </a>
     <a
       href={`${base}/organisation/${Form.TERMINATE}${
-        $page.params.uuid ? `#${$page.params.uuid}` : ""
+        $page.params.uuid ? `#uuid=${$page.params.uuid}` : ""
       }`}
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >

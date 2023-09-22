@@ -11,6 +11,7 @@
   import Search from "$lib/components/search.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
   import { page } from "$app/stores"
+  import { getUuidFromHash } from "$lib/util/helpers"
 
   let fromDate: string
   let orgUnit: {
@@ -19,7 +20,7 @@
     attrs: []
   }
   let name: string
-  const urlHashOrgUnitUuid = $page.url.hash.split("&")[0].substring(1)
+  const urlHashOrgUnitUuid = getUuidFromHash($page.url.hash)
 
   gql`
     query OrgUnit($uuid: [UUID!], $fromDate: DateTime) {

@@ -13,6 +13,7 @@
   import type { SubmitFunction } from "./$types"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import Search from "$lib/components/search.svelte"
+  import { getUuidFromHash } from "$lib/util/helpers"
 
   gql`
     query GetOrgUnitAndFacets(
@@ -65,7 +66,7 @@
   let fromDate: string
   let toDate: string
 
-  const urlHashOrgUnitUuid = $page.url.hash.split("&")[0].substring(1) || null
+  const urlHashOrgUnitUuid = getUuidFromHash($page.url.hash)
   const includeOrgUnit = urlHashOrgUnitUuid ? true : false
 
   const handler: SubmitFunction =

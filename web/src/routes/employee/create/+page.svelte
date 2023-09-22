@@ -1,16 +1,12 @@
 <script lang="ts">
-  import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
-  import { goto } from "$app/navigation"
-  import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
   import { CreateEmployeeDocument } from "./query.generated"
   import { gql } from "graphql-request"
-  import { page } from "$app/stores"
 
   let cprNumber: string
   let firstName: string

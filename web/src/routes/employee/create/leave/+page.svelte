@@ -20,6 +20,7 @@
   import {
     getEngagementTitlesAndUuid,
     type EngagementTitleAndUuid,
+    getUuidFromHash,
   } from "$lib/util/helpers"
   import Search from "$lib/components/search.svelte"
   import { onMount } from "svelte"
@@ -125,10 +126,10 @@
       }
     }
 
-  const urlHashEmployeeUuid = $page.url.hash.split("&")[0].substring(1) || null
+  const urlHashEmployeeUuid = getUuidFromHash($page.url.hash)
   const includeEmployee = urlHashEmployeeUuid ? true : false
 
-  async function updateEngagements(employeeUuid: string | null) {
+  async function updateEngagements(employeeUuid: string | undefined | null) {
     const res = await graphQLClient().request(GetEmployeeDocument, {
       uuid: employeeUuid,
       fromDate: $date,

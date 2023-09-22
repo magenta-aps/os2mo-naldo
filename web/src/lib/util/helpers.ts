@@ -2,6 +2,12 @@ import type { OpenValidity, Validity } from "$lib/graphql/types"
 import { date } from "$lib/stores/date"
 import { get } from "svelte/store"
 
+export const getUuidFromHash = (hash: string) => {
+  let uuidFromHash = hash.split("&").find((e) => e.startsWith("#uuid="))
+
+  return uuidFromHash ? uuidFromHash.replace("#uuid=", "") : undefined
+}
+
 export const tenseToValidity = (
   tense: Tense,
   date: string

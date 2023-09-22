@@ -31,7 +31,7 @@
     </a>
     <a
       href={`${base}/employee/${Form.CREATE}/leave/${
-        $page.params.uuid ? `#${$page.params.uuid}` : ""
+        $page.params.uuid ? `#uuid=${$page.params.uuid}` : ""
       }`}
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
@@ -51,7 +51,7 @@
     </a>
     <a
       href={`${base}/employee/${Form.MOVE}${
-        $page.params.uuid ? `#${$page.params.uuid}` : ""
+        $page.params.uuid ? `#uuid=${$page.params.uuid}` : ""
       }`}
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
