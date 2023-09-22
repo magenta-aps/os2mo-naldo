@@ -11,9 +11,10 @@
   import { date } from "$lib/stores/date"
   import Search from "$lib/components/search.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
+  import { getUuidFromHash } from "$lib/util/helpers"
 
   let toDate: string
-  const urlHashOrgUnitUuid = $page.url.hash.split("&")[0].substring(1)
+  const urlHashOrgUnitUuid = getUuidFromHash($page.url.hash)
 
   gql`
     query OrgUnit($uuid: [UUID!], $fromDate: DateTime!) {

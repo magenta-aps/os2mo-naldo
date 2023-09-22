@@ -12,6 +12,7 @@
   import Search from "$lib/components/search.svelte"
   import {
     getEngagementTitlesAndUuid,
+    getUuidFromHash,
     type EngagementTitleAndUuid,
   } from "$lib/util/helpers"
   import { onMount } from "svelte"
@@ -25,7 +26,7 @@
   let engagements: EngagementTitleAndUuid[] | undefined
   let fromDate: string
 
-  const urlHashEmployeeUuid = $page.url.hash.split("&")[0].substring(1) || null
+  const urlHashEmployeeUuid = getUuidFromHash($page.url.hash)
   const includeEmployee = urlHashEmployeeUuid ? true : false
 
   gql`
@@ -94,7 +95,7 @@
         }
       }
     }
-  async function updateEngagements(employeeUuid: string | null) {
+  async function updateEngagements(employeeUuid: string | undefined | null) {
     const res = await graphQLClient().request(EngagementsDocument, {
       uuid: employeeUuid,
       fromDate: $date,
