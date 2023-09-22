@@ -2278,6 +2278,7 @@ export type EmployeesBoundEngagementFilter = {
 
 export type EmployeesBoundItUserFilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  itsystem_uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -3926,6 +3927,21 @@ export type ItUserFilter = {
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Only return IT users of ITSystem with these UUIDs filter limiting which entries are returned.
+   *
+   * | `itsystem_uuids`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  itsystem_uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /**
    * Organisational Unit UUID filter limiting which entries are returned.
    *
@@ -6394,6 +6410,7 @@ export type OrgUnitsboundengagementfilter = {
 export type OrgUnitsboundituserfilter = {
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  itsystem_uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -8388,6 +8405,7 @@ export type UuidsBoundFacetFilter = {
 export type UuidsBoundItUserFilter = {
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  itsystem_uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
