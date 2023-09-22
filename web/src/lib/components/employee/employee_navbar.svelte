@@ -83,25 +83,25 @@
       </span>
       <p class="text-base-100">Flyt mange engagementer</p>
     </label>
-    <label class="btn btn-sm btn-primary text-base-100 normal-case font-normal" for="">
-      <a
-        href="{base}/employee/{$page.params.uuid}/{Form.TERMINATE}"
-        class="btn btn-sm btn-primary text-base-100 normal-case font-normal"
-      >
-        <span class="inline-block align-middle pr-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            ><path
-              d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6 16.538l-4.592-4.548 4.546-4.587-1.416-1.403-4.545 4.589-4.588-4.543-1.405 1.405 4.593 4.552-4.547 4.592 1.405 1.405 4.555-4.596 4.591 4.55 1.403-1.416z"
-            /></svg
-          >
-        </span>
-        <p class="text-base-100">Opsig medarbejder</p>
-      </a>
-    </label>
+    <a
+      href={`${base}/employee/${Form.TERMINATE}${
+        $page.params.uuid ? `#uuid=${$page.params.uuid}` : ""
+      }`}
+      class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
+    >
+      <span class="inline-block align-middle pr-2">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          ><path
+            d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6 16.538l-4.592-4.548 4.546-4.587-1.416-1.403-4.545 4.589-4.588-4.543-1.405 1.405 4.593 4.552-4.547 4.592 1.405 1.405 4.555-4.596 4.591 4.55 1.403-1.416z"
+          /></svg
+        >
+      </span>
+      <p class="text-base-100">Opsig medarbejder</p>
+    </a>
   </div>
 </div>

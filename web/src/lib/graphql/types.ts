@@ -3551,6 +3551,44 @@ export type ItSystemCreateInput = {
   uuid?: InputMaybe<Scalars['UUID']['input']>;
 };
 
+/** IT system filter. */
+export type ItSystemFilter = {
+  /** Limit the elements returned by their starting validity. */
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /** Limit the elements returned by their ending validity. */
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * User-key filter limiting which entries are returned.
+   *
+   * | `user_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * UUID filter limiting which entries are returned.
+   *
+   * | `uuids`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
 /**
  * Top-level container for (bi)-temporal and actual state data access.
  *
@@ -5367,7 +5405,7 @@ export type Mutation = {
    */
   address_delete: AddressResponse;
   /** Refresh addresses. */
-  address_refresh: Array<Scalars['UUID']['output']>;
+  address_refresh: UuidPaged;
   /** Terminates an address. */
   address_terminate: AddressResponse;
   /** Updates an address. */
@@ -5375,7 +5413,7 @@ export type Mutation = {
   /** Creates an association. */
   association_create: AssociationResponse;
   /** Refresh associations. */
-  association_refresh: Array<Scalars['UUID']['output']>;
+  association_refresh: UuidPaged;
   /** Terminates an association */
   association_terminate: AssociationResponse;
   /** Updates an association. */
@@ -5402,13 +5440,13 @@ export type Mutation = {
    */
   class_delete: ClassResponse;
   /** Refresh classes. */
-  class_refresh: Array<Scalars['UUID']['output']>;
+  class_refresh: UuidPaged;
   /** Updates a class. */
   class_update: ClassResponse;
   /** Creates an employee. */
   employee_create: EmployeeResponse;
   /** Refresh employees. */
-  employee_refresh: Array<Scalars['UUID']['output']>;
+  employee_refresh: UuidPaged;
   /** Terminates an employee. */
   employee_terminate: EmployeeResponse;
   /** Updates an employee. */
@@ -5435,7 +5473,7 @@ export type Mutation = {
    */
   engagement_delete: EngagementResponse;
   /** Refresh engagements. */
-  engagement_refresh: Array<Scalars['UUID']['output']>;
+  engagement_refresh: UuidPaged;
   /** Terminates an engagement. */
   engagement_terminate: EngagementResponse;
   /** Updates an engagement. */
@@ -5462,7 +5500,7 @@ export type Mutation = {
    */
   facet_delete: FacetResponse;
   /** Refresh facets. */
-  facet_refresh: Array<Scalars['UUID']['output']>;
+  facet_refresh: UuidPaged;
   /** Updates a facet. */
   facet_update: FacetResponse;
   /** Creates an IT-Association. */
@@ -5493,7 +5531,7 @@ export type Mutation = {
    */
   itsystem_delete: ItSystemResponse;
   /** Refresh ITSystems. */
-  itsystem_refresh: Array<Scalars['UUID']['output']>;
+  itsystem_refresh: UuidPaged;
   /** Updates an ITSystem. */
   itsystem_update: ItSystemResponse;
   /** Creates an IT-User. */
@@ -5518,7 +5556,7 @@ export type Mutation = {
    */
   ituser_delete: ItUserResponse;
   /** Refresh IT-Users. */
-  ituser_refresh: Array<Scalars['UUID']['output']>;
+  ituser_refresh: UuidPaged;
   /** Terminates IT-User. */
   ituser_terminate: ItUserResponse;
   /** Updates an IT-User. */
@@ -5526,7 +5564,7 @@ export type Mutation = {
   /** Creates a KLE annotation. */
   kle_create: KleResponse;
   /** Refresh KLEs. */
-  kle_refresh: Array<Scalars['UUID']['output']>;
+  kle_refresh: UuidPaged;
   /** Terminates a KLE annotation. */
   kle_terminate: KleResponse;
   /** Updates a KLE annotation. */
@@ -5534,7 +5572,7 @@ export type Mutation = {
   /** Creates a leave. */
   leave_create: LeaveResponse;
   /** Refresh leaves. */
-  leave_refresh: Array<Scalars['UUID']['output']>;
+  leave_refresh: UuidPaged;
   /** Terminates a leave. */
   leave_terminate: LeaveResponse;
   /** Updates a leave. */
@@ -5542,7 +5580,7 @@ export type Mutation = {
   /** Creates a manager relation. */
   manager_create: ManagerResponse;
   /** Refresh managers. */
-  manager_refresh: Array<Scalars['UUID']['output']>;
+  manager_refresh: UuidPaged;
   /** Terminates a manager relation. */
   manager_terminate: ManagerResponse;
   /** Updates a manager relation. */
@@ -5555,19 +5593,19 @@ export type Mutation = {
   /** Creates an organisation unit. */
   org_unit_create: OrganisationUnitResponse;
   /** Refresh organization units. */
-  org_unit_refresh: Array<Scalars['UUID']['output']>;
+  org_unit_refresh: UuidPaged;
   /** Terminates an organization unit. */
   org_unit_terminate: OrganisationUnitResponse;
   /** Updates an organisation unit. */
   org_unit_update: OrganisationUnitResponse;
   /** Refresh owners. */
-  owner_refresh: Array<Scalars['UUID']['output']>;
+  owner_refresh: UuidPaged;
   /** Refresh a related unit. */
-  related_unit_refresh: Array<Scalars['UUID']['output']>;
+  related_unit_refresh: UuidPaged;
   /** Creates a role. */
   role_create: RoleResponse;
   /** Refresh roles. */
-  role_refresh: Array<Scalars['UUID']['output']>;
+  role_refresh: UuidPaged;
   /** Terminates a role. */
   role_terminate: RoleResponse;
   /** Updates a role. */
@@ -5640,7 +5678,9 @@ export type MutationAddress_DeleteArgs = {
  *
  */
 export type MutationAddress_RefreshArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<AddressFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -5689,7 +5729,9 @@ export type MutationAssociation_CreateArgs = {
  *
  */
 export type MutationAssociation_RefreshArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<AssociationFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -5750,7 +5792,9 @@ export type MutationClass_DeleteArgs = {
  *
  */
 export type MutationClass_RefreshArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ClassFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -5787,7 +5831,9 @@ export type MutationEmployee_CreateArgs = {
  *
  */
 export type MutationEmployee_RefreshArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<EmployeeFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -5848,7 +5894,9 @@ export type MutationEngagement_DeleteArgs = {
  *
  */
 export type MutationEngagement_RefreshArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<EngagementFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -5909,7 +5957,9 @@ export type MutationFacet_DeleteArgs = {
  *
  */
 export type MutationFacet_RefreshArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<FacetFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -5994,7 +6044,9 @@ export type MutationItsystem_DeleteArgs = {
  *
  */
 export type MutationItsystem_RefreshArgs = {
-  filter?: InputMaybe<BaseFilter>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<ItSystemFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -6043,7 +6095,9 @@ export type MutationItuser_DeleteArgs = {
  *
  */
 export type MutationItuser_RefreshArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ItUserFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -6092,7 +6146,9 @@ export type MutationKle_CreateArgs = {
  *
  */
 export type MutationKle_RefreshArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<KleFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -6141,7 +6197,9 @@ export type MutationLeave_CreateArgs = {
  *
  */
 export type MutationLeave_RefreshArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<LeaveFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -6190,7 +6248,9 @@ export type MutationManager_CreateArgs = {
  *
  */
 export type MutationManager_RefreshArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ManagerFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -6251,7 +6311,9 @@ export type MutationOrg_Unit_CreateArgs = {
  *
  */
 export type MutationOrg_Unit_RefreshArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<OrganisationUnitFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -6288,7 +6350,9 @@ export type MutationOrg_Unit_UpdateArgs = {
  *
  */
 export type MutationOwner_RefreshArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<OwnerFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -6301,7 +6365,9 @@ export type MutationOwner_RefreshArgs = {
  *
  */
 export type MutationRelated_Unit_RefreshArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<RelatedUnitFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -6326,7 +6392,9 @@ export type MutationRole_CreateArgs = {
  *
  */
 export type MutationRole_RefreshArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<RoleFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -8365,6 +8433,26 @@ export type RoleUpdateInput = {
   uuid: Scalars['UUID']['input'];
   /** Validity range for the role to be updated. */
   validity: RaValidityInput;
+};
+
+/** Result page in cursor-based pagination. */
+export type UuidPaged = {
+  __typename?: 'UUIDPaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<Scalars['UUID']['output']>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
 };
 
 export type UuidsBoundBaseFilter = {
