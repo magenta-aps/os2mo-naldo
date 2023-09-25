@@ -1,5 +1,8 @@
 FROM node:18-alpine AS base
 
+ARG COMMIT_TAG
+ENV PUBLIC_COMMIT_TAG=${COMMIT_TAG:-HEAD}
+
 WORKDIR /app
 
 COPY web/package.json web/yarn.lock ./
