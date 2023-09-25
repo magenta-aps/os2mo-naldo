@@ -3,7 +3,7 @@
   import DrawerContent from "$lib/components/drawer_content.svelte"
 </script>
 
-<div class="drawer lg:drawer-open">
+<div class="drawer lg:drawer-open h-[calc(100vh-4rem)]">
   <input id="drawer" type="checkbox" class="drawer-toggle" />
   <div class="drawer-content flex flex-col h-auto">
     <!-- Page content here -->
