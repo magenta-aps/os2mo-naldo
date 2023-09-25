@@ -71,7 +71,7 @@ SvelteKit build:
     - yarn
     - yarn build
   variables:
-    BUILD_DOCKER_EXTRA_FLAGS: --build-arg=COMMIT_SHA=${CI_COMMIT_SHA} --build-arg=COMMIT_TAG=${CI_COMMIT_TAG}
+    BUILD_DOCKER_EXTRA_FLAGS: --build-arg=COMMIT_TAG=please_work
 
 Deploy to dev:
   extends: .release-to-dev
