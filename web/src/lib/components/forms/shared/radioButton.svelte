@@ -2,34 +2,35 @@
   import { createEventDispatcher } from "svelte"
 
   export let title: string | undefined = undefined
-  export let id: string
+  export let id: string // dette vil blive brugt som uuid
   export let value: string
   export let startValue: string | undefined = undefined
   export let extra_classes = ""
+  export let groupName: string // Navnet på radiogruppen
 
   const dispatch = createEventDispatcher()
 
-  function handleCheckboxChange(event: Event) {
+  function handleRadioChange(event: Event) {
     const target = event.target as HTMLInputElement
     const isChecked = target.checked
     const uuid = target.id
 
-    console.log("Checkbox Changed Event Emitted", { isChecked, uuid })
+    console.log("Radio Changed Event Emitted", { isChecked, uuid })
 
-    dispatch("checkboxChanged", { isChecked, uuid })
+    dispatch("radioChanged", { isChecked, uuid })
   }
 </script>
 
 <div class="form-control pb-4">
   <label class="label cursor-pointer p-0 gap-4">
     <input
-      type="checkbox"
+      type="radio"
       {id}
-      name={id}
+      name={groupName}
       {value}
       checked={startValue === value}
       class="checkbox {extra_classes} rounded normal-case font-normal text-base text-base-100"
-      on:change={handleCheckboxChange}
+      on:change={handleRadioChange}
     />
     {#if title}
       <label for={id}>{title}</label>

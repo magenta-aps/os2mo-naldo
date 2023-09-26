@@ -18,6 +18,9 @@
   export let required = true
   let orgTree: any[] = []
   let isFocused = false
+  /* TODO: usechecbox  og multiselect skal som udgangspunkt være false */
+  export let useCheckbox: boolean = false
+  export let multiSelect: boolean = false
 
   gql`
     query OrgTree($from_date: DateTime!) {
@@ -83,19 +86,30 @@
       {labelText}
     </label>
     <div use:floatingRef>
-      <input
-        {id}
-        {required}
-        on:focus={() => {
-          isFocused = true
-        }}
-        bind:value={selectedOrg.name}
-        class="input input-bordered input-sm text-base text-secondary font-normal rounded active:input-primary focus:input-primary w-full active:outline-offset-0 focus:outline-offset-0"
-      />
+      {#if !useCheckbox}
+        <input
+          {id}
+          {required}
+          on:focus={() => {
+            isFocused = true
+          }}
+          bind:value={selectedOrg.name}
+          class="input input-bordered input-sm text-base text-secondary font-normal rounded active:input-primary focus:input-primary w-full active:outline-offset-0 focus:outline-offset-0"
+        />
+        <!-- Hidden input for single select when checkboxes are not used -->
+        <input hidden {id} name={id} bind:value={selectedOrg.uuid} />
+      {/if}
 
-      <!-- Hidden hack to return the UUID while displaying the name -->
-      <input hidden {id} name={id} bind:value={selectedOrg.uuid} />
-      {#if isFocused}
+      <!-- Check useCheckbox to determine the presentation of the list-->
+      {#if useCheckbox}
+        <div class="w-96 max-w-full px-5">
+          <ul class="menu bg-base-200">
+            {#each orgTree as child}
+              <Node {...child} bind:selectedOrg {useCheckbox} {multiSelect} />
+            {/each}
+          </ul>
+        </div>
+      {:else if isFocused}
         <div
           use:floatingContent
           class="w-96 max-w-full px-5"

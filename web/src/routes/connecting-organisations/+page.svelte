@@ -11,41 +11,40 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import { UpdateRelatedUnitsDocument, RelatedUnits2Document } from "./query.generated"
+  import { OrgTreeRelatedDocument, UpdateRelatedUnitsDocument } from "./query.generated"
+  import SelectOrgTree from "$lib/components/org/select_tree/org_tree.svelte"
+  import {
+    selectedDestinationUuids,
+    selectedOriginUuid,
+  } from "$lib/stores/selectedItem"
 
-  let fromDate: string
-  let destinationUuid: any[]
+  let destinationUuids: string[] = []
   let originUuid: string
 
+  let fromDate = new Date().toISOString().split("T")[0]
+  let parent: { name: string; uuid?: any | null }
+
+  /* TODO:ny graphQL med midre query? */
   gql`
-    query RelatedUnits($uuid: [UUID!], $fromDate: DateTime) {
-      org_units(uuids: $uuid, from_date: $fromDate) {
+    query OrgTreeRelated($from_date: DateTime!) {
+      org_units(filter: { from_date: $from_date }) {
         objects {
           objects {
+            name
             uuid
-            user_key
-            related_units {
+            children {
+              name
               uuid
-              user_key
-              org_units {
-                uuid
-                user_key
-              }
             }
           }
         }
       }
-    }
-
-    query RelatedUnits2($fromDate: DateTime) {
-      related_units(from_date: $fromDate) {
+      related_units {
         objects {
           objects {
-            uuid
-            user_key
             org_units {
               uuid
-              user_key
+              name
             }
           }
         }
@@ -67,6 +66,7 @@
           const mutation = await graphQLClient().request(UpdateRelatedUnitsDocument, {
             input: result.data,
           })
+          /* TODO: Intetsigende besked ret til noget mere fornuftigt */
           $success = {
             message: `Tilknytning til ${mutation.related_units_update.uuid} er blevet oprettet`,
           }
@@ -76,13 +76,27 @@
         }
       }
     }
+
+  $: originName = $selectedOriginUuid ? $selectedOriginUuid.name : "Ukendt"
+  $: destinationNames = $selectedDestinationUuids.map((dest) => dest.name)
 </script>
 
-{#await graphQLClient().request(RelatedUnits2Document, { fromDate: $date })}
-  <!-- TODO: Should have a skeleton for the loading stage -->
+{#await graphQLClient().request(OrgTreeRelatedDocument, { from_date: $date })}
   Henter data...
 {:then data}
-  {console.log(data)}
+  {@const org_units = data.related_units.objects[0].objects[0].org_units}
+
+  {@const connectionText = originName
+    ? `${originName} kobles sammen med: ${
+        destinationNames.length
+          ? destinationNames.length > 1
+            ? destinationNames.slice(0, -1).join(", ") +
+              " og " +
+              destinationNames[destinationNames.length - 1]
+            : destinationNames[0]
+          : ""
+      }`
+    : ""}
 
   <title>Organisationssammenkobling | OS2mo</title>
 
@@ -96,41 +110,58 @@
     <div class="w-1/2 min-w-fit bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
-          <DateInput
-            bind:value={fromDate}
-            startValue={$date}
-            title="Startdato"
-            id="from"
+          <input type="hidden" name="from" bind:value={fromDate} />
+
+          <SelectOrgTree
+            useCheckbox={true}
+            multiSelect={false}
+            bind:selectedOrg={parent}
+            labelText="Vælg enhed"
+          />
+          <!-- Skjult felt for origin-uuid -->
+          <input
+            type="hidden"
+            id="origin-uuid"
+            name="origin-uuid"
+            value={$selectedOriginUuid ? $selectedOriginUuid.uuid : ""}
+          />
+
+          <SelectOrgTree
+            useCheckbox={true}
+            multiSelect={true}
+            bind:selectedOrg={parent}
+            labelText="Angiv hvilke enheder der skal sammenkobles med enheden til venstre"
+          />
+          <!-- Skjult felt for destination-uuids -->
+          <input
+            type="hidden"
+            id="destination-uuids"
+            name="destination-uuids"
+            value={$selectedDestinationUuids.map((obj) => obj.uuid).join(",")}
           />
         </div>
-        <Input
-          title="Origin UUID"
-          id="origin-uuid"
-          required={true}
-          bind:value={originUuid}
-        />
+        <div class="info-text py-2">{connectionText}</div>
+        <div class="flex py-6 gap-4">
+          <button
+            type="submit"
+            class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+            >Gem</button
+          >
+          <!--  TODO:hvorskal goto: vise hen? -->
+          <button
+            type="button"
+            class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+            on:click={() => goto(`${base}/connecting-organisations/`)}
+          >
+            Annullér
+          </button>
+          <Error />
+        </div>
       </div>
-      <Input
-        title="Distination UUID"
-        id="destination-uuid"
-        required={true}
-        bind:value={destinationUuid[0]}
-      />
     </div>
-    <div class="flex py-6 gap-4">
-      <button
-        type="submit"
-        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >Gem</button
-      >
-      <button
-        type="button"
-        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        on:click={() => goto(`${base}/connecting-organisations/`)}
-      >
-        Annullér
-      </button>
-    </div>
-    <Error />
   </form>
+
+  {console.log("origin:", $selectedOriginUuid)}
+  {console.log("distination:", $selectedDestinationUuids)}
+  {console.log("data:", org_units)}
 {/await}
