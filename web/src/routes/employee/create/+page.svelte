@@ -71,7 +71,7 @@
           placeholder="Efternavn"
           bind:value={lastName}
           required={true}
-          extra_classes="pt-6 basis-1/2"
+          extra_classes="basis-1/2"
         />
       </div>
       <div class="flex flex-row gap-6">

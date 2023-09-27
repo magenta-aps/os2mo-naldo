@@ -20,9 +20,10 @@
 </script>
 
 <div class="form-control pb-4 {extra_classes}">
-  {#if title}
+  {#if title || required}
     <label for={id} class="text-sm text-secondary pb-1">
-      {title}
+      {title ? title : ""}
+      {required ? "*" : ""}
     </label>
   {/if}
   <select
