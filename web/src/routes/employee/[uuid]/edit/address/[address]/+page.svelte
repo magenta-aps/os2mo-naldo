@@ -17,10 +17,8 @@
 
   let fromDate: string
   let toDate: string
-  let visibility: string
   let addressType: { name: string; uuid?: any | null }
   $: addressUuid = addressType?.uuid
-  let input: string | number
 
   gql`
     query AddressAndFacets(
@@ -133,6 +131,7 @@
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
+            required={true}
           />
           <DateInput
             bind:value={toDate}
@@ -147,11 +146,9 @@
           <Select
             title="Synlighed"
             id="visibility"
-            bind:value={visibility}
             startValue={address.visibility?.name}
             iterable={getClassesByFacetUserKey(facets, "visibility")}
             extra_classes="basis-1/2"
-            required={true}
           />
           <Select
             title="Adressetype"
@@ -171,7 +168,6 @@
               title="Email"
               id="value"
               type="email"
-              bind:value={input}
               startValue={address.name}
               required={true}
             />
@@ -179,7 +175,6 @@
             <Input
               title="Lokation"
               id="value"
-              bind:value={input}
               startValue={address.name}
               required={true}
             />
@@ -187,7 +182,6 @@
             <Input
               title="Postadresse"
               id="value"
-              bind:value={input}
               startValue={address.name}
               required={true}
             />
@@ -198,7 +192,6 @@
               type="tel"
               pattern="[0-9]+"
               patternMessage="Kun tal & '+' er tilladt"
-              bind:value={input}
               startValue={address.name}
               required={true}
             />

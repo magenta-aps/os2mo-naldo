@@ -17,10 +17,8 @@
 
   let fromDate: string
   let toDate: string
-  let visibility: string
   let addressType: { name: string; uuid?: any | null }
   $: addressUuid = addressType?.uuid
-  let input: string | number
 
   gql`
     query FacetsAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
@@ -113,6 +111,7 @@
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
+            required={true}
           />
           <DateInput
             bind:value={toDate}
@@ -126,10 +125,8 @@
           <Select
             title="Synlighed"
             id="visibility"
-            bind:value={visibility}
             iterable={getClassesByFacetUserKey(facets, "visibility")}
             extra_classes="basis-1/2"
-            required={true}
           />
           <Select
             title="Adressetype"
@@ -144,17 +141,11 @@
         </div>
         {#if addressType}
           {#if addressType.name == "Email"}
-            <Input
-              title="Email"
-              id="value"
-              type="email"
-              bind:value={input}
-              required={true}
-            />
+            <Input title="Email" id="value" type="email" required={true} />
           {:else if addressType.name == "Lokation"}
-            <Input title="Lokation" id="value" bind:value={input} required={true} />
+            <Input title="Lokation" id="value" required={true} />
           {:else if addressType.name == "Postadresse"}
-            <Input title="Postadresse" id="value" bind:value={input} required={true} />
+            <Input title="Postadresse" id="value" required={true} />
           {:else if addressType.name == "Telefon"}
             <Input
               title="Telefon"
@@ -162,7 +153,6 @@
               type="tel"
               pattern="[0-9]+"
               patternMessage="Kun tal & '+' er tilladt"
-              bind:value={input}
               required={true}
             />
           {/if}

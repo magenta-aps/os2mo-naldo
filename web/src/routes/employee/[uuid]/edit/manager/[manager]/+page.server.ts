@@ -14,6 +14,7 @@ export const actions: Actions = {
 
     return {
       uuid: params.manager,
+      person: params.uuid,
       ...(orgUnitUuid && { org_unit: orgUnitUuid }),
       ...(managerType && { manager_type: managerType }),
       ...(managerLevel && { manager_level: managerLevel }),

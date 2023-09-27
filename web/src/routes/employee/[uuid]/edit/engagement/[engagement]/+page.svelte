@@ -16,18 +16,12 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import Search from "$lib/components/search.svelte"
 
   let fromDate: string
   let toDate: string
-  let orgUnitUuid: string
-  let user_key: string
-  let jobFunction: string
-  let engagementType: string
-  let primary: string
 
-  // TODO: Move facets to its own query to not have the datetime overwritten
   gql`
     query EngagementAndFacet($uuid: [UUID!], $fromDate: DateTime) {
       facets(
@@ -104,7 +98,7 @@
             input: result.data,
           })
           $success = {
-            message: `${mutation.engagement_update.objects[0].employee[0].name} er blevet redigeret`,
+            message: `Engagement til ${mutation.engagement_update.objects[0].employee[0].name} er blevet redigeret`,
             uuid: $page.params.uuid,
             type: "employee",
           }
@@ -125,10 +119,10 @@
   {@const minDate = engagement.org_unit[0].validity.from.split("T")[0]}
   {@const maxDate = engagement.org_unit[0].validity.to?.split("T")[0]}
 
-  <title>Rediger {engagement?.employee[0].name} | OS2mo</title>
+  <title>Rediger engagement for {engagement?.employee[0].name} | OS2mo</title>
 
   <div class="flex align-center px-6 pt-6 pb-4">
-    <h3 class="flex-1">Rediger {engagement.employee[0].name}</h3>
+    <h3 class="flex-1">Rediger engagement for {engagement.employee[0].name}</h3>
   </div>
 
   <div class="divider p-0 m-0 mb-4 w-full" />
@@ -144,6 +138,7 @@
             id="from"
             min={minDate}
             max={maxDate ? maxDate : null}
+            required={true}
           />
           <DateInput
             bind:value={toDate}
@@ -156,46 +151,43 @@
             max={maxDate ? maxDate : null}
           />
         </div>
-        <Input
-          title="Organisationsenhed UUID"
-          id="org-unit-uuid"
-          bind:value={orgUnitUuid}
-          startValue={engagement.org_unit[0].uuid}
+        <Search
+          type="org-unit"
+          startValue={{
+            uuid: engagement.org_unit[0].uuid,
+            name: engagement.org_unit[0].name,
+            attrs: [],
+          }}
           required={true}
-          extra_classes="basis-1/2"
         />
         <div class="flex flex-row gap-6">
           <Input
             title="ID"
             id="user-key"
-            bind:value={user_key}
             startValue={engagement.user_key}
             extra_classes="basis-1/2"
           />
           <Select
             title="Stillingsbetegnelse"
             id="job-function"
-            bind:value={jobFunction}
             startValue={engagement.job_function.name}
             iterable={getClassesByFacetUserKey(facets, "engagement_job_function")}
-            required={true}
             extra_classes="basis-1/2"
+            required={true}
           />
         </div>
         <div class="flex flex-row gap-6">
           <Select
             title="Engagementstype"
             id="engagement-type"
-            bind:value={engagementType}
             startValue={engagement.engagement_type.name}
             iterable={getClassesByFacetUserKey(facets, "engagement_type")}
-            required={true}
             extra_classes="basis-1/2"
+            required={true}
           />
           <Select
             title="Primær"
             id="primary"
-            bind:value={primary}
             startValue={engagement.primary?.name}
             iterable={getClassesByFacetUserKey(facets, "primary_type")}
             extra_classes="basis-1/2"

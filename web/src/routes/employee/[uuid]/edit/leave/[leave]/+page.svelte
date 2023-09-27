@@ -18,8 +18,6 @@
 
   let fromDate: string
   let toDate: string
-  let leaveType: string
-  let engagementUuid: string
 
   gql`
     query LeaveAndFacet($uuid: [UUID!], $fromDate: DateTime) {
@@ -147,6 +145,7 @@
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
+            required={true}
           />
           <DateInput
             bind:value={toDate}
@@ -159,7 +158,6 @@
         </div>
 
         <Select
-          bind:value={leaveType}
           startValue={leave.leave_type.user_key}
           title="Orlovstype"
           id="leave-type-uuid"
@@ -171,12 +169,11 @@
           title="Medarbejder"
           id="employee-uuid"
           startValue={employeeName}
-          value={undefined}
           disabled
+          required={true}
         />
 
         <Select
-          bind:value={engagementUuid}
           title="Engagementer"
           id="engagement-uuid"
           startValue={engagementStartValue.name}

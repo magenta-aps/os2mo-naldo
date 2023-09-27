@@ -17,7 +17,7 @@ export const actions: Actions = {
       person: params.uuid,
       org_unit: orgUnitUuid,
       association_type: associationType,
-      primary: primary,
+      ...(primary && { primary: primary }),
       validity: { from: startDate, ...(endDate && { to: endDate }) },
     }
   },
