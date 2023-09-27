@@ -20,6 +20,7 @@
 
   let destinationUuids: string[] = []
   let originUuid: string
+  let relatedUnits: any[] = []
 
   let fromDate = new Date().toISOString().split("T")[0]
   let parent: { name: string; uuid?: any | null }
@@ -27,19 +28,7 @@
   /* TODO:ny graphQL med midre query? */
   gql`
     query OrgTreeRelated($from_date: DateTime!) {
-      org_units(filter: { from_date: $from_date }) {
-        objects {
-          objects {
-            name
-            uuid
-            children {
-              name
-              uuid
-            }
-          }
-        }
-      }
-      related_units {
+      related_units(filter: { from_date: $from_date }) {
         objects {
           objects {
             org_units {
@@ -77,15 +66,18 @@
       }
     }
 
-  $: originName = $selectedOriginUuid ? $selectedOriginUuid.name : "Ukendt"
+  $: originName = $selectedOriginUuid ? $selectedOriginUuid.name : "Enheden"
   $: destinationNames = $selectedDestinationUuids.map((dest) => dest.name)
 </script>
 
 {#await graphQLClient().request(OrgTreeRelatedDocument, { from_date: $date })}
   Henter data...
 {:then data}
-  {@const org_units = data.related_units.objects[0].objects[0].org_units}
+  {@const related_units = data.related_units.objects}
+  {(relatedUnits = related_units)}
+  <!-- TODO: indlæs værdier i store, brug uuid i graph? -->
 
+  <!-- Todo: håndter default i origin-->
   {@const connectionText = originName
     ? `${originName} kobles sammen med: ${
         destinationNames.length
@@ -111,6 +103,7 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <input type="hidden" name="from" bind:value={fromDate} />
+          <!--  TODO: lav en default værdi for radioButton -->
 
           <SelectOrgTree
             useCheckbox={true}
@@ -127,6 +120,7 @@
           />
 
           <SelectOrgTree
+            {relatedUnits}
             useCheckbox={true}
             multiSelect={true}
             bind:selectedOrg={parent}
@@ -163,5 +157,5 @@
 
   {console.log("origin:", $selectedOriginUuid)}
   {console.log("distination:", $selectedDestinationUuids)}
-  {console.log("data:", org_units)}
+  {console.log("related_units", relatedUnits)}
 {/await}

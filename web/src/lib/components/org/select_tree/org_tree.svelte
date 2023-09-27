@@ -18,9 +18,9 @@
   export let required = true
   let orgTree: any[] = []
   let isFocused = false
-  /* TODO: usechecbox  og multiselect skal som udgangspunkt være false */
   export let useCheckbox: boolean = false
   export let multiSelect: boolean = false
+  export let relatedUnits: any[] = []
 
   gql`
     query OrgTree($from_date: DateTime!) {
@@ -99,13 +99,18 @@
         <!-- Hidden input for single select when checkboxes are not used -->
         <input hidden {id} name={id} bind:value={selectedOrg.uuid} />
       {/if}
-
       <!-- Check useCheckbox to determine the presentation of the list-->
       {#if useCheckbox}
         <div class="w-96 max-w-full px-5">
           <ul class="menu bg-base-200">
             {#each orgTree as child}
-              <Node {...child} bind:selectedOrg {useCheckbox} {multiSelect} />
+              <Node
+                {...child}
+                bind:selectedOrg
+                {useCheckbox}
+                {multiSelect}
+                {relatedUnits}
+              />
             {/each}
           </ul>
         </div>

@@ -11,7 +11,6 @@
   import RadioButton from "$lib/components/forms/shared/radioButton.svelte"
   import { OrgUnitChildrenDocument } from "$lib/components/org/select_tree/query.generated"
 
-  export let breadcrumbs: string[] = []
   export let selectedOrg: any
   export let name = ""
   export let children: any[] = []
@@ -20,12 +19,11 @@
   export let fromDate: string
   let open = false
   let loading = false
-
-  /* TODO: usechecbox  og multiselect skal som udgangspunkt være false */
   export let useCheckbox: boolean = false
   export let multiSelect: boolean = false
-  let isChecked = false
+  let isChecked: boolean = false
   const dispatch = createEventDispatcher()
+  export let relatedUnits: any[] = []
 
   gql`
     query OrgUnitChildren($uuid: [UUID!], $fromDate: DateTime) {
@@ -64,33 +62,11 @@
     open = !open
   }
 
-  const expandToActiveChild = async () => {
-    if (breadcrumbs && breadcrumbs[0] === uuid) {
-      // Removes used UUID
-      breadcrumbs = breadcrumbs.slice(1)
-      await toggleOpen()
-
-      // Exhausted breadcrumbs and the correct org should be visible
-      if (breadcrumbs.length === 0) {
-        const activeNode = document.getElementById("active")
-        if (activeNode) {
-          activeNode.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
-            inline: "center",
-          })
-        }
-      }
-    } else {
-      // If UUID isn't a match, you're down a wrong branch
-      breadcrumbs = []
-    }
-  }
-
-  onMount(async () => {
-    await expandToActiveChild()
-  })
-
+  /*   TODO: lav kode der indlæser værdier fra graphQL og sætter hak i de uuider, der er på listen
+origen=radiobuttonværdi,
+distination=checkboksværdi
+ */
+  /* TODO: sørg for at deaktivere origin-uuid i distination-uuids*/
   const handleRadioChange = (event: CustomEvent) => {
     const isChecked = event.detail.isChecked
     if (isChecked) {
@@ -115,7 +91,9 @@
 
   let checkboxValue: string = isChecked ? "checked" : "unchecked"
 
-  $: checkboxValue = isChecked ? "checked" : "unchecked"
+  $: isChecked = $selectedOriginUuid ? $selectedOriginUuid.uuid === uuid : false
+
+  onMount(async () => {})
 </script>
 
 <li
@@ -137,12 +115,12 @@
         <Checkbox
           id={uuid}
           title={name}
-          value={checkboxValue}
+          value={isChecked ? "checked" : "unchecked"}
           on:checkboxChanged={handleCheckboxChange}
         />
       {:else}
         <RadioButton
-          groupName="origenUuid"
+          groupName="originUuid"
           id={uuid}
           title={name}
           value={checkboxValue}
