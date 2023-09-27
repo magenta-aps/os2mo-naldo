@@ -7,6 +7,8 @@
   export let startValue: string | undefined = undefined
   export let extra_classes = ""
 
+  export let disabled: boolean = false
+
   const dispatch = createEventDispatcher()
 
   function handleCheckboxChange(event: Event) {
@@ -21,7 +23,7 @@
 </script>
 
 <div class="form-control pb-4">
-  <label class="label cursor-pointer p-0 gap-4">
+  <label class="label cursor-pointer p-0 gap-4 {disabled ? 'text-gray-400' : ''}">
     <input
       type="checkbox"
       {id}
@@ -30,6 +32,7 @@
       checked={startValue === value}
       class="checkbox {extra_classes} rounded normal-case font-normal text-base text-base-100"
       on:change={handleCheckboxChange}
+      {disabled}
     />
     {#if title}
       <label for={id}>{title}</label>

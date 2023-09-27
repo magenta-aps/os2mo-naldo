@@ -22,6 +22,7 @@
   export let useCheckbox: boolean = false
   export let multiSelect: boolean = false
   let isChecked: boolean = false
+
   const dispatch = createEventDispatcher()
   export let relatedUnits: any[] = []
 
@@ -68,17 +69,23 @@ distination=checkboksværdi
  */
   /* TODO: sørg for at deaktivere origin-uuid i distination-uuids*/
   const handleRadioChange = (event: CustomEvent) => {
+    console.log("radio resived in node")
     const isChecked = event.detail.isChecked
     if (isChecked) {
       selectedOriginUuid.set({ uuid, name })
     } else {
       selectedOriginUuid.set(null)
     }
+    dispatch("radioChanged", { detail: event.detail })
+
     dispatch("update", { origin: $selectedOriginUuid })
   }
 
   const handleCheckboxChange = (event: CustomEvent) => {
+    console.log("Checkbox received in node")
     const isChecked = event.detail.isChecked
+    const uuid = event.detail.uuid
+
     selectedDestinationUuids.update((currentDestinations) => {
       if (isChecked) {
         return [...currentDestinations, { uuid, name }]
@@ -86,12 +93,12 @@ distination=checkboksværdi
         return currentDestinations.filter((org) => org.uuid !== uuid)
       }
     })
-    dispatch("update", { destinations: $selectedDestinationUuids })
   }
 
   let checkboxValue: string = isChecked ? "checked" : "unchecked"
 
-  $: isChecked = $selectedOriginUuid ? $selectedOriginUuid.uuid === uuid : false
+  $: isCheckedOrigin = $selectedOriginUuid ? $selectedOriginUuid.uuid === uuid : false
+  $: isCheckedDestination = $selectedDestinationUuids.some((obj) => obj.uuid === uuid)
 
   onMount(async () => {})
 </script>
@@ -115,15 +122,17 @@ distination=checkboksværdi
         <Checkbox
           id={uuid}
           title={name}
-          value={isChecked ? "checked" : "unchecked"}
+          value="checked"
+          startValue={isCheckedDestination ? "checked" : "unchecked"}
           on:checkboxChanged={handleCheckboxChange}
+          disabled={($selectedOriginUuid && $selectedOriginUuid.uuid === uuid) || false}
         />
       {:else}
         <RadioButton
           groupName="originUuid"
           id={uuid}
           title={name}
-          value={checkboxValue}
+          value={isCheckedOrigin ? "checked" : "unchecked"}
           on:radioChanged={handleRadioChange}
         />
       {/if}

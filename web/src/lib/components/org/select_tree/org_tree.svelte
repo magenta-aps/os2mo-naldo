@@ -7,6 +7,9 @@
   import { gql } from "graphql-request"
   import { OrgTreeDocument } from "./query.generated"
 
+  import { createEventDispatcher } from "svelte"
+  const dispatch = createEventDispatcher()
+
   export let selectedOrg: { name: string; uuid?: any | null }
   export let startOrg: { name: string; uuid?: any | null } | null | undefined = {
     name: "",
@@ -70,6 +73,12 @@
     placement: "bottom",
     middleware: [offset(6), flip(), shift()],
   })
+
+  const handleRadioChange = (event: CustomEvent) => {
+    console.log("handleRadioChange is called org_tree", event.detail)
+
+    dispatch("radioChanged", { detail: event.detail })
+  }
 </script>
 
 {#await fetchOrgTree()}
@@ -110,6 +119,7 @@
                 {useCheckbox}
                 {multiSelect}
                 {relatedUnits}
+                on:radioChanged={handleRadioChange}
               />
             {/each}
           </ul>

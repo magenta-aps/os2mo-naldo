@@ -1,7 +1,5 @@
 <script lang="ts">
-  import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import Input from "$lib/components/forms/shared/input.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { goto } from "$app/navigation"
@@ -9,23 +7,25 @@
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
-  import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import { OrgTreeRelatedDocument, UpdateRelatedUnitsDocument } from "./query.generated"
+  import {
+    RelatedUnitsDocument,
+    OrgTreeRelatedDocument,
+    UpdateRelatedUnitsDocument,
+  } from "./query.generated"
   import SelectOrgTree from "$lib/components/org/select_tree/org_tree.svelte"
   import {
     selectedDestinationUuids,
     selectedOriginUuid,
   } from "$lib/stores/selectedItem"
 
-  let destinationUuids: string[] = []
-  let originUuid: string
   let relatedUnits: any[] = []
+  let previousUuid: string | null = null
 
   let fromDate = new Date().toISOString().split("T")[0]
   let parent: { name: string; uuid?: any | null }
 
-  /* TODO:ny graphQL med midre query? */
+  /* TODO: er der brug for begge gql-query */
   gql`
     query OrgTreeRelated($from_date: DateTime!) {
       related_units(filter: { from_date: $from_date }) {
@@ -34,6 +34,23 @@
             org_units {
               uuid
               name
+            }
+          }
+        }
+      }
+    }
+
+    query RelatedUnits($org_unit: [UUID!], $fromDate: DateTime) {
+      related_units(filter: { org_units: $org_unit, from_date: $fromDate }) {
+        objects {
+          objects {
+            org_units {
+              name
+              uuid
+            }
+            validity {
+              from
+              to
             }
           }
         }
@@ -65,6 +82,84 @@
         }
       }
     }
+
+  const handleRadioChange = (event: CustomEvent) => {
+    console.log("handleRadioChange was called +page", event.detail)
+    const isChecked = event.detail.isChecked
+    console.log("isChecked value:", isChecked)
+
+    selectedOriginUuid.set({ uuid: parent.uuid, name: parent.name })
+    console.log("parent.uuid:", parent.uuid)
+    fetchRelatedUnits(parent.uuid)
+  }
+
+  const handleCheckboxChange = (event: CustomEvent) => {
+    const isChecked = event.detail.isChecked
+
+    selectedDestinationUuids.update((currentDestinations) => {
+      if (isChecked) {
+        return [...currentDestinations, { uuid: parent.uuid, name: parent.name }]
+      } else {
+        return currentDestinations.filter((org) => org.uuid !== parent.uuid)
+      }
+    })
+  }
+
+  async function fetchRelatedUnits(originUUID: string) {
+    try {
+      const response = await graphQLClient().request(RelatedUnitsDocument, {
+        org_unit: originUUID,
+        fromDate: fromDate,
+      })
+      relatedUnits = response.related_units.objects
+      console.log("fetchRelatedUnits: ", relatedUnits)
+      updateSelectedDestinationUuids()
+    } catch (err) {
+      console.error(err)
+      $error = { message: err as string }
+    }
+  }
+
+  const updateSelectedDestinationUuids = () => {
+    relatedUnits.forEach((related) => {
+      const related_unit = related.objects[0]
+      let relatedUuid: string
+      let relatedName: string
+
+      if (related_unit.org_units[0].uuid === $selectedOriginUuid?.uuid) {
+        relatedUuid = related_unit.org_units[1].uuid
+        relatedName = related_unit.org_units[1].name
+      } else {
+        relatedUuid = related_unit.org_units[0].uuid
+        relatedName = related_unit.org_units[0].name
+      }
+
+      selectedDestinationUuids.update((currentDestinations) => {
+        if (!currentDestinations.some((dest) => dest.uuid === relatedUuid)) {
+          console.log(
+            "updateSelectedDestinationUuids + currentDest + if: ",
+            currentDestinations
+          )
+          return [...currentDestinations, { uuid: relatedUuid, name: relatedName }]
+        } else {
+          console.log(
+            "updateSelectedDestinationUuids +currentDest + else: ",
+            currentDestinations
+          )
+          return currentDestinations
+        }
+      })
+    })
+  }
+
+  $: if ($selectedOriginUuid && $selectedOriginUuid.uuid !== previousUuid) {
+    selectedDestinationUuids.set([])
+    fetchRelatedUnits($selectedOriginUuid.uuid)
+
+    previousUuid = $selectedOriginUuid.uuid
+  }
+
+  $: console.log("Parent changed:", parent)
 
   $: originName = $selectedOriginUuid ? $selectedOriginUuid.name : "Enheden"
   $: destinationNames = $selectedDestinationUuids.map((dest) => dest.name)
@@ -103,13 +198,15 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <input type="hidden" name="from" bind:value={fromDate} />
-          <!--  TODO: lav en default værdi for radioButton -->
+          <!--  TODO: lav en default værdi for radioButton, så første indlæsning ikke ser "sær" ud-->
 
           <SelectOrgTree
+            {relatedUnits}
             useCheckbox={true}
             multiSelect={false}
             bind:selectedOrg={parent}
             labelText="Vælg enhed"
+            on:radioChanged={handleRadioChange}
           />
           <!-- Skjult felt for origin-uuid -->
           <input
@@ -120,11 +217,11 @@
           />
 
           <SelectOrgTree
-            {relatedUnits}
             useCheckbox={true}
             multiSelect={true}
             bind:selectedOrg={parent}
             labelText="Angiv hvilke enheder der skal sammenkobles med enheden til venstre"
+            on:checkboxChanged={handleCheckboxChange}
           />
           <!-- Skjult felt for destination-uuids -->
           <input
@@ -141,7 +238,7 @@
             class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
             >Gem</button
           >
-          <!--  TODO:hvorskal goto: vise hen? -->
+          <!--  TODO:hvorskal goto: vise hen, hvis den skal være der? -->
           <button
             type="button"
             class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
@@ -157,5 +254,6 @@
 
   {console.log("origin:", $selectedOriginUuid)}
   {console.log("distination:", $selectedDestinationUuids)}
-  {console.log("related_units", relatedUnits)}
+  {console.log("relatedUnits + page", relatedUnits)}
+  {console.log("related_units + page", related_units)}
 {/await}
