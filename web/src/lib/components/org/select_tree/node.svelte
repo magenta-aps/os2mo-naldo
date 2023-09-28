@@ -17,14 +17,14 @@
   export let indent = 0
   export let uuid = ""
   export let fromDate: string
-  export let useCheckbox: boolean = false
-  export let multiSelect: boolean = false
+  export let isCheckboxMode: boolean = false
+  export let allowMultipleSelection: boolean = false
   /*  export let relatedUnits: any[] = [] */
 
   let open = false
   let loading = false
-  let isChecked: boolean = false
-  let checkboxValue: string = isChecked ? "checked" : "unchecked"
+  /* let isChecked: boolean = false */
+  /*let checkboxValue: string = isChecked ? "checked" : "unchecked"*/
 
   const dispatch = createEventDispatcher()
 
@@ -64,30 +64,29 @@
     open = !open
   }
 
-  const handleRadioChange = (event: CustomEvent) => {
+  //todo: er dette navn beskrivende?
+  const handleItemChange = (event: CustomEvent, isCheckbox: boolean) => {
     const isChecked = event.detail.isChecked
-    if (isChecked) {
-      selectedOriginUuid.set({ uuid, name })
+
+    if (isCheckbox) {
+      selectedDestinationUuids.update((currentDestinations) => {
+        if (isChecked) {
+          return [...currentDestinations, { uuid, name }]
+        } else {
+          return currentDestinations.filter((org) => org.uuid !== uuid)
+        }
+      })
     } else {
-      selectedOriginUuid.set(null)
-    }
-    dispatch("radioChanged", { detail: event.detail })
-    dispatch("update", { origin: $selectedOriginUuid })
-  }
-
-  const handleCheckboxChange = (event: CustomEvent) => {
-    const isChecked = event.detail.isChecked
-    const uuid = event.detail.uuid
-
-    selectedDestinationUuids.update((currentDestinations) => {
       if (isChecked) {
-        return [...currentDestinations, { uuid, name }]
+        selectedOriginUuid.set({ uuid, name })
       } else {
-        return currentDestinations.filter((org) => org.uuid !== uuid)
+        selectedOriginUuid.set(null)
       }
-    })
+    }
+    dispatch(isCheckbox ? "checkboxChanged" : "radioChanged", { detail: event.detail })
   }
 
+  //todo: mere sigende navne fx $: isOriginSelected og $: isDestinationSelected?
   $: isCheckedOrigin = $selectedOriginUuid ? $selectedOriginUuid.uuid === uuid : false
   $: isCheckedDestination = $selectedDestinationUuids.some((obj) => obj.uuid === uuid)
 
@@ -108,16 +107,16 @@
     {:else if children && children.length > 0}
       <!-- TODO: hvilke pile skal benyttes ved toggle? -->
       <!-- <p on:click={toggleOpen}>{open ? "⌄" : "➤"}</p> -->
-      <p on:click={toggleOpen}>{open ? "⌄" : ">"}</p>
+      <p on:click={toggleOpen}>{open ? "V" : ">"}</p>
     {/if}
-    {#if useCheckbox}
-      {#if multiSelect}
+    {#if isCheckboxMode}
+      {#if allowMultipleSelection}
         <Checkbox
           id={uuid}
           title={name}
           value="checked"
           startValue={isCheckedDestination ? "checked" : "unchecked"}
-          on:checkboxChanged={handleCheckboxChange}
+          on:checkboxChanged={(e) => handleItemChange(e, true)}
           disabled={($selectedOriginUuid && $selectedOriginUuid.uuid === uuid) || false}
         />
       {:else}
@@ -126,7 +125,7 @@
           id={uuid}
           title={name}
           value={isCheckedOrigin ? "checked" : "unchecked"}
-          on:radioChanged={handleRadioChange}
+          on:radioChanged={(e) => handleItemChange(e, false)}
         />
       {/if}
     {:else}
@@ -141,8 +140,8 @@
       {...child}
       indent={indent + 24}
       {fromDate}
-      {multiSelect}
-      {useCheckbox}
+      {allowMultipleSelection}
+      {isCheckboxMode}
       bind:selectedOrg
     />
   {/each}

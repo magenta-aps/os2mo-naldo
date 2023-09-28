@@ -12,10 +12,7 @@
 
   function handleCheckboxChange(event: Event) {
     const target = event.target as HTMLInputElement
-    const isChecked = target.checked
-    const uuid = target.id
-
-    dispatch("checkboxChanged", { isChecked, uuid })
+    dispatch("checkboxChanged", { isChecked: target.checked, uuid: target.id })
   }
 </script>
 

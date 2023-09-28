@@ -83,6 +83,7 @@
       }
     }
 
+  /*  TODO: sammenskriv handleRadioChange og handleCheckboxChange til en funktion? */
   const handleRadioChange = (event: CustomEvent) => {
     const isChecked = event.detail.isChecked
     selectedOriginUuid.set({ uuid: parent.uuid, name: parent.name })
@@ -155,8 +156,8 @@
 {#await graphQLClient().request(OrgTreeRelatedDocument, { from_date: $date })}
   Henter data...
 {:then data}
-  {@const related_units = data.related_units.objects}
-
+  <!-- TODO: tekst skal muligvis rykkes til script? -->
+  <!-- TODO: Der skal laces  om i stylingen af siden -->
   {@const connectionText = originName
     ? `${originName} kobles sammen med: ${
         destinationNames.length
@@ -182,7 +183,7 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <input type="hidden" name="from" bind:value={fromDate} />
-          <!-- Skjkjult radioButton der tvinger brugerne til at vælge en værdi til at starte med, og til at disable gem og anuler knapperne-->
+          <!-- Skjult radioButton der tvinger brugerne til at vælge en værdi til at starte med, og til at disable 'gem' og 'anullér' knapperne-->
           <input
             type="radio"
             name="originUuid"
@@ -191,15 +192,17 @@
             checked
             hidden
           />
-
+          <!-- TODO: skal træet skal foldes ud til at vise de markerede enheder når origin er valgt -->
+          <!-- TODO: højre side skal deaktiveres indtil der er valgt en origin -->
           <SelectOrgTree
             {relatedUnits}
-            useCheckbox={true}
-            multiSelect={false}
+            isCheckboxMode={true}
+            allowMultipleSelection={false}
             bind:selectedOrg={parent}
             labelText="Vælg enhed"
             on:radioChanged={handleRadioChange}
           />
+
           <!-- Skjult felt for origin-uuid -->
           <input
             type="hidden"
@@ -209,12 +212,13 @@
           />
 
           <SelectOrgTree
-            useCheckbox={true}
-            multiSelect={true}
+            isCheckboxMode={true}
+            allowMultipleSelection={true}
             bind:selectedOrg={parent}
             labelText="Angiv hvilke enheder der skal sammenkobles med enheden til venstre"
             on:checkboxChanged={handleCheckboxChange}
           />
+
           <!-- Skjult felt for destination-uuids -->
           <input
             type="hidden"
@@ -230,7 +234,7 @@
             class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
             disabled={isDisabled}>Gem</button
           >
-          <!--  TODO:hvorskal goto: vise hen, hvis den skal være der? -->
+          <!--  TODO:hvor skal goto: vise hen, hvis den skal vise nogle steder hen? -->
           <button
             type="button"
             class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"

@@ -19,6 +19,7 @@
   }
 </script>
 
+<!--benyttet checkbox klasse for gøre radioButton og checkbox visuelt ens -->
 <div class="form-control pb-4">
   <label class="label cursor-pointer p-0 gap-4">
     <input

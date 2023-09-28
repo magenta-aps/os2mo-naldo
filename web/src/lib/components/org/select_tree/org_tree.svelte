@@ -17,8 +17,8 @@
   export let labelText = "Angiv overenhed"
   export let id = "select-org-tree"
   export let required = true
-  export let useCheckbox: boolean = false
-  export let multiSelect: boolean = false
+  export let isCheckboxMode: boolean = false
+  export let allowMultipleSelection: boolean = false
   export let relatedUnits: any[] = []
 
   let orgTree: any[] = []
@@ -88,13 +88,13 @@
     </label>
     <input disabled class="input input-bordered input-sm rounded w-full" />
   </div>
-{:then}
+{:then data}
   <div class="form-control pb-4">
     <label for={id} class="text-sm text-secondary pb-1">
       {labelText}
     </label>
     <div use:floatingRef>
-      {#if !useCheckbox}
+      {#if !isCheckboxMode}
         <input
           {id}
           {required}
@@ -107,16 +107,16 @@
         <!-- Hidden input for single select when checkboxes are not used -->
         <input hidden {id} name={id} bind:value={selectedOrg.uuid} />
       {/if}
-      <!-- Check useCheckbox to determine the presentation of the list-->
-      {#if useCheckbox}
+      <!-- Check isCheckboxMode to determine the presentation of the list-->
+      {#if isCheckboxMode}
         <div class="w-96 max-w-full px-5">
           <ul class="menu bg-base-200">
             {#each orgTree as child}
               <Node
                 {...child}
                 bind:selectedOrg
-                {useCheckbox}
-                {multiSelect}
+                {isCheckboxMode}
+                {allowMultipleSelection}
                 {relatedUnits}
                 on:radioChanged={handleRadioChange}
               />

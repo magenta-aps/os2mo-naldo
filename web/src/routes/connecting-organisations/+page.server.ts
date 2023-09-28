@@ -12,7 +12,7 @@ export const actions: Actions = {
     const destinationUuids = data.getAll("destination-uuids")
 
     /* destinationUuids modtager en string som FormDataEntryValue[], 
-    men promise forventer et array af strings defor denne modificering af data */
+    men promise forventer et array af strings derfor denne modificering af data */
     let uuidArray: string[] = []
     const destinationUuidsString =
       destinationUuids.length > 0 ? destinationUuids[0] : ""
