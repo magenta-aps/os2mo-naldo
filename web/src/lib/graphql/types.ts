@@ -3539,7 +3539,7 @@ export type ItSystem = {
   /** UUID of the entity */
   uuid: Scalars['UUID']['output'];
   /** Validity of the IT system object. */
-  validity: Validity;
+  validity: OpenValidity;
 };
 
 export type ItSystemCreateInput = {

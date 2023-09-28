@@ -15,6 +15,7 @@
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import Search from "$lib/components/search.svelte"
+  import NewSelect from "$lib/components/forms/new_select.svelte"
 
   let fromDate: string
   let toDate: string
@@ -108,7 +109,7 @@
   <div class="divider p-0 m-0 mb-4 w-full" />
 
   <form method="post" class="mx-6" use:enhance={handler}>
-    <div class="w-1/2 min-w-fit bg-slate-100 rounded">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
@@ -146,12 +147,12 @@
             required={true}
           />
         </div>
-        <Select
+        <NewSelect
           title="Lederansvar"
           id="responsibility"
-          bind:value={responsibility}
           iterable={getClassesByFacetUserKey(facets, "responsibility")}
           required={true}
+          multiple={true}
         />
       </div>
     </div>
