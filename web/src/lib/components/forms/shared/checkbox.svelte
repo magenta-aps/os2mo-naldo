@@ -6,7 +6,6 @@
   export let value: string
   export let startValue: string | undefined = undefined
   export let extra_classes = ""
-
   export let disabled: boolean = false
 
   const dispatch = createEventDispatcher()
@@ -15,8 +14,6 @@
     const target = event.target as HTMLInputElement
     const isChecked = target.checked
     const uuid = target.id
-
-    console.log("Checkbox Changed Event Emitted", { isChecked, uuid })
 
     dispatch("checkboxChanged", { isChecked, uuid })
   }

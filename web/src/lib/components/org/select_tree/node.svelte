@@ -17,14 +17,16 @@
   export let indent = 0
   export let uuid = ""
   export let fromDate: string
-  let open = false
-  let loading = false
   export let useCheckbox: boolean = false
   export let multiSelect: boolean = false
+  /*  export let relatedUnits: any[] = [] */
+
+  let open = false
+  let loading = false
   let isChecked: boolean = false
+  let checkboxValue: string = isChecked ? "checked" : "unchecked"
 
   const dispatch = createEventDispatcher()
-  export let relatedUnits: any[] = []
 
   gql`
     query OrgUnitChildren($uuid: [UUID!], $fromDate: DateTime) {
@@ -46,7 +48,6 @@
       uuid: uuid,
       fromDate: fromDate,
     })
-
     return res.org_units?.objects[0].objects[0].children
   }
 
@@ -63,13 +64,7 @@
     open = !open
   }
 
-  /*   TODO: lav kode der indlæser værdier fra graphQL og sætter hak i de uuider, der er på listen
-origen=radiobuttonværdi,
-distination=checkboksværdi
- */
-  /* TODO: sørg for at deaktivere origin-uuid i distination-uuids*/
   const handleRadioChange = (event: CustomEvent) => {
-    console.log("radio resived in node")
     const isChecked = event.detail.isChecked
     if (isChecked) {
       selectedOriginUuid.set({ uuid, name })
@@ -77,12 +72,10 @@ distination=checkboksværdi
       selectedOriginUuid.set(null)
     }
     dispatch("radioChanged", { detail: event.detail })
-
     dispatch("update", { origin: $selectedOriginUuid })
   }
 
   const handleCheckboxChange = (event: CustomEvent) => {
-    console.log("Checkbox received in node")
     const isChecked = event.detail.isChecked
     const uuid = event.detail.uuid
 
@@ -95,11 +88,10 @@ distination=checkboksværdi
     })
   }
 
-  let checkboxValue: string = isChecked ? "checked" : "unchecked"
-
   $: isCheckedOrigin = $selectedOriginUuid ? $selectedOriginUuid.uuid === uuid : false
   $: isCheckedDestination = $selectedDestinationUuids.some((obj) => obj.uuid === uuid)
 
+  //TODO: skal denne benyttes
   onMount(async () => {})
 </script>
 
@@ -115,7 +107,8 @@ distination=checkboksværdi
       <div class="animate-spin rounded-full h-5 w-5 border-b-4 border-primary" />
     {:else if children && children.length > 0}
       <!-- TODO: hvilke pile skal benyttes ved toggle? -->
-      <p on:click={toggleOpen}>{open ? "⌄" : "➤"}</p>
+      <!-- <p on:click={toggleOpen}>{open ? "⌄" : "➤"}</p> -->
+      <p on:click={toggleOpen}>{open ? "⌄" : ">"}</p>
     {/if}
     {#if useCheckbox}
       {#if multiSelect}

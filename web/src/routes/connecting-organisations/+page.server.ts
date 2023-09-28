@@ -18,7 +18,6 @@ export const actions: Actions = {
       destinationUuids.length > 0 ? destinationUuids[0] : ""
     if (typeof destinationUuidsString === "string") {
       uuidArray = destinationUuidsString.split(",")
-      console.log(uuidArray)
     }
 
     return {

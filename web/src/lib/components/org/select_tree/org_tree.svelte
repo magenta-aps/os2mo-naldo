@@ -6,9 +6,7 @@
   import { date } from "$lib/stores/date"
   import { gql } from "graphql-request"
   import { OrgTreeDocument } from "./query.generated"
-
   import { createEventDispatcher } from "svelte"
-  const dispatch = createEventDispatcher()
 
   export let selectedOrg: { name: string; uuid?: any | null }
   export let startOrg: { name: string; uuid?: any | null } | null | undefined = {
@@ -19,11 +17,14 @@
   export let labelText = "Angiv overenhed"
   export let id = "select-org-tree"
   export let required = true
-  let orgTree: any[] = []
-  let isFocused = false
   export let useCheckbox: boolean = false
   export let multiSelect: boolean = false
   export let relatedUnits: any[] = []
+
+  let orgTree: any[] = []
+  let isFocused = false
+
+  const dispatch = createEventDispatcher()
 
   gql`
     query OrgTree($from_date: DateTime!) {
@@ -75,8 +76,6 @@
   })
 
   const handleRadioChange = (event: CustomEvent) => {
-    console.log("handleRadioChange is called org_tree", event.detail)
-
     dispatch("radioChanged", { detail: event.detail })
   }
 </script>

@@ -2,11 +2,11 @@
   import { createEventDispatcher } from "svelte"
 
   export let title: string | undefined = undefined
-  export let id: string // dette vil blive brugt som uuid
+  export let id: string
   export let value: string
   export let startValue: string | undefined = undefined
   export let extra_classes = ""
-  export let groupName: string // Navnet på radiogruppen
+  export let groupName: string
 
   const dispatch = createEventDispatcher()
 
@@ -14,8 +14,6 @@
     const target = event.target as HTMLInputElement
     const isChecked = target.checked
     const uuid = target.id
-
-    console.log("Radio Changed Event Emitted", { isChecked, uuid })
 
     dispatch("radioChanged", { isChecked, uuid })
   }

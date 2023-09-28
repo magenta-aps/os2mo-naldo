@@ -21,9 +21,9 @@
 
   let relatedUnits: any[] = []
   let previousUuid: string | null = null
-
   let fromDate = new Date().toISOString().split("T")[0]
   let parent: { name: string; uuid?: any | null }
+  let isDisabled = true
 
   /* TODO: er der brug for begge gql-query */
   gql`
@@ -84,12 +84,8 @@
     }
 
   const handleRadioChange = (event: CustomEvent) => {
-    console.log("handleRadioChange was called +page", event.detail)
     const isChecked = event.detail.isChecked
-    console.log("isChecked value:", isChecked)
-
     selectedOriginUuid.set({ uuid: parent.uuid, name: parent.name })
-    console.log("parent.uuid:", parent.uuid)
     fetchRelatedUnits(parent.uuid)
   }
 
@@ -112,7 +108,7 @@
         fromDate: fromDate,
       })
       relatedUnits = response.related_units.objects
-      console.log("fetchRelatedUnits: ", relatedUnits)
+
       updateSelectedDestinationUuids()
     } catch (err) {
       console.error(err)
@@ -136,16 +132,8 @@
 
       selectedDestinationUuids.update((currentDestinations) => {
         if (!currentDestinations.some((dest) => dest.uuid === relatedUuid)) {
-          console.log(
-            "updateSelectedDestinationUuids + currentDest + if: ",
-            currentDestinations
-          )
           return [...currentDestinations, { uuid: relatedUuid, name: relatedName }]
         } else {
-          console.log(
-            "updateSelectedDestinationUuids +currentDest + else: ",
-            currentDestinations
-          )
           return currentDestinations
         }
       })
@@ -155,24 +143,20 @@
   $: if ($selectedOriginUuid && $selectedOriginUuid.uuid !== previousUuid) {
     selectedDestinationUuids.set([])
     fetchRelatedUnits($selectedOriginUuid.uuid)
-
     previousUuid = $selectedOriginUuid.uuid
   }
 
-  $: console.log("Parent changed:", parent)
-
   $: originName = $selectedOriginUuid ? $selectedOriginUuid.name : "Enheden"
   $: destinationNames = $selectedDestinationUuids.map((dest) => dest.name)
+
+  $: isDisabled = !$selectedOriginUuid || $selectedOriginUuid.uuid === "hiddenValue"
 </script>
 
 {#await graphQLClient().request(OrgTreeRelatedDocument, { from_date: $date })}
   Henter data...
 {:then data}
   {@const related_units = data.related_units.objects}
-  {(relatedUnits = related_units)}
-  <!-- TODO: indlæs værdier i store, brug uuid i graph? -->
 
-  <!-- Todo: håndter default i origin-->
   {@const connectionText = originName
     ? `${originName} kobles sammen med: ${
         destinationNames.length
@@ -198,7 +182,15 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <input type="hidden" name="from" bind:value={fromDate} />
-          <!--  TODO: lav en default værdi for radioButton, så første indlæsning ikke ser "sær" ud-->
+          <!-- Skjkjult radioButton der tvinger brugerne til at vælge en værdi til at starte med, og til at disable gem og anuler knapperne-->
+          <input
+            type="radio"
+            name="originUuid"
+            id="hiddenRadioButton"
+            value="hiddenValue"
+            checked
+            hidden
+          />
 
           <SelectOrgTree
             {relatedUnits}
@@ -236,12 +228,13 @@
           <button
             type="submit"
             class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-            >Gem</button
+            disabled={isDisabled}>Gem</button
           >
           <!--  TODO:hvorskal goto: vise hen, hvis den skal være der? -->
           <button
             type="button"
             class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+            disabled={isDisabled}
             on:click={() => goto(`${base}/connecting-organisations/`)}
           >
             Annullér
@@ -251,9 +244,4 @@
       </div>
     </div>
   </form>
-
-  {console.log("origin:", $selectedOriginUuid)}
-  {console.log("distination:", $selectedDestinationUuids)}
-  {console.log("relatedUnits + page", relatedUnits)}
-  {console.log("related_units + page", related_units)}
 {/await}
