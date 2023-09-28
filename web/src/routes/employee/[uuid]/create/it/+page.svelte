@@ -108,7 +108,7 @@
   <div class="divider p-0 m-0 mb-4 w-full" />
 
   <form method="post" class="mx-6" use:enhance={handler}>
-    <div class="w-1/2 min-w-fit bg-slate-100 rounded">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
@@ -157,7 +157,6 @@
         />
       </div>
     </div>
-    <!-- TODO: Add support for adding more IT users at once -->
     <div class="flex py-6 gap-4">
       <button
         type="submit"

@@ -1,11 +1,6 @@
 import type { Actions, RequestEvent } from "@sveltejs/kit"
 import type { ManagerCreateInput } from "$lib/graphql/types"
-
-type UnpackedClass = {
-  name: string
-  uuid: string
-  user_key: string
-}[]
+import type { UnpackedClass } from "$lib/util/helpers"
 
 export const actions: Actions = {
   default: async ({ request, params }: RequestEvent): Promise<ManagerCreateInput> => {
@@ -17,7 +12,7 @@ export const actions: Actions = {
     // const jsonResponsibility = data.get("responsibility") as string
     // const responsibility = JSON.parse(jsonResponsibility) as Class
     // const resp = responsibility.map(v => v.uuid)
-    const resp = (
+    const responsibilities = (
       JSON.parse(data.get("responsibility") as string) as UnpackedClass
     ).map((v) => v.uuid)
     const startDate = data.get("from")
@@ -25,11 +20,11 @@ export const actions: Actions = {
 
     return {
       org_unit: params.uuid,
+      ...(employeeUuid && { person: employeeUuid }),
       manager_type: managerType,
       manager_level: managerLevel,
-      responsibility: resp,
+      responsibility: responsibilities,
       validity: { from: startDate, ...(endDate && { to: endDate }) },
-      ...(employeeUuid && { person: employeeUuid }),
     }
   },
 }

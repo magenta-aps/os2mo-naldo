@@ -1,7 +1,6 @@
 <script lang="ts">
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import Input from "$lib/components/forms/shared/input.svelte"
   import Select from "$lib/components/forms/shared/select.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
@@ -15,7 +14,7 @@
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import Search from "$lib/components/search.svelte"
-  import NewSelect from "$lib/components/forms/new_select.svelte"
+  import SelectMultiple from "$lib/components/forms/shared/selectMultiple.svelte"
 
   let fromDate: string
   let toDate: string
@@ -142,7 +141,7 @@
             required={true}
           />
         </div>
-        <NewSelect
+        <SelectMultiple
           title="Lederansvar"
           id="responsibility"
           iterable={getClassesByFacetUserKey(facets, "responsibility")}

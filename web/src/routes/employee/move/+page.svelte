@@ -125,7 +125,7 @@
     {@const startValueEmployee = data.employees?.objects[0].objects[0]}
     {@const minDate = startValueEmployee?.engagements[0]?.validity.from}
 
-    <div class="w-1/2 min-w-fit bg-slate-100 rounded">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
