@@ -1,7 +1,6 @@
 <script lang="ts">
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import Input from "$lib/components/forms/shared/input.svelte"
   import Select from "$lib/components/forms/shared/select.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
@@ -17,8 +16,6 @@
 
   let fromDate: string
   let toDate: string
-  let kleNumber: string
-  let kleAspect: string
 
   gql`
     query FacetsAndOrg($uuid: [UUID!], $fromDate: DateTime) {
@@ -102,6 +99,7 @@
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
+            required={true}
           />
           <DateInput
             bind:value={toDate}
@@ -115,7 +113,6 @@
           <Select
             title="KLE nummer"
             id="kle-number"
-            bind:value={kleNumber}
             iterable={getClassesByFacetUserKey(facets, "kle_number")}
             extra_classes="basis-1/2"
             required={true}
@@ -123,7 +120,6 @@
           <Select
             title="KLE aspekt"
             id="kle-aspect"
-            bind:value={kleAspect}
             iterable={getClassesByFacetUserKey(facets, "kle_aspect")}
             extra_classes="basis-1/2"
             required={true}

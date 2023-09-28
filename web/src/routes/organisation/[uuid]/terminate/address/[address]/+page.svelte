@@ -2,7 +2,6 @@
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import { enhance } from "$app/forms"
-  import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
@@ -14,8 +13,6 @@
 
   let toDate: string
 
-  // TODO: When updating GraphQL remember to change `address_terminate` `at` to `input`,
-  // which was changed in v8
   gql`
     query Address($uuid: [UUID!], $fromDate: DateTime!, $org_unit_uuid: [UUID!]) {
       addresses(filter: { uuids: $uuid, from_date: $fromDate }) {
@@ -46,7 +43,7 @@
     }
 
     mutation TerminateAddress($input: AddressTerminateInput!) {
-      address_terminate(at: $input) {
+      address_terminate(input: $input) {
         uuid
         objects {
           validity {
@@ -66,9 +63,7 @@
           })
 
           $success = {
-            message: `Adressen afsluttes d. ${
-              mutation.address_terminate.objects[0].validity.to.split("T")[0]
-            }`,
+            message: `Adressen afsluttes d. ${toDate}`,
             uuid: $page.params.uuid,
             type: "organisation",
           }
@@ -107,6 +102,7 @@
           id="to"
           min={minDate}
           max={maxDate ? maxDate : null}
+          required={true}
         />
       </div>
     </div>

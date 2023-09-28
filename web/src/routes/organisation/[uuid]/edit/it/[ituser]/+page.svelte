@@ -22,8 +22,6 @@
 
   let fromDate: string
   let toDate: string
-  let itSystem: string
-  let accountName: string
 
   gql`
     query ITUserItSystemsOrgAndPrimary(
@@ -134,6 +132,7 @@
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
+            required={true}
           />
           <DateInput
             bind:value={toDate}
@@ -151,7 +150,6 @@
             title="IT-systemer"
             id="it-system"
             startValue={itUser.itsystem.name}
-            bind:value={itSystem}
             extra_classes="basis-1/2"
             iterable={getITSystemNames(itSystems)}
             required={true}
@@ -161,7 +159,6 @@
             id="account-name"
             extra_classes="basis-1/2"
             startValue={itUser.user_key}
-            bind:value={accountName}
             required={true}
           />
         </div>
@@ -174,7 +171,6 @@
             extra_classes="checkbox-primary"
           />
         </div>
-        <!-- Enten skal vi gøre det her, ellers skal vi lave et gql kald i `+page.server.ts`? -->
         <input
           hidden
           name="non-primary"

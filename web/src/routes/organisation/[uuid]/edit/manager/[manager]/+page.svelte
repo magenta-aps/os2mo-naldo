@@ -17,9 +17,6 @@
 
   let fromDate: string
   let toDate: string
-  let managerType: string
-  let managerLevel: string
-  let responsibility: string
 
   gql`
     query ManagerAndFacets($uuid: [UUID!], $fromDate: DateTime) {
@@ -133,6 +130,7 @@
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
+            required={true}
           />
           <DateInput
             bind:value={toDate}
@@ -150,6 +148,7 @@
             name: manager.org_unit[0].name,
             attrs: [],
           }}
+          required={true}
         />
         <Search
           type="employee"
@@ -161,32 +160,31 @@
               }
             : undefined}
           wantedAttrs={["Email"]}
-          required={false}
         />
         <div class="flex flex-row gap-6">
           <Select
             title="Ledertype"
             id="manager-type"
-            bind:value={managerType}
             startValue={manager.manager_type.name}
             iterable={getClassesByFacetUserKey(facets, "manager_type")}
             extra_classes="basis-1/2"
+            required={true}
           />
           <Select
             title="Lederniveau"
             id="manager-level"
-            bind:value={managerLevel}
             startValue={manager.manager_level.name}
             iterable={getClassesByFacetUserKey(facets, "manager_level")}
             extra_classes="basis-1/2"
+            required={true}
           />
         </div>
         <Select
           title="Lederansvar"
           id="responsibility"
-          bind:value={responsibility}
           startValue={manager.responsibilities[0].name}
           iterable={getClassesByFacetUserKey(facets, "responsibility")}
+          required={true}
         />
       </div>
     </div>

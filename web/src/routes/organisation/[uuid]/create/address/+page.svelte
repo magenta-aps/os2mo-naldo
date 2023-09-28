@@ -18,10 +18,8 @@
 
   let fromDate: string
   let toDate: string
-  let visibility: string
   let addressType: { name: string; uuid?: any | null }
   $: addressUuid = addressType?.uuid
-  let input: string | number
 
   gql`
     query FacetsAndOrg($uuid: [UUID!], $fromDate: DateTime) {
@@ -66,7 +64,7 @@
             input: result.data,
           })
           $success = {
-            message: `Tilknytning til FIX ME er blevet oprettet`,
+            message: `Tilknytningen er blevet oprettet`,
             uuid: $page.params.uuid,
             type: "organisation",
           }
@@ -105,6 +103,7 @@
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
+            required={true}
           />
           <DateInput
             bind:value={toDate}
@@ -118,40 +117,27 @@
           <Select
             title="Synlighed"
             id="visibility"
-            bind:value={visibility}
             iterable={getClassesByFacetUserKey(facets, "visibility")}
             extra_classes="basis-1/2"
-            required={true}
           />
           <Select
             title="Adressetype"
             id="address-type"
             bind:value={addressType}
             iterable={getClassesByFacetUserKey(facets, "org_unit_address_type")}
-            required={true}
             extra_classes="basis-1/2"
             returnType="object"
+            required={true}
           />
           <input hidden name="address-type-uuid" bind:value={addressUuid} />
         </div>
         {#if addressType}
           {#if addressType.name == "Afdelingskode"}
-            <Input
-              title="Afdelingskode"
-              id="value"
-              bind:value={input}
-              required={true}
-            />
+            <Input title="Afdelingskode" id="value" required={true} />
           {:else if addressType.name == "Email"}
-            <Input
-              title="Email"
-              id="value"
-              type="email"
-              bind:value={input}
-              required={true}
-            />
+            <Input title="Email" id="value" type="email" required={true} />
           {:else if addressType.name == "P-nummer"}
-            <Input title="P-nummer" id="value" bind:value={input} required={true} />
+            <Input title="P-nummer" id="value" required={true} />
           {:else if addressType.name == "Postadresse"}
             <DarSearch title="Postadresse" />
           {:else if addressType.name == "Webadresse"}
@@ -161,19 +147,18 @@
               type="url"
               pattern="^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+\.[a-z]+(\/[a-zA-Z0-9#]+\/?)*$"
               patternMessage="Indtast en gyldig url"
-              bind:value={input}
               required={true}
             />
           {:else if addressType.name == "Formålskode"}
-            <Input title="Formålskode" id="value" bind:value={input} required={true} />
+            <Input title="Formålskode" id="value" required={true} />
           {:else if addressType.name == "Lokation"}
-            <Input title="Lokation" id="value" bind:value={input} required={true} />
+            <Input title="Lokation" id="value" required={true} />
           {:else if addressType.name == "EAN-nummer"}
-            <Input title="EAN-nummer" id="value" bind:value={input} required={true} />
+            <Input title="EAN-nummer" id="value" required={true} />
           {:else if addressType.name == "Skolekode"}
-            <Input title="Skolekode" id="value" bind:value={input} required={true} />
+            <Input title="Skolekode" id="value" required={true} />
           {:else if addressType.name == "Fax"}
-            <Input title="Fax" id="value" bind:value={input} required={true} />
+            <Input title="Fax" id="value" required={true} />
           {:else if addressType.name == "Returadresse"}
             <DarSearch title="Returadresse" />
           {:else if addressType.name == "Henvendelsessted"}
@@ -185,7 +170,6 @@
               type="tel"
               pattern="[0-9]+"
               patternMessage="Kun tal & '+' er tilladt"
-              bind:value={input}
               required={true}
             />
           {/if}

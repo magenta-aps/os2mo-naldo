@@ -81,12 +81,14 @@
   <div class="w-1/2 min-w-fit bg-slate-100 rounded">
     <div class="p-8">
       <div class="flex flex-row gap-6">
+        <!-- These inputs needs to update, when org-unit is changed -->
         <DateInput
           bind:value={fromDate}
           startValue={$date}
           title="Startdato"
           id="from"
           max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
+          required={true}
         />
       </div>
       {#if urlHashOrgUnitUuid}
@@ -96,6 +98,7 @@
             id="organisation-uuid"
             disabled
             placeholder="Henter organisation..."
+            required={true}
           />
         {:then data}
           {@const orgUnit = data.org_units.objects[0].objects[0]}
@@ -107,10 +110,11 @@
               name: orgUnit.name,
               attrs: [],
             }}
+            required={true}
           />
         {/await}
       {:else}
-        <Search type="org-unit" title="Angiv enhed" />
+        <Search type="org-unit" title="Angiv enhed" required={true} />
       {/if}
       <Search type="org-unit" id="select-parent-org-tree" title="Angiv ny overenhed" />
     </div>

@@ -15,7 +15,7 @@ export const actions: Actions = {
       org_unit: params.uuid,
       address_type: addressType,
       value: value,
-      visibility: visibility,
+      ...(visibility && { visibility: visibility }),
       validity: { from: startDate, ...(endDate && { to: endDate }) },
     }
   },

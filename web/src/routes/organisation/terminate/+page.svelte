@@ -10,7 +10,6 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import Search from "$lib/components/search.svelte"
-  import Input from "$lib/components/forms/shared/input.svelte"
   import { getUuidFromHash } from "$lib/util/helpers"
 
   let toDate: string
@@ -105,6 +104,7 @@
           id="to"
           min={minDate}
           max={maxDate ? maxDate : null}
+          required={true}
         />
         {#if orgUnit}
           <Search
@@ -115,9 +115,15 @@
               name: orgUnit.name,
               attrs: [],
             }}
+            required={true}
           />
         {:else}
-          <Search type="org-unit" title="Angiv overenhed" id="parent-uuid" />
+          <Search
+            type="org-unit"
+            title="Angiv overenhed"
+            id="parent-uuid"
+            required={true}
+          />
         {/if}
       </div>
     </div>

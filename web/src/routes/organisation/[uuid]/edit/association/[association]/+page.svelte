@@ -1,7 +1,6 @@
 <script lang="ts">
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import Input from "$lib/components/forms/shared/input.svelte"
   import Select from "$lib/components/forms/shared/select.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
@@ -21,8 +20,6 @@
 
   let fromDate: string
   let toDate: string
-  let associationType: string
-  let primary: string
 
   gql`
     query AssociationAndFacet($uuid: [UUID!], $fromDate: DateTime) {
@@ -131,10 +128,9 @@
             title="Startdato"
             id="from"
             min={minDate}
-            max={maxDate ? maxDate : null}
+            max={toDate ? toDate : maxDate}
+            required={true}
           />
-          <!-- These inputs needs to change, so their dates 
-          can only be in the registrations of their parent org -->
           <DateInput
             bind:value={toDate}
             startValue={association.validity.to
@@ -154,22 +150,21 @@
             attrs: [],
           }}
           wantedAttrs={["Email"]}
+          required={true}
         />
         <div class="flex flex-row gap-6">
           <Select
             title="Tilknytningsrolle"
             id="association-type"
             startValue={association.association_type?.name}
-            bind:value={associationType}
             iterable={getClassesByFacetUserKey(facets, "association_type")}
-            required={true}
             extra_classes="basis-1/2"
+            required={true}
           />
           <Select
             title="Primær"
             id="primary"
             startValue={association.primary?.name}
-            bind:value={primary}
             iterable={getClassesByFacetUserKey(facets, "primary_type")}
             extra_classes="basis-1/2"
           />
