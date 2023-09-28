@@ -13,8 +13,10 @@
 </script>
 
 <div class="form-control basis-1/2 {padding}">
-  {#if title}
-    <label for={id} class="text-sm text-secondary pb-1">{title}</label>
+  {#if title || required}
+    <label for={id} class="text-sm text-secondary pb-1"
+      >{title ? title : ""} {required ? "*" : ""}</label
+    >
   {/if}
   <input
     {id}
