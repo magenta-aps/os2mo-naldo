@@ -14,6 +14,7 @@
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import Search from "$lib/components/search.svelte"
+  import SelectMultiple from "$lib/components/forms/shared/selectMultiple.svelte"
 
   let fromDate: string
   let toDate: string
@@ -54,6 +55,7 @@
             responsibilities {
               uuid
               name
+              user_key
             }
             validity {
               from
@@ -114,6 +116,7 @@
   Henter data...
 {:then data}
   {@const manager = data.managers.objects[0].objects[0]}
+  {@const responsibilities = manager.responsibilities}
   {@const facets = data.facets.objects}
   {@const minDate = manager.org_unit[0].validity.from.split("T")[0]}
   {@const maxDate = manager.validity?.to?.split("T")[0]}
@@ -127,7 +130,7 @@
   <div class="divider p-0 m-0 mb-4 w-full" />
 
   <form method="post" class="mx-6" use:enhance={handler}>
-    <div class="w-1/2 min-w-fit bg-slate-100 rounded">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
@@ -175,13 +178,13 @@
             required={true}
           />
         </div>
-        <!-- FIXME: Use new multi select -->
-        <Select
+        <SelectMultiple
           title="Lederansvar"
           id="responsibility"
-          startValue={manager.responsibilities[0].name}
+          startValue={responsibilities}
           iterable={getClassesByFacetUserKey(facets, "responsibility")}
           required={true}
+          multiple={true}
         />
       </div>
     </div>

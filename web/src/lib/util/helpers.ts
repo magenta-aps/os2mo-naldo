@@ -78,3 +78,10 @@ export const getITSystemNames = (itsystems: ITSystem[]) => {
   }))
   return ITSystems.sort((a, b) => (a.name > b.name ? 1 : -1))
 }
+
+// Type used for Multi-select
+export type UnpackedClass = {
+  name: string
+  uuid: string
+  user_key: string
+}[]

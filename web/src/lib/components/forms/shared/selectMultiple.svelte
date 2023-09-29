@@ -7,7 +7,8 @@
   export let placeholder: string = ""
   export let disabled = false
   export let multiple = false
-  // export let startValue: string | undefined = undefined
+  // TODO: Types needs to be fixed OVERALL
+  export let startValue: any[] | undefined = undefined
 
   const itemId = "uuid" // Used by the component to differentiate between items
 
@@ -50,6 +51,7 @@
     items={iterable}
     {multiple}
     searchable={false}
+    value={startValue}
     on:change
     on:clear
   >

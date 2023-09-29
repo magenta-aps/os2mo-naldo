@@ -95,7 +95,7 @@
     {@const minDate = orgUnit?.parent?.validity.from.split("T")[0]}
     {@const maxDate = orgUnit?.parent?.validity.to?.split("T")[0]}
 
-    <div class="w-1/2 min-w-fit bg-slate-100 rounded">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <DateInput
           bind:value={toDate}
