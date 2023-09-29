@@ -6,7 +6,6 @@
     selectedDestinationUuids,
     selectedOriginUuid,
   } from "$lib/stores/selectedItem"
-  import { onMount } from "svelte"
   import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
   import RadioButton from "$lib/components/forms/shared/radioButton.svelte"
   import { OrgUnitChildrenDocument } from "$lib/components/org/select_tree/query.generated"
@@ -19,7 +18,7 @@
   export let fromDate: string
   export let isCheckboxMode: boolean = false
   export let allowMultipleSelection: boolean = false
-  export let relatedUnits: any[] = []
+  /*  export let relatedUnits: any[] = [] */
 
   let open = false
   let loading = false
@@ -64,62 +63,37 @@
     open = !open
   }
 
-  /* TODO: rydde op i handlere de er meget ens */
-  const handleRadioChange = (event: Event) => {
-    console.log("event udsent fra node radio")
-    const target = event.target as HTMLInputElement
-    const isChecked = target.checked
-    const uuid = target.id
-    console.log("node-radio", isChecked)
-    if (target && target.checked) {
-      // Tjek for target's eksistens
-      selectedOriginUuid.set({ uuid, name })
-    } else {
-      selectedOriginUuid.set(null)
-    }
-    dispatch("radioChanged", { isChecked, uuid })
-  }
-
-  const handleCheckboxChange = (event: Event) => {
-    console.log("event udsent fra node box")
-    const target = event.target as HTMLInputElement
-    const isChecked = target.checked
-    const uuid = target.id
-    console.log("node-checkbox", isChecked)
-    if (target && target.checked) {
-      // Tjek for target's eksistens
-      selectedDestinationUuids.update((currentDestinations) => {
-        return [...currentDestinations, { uuid, name }]
-      })
-    } else {
-      selectedDestinationUuids.update((currentDestinations) => {
-        return currentDestinations.filter((org) => org.uuid !== uuid)
-      })
-    }
-    dispatch("checkboxChanged", { isChecked, uuid })
-  }
-
   function handleInputChange(event: Event) {
     const target = event.target as HTMLInputElement
     const isChecked = target.checked
     const uuid = target.id
 
-    // Kontrollér, om det er en radio eller checkbox
     if (target.type === "radio") {
-      handleRadioChange(event)
+      if (isChecked) {
+        selectedOriginUuid.set({ uuid, name })
+      } else {
+        selectedOriginUuid.set(null)
+      }
+      dispatch("radioChanged", { isChecked, uuid })
     } else if (target.type === "checkbox") {
-      handleCheckboxChange(event)
+      if (isChecked) {
+        selectedDestinationUuids.update((currentDestinations) => {
+          return [...currentDestinations, { uuid, name }]
+        })
+      } else {
+        selectedDestinationUuids.update((currentDestinations) => {
+          return currentDestinations.filter((org) => org.uuid !== uuid)
+        })
+      }
+      dispatch("checkboxChanged", { isChecked, uuid })
     }
   }
 
   //todo: mere sigende navne fx $: isOriginSelected og $: isDestinationSelected?
   //todo: logikken i denne $: isCheckedOrigin = $selectedOriginUuid ? $selectedOriginUuid.uuid === uuid : false og i knappen er næsten den samme disabled={($selectedOriginUuid && $selectedOriginUuid.uuid === uuid) || false}
-
-  $: isCheckedOrigin = $selectedOriginUuid ? $selectedOriginUuid.uuid === uuid : false
+  /*   $: isCheckedOrigin = $selectedOriginUuid ? $selectedOriginUuid.uuid === uuid : false*/
+  $: isCheckedOrigin = $selectedOriginUuid && $selectedOriginUuid.uuid === uuid
   $: isCheckedDestination = $selectedDestinationUuids.some((obj) => obj.uuid === uuid)
-
-  //TODO: skal denne benyttes
-  /*  onMount(async () => {}) */
 </script>
 
 <!-- TODO: fjern A11y ignore når checkboxer fungere som det skal igen, er pt tilføjet for ikke at have gule linjer over alt i koden -->
@@ -160,7 +134,6 @@
             title={name}
             value="checked"
             startValue={isCheckedDestination ? "checked" : "unchecked"}
-            on:change={(event) => handleCheckboxChange(event)}
             disabled={!$selectedOriginUuid ||
               ($selectedOriginUuid && $selectedOriginUuid.uuid === uuid)}
           />
@@ -172,7 +145,6 @@
             id={uuid}
             title={name}
             value={isCheckedOrigin ? "checked" : "unchecked"}
-            on:change={(event) => handleRadioChange(event)}
           />
         </div>
       {/if}

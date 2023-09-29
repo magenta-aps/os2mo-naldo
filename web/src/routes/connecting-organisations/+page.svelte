@@ -82,7 +82,7 @@
       }
     }
 
-  /*  TODO:ryd op i hadler når alt virker ordenlig efter ændringe i checkBox */
+  /*  TODO:ryd op i console.log når alt virker ordenlig i checkBox */
 
   function handleCheckboxChangeFromSelectTree(event: CustomEvent) {
     console.log("event revived from checbox on page", event.detail)
@@ -90,23 +90,6 @@
 
   function handleRadioChangeFromSelectTree(event: CustomEvent) {
     console.log("event revived from radio on page", event.detail)
-  }
-
-  const handleEventChange = (isChecked: boolean, isCheckbox: boolean) => {
-    if (isCheckbox) {
-      selectedDestinationUuids.update((currentDestinations) => {
-        if (isChecked) {
-          console.log("page-checkbox", isChecked)
-          return [...currentDestinations, { uuid: parent.uuid, name: parent.name }]
-        }
-        console.log("page-checkbox", isChecked)
-        return currentDestinations.filter((org) => org.uuid !== parent.uuid)
-      })
-    } else {
-      console.log("page-radio", isChecked)
-      selectedOriginUuid.set({ uuid: parent.uuid, name: parent.name })
-      fetchRelatedUnits(parent.uuid)
-    }
   }
 
   async function fetchRelatedUnits(originUUID: string) {
@@ -149,14 +132,7 @@
   $: originName = $selectedOriginUuid ? $selectedOriginUuid.name : "Enheden"
   $: destinationNames = $selectedDestinationUuids.map((dest) => dest.name)
   $: isDisabled = !$selectedOriginUuid || $selectedOriginUuid.uuid === "hiddenValue"
-</script>
-
-{#await graphQLClient().request(OrgTreeRelatedDocument, { from_date: $date })}
-  Henter data...
-{:then data}
-  <!-- TODO: tekst skal muligvis rykkes til script? -->
-  <!-- TODO: Der skal laves  om i stylingen af siden: pil,label og box sidder skævt i forhold til hinanden, der er forlangt til navnet fra checkboxen og der det er roddet ud når man folder trææet ud -->
-  {@const connectionText = originName
+  $: connectionText = originName
     ? `${originName} kobles sammen med: ${
         destinationNames.length
           ? destinationNames.length > 1
@@ -166,7 +142,35 @@
             : destinationNames[0]
           : ""
       }`
-    : ""}
+    : ""
+
+  /*  $: if ($selectedOriginUuid && $selectedOriginUuid.uuid !== previousUuid) {
+    selectedDestinationUuids.set([])
+    fetchRelatedUnits($selectedOriginUuid.uuid)
+    previousUuid = $selectedOriginUuid.uuid
+  }
+
+  $: originName = $selectedOriginUuid ? $selectedOriginUuid.name : "Enheden"
+  $: destinationNames = $selectedDestinationUuids.map((dest) => dest.name)
+  $: isDisabled = !$selectedOriginUuid || $selectedOriginUuid.uuid === "hiddenValue" */
+</script>
+
+{#await graphQLClient().request(OrgTreeRelatedDocument, { from_date: $date })}
+  Henter data...
+{:then data}
+  <!-- TODO: tekst skal muligvis rykkes til script? -->
+  <!-- TODO: Der skal laves  om i stylingen af siden: pil,label og box sidder skævt i forhold til hinanden, der er forlangt til navnet fra checkboxen og der det er roddet ud når man folder trææet ud -->
+  <!-- {@const connectionText = originName
+    ? `${originName} kobles sammen med: ${
+        destinationNames.length
+          ? destinationNames.length > 1
+            ? destinationNames.slice(0, -1).join(", ") +
+              " og " +
+              destinationNames[destinationNames.length - 1]
+            : destinationNames[0]
+          : ""
+      }`
+    : ""} -->
 
   <title>Organisationssammenkobling | OS2mo</title>
 
@@ -195,13 +199,13 @@
           <!-- TODO: skal relatedUnits sendes med her? -->
           <div class="flex flex-col w-1/2">
             <SelectOrgTree
-              {relatedUnits}
               isCheckboxMode={true}
               allowMultipleSelection={false}
               bind:selectedOrg={parent}
               labelText="Vælg enhed"
               on:radioChanged={handleRadioChangeFromSelectTree}
             />
+
             <!-- Skjult felt for origin-uuid -->
             <input
               type="hidden"

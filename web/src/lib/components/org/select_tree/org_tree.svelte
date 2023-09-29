@@ -76,12 +76,10 @@
   })
 
   function handleCheckboxChangeFromNode(event: CustomEvent) {
-    console.log("org_tree-radionChange")
     dispatch("checkboxChanged", { detail: event.detail })
   }
 
   function handleRadioChangeFromNode(event: CustomEvent) {
-    console.log("org_tree-radionChange")
     dispatch("radioChanged", { detail: event.detail })
   }
 </script>
@@ -92,6 +90,7 @@
 {#await fetchOrgTree()}
   <div class="form-control pb-4 flex flex-col">
     <label for={id} class="text-sm text-secondary pb-1 h-6 break-words flex items-end">
+      <!--  Gammel Label styling -->
       <!-- <label for={id} class="text-sm text-secondary pb-1"> -->
       {labelText}
       <span class="animate-spin rounded-full h-6 w-6 border-b-4 border-primary" />
