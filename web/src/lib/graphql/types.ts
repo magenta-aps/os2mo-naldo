@@ -3028,6 +3028,8 @@ export type Facet = {
   user_key: Scalars['String']['output'];
   /** UUID of the entity */
   uuid: Scalars['UUID']['output'];
+  /** Validity of the facet. */
+  validity: OpenValidity;
 };
 
 
@@ -3063,6 +3065,8 @@ export type FacetCreateInput = {
 
 /** Facet filter. */
 export type FacetFilter = {
+  /** Limit the elements returned by their starting validity. */
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
    * Parent user-key filter limiting which entries are returned.
    *
@@ -3093,6 +3097,8 @@ export type FacetFilter = {
    *
    */
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
    * User-key filter limiting which entries are returned.
    *
@@ -3235,6 +3241,13 @@ export type FacetResponsePaged = {
    *
    */
   page_info: PageInfo;
+};
+
+export type FacetTerminateInput = {
+  /** UUID for the facet we want to terminate. */
+  uuid: Scalars['UUID']['input'];
+  /** When to terminate the facet */
+  validity: ValidityInput;
 };
 
 export type FacetUpdateInput = {
@@ -5503,6 +5516,8 @@ export type Mutation = {
   facet_delete: FacetResponse;
   /** Refresh facets. */
   facet_refresh: UuidPaged;
+  /** Terminates a facet. */
+  facet_terminate: FacetResponse;
   /** Updates a facet. */
   facet_update: FacetResponse;
   /** Creates an IT-Association. */
@@ -5790,6 +5805,11 @@ export type MutationFacet_RefreshArgs = {
   filter?: InputMaybe<FacetFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationFacet_TerminateArgs = {
+  input: FacetTerminateInput;
 };
 
 
@@ -7062,7 +7082,9 @@ export type ParentsBoundClassFilter = {
 };
 
 export type ParentsBoundFacetFilter = {
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
@@ -8054,8 +8076,10 @@ export type UuidsBoundEngagementFilter = {
 };
 
 export type UuidsBoundFacetFilter = {
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 

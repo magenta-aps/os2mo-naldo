@@ -19,10 +19,6 @@
 
   let fromDate: string
   let toDate: string
-  let employeeUuid: string
-  let managerType: string
-  let managerLevel: string
-  let responsibility: string
 
   gql`
     query FacetsAndOrg($uuid: [UUID!], $fromDate: DateTime) {
@@ -119,6 +115,7 @@
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
+            required={true}
           />
           <DateInput
             bind:value={toDate}
@@ -128,12 +125,11 @@
             max={maxDate}
           />
         </div>
-        <Search type="employee" wantedAttrs={["Email"]} required={false} />
+        <Search type="employee" wantedAttrs={["Email"]} />
         <div class="flex flex-row gap-6">
           <Select
             title="Ledertype"
             id="manager-type"
-            bind:value={managerType}
             iterable={getClassesByFacetUserKey(facets, "manager_type")}
             extra_classes="basis-1/2"
             required={true}
@@ -141,7 +137,6 @@
           <Select
             title="Lederniveau"
             id="manager-level"
-            bind:value={managerLevel}
             iterable={getClassesByFacetUserKey(facets, "manager_level")}
             extra_classes="basis-1/2"
             required={true}

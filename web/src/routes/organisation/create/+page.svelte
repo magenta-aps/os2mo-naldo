@@ -119,6 +119,7 @@
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
+            required={true}
           />
           <DateInput
             bind:value={toDate}
@@ -138,15 +139,9 @@
               name: orgUnit.name,
               attrs: [],
             }}
-            required={false}
           />
         {:else}
-          <Search
-            type="org-unit"
-            title="Angiv overenhed"
-            id="parent-uuid"
-            required={false}
-          />
+          <Search type="org-unit" title="Angiv overenhed" id="parent-uuid" />
         {/if}
 
         <Input title="Navn" id="name" required={true} />
@@ -163,7 +158,6 @@
             id="org-unit-level"
             extra_classes="basis-1/2"
             iterable={getClassesByFacetUserKey(facets, "org_unit_level")}
-            required={true}
           />
           <Input title="Enhedsnummer" id="org-unit-number" extra_classes="basis-1/2" />
         </div>

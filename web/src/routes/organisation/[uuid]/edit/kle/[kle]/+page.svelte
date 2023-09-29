@@ -16,8 +16,6 @@
 
   let fromDate: string
   let toDate: string
-  let kleNumber: string
-  let kleAspect: string
 
   gql`
     query KLEAndFacet($uuid: [UUID!], $fromDate: DateTime) {
@@ -114,7 +112,8 @@
             title="Startdato"
             id="from"
             min={minDate}
-            max={maxDate ? maxDate : null}
+            max={toDate ? toDate : maxDate}
+            required={true}
           />
           <DateInput
             bind:value={toDate}
@@ -122,7 +121,7 @@
             title="Slutdato"
             id="to"
             min={fromDate}
-            max={maxDate ? maxDate : null}
+            max={maxDate}
           />
         </div>
         <div class="flex flex-row gap-6">
@@ -130,7 +129,6 @@
             title="KLE nummer"
             id="kle-number"
             startValue={kle.kle_number.name}
-            bind:value={kleNumber}
             extra_classes="basis-1/2"
             iterable={getClassesByFacetUserKey(facets, "kle_number")}
             required={true}
@@ -139,7 +137,6 @@
             title="KLE aspekt"
             id="kle-aspect"
             startValue={kle.kle_aspects[0].name}
-            bind:value={kleAspect}
             extra_classes="basis-1/2"
             iterable={getClassesByFacetUserKey(facets, "kle_aspect")}
             required={true}

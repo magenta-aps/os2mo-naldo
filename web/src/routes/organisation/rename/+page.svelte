@@ -53,7 +53,7 @@
           })
 
           $success = {
-            message: `${orgUnit.name} er blevet omdøbt til ${mutation.org_unit_update.objects[0].name}`,
+            message: `${orgUnit.name} er blevet omdøbt til ${name}`,
             uuid: mutation.org_unit_update.uuid,
             type: "organisation",
           }
@@ -83,6 +83,7 @@
           title="Startdato"
           id="from"
           max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
+          required={true}
         />
       </div>
       {#if urlHashOrgUnitUuid}
@@ -105,12 +106,14 @@
             }}
             bind:value={orgUnit}
             on:change={() => (name = orgUnit.name)}
+            required={true}
           />
           <Input
             title="Nyt navn"
             id="name"
             startValue={orgUnitUuidFromHash.name}
             bind:value={name}
+            required={true}
           />
         {/await}
       {:else}

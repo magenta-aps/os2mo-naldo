@@ -18,12 +18,9 @@
 
   let fromDate: string
   let toDate: string
-  let visibility: string
   let addressType: { name: string; uuid?: any | null }
   $: addressUuid = addressType?.uuid
-  let input: string | number
 
-  // TODO: Split queries, so the date doesn't get reset because of facets
   gql`
     query AddressAndFacets(
       $uuid: [UUID!]
@@ -132,7 +129,8 @@
             title="Startdato"
             id="from"
             min={minDate}
-            max={maxDate ? maxDate : null}
+            max={toDate ? toDate : maxDate}
+            required={true}
           />
           <DateInput
             bind:value={toDate}
@@ -147,21 +145,18 @@
           <Select
             title="Synlighed"
             id="visibility"
-            bind:value={visibility}
             startValue={address.visibility?.name}
             iterable={getClassesByFacetUserKey(facets, "visibility")}
             extra_classes="basis-1/2"
-            required={true}
           />
           <Select
             title="Adressetype"
             id="address-type"
-            bind:value={addressType}
             startValue={address.address_type.name}
             iterable={getClassesByFacetUserKey(facets, "org_unit_address_type")}
-            required={true}
             extra_classes="basis-1/2"
             returnType="object"
+            required={true}
           />
           <input hidden name="address-type-uuid" bind:value={addressUuid} />
         </div>
@@ -174,7 +169,6 @@
             <Input
               title="Afdelingskode"
               id="value"
-              bind:value={input}
               startValue={address.name}
               required={true}
             />
@@ -183,7 +177,6 @@
               title="Email"
               id="value"
               type="email"
-              bind:value={input}
               startValue={address.name}
               required={true}
             />
@@ -191,12 +184,10 @@
             <Input
               title="P-nummer"
               id="value"
-              bind:value={input}
-              required={true}
               startValue={address.name}
+              required={true}
             />
           {:else if addressType.name == "Postadresse"}
-            <!-- TODO: DAR input field? -->
             <DarSearch
               title="Postadresse"
               startValue={{
@@ -204,6 +195,7 @@
                 adresse: { id: address.value },
                 adgangsadresse: { id: address.value },
               }}
+              required={true}
             />
           {:else if addressType.name == "Webadresse"}
             <Input
@@ -212,7 +204,6 @@
               type="url"
               pattern="^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+\.[a-z]+(\/[a-zA-Z0-9#]+\/?)*$"
               patternMessage="Indtast en gyldig url"
-              bind:value={input}
               startValue={address.name}
               required={true}
             />
@@ -220,7 +211,6 @@
             <Input
               title="Formålskode"
               id="value"
-              bind:value={input}
               startValue={address.name}
               required={true}
             />
@@ -228,7 +218,6 @@
             <Input
               title="Lokation"
               id="value"
-              bind:value={input}
               startValue={address.name}
               required={true}
             />
@@ -236,7 +225,6 @@
             <Input
               title="EAN-nummer"
               id="value"
-              bind:value={input}
               startValue={address.name}
               required={true}
             />
@@ -244,20 +232,12 @@
             <Input
               title="Skolekode"
               id="value"
-              bind:value={input}
               startValue={address.name}
               required={true}
             />
           {:else if addressType.name == "Fax"}
-            <Input
-              title="Fax"
-              id="value"
-              bind:value={input}
-              startValue={address.name}
-              required={true}
-            />
+            <Input title="Fax" id="value" startValue={address.name} required={true} />
           {:else if addressType.name == "Returadresse"}
-            <!-- TODO: DAR input field? -->
             <DarSearch
               title="Returadresse"
               startValue={{
@@ -265,6 +245,7 @@
                 adresse: { id: address.value },
                 adgangsadresse: { id: address.value },
               }}
+              required={true}
             />
           {:else if addressType.name == "Henvendelsessted"}
             <!-- TODO: DAR input field? -->
@@ -275,6 +256,7 @@
                 adresse: { id: address.value },
                 adgangsadresse: { id: address.value },
               }}
+              required={true}
             />
           {:else if addressType.name == "Telefon"}
             <Input
@@ -283,7 +265,6 @@
               type="tel"
               pattern="[0-9]+"
               patternMessage="Kun tal & '+' er tilladt"
-              bind:value={input}
               startValue={address.name}
               required={true}
             />

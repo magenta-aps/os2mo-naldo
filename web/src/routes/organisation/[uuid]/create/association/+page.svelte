@@ -1,7 +1,6 @@
 <script lang="ts">
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import Input from "$lib/components/forms/shared/input.svelte"
   import Select from "$lib/components/forms/shared/select.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
@@ -18,9 +17,6 @@
 
   let fromDate: string
   let toDate: string
-  let employeeUuid: string
-  let associationType: string
-  let primary: string
 
   gql`
     query FacetAndOrg($uuid: [UUID!], $fromDate: DateTime) {
@@ -110,36 +106,29 @@
             title="Startdato"
             id="from"
             min={minDate}
-            max={maxDate
-              ? maxDate
-              : new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
+            max={toDate ? toDate : maxDate}
+            required={true}
           />
-          <!-- These inputs needs to change, so their dates 
-            can only be in the registrations of their parent org -->
           <DateInput
             bind:value={toDate}
             title="Slutdato"
             id="to"
-            min={fromDate}
-            max={maxDate
-              ? maxDate
-              : new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
+            min={fromDate ? fromDate : minDate}
+            max={maxDate}
           />
         </div>
-        <Search type="employee" wantedAttrs={["Email"]} />
+        <Search type="employee" wantedAttrs={["Email"]} required={true} />
         <div class="flex flex-row gap-6">
           <Select
             title="Tilknytningsrolle"
             id="association-type"
-            bind:value={associationType}
             iterable={getClassesByFacetUserKey(facets, "association_type")}
-            required={true}
             extra_classes="basis-1/2"
+            required={true}
           />
           <Select
             title="Primær"
             id="primary"
-            bind:value={primary}
             iterable={getClassesByFacetUserKey(facets, "primary_type")}
             extra_classes="basis-1/2"
           />

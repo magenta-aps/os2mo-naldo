@@ -3,7 +3,6 @@
   import Error from "$lib/components/alerts/error.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
-  import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
@@ -56,9 +55,7 @@
           })
 
           $success = {
-            message: `KLE-opmærkningen afsluttes ${
-              mutation.kle_terminate.objects[0].validity.to.split("T")[0]
-            }`,
+            message: `KLE-opmærkningen afsluttes ${toDate}`,
             uuid: $page.params.uuid,
             type: "organisation",
           }
@@ -96,6 +93,7 @@
           id="to"
           min={minDate}
           max={maxDate ? maxDate : null}
+          required={true}
         />
       </div>
     </div>
