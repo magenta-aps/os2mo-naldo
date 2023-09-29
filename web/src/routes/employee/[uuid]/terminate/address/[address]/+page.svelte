@@ -13,8 +13,6 @@
 
   let toDate: string
 
-  // TODO: When updating GraphQL remember to change `address_terminate` `at` to `input`,
-  // which was changed in v8
   gql`
     query Address($uuid: [UUID!], $fromDate: DateTime!) {
       addresses(filter: { uuids: $uuid, from_date: $fromDate }) {
@@ -37,7 +35,7 @@
     }
 
     mutation TerminateAddress($input: AddressTerminateInput!) {
-      address_terminate(at: $input) {
+      address_terminate(input: $input) {
         uuid
         objects {
           validity {
@@ -99,6 +97,7 @@
           title="Slutdato"
           id="to"
           min={minDate}
+          required={true}
         />
       </div>
     </div>

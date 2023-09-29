@@ -14,11 +14,10 @@
   import type { SubmitFunction } from "./$types"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import { FacetsAndRoleDocument, UpdateRoleDocument } from "./query.generated"
+  import Search from "$lib/components/search.svelte"
 
   let fromDate: string
   let toDate: string
-  let orgUnitUuid: string
-  let roleType: string
 
   gql`
     query FacetsAndRole($uuid: [UUID!], $fromDate: DateTime) {
@@ -124,6 +123,7 @@
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
+            required={true}
           />
           <DateInput
             bind:value={toDate}
@@ -134,28 +134,23 @@
             max={maxDate}
           />
         </div>
-        <div class="flex flex-row gap-6">
-          <!-- TODO: We need some sort of input, to choose an org_unit.
-            Hopefully we can do it with GraphQL soon :copium: -->
-          <Input
-            title="Organisationsenhed UUID"
-            id="org-unit-uuid"
-            bind:value={orgUnitUuid}
-            startValue={org_unit.uuid}
-            required={true}
-            extra_classes="basis-1/2"
-          />
+        <Search
+          type="org-unit"
+          startValue={{
+            uuid: role.org_unit[0].uuid,
+            name: role.org_unit[0].name,
+            attrs: [],
+          }}
+          required={true}
+        />
 
-          <Select
-            title="Rolletype"
-            id="role-type"
-            bind:value={roleType}
-            startValue={role.role_type.name}
-            iterable={getClassesByFacetUserKey(facets, "role_type")}
-            required={true}
-            extra_classes="basis-1/2"
-          />
-        </div>
+        <Select
+          title="Rolletype"
+          id="role-type"
+          startValue={role.role_type.name}
+          iterable={getClassesByFacetUserKey(facets, "role_type")}
+          required={true}
+        />
       </div>
     </div>
     <div class="flex py-6 gap-4">

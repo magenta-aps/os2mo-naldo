@@ -15,11 +15,6 @@
 
   let fromDate: string
   let toDate: string
-  let firstName: string
-  let lastName: string
-  let nicknameFirstName: string
-  let nicknameLastName: string
-  let seniority: string
 
   gql`
     query Employee($uuid: [UUID!], $fromDate: DateTime) {
@@ -93,6 +88,7 @@
             startValue={$date}
             title="Startdato"
             id="from"
+            required={true}
           />
           <DateInput
             bind:value={toDate}
@@ -107,38 +103,30 @@
           <Input
             title="Navn"
             id="first-name"
-            bind:value={firstName}
             startValue={employee.given_name}
             extra_classes="basis-1/2"
+            required={true}
           />
           <Input
             id="last-name"
-            bind:value={lastName}
             startValue={employee.surname}
-            extra_classes="basis-1/2 pt-6"
+            extra_classes="basis-1/2"
+            required={true}
           />
         </div>
         <div class="flex flex-row gap-6">
           <Input
             title="Kaldenavn"
             id="nickname-first-name"
-            bind:value={nicknameFirstName}
             startValue={employee.nickname_givenname}
             extra_classes="basis-1/2"
           />
           <Input
             id="nickname-last-name"
-            bind:value={nicknameLastName}
             startValue={employee.nickname_surname}
             extra_classes="basis-1/2 pt-6"
           />
         </div>
-        <DateInput
-          bind:value={seniority}
-          title="Anciennitet"
-          id="seniority"
-          startValue={employee.seniority}
-        />
       </div>
     </div>
     <div class="flex py-6 gap-4">

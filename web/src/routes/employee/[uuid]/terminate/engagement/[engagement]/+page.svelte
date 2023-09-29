@@ -3,7 +3,6 @@
   import Error from "$lib/components/alerts/error.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
-  import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
@@ -62,7 +61,7 @@
           $success = {
             message: `${mutation.engagement_terminate.objects[0].employee[0].name} afsluttes d. ${toDate}`,
             uuid: $page.params.uuid,
-            type: "employee"
+            type: "employee",
           }
         } catch (err) {
           console.error(err)
@@ -98,6 +97,7 @@
           id="to"
           min={minDate}
           max={maxDate ? maxDate : null}
+          required={true}
         />
       </div>
     </div>

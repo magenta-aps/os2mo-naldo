@@ -1,7 +1,6 @@
 <script lang="ts">
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import Input from "$lib/components/forms/shared/input.svelte"
   import Select from "$lib/components/forms/shared/select.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
@@ -18,9 +17,6 @@
 
   let fromDate: string
   let toDate: string
-  let managerType: string
-  let managerLevel: string
-  let responsibility: string
 
   gql`
     query FacetsAndOrg($uuid: [UUID!], $fromDate: DateTime) {
@@ -117,6 +113,7 @@
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
+            required={true}
           />
           <DateInput
             bind:value={toDate}
@@ -126,12 +123,11 @@
             max={maxDate}
           />
         </div>
-        <Search type="org-unit" />
+        <Search type="org-unit" required={true} />
         <div class="flex flex-row gap-6">
           <Select
             title="Ledertype"
             id="manager-type"
-            bind:value={managerType}
             iterable={getClassesByFacetUserKey(facets, "manager_type")}
             extra_classes="basis-1/2"
             required={true}
@@ -139,20 +135,18 @@
           <Select
             title="Lederniveau"
             id="manager-level"
-            bind:value={managerLevel}
             iterable={getClassesByFacetUserKey(facets, "manager_level")}
             extra_classes="basis-1/2"
             required={true}
           />
         </div>
+        <!-- FIXME: Use new Multi select -->
         <Select
           title="Lederansvar"
           id="responsibility"
-          bind:value={responsibility}
           iterable={getClassesByFacetUserKey(facets, "responsibility")}
           required={true}
         />
-        <!-- Insert substitute field? -->
       </div>
     </div>
     <div class="flex py-6 gap-4">

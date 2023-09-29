@@ -96,6 +96,7 @@
           id="to"
           min={minDate}
           max={maxDate ? maxDate : null}
+          required={true}
         />
       </div>
     </div>

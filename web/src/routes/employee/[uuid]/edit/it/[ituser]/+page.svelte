@@ -22,8 +22,6 @@
 
   let fromDate: string
   let toDate: string
-  let itSystem: string
-  let accountName: string
 
   gql`
     query ITUserItSystemsAndPrimary(
@@ -132,6 +130,7 @@
             title="Startdato"
             id="from"
             min={minDate}
+            required={true}
           />
           <DateInput
             bind:value={toDate}
@@ -146,7 +145,6 @@
             title="IT-systemer"
             id="it-system"
             startValue={itUser.itsystem.name}
-            bind:value={itSystem}
             extra_classes="basis-1/2"
             iterable={getITSystemNames(itSystems)}
             required={true}
@@ -156,7 +154,6 @@
             id="account-name"
             extra_classes="basis-1/2"
             startValue={itUser.user_key}
-            bind:value={accountName}
             required={true}
           />
         </div>

@@ -1,7 +1,6 @@
 <script lang="ts">
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import Input from "$lib/components/forms/shared/input.svelte"
   import Select from "$lib/components/forms/shared/select.svelte"
   import { enhance } from "$app/forms"
   import { goto } from "$app/navigation"
@@ -14,11 +13,10 @@
   import type { SubmitFunction } from "./$types"
   import { CreateRoleDocument, FacetsAndEmployeesDocument } from "./query.generated"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import Search from "$lib/components/search.svelte"
 
   let fromDate: string
   let toDate: string
-  let orgUnitUuid: string
-  let roleType: string
 
   gql`
     query FacetsAndEmployees($uuid: [UUID!], $fromDate: DateTime) {
@@ -68,7 +66,8 @@
           $success = {
             message: `Rolle til ${mutation.role_create.objects[0].employee[0].name} er blevet oprettet`,
             uuid: $page.params.uuid,
-            }
+            type: "employee",
+          }
         } catch (err) {
           console.error(err)
           $error = { message: err as string }
@@ -105,6 +104,7 @@
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
+            required={true}
           />
           <DateInput
             bind:value={toDate}
@@ -114,26 +114,13 @@
             max={maxDate}
           />
         </div>
-        <div class="flex flex-row gap-6">
-          <!-- We need some sort of input, to choose an org_unit.
-            Hopefully we can do it with GraphQL soon :copium: -->
-          <Input
-            title="Organisationsenhed UUID"
-            id="org-unit-uuid"
-            bind:value={orgUnitUuid}
-            required={true}
-            extra_classes="basis-1/2"
-          />
-
-          <Select
-            title="Rolletype"
-            id="role-type"
-            bind:value={roleType}
-            iterable={getClassesByFacetUserKey(facets, "role_type")}
-            required={true}
-            extra_classes="basis-1/2"
-          />
-        </div>
+        <Search type="org-unit" required={true} />
+        <Select
+          title="Rolletype"
+          id="role-type"
+          iterable={getClassesByFacetUserKey(facets, "role_type")}
+          required={true}
+        />
       </div>
     </div>
     <div class="flex py-6 gap-4">

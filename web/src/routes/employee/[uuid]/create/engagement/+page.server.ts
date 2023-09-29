@@ -21,7 +21,7 @@ export const actions: Actions = {
       ...(userKey && { user_key: userKey }),
       engagement_type: engagementType,
       job_function: jobFunction,
-      primary: primary,
+      ...(primary && { primary: primary }),
       validity: { from: startDate, ...(endDate && { to: endDate }) },
     }
   },

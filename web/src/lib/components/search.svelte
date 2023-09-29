@@ -16,7 +16,7 @@
     type === "employee" ? "person" : "organisation"
   }`
   export let id = `${type}-uuid`
-  export let required = true
+  export let required = false
   export let disabled = false
 
   const itemId = "uuid" // Used by the component to differentiate between items
@@ -41,7 +41,8 @@
 <div class="w-full {action === 'select' ? 'pb-4' : ''}">
   {#if action === "select"}
     <label for="autocomplete" class="text-sm text-secondary pb-1">
-      {title}
+      {title ? title : ""}
+      {required ? "*" : ""}
     </label>
   {/if}
   <SvelteSelect

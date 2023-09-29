@@ -22,13 +22,10 @@
   } from "$lib/util/get_classes"
   import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
   import { getITUserITSystemName } from "$lib/util/helpers"
+  import Search from "$lib/components/search.svelte"
 
   let fromDate: string
   let toDate: string
-  let employeeUuid: string
-  let orgUnitUuid: string
-  let jobFunction: string
-  let itUserUuid: string
 
   gql`
     query ITAssociationAndFacets($uuid: [UUID!], $fromDate: DateTime) {
@@ -76,6 +73,7 @@
             }
             org_unit {
               uuid
+              name
             }
             it_user {
               itsystem {
@@ -161,6 +159,7 @@
             title="Startdato"
             id="from"
             min={minDate}
+            required={true}
           />
           <DateInput
             bind:value={toDate}
@@ -172,37 +171,38 @@
             min={fromDate}
           />
         </div>
+        <!-- FIXME: Use new Search -->
         <Input
-          title="Medarbejder UUID"
+          title="Medarbejder"
           id="employee-uuid"
-          bind:value={employeeUuid}
-          startValue={itassociation.employee[0].uuid}
+          startValue={itassociation.employee[0].name}
           disabled
         />
-        <Input
-          title="Organisationsenhed UUID"
-          id="org-unit-uuid"
-          bind:value={orgUnitUuid}
-          startValue={itassociation.org_unit[0].uuid}
+        <Search
+          type="org-unit"
+          startValue={{
+            uuid: itassociation.org_unit[0].uuid,
+            name: itassociation.org_unit[0].name,
+            attrs: [],
+          }}
           required={true}
         />
         <div class="flex flex-row gap-6">
           <Select
-            bind:value={itUserUuid}
             title="IT-konto"
             id="it-user-uuid"
             startValue={itUserStartValue[0].name}
             iterable={getITUserITSystemName(itusers)}
-            required={true}
             extra_classes="basis-1/2"
+            required={true}
           />
           <Select
             title="Stillingsbetegnelse"
             id="job-function"
             startValue={itassociation.job_function?.name}
-            bind:value={jobFunction}
             iterable={getClassesByFacetUserKey(facets, "engagement_job_function")}
             extra_classes="basis-1/2"
+            required={true}
           />
         </div>
         <div class="flex">

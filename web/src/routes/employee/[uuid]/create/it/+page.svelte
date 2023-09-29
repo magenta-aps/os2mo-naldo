@@ -22,8 +22,6 @@
 
   let fromDate: string
   let toDate: string
-  let itSystem: string
-  let accountName: string
 
   gql`
     query ItSystemsClassAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
@@ -119,6 +117,7 @@
             title="Startdato"
             id="from"
             min={minDate}
+            required={true}
           />
           <DateInput
             bind:value={toDate}
@@ -131,7 +130,6 @@
           <Select
             title="IT-system"
             id="it-system"
-            bind:value={itSystem}
             iterable={getITSystemNames(itSystems)}
             extra_classes="basis-1/2"
             required={true}
@@ -140,7 +138,6 @@
             extra_classes="basis-1/2"
             title="Kontonavn"
             id="account-name"
-            bind:value={accountName}
             required={true}
           />
         </div>

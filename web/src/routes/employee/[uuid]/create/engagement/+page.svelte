@@ -15,14 +15,10 @@
   import { date } from "$lib/stores/date"
   import type { SubmitFunction } from "./$types"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import Search from "$lib/components/search.svelte"
 
   let fromDate: string
   let toDate: string
-  let orgUnitUuid: string
-  let user_key: string
-  let jobFunction: string
-  let engagementType: string
-  let primary: string
 
   gql`
     query FacetAndOrg($uuid: [UUID!], $fromDate: DateTime) {
@@ -114,6 +110,7 @@
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
+            required={true}
           />
           <DateInput
             bind:value={toDate}
@@ -123,26 +120,12 @@
             max={maxDate}
           />
         </div>
-        <!-- We need some sort of input, to choose an org_unit.
-          Hopefully we can do it with GraphQL soon :copium: -->
-        <Input
-          title="Organisationsenhed UUID"
-          id="org-unit-uuid"
-          bind:value={orgUnitUuid}
-          required={true}
-          extra_classes="basis-1/2"
-        />
+        <Search type="org-unit" required={true} />
         <div class="flex flex-row gap-6">
-          <Input
-            title="ID"
-            id="user-key"
-            bind:value={user_key}
-            extra_classes="basis-1/2"
-          />
+          <Input title="ID" id="user-key" extra_classes="basis-1/2" />
           <Select
             title="Stillingsbetegnelse"
             id="job-function"
-            bind:value={jobFunction}
             iterable={getClassesByFacetUserKey(facets, "engagement_job_function")}
             required={true}
             extra_classes="basis-1/2"
@@ -152,7 +135,6 @@
           <Select
             title="Engagementstype"
             id="engagement-type"
-            bind:value={engagementType}
             iterable={getClassesByFacetUserKey(facets, "engagement_type")}
             required={true}
             extra_classes="basis-1/2"
@@ -160,7 +142,6 @@
           <Select
             title="Primær"
             id="primary"
-            bind:value={primary}
             iterable={getClassesByFacetUserKey(facets, "primary_type")}
             extra_classes="basis-1/2"
           />

@@ -18,8 +18,6 @@
 
   let fromDate: string
   let toDate: string
-  let leaveType: string
-  let engagementUuid: string
 
   gql`
     query LeaveAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
@@ -125,6 +123,7 @@
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
+            required={true}
           />
           <DateInput
             bind:value={toDate}
@@ -136,21 +135,19 @@
         </div>
 
         <Select
-          bind:value={leaveType}
           title="Orlovstype"
           id="leave-type-uuid"
           iterable={getClassesByFacetUserKey(facets, "leave_type")}
           required={true}
         />
+        <!-- FIXME: Use new Search -->
         <Input
           title="Medarbejder"
           id="employee-uuid"
           startValue={employeeName}
-          value={undefined}
           disabled
         />
         <Select
-          bind:value={engagementUuid}
           title="Engagementer"
           id="engagement-uuid"
           iterable={getEngagementTitlesAndUuid(engagements)}

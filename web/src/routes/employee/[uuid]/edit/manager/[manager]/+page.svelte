@@ -1,7 +1,6 @@
 <script lang="ts">
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import Input from "$lib/components/forms/shared/input.svelte"
   import Select from "$lib/components/forms/shared/select.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
@@ -18,10 +17,6 @@
 
   let fromDate: string
   let toDate: string
-  let orgUnitUuid: string
-  let managerType: string
-  let managerLevel: string
-  let responsibility: string
 
   gql`
     query ManagerAndFacets($uuid: [UUID!], $fromDate: DateTime) {
@@ -66,6 +61,7 @@
             }
             org_unit {
               uuid
+              name
               validity {
                 from
                 to
@@ -141,6 +137,7 @@
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
+            required={true}
           />
           <DateInput
             bind:value={toDate}
@@ -151,38 +148,40 @@
           />
         </div>
         <!-- We need some sort of input, to choose an org_unit. !-->
-        <Input
-          title="Organisationsenhed UUID"
-          id="org-unit-uuid"
-          bind:value={orgUnitUuid}
-          startValue={manager.org_unit[0].uuid}
+        <Search
+          type="org-unit"
+          startValue={{
+            uuid: manager.org_unit[0].uuid,
+            name: manager.org_unit[0].name,
+            attrs: [],
+          }}
           required={true}
         />
-        <Search type="org-unit" />
         <div class="flex flex-row gap-6">
           <Select
             title="Ledertype"
             id="manager-type"
-            bind:value={managerType}
             startValue={manager.manager_type.name}
             iterable={getClassesByFacetUserKey(facets, "manager_type")}
             extra_classes="basis-1/2"
+            required={true}
           />
           <Select
             title="Lederniveau"
             id="manager-level"
-            bind:value={managerLevel}
             startValue={manager.manager_level.name}
             iterable={getClassesByFacetUserKey(facets, "manager_level")}
             extra_classes="basis-1/2"
+            required={true}
           />
         </div>
+        <!-- FIXME: Use new multi select -->
         <Select
           title="Lederansvar"
           id="responsibility"
-          bind:value={responsibility}
           startValue={manager.responsibilities[0].name}
           iterable={getClassesByFacetUserKey(facets, "responsibility")}
+          required={true}
         />
       </div>
     </div>

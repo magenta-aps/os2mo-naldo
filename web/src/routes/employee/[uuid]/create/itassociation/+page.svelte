@@ -22,12 +22,10 @@
     getClassesByFacetUserKey,
   } from "$lib/util/get_classes"
   import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
+  import Search from "$lib/components/search.svelte"
 
   let fromDate: string
   let toDate: string
-  let orgUnitUuid: string
-  let itUserUuid: string
-  let jobFunction: string
 
   gql`
     query FacetClassesAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
@@ -133,6 +131,7 @@
             title="Startdato"
             id="from"
             min={minDate}
+            required={true}
           />
           <!-- These inputs needs to change, so their dates 
             can only be in the registrations of their parent org -->
@@ -140,24 +139,16 @@
           which org_unit has been chosen -->
           <DateInput bind:value={toDate} title="Slutdato" id="to" min={fromDate} />
         </div>
-        <!-- We need some sort of input, to choose an employee.
-          Hopefully we can do it with GraphQL soon :copium: -->
+        <!-- FIXME: Use new search -->
         <Input
-          title="Medarbejder UUID"
+          title="Medarbejder"
           id="employee-uuid"
           startValue={employeeName}
-          value={undefined}
           disabled
         />
-        <Input
-          title="Organisationsenhed UUID"
-          id="org-unit-uuid"
-          bind:value={orgUnitUuid}
-          required={true}
-        />
+        <Search type="org-unit" required={true} />
         <div class="flex flex-row gap-6">
           <Select
-            bind:value={itUserUuid}
             title="IT-konto"
             id="it-user-uuid"
             iterable={getITUserITSystemName(itusers)}
@@ -167,7 +158,6 @@
           <Select
             title="Stillingsbetegnelse"
             id="job-function"
-            bind:value={jobFunction}
             iterable={getClassesByFacetUserKey(facets, "engagement_job_function")}
             required={true}
             extra_classes="basis-1/2"
