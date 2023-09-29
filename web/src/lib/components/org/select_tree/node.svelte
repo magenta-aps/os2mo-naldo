@@ -19,11 +19,11 @@
   export let fromDate: string
   export let isCheckboxMode: boolean = false
   export let allowMultipleSelection: boolean = false
-  /*  export let relatedUnits: any[] = [] */
+  export let relatedUnits: any[] = []
 
   let open = false
   let loading = false
-  /* let isChecked: boolean = false */
+  /*  export let isChecked: boolean = false */
   /*let checkboxValue: string = isChecked ? "checked" : "unchecked"*/
 
   const dispatch = createEventDispatcher()
@@ -64,26 +64,52 @@
     open = !open
   }
 
-  //todo: er dette navn beskrivende?
-  const handleItemChange = (event: CustomEvent, isCheckbox: boolean) => {
-    const isChecked = event.detail.isChecked
+  /* TODO: rydde op i handlere de er meget ens */
+  const handleRadioChange = (event: Event) => {
+    console.log("event udsent fra node radio")
+    const target = event.target as HTMLInputElement
+    const isChecked = target.checked
+    const uuid = target.id
+    console.log("node-radio", isChecked)
+    if (target && target.checked) {
+      // Tjek for target's eksistens
+      selectedOriginUuid.set({ uuid, name })
+    } else {
+      selectedOriginUuid.set(null)
+    }
+    dispatch("radioChanged", { isChecked, uuid })
+  }
 
-    if (isCheckbox) {
+  const handleCheckboxChange = (event: Event) => {
+    console.log("event udsent fra node box")
+    const target = event.target as HTMLInputElement
+    const isChecked = target.checked
+    const uuid = target.id
+    console.log("node-checkbox", isChecked)
+    if (target && target.checked) {
+      // Tjek for target's eksistens
       selectedDestinationUuids.update((currentDestinations) => {
-        if (isChecked) {
-          return [...currentDestinations, { uuid, name }]
-        } else {
-          return currentDestinations.filter((org) => org.uuid !== uuid)
-        }
+        return [...currentDestinations, { uuid, name }]
       })
     } else {
-      if (isChecked) {
-        selectedOriginUuid.set({ uuid, name })
-      } else {
-        selectedOriginUuid.set(null)
-      }
+      selectedDestinationUuids.update((currentDestinations) => {
+        return currentDestinations.filter((org) => org.uuid !== uuid)
+      })
     }
-    dispatch(isCheckbox ? "checkboxChanged" : "radioChanged", { detail: event.detail })
+    dispatch("checkboxChanged", { isChecked, uuid })
+  }
+
+  function handleInputChange(event: Event) {
+    const target = event.target as HTMLInputElement
+    const isChecked = target.checked
+    const uuid = target.id
+
+    // Kontrollér, om det er en radio eller checkbox
+    if (target.type === "radio") {
+      handleRadioChange(event)
+    } else if (target.type === "checkbox") {
+      handleCheckboxChange(event)
+    }
   }
 
   //todo: mere sigende navne fx $: isOriginSelected og $: isDestinationSelected?
@@ -93,50 +119,13 @@
   $: isCheckedDestination = $selectedDestinationUuids.some((obj) => obj.uuid === uuid)
 
   //TODO: skal denne benyttes
-  onMount(async () => {})
+  /*  onMount(async () => {}) */
 </script>
 
-<!--  TODO: tjek at alt virker som det skal efter omskrivningen, når det er tjekket kan dette slettes-->
-<!-- <li
-  style="padding-left: {indent}px"
-  on:click={() => {
-    selectedOrg.name = name
-    selectedOrg.uuid = uuid
-  }}
->
-  <div>
-    {#if loading}
-      <div class="animate-spin rounded-full h-5 w-5 border-b-4 border-primary" />
-    {:else if children && children.length > 0} -->
-<!-- TODO: hvilke pile skal benyttes ved toggle? -->
-<!-- <p on:click={toggleOpen}>{open ? "⌄" : "➤"}</p> -->
-<!--     <p on:click={toggleOpen}>{open ? "V" : ">"}</p>
-    {/if}
-    {#if isCheckboxMode}
-      {#if allowMultipleSelection}
-        <Checkbox
-          id={uuid}
-          title={name}
-          value="checked"
-          startValue={isCheckedDestination ? "checked" : "unchecked"}
-          on:checkboxChanged={(e) => handleItemChange(e, true)}
-          disabled={!$selectedOriginUuid || ($selectedOriginUuid && $selectedOriginUuid.uuid === uuid)}
-        />
-      {:else}
-        <RadioButton
-          groupName="originUuid"
-          id={uuid}
-          title={name}
-          value={isCheckedOrigin ? "checked" : "unchecked"}
-          on:radioChanged={(e) => handleItemChange(e, false)}
-        />
-      {/if}
-    {:else}
-      {name}
-    {/if}
-  </div>
-</li> -->
+<!-- TODO: fjern A11y ignore når checkboxer fungere som det skal igen, er pt tilføjet for ikke at have gule linjer over alt i koden -->
 
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <li
   style="padding-left: {indent}px"
   on:click={() => {
@@ -151,7 +140,9 @@
     {:else if children && children.length > 0}
       <!-- TODO: hvilke pile skal benyttes ved toggle? -->
       <!-- <p on:click={toggleOpen}>{open ? "⌄" : "➤"}</p> -->
-      <p on:click={toggleOpen}>{open ? "V" : ">"}</p>
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+      <p on:click={toggleOpen}>{open ? "⌄" : ">"}</p>
     {/if}
 
     <!-- Navn visning for ikke-checkbox mode -->
@@ -163,23 +154,27 @@
     <!-- Checkbox Mode Indhold -->
     {#if isCheckboxMode}
       {#if allowMultipleSelection}
-        <Checkbox
-          id={uuid}
-          title={name}
-          value="checked"
-          startValue={isCheckedDestination ? "checked" : "unchecked"}
-          on:checkboxChanged={(e) => handleItemChange(e, true)}
-          disabled={!$selectedOriginUuid ||
-            ($selectedOriginUuid && $selectedOriginUuid.uuid === uuid)}
-        />
+        <div on:change={handleInputChange}>
+          <Checkbox
+            id={uuid}
+            title={name}
+            value="checked"
+            startValue={isCheckedDestination ? "checked" : "unchecked"}
+            on:change={(event) => handleCheckboxChange(event)}
+            disabled={!$selectedOriginUuid ||
+              ($selectedOriginUuid && $selectedOriginUuid.uuid === uuid)}
+          />
+        </div>
       {:else}
-        <RadioButton
-          groupName="originUuid"
-          id={uuid}
-          title={name}
-          value={isCheckedOrigin ? "checked" : "unchecked"}
-          on:radioChanged={(e) => handleItemChange(e, false)}
-        />
+        <div on:change={handleInputChange}>
+          <RadioButton
+            groupName="originUuid"
+            id={uuid}
+            title={name}
+            value={isCheckedOrigin ? "checked" : "unchecked"}
+            on:change={(event) => handleRadioChange(event)}
+          />
+        </div>
       {/if}
     {/if}
   </div>

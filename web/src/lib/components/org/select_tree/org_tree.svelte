@@ -75,12 +75,20 @@
     middleware: [offset(6), flip(), shift()],
   })
 
-  const handleRadioChange = (event: CustomEvent) => {
+  function handleCheckboxChangeFromNode(event: CustomEvent) {
+    console.log("org_tree-radionChange")
+    dispatch("checkboxChanged", { detail: event.detail })
+  }
+
+  function handleRadioChangeFromNode(event: CustomEvent) {
+    console.log("org_tree-radionChange")
     dispatch("radioChanged", { detail: event.detail })
   }
 </script>
 
+<!-- TODO: fjern A11y ignore når checkboxer fungere som det skal igen, er pt tilføjet for ikke at have gule linjer over alt i koden -->
 <!-- TODO: tjek at træet bliver vist ordenligt som dropdown efter der er ændret i klasserne, ellers skal labeltext også flyttes ind i if/else -->
+<!-- TODO: det ser måske lidt sjovt ud med spinning wheel ved siden af overskrifterne? -->
 {#await fetchOrgTree()}
   <div class="form-control pb-4 flex flex-col">
     <label for={id} class="text-sm text-secondary pb-1 h-6 break-words flex items-end">
@@ -107,7 +115,8 @@
               {isCheckboxMode}
               {allowMultipleSelection}
               {relatedUnits}
-              on:radioChanged={handleRadioChange}
+              on:checkboxChanged={handleCheckboxChangeFromNode}
+              on:radioChanged={handleRadioChangeFromNode}
             />
           {/each}
         </ul>
@@ -115,6 +124,7 @@
     {:else}
       <!-- Standard Mode Content -->
       {#if isFocused}
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div
           use:floatingContent
           class="w-96 max-w-full px-5"
@@ -142,54 +152,3 @@
     {/if}
   </div>
 {/await}
-
-<!--  TODO: tjek at alt virker som det skal efter omskrivningen, når det er tjekket kan dette slettes-->
-<!--   <div use:floatingRef>
-      {#if !isCheckboxMode}
-        <input
-          {id}
-          {required}
-          on:focus={() => {
-            isFocused = true
-          }}
-          bind:value={selectedOrg.name}
-          class="input input-bordered input-sm text-base text-secondary font-normal rounded active:input-primary focus:input-primary w-full active:outline-offset-0 focus:outline-offset-0"
-        />
-        <!-- Hidden input for single select when checkboxes are not used -->
-<!--     <input hidden {id} name={id} bind:value={selectedOrg.uuid} />
-      {/if} -->
-<!-- Check isCheckboxMode to determine the presentation of the list-->
-<!--   {#if isCheckboxMode}
-     
-        <div class="max-w-full px-5 ">
-          <ul class="menu bg-white rounded border ">
-            {#each orgTree as child}
-              <Node
-                {...child}
-                bind:selectedOrg
-                {isCheckboxMode}
-                {allowMultipleSelection}
-                {relatedUnits}
-                on:radioChanged={handleRadioChange}
-                
-              />
-            {/each}
-          </ul>
-       
-      </div>
-      {:else if isFocused}
-        <div
-          use:floatingContent
-          class="w-96 max-w-full px-5"
-          on:mouseleave={delayedUnfocus}
-        >
-          <ul class="menu bg-base-200">
-            {#each orgTree as child}
-              <Node {...child} bind:selectedOrg />
-            {/each}
-          </ul>
-        </div>
-      {/if}
-    </div>
-  </div> 
-{/await} -->

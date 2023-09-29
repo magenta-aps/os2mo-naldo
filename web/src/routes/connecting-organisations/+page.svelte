@@ -82,17 +82,28 @@
       }
     }
 
-  const handleEventChange = (event: CustomEvent, isCheckbox: boolean) => {
-    const isChecked = event.detail.isChecked
+  /*  TODO:ryd op i hadler når alt virker ordenlig efter ændringe i checkBox */
 
+  function handleCheckboxChangeFromSelectTree(event: CustomEvent) {
+    console.log("event revived from checbox on page", event.detail)
+  }
+
+  function handleRadioChangeFromSelectTree(event: CustomEvent) {
+    console.log("event revived from radio on page", event.detail)
+  }
+
+  const handleEventChange = (isChecked: boolean, isCheckbox: boolean) => {
     if (isCheckbox) {
       selectedDestinationUuids.update((currentDestinations) => {
         if (isChecked) {
+          console.log("page-checkbox", isChecked)
           return [...currentDestinations, { uuid: parent.uuid, name: parent.name }]
         }
+        console.log("page-checkbox", isChecked)
         return currentDestinations.filter((org) => org.uuid !== parent.uuid)
       })
     } else {
+      console.log("page-radio", isChecked)
       selectedOriginUuid.set({ uuid: parent.uuid, name: parent.name })
       fetchRelatedUnits(parent.uuid)
     }
@@ -181,6 +192,7 @@
             hidden
           />
           <!-- TODO: træet skal foldes ud så man kan se hvad der er markert, hvis der findes indhold i selectedDestinationUuids-->
+          <!-- TODO: skal relatedUnits sendes med her? -->
           <div class="flex flex-col w-1/2">
             <SelectOrgTree
               {relatedUnits}
@@ -188,7 +200,7 @@
               allowMultipleSelection={false}
               bind:selectedOrg={parent}
               labelText="Vælg enhed"
-              on:change={(e) => handleEventChange(e, false)}
+              on:radioChanged={handleRadioChangeFromSelectTree}
             />
             <!-- Skjult felt for origin-uuid -->
             <input
@@ -204,7 +216,7 @@
               allowMultipleSelection={true}
               bind:selectedOrg={parent}
               labelText="Angiv hvilke enheder der skal sammenkobles med enheden til venstre"
-              on:change={(e) => handleEventChange(e, true)}
+              on:checkboxChanged={handleCheckboxChangeFromSelectTree}
             />
             <!-- Skjult felt for destination-uuids -->
             <input
@@ -237,3 +249,7 @@
     </div>
   </form>
 {/await}
+<!--TODO:fjern når alt virker ordenlig efter ændringe i checkBox *-->
+{console.log("origin: ", $selectedOriginUuid)}
+{console.log("dist: ", $selectedDestinationUuids)}
+{console.log("related: ", relatedUnits)}
