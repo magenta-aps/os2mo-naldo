@@ -87,6 +87,8 @@
   }
 
   //todo: mere sigende navne fx $: isOriginSelected og $: isDestinationSelected?
+  //todo: logikken i denne $: isCheckedOrigin = $selectedOriginUuid ? $selectedOriginUuid.uuid === uuid : false og i knappen er næsten den samme disabled={($selectedOriginUuid && $selectedOriginUuid.uuid === uuid) || false}
+
   $: isCheckedOrigin = $selectedOriginUuid ? $selectedOriginUuid.uuid === uuid : false
   $: isCheckedDestination = $selectedDestinationUuids.some((obj) => obj.uuid === uuid)
 
@@ -94,7 +96,8 @@
   onMount(async () => {})
 </script>
 
-<li
+<!--  TODO: tjek at alt virker som det skal efter omskrivningen, når det er tjekket kan dette slettes-->
+<!-- <li
   style="padding-left: {indent}px"
   on:click={() => {
     selectedOrg.name = name
@@ -104,10 +107,10 @@
   <div>
     {#if loading}
       <div class="animate-spin rounded-full h-5 w-5 border-b-4 border-primary" />
-    {:else if children && children.length > 0}
-      <!-- TODO: hvilke pile skal benyttes ved toggle? -->
-      <!-- <p on:click={toggleOpen}>{open ? "⌄" : "➤"}</p> -->
-      <p on:click={toggleOpen}>{open ? "V" : ">"}</p>
+    {:else if children && children.length > 0} -->
+<!-- TODO: hvilke pile skal benyttes ved toggle? -->
+<!-- <p on:click={toggleOpen}>{open ? "⌄" : "➤"}</p> -->
+<!--     <p on:click={toggleOpen}>{open ? "V" : ">"}</p>
     {/if}
     {#if isCheckboxMode}
       {#if allowMultipleSelection}
@@ -117,7 +120,7 @@
           value="checked"
           startValue={isCheckedDestination ? "checked" : "unchecked"}
           on:checkboxChanged={(e) => handleItemChange(e, true)}
-          disabled={($selectedOriginUuid && $selectedOriginUuid.uuid === uuid) || false}
+          disabled={!$selectedOriginUuid || ($selectedOriginUuid && $selectedOriginUuid.uuid === uuid)}
         />
       {:else}
         <RadioButton
@@ -130,6 +133,54 @@
       {/if}
     {:else}
       {name}
+    {/if}
+  </div>
+</li> -->
+
+<li
+  style="padding-left: {indent}px"
+  on:click={() => {
+    selectedOrg.name = name
+    selectedOrg.uuid = uuid
+  }}
+>
+  <div>
+    <!-- Indlæsningsindikator -->
+    {#if loading}
+      <div class="animate-spin rounded-full h-5 w-5 border-b-4 border-primary" />
+    {:else if children && children.length > 0}
+      <!-- TODO: hvilke pile skal benyttes ved toggle? -->
+      <!-- <p on:click={toggleOpen}>{open ? "⌄" : "➤"}</p> -->
+      <p on:click={toggleOpen}>{open ? "V" : ">"}</p>
+    {/if}
+
+    <!-- Navn visning for ikke-checkbox mode -->
+    {#if !isCheckboxMode}
+      {name}
+    {/if}
+
+    <!--   TODO: hvordan bliver dette stylet korrekt? -->
+    <!-- Checkbox Mode Indhold -->
+    {#if isCheckboxMode}
+      {#if allowMultipleSelection}
+        <Checkbox
+          id={uuid}
+          title={name}
+          value="checked"
+          startValue={isCheckedDestination ? "checked" : "unchecked"}
+          on:checkboxChanged={(e) => handleItemChange(e, true)}
+          disabled={!$selectedOriginUuid ||
+            ($selectedOriginUuid && $selectedOriginUuid.uuid === uuid)}
+        />
+      {:else}
+        <RadioButton
+          groupName="originUuid"
+          id={uuid}
+          title={name}
+          value={isCheckedOrigin ? "checked" : "unchecked"}
+          on:radioChanged={(e) => handleItemChange(e, false)}
+        />
+      {/if}
     {/if}
   </div>
 </li>

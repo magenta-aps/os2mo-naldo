@@ -9,7 +9,7 @@
   export let disabled: boolean = false
 
   const dispatch = createEventDispatcher()
-
+  //TODO: find løsning der ikke påvirker alt i systemet, fjern denne event når der er testet færdig
   function handleCheckboxChange(event: Event) {
     const target = event.target as HTMLInputElement
     dispatch("checkboxChanged", { isChecked: target.checked, uuid: target.id })

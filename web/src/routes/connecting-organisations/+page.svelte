@@ -67,39 +67,35 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(UpdateRelatedUnitsDocument, {
-            input: result.data,
-          })
-          /* TODO: Intetsigende besked ret til noget mere fornuftigt */
-          $success = {
-            message: `Tilknytning til ${mutation.related_units_update.uuid} er blevet oprettet`,
-          }
-        } catch (err) {
-          console.error(err)
-          $error = { message: err as string }
+      if (result.type !== "success" || !result.data) return
+
+      try {
+        const mutation = await graphQLClient().request(UpdateRelatedUnitsDocument, {
+          input: result.data,
+        })
+        $success = {
+          message: `Tilknytning til ${mutation.related_units_update.uuid} er blevet oprettet`,
         }
+      } catch (err) {
+        console.error(err)
+        $error = { message: err as string }
       }
     }
 
-  /*  TODO: sammenskriv handleRadioChange og handleCheckboxChange til en funktion? */
-  const handleRadioChange = (event: CustomEvent) => {
-    const isChecked = event.detail.isChecked
-    selectedOriginUuid.set({ uuid: parent.uuid, name: parent.name })
-    fetchRelatedUnits(parent.uuid)
-  }
-
-  const handleCheckboxChange = (event: CustomEvent) => {
+  const handleEventChange = (event: CustomEvent, isCheckbox: boolean) => {
     const isChecked = event.detail.isChecked
 
-    selectedDestinationUuids.update((currentDestinations) => {
-      if (isChecked) {
-        return [...currentDestinations, { uuid: parent.uuid, name: parent.name }]
-      } else {
+    if (isCheckbox) {
+      selectedDestinationUuids.update((currentDestinations) => {
+        if (isChecked) {
+          return [...currentDestinations, { uuid: parent.uuid, name: parent.name }]
+        }
         return currentDestinations.filter((org) => org.uuid !== parent.uuid)
-      }
-    })
+      })
+    } else {
+      selectedOriginUuid.set({ uuid: parent.uuid, name: parent.name })
+      fetchRelatedUnits(parent.uuid)
+    }
   }
 
   async function fetchRelatedUnits(originUUID: string) {
@@ -109,7 +105,6 @@
         fromDate: fromDate,
       })
       relatedUnits = response.related_units.objects
-
       updateSelectedDestinationUuids()
     } catch (err) {
       console.error(err)
@@ -118,27 +113,20 @@
   }
 
   const updateSelectedDestinationUuids = () => {
-    relatedUnits.forEach((related) => {
+    const newDestinations = relatedUnits.flatMap((related) => {
       const related_unit = related.objects[0]
-      let relatedUuid: string
-      let relatedName: string
-
       if (related_unit.org_units[0].uuid === $selectedOriginUuid?.uuid) {
-        relatedUuid = related_unit.org_units[1].uuid
-        relatedName = related_unit.org_units[1].name
-      } else {
-        relatedUuid = related_unit.org_units[0].uuid
-        relatedName = related_unit.org_units[0].name
-      }
-
-      selectedDestinationUuids.update((currentDestinations) => {
-        if (!currentDestinations.some((dest) => dest.uuid === relatedUuid)) {
-          return [...currentDestinations, { uuid: relatedUuid, name: relatedName }]
-        } else {
-          return currentDestinations
+        return {
+          uuid: related_unit.org_units[1].uuid,
+          name: related_unit.org_units[1].name,
         }
-      })
+      }
+      return {
+        uuid: related_unit.org_units[0].uuid,
+        name: related_unit.org_units[0].name,
+      }
     })
+    selectedDestinationUuids.set(newDestinations)
   }
 
   $: if ($selectedOriginUuid && $selectedOriginUuid.uuid !== previousUuid) {
@@ -149,7 +137,6 @@
 
   $: originName = $selectedOriginUuid ? $selectedOriginUuid.name : "Enheden"
   $: destinationNames = $selectedDestinationUuids.map((dest) => dest.name)
-
   $: isDisabled = !$selectedOriginUuid || $selectedOriginUuid.uuid === "hiddenValue"
 </script>
 
@@ -157,7 +144,7 @@
   Henter data...
 {:then data}
   <!-- TODO: tekst skal muligvis rykkes til script? -->
-  <!-- TODO: Der skal laces  om i stylingen af siden -->
+  <!-- TODO: Der skal laves  om i stylingen af siden: pil,label og box sidder skævt i forhold til hinanden, der er forlangt til navnet fra checkboxen og der det er roddet ud når man folder trææet ud -->
   {@const connectionText = originName
     ? `${originName} kobles sammen med: ${
         destinationNames.length
@@ -179,9 +166,10 @@
   <div class="divider p-0 m-0 mb-4 w-full" />
 
   <form method="post" class="mx-6" use:enhance={handler}>
-    <div class="w-1/2 min-w-fit bg-slate-100 rounded">
+    <div class=" min-w-fit bg-slate-100 rounded">
       <div class="p-8">
-        <div class="flex flex-row gap-6">
+        <div class="flex flex-col sm:flex-row gap-6 w-full">
+          <!--  TODO: sæt denne til at hente dags-dato? -->
           <input type="hidden" name="from" bind:value={fromDate} />
           <!-- Skjult radioButton der tvinger brugerne til at vælge en værdi til at starte med, og til at disable 'gem' og 'anullér' knapperne-->
           <input
@@ -192,60 +180,60 @@
             checked
             hidden
           />
-          <!-- TODO: skal træet skal foldes ud til at vise de markerede enheder når origin er valgt -->
-          <!-- TODO: højre side skal deaktiveres indtil der er valgt en origin -->
-          <SelectOrgTree
-            {relatedUnits}
-            isCheckboxMode={true}
-            allowMultipleSelection={false}
-            bind:selectedOrg={parent}
-            labelText="Vælg enhed"
-            on:radioChanged={handleRadioChange}
-          />
-
-          <!-- Skjult felt for origin-uuid -->
-          <input
-            type="hidden"
-            id="origin-uuid"
-            name="origin-uuid"
-            value={$selectedOriginUuid ? $selectedOriginUuid.uuid : ""}
-          />
-
-          <SelectOrgTree
-            isCheckboxMode={true}
-            allowMultipleSelection={true}
-            bind:selectedOrg={parent}
-            labelText="Angiv hvilke enheder der skal sammenkobles med enheden til venstre"
-            on:checkboxChanged={handleCheckboxChange}
-          />
-
-          <!-- Skjult felt for destination-uuids -->
-          <input
-            type="hidden"
-            id="destination-uuids"
-            name="destination-uuids"
-            value={$selectedDestinationUuids.map((obj) => obj.uuid).join(",")}
-          />
+          <!-- TODO: træet skal foldes ud så man kan se hvad der er markert, hvis der findes indhold i selectedDestinationUuids-->
+          <div class="flex flex-col w-1/2">
+            <SelectOrgTree
+              {relatedUnits}
+              isCheckboxMode={true}
+              allowMultipleSelection={false}
+              bind:selectedOrg={parent}
+              labelText="Vælg enhed"
+              on:change={(e) => handleEventChange(e, false)}
+            />
+            <!-- Skjult felt for origin-uuid -->
+            <input
+              type="hidden"
+              id="origin-uuid"
+              name="origin-uuid"
+              value={$selectedOriginUuid ? $selectedOriginUuid.uuid : ""}
+            />
+          </div>
+          <div class="flex flex-col w-1/2">
+            <SelectOrgTree
+              isCheckboxMode={true}
+              allowMultipleSelection={true}
+              bind:selectedOrg={parent}
+              labelText="Angiv hvilke enheder der skal sammenkobles med enheden til venstre"
+              on:change={(e) => handleEventChange(e, true)}
+            />
+            <!-- Skjult felt for destination-uuids -->
+            <input
+              type="hidden"
+              id="destination-uuids"
+              name="destination-uuids"
+              value={$selectedDestinationUuids.map((obj) => obj.uuid).join(",")}
+            />
+          </div>
         </div>
-        <div class="info-text py-2">{connectionText}</div>
-        <div class="flex py-6 gap-4">
-          <button
-            type="submit"
-            class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-            disabled={isDisabled}>Gem</button
-          >
-          <!--  TODO:hvor skal goto: vise hen, hvis den skal vise nogle steder hen? -->
-          <button
-            type="button"
-            class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-            disabled={isDisabled}
-            on:click={() => goto(`${base}/connecting-organisations/`)}
-          >
-            Annullér
-          </button>
-          <Error />
-        </div>
+        <div class="text-sm text-secondary pb-1">{connectionText}</div>
       </div>
+    </div>
+    <div class="flex py-6 gap-4">
+      <button
+        type="submit"
+        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+        disabled={isDisabled}>Gem</button
+      >
+      <!--  TODO:hvor skal goto: vise hen, hvis den skal vise nogle steder hen? -->
+      <button
+        type="button"
+        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+        disabled={isDisabled}
+        on:click={() => goto(`${base}/connecting-organisations/`)}
+      >
+        Annullér
+      </button>
+      <Error />
     </div>
   </form>
 {/await}

@@ -80,21 +80,53 @@
   }
 </script>
 
+<!-- TODO: tjek at træet bliver vist ordenligt som dropdown efter der er ændret i klasserne, ellers skal labeltext også flyttes ind i if/else -->
 {#await fetchOrgTree()}
-  <div class="form-control pb-4">
-    <label for={id} class="text-sm text-secondary pb-1">
+  <div class="form-control pb-4 flex flex-col">
+    <label for={id} class="text-sm text-secondary pb-1 h-6 break-words flex items-end">
+      <!-- <label for={id} class="text-sm text-secondary pb-1"> -->
       {labelText}
       <span class="animate-spin rounded-full h-6 w-6 border-b-4 border-primary" />
     </label>
     <input disabled class="input input-bordered input-sm rounded w-full" />
   </div>
 {:then data}
-  <div class="form-control pb-4">
-    <label for={id} class="text-sm text-secondary pb-1">
+  <div class="form-control pb-4 flex flex-col">
+    <label for={id} class="text-sm text-secondary pb-1 h-6 break-words flex items-end">
       {labelText}
     </label>
-    <div use:floatingRef>
-      {#if !isCheckboxMode}
+
+    {#if isCheckboxMode}
+      <!-- Checkbox Mode Content -->
+      <div use:floatingRef class="max-w-full">
+        <ul class="menu bg-white rounded border">
+          {#each orgTree as child}
+            <Node
+              {...child}
+              bind:selectedOrg
+              {isCheckboxMode}
+              {allowMultipleSelection}
+              {relatedUnits}
+              on:radioChanged={handleRadioChange}
+            />
+          {/each}
+        </ul>
+      </div>
+    {:else}
+      <!-- Standard Mode Content -->
+      {#if isFocused}
+        <div
+          use:floatingContent
+          class="w-96 max-w-full px-5"
+          on:mouseleave={delayedUnfocus}
+        >
+          <ul class="menu bg-base-200">
+            {#each orgTree as child}
+              <Node {...child} bind:selectedOrg />
+            {/each}
+          </ul>
+        </div>
+      {:else}
         <input
           {id}
           {required}
@@ -107,10 +139,30 @@
         <!-- Hidden input for single select when checkboxes are not used -->
         <input hidden {id} name={id} bind:value={selectedOrg.uuid} />
       {/if}
-      <!-- Check isCheckboxMode to determine the presentation of the list-->
-      {#if isCheckboxMode}
-        <div class="w-96 max-w-full px-5">
-          <ul class="menu bg-base-200">
+    {/if}
+  </div>
+{/await}
+
+<!--  TODO: tjek at alt virker som det skal efter omskrivningen, når det er tjekket kan dette slettes-->
+<!--   <div use:floatingRef>
+      {#if !isCheckboxMode}
+        <input
+          {id}
+          {required}
+          on:focus={() => {
+            isFocused = true
+          }}
+          bind:value={selectedOrg.name}
+          class="input input-bordered input-sm text-base text-secondary font-normal rounded active:input-primary focus:input-primary w-full active:outline-offset-0 focus:outline-offset-0"
+        />
+        <!-- Hidden input for single select when checkboxes are not used -->
+<!--     <input hidden {id} name={id} bind:value={selectedOrg.uuid} />
+      {/if} -->
+<!-- Check isCheckboxMode to determine the presentation of the list-->
+<!--   {#if isCheckboxMode}
+     
+        <div class="max-w-full px-5 ">
+          <ul class="menu bg-white rounded border ">
             {#each orgTree as child}
               <Node
                 {...child}
@@ -119,10 +171,12 @@
                 {allowMultipleSelection}
                 {relatedUnits}
                 on:radioChanged={handleRadioChange}
+                
               />
             {/each}
           </ul>
-        </div>
+       
+      </div>
       {:else if isFocused}
         <div
           use:floatingContent
@@ -137,5 +191,5 @@
         </div>
       {/if}
     </div>
-  </div>
-{/await}
+  </div> 
+{/await} -->

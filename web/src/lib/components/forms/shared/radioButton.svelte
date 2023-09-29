@@ -9,7 +9,7 @@
   export let groupName: string
 
   const dispatch = createEventDispatcher()
-
+  //TODO: find løsning der ikke påvirker alt i systemet, fjern denne event når der er testet færdig
   function handleRadioChange(event: Event) {
     const target = event.target as HTMLInputElement
     const isChecked = target.checked
