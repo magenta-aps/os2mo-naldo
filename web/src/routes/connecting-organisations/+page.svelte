@@ -8,11 +8,7 @@
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { date } from "$lib/stores/date"
-  import {
-    RelatedUnitsDocument,
-    OrgTreeRelatedDocument,
-    UpdateRelatedUnitsDocument,
-  } from "./query.generated"
+  import { RelatedUnitsDocument, UpdateRelatedUnitsDocument } from "./query.generated"
   import SelectOrgTree from "$lib/components/org/select_tree/org_tree.svelte"
   import {
     selectedDestinationUuids,
@@ -21,25 +17,11 @@
 
   let relatedUnits: any[] = []
   let previousUuid: string | null = null
-  let fromDate = new Date().toISOString().split("T")[0]
+  /* let fromDate = new Date().toISOString().split("T")[0] */
   let parent: { name: string; uuid?: any | null }
   let isDisabled = true
 
-  /* TODO: er der brug for begge gql-query */
   gql`
-    query OrgTreeRelated($from_date: DateTime!) {
-      related_units(filter: { from_date: $from_date }) {
-        objects {
-          objects {
-            org_units {
-              uuid
-              name
-            }
-          }
-        }
-      }
-    }
-
     query RelatedUnits($org_unit: [UUID!], $fromDate: DateTime) {
       related_units(filter: { org_units: $org_unit, from_date: $fromDate }) {
         objects {
@@ -73,8 +55,9 @@
         const mutation = await graphQLClient().request(UpdateRelatedUnitsDocument, {
           input: result.data,
         })
+        /* TODO: lav en brugbar besked til succes-besked  */
         $success = {
-          message: `Tilknytning til ${mutation.related_units_update.uuid} er blevet oprettet`,
+          message: `Tilknytning er blevet oprettet`,
         }
       } catch (err) {
         console.error(err)
@@ -82,8 +65,7 @@
       }
     }
 
-  /*  TODO:ryd op i console.log når alt virker ordenlig i checkBox */
-
+  /*  TODO:ryd op i console.log når alt virker som det skal, disse skal ændres til <div on:change={handleInputChange}> om selectrees? */
   function handleCheckboxChangeFromSelectTree(event: CustomEvent) {
     console.log("event revived from checbox on page", event.detail)
   }
@@ -96,7 +78,7 @@
     try {
       const response = await graphQLClient().request(RelatedUnitsDocument, {
         org_unit: originUUID,
-        fromDate: fromDate,
+        fromDate: $date,
       })
       relatedUnits = response.related_units.objects
       updateSelectedDestinationUuids()
@@ -130,8 +112,11 @@
   }
 
   $: originName = $selectedOriginUuid ? $selectedOriginUuid.name : "Enheden"
+
   $: destinationNames = $selectedDestinationUuids.map((dest) => dest.name)
+
   $: isDisabled = !$selectedOriginUuid || $selectedOriginUuid.uuid === "hiddenValue"
+
   $: connectionText = originName
     ? `${originName} kobles sammen med: ${
         destinationNames.length
@@ -143,35 +128,11 @@
           : ""
       }`
     : ""
-
-  /*  $: if ($selectedOriginUuid && $selectedOriginUuid.uuid !== previousUuid) {
-    selectedDestinationUuids.set([])
-    fetchRelatedUnits($selectedOriginUuid.uuid)
-    previousUuid = $selectedOriginUuid.uuid
-  }
-
-  $: originName = $selectedOriginUuid ? $selectedOriginUuid.name : "Enheden"
-  $: destinationNames = $selectedDestinationUuids.map((dest) => dest.name)
-  $: isDisabled = !$selectedOriginUuid || $selectedOriginUuid.uuid === "hiddenValue" */
 </script>
 
-{#await graphQLClient().request(OrgTreeRelatedDocument, { from_date: $date })}
+{#await graphQLClient().request(RelatedUnitsDocument, { fromDate: $date })}
   Henter data...
 {:then data}
-  <!-- TODO: tekst skal muligvis rykkes til script? -->
-  <!-- TODO: Der skal laves  om i stylingen af siden: pil,label og box sidder skævt i forhold til hinanden, der er forlangt til navnet fra checkboxen og der det er roddet ud når man folder trææet ud -->
-  <!-- {@const connectionText = originName
-    ? `${originName} kobles sammen med: ${
-        destinationNames.length
-          ? destinationNames.length > 1
-            ? destinationNames.slice(0, -1).join(", ") +
-              " og " +
-              destinationNames[destinationNames.length - 1]
-            : destinationNames[0]
-          : ""
-      }`
-    : ""} -->
-
   <title>Organisationssammenkobling | OS2mo</title>
 
   <div class="flex align-center px-6 pt-6 pb-4">
@@ -184,8 +145,7 @@
     <div class=" min-w-fit bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-col sm:flex-row gap-6 w-full">
-          <!--  TODO: sæt denne til at hente dags-dato? -->
-          <input type="hidden" name="from" bind:value={fromDate} />
+          <input type="hidden" name="from" bind:value={$date} />
           <!-- Skjult radioButton der tvinger brugerne til at vælge en værdi til at starte med, og til at disable 'gem' og 'anullér' knapperne-->
           <input
             type="radio"
@@ -196,7 +156,6 @@
             hidden
           />
           <!-- TODO: træet skal foldes ud så man kan se hvad der er markert, hvis der findes indhold i selectedDestinationUuids-->
-          <!-- TODO: skal relatedUnits sendes med her? -->
           <div class="flex flex-col w-1/2">
             <SelectOrgTree
               isCheckboxMode={true}
@@ -253,7 +212,3 @@
     </div>
   </form>
 {/await}
-<!--TODO:fjern når alt virker ordenlig efter ændringe i checkBox *-->
-{console.log("origin: ", $selectedOriginUuid)}
-{console.log("dist: ", $selectedDestinationUuids)}
-{console.log("related: ", relatedUnits)}

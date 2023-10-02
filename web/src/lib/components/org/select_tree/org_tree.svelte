@@ -19,7 +19,7 @@
   export let required = true
   export let isCheckboxMode: boolean = false
   export let allowMultipleSelection: boolean = false
-  export let relatedUnits: any[] = []
+  /*  export let relatedUnits: any[] = [] */
 
   let orgTree: any[] = []
   let isFocused = false
@@ -113,7 +113,6 @@
               bind:selectedOrg
               {isCheckboxMode}
               {allowMultipleSelection}
-              {relatedUnits}
               on:checkboxChanged={handleCheckboxChangeFromNode}
               on:radioChanged={handleRadioChangeFromNode}
             />

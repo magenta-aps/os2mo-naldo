@@ -9,6 +9,8 @@
   import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
   import RadioButton from "$lib/components/forms/shared/radioButton.svelte"
   import { OrgUnitChildrenDocument } from "$lib/components/org/select_tree/query.generated"
+  import ArrowDown from "../../forms/shared/arrowDown.svelte"
+  import ArrowRight from "../../forms/shared/arrowRight.svelte"
 
   export let selectedOrg: any
   export let name = ""
@@ -96,7 +98,7 @@
   $: isCheckedDestination = $selectedDestinationUuids.some((obj) => obj.uuid === uuid)
 </script>
 
-<!-- TODO: fjern A11y ignore når checkboxer fungere som det skal igen, er pt tilføjet for ikke at have gule linjer over alt i koden -->
+<!-- TODO: fjern A11y ignore når checkboxer fungere som det skal, er pt tilføjet for ikke at have gule linjer over alt i koden -->
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
@@ -107,28 +109,37 @@
     selectedOrg.uuid = uuid
   }}
 >
-  <div>
+  <div class="flex items-center">
     <!-- Indlæsningsindikator -->
     {#if loading}
       <div class="animate-spin rounded-full h-5 w-5 border-b-4 border-primary" />
-    {:else if children && children.length > 0}
-      <!-- TODO: hvilke pile skal benyttes ved toggle? -->
-      <!-- <p on:click={toggleOpen}>{open ? "⌄" : "➤"}</p> -->
+    {:else}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-      <p on:click={toggleOpen}>{open ? "⌄" : ">"}</p>
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <!-- Placeholder for arrows even if no children are present, gives a better visuel experience -->
+      <div
+        class="flex items-center justify-center w-5 h-5 mr-2 mb-3"
+        on:click={toggleOpen}
+      >
+        {#if children && children.length > 0}
+          {#if open}
+            <ArrowDown />
+          {:else}
+            <ArrowRight />
+          {/if}
+        {/if}
+      </div>
     {/if}
 
     <!-- Navn visning for ikke-checkbox mode -->
     {#if !isCheckboxMode}
-      {name}
+      <span class="mr-2">{name}</span>
     {/if}
 
-    <!--   TODO: hvordan bliver dette stylet korrekt? -->
     <!-- Checkbox Mode Indhold -->
     {#if isCheckboxMode}
       {#if allowMultipleSelection}
-        <div on:change={handleInputChange}>
+        <div on:change={handleInputChange} class="ml-2">
           <Checkbox
             id={uuid}
             title={name}
@@ -139,7 +150,7 @@
           />
         </div>
       {:else}
-        <div on:change={handleInputChange}>
+        <div on:change={handleInputChange} class="ml-2">
           <RadioButton
             groupName="originUuid"
             id={uuid}
@@ -152,11 +163,12 @@
   </div>
 </li>
 
+<!-- TODO:indent er sat til 30 i stedet for 24 da det visuelt gør det lettere i selectree når der er checkbox, tjek hvordan det ser ud i dropdown -->
 {#if open}
   {#each children as child}
     <svelte:self
       {...child}
-      indent={indent + 24}
+      indent={indent + 30}
       {fromDate}
       {allowMultipleSelection}
       {isCheckboxMode}
