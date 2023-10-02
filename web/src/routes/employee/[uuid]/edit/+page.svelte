@@ -26,7 +26,6 @@
             nickname_givenname
             nickname_surname
             cpr_no
-            seniority
             validity {
               from
               to

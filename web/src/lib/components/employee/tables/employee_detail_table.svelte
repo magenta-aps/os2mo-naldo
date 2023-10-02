@@ -21,7 +21,6 @@
             name
             uuid
             nickname
-            seniority
             validity {
               from
               to
@@ -33,7 +32,7 @@
   `
 </script>
 
-<DetailTable headers={["Navn", "Kaldenavn", "Anciennitet", "Dato", "", ""]}>
+<DetailTable headers={["Navn", "Kaldenavn", "Dato", "", ""]}>
   {#await graphQLClient().request( EmployeeDocument, { uuid: uuid, ...tenseToValidity(tense, $date) } )}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
@@ -48,7 +47,6 @@
           {employee.name}
         </td>
         <td class="p-4">{employee.nickname}</td>
-        <td class="p-4">{employee.seniority || ""}</td>
         <ValidityTableCell validity={employee.validity} />
         <td>
           <a aria-disabled href="{base}/employee/{uuid}/edit">
