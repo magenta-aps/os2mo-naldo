@@ -10,7 +10,7 @@ services:
       PUBLIC_BASE_URL: http://localhost:5000
       PUBLIC_DAR_ACCESS_ADDRESSES: "true"
     ports:
-      - 4173:3000   # prod - node
+      - 4173:3000 # prod - node
     restart: on-failure
 
   dev:
@@ -22,7 +22,7 @@ services:
       PUBLIC_BASE_URL: http://127.0.0.1:5001
       PUBLIC_DAR_ACCESS_ADDRESSES: "true"
     ports:
-      - 5173:5173   # dev
+      - 5173:5173 # dev
       - 24678:24678 # hot module reloading
     volumes:
       - ./web/src:/app/src
