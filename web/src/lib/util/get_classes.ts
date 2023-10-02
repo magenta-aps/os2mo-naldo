@@ -2,7 +2,7 @@ type Facet = {
   objects: {
     uuid: any
     user_key: string
-    classes: { __typename?: "Class"; name: string; uuid: any; user_key: string }[]
+    classes: { name: string; uuid: any; user_key: string }[]
   }[]
 }
 
