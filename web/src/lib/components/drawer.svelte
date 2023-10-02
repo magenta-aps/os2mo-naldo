@@ -3,9 +3,9 @@
   import DrawerContent from "$lib/components/drawer_content.svelte"
 </script>
 
-<div class="drawer lg:drawer-open h-[calc(100vh-4rem)]">
+<div class="drawer lg:drawer-open">
   <input id="drawer" type="checkbox" class="drawer-toggle" />
-  <div class="drawer-content flex flex-col h-auto">
+  <div class="drawer-content flex flex-col">
     <!-- Page content here -->
     {#if $isAuth}
       <slot />
@@ -18,9 +18,10 @@
       </div>
     {/if}
   </div>
-  <div class="drawer-side">
+  <div class="drawer-side h-min">
     <label for="drawer" class="drawer-overlay" />
-    <ul class="overflow-y-auto w-80 bg-base-100 min-h-screen border">
+    <!-- minus 4rem to deal with the navbar making the page scrollable -->
+    <ul class="overflow-y-auto w-80 bg-base-100 min-h-[calc(100vh-4rem)] border">
       <!-- Sidebar content here -->
       <div class="flex-none">
         <DrawerContent />
