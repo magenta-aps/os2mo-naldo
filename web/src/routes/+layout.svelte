@@ -17,7 +17,7 @@
   <title>OS2mo</title>
 </svelte:head>
 
-<div class="flex flex-col h-screen">
+<div class="flex flex-col">
   <Navbar />
   <Drawer>
     <slot />
