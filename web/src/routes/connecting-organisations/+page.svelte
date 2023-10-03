@@ -55,7 +55,7 @@
         const mutation = await graphQLClient().request(UpdateRelatedUnitsDocument, {
           input: result.data,
         })
-        /* TODO: lav en brugbar besked til succes-besked  */
+        /* TODO: lav en brugbar besked til succes-besked */
         $success = {
           message: `Tilknytning er blevet oprettet`,
         }

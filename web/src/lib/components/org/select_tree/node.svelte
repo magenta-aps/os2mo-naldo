@@ -1,7 +1,7 @@
 <script lang="ts">
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
-  import { createEventDispatcher } from "svelte"
+  import { createEventDispatcher, onMount } from "svelte"
   import {
     selectedDestinationUuids,
     selectedOriginUuid,
@@ -20,12 +20,9 @@
   export let fromDate: string
   export let isCheckboxMode: boolean = false
   export let allowMultipleSelection: boolean = false
-  /*  export let relatedUnits: any[] = [] */
 
   let open = false
   let loading = false
-  /*  export let isChecked: boolean = false */
-  /*let checkboxValue: string = isChecked ? "checked" : "unchecked"*/
 
   const dispatch = createEventDispatcher()
 
@@ -91,15 +88,35 @@
     }
   }
 
-  //todo: mere sigende navne fx $: isOriginSelected og $: isDestinationSelected?
-  //todo: logikken i denne $: isCheckedOrigin = $selectedOriginUuid ? $selectedOriginUuid.uuid === uuid : false og i knappen er næsten den samme disabled={($selectedOriginUuid && $selectedOriginUuid.uuid === uuid) || false}
-  /*   $: isCheckedOrigin = $selectedOriginUuid ? $selectedOriginUuid.uuid === uuid : false*/
-  $: isCheckedOrigin = $selectedOriginUuid && $selectedOriginUuid.uuid === uuid
-  $: isCheckedDestination = $selectedDestinationUuids.some((obj) => obj.uuid === uuid)
+  /*  TODO: problemeer med at indlæse to parent, og foldder ikke altid ud som den skal forkert tilgang? for enkel? */
+  const expandRelevantBranch = async () => {
+    if (allowMultipleSelection) {
+      const shouldOpenOrigin = children.some(
+        (child) => child.uuid === $selectedOriginUuid?.uuid
+      )
+      const shouldOpenDestination = $selectedDestinationUuids.some((dest) =>
+        children.some((child) => child.uuid === dest.uuid)
+      )
+
+      if ((shouldOpenOrigin || shouldOpenDestination) && !open) {
+        await toggleOpen()
+        open = true
+      }
+    }
+  }
+
+  $: if ($selectedOriginUuid) {
+    console.log("selectedeOrg +node", $selectedOriginUuid)
+    expandRelevantBranch()
+  }
+
+  //todo: mere sigende navne?
+  /*   $: isOriginSelected = $selectedOriginUuid ? $selectedOriginUuid.uuid === uuid : false*/
+  $: isOriginSelected = $selectedOriginUuid && $selectedOriginUuid.uuid === uuid
+  $: isDestinationSelected = $selectedDestinationUuids.some((obj) => obj.uuid === uuid)
 </script>
 
 <!-- TODO: fjern A11y ignore når checkboxer fungere som det skal, er pt tilføjet for ikke at have gule linjer over alt i koden -->
-
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <li
@@ -144,7 +161,7 @@
             id={uuid}
             title={name}
             value="checked"
-            startValue={isCheckedDestination ? "checked" : "unchecked"}
+            startValue={isDestinationSelected ? "checked" : "unchecked"}
             disabled={!$selectedOriginUuid ||
               ($selectedOriginUuid && $selectedOriginUuid.uuid === uuid)}
           />
@@ -155,7 +172,7 @@
             groupName="originUuid"
             id={uuid}
             title={name}
-            value={isCheckedOrigin ? "checked" : "unchecked"}
+            value={isOriginSelected ? "checked" : "unchecked"}
           />
         </div>
       {/if}
@@ -164,6 +181,7 @@
 </li>
 
 <!-- TODO:indent er sat til 30 i stedet for 24 da det visuelt gør det lettere i selectree når der er checkbox, tjek hvordan det ser ud i dropdown -->
+<!--  {#if isCheckboxMode && allowMultipleSelection} -->
 {#if open}
   {#each children as child}
     <svelte:self
