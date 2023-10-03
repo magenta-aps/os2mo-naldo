@@ -1,5 +1,4 @@
 <script lang="ts">
-  import SelectOrgTree from "$lib/components/org/select_tree/org_tree.svelte"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
@@ -15,13 +14,13 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import Search from "$lib/components/search.svelte"
 
   let fromDate: string
   let toDate: string
   let name: string
   let orgLevel: string
   let orgType: string
-  let parent: { name: string; uuid?: any | null }
 
   gql`
     query GetOrgUnitAndFacets($uuid: [UUID!], $fromDate: DateTime) {
@@ -137,8 +136,17 @@
             max={maxDate ? maxDate : null}
           />
         </div>
-        <SelectOrgTree bind:selectedOrg={parent} startOrg={org_unit.parent} />
-
+        <Search
+          title="Overenhed"
+          type="org-unit"
+          startValue={org_unit.parent
+            ? {
+                uuid: org_unit.parent.uuid,
+                name: org_unit.parent.name,
+                attrs: [],
+              }
+            : undefined}
+        />
         <Input
           title="Navn"
           id="name"
