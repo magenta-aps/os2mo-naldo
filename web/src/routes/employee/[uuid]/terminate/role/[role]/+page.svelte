@@ -59,7 +59,11 @@
           })
 
           $success = {
-            message: `Rollen for ${mutation.role_terminate.objects[0].employee[0].name} afsluttes d. ${toDate}`,
+            message: `Rollen ${
+              mutation.role_terminate.objects[0].employee
+                ? `for ${mutation.role_terminate.objects[0].employee[0].name}`
+                : ""
+            } afsluttes d. ${toDate}`,
             uuid: $page.params.uuid,
             type: "employee",
           }

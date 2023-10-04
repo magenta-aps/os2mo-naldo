@@ -68,11 +68,11 @@
             input: result.data,
           })
           $success = {
-            message: `Adresse oprettet ${
-              mutation.address_create.objects[0].employee
-                ? `for ${mutation.address_create.objects[0].employee[0].name}`
+            message: `Adressen ${
+              mutation.address_create.objects[0]?.employee
+                ? `for ${mutation.address_create.objects[0].employee?.[0].name}`
                 : ""
-            }`,
+            } er oprettet fra d. ${fromDate}`,
             uuid: $page.params.uuid,
             type: "employee",
           }

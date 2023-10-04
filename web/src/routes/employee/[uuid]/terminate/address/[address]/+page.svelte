@@ -36,10 +36,9 @@
 
     mutation TerminateAddress($input: AddressTerminateInput!) {
       address_terminate(input: $input) {
-        uuid
         objects {
-          validity {
-            to
+          employee {
+            name
           }
         }
       }
@@ -55,9 +54,11 @@
           })
 
           $success = {
-            message: `Adressen afsluttes d. ${
-              mutation.address_terminate.objects[0].validity.to.split("T")[0]
-            }`,
+            message: `Adressen ${
+              mutation.address_terminate.objects[0].employee
+                ? `for ${mutation.address_terminate.objects[0].employee[0].name}`
+                : ""
+            } afsluttes d. ${toDate}`,
             uuid: $page.params.uuid,
             type: "employee",
           }

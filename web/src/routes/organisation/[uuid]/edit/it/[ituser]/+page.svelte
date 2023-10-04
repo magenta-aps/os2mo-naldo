@@ -78,6 +78,9 @@
     mutation UpdateITUser($input: ITUserUpdateInput!) {
       ituser_update(input: $input) {
         uuid
+        objects {
+          user_key
+        }
       }
     }
   `
@@ -87,12 +90,16 @@
     async ({ result }) => {
       if (result.type === "success" && result.data) {
         try {
-          await graphQLClient().request(UpdateItUserDocument, {
+          const mutation = await graphQLClient().request(UpdateItUserDocument, {
             input: result.data,
           })
 
           $success = {
-            message: "IT kontoen er blevet redigeret",
+            message: `IT-kontoen ${
+              mutation.ituser_update.objects[0].user_key
+                ? `for ${mutation.ituser_update.objects[0].user_key}`
+                : ""
+            } redigeres fra d. ${fromDate}`,
             uuid: $page.params.uuid,
             type: "organisation",
           }

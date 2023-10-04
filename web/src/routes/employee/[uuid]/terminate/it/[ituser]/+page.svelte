@@ -59,7 +59,11 @@
           })
 
           $success = {
-            message: `IT-kontoen ${mutation.ituser_terminate.objects[0].user_key} afsluttes d. ${toDate}`,
+            message: `IT-kontoen ${
+              mutation.ituser_terminate.objects[0].user_key
+                ? mutation.ituser_terminate.objects[0].user_key
+                : ""
+            } afsluttes d. ${toDate}`,
             uuid: $page.params.uuid,
             type: "employee",
           }

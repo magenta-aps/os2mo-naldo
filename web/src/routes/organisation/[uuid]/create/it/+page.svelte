@@ -53,12 +53,8 @@
     mutation CreateItUser($input: ITUserCreateInput!) {
       ituser_create(input: $input) {
         objects {
-          employee {
-            name
-          }
-          itsystem {
-            name
-          }
+          user_key
+          uuid
         }
       }
     }
@@ -72,11 +68,11 @@
             input: result.data,
           })
           $success = {
-            message: `IT-konto er oprettet ${
-              mutation.ituser_create.objects[0]?.employee
-                ? `for ${mutation.ituser_create.objects[0].employee[0].name}`
+            message: `IT-kontoen ${
+              mutation.ituser_create.objects[0]?.user_key
+                ? `til ${mutation.ituser_create.objects[0].user_key}`
                 : ""
-            }`,
+            } er oprettet fra d. ${fromDate}`,
             uuid: $page.params.uuid,
             type: "organisation",
           }

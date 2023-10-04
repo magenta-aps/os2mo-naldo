@@ -76,6 +76,9 @@
       address_update(input: $input) {
         objects {
           name
+          org_unit {
+            name
+          }
         }
       }
     }
@@ -90,7 +93,11 @@
             input: result.data,
           })
           $success = {
-            message: `${mutation.address_update.objects[0].name} er blevet redigeret`,
+            message: `Adressen ${
+              mutation.address_update.objects[0].org_unit
+                ? `for ${mutation.address_update.objects[0].org_unit[0].name}`
+                : ""
+            } redigeres fra d. ${fromDate}`,
             uuid: $page.params.uuid,
             type: "organisation",
           }

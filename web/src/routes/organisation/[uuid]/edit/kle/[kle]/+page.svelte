@@ -60,6 +60,11 @@
     mutation UpdateKLE($input: KLEUpdateInput!) {
       kle_update(input: $input) {
         uuid
+        objects {
+          org_unit {
+            name
+          }
+        }
       }
     }
   `
@@ -73,7 +78,11 @@
             input: result.data,
           })
           $success = {
-            message: `KLE-opmærkning er blevet redigeret.`,
+            message: `KLE-opmærkningen ${
+              mutation.kle_update.objects[0].org_unit
+                ? `for ${mutation.kle_update.objects[0].org_unit[0].name}`
+                : ""
+            } redigeres fra d. ${fromDate}`,
             uuid: $page.params.uuid,
             type: "organisation",
           }

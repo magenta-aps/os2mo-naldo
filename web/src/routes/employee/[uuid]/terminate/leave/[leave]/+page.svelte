@@ -53,7 +53,11 @@
             input: result.data,
           })
           $success = {
-            message: `Afsluttede orlov for ${mutation.leave_terminate.objects[0].person[0].name} `,
+            message: `Orloven ${
+              mutation.leave_terminate.objects[0].person
+                ? `for ${mutation.leave_terminate.objects[0].person[0].name}`
+                : ""
+            } afsluttes d. ${toDate}`,
             uuid: $page.params.uuid,
             type: "employee",
           }

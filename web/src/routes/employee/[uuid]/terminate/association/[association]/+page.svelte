@@ -43,7 +43,6 @@
         objects {
           employee {
             name
-            uuid
           }
         }
       }
@@ -58,7 +57,11 @@
             input: result.data,
           })
           $success = {
-            message: `Tilknytningen for ${mutation.association_terminate.objects[0].employee[0].name} afsluttes d. ${toDate}`,
+            message: `Tilknytningen ${
+              mutation.association_terminate.objects[0].employee
+                ? `for ${mutation.association_terminate.objects[0].employee[0].name}`
+                : ""
+            } afsluttes d. ${toDate}`,
             uuid: $page.params.uuid,
             type: "employee",
           }

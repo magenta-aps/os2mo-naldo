@@ -47,6 +47,11 @@
     mutation CreateKLE($input: KLECreateInput!) {
       kle_create(input: $input) {
         uuid
+        objects {
+          org_unit {
+            name
+          }
+        }
       }
     }
   `
@@ -60,7 +65,11 @@
             input: result.data,
           })
           $success = {
-            message: `KLE opmærkning er blevet oprettet.`,
+            message: `KLE-opmærkningen ${
+              mutation.kle_create.objects[0]?.org_unit
+                ? `for ${mutation.kle_create.objects[0].org_unit[0].name}`
+                : ""
+            } er oprettet fra d. ${fromDate}`,
             uuid: $page.params.uuid,
             type: "organisation",
           }

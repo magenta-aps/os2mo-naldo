@@ -75,11 +75,11 @@
             input: result.data,
           })
           $success = {
-            message: `IT-konto er oprettet ${
+            message: `IT-kontoen ${
               mutation.ituser_create.objects[0]?.employee
                 ? `for ${mutation.ituser_create.objects[0].employee[0].name}`
                 : ""
-            }`,
+            } er oprettet fra d. ${fromDate}`,
             uuid: $page.params.uuid,
             type: "employee",
           }

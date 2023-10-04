@@ -98,7 +98,11 @@
             input: result.data,
           })
           $success = {
-            message: `Engagement til ${mutation.engagement_update.objects[0].employee[0].name} er blevet redigeret`,
+            message: `Engagementet ${
+              mutation.engagement_update.objects[0].employee
+                ? `for ${mutation.engagement_update.objects[0].employee[0].name}`
+                : ""
+            } redigeres fra d. ${fromDate}`,
             uuid: $page.params.uuid,
             type: "employee",
           }

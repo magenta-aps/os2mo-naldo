@@ -67,7 +67,11 @@
             input: result.data,
           })
           $success = {
-            message: `Tilknytning til ${mutation.association_create.objects[0].employee[0].name} er blevet oprettet`,
+            message: `Tilknytningen ${
+              mutation.association_create.objects[0]?.employee
+                ? `til ${mutation.association_create.objects[0].employee[0].name}`
+                : ""
+            } er oprettet fra d. ${fromDate}`,
             uuid: $page.params.uuid,
             type: "organisation",
           }

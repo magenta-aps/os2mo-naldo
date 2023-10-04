@@ -71,11 +71,11 @@
             input: result.data,
           })
           $success = {
-            message: `Lederrolle er oprettet ${
+            message: `Lederrollen ${
               mutation.manager_create.objects[0]?.employee
                 ? `for ${mutation.manager_create.objects[0].employee[0].name}`
                 : ""
-            }`,
+            } er oprettet fra d. ${fromDate}`,
             uuid: $page.params.uuid,
             type: "employee",
           }

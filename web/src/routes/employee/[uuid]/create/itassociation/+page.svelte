@@ -91,7 +91,11 @@
             input: result.data,
           })
           $success = {
-            message: `Tilknytning til ${mutation.itassociation_create.objects[0].employee[0].name} er blevet oprettet`,
+            message: `IT-tilknytningen ${
+              mutation.itassociation_create.objects[0]?.employee
+                ? `for ${mutation.itassociation_create.objects[0].employee[0].name}`
+                : ""
+            } er oprettet fra d. ${fromDate}`,
             uuid: $page.params.uuid,
             type: "employee",
           }

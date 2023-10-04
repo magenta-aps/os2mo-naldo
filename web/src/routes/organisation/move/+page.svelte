@@ -51,13 +51,15 @@
           })
 
           $success = {
-            message: `${
+            message: `Organisationsenheden ${
               mutation.org_unit_update.objects[0].name
-            } er blevet flyttet til ${
+                ? mutation.org_unit_update.objects[0].name
+                : ""
+            } flyttes til ${
               mutation.org_unit_update.objects[0].parent
-                ? mutation.org_unit_update.objects[0].parent?.name
+                ? `${mutation.org_unit_update.objects[0].parent.name}`
                 : "roden"
-            }`,
+            } d. ${fromDate}`,
             uuid: mutation.org_unit_update.uuid,
             type: "organisation",
           }
@@ -84,7 +86,7 @@
         <DateInput
           bind:value={fromDate}
           startValue={$date}
-          title="Startdato"
+          title="Flyttedato"
           id="from"
           max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
           required={true}

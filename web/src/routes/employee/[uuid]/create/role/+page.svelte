@@ -64,7 +64,11 @@
             input: result.data,
           })
           $success = {
-            message: `Rolle til ${mutation.role_create.objects[0].employee[0].name} er blevet oprettet`,
+            message: `Rollen ${
+              mutation.role_create.objects[0]?.employee
+                ? `for ${mutation.role_create.objects[0].employee[0].name}`
+                : ""
+            } er oprettet fra d. ${fromDate}`,
             uuid: $page.params.uuid,
             type: "employee",
           }

@@ -81,7 +81,15 @@
             input: result.data,
           })
           $success = {
-            message: `${mutation.leave_create.objects[0].leave_type.name} til ${mutation.leave_create.objects[0].employee[0].name} er blevet oprettet`,
+            message: `${
+              mutation.leave_create.objects[0]?.leave_type
+                ? mutation.leave_create.objects[0]?.leave_type.name
+                : "Orloven"
+            } ${
+              mutation.leave_create.objects[0]?.employee
+                ? `for ${mutation.leave_create.objects[0].employee[0].name}`
+                : ""
+            } er oprettet fra d. ${fromDate}`,
             uuid: $page.params.uuid,
             type: "employee",
           }
@@ -103,10 +111,10 @@
   {@const engagements = employee.engagements}
   {@const employeeName = employee.name}
 
-  <title>Opretssssssssss orlov | OS2mo</title>
+  <title>Opret orlov | OS2mo</title>
 
   <div class="flex align-center px-6 pt-6 pb-4">
-    <h3 class="flex-1">Opretssssssssssss orlov</h3>
+    <h3 class="flex-1">Opret orlov</h3>
   </div>
 
   <div class="divider p-0 m-0 mb-4 w-full" />

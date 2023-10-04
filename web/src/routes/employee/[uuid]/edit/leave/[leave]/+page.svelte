@@ -102,7 +102,11 @@
             input: result.data,
           })
           $success = {
-            message: `Orlov for ${mutation.leave_update.objects[0].person[0].name} er blevet redigeret`,
+            message: `Orloven ${
+              mutation.leave_update.objects[0].person
+                ? `for ${mutation.leave_update.objects[0].person[0].name}`
+                : ""
+            } redigeres fra d. ${fromDate}`,
             uuid: $page.params.uuid,
             type: "employee",
           }

@@ -72,7 +72,11 @@
             }
           )
           $success = {
-            message: `IT-tilknytningen for ${mutation.itassociation_terminate.objects[0].employee[0].name} afsluttes d. ${toDate}`,
+            message: `IT-tilknytningen ${
+              mutation.itassociation_terminate.objects[0].employee
+                ? `for ${mutation.itassociation_terminate.objects[0].employee[0].name}`
+                : ""
+            } afsluttes d. ${toDate}`,
             uuid: $page.params.uuid,
             type: "employee",
           }

@@ -46,8 +46,8 @@
       address_terminate(input: $input) {
         uuid
         objects {
-          validity {
-            to
+          org_unit {
+            name
           }
         }
       }
@@ -63,7 +63,11 @@
           })
 
           $success = {
-            message: `Adressen afsluttes d. ${toDate}`,
+            message: `Adressen ${
+              mutation.address_terminate.objects[0].org_unit
+                ? `for ${mutation.address_terminate.objects[0].org_unit[0].name}`
+                : ""
+            } afsluttes d. ${toDate}`,
             uuid: $page.params.uuid,
             type: "organisation",
           }
