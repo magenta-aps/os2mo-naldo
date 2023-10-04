@@ -51,6 +51,7 @@
     --icons-color="#00244E"
     --border-focused="solid 0px"
     --padding="0 0 0 0.75rem"
+    placeholder="Søg efter adresse"
     id="dar-search"
     listAutoWidth={false}
     loadOptions={fetchDAR}
