@@ -7,13 +7,49 @@
   import { date } from "$lib/stores/date"
   import { globalNavigation } from "$lib/stores/navigation"
   import { gql } from "graphql-request"
-  import { OrgUnitsWithChildrenDocument } from "./query.generated"
+  import {
+    OrgUnitsWithChildrenDocument,
+    OrgUnitHierarchiesDocument,
+  } from "./query.generated"
+  import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
+
+  const brutto = { uuid: null, name: "Bruttoorganisation", user_key: null }
+  let orgUnitHierachy = brutto
+
+  gql`
+    query OrgUnitHierarchies {
+      facets(filter: { user_keys: "org_unit_hierarchy" }) {
+        objects {
+          objects {
+            user_key
+            uuid
+            classes {
+              name
+              user_key
+              uuid
+            }
+          }
+        }
+      }
+    }
+  `
 
   // First load from index
-  const fetchOrgTree = async (fromDate: string, childUuid?: string | null) => {
+  const fetchOrgTree = async (
+    fromDate: string,
+    childUuid?: string | null,
+    orgUnitHierachyUuid?: string | null
+  ) => {
     gql`
-      query OrgUnitsWithChildren($fromDate: DateTime) {
-        org_units(filter: { parents: null, from_date: $fromDate }) {
+      query OrgUnitsWithChildren($fromDate: DateTime, $orgUnitHierarchies: [UUID!]) {
+        org_units(
+          filter: {
+            parents: null
+            from_date: $fromDate
+            hierarchies: $orgUnitHierarchies
+          }
+        ) {
           objects {
             objects {
               name
@@ -31,6 +67,7 @@
     // Breadcrumbs
     const res = await graphQLClient().request(OrgUnitsWithChildrenDocument, {
       fromDate: fromDate,
+      orgUnitHierarchies: orgUnitHierachyUuid,
     })
 
     const orgTree = []
@@ -55,9 +92,7 @@
     return orgTree
   }
 
-  let refreshableOrgTree = fetchOrgTree($date)
-
-  $: refreshableOrgTree = fetchOrgTree($date)
+  let refreshableOrgTree = fetchOrgTree($date, null, orgUnitHierachy?.uuid)
 
   // TODO: Replace with subscriptions when implmented
   $: if ($success.type === "organisation") {
@@ -70,13 +105,29 @@
   }
 </script>
 
-{#await refreshableOrgTree}
-  <div role="status" class="max-w-sm animate-pulse">
-    <div class="h-10 bg-base-100 rounded dark:bg-accent max-w-4 mb-2.5" />
-    <span class="sr-only">Loading...</span>
-  </div>
-{:then orgTree}
-  {#each orgTree as child}
-    <Node {...child} />
-  {/each}
+{#await graphQLClient().request(OrgUnitHierarchiesDocument) then data}
+  {#if data.facets.objects[0].objects[0].classes.length}
+    {@const facets = data.facets.objects}
+    <SelectNew
+      id="org-unit-hierarchy"
+      bind:value={orgUnitHierachy}
+      startValue={brutto}
+      iterable={getClassesByFacetUserKey(facets, "org_unit_hierarchy")}
+      extra={brutto}
+      on:change={() =>
+        (refreshableOrgTree = fetchOrgTree($date, null, orgUnitHierachy?.uuid))}
+    />
+  {/if}
+  {#key refreshableOrgTree}
+    {#await refreshableOrgTree}
+      <div role="status" class="max-w-sm animate-pulse">
+        <div class="h-10 bg-base-100 rounded dark:bg-accent max-w-4 mb-2.5" />
+        <span class="sr-only">Loading...</span>
+      </div>
+    {:then orgTree}
+      {#each orgTree as child}
+        <Node {...child} />
+      {/each}
+    {/await}
+  {/key}
 {/await}
