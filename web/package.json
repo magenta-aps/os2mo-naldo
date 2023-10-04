@@ -41,7 +41,7 @@
     "@sveltejs/vite-plugin-svelte": "^2.4.5",
     "graphql": "^16.8.0",
     "graphql-request": "^6.0.0",
-    "keycloak-js": "^22.0.3",
+    "keycloak-js": "^22.0.4",
     "prettier": "<3.0.0",
     "prettier-plugin-svelte": "<3.0.0",
     "svelte-select": "^5.7.0",
