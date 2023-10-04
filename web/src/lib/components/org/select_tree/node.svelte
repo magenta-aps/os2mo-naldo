@@ -180,8 +180,6 @@
   </div>
 </li>
 
-<!-- TODO:indent er sat til 30 i stedet for 24 da det visuelt gør det lettere i selectree når der er checkbox, tjek hvordan det ser ud i dropdown -->
-<!--  {#if isCheckboxMode && allowMultipleSelection} -->
 {#if open}
   {#each children as child}
     <svelte:self

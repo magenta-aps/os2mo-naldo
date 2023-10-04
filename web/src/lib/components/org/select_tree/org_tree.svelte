@@ -84,14 +84,11 @@
   }
 </script>
 
-<!-- TODO: fjern A11y ignore når checkboxer fungere som det skal igen, er pt tilføjet for ikke at have gule linjer over alt i koden -->
-<!-- TODO: tjek at træet bliver vist ordenligt som dropdown efter der er ændret i klasserne, ellers skal labeltext også flyttes ind i if/else -->
+<!-- TODO: fjern A11y ignore når relatedeUnit fungere som det skal, er pt tilføjet for ikke at have gule linjer over alt i koden -->
 <!-- TODO: det ser måske lidt sjovt ud med spinning wheel ved siden af overskrifterne? -->
 {#await fetchOrgTree()}
   <div class="form-control pb-4 flex flex-col">
     <label for={id} class="text-sm text-secondary pb-1 h-6 break-words flex items-end">
-      <!--  Gammel Label styling -->
-      <!-- <label for={id} class="text-sm text-secondary pb-1"> -->
       {labelText}
       <span class="animate-spin rounded-full h-6 w-6 border-b-4 border-primary" />
     </label>
@@ -104,7 +101,6 @@
     </label>
 
     {#if isCheckboxMode}
-      <!-- Checkbox Mode Content -->
       <div use:floatingRef class="max-w-full">
         <ul class="menu bg-white rounded border">
           {#each orgTree as child}
@@ -120,21 +116,7 @@
         </ul>
       </div>
     {:else}
-      <!-- Standard Mode Content -->
-      {#if isFocused}
-        <!-- svelte-ignore a11y-no-static-element-interactions -->
-        <div
-          use:floatingContent
-          class="w-96 max-w-full px-5"
-          on:mouseleave={delayedUnfocus}
-        >
-          <ul class="menu bg-base-200">
-            {#each orgTree as child}
-              <Node {...child} bind:selectedOrg />
-            {/each}
-          </ul>
-        </div>
-      {:else}
+      <div use:floatingRef>
         <input
           {id}
           {required}
@@ -144,9 +126,24 @@
           bind:value={selectedOrg.name}
           class="input input-bordered input-sm text-base text-secondary font-normal rounded active:input-primary focus:input-primary w-full active:outline-offset-0 focus:outline-offset-0"
         />
+
         <!-- Hidden input for single select when checkboxes are not used -->
         <input hidden {id} name={id} bind:value={selectedOrg.uuid} />
-      {/if}
+
+        {#if isFocused}
+          <div
+            use:floatingContent
+            class="w-96 max-w-full px-5"
+            on:mouseleave={delayedUnfocus}
+          >
+            <ul class="menu bg-base-200">
+              {#each orgTree as child}
+                <Node {...child} bind:selectedOrg />
+              {/each}
+            </ul>
+          </div>
+        {/if}
+      </div>
     {/if}
   </div>
 {/await}
