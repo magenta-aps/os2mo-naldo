@@ -9,15 +9,15 @@
   import { gql } from "graphql-request"
   import { date } from "$lib/stores/date"
   import { RelatedUnitsDocument, UpdateRelatedUnitsDocument } from "./query.generated"
-  import SelectOrgTree from "$lib/components/org/select_tree/org_tree.svelte"
+
   import {
     selectedDestinationUuids,
     selectedOriginUuid,
   } from "$lib/stores/selectedItem"
+  import CheckboxOrgTree from "./checkbox_tree/checkbox_org_tree.svelte"
 
   let relatedUnits: any[] = []
   let previousUuid: string | null = null
-  /* let fromDate = new Date().toISOString().split("T")[0] */
   let parent: { name: string; uuid?: any | null }
   let isDisabled = true
 
@@ -55,7 +55,6 @@
         const mutation = await graphQLClient().request(UpdateRelatedUnitsDocument, {
           input: result.data,
         })
-        /* TODO: lav en brugbar besked til succes-besked */
         $success = {
           message: `Tilknytning er blevet oprettet`,
         }
@@ -64,15 +63,6 @@
         $error = { message: err as string }
       }
     }
-
-  /*  TODO:ryd op i console.log når alt virker som det skal, disse skal ændres til <div on:change={handleInputChange}> om selectrees? */
-  function handleCheckboxChangeFromSelectTree(event: CustomEvent) {
-    console.log("event revived from checbox on page", event.detail)
-  }
-
-  function handleRadioChangeFromSelectTree(event: CustomEvent) {
-    console.log("event revived from radio on page", event.detail)
-  }
 
   async function fetchRelatedUnits(originUUID: string) {
     try {
@@ -146,6 +136,7 @@
       <div class="p-8">
         <div class="flex flex-col sm:flex-row gap-6 w-full">
           <input type="hidden" name="from" bind:value={$date} />
+          <!--todo: når et valgt node foldes sammen skal den skjulte radiobutton vælges igen-->
           <!-- Skjult radioButton der tvinger brugerne til at vælge en værdi til at starte med, og til at disable 'gem' og 'anullér' knapperne-->
           <input
             type="radio"
@@ -155,14 +146,11 @@
             checked
             hidden
           />
-          <!-- TODO: træet skal foldes ud så man kan se hvad der er markert, hvis der findes indhold i selectedDestinationUuids-->
           <div class="flex flex-col w-1/2">
-            <SelectOrgTree
-              isCheckboxMode={true}
+            <CheckboxOrgTree
               allowMultipleSelection={false}
               bind:selectedOrg={parent}
               labelText="Vælg enhed"
-              on:radioChanged={handleRadioChangeFromSelectTree}
             />
 
             <!-- Skjult felt for origin-uuid -->
@@ -174,12 +162,10 @@
             />
           </div>
           <div class="flex flex-col w-1/2">
-            <SelectOrgTree
-              isCheckboxMode={true}
+            <CheckboxOrgTree
               allowMultipleSelection={true}
               bind:selectedOrg={parent}
               labelText="Angiv hvilke enheder der skal sammenkobles med enheden til venstre"
-              on:checkboxChanged={handleCheckboxChangeFromSelectTree}
             />
             <!-- Skjult felt for destination-uuids -->
             <input

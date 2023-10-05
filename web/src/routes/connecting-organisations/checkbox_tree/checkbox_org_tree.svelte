@@ -1,11 +1,10 @@
 <script lang="ts">
   import { graphQLClient } from "$lib/util/http"
-  import Node from "$lib/components/org/select_tree/node.svelte"
-  import { offset, flip, shift } from "@floating-ui/dom"
-  import { createFloatingActions } from "svelte-floating-ui"
+
   import { date } from "$lib/stores/date"
   import { gql } from "graphql-request"
   import { OrgTreeDocument } from "./query.generated"
+  import CheckboxNode from "./checkboxNode.svelte"
 
   export let selectedOrg: { name: string; uuid?: any | null }
   export let startOrg: { name: string; uuid?: any | null } | null | undefined = {
@@ -14,13 +13,10 @@
   }
   selectedOrg = selectedOrg ?? startOrg // For flexibility when binding
   export let labelText = "Angiv overenhed"
-  export let id = "select-org-tree"
-  export let required = true
-  /*   export let isCheckboxMode: boolean = false
+  export let id = "checkbox-org-tree"
   export let allowMultipleSelection: boolean = false
- */
+
   let orgTree: any[] = []
-  let isFocused = false
 
   gql`
     query OrgTree($from_date: DateTime!) {
@@ -59,17 +55,6 @@
       }
     }
   }
-
-  const delayedUnfocus = () => {
-    // Stupid hack to make the floatingContent be clickable before it disappears
-    setTimeout(() => (isFocused = false), 250)
-  }
-
-  const [floatingRef, floatingContent] = createFloatingActions({
-    strategy: "absolute",
-    placement: "bottom",
-    middleware: [offset(6), flip(), shift()],
-  })
 </script>
 
 <!-- TODO: fjern A11y ignore når relatedeUnit fungere som det skal, er pt tilføjet for ikke at have gule linjer over alt i koden -->
@@ -88,48 +73,12 @@
       {labelText}
     </label>
 
-    <!--   {#if isCheckboxMode}
-      <div use:floatingRef class="max-w-full">
-        <ul class="menu bg-white rounded border">
-          {#each orgTree as child}
-            <Node
-              {...child}
-              bind:selectedOrg
-              {isCheckboxMode}
-              {allowMultipleSelection}
-            />
-          {/each}
-        </ul>
-      </div>
-    {:else} -->
-    <div use:floatingRef>
-      <input
-        {id}
-        {required}
-        on:focus={() => {
-          isFocused = true
-        }}
-        bind:value={selectedOrg.name}
-        class="input input-bordered input-sm text-base text-secondary font-normal rounded active:input-primary focus:input-primary w-full active:outline-offset-0 focus:outline-offset-0"
-      />
-      <!-- Hidden input for single select when checkboxes are not used -->
-      <input hidden {id} name={id} bind:value={selectedOrg.uuid} />
-
-      {#if isFocused}
-        <!-- svelte-ignore a11y-no-static-element-interactions -->
-        <div
-          use:floatingContent
-          class="w-96 max-w-full px-5"
-          on:mouseleave={delayedUnfocus}
-        >
-          <ul class="menu bg-base-200">
-            {#each orgTree as child}
-              <Node {...child} bind:selectedOrg />
-            {/each}
-          </ul>
-        </div>
-      {/if}
+    <div class="max-w-full">
+      <ul class="menu bg-white rounded border">
+        {#each orgTree as child}
+          <CheckboxNode {...child} bind:selectedOrg {allowMultipleSelection} />
+        {/each}
+      </ul>
     </div>
-    <!--  {/if} -->
   </div>
 {/await}
