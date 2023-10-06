@@ -87,9 +87,11 @@
             input: result.data,
           })
           $success = {
-            // Hvis medarbejderen bliver ændret, så kommer det til at virke lidt funky, nu jeg tænker over det..
-            // for så vil det være den "nye" medarbejders navn der vil stå der. Men ellers ret sejt imo
-            message: `Tilknytning for ${mutation.association_update.objects[0].employee[0].name} er blevet redigeret`,
+            message: `Tilknytningen ${
+              mutation.association_update.objects[0].employee
+                ? `for ${mutation.association_update.objects[0].employee[0].name}`
+                : ""
+            } redigeres fra d. ${fromDate}`,
             uuid: $page.params.uuid,
             type: "organisation",
           }

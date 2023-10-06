@@ -95,11 +95,11 @@
             input: result.data,
           })
           $success = {
-            message: `Tilknytning for ${
+            message: `Lederrollen ${
               mutation.manager_update.objects[0].employee
-                ? mutation.manager_update.objects[0].employee
+                ? `for ${mutation.manager_update.objects[0].employee[0].name}`
                 : ""
-            } er blevet redigeret`,
+            } redigeres fra d. ${fromDate}`,
             uuid: $page.params.uuid,
             type: "employee",
           }

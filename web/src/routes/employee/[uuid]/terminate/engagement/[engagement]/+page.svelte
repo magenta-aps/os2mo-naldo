@@ -59,7 +59,11 @@
           })
 
           $success = {
-            message: `${mutation.engagement_terminate.objects[0].employee[0].name} afsluttes d. ${toDate}`,
+            message: `Engagementet ${
+              mutation.engagement_terminate.objects[0].employee
+                ? `for ${mutation.engagement_terminate.objects[0].employee[0].name}`
+                : ""
+            } afsluttes d. ${toDate}`,
             uuid: $page.params.uuid,
             type: "employee",
           }

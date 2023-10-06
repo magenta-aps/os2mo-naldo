@@ -1,7 +1,6 @@
 <script lang="ts">
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import Input from "$lib/components/forms/shared/input.svelte"
   import Select from "$lib/components/forms/shared/select.svelte"
   import { enhance } from "$app/forms"
   import { goto } from "$app/navigation"
@@ -80,7 +79,11 @@
             input: result.data,
           })
           $success = {
-            message: `Rolle til ${mutation.role_update.objects[0].employee[0].name} er blevet redigeret`,
+            message: `Rollen ${
+              mutation.role_update.objects[0].employee
+                ? `for ${mutation.role_update.objects[0].employee[0].name}`
+                : ""
+            } redigeres fra d. ${fromDate}`,
             uuid: $page.params.uuid,
             type: "employee",
           }

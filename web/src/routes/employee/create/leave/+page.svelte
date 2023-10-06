@@ -115,7 +115,15 @@
             input: result.data,
           })
           $success = {
-            message: `${mutation.leave_create.objects[0].leave_type.name} til ${mutation.leave_create.objects[0].employee[0].name} er blevet oprettet`,
+            message: `${
+              mutation.leave_create.objects[0]?.leave_type
+                ? mutation.leave_create.objects[0]?.leave_type.name
+                : "Orloven"
+            } ${
+              mutation.leave_create.objects[0]?.employee
+                ? `for ${mutation.leave_create.objects[0].employee[0].name}`
+                : ""
+            } er oprettet fra d. ${fromDate}`,
             uuid: mutation.leave_create.objects[0].employee[0].uuid,
             type: "employee",
           }

@@ -55,8 +55,8 @@
 
     mutation CreateOrgUnit($input: OrganisationUnitCreateInput!) {
       org_unit_create(input: $input) {
-        uuid
         objects {
+          uuid
           name
         }
       }
@@ -65,6 +65,11 @@
 
   let fromDate: string
   let toDate: string
+  let parent: {
+    uuid: string
+    name: string
+    attrs: []
+  }
 
   const urlHashOrgUnitUuid = getUuidFromHash($page.url.hash)
   const includeOrgUnit = urlHashOrgUnitUuid ? true : false
@@ -78,8 +83,17 @@
             input: result.data,
           })
           $success = {
-            message: `Organisationsenheden ${mutation.org_unit_create.objects[0].name} er blevet oprettet`,
-            uuid: mutation.org_unit_create.uuid,
+            message: `Organisationsenheden ${
+              mutation.org_unit_create.objects[0]?.name
+                ? mutation.org_unit_create.objects[0].name
+                : ""
+            } er blevet oprettet.`,
+            // TODO: Fix `parent` redirect, when `/organisation` is not a thing anymore
+            uuid: mutation.org_unit_create.objects[0]?.uuid
+              ? mutation.org_unit_create.objects[0].uuid
+              : parent
+              ? parent.uuid
+              : "",
             type: "organisation",
           }
         } catch (err) {
@@ -133,6 +147,7 @@
             type="org-unit"
             title="Angiv overenhed"
             id="parent-uuid"
+            bind:value={parent}
             startValue={{
               uuid: orgUnit.uuid,
               name: orgUnit.name,
@@ -140,7 +155,12 @@
             }}
           />
         {:else}
-          <Search type="org-unit" title="Angiv overenhed" id="parent-uuid" />
+          <Search
+            type="org-unit"
+            title="Angiv overenhed"
+            id="parent-uuid"
+            bind:value={parent}
+          />
         {/if}
 
         <Input title="Navn" id="name" required={true} />

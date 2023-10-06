@@ -91,7 +91,11 @@
             input: result.data,
           })
           $success = {
-            message: `Adresse redigeret`,
+            message: `Adressen ${
+              mutation.address_update.objects[0].employee
+                ? `for ${mutation.address_update.objects[0].employee[0].name}`
+                : ""
+            } redigeres fra d. ${fromDate}`,
             uuid: $page.params.uuid,
             type: "employee",
           }

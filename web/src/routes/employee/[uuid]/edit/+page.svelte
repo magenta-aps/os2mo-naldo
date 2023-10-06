@@ -53,7 +53,7 @@
             input: result.data,
           })
           $success = {
-            message: `Medarbejderen ${mutation.employee_update.objects[0].name} er blevet redigeret.`,
+            message: `Medarbejderen ${mutation.employee_update.objects[0].name} redigeres fra d. ${fromDate}`,
             uuid: mutation.employee_update.objects[0].uuid,
             type: "employee",
           }

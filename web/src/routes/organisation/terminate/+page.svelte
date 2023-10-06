@@ -62,7 +62,11 @@
           })
 
           $success = {
-            message: `Organisationsenheden ${mutation.org_unit_terminate.objects[0].name} afsluttes d. ${toDate}`,
+            message: `Organisationsenheden ${
+              mutation.org_unit_terminate.objects[0].name
+                ? mutation.org_unit_terminate.objects[0].name
+                : ""
+            } afsluttes d. ${toDate}`,
             uuid: mutation.org_unit_terminate.objects[0].uuid,
             type: "organisation",
           }

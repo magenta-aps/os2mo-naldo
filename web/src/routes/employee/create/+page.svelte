@@ -34,7 +34,11 @@
             input: result.data,
           })
           $success = {
-            message: `Medarbejderen ${mutation.employee_create.objects[0].name} er blevet oprettet.`,
+            message: `Medarbejderen ${
+              mutation.employee_create.objects[0].name
+                ? mutation.employee_create.objects[0].name
+                : ""
+            } er blevet oprettet.`,
             uuid: mutation.employee_create.objects[0].uuid,
             type: "employee",
           }

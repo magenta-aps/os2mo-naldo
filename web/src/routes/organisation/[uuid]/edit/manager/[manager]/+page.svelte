@@ -76,6 +76,9 @@
       manager_update(input: $input) {
         objects {
           uuid
+          employee {
+            name
+          }
         }
       }
     }
@@ -90,7 +93,12 @@
             input: result.data,
           })
           $success = {
-            message: `Lederrollen er blevet redigeret`,
+            // Ville gerne kunne skrive "gøres vakant" her, men det kan vi desværre ikke rigtig..
+            message: `Lederrollen ${
+              mutation.manager_update.objects[0].employee
+                ? `for ${mutation.manager_update.objects[0].employee[0].name} `
+                : ""
+            } redigeres fra d. ${fromDate}`,
             uuid: $page.params.uuid,
             type: "organisation",
           }

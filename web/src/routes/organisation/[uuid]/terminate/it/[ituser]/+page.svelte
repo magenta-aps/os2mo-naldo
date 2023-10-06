@@ -45,6 +45,9 @@
     mutation TerminateITUser($input: ITUserTerminateInput!) {
       ituser_terminate(input: $input) {
         uuid
+        objects {
+          user_key
+        }
       }
     }
   `
@@ -58,7 +61,11 @@
           })
 
           $success = {
-            message: `IT-brugeren afsluttes d. ${toDate}`,
+            message: `IT-kontoen ${
+              mutation.ituser_terminate.objects[0].user_key
+                ? `for ${mutation.ituser_terminate.objects[0].user_key}`
+                : ""
+            } afsluttes d. ${toDate}`,
             uuid: $page.params.uuid,
             type: "organisation",
           }

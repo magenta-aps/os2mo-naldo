@@ -90,7 +90,11 @@
             input: result.data,
           })
           $success = {
-            message: `Tilknytning for ${mutation.association_update.objects[0].employee[0].name} er blevet redigeret`,
+            message: `Tilknytningen ${
+              mutation.association_update.objects[0].employee
+                ? `for ${mutation.association_update.objects[0].employee[0].name}`
+                : ""
+            } redigeres fra d. ${fromDate}`,
             uuid: $page.params.uuid,
             type: "employee",
           }

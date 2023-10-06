@@ -56,7 +56,11 @@
           })
 
           $success = {
-            message: `${mutation.employee_terminate.objects[0].name} afsluttes d. ${toDate}`,
+            message: `Medarbejderen ${
+              mutation.employee_terminate.objects[0].name
+                ? mutation.employee_terminate.objects[0].name
+                : ""
+            } afsluttes d. ${toDate}`,
             uuid: $page.params.uuid,
             type: "employee",
           }

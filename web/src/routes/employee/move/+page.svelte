@@ -85,7 +85,11 @@
             input: result.data,
           })
           $success = {
-            message: `${mutation.engagement_update.objects[0].employee[0].name} er blevet redigeret`,
+            message: `Engagementet ${
+              mutation.engagement_update.objects[0].employee
+                ? `for ${mutation.engagement_update.objects[0].employee[0].name}`
+                : ""
+            } flyttes d. ${fromDate}`,
             uuid: mutation.engagement_update.objects[0].employee[0].uuid,
             type: "employee",
           }

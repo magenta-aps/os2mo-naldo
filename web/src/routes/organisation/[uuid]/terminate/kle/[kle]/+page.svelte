@@ -38,8 +38,8 @@
       kle_terminate(input: $input) {
         uuid
         objects {
-          validity {
-            to
+          org_unit {
+            name
           }
         }
       }
@@ -55,7 +55,11 @@
           })
 
           $success = {
-            message: `KLE-opmærkningen afsluttes ${toDate}`,
+            message: `KLE-opmærkningen ${
+              mutation.kle_terminate.objects[0].org_unit
+                ? `for ${mutation.kle_terminate.objects[0].org_unit[0].name}`
+                : ""
+            } afsluttes d. ${toDate}`,
             uuid: $page.params.uuid,
             type: "organisation",
           }

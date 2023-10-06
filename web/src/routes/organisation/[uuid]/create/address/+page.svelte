@@ -51,6 +51,11 @@
     mutation CreateAddress($input: AddressCreateInput!) {
       address_create(input: $input) {
         uuid
+        objects {
+          org_unit {
+            name
+          }
+        }
       }
     }
   `
@@ -64,7 +69,11 @@
             input: result.data,
           })
           $success = {
-            message: `Tilknytningen er blevet oprettet`,
+            message: `Adressen ${
+              mutation.address_create.objects[0]?.org_unit
+                ? `for ${mutation.address_create.objects[0].org_unit[0].name}`
+                : ""
+            } er oprettet fra d. ${fromDate}`,
             uuid: $page.params.uuid,
             type: "organisation",
           }

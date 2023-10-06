@@ -118,7 +118,11 @@
             input: result.data,
           })
           $success = {
-            message: `IT-tilknytning for ${mutation.itassociation_update.objects[0].employee[0].name} er blevet redigeret`,
+            message: `IT-tilknytningen ${
+              mutation.itassociation_update.objects[0].employee
+                ? `for ${mutation.itassociation_update.objects[0].employee[0].name}`
+                : ""
+            } redigeres fra d. ${fromDate}`,
             uuid: $page.params.uuid,
             type: "employee",
           }

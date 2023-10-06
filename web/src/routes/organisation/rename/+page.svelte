@@ -53,7 +53,7 @@
           })
 
           $success = {
-            message: `${orgUnit.name} er blevet omdøbt til ${name}`,
+            message: `${orgUnit.name} omdøbes til ${name} d. ${fromDate}`,
             uuid: mutation.org_unit_update.uuid,
             type: "organisation",
           }
