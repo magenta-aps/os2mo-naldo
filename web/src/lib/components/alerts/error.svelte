@@ -2,17 +2,17 @@
   import { slide } from "svelte/transition"
   import { error } from "$lib/stores/alert"
 
-  const startTimeout = () => {
-    setTimeout(
-      () => {
-        $error = { message: "" }
-      },
-      $error.timeOutTime ? $error.timeOutTime : 5000
-    )
-  }
-
   $: if ($error.message) {
-    startTimeout()
+    console.error($error.message)
+    ;($error.message = $error.message.response.errors[0].extensions
+      ? $error.message.response.errors[0].extensions.error_context.description
+      : $error.message.response.errors[0].message),
+      setTimeout(
+        () => {
+          $error = { message: "" }
+        },
+        $error.timeOutTime ? $error.timeOutTime : 5000
+      )
   }
 </script>
 
@@ -22,7 +22,7 @@
       <div>
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="stroke-current flex-shrink-0 h-6 w-6"
+          class="stroke-current h-6 w-6 inline-block"
           fill="none"
           viewBox="0 0 24 24"
           ><path
