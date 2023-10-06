@@ -152,6 +152,7 @@
           <Select
             title="Adressetype"
             id="address-type"
+            bind:value={addressType}
             startValue={address.address_type.name}
             iterable={getClassesByFacetUserKey(facets, "org_unit_address_type")}
             extra_classes="basis-1/2"
