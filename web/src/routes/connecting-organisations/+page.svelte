@@ -15,10 +15,11 @@
     selectedOriginUuid,
   } from "$lib/stores/selectedItem"
   import CheckboxOrgTree from "./checkbox_tree/checkbox_org_tree.svelte"
+  import { onDestroy } from "svelte"
 
   let relatedUnits: any[] = []
   let previousUuid: string | null = null
-  let parent: { name: string; uuid?: any | null }
+  /* let parent: { name: string; uuid?: any | null } */
   let isDisabled = true
 
   gql`
@@ -55,8 +56,9 @@
         const mutation = await graphQLClient().request(UpdateRelatedUnitsDocument, {
           input: result.data,
         })
+        /* TODO: bedre besked oprettet er måske ikke korrekt? kan man evt sende connectionText?*/
         $success = {
-          message: `Tilknytning er blevet oprettet`,
+          message: `Tilknytning er blevet redigeret`,
         }
       } catch (err) {
         console.error(err)
@@ -101,6 +103,16 @@
     previousUuid = $selectedOriginUuid.uuid
   }
 
+  //Måske ikke så svelte-korrekt men det lader til at fungere
+  $: if (!$selectedOriginUuid) {
+    const hiddenRadioButton = document.getElementById(
+      "hiddenRadioButton"
+    ) as HTMLInputElement
+    if (hiddenRadioButton) {
+      hiddenRadioButton.checked = true
+    }
+  }
+
   $: originName = $selectedOriginUuid ? $selectedOriginUuid.name : "Enheden"
 
   $: destinationNames = $selectedDestinationUuids.map((dest) => dest.name)
@@ -108,16 +120,21 @@
   $: isDisabled = !$selectedOriginUuid || $selectedOriginUuid.uuid === "hiddenValue"
 
   $: connectionText = originName
-    ? `${originName} kobles sammen med: ${
-        destinationNames.length
-          ? destinationNames.length > 1
-            ? destinationNames.slice(0, -1).join(", ") +
-              " og " +
-              destinationNames[destinationNames.length - 1]
-            : destinationNames[0]
-          : ""
-      }`
+    ? `${originName} kobles sammen med: ${formatDestinationNames(destinationNames)}`
     : ""
+
+  function formatDestinationNames(names: string[]): string {
+    if (!names.length) return ""
+    if (names.length === 1) return names[0]
+    return `${names.slice(0, -1).join(", ")} og ${names[names.length - 1]}`
+  }
+
+  onDestroy(resetStore)
+
+  function resetStore() {
+    selectedOriginUuid.set(null)
+    selectedDestinationUuids.set([])
+  }
 </script>
 
 {#await graphQLClient().request(RelatedUnitsDocument, { fromDate: $date })}
@@ -136,8 +153,7 @@
       <div class="p-8">
         <div class="flex flex-col sm:flex-row gap-6 w-full">
           <input type="hidden" name="from" bind:value={$date} />
-          <!--todo: når et valgt node foldes sammen skal den skjulte radiobutton vælges igen-->
-          <!-- Skjult radioButton der tvinger brugerne til at vælge en værdi til at starte med, og til at disable 'gem' og 'anullér' knapperne-->
+          <!-- Skjult radioButton der tvinger brugerne til at vælge en værdi, og til at disable 'gem' og 'anullér' knapperne-->
           <input
             type="radio"
             name="originUuid"
@@ -146,13 +162,14 @@
             checked
             hidden
           />
-          <div class="flex flex-col w-1/2">
+          <!-- <div class="flex flex-col w-1/2">
             <CheckboxOrgTree
               allowMultipleSelection={false}
               bind:selectedOrg={parent}
               labelText="Vælg enhed"
-            />
-
+            /> -->
+          <div class="flex flex-col w-1/2">
+            <CheckboxOrgTree allowMultipleSelection={false} labelText="Vælg enhed" />
             <!-- Skjult felt for origin-uuid -->
             <input
               type="hidden"
@@ -161,10 +178,15 @@
               value={$selectedOriginUuid ? $selectedOriginUuid.uuid : ""}
             />
           </div>
-          <div class="flex flex-col w-1/2">
+          <!-- <div class="flex flex-col w-1/2">
             <CheckboxOrgTree
               allowMultipleSelection={true}
               bind:selectedOrg={parent}
+              labelText="Angiv hvilke enheder der skal sammenkobles med enheden til venstre"
+            /> -->
+          <div class="flex flex-col w-1/2">
+            <CheckboxOrgTree
+              allowMultipleSelection={true}
               labelText="Angiv hvilke enheder der skal sammenkobles med enheden til venstre"
             />
             <!-- Skjult felt for destination-uuids -->
