@@ -2,15 +2,9 @@
   import { graphQLClient } from "$lib/util/http"
   import { date } from "$lib/stores/date"
   import { gql } from "graphql-request"
-  import { OrgTreeCheckboxDocument } from "./query.generated"
+  import { RelatedeUnitsOrgTreeDocument } from "./query.generated"
   import CheckboxNode from "./checkboxNode.svelte"
 
-  /*  export let selectedOrg: { name: string; uuid?: any | null }
-  export let startOrg: { name: string; uuid?: any | null } | null | undefined = {
-    name: "",
-    uuid: "",
-  } */
-  /* selectedOrg = selectedOrg ?? startOrg // For flexibility when binding */
   export let labelText = "Vælg ebhed"
   export let id = "checkbox-org-tree"
   export let allowMultipleSelection: boolean = false
@@ -18,7 +12,7 @@
   let orgTree: any[] = []
 
   gql`
-    query OrgTreeCheckbox($from_date: DateTime!) {
+    query RelatedeUnitsOrgTree($from_date: DateTime!) {
       org_units(filter: { from_date: $from_date }) {
         objects {
           uuid
@@ -40,7 +34,7 @@
   `
 
   const fetchOrgTree = async () => {
-    const data = await graphQLClient().request(OrgTreeCheckboxDocument, {
+    const data = await graphQLClient().request(RelatedeUnitsOrgTreeDocument, {
       from_date: $date,
     })
     if (data.org_units) {
@@ -79,7 +73,6 @@
     <div class="max-w-full">
       <ul class="menu bg-white rounded border">
         {#each orgTree as child}
-          <!-- <CheckboxNode {...child} bind:selectedOrg {allowMultipleSelection} /> -->
           <CheckboxNode {...child} {allowMultipleSelection} />
         {/each}
       </ul>

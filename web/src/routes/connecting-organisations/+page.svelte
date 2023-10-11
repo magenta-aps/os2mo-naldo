@@ -19,7 +19,6 @@
 
   let relatedUnits: any[] = []
   let previousUuid: string | null = null
-  /* let parent: { name: string; uuid?: any | null } */
   let isDisabled = true
 
   gql`
@@ -56,9 +55,8 @@
         const mutation = await graphQLClient().request(UpdateRelatedUnitsDocument, {
           input: result.data,
         })
-        /* TODO: bedre besked oprettet er måske ikke korrekt? kan man evt sende connectionText?*/
         $success = {
-          message: `Tilknytning er blevet redigeret`,
+          message: `Tilknytningen blev redigeret`,
         }
       } catch (err) {
         console.error(err)
@@ -103,7 +101,7 @@
     previousUuid = $selectedOriginUuid.uuid
   }
 
-  //Måske ikke så svelte-korrekt men det lader til at fungere
+  //Ikke svelte-korrekt men kunne ikke få andet til at fungere
   $: if (!$selectedOriginUuid) {
     const hiddenRadioButton = document.getElementById(
       "hiddenRadioButton"
@@ -162,12 +160,6 @@
             checked
             hidden
           />
-          <!-- <div class="flex flex-col w-1/2">
-            <CheckboxOrgTree
-              allowMultipleSelection={false}
-              bind:selectedOrg={parent}
-              labelText="Vælg enhed"
-            /> -->
           <div class="flex flex-col w-1/2">
             <CheckboxOrgTree allowMultipleSelection={false} labelText="Vælg enhed" />
             <!-- Skjult felt for origin-uuid -->
@@ -178,12 +170,6 @@
               value={$selectedOriginUuid ? $selectedOriginUuid.uuid : ""}
             />
           </div>
-          <!-- <div class="flex flex-col w-1/2">
-            <CheckboxOrgTree
-              allowMultipleSelection={true}
-              bind:selectedOrg={parent}
-              labelText="Angiv hvilke enheder der skal sammenkobles med enheden til venstre"
-            /> -->
           <div class="flex flex-col w-1/2">
             <CheckboxOrgTree
               allowMultipleSelection={true}
