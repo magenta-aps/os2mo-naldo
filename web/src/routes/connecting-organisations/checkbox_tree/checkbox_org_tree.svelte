@@ -2,17 +2,17 @@
   import { graphQLClient } from "$lib/util/http"
   import { date } from "$lib/stores/date"
   import { gql } from "graphql-request"
-  import { RelatedeUnitsOrgTreeDocument } from "./query.generated"
+  import { RelatedUnitsOrgTreeDocument } from "./query.generated"
   import CheckboxNode from "./checkboxNode.svelte"
 
-  export let labelText = "Vælg ebhed"
+  export let labelText = "Vælg enhed"
   export let id = "checkbox-org-tree"
   export let allowMultipleSelection: boolean = false
 
   let orgTree: any[] = []
 
   gql`
-    query RelatedeUnitsOrgTree($from_date: DateTime!) {
+    query RelatedUnitsOrgTree($from_date: DateTime!) {
       org_units(filter: { from_date: $from_date }) {
         objects {
           uuid
@@ -34,7 +34,7 @@
   `
 
   const fetchOrgTree = async () => {
-    const data = await graphQLClient().request(RelatedeUnitsOrgTreeDocument, {
+    const data = await graphQLClient().request(RelatedUnitsOrgTreeDocument, {
       from_date: $date,
     })
     if (data.org_units) {
@@ -55,7 +55,6 @@
   }
 </script>
 
-<!-- TODO: det ser måske lidt sjovt ud med spinning wheel ved siden af begge overskrifter? -->
 {#await fetchOrgTree()}
   <div class="form-control pb-4 flex flex-col">
     <label for={id} class="text-sm text-secondary pb-1 h-6 break-words flex items-end">
@@ -69,7 +68,6 @@
     <label for={id} class="text-sm text-secondary pb-1 h-6 break-words flex items-end">
       {labelText}
     </label>
-
     <div class="max-w-full">
       <ul class="menu bg-white rounded border">
         {#each orgTree as child}

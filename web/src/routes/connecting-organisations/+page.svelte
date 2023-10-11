@@ -9,16 +9,12 @@
   import { gql } from "graphql-request"
   import { date } from "$lib/stores/date"
   import { RelatedUnitsDocument, UpdateRelatedUnitsDocument } from "./query.generated"
-
-  import {
-    selectedDestinationUuids,
-    selectedOriginUuid,
-  } from "$lib/stores/selectedItem"
   import CheckboxOrgTree from "./checkbox_tree/checkbox_org_tree.svelte"
   import { onDestroy } from "svelte"
+  import { selectedDestinationsOrgs, selectedOriginOrg } from "$lib/stores/selectedOrg"
 
   let relatedUnits: any[] = []
-  let previousUuid: string | null = null
+  let previousUuid: string
   let isDisabled = true
 
   gql`
@@ -81,28 +77,23 @@
   const updateSelectedDestinationUuids = () => {
     const newDestinations = relatedUnits.flatMap((related) => {
       const related_unit = related.objects[0]
-      if (related_unit.org_units[0].uuid === $selectedOriginUuid?.uuid) {
+      if (related_unit.org_units[0].uuid !== $selectedOriginOrg?.uuid) {
+        return {
+          uuid: related_unit.org_units[0].uuid,
+          name: related_unit.org_units[0].name,
+        }
+      } else {
         return {
           uuid: related_unit.org_units[1].uuid,
           name: related_unit.org_units[1].name,
         }
       }
-      return {
-        uuid: related_unit.org_units[0].uuid,
-        name: related_unit.org_units[0].name,
-      }
     })
-    selectedDestinationUuids.set(newDestinations)
+    selectedDestinationsOrgs.set(newDestinations)
   }
 
-  $: if ($selectedOriginUuid && $selectedOriginUuid.uuid !== previousUuid) {
-    selectedDestinationUuids.set([])
-    fetchRelatedUnits($selectedOriginUuid.uuid)
-    previousUuid = $selectedOriginUuid.uuid
-  }
-
-  //Ikke svelte-korrekt men kunne ikke få andet til at fungere
-  $: if (!$selectedOriginUuid) {
+  //Ikke svelte-korrekt men kunne ikke få andet til at fungere, sætter hiddenRadioButton som valgt når selectedOriginOrg=null
+  $: if (!$selectedOriginOrg) {
     const hiddenRadioButton = document.getElementById(
       "hiddenRadioButton"
     ) as HTMLInputElement
@@ -111,11 +102,16 @@
     }
   }
 
-  $: originName = $selectedOriginUuid ? $selectedOriginUuid.name : "Enheden"
+  $: if ($selectedOriginOrg && $selectedOriginOrg.uuid !== previousUuid) {
+    fetchRelatedUnits($selectedOriginOrg.uuid)
+    previousUuid = $selectedOriginOrg.uuid
+  }
 
-  $: destinationNames = $selectedDestinationUuids.map((dest) => dest.name)
+  $: originName = $selectedOriginOrg ? $selectedOriginOrg.name : "Enheden"
 
-  $: isDisabled = !$selectedOriginUuid || $selectedOriginUuid.uuid === "hiddenValue"
+  $: destinationNames = $selectedDestinationsOrgs.map((dest) => dest.name)
+
+  $: isDisabled = !$selectedOriginOrg || $selectedOriginOrg.uuid === "hiddenValue"
 
   $: connectionText = originName
     ? `${originName} kobles sammen med: ${formatDestinationNames(destinationNames)}`
@@ -123,15 +119,16 @@
 
   function formatDestinationNames(names: string[]): string {
     if (!names.length) return ""
-    if (names.length === 1) return names[0]
-    return `${names.slice(0, -1).join(", ")} og ${names[names.length - 1]}`
+    return names.length === 1
+      ? names[0]
+      : `${names.slice(0, -1).join(", ")} og ${names[names.length - 1]}`
   }
 
   onDestroy(resetStore)
 
   function resetStore() {
-    selectedOriginUuid.set(null)
-    selectedDestinationUuids.set([])
+    selectedOriginOrg.set(null)
+    selectedDestinationsOrgs.set([])
   }
 </script>
 
@@ -151,7 +148,7 @@
       <div class="p-8">
         <div class="flex flex-col sm:flex-row gap-6 w-full">
           <input type="hidden" name="from" bind:value={$date} />
-          <!-- Skjult radioButton der tvinger brugerne til at vælge en værdi, og til at disable 'gem' og 'anullér' knapperne-->
+          <!-- Skjult radioButton der tvinger bruger til at vælge en værdi, og til at disable 'gem' og 'annullér' knapperne-->
           <input
             type="radio"
             name="originUuid"
@@ -167,7 +164,7 @@
               type="hidden"
               id="origin-uuid"
               name="origin-uuid"
-              value={$selectedOriginUuid ? $selectedOriginUuid.uuid : ""}
+              value={$selectedOriginOrg ? $selectedOriginOrg.uuid : ""}
             />
           </div>
           <div class="flex flex-col w-1/2">
@@ -180,7 +177,7 @@
               type="hidden"
               id="destination-uuids"
               name="destination-uuids"
-              value={$selectedDestinationUuids.map((obj) => obj.uuid).join(",")}
+              value={$selectedDestinationsOrgs.map((obj) => obj.uuid).join(",")}
             />
           </div>
         </div>
@@ -191,8 +188,9 @@
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        disabled={isDisabled}>Gem</button
-      >
+        disabled={isDisabled}
+        >Gem
+      </button>
       <!--  TODO:hvor skal goto: vise hen, hvis den skal vise nogle steder hen? -->
       <button
         type="button"

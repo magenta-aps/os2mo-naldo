@@ -8,7 +8,7 @@ export const actions: Actions = {
     const originUuid = data.get("origin-uuid")
 
     const destinationUuidsEntry = data.getAll("destination-uuids")[0]
-    /* Tjek at destinationUuidsEntry er en streng   og at den ikke er tom (for at TypeScript tillader `.split()` metoden) */
+    /* Tjek at destinationUuidsEntry er en streng (for at TypeScript tillader `.split()` metoden) */
     const destinationUuids =
       typeof destinationUuidsEntry === "string" && destinationUuidsEntry
         ? destinationUuidsEntry.split(",").filter(Boolean)

@@ -2,14 +2,11 @@
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { createEventDispatcher, onMount } from "svelte"
-  import {
-    selectedDestinationUuids,
-    selectedOriginUuid,
-  } from "$lib/stores/selectedItem"
+  import { selectedDestinationsOrgs, selectedOriginOrg } from "$lib/stores/selectedOrg"
   import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
   import RadioButton from "$lib/components/forms/shared/radioButton.svelte"
   import Arrow from "$lib/components/forms/shared/arrow.svelte"
-  import { RelatedeUnitsChildrenDocument } from "./query.generated"
+  import { RelatedUnitsChildrenDocument } from "./query.generated"
 
   export let name = ""
   export let children: any[] = []
@@ -21,12 +18,11 @@
 
   let loading = false
   let isOpen = false
-  let prevSelectedOriginUuid: string = ""
 
   const dispatch = createEventDispatcher()
 
   gql`
-    query RelatedeUnitsChildren($uuid: [UUID!], $fromDate: DateTime) {
+    query RelatedUnitsChildren($uuid: [UUID!], $fromDate: DateTime) {
       org_units(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
           objects {
@@ -45,7 +41,7 @@
   `
 
   const fetchChildren = async (uuid: string) => {
-    const res = await graphQLClient().request(RelatedeUnitsChildrenDocument, {
+    const res = await graphQLClient().request(RelatedUnitsChildrenDocument, {
       uuid: uuid,
       fromDate: fromDate,
     })
@@ -68,26 +64,30 @@
     await Promise.all(fetchPromises)
   }
 
-  const toggleOpen = async () => {
+  const openNode = async () => {
     if (!isOpen) {
       loading = true
-      for (let child of children) {
-        if (!child.children) {
-          child.children = await fetchChildren(child.uuid)
-        }
-      }
+      await fetchAndSetChildren()
       loading = false
+      isOpen = true
     }
-    isOpen = !isOpen
+  }
 
-    // Check if the selected node is still visible after the toggle
-    if (
-      !allowMultipleSelection &&
-      $selectedOriginUuid &&
-      !isUuidVisible({ children, isOpen, uuid: parentUuid }, $selectedOriginUuid.uuid)
-    ) {
-      selectedOriginUuid.set(null)
-      selectedDestinationUuids.set([])
+  const closeNode = () => {
+    if (!isOpen) return
+    if (isOpen) {
+      if (
+        !allowMultipleSelection &&
+        $selectedOriginOrg &&
+        !isUuidVisible(
+          { children, isOpen: false, uuid: parentUuid },
+          $selectedOriginOrg.uuid
+        )
+      ) {
+        selectedOriginOrg.set(null)
+        selectedDestinationsOrgs.set([])
+      }
+      isOpen = false
     }
   }
 
@@ -97,30 +97,16 @@
     const uuid = target.id
 
     if (target.type === "radio") {
-      handleRadioChange(isChecked, uuid)
+      selectedOriginOrg.set(isChecked ? { uuid, name } : null)
+      dispatch("radioChanged", { isChecked, uuid })
     } else if (target.type === "checkbox") {
-      handleCheckboxChange(isChecked, uuid)
+      selectedDestinationsOrgs.update((currentDestinations) => {
+        return isChecked
+          ? [...currentDestinations, { uuid, name }]
+          : currentDestinations.filter((org) => org.uuid !== uuid)
+      })
+      dispatch("checkboxChanged", { isChecked, uuid })
     }
-  }
-
-  function handleRadioChange(isChecked: boolean, uuid: string) {
-    if (isChecked) {
-      selectedOriginUuid.set({ uuid, name })
-    } else {
-      selectedOriginUuid.set(null)
-    }
-    dispatch("radioChanged", { isChecked, uuid })
-  }
-
-  function handleCheckboxChange(isChecked: boolean, uuid: string) {
-    selectedDestinationUuids.update((currentDestinations) => {
-      if (isChecked) {
-        return [...currentDestinations, { uuid, name }]
-      } else {
-        return currentDestinations.filter((org) => org.uuid !== uuid)
-      }
-    })
-    dispatch("checkboxChanged", { isChecked, uuid })
   }
 
   function openParentNodes(currentUuid: string): void {
@@ -138,7 +124,7 @@
     if (node.children) {
       for (let child of node.children) {
         if (
-          $selectedDestinationUuids.some((dest) => dest.uuid === child.uuid) ||
+          $selectedDestinationsOrgs.some((dest) => dest.uuid === child.uuid) ||
           hasMatchingDescendant(child)
         ) {
           return true
@@ -162,93 +148,48 @@
     return false
   }
 
-  onMount(async () => {
-    await fetchAndSetChildren()
-  })
+  $: if ($selectedOriginOrg && allowMultipleSelection) {
+    isOpen = false
 
-  /*  $: {
-  if ($selectedOriginUuid === null && allowMultipleSelection) {
-    isOpen = false;
-  }
-
-  if ($selectedOriginUuid && allowMultipleSelection) {
-    // Luk alle noder
-    isOpen = false;
-
-    $selectedDestinationUuids.forEach((destination) => {
+    $selectedDestinationsOrgs.forEach((destination) => {
       if (
         destination.uuid === uuid ||
         children.some((child) => child.uuid === destination.uuid)
       ) {
-        openParentNodes(destination.uuid);
+        openParentNodes(destination.uuid)
       }
-      // Tjek for at åbne rodnoden
+
       if (
         parentUuid === "" &&
         children.some((child) => child.uuid === destination.uuid)
       ) {
-        isOpen = true;
+        isOpen = true
       }
-    });
+    })
   }
-} */
 
-  $: {
-    if ($selectedOriginUuid === null && allowMultipleSelection) {
-      isOpen = false
-    }
-
-    if (
-      $selectedOriginUuid &&
-      $selectedOriginUuid.uuid !== prevSelectedOriginUuid &&
-      allowMultipleSelection
-    ) {
-      isOpen = false
-
-      $selectedDestinationUuids.forEach((destination) => {
-        if (
-          destination.uuid === uuid ||
-          children.some((child) => child.uuid === destination.uuid)
-        ) {
-          openParentNodes(destination.uuid)
-        }
-        // Tjek for at åbne rodnoden
-        if (
-          parentUuid === "" &&
-          children.some((child) => child.uuid === destination.uuid)
-        ) {
-          isOpen = true
-        }
-      })
-
-      prevSelectedOriginUuid = $selectedOriginUuid.uuid
-    }
+  $: if ($selectedOriginOrg === null && allowMultipleSelection) {
+    isOpen = false
   }
+
+  $: isSelectedOrigin = $selectedOriginOrg && $selectedOriginOrg.uuid === uuid
+  $: isSelectedDestination = $selectedDestinationsOrgs.some((obj) => obj.uuid === uuid)
 
   $: sortedChildren = children.slice().sort((a, b) => a.name.localeCompare(b.name))
 
-  $: isSelectedOrigin = $selectedOriginUuid && $selectedOriginUuid.uuid === uuid
-  $: isSelectedDestination = $selectedDestinationUuids.some((obj) => obj.uuid === uuid)
+  onMount(async () => {
+    await fetchAndSetChildren()
+  })
 </script>
-
-<!-- TODO: fjern A11y ignore når checkboxer fungere som det skal, er pt tilføjet for ikke at have gule linjer over alt i koden -->
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-
-<!-- TODO: Der skal muligvis indføres en animate-spin mens der bliver læst ind så man kan se at derforegår noget, men hvor vil det give mening?-->
 
 <li style="padding-left: {indent}px">
   <div class="flex items-center">
     {#if loading}
       <div class="animate-spin rounded-full h-5 w-5 border-b-4 border-primary" />
     {:else}
-      <!-- {uuid} (Parent UUID: {parentUuid})  -->
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <!-- Placeholder for arrows even if no children are present, gives a better visuel experience -->
       <div
         class="flex items-center justify-center w-5 h-5 mr-2 mb-3"
-        on:click={toggleOpen}
+        on:click={isOpen ? closeNode : openNode}
       >
         {#if children && children.length > 0}
           {#if isOpen}
@@ -266,8 +207,8 @@
           title={name}
           value="checked"
           startValue={isSelectedDestination ? "checked" : "unchecked"}
-          disabled={!$selectedOriginUuid ||
-            ($selectedOriginUuid && $selectedOriginUuid.uuid === uuid)}
+          disabled={!$selectedOriginOrg ||
+            ($selectedOriginOrg && $selectedOriginOrg.uuid === uuid)}
         />
       </div>
     {:else}
