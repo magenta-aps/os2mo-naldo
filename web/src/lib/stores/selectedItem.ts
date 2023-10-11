@@ -1,3 +1,4 @@
+import { onDestroy } from "svelte"
 import { writable } from "svelte/store"
 
 /* Gemmer et objekt, så det er let at få fat i både uuid og navn til beskeder og andre visninger */

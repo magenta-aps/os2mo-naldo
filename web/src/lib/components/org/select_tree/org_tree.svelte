@@ -16,9 +16,7 @@
   export let labelText = "Angiv overenhed"
   export let id = "select-org-tree"
   export let required = true
-  /*   export let isCheckboxMode: boolean = false
-  export let allowMultipleSelection: boolean = false
- */
+
   let orgTree: any[] = []
   let isFocused = false
 
@@ -72,8 +70,6 @@
   })
 </script>
 
-<!-- TODO: fjern A11y ignore når relatedeUnit fungere som det skal, er pt tilføjet for ikke at have gule linjer over alt i koden -->
-<!-- TODO: det ser måske lidt sjovt ud med spinning wheel ved siden af overskrifterne? -->
 {#await fetchOrgTree()}
   <div class="form-control pb-4 flex flex-col">
     <label for={id} class="text-sm text-secondary pb-1 h-6 break-words flex items-end">
@@ -87,21 +83,6 @@
     <label for={id} class="text-sm text-secondary pb-1 h-6 break-words flex items-end">
       {labelText}
     </label>
-
-    <!--   {#if isCheckboxMode}
-      <div use:floatingRef class="max-w-full">
-        <ul class="menu bg-white rounded border">
-          {#each orgTree as child}
-            <Node
-              {...child}
-              bind:selectedOrg
-              {isCheckboxMode}
-              {allowMultipleSelection}
-            />
-          {/each}
-        </ul>
-      </div>
-    {:else} -->
     <div use:floatingRef>
       <input
         {id}
@@ -112,11 +93,8 @@
         bind:value={selectedOrg.name}
         class="input input-bordered input-sm text-base text-secondary font-normal rounded active:input-primary focus:input-primary w-full active:outline-offset-0 focus:outline-offset-0"
       />
-      <!-- Hidden input for single select when checkboxes are not used -->
       <input hidden {id} name={id} bind:value={selectedOrg.uuid} />
-
       {#if isFocused}
-        <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div
           use:floatingContent
           class="w-96 max-w-full px-5"
@@ -130,6 +108,5 @@
         </div>
       {/if}
     </div>
-    <!--  {/if} -->
   </div>
 {/await}
