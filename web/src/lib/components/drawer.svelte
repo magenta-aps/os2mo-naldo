@@ -68,7 +68,16 @@
 </script>
 
 <div class="drawer lg:drawer-open h-[calc(100vh-4rem)]">
-  <input id="drawer" type="checkbox" class="drawer-toggle" />
+  <input
+    id="drawer"
+    type="checkbox"
+    class="drawer-toggle"
+    aria-label="Toggle sidebar"
+  />
+
+  <!-- Tilføjer en label for at kontrollere checkboxens tilstand, hvilket vil vise eller skjule sidebaren -->
+  <label for="drawer" class="drawer-overlay cursor-pointer" aria-hidden="true" />
+
   <div class="drawer-content flex flex-col h-auto">
     <!-- Page content here -->
     {#if $isAuth}
