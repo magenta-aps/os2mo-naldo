@@ -74,8 +74,6 @@
     class="drawer-toggle"
     aria-label="Toggle sidebar"
   />
-
-  <!-- Tilføjer en label for at kontrollere checkboxens tilstand, hvilket vil vise eller skjule sidebaren -->
   <label for="drawer" class="drawer-overlay cursor-pointer" aria-hidden="true" />
 
   <div class="drawer-content flex flex-col h-auto">
