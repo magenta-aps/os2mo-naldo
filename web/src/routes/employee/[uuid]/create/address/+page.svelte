@@ -14,11 +14,19 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import type { SubmitFunction } from "./$types"
+  import { form, field } from "svelte-forms"
+  import { required, email, pattern } from "svelte-forms/validators"
+  import DarSearch from "$lib/components/DARSearch.svelte"
+  import { Addresses } from "$lib/util/addresses"
 
   let fromDate: string
   let toDate: string
   let addressType: { name: string; uuid?: any | null }
   $: addressUuid = addressType?.uuid
+
+  // update the field depending on address-type
+  let address = field("", "")
+  $: myForm = form(address)
 
   gql`
     query FacetsAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
@@ -58,26 +66,47 @@
       }
     }
   `
+  $: switch (addressType?.name) {
+    case Addresses.EMAIL:
+      address = field(Addresses.EMAIL, "", [required(), email()])
+      break
+    case Addresses.LOKATION:
+      address = field(Addresses.LOKATION, "", [required()])
+      break
+    case Addresses.POSTADRESSE:
+      address = field(Addresses.POSTADRESSE, "", [required()])
+      break
+    case Addresses.TELEFON:
+      // This regex is not perfect, as it allows ex. `12345678` and `+45123456`, but use it for now
+      address = field(Addresses.TELEFON, "", [required(), pattern(/(\+45)?\d{8}/)])
+      break
+    default:
+      break
+  }
 
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(CreateAddressDocument, {
-            input: result.data,
-          })
-          $success = {
-            message: `Adressen ${
-              mutation.address_create.objects[0]?.employee
-                ? `for ${mutation.address_create.objects[0].employee?.[0].name}`
-                : ""
-            } er oprettet fra d. ${fromDate}`,
-            uuid: $page.params.uuid,
-            type: "employee",
+      // Await the validation, before we continue
+      await myForm.validate()
+      if ($myForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(CreateAddressDocument, {
+              input: result.data,
+            })
+            $success = {
+              message: `Adressen ${
+                mutation.address_create.objects[0]?.employee
+                  ? `for ${mutation.address_create.objects[0].employee?.[0].name}`
+                  : ""
+              } er oprettet fra d. ${fromDate}`,
+              uuid: $page.params.uuid,
+              type: "employee",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -139,19 +168,20 @@
           <input hidden name="address-type-uuid" bind:value={addressUuid} />
         </div>
         {#if addressType}
-          {#if addressType.name == "Email"}
-            <Input title="Email" id="value" type="email" required={true} />
-          {:else if addressType.name == "Lokation"}
-            <Input title="Lokation" id="value" required={true} />
-          {:else if addressType.name == "Postadresse"}
-            <Input title="Postadresse" id="value" required={true} />
-          {:else if addressType.name == "Telefon"}
-            <Input
-              title="Telefon"
+          {#if addressType.name === Addresses.POSTADRESSE}
+            <DarSearch
+              title={addressType.name}
               id="value"
-              type="tel"
-              pattern="[0-9]+"
-              patternMessage="Kun tal & '+' er tilladt"
+              bind:darName={$address.value}
+              errors={$address.errors}
+              required={true}
+            />
+          {:else}
+            <Input
+              title={addressType.name}
+              id="value"
+              bind:value={$address.value}
+              errors={$address.errors}
               required={true}
             />
           {/if}

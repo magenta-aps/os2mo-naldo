@@ -1,0 +1,15 @@
+export enum Addresses {
+  AFDELINGSKODE = "Afdelingskode",
+  EAN_NUMMER = "EAN-nummer",
+  EMAIL = "Email",
+  FAX = "Fax",
+  FORMAALSKODE = "Formålskode",
+  HENVENDELSESSTED = "Henvendelsessted",
+  LOKATION = "Lokation",
+  P_NUMMER = "P-nummer",
+  POSTADRESSE = "Postadresse",
+  RETURADRESSE = "Returadresse",
+  SKOLEKODE = "Skolekode",
+  TELEFON = "Telefon",
+  WEBADRESSE = "Webadresse",
+}
