@@ -99,6 +99,8 @@
           use:floatingContent
           class="w-96 max-w-full px-5"
           on:mouseleave={delayedUnfocus}
+          role="menu"
+          tabindex="0"
         >
           <ul class="menu bg-base-200">
             {#each orgTree as child}

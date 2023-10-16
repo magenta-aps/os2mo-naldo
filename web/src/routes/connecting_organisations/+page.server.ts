@@ -1,18 +1,19 @@
 import type { RelatedUnitsUpdateInput } from "$lib/graphql/types"
 import type { Actions, RequestEvent } from "@sveltejs/kit"
 
+type UnpackedClass = {
+  name: string
+  uuid: string
+}[]
 export const actions: Actions = {
   default: async ({ request }: RequestEvent): Promise<RelatedUnitsUpdateInput> => {
     const data = await request.formData()
     const startDate = data.get("from")
     const originUuid = data.get("origin-uuid")
 
-    const destinationUuidsEntry = data.getAll("destination-uuids")[0]
-    /* Tjek at destinationUuidsEntry er en streng (for at TypeScript tillader `.split()` metoden) */
-    const destinationUuids =
-      typeof destinationUuidsEntry === "string" && destinationUuidsEntry
-        ? destinationUuidsEntry.split(",").filter(Boolean)
-        : []
+    const destinationUuids = (
+      JSON.parse(data.get("destination-uuids") as string) as UnpackedClass
+    ).map((v) => v.uuid)
 
     return {
       validity: { from: startDate },

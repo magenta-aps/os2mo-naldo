@@ -7,7 +7,7 @@
   export let groupName: string
 </script>
 
-<!--benyttet checkbox klasse for gøre radioButton og checkbox visuelt ens -->
+<!--using  checkbox-class to make radioButton and checkbox look visually identical -->
 <div class="form-control pb-4">
   <label class="label cursor-pointer p-0 gap-4">
     <input

@@ -1,7 +1,7 @@
 <script lang="ts">
   import Error from "$lib/components/alerts/error.svelte"
   import { enhance } from "$app/forms"
-  import type { SubmitFunction } from "./$types"
+  import type { SubmitFunction } from "../connecting_organisations/$types"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
@@ -11,11 +11,13 @@
   import { RelatedUnitsDocument, UpdateRelatedUnitsDocument } from "./query.generated"
   import CheckboxOrgTree from "./checkbox_tree/checkbox_org_tree.svelte"
   import { onDestroy } from "svelte"
-  import { selectedDestinationsOrgs, selectedOriginOrg } from "$lib/stores/selectedOrg"
 
   let relatedUnits: any[] = []
   let previousUuid: string
   let isDisabled = true
+
+  let selectedOriginOrg: { uuid: string; name: string } | null = null
+  let selectedDestinationsOrgs: { uuid: string; name: string }[] = []
 
   gql`
     query RelatedUnits($org_unit: [UUID!], $fromDate: DateTime) {
@@ -47,12 +49,22 @@
     async ({ result }) => {
       if (result.type !== "success" || !result.data) return
 
+      if (!selectedOriginOrg) {
+        console.warn("selectedOriginOrg is null or undefined")
+        return
+      }
+
       try {
         const mutation = await graphQLClient().request(UpdateRelatedUnitsDocument, {
           input: result.data,
         })
+        //diffrent success message if the destination list is empty?
         $success = {
-          message: `Tilknytningen blev redigeret`,
+          message: `${
+            selectedOriginOrg.name
+          } blev knyttet sammen med: ${formatDestinationNamesFromOrgs(
+            selectedDestinationsOrgs
+          )}`,
         }
       } catch (err) {
         console.error(err)
@@ -60,10 +72,10 @@
       }
     }
 
-  async function fetchRelatedUnits(originUUID: string) {
+  async function fetchRelatedUnits(originUuid: string) {
     try {
       const response = await graphQLClient().request(RelatedUnitsDocument, {
-        org_unit: originUUID,
+        org_unit: originUuid,
         fromDate: $date,
       })
       relatedUnits = response.related_units.objects
@@ -77,7 +89,7 @@
   const updateSelectedDestinationUuids = () => {
     const newDestinations = relatedUnits.flatMap((related) => {
       const related_unit = related.objects[0]
-      if (related_unit.org_units[0].uuid !== $selectedOriginOrg?.uuid) {
+      if (related_unit.org_units[0].uuid !== selectedOriginOrg?.uuid) {
         return {
           uuid: related_unit.org_units[0].uuid,
           name: related_unit.org_units[0].name,
@@ -89,11 +101,13 @@
         }
       }
     })
-    selectedDestinationsOrgs.set(newDestinations)
+
+    selectedDestinationsOrgs = [...newDestinations]
+    return selectedDestinationsOrgs
   }
 
-  //Ikke svelte-korrekt men kunne ikke få andet til at fungere, sætter hiddenRadioButton som valgt når selectedOriginOrg=null
-  $: if (!$selectedOriginOrg) {
+  //Not Svelte-correct but couldn't get anything else to work, sets hiddenRadioButton as selected when selectedOriginOrg=null
+  $: if (!selectedOriginOrg) {
     const hiddenRadioButton = document.getElementById(
       "hiddenRadioButton"
     ) as HTMLInputElement
@@ -102,33 +116,33 @@
     }
   }
 
-  $: if ($selectedOriginOrg && $selectedOriginOrg.uuid !== previousUuid) {
-    fetchRelatedUnits($selectedOriginOrg.uuid)
-    previousUuid = $selectedOriginOrg.uuid
+  $: if (selectedOriginOrg && selectedOriginOrg.uuid !== previousUuid) {
+    fetchRelatedUnits(selectedOriginOrg.uuid)
+    previousUuid = selectedOriginOrg.uuid
   }
 
-  $: originName = $selectedOriginOrg ? $selectedOriginOrg.name : "Enheden"
+  $: originName = selectedOriginOrg ? selectedOriginOrg.name : "Enheden"
 
-  $: destinationNames = $selectedDestinationsOrgs.map((dest) => dest.name)
+  $: isDisabled = !selectedOriginOrg || selectedOriginOrg.uuid === "hiddenValue"
 
-  $: isDisabled = !$selectedOriginOrg || $selectedOriginOrg.uuid === "hiddenValue"
+  $: connectionText = `${originName} kobles sammen med: ${formatDestinationNamesFromOrgs(
+    selectedDestinationsOrgs
+  )}`
 
-  $: connectionText = originName
-    ? `${originName} kobles sammen med: ${formatDestinationNames(destinationNames)}`
-    : ""
+  function formatDestinationNamesFromOrgs(orgs: { name: string }[]): string {
+    const names = orgs.map((org) => org.name)
 
-  function formatDestinationNames(names: string[]): string {
     if (!names.length) return ""
     return names.length === 1
       ? names[0]
       : `${names.slice(0, -1).join(", ")} og ${names[names.length - 1]}`
   }
 
-  onDestroy(resetStore)
+  onDestroy(resetSelected)
 
-  function resetStore() {
-    selectedOriginOrg.set(null)
-    selectedDestinationsOrgs.set([])
+  function resetSelected() {
+    selectedOriginOrg = null
+    selectedDestinationsOrgs = []
   }
 </script>
 
@@ -148,7 +162,8 @@
       <div class="p-8">
         <div class="flex flex-col sm:flex-row gap-6 w-full">
           <input type="hidden" name="from" bind:value={$date} />
-          <!-- Skjult radioButton der tvinger bruger til at vælge en værdi, og til at disable 'gem' og 'annullér' knapperne-->
+          <!-- "Hidden radioButton ensures a clean display when no selection has been made ore af checked value is in a closed node. 
+          This might be achievable with CSS, but I'm not sure how and if it's supported in all browsers -->
           <input
             type="radio"
             name="originUuid"
@@ -158,26 +173,32 @@
             hidden
           />
           <div class="flex flex-col w-1/2">
-            <CheckboxOrgTree allowMultipleSelection={false} labelText="Vælg enhed" />
-            <!-- Skjult felt for origin-uuid -->
+            <CheckboxOrgTree
+              allowMultipleSelection={false}
+              bind:selectedDestinationsOrgs
+              bind:selectedOriginOrg
+              labelText="Vælg enhed"
+            />
+            <!-- Hidden field for origin-uuid -->
             <input
               type="hidden"
               id="origin-uuid"
               name="origin-uuid"
-              value={$selectedOriginOrg ? $selectedOriginOrg.uuid : ""}
+              value={selectedOriginOrg ? selectedOriginOrg.uuid : ""}
             />
           </div>
           <div class="flex flex-col w-1/2">
             <CheckboxOrgTree
               allowMultipleSelection={true}
+              bind:selectedDestinationsOrgs
+              bind:selectedOriginOrg
               labelText="Angiv hvilke enheder der skal sammenkobles med enheden til venstre"
             />
-            <!-- Skjult felt for destination-uuids -->
             <input
               type="hidden"
               id="destination-uuids"
               name="destination-uuids"
-              value={$selectedDestinationsOrgs.map((obj) => obj.uuid).join(",")}
+              value={JSON.stringify(selectedDestinationsOrgs)}
             />
           </div>
         </div>
@@ -191,7 +212,7 @@
         disabled={isDisabled}
         >Gem
       </button>
-      <!--  TODO:hvor skal goto: vise hen, hvis den skal vise nogle steder hen? -->
+      <!-- TODO: Where should goto: point to, if it's supposed to point somewhere? -->
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"

@@ -2,11 +2,10 @@
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { createEventDispatcher, onMount } from "svelte"
-  import { selectedDestinationsOrgs, selectedOriginOrg } from "$lib/stores/selectedOrg"
   import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
-  import RadioButton from "$lib/components/forms/shared/radioButton.svelte"
-  import Arrow from "$lib/components/forms/shared/arrow.svelte"
+  import RadioButton from "$lib/components/forms/shared/radio_button.svelte"
   import { RelatedUnitsChildrenDocument } from "./query.generated"
+  import Icon from "$lib/components/icon.svelte"
 
   export let name = ""
   export let children: any[] = []
@@ -18,6 +17,9 @@
 
   let loading = false
   let isOpen = false
+
+  export let selectedOriginOrg: { uuid: string; name: string } | null = null
+  export let selectedDestinationsOrgs: { uuid: string; name: string }[] = []
 
   const dispatch = createEventDispatcher()
 
@@ -46,7 +48,7 @@
       fromDate: fromDate,
     })
     const children = res.org_units?.objects[0].objects[0].children
-    return children.sort((a, b) => a.name.localeCompare(b.name))
+    return children
   }
 
   const fetchAndSetChildren = async () => {
@@ -57,6 +59,7 @@
         fetchPromises.push(
           fetchChildren(child.uuid).then((fetchedChildren) => {
             child.children = fetchedChildren
+            children = [...children]
           })
         )
       }
@@ -78,14 +81,14 @@
     if (isOpen) {
       if (
         !allowMultipleSelection &&
-        $selectedOriginOrg &&
+        selectedOriginOrg &&
         !isUuidVisible(
           { children, isOpen: false, uuid: parentUuid },
-          $selectedOriginOrg.uuid
+          selectedOriginOrg.uuid
         )
       ) {
-        selectedOriginOrg.set(null)
-        selectedDestinationsOrgs.set([])
+        selectedOriginOrg = null
+        selectedDestinationsOrgs = []
       }
       isOpen = false
     }
@@ -97,14 +100,17 @@
     const uuid = target.id
 
     if (target.type === "radio") {
-      selectedOriginOrg.set(isChecked ? { uuid, name } : null)
+      selectedOriginOrg = isChecked ? { uuid, name } : null
       dispatch("radioChanged", { isChecked, uuid })
     } else if (target.type === "checkbox") {
-      selectedDestinationsOrgs.update((currentDestinations) => {
-        return isChecked
-          ? [...currentDestinations, { uuid, name }]
-          : currentDestinations.filter((org) => org.uuid !== uuid)
-      })
+      if (isChecked) {
+        selectedDestinationsOrgs.push({ uuid, name })
+        selectedDestinationsOrgs = [...selectedDestinationsOrgs]
+      } else {
+        selectedDestinationsOrgs = selectedDestinationsOrgs.filter(
+          (org) => org.uuid !== uuid
+        )
+      }
       dispatch("checkboxChanged", { isChecked, uuid })
     }
   }
@@ -120,11 +126,11 @@
   }
 
   function hasMatchingDescendant(node: any): boolean {
-    // Tjekker for børn, og hvis der er børn, tjekker rekursivt
+    // Checks for children, and if there are children, checks recursively.
     if (node.children) {
       for (let child of node.children) {
         if (
-          $selectedDestinationsOrgs.some((dest) => dest.uuid === child.uuid) ||
+          selectedDestinationsOrgs.some((dest) => dest.uuid === child.uuid) ||
           hasMatchingDescendant(child)
         ) {
           return true
@@ -148,10 +154,8 @@
     return false
   }
 
-  $: if ($selectedOriginOrg && allowMultipleSelection) {
-    isOpen = false
-
-    $selectedDestinationsOrgs.forEach((destination) => {
+  $: if (selectedOriginOrg && allowMultipleSelection) {
+    selectedDestinationsOrgs.forEach((destination) => {
       if (
         destination.uuid === uuid ||
         children.some((child) => child.uuid === destination.uuid)
@@ -168,14 +172,16 @@
     })
   }
 
-  $: if ($selectedOriginOrg === null && allowMultipleSelection) {
+  $: if (selectedOriginOrg === null && allowMultipleSelection) {
     isOpen = false
   }
 
-  $: isSelectedOrigin = $selectedOriginOrg && $selectedOriginOrg.uuid === uuid
-  $: isSelectedDestination = $selectedDestinationsOrgs.some((obj) => obj.uuid === uuid)
+  $: isSelectedOrigin = selectedOriginOrg && selectedOriginOrg.uuid === uuid
+  $: isSelectedDestination = selectedDestinationsOrgs.some((obj) => obj.uuid === uuid)
 
-  $: sortedChildren = children.slice().sort((a, b) => a.name.localeCompare(b.name))
+  $: sortedChildren = children
+    .slice()
+    .sort((a, b) => (a.name > b.name ? 1 : a.name < b.name ? -1 : 0))
 
   onMount(async () => {
     await fetchAndSetChildren()
@@ -188,15 +194,19 @@
       <div class="animate-spin rounded-full h-5 w-5 border-b-4 border-primary" />
     {:else}
       <div
+        role="button"
+        tabindex="0"
         class="flex items-center justify-center w-5 h-5 mr-2 mb-3"
         on:click={isOpen ? closeNode : openNode}
+        on:keydown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            isOpen ? closeNode() : openNode()
+            event.preventDefault()
+          }
+        }}
       >
-        {#if children && children.length > 0}
-          {#if isOpen}
-            <Arrow class="transform rotate-90" />
-          {:else}
-            <Arrow />
-          {/if}
+        {#if children.length}
+          <Icon type="arrow" class={isOpen ? "transform rotate-90" : ""} />
         {/if}
       </div>
     {/if}
@@ -207,8 +217,7 @@
           title={name}
           value="checked"
           startValue={isSelectedDestination ? "checked" : "unchecked"}
-          disabled={!$selectedOriginOrg ||
-            ($selectedOriginOrg && $selectedOriginOrg.uuid === uuid)}
+          disabled={!selectedOriginOrg || selectedOriginOrg.uuid === uuid}
         />
       </div>
     {:else}
@@ -231,6 +240,8 @@
       indent={indent + 30}
       {fromDate}
       {allowMultipleSelection}
+      bind:selectedDestinationsOrgs
+      bind:selectedOriginOrg
       parentUuid={uuid}
       on:openParent={(e) => {
         if (e.detail.uuid === uuid) {

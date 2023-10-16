@@ -3,13 +3,16 @@
   import { date } from "$lib/stores/date"
   import { gql } from "graphql-request"
   import { RelatedUnitsOrgTreeDocument } from "./query.generated"
-  import CheckboxNode from "./checkboxNode.svelte"
+  import CheckboxNode from "./checkbox_node.svelte"
 
   export let labelText = "Vælg enhed"
-  export let id = "checkbox-org-tree"
+  export let id = "checkbox_org_tree"
   export let allowMultipleSelection: boolean = false
 
   let orgTree: any[] = []
+
+  export let selectedOriginOrg: { uuid: string; name: string } | null = null
+  export let selectedDestinationsOrgs: { uuid: string; name: string }[] = []
 
   gql`
     query RelatedUnitsOrgTree($from_date: DateTime!) {
@@ -41,7 +44,7 @@
       for (let org of data.org_units.objects) {
         if (org.objects[0].parent === null) {
           const sortedChildren = org.objects[0].children.sort((a, b) =>
-            a.name.localeCompare(b.name)
+            a.name > b.name ? 1 : a.name < b.name ? -1 : 0
           )
           orgTree.push({
             uuid: org.uuid,
@@ -71,7 +74,12 @@
     <div class="max-w-full">
       <ul class="menu bg-white rounded border">
         {#each orgTree as child}
-          <CheckboxNode {...child} {allowMultipleSelection} />
+          <CheckboxNode
+            {...child}
+            {allowMultipleSelection}
+            bind:selectedDestinationsOrgs
+            bind:selectedOriginOrg
+          />
         {/each}
       </ul>
     </div>
