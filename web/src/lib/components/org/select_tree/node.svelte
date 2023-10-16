@@ -2,6 +2,7 @@
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { OrgChildrenDocument } from "./query.generated"
+  import Icon from "$lib/components/icon.svelte"
 
   export let selectedOrg: any
   export let name = ""
@@ -51,20 +52,44 @@
   }
 </script>
 
-<li
-  style="padding-left: {indent}px"
-  on:click={() => {
-    selectedOrg.name = name
-    selectedOrg.uuid = uuid
-  }}
->
-  <div>
+<li style="padding-left: {indent}px">
+  <div
+    role="button"
+    tabindex="0"
+    class="flex items-center"
+    on:click={() => {
+      selectedOrg.name = name
+      selectedOrg.uuid = uuid
+    }}
+    on:keydown={(event) => {
+      if (event.key === "Enter" || event.key === "Space") {
+        selectedOrg.name = name
+        selectedOrg.uuid = uuid
+        event.preventDefault()
+      }
+    }}
+  >
     {#if loading}
       <div class="animate-spin rounded-full h-5 w-5 border-b-4 border-primary" />
-    {:else if children.length}
-      <p on:click={toggleOpen}>{open ? "⌄" : "➤"}</p>
+    {:else}
+      <div
+        class="flex items-center justify-center w-5 h-5 mr-2 mb-3"
+        role="button"
+        tabindex="0"
+        on:click={toggleOpen}
+        on:keydown={(event) => {
+          if (event.key === "Enter" || event.key === "Space") {
+            toggleOpen()
+            event.preventDefault()
+          }
+        }}
+      >
+        {#if children && children.length > 0}
+          <Icon type="arrow" class={open ? "transform rotate-90" : ""} />
+        {/if}
+      </div>
     {/if}
-    {name}
+    <span class="mr-2">{name}</span>
   </div>
 </li>
 

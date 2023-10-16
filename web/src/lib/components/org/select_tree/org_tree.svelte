@@ -16,6 +16,7 @@
   export let labelText = "Angiv overenhed"
   export let id = "select-org-tree"
   export let required = true
+
   let orgTree: any[] = []
   let isFocused = false
 
@@ -70,16 +71,16 @@
 </script>
 
 {#await fetchOrgTree()}
-  <div class="form-control pb-4">
-    <label for={id} class="text-sm text-secondary pb-1">
+  <div class="form-control pb-4 flex flex-col">
+    <label for={id} class="text-sm text-secondary pb-1 h-6 break-words flex items-end">
       {labelText}
       <span class="animate-spin rounded-full h-6 w-6 border-b-4 border-primary" />
     </label>
     <input disabled class="input input-bordered input-sm rounded w-full" />
   </div>
-{:then}
-  <div class="form-control pb-4">
-    <label for={id} class="text-sm text-secondary pb-1">
+{:then data}
+  <div class="form-control pb-4 flex flex-col">
+    <label for={id} class="text-sm text-secondary pb-1 h-6 break-words flex items-end">
       {labelText}
     </label>
     <div use:floatingRef>
@@ -100,6 +101,8 @@
           use:floatingContent
           class="w-96 max-w-full px-5"
           on:mouseleave={delayedUnfocus}
+          role="menu"
+          tabindex="0"
         >
           <ul class="menu bg-base-200">
             {#each orgTree as child}
