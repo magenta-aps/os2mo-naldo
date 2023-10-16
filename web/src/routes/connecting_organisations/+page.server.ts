@@ -1,5 +1,6 @@
-import type { RelatedUnitsUpdateInput } from "$lib/graphql/types"
 import type { Actions, RequestEvent } from "@sveltejs/kit"
+import { RelatedUnitsUpdateInput } from "../../lib/graphql/types"
+/* For some reason, my VS-Code will only accept this import-format today */
 
 type UnpackedClass = {
   name: string
