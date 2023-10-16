@@ -16,7 +16,6 @@
   export let labelText = "Angiv overenhed"
   export let id = "select-org-tree"
   export let required = true
-
   let orgTree: any[] = []
   let isFocused = false
 
@@ -71,16 +70,16 @@
 </script>
 
 {#await fetchOrgTree()}
-  <div class="form-control pb-4 flex flex-col">
-    <label for={id} class="text-sm text-secondary pb-1 h-6 break-words flex items-end">
+  <div class="form-control pb-4">
+    <label for={id} class="text-sm text-secondary pb-1">
       {labelText}
       <span class="animate-spin rounded-full h-6 w-6 border-b-4 border-primary" />
     </label>
     <input disabled class="input input-bordered input-sm rounded w-full" />
   </div>
-{:then data}
-  <div class="form-control pb-4 flex flex-col">
-    <label for={id} class="text-sm text-secondary pb-1 h-6 break-words flex items-end">
+{:then}
+  <div class="form-control pb-4">
+    <label for={id} class="text-sm text-secondary pb-1">
       {labelText}
     </label>
     <div use:floatingRef>
@@ -93,14 +92,14 @@
         bind:value={selectedOrg.name}
         class="input input-bordered input-sm text-base text-secondary font-normal rounded active:input-primary focus:input-primary w-full active:outline-offset-0 focus:outline-offset-0"
       />
+
+      <!-- Hidden hack to return the UUID while displaying the name -->
       <input hidden {id} name={id} bind:value={selectedOrg.uuid} />
       {#if isFocused}
         <div
           use:floatingContent
           class="w-96 max-w-full px-5"
           on:mouseleave={delayedUnfocus}
-          role="menu"
-          tabindex="0"
         >
           <ul class="menu bg-base-200">
             {#each orgTree as child}
