@@ -6,15 +6,20 @@
   let isResizing = false
   let currentSidebarWidth = 320
   const standardSidebarWidth = 320
-  const largeScreenBreakpoint = 1024 // standard lg breakpoint in Tailwind
-  let drawerContentHeight = 0
-  let resizeHandleHeight = 0
+  const largeScreenBreakpoint = 1024
+
+  let drawerContentHeight = 0 // Not resizable by user; is set by drawerContent
+  let resizeHandleHeight = 0 // Not resizable by user; is set by drawerContent or screenHeight.
 
   let isLgScreen: boolean
 
   $: {
     if (typeof window !== "undefined") {
-      resizeHandleHeight = drawerContentHeight // The handle height follows the height of DrawerContent.
+      const vhValue = window.innerHeight
+      const calcValue = vhValue - 64 // Assuming 4rem is equal to 64px.
+
+      resizeHandleHeight = Math.max(drawerContentHeight, calcValue)
+
       isLgScreen = window.innerWidth >= largeScreenBreakpoint
 
       if (isLgScreen) {
@@ -29,25 +34,25 @@
 
   onMount(() => {
     document.addEventListener("mousemove", handleMouseMove)
-    document.addEventListener("mousedown", handleMouseDownOrUp)
-    document.addEventListener("mouseup", handleMouseDownOrUp)
-    window.addEventListener("resize", checkScreenSize) // Check screen size on window resize
+    document.addEventListener("mousedown", handleMouseDownOrUp) //Tracks mouse-button press
+    document.addEventListener("mouseup", handleMouseDownOrUp) //Tracks mouse-button press
+    window.addEventListener("resize", checkScreenSize)
 
     checkScreenSize()
-
-    onDestroy(() => {
-      document.removeEventListener("mousemove", handleMouseMove)
-      document.removeEventListener("mousedown", handleMouseDownOrUp)
-      document.removeEventListener("mouseup", handleMouseDownOrUp)
-      window.removeEventListener("resize", checkScreenSize)
-    })
   })
 
   function checkScreenSize() {
+    const wasLgScreen = isLgScreen
     isLgScreen = window.innerWidth >= largeScreenBreakpoint
+
+    if (wasLgScreen && !isLgScreen) {
+      currentSidebarWidth = 0
+    }
   }
 
   function handleMouseMove(e: MouseEvent) {
+    if (!isLgScreen) return
+
     if (
       isResizing &&
       e.clientX > standardSidebarWidth &&
@@ -58,6 +63,11 @@
   }
 
   function handleMouseDownOrUp(e: MouseEvent) {
+    if (!isLgScreen) {
+      isResizing = false
+      return
+    }
+
     if (e.type === "mousedown" && isResizing) {
       document.body.classList.add("no-select")
     } else if (e.type === "mouseup") {
@@ -65,6 +75,13 @@
       document.body.classList.remove("no-select")
     }
   }
+
+  /* onDestroy(() => {
+    document.removeEventListener("mousemove", handleMouseMove)
+    document.removeEventListener("mousedown", handleMouseDownOrUp)
+    document.removeEventListener("mouseup", handleMouseDownOrUp)
+    window.removeEventListener("resize", checkScreenSize)
+}) */
 </script>
 
 <div class="drawer lg:drawer-open h-[calc(100vh-4rem)]">
@@ -89,11 +106,8 @@
       </div>
     {/if}
   </div>
-  <div
-    class="drawer-side relative"
-    style="width: {currentSidebarWidth}px; min-height: calc(100vh-4rem);"
-  >
-    <ul class="overflow-y-auto bg-base-100 border">
+  <div class="drawer-side relative" style="width: {currentSidebarWidth}px; h-min;">
+    <ul class="overflow-y-auto bg-base-100 min-h-[calc(100vh-4rem)] border">
       <!-- Sidebar content here -->
       <div bind:clientHeight={drawerContentHeight}>
         <DrawerContent />
@@ -101,7 +115,7 @@
     </ul>
     <div
       role="button"
-      class="drawer-side-resize-handle absolute top-0 right-0 cursor-ew-resize w-3 flex items-center justify-center {isLgScreen
+      class="drawer-side-resize-handle absolute top-0 right-0 cursor-ew-resize w-3 flex items-center justify-center bg-red-500 {isLgScreen
         ? ''
         : 'hidden'}"
       style="height: {resizeHandleHeight}px;"
@@ -119,5 +133,11 @@
     -webkit-user-select: none;
     -ms-user-select: none;
     -moz-user-select: none;
+  }
+
+  @media (max-width: 1023px) {
+    .drawer-side-resize-handle {
+      pointer-events: none;
+    }
   }
 </style>
