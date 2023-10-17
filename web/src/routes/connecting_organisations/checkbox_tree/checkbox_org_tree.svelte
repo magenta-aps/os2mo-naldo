@@ -67,6 +67,7 @@
     <input disabled class="input input-bordered input-sm rounded w-full" />
   </div>
 {:then data}
+  {console.log("orgTree", orgTree)}
   <div class="form-control pb-4 flex flex-col">
     <label for={id} class="text-sm text-secondary pb-1 h-6 break-words flex items-end">
       {labelText}

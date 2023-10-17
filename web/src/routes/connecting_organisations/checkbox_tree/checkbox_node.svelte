@@ -18,6 +18,8 @@
   let loading = false
   let isOpen = false
 
+  let forceUpdate = 0
+
   export let selectedOriginOrg: { uuid: string; name: string } | null = null
   export let selectedDestinationsOrgs: { uuid: string; name: string }[] = []
 
@@ -50,8 +52,8 @@
     const children = res.org_units?.objects[0].objects[0].children
     return children
   }
-
-  const fetchAndSetChildren = async () => {
+  /* 
+const fetchAndSetChildren = async () => {
     const fetchPromises = []
 
     for (let child of children) {
@@ -65,6 +67,16 @@
       }
     }
     await Promise.all(fetchPromises)
+  }  */
+
+  const fetchAndSetChildren = async () => {
+    for (let child of children) {
+      if (!child.children) {
+        const fetchedChildren = await fetchChildren(child.uuid)
+        child.children = fetchedChildren
+        children = [...children]
+      }
+    }
   }
 
   const openNode = async () => {
@@ -79,14 +91,14 @@
   const closeNode = () => {
     if (!isOpen) return
     if (isOpen) {
-      if (
+      /*  if (
         !allowMultipleSelection &&
         selectedOriginOrg &&
         !isUuidVisible(
           { children, isOpen: false, uuid: parentUuid },
           selectedOriginOrg.uuid
         )
-      ) {
+      ) */ {
         selectedOriginOrg = null
         selectedDestinationsOrgs = []
       }
@@ -115,13 +127,27 @@
     }
   }
 
-  function openParentNodes(currentUuid: string): void {
+  /*   function openParentNodes(currentUuid: string): void {
     if (hasMatchingDescendant({ uuid, children })) {
       isOpen = true
 
       if (parentUuid !== "") {
         dispatch("openParent", { uuid: parentUuid })
       }
+    }
+  } */
+
+  function openParentNodes(currentUuid: string): void {
+    if (hasMatchingDescendant({ uuid, children })) {
+      isOpen = true
+      forceUpdate += 1
+    }
+
+    if (parentUuid !== "") {
+      console.log(
+        `Sending openParent for child with UUID: ${currentUuid} to parent with UUID: ${parentUuid}`
+      )
+      dispatch("openSelf", { parentUuid: parentUuid, currentUuid: currentUuid })
     }
   }
 
@@ -140,7 +166,7 @@
     return false
   }
 
-  function isUuidVisible(node: any, uuidToCheck: string): boolean {
+  /* function isUuidVisible(node: any, uuidToCheck: string): boolean {
     if (node.uuid === uuidToCheck && node.isOpen) return true
 
     if (node.children) {
@@ -152,7 +178,7 @@
     }
 
     return false
-  }
+  } */
 
   $: if (selectedOriginOrg && allowMultipleSelection) {
     selectedDestinationsOrgs.forEach((destination) => {
@@ -211,6 +237,8 @@
       </div>
     {/if}
     {#if allowMultipleSelection}
+      {uuid}
+      parent {parentUuid}
       <div on:change={handleInputChange} class="ml-2">
         <Checkbox
           id={uuid}
@@ -233,7 +261,7 @@
   </div>
 </li>
 
-{#if isOpen}
+<!-- {#if isOpen}
   {#each sortedChildren as child}
     <svelte:self
       {...child}
@@ -251,4 +279,30 @@
       }}
     />
   {/each}
+{/if} -->
+{#if isOpen}
+  {#each sortedChildren as child}
+    <svelte:self
+      {...child}
+      indent={indent + 30}
+      {fromDate}
+      {allowMultipleSelection}
+      bind:selectedDestinationsOrgs
+      bind:selectedOriginOrg
+      parentUuid={uuid}
+      on:openSelf={(e) => {
+        isOpen = true
+        e.stopPropagation()
+      }}
+      on:requestParentOpen={(e) => {
+        if (e.detail.parentUuid === uuid) {
+          isOpen = true
+          if (parentUuid !== "") {
+            dispatch("requestParentOpen", { parentUuid: parentUuid, currentUuid: uuid })
+          }
+        }
+      }}
+    />
+  {/each}
 {/if}
+<span style="display: none;">{forceUpdate}</span>
