@@ -8,7 +8,11 @@
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { date } from "$lib/stores/date"
-  import { RelatedUnitsDocument, UpdateRelatedUnitsDocument } from "./query.generated"
+  import {
+    RelatedUnitsDocument,
+    UpdateRelatedUnitsDocument,
+    RelatedUnitsOrgTreeDocument,
+  } from "./query.generated"
   import CheckboxOrgTree from "./checkbox_tree/checkbox_org_tree.svelte"
   import { onDestroy } from "svelte"
 
@@ -16,8 +20,8 @@
   let previousUuid: string
   let isDisabled = true
 
-  let selectedOriginOrg: { uuid: string; name: string } | null = null
-  let selectedDestinationsOrgs: { uuid: string; name: string }[] = []
+  //let selectedOriginOrg: { uuid: string; name: string } | null = null
+  //let selectedDestinationsOrgs: { uuid: string; name: string }[] = []
 
   gql`
     query RelatedUnits($org_unit: [UUID!], $fromDate: DateTime) {
@@ -42,7 +46,85 @@
         uuid
       }
     }
+
+    query RelatedUnitsOrgTree($from_date: DateTime!) {
+      org_units(filter: { from_date: $from_date }) {
+        objects {
+          uuid
+          objects {
+            name
+            uuid
+            parent {
+              name
+              uuid
+            }
+            children {
+              name
+              uuid
+            }
+          }
+        }
+      }
+    }
   `
+
+  export let orgTree: any[] = []
+
+  export let selectedOriginOrg: { uuid: string; name: string } | null = null
+  export let selectedDestinationsOrgs: { uuid: string; name: string }[] = []
+
+  const fetchAll = async () => {
+    await graphQLClient().request(RelatedUnitsDocument, { fromDate: $date })
+    await fetchOrgTree()
+  }
+
+  const convertListToTree = (orgUnitList: any[]) => {
+    // Converts a flat list of org units to a tree of org units.
+    // Each node in the org unit tree gets a "children" attribute containing its children.
+    // Source: https://stackoverflow.com/a/40732240
+
+    // Variable holding the resulting tree
+    const dataTree: any[] = []
+
+    // Temporary holding place used in the main loop
+    const hashTable = Object.create(null)
+
+    // Add an empty list called "children" to each org unit in the flat list
+    orgUnitList.forEach(
+      (orgUnit) => (hashTable[orgUnit.uuid] = { ...orgUnit, children: [] })
+    )
+
+    // Convert flat list to tree
+    orgUnitList.forEach((orgUnit) => {
+      if (orgUnit.parentUuid) {
+        // Add (another) child to the parent org unit
+        hashTable[orgUnit.parentUuid].children.push(hashTable[orgUnit.uuid])
+      } else {
+        // Add (another) root node to the top of the tree
+        dataTree.push(hashTable[orgUnit.uuid])
+      }
+    })
+
+    return dataTree
+  }
+
+  const fetchOrgTree = async () => {
+    const data = await graphQLClient().request(RelatedUnitsOrgTreeDocument, {
+      from_date: $date,
+    })
+    if (data.org_units) {
+      const orgUnitList: any[] = []
+      for (let org of data.org_units.objects) {
+        orgUnitList.push({
+          uuid: org.uuid,
+          parentUuid: org.objects[0].parent?.uuid,
+          name: org.objects[0].name,
+          fromDate: $date,
+        })
+      }
+      orgTree = convertListToTree(orgUnitList)
+    }
+  }
 
   const handler: SubmitFunction =
     () =>
@@ -146,9 +228,10 @@
   }
 </script>
 
-{#await graphQLClient().request(RelatedUnitsDocument, { fromDate: $date })}
+{#await fetchAll()}
   Henter data...
-{:then data}
+  <span class="animate-spin rounded-full h-6 w-6 border-b-4 border-primary" />
+{:then}
   <title>Organisationssammenkobling | OS2mo</title>
 
   <div class="flex align-center px-6 pt-6 pb-4">
@@ -175,6 +258,7 @@
           <div class="flex flex-col w-1/2">
             <CheckboxOrgTree
               allowMultipleSelection={false}
+              bind:orgTree
               bind:selectedDestinationsOrgs
               bind:selectedOriginOrg
               labelText="Vælg enhed"
@@ -190,6 +274,7 @@
           <div class="flex flex-col w-1/2">
             <CheckboxOrgTree
               allowMultipleSelection={true}
+              bind:orgTree
               bind:selectedDestinationsOrgs
               bind:selectedOriginOrg
               labelText="Angiv hvilke enheder der skal sammenkobles med enheden til venstre"

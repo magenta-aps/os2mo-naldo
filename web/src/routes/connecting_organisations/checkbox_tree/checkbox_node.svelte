@@ -15,16 +15,16 @@
   export let allowMultipleSelection: boolean = false
   export let parentUuid: string = ""
 
-  let loading = false
+  let loading = false // TODO: remove
   let isOpen = false
 
-  let forceUpdate = 0
-
+  export let orgTree: any[] = []
   export let selectedOriginOrg: { uuid: string; name: string } | null = null
   export let selectedDestinationsOrgs: { uuid: string; name: string }[] = []
 
   const dispatch = createEventDispatcher()
 
+  /*
   gql`
     query RelatedUnitsChildren($uuid: [UUID!], $fromDate: DateTime) {
       org_units(filter: { uuids: $uuid, from_date: $fromDate }) {
@@ -43,7 +43,9 @@
       }
     }
   `
+*/
 
+  /*
   const fetchChildren = async (uuid: string) => {
     const res = await graphQLClient().request(RelatedUnitsChildrenDocument, {
       uuid: uuid,
@@ -52,60 +54,69 @@
     const children = res.org_units?.objects[0].objects[0].children
     return children
   }
-  /* 
-const fetchAndSetChildren = async () => {
-    const fetchPromises = []
-
-    for (let child of children) {
-      if (!child.children) {
-        fetchPromises.push(
-          fetchChildren(child.uuid).then((fetchedChildren) => {
-            child.children = fetchedChildren
-            children = [...children]
-          })
-        )
-      }
-    }
-    await Promise.all(fetchPromises)
-  }  */
 
   const fetchAndSetChildren = async () => {
     for (let child of children) {
       if (!child.children) {
         const fetchedChildren = await fetchChildren(child.uuid)
+        console.log(`Fetched children for UUID ${child.uuid}:`, fetchedChildren)
         child.children = fetchedChildren
         children = [...children]
       }
     }
   }
+  */
 
   const openNode = async () => {
+    console.log("Trying to open node with UUID:", uuid)
     if (!isOpen) {
-      loading = true
+      /*  loading = true
       await fetchAndSetChildren()
-      loading = false
+      loading = false */
       isOpen = true
     }
   }
 
   const closeNode = () => {
+    console.log("Trying to close node with UUID:", uuid)
     if (!isOpen) return
     if (isOpen) {
-      /*  if (
+      if (
         !allowMultipleSelection &&
         selectedOriginOrg &&
         !isUuidVisible(
           { children, isOpen: false, uuid: parentUuid },
           selectedOriginOrg.uuid
         )
-      ) */ {
+      ) {
         selectedOriginOrg = null
         selectedDestinationsOrgs = []
       }
       isOpen = false
     }
   }
+  /*
+  const toggleOpen = async () => {
+    console.log("Trying to toggle node with UUID:", uuid)
 
+    if (isOpen) {
+      if (
+        !allowMultipleSelection &&
+        selectedOriginOrg &&
+        !isUuidVisible(
+          { children, isOpen: false, uuid: parentUuid },
+          selectedOriginOrg.uuid
+        )
+      )
+        isOpen = false
+    } else {
+      //loading = true;
+      //await fetchAndSetChildren();
+      //loading = false;
+      isOpen = true
+    }
+  }
+*/
   function handleInputChange(event: Event) {
     const target = event.target as HTMLInputElement
     const isChecked = target.checked
@@ -127,20 +138,9 @@ const fetchAndSetChildren = async () => {
     }
   }
 
-  /*   function openParentNodes(currentUuid: string): void {
-    if (hasMatchingDescendant({ uuid, children })) {
-      isOpen = true
-
-      if (parentUuid !== "") {
-        dispatch("openParent", { uuid: parentUuid })
-      }
-    }
-  } */
-
   function openParentNodes(currentUuid: string): void {
     if (hasMatchingDescendant({ uuid, children })) {
       isOpen = true
-      forceUpdate += 1
     }
 
     if (parentUuid !== "") {
@@ -153,20 +153,25 @@ const fetchAndSetChildren = async () => {
 
   function hasMatchingDescendant(node: any): boolean {
     // Checks for children, and if there are children, checks recursively.
+    console.log(`Checking node with UUID ${node.uuid}. Children:`, node.children)
+
     if (node.children) {
       for (let child of node.children) {
-        if (
-          selectedDestinationsOrgs.some((dest) => dest.uuid === child.uuid) ||
-          hasMatchingDescendant(child)
-        ) {
+        console.log(`Comparing child UUID ${child.uuid} to destination UUID`)
+        if (selectedDestinationsOrgs.some((dest) => dest.uuid === child.uuid)) {
+          console.log(`Child with UUID ${child.uuid} matches with destination.`)
+          return true
+        } else if (hasMatchingDescendant(child)) {
+          console.log(`Child with UUID ${child.uuid} has a descendant that matches.`)
           return true
         }
       }
     }
+    console.log(`No matching child or descendant found for node with UUID ${node.uuid}`)
     return false
   }
 
-  /* function isUuidVisible(node: any, uuidToCheck: string): boolean {
+  function isUuidVisible(node: any, uuidToCheck: string): boolean {
     if (node.uuid === uuidToCheck && node.isOpen) return true
 
     if (node.children) {
@@ -178,23 +183,13 @@ const fetchAndSetChildren = async () => {
     }
 
     return false
-  } */
+  }
+
+  $: console.log("Selected Destinations: ", selectedDestinationsOrgs)
 
   $: if (selectedOriginOrg && allowMultipleSelection) {
-    selectedDestinationsOrgs.forEach((destination) => {
-      if (
-        destination.uuid === uuid ||
-        children.some((child) => child.uuid === destination.uuid)
-      ) {
-        openParentNodes(destination.uuid)
-      }
-
-      if (
-        parentUuid === "" &&
-        children.some((child) => child.uuid === destination.uuid)
-      ) {
-        isOpen = true
-      }
+    selectedDestinationsOrgs.forEach((destination, index) => {
+      openParentNodes(destination.uuid)
     })
   }
 
@@ -209,9 +204,11 @@ const fetchAndSetChildren = async () => {
     .slice()
     .sort((a, b) => (a.name > b.name ? 1 : a.name < b.name ? -1 : 0))
 
+  /*
   onMount(async () => {
     await fetchAndSetChildren()
   })
+  */
 </script>
 
 <li style="padding-left: {indent}px">
@@ -231,14 +228,24 @@ const fetchAndSetChildren = async () => {
           }
         }}
       >
+        <!-- <div
+        role="button"
+        tabindex="0"
+        class="flex items-center justify-center w-5 h-5 mr-2 mb-3"
+        on:click={toggleOpen}
+        on:keydown={(event) => {
+          if (event.key === "Enter" || event.key === "Space") {
+            toggleOpen();
+            event.preventDefault();
+          }
+        }} -->
+
         {#if children.length}
           <Icon type="arrow" class={isOpen ? "transform rotate-90" : ""} />
         {/if}
       </div>
     {/if}
     {#if allowMultipleSelection}
-      {uuid}
-      parent {parentUuid}
       <div on:change={handleInputChange} class="ml-2">
         <Checkbox
           id={uuid}
@@ -261,25 +268,6 @@ const fetchAndSetChildren = async () => {
   </div>
 </li>
 
-<!-- {#if isOpen}
-  {#each sortedChildren as child}
-    <svelte:self
-      {...child}
-      indent={indent + 30}
-      {fromDate}
-      {allowMultipleSelection}
-      bind:selectedDestinationsOrgs
-      bind:selectedOriginOrg
-      parentUuid={uuid}
-      on:openParent={(e) => {
-        if (e.detail.uuid === uuid) {
-          isOpen = true
-          e.stopPropagation()
-        }
-      }}
-    />
-  {/each}
-{/if} -->
 {#if isOpen}
   {#each sortedChildren as child}
     <svelte:self
@@ -305,4 +293,3 @@ const fetchAndSetChildren = async () => {
     />
   {/each}
 {/if}
-<span style="display: none;">{forceUpdate}</span>
