@@ -16,10 +16,23 @@
       name={groupName}
       {value}
       checked={startValue === value}
-      class="checkbox {extra_classes} rounded normal-case font-normal text-base text-base-100"
+      class="checkbox {extra_classes} rounded normal-case font-normal text-base text-base-100 checkbox-radio"
     />
     {#if title}
       <label for={id}>{title}</label>
     {/if}
   </label>
 </div>
+
+<style>
+  /* Styling removes the minus-sign in the checkbox when the selected value isn't displayed on the screen. */
+  .checkbox:indeterminate {
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+
+  .checkbox:indeterminate::before,
+  .checkbox:indeterminate::after {
+    content: none !important;
+  }
+</style>

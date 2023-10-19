@@ -4,24 +4,26 @@
   import type { SubmitFunction } from "../connecting_organisations/$types"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
-  import { success, error } from "$lib/stores/alert"
+  import { error, success } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { date } from "$lib/stores/date"
   import {
     RelatedUnitsDocument,
-    UpdateRelatedUnitsDocument,
     RelatedUnitsOrgTreeDocument,
+    UpdateRelatedUnitsDocument,
   } from "./query.generated"
   import CheckboxOrgTree from "./checkbox_tree/checkbox_org_tree.svelte"
   import { onDestroy } from "svelte"
 
+  export let orgTree: any[] = []
+
+  export let selectedOriginOrg: { uuid: string; name: string } | null = null
+  export let selectedDestinationsOrgs: { uuid: string; name: string }[] = []
+
   let relatedUnits: any[] = []
   let previousUuid: string
   let isDisabled = true
-
-  //let selectedOriginOrg: { uuid: string; name: string } | null = null
-  //let selectedDestinationsOrgs: { uuid: string; name: string }[] = []
 
   gql`
     query RelatedUnits($org_unit: [UUID!], $fromDate: DateTime) {
@@ -38,12 +40,6 @@
             }
           }
         }
-      }
-    }
-
-    mutation UpdateRelatedUnits($input: RelatedUnitsUpdateInput!) {
-      related_units_update(input: $input) {
-        uuid
       }
     }
 
@@ -66,20 +62,34 @@
         }
       }
     }
+
+    mutation UpdateRelatedUnits($input: RelatedUnitsUpdateInput!) {
+      related_units_update(input: $input) {
+        uuid
+      }
+    }
   `
 
-  export let orgTree: any[] = []
-
-  export let selectedOriginOrg: { uuid: string; name: string } | null = null
-  export let selectedDestinationsOrgs: { uuid: string; name: string }[] = []
-
-  const fetchAll = async () => {
-    await graphQLClient().request(RelatedUnitsDocument, { fromDate: $date })
-    await fetchOrgTree()
+  const fetchOrgTree = async () => {
+    const data = await graphQLClient().request(RelatedUnitsOrgTreeDocument, {
+      from_date: $date,
+    })
+    if (data.org_units) {
+      const orgUnitList: any[] = []
+      for (let org of data.org_units.objects) {
+        orgUnitList.push({
+          uuid: org.uuid,
+          parentUuid: org.objects[0].parent?.uuid,
+          name: org.objects[0].name,
+          fromDate: $date,
+        })
+      }
+      orgTree = convertListToTree(orgUnitList)
+    }
   }
 
   const convertListToTree = (orgUnitList: any[]) => {
-    // Converts a flat list of org units to a tree of org units.
+    // Converts a flat list of org units to a tree of org units. This ensures that the organisation and its structure only need to be fetched once
     // Each node in the org unit tree gets a "children" attribute containing its children.
     // Source: https://stackoverflow.com/a/40732240
 
@@ -108,21 +118,17 @@
     return dataTree
   }
 
-  const fetchOrgTree = async () => {
-    const data = await graphQLClient().request(RelatedUnitsOrgTreeDocument, {
-      from_date: $date,
-    })
-    if (data.org_units) {
-      const orgUnitList: any[] = []
-      for (let org of data.org_units.objects) {
-        orgUnitList.push({
-          uuid: org.uuid,
-          parentUuid: org.objects[0].parent?.uuid,
-          name: org.objects[0].name,
-          fromDate: $date,
-        })
-      }
-      orgTree = convertListToTree(orgUnitList)
+  async function fetchRelatedUnits(originUuid: string) {
+    try {
+      const response = await graphQLClient().request(RelatedUnitsDocument, {
+        org_unit: originUuid,
+        fromDate: $date,
+      })
+      relatedUnits = response.related_units.objects
+      updateSelectedDestinationUuids()
+    } catch (err) {
+      console.error(err)
+      $error = { message: err as string }
     }
   }
 
@@ -140,13 +146,20 @@
         const mutation = await graphQLClient().request(UpdateRelatedUnitsDocument, {
           input: result.data,
         })
-        //diffrent success message if the destination list is empty?
-        $success = {
-          message: `${
-            selectedOriginOrg.name
-          } blev knyttet sammen med: ${formatDestinationNamesFromOrgs(
-            selectedDestinationsOrgs
-          )}`,
+
+        // Check if selectedDestinationsOrgs is empty to determine which success message should be sent.
+        if (selectedDestinationsOrgs.length === 0) {
+          $success = {
+            message: `Alle tilknytninger til ${selectedOriginOrg.name} blev fjernet.`,
+          }
+        } else {
+          $success = {
+            message: `${
+              selectedOriginOrg.name
+            } blev knyttet sammen med: ${formatDestinationNamesFromOrgs(
+              selectedDestinationsOrgs
+            )}`,
+          }
         }
       } catch (err) {
         console.error(err)
@@ -154,18 +167,9 @@
       }
     }
 
-  async function fetchRelatedUnits(originUuid: string) {
-    try {
-      const response = await graphQLClient().request(RelatedUnitsDocument, {
-        org_unit: originUuid,
-        fromDate: $date,
-      })
-      relatedUnits = response.related_units.objects
-      updateSelectedDestinationUuids()
-    } catch (err) {
-      console.error(err)
-      $error = { message: err as string }
-    }
+  const fetchAll = async () => {
+    await graphQLClient().request(RelatedUnitsDocument, { fromDate: $date })
+    await fetchOrgTree()
   }
 
   const updateSelectedDestinationUuids = () => {
@@ -188,16 +192,6 @@
     return selectedDestinationsOrgs
   }
 
-  //Not Svelte-correct but couldn't get anything else to work, sets hiddenRadioButton as selected when selectedOriginOrg=null
-  $: if (!selectedOriginOrg) {
-    const hiddenRadioButton = document.getElementById(
-      "hiddenRadioButton"
-    ) as HTMLInputElement
-    if (hiddenRadioButton) {
-      hiddenRadioButton.checked = true
-    }
-  }
-
   $: if (selectedOriginOrg && selectedOriginOrg.uuid !== previousUuid) {
     fetchRelatedUnits(selectedOriginOrg.uuid)
     previousUuid = selectedOriginOrg.uuid
@@ -205,7 +199,7 @@
 
   $: originName = selectedOriginOrg ? selectedOriginOrg.name : "Enheden"
 
-  $: isDisabled = !selectedOriginOrg || selectedOriginOrg.uuid === "hiddenValue"
+  $: isDisabled = !selectedOriginOrg
 
   $: connectionText = `${originName} kobles sammen med: ${formatDestinationNamesFromOrgs(
     selectedDestinationsOrgs
@@ -231,7 +225,7 @@
 {#await fetchAll()}
   Henter data...
   <span class="animate-spin rounded-full h-6 w-6 border-b-4 border-primary" />
-{:then}
+{:then data}
   <title>Organisationssammenkobling | OS2mo</title>
 
   <div class="flex align-center px-6 pt-6 pb-4">
@@ -245,16 +239,7 @@
       <div class="p-8">
         <div class="flex flex-col sm:flex-row gap-6 w-full">
           <input type="hidden" name="from" bind:value={$date} />
-          <!-- "Hidden radioButton ensures a clean display when no selection has been made ore af checked value is in a closed node. 
-          This might be achievable with CSS, but I'm not sure how and if it's supported in all browsers -->
-          <input
-            type="radio"
-            name="originUuid"
-            id="hiddenRadioButton"
-            value="hiddenValue"
-            checked
-            hidden
-          />
+
           <div class="flex flex-col w-1/2">
             <CheckboxOrgTree
               allowMultipleSelection={false}

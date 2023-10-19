@@ -1,122 +1,23 @@
 <script lang="ts">
-  import { graphQLClient } from "$lib/util/http"
-  import { gql } from "graphql-request"
-  import { createEventDispatcher, onMount } from "svelte"
+  import { createEventDispatcher } from "svelte"
   import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
   import RadioButton from "$lib/components/forms/shared/radio_button.svelte"
-  import { RelatedUnitsChildrenDocument } from "./query.generated"
   import Icon from "$lib/components/icon.svelte"
 
   export let name = ""
   export let children: any[] = []
   export let indent = 0
   export let uuid = ""
-  export let fromDate: string
   export let allowMultipleSelection: boolean = false
   export let parentUuid: string = ""
-
-  let loading = false // TODO: remove
-  let isOpen = false
 
   export let orgTree: any[] = []
   export let selectedOriginOrg: { uuid: string; name: string } | null = null
   export let selectedDestinationsOrgs: { uuid: string; name: string }[] = []
 
+  let isOpen = false
   const dispatch = createEventDispatcher()
 
-  /*
-  gql`
-    query RelatedUnitsChildren($uuid: [UUID!], $fromDate: DateTime) {
-      org_units(filter: { uuids: $uuid, from_date: $fromDate }) {
-        objects {
-          objects {
-            children {
-              name
-              uuid
-              children {
-                name
-                uuid
-              }
-            }
-          }
-        }
-      }
-    }
-  `
-*/
-
-  /*
-  const fetchChildren = async (uuid: string) => {
-    const res = await graphQLClient().request(RelatedUnitsChildrenDocument, {
-      uuid: uuid,
-      fromDate: fromDate,
-    })
-    const children = res.org_units?.objects[0].objects[0].children
-    return children
-  }
-
-  const fetchAndSetChildren = async () => {
-    for (let child of children) {
-      if (!child.children) {
-        const fetchedChildren = await fetchChildren(child.uuid)
-        console.log(`Fetched children for UUID ${child.uuid}:`, fetchedChildren)
-        child.children = fetchedChildren
-        children = [...children]
-      }
-    }
-  }
-  */
-
-  const openNode = async () => {
-    console.log("Trying to open node with UUID:", uuid)
-    if (!isOpen) {
-      /*  loading = true
-      await fetchAndSetChildren()
-      loading = false */
-      isOpen = true
-    }
-  }
-
-  const closeNode = () => {
-    console.log("Trying to close node with UUID:", uuid)
-    if (!isOpen) return
-    if (isOpen) {
-      if (
-        !allowMultipleSelection &&
-        selectedOriginOrg &&
-        !isUuidVisible(
-          { children, isOpen: false, uuid: parentUuid },
-          selectedOriginOrg.uuid
-        )
-      ) {
-        selectedOriginOrg = null
-        selectedDestinationsOrgs = []
-      }
-      isOpen = false
-    }
-  }
-  /*
-  const toggleOpen = async () => {
-    console.log("Trying to toggle node with UUID:", uuid)
-
-    if (isOpen) {
-      if (
-        !allowMultipleSelection &&
-        selectedOriginOrg &&
-        !isUuidVisible(
-          { children, isOpen: false, uuid: parentUuid },
-          selectedOriginOrg.uuid
-        )
-      )
-        isOpen = false
-    } else {
-      //loading = true;
-      //await fetchAndSetChildren();
-      //loading = false;
-      isOpen = true
-    }
-  }
-*/
   function handleInputChange(event: Event) {
     const target = event.target as HTMLInputElement
     const isChecked = target.checked
@@ -144,34 +45,55 @@
     }
 
     if (parentUuid !== "") {
-      console.log(
-        `Sending openParent for child with UUID: ${currentUuid} to parent with UUID: ${parentUuid}`
-      )
       dispatch("openSelf", { parentUuid: parentUuid, currentUuid: currentUuid })
     }
   }
 
   function hasMatchingDescendant(node: any): boolean {
-    // Checks for children, and if there are children, checks recursively.
-    console.log(`Checking node with UUID ${node.uuid}. Children:`, node.children)
-
+    // Checks for children, and if there are children, checks recursively for match.
     if (node.children) {
       for (let child of node.children) {
-        console.log(`Comparing child UUID ${child.uuid} to destination UUID`)
         if (selectedDestinationsOrgs.some((dest) => dest.uuid === child.uuid)) {
-          console.log(`Child with UUID ${child.uuid} matches with destination.`)
           return true
         } else if (hasMatchingDescendant(child)) {
-          console.log(`Child with UUID ${child.uuid} has a descendant that matches.`)
           return true
         }
       }
     }
-    console.log(`No matching child or descendant found for node with UUID ${node.uuid}`)
     return false
   }
 
-  function isUuidVisible(node: any, uuidToCheck: string): boolean {
+  const toggleNode = () => {
+    isOpen = !isOpen
+  }
+
+  // "Code to reset the value in selectedOriginOrg when it's hidden due to a node being closed."
+  /*  const openNode = async () => {
+    if (!isOpen) {
+      isOpen = true
+    }
+  } */
+
+  // "Code to reset the value in selectedOriginOrg when it's hidden due to a node being closed."
+  /* const closeNode = () => {
+    if (!isOpen) return
+    if (isOpen) {
+      if (
+        !allowMultipleSelection &&
+        selectedOriginOrg &&
+        !isUuidVisible(
+          { children, isOpen: false, uuid: parentUuid },
+          selectedOriginOrg.uuid
+        )
+      )  {
+        selectedOriginOrg = null
+        selectedDestinationsOrgs = []
+      } 
+      isOpen = false
+    }
+  } */
+  // "Code to reset the value in selectedOriginOrg when it's hidden due to a node being closed."
+  /*  function isUuidVisible(node: any, uuidToCheck: string): boolean {
     if (node.uuid === uuidToCheck && node.isOpen) return true
 
     if (node.children) {
@@ -181,14 +103,11 @@
         }
       }
     }
-
     return false
-  }
-
-  $: console.log("Selected Destinations: ", selectedDestinationsOrgs)
+  } */
 
   $: if (selectedOriginOrg && allowMultipleSelection) {
-    selectedDestinationsOrgs.forEach((destination, index) => {
+    selectedDestinationsOrgs.forEach((destination) => {
       openParentNodes(destination.uuid)
     })
   }
@@ -203,48 +122,28 @@
   $: sortedChildren = children
     .slice()
     .sort((a, b) => (a.name > b.name ? 1 : a.name < b.name ? -1 : 0))
-
-  /*
-  onMount(async () => {
-    await fetchAndSetChildren()
-  })
-  */
 </script>
 
-<li style="padding-left: {indent}px">
+<!-- "Code to reset the value in selectedOriginOrg when it's hidden due to a node being closed." -->
+<!-- <li style="padding-left: {indent}px">
   <div class="flex items-center">
-    {#if loading}
-      <div class="animate-spin rounded-full h-5 w-5 border-b-4 border-primary" />
-    {:else}
-      <div
-        role="button"
-        tabindex="0"
-        class="flex items-center justify-center w-5 h-5 mr-2 mb-3"
-        on:click={isOpen ? closeNode : openNode}
-        on:keydown={(event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            isOpen ? closeNode() : openNode()
-            event.preventDefault()
-          }
-        }}
-      >
-        <!-- <div
-        role="button"
-        tabindex="0"
-        class="flex items-center justify-center w-5 h-5 mr-2 mb-3"
-        on:click={toggleOpen}
-        on:keydown={(event) => {
-          if (event.key === "Enter" || event.key === "Space") {
-            toggleOpen();
-            event.preventDefault();
-          }
-        }} -->
+    <div
+      role="button"
+      tabindex="0"
+      class="flex items-center justify-center w-5 h-5 mr-2 mb-3"
+      on:click={isOpen ? closeNode : openNode}
+      on:keydown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          isOpen ? closeNode() : openNode()
+          event.preventDefault()
+        }
+      }}
+    >
+      {#if children.length}
+        <Icon type="arrow" class={isOpen ? "transform rotate-90" : ""} />
+      {/if}
+    </div>
 
-        {#if children.length}
-          <Icon type="arrow" class={isOpen ? "transform rotate-90" : ""} />
-        {/if}
-      </div>
-    {/if}
     {#if allowMultipleSelection}
       <div on:change={handleInputChange} class="ml-2">
         <Checkbox
@@ -261,7 +160,52 @@
           groupName="originUuid"
           id={uuid}
           title={name}
-          value={isSelectedOrigin ? "checked" : "unchecked"}
+          value="checked"
+  startValue={isSelectedOrigin ? "checked" : "unchecked"}
+/>
+      
+      </div>
+    {/if}
+  </div>
+</li> -->
+
+<li style="padding-left: {indent}px">
+  <div class="flex items-center">
+    <div
+      role="button"
+      tabindex="0"
+      class="flex items-center justify-center w-5 h-5 mr-2 mb-3"
+      on:click={toggleNode}
+      on:keydown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          toggleNode()
+          event.preventDefault()
+        }
+      }}
+    >
+      {#if children.length}
+        <Icon type="arrow" class={isOpen ? "transform rotate-90" : ""} />
+      {/if}
+    </div>
+
+    {#if allowMultipleSelection}
+      <div on:change={handleInputChange} class="ml-2">
+        <Checkbox
+          id={uuid}
+          title={name}
+          value="checked"
+          startValue={isSelectedDestination ? "checked" : "unchecked"}
+          disabled={!selectedOriginOrg || selectedOriginOrg.uuid === uuid}
+        />
+      </div>
+    {:else}
+      <div on:change={handleInputChange} class="ml-2">
+        <RadioButton
+          groupName="originUuid"
+          id={uuid}
+          title={name}
+          value="checked"
+          startValue={isSelectedOrigin ? "checked" : "unchecked"}
         />
       </div>
     {/if}
@@ -273,7 +217,6 @@
     <svelte:self
       {...child}
       indent={indent + 30}
-      {fromDate}
       {allowMultipleSelection}
       bind:selectedDestinationsOrgs
       bind:selectedOriginOrg
