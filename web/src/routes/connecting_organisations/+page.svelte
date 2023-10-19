@@ -17,7 +17,6 @@
   import { onDestroy } from "svelte"
 
   export let orgTree: any[] = []
-
   export let selectedOriginOrg: { uuid: string; name: string } | null = null
   export let selectedDestinationsOrgs: { uuid: string; name: string }[] = []
 
@@ -93,17 +92,13 @@
     // Each node in the org unit tree gets a "children" attribute containing its children.
     // Source: https://stackoverflow.com/a/40732240
 
-    // Variable holding the resulting tree
-    const dataTree: any[] = []
-
-    // Temporary holding place used in the main loop
-    const hashTable = Object.create(null)
+    const dataTree: any[] = [] // Variable holding the resulting tree
+    const hashTable = Object.create(null) // Temporary holding place used in the main loop
 
     // Add an empty list called "children" to each org unit in the flat list
     orgUnitList.forEach(
       (orgUnit) => (hashTable[orgUnit.uuid] = { ...orgUnit, children: [] })
     )
-
     // Convert flat list to tree
     orgUnitList.forEach((orgUnit) => {
       if (orgUnit.parentUuid) {
@@ -114,7 +109,6 @@
         dataTree.push(hashTable[orgUnit.uuid])
       }
     })
-
     return dataTree
   }
 
@@ -146,7 +140,6 @@
         const mutation = await graphQLClient().request(UpdateRelatedUnitsDocument, {
           input: result.data,
         })
-
         // Check if selectedDestinationsOrgs is empty to determine which success message should be sent.
         if (selectedDestinationsOrgs.length === 0) {
           $success = {
@@ -214,7 +207,7 @@
       : `${names.slice(0, -1).join(", ")} og ${names[names.length - 1]}`
   }
 
-  onDestroy(resetSelected)
+  onDestroy(resetSelected) //reset selected when closening the page
 
   function resetSelected() {
     selectedOriginOrg = null

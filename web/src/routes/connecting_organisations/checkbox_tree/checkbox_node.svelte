@@ -16,6 +16,7 @@
   export let selectedDestinationsOrgs: { uuid: string; name: string }[] = []
 
   let isOpen = false
+
   const dispatch = createEventDispatcher()
 
   function handleInputChange(event: Event) {
@@ -67,45 +68,6 @@
     isOpen = !isOpen
   }
 
-  // "Code to reset the value in selectedOriginOrg when it's hidden due to a node being closed."
-  /*  const openNode = async () => {
-    if (!isOpen) {
-      isOpen = true
-    }
-  } */
-
-  // "Code to reset the value in selectedOriginOrg when it's hidden due to a node being closed."
-  /* const closeNode = () => {
-    if (!isOpen) return
-    if (isOpen) {
-      if (
-        !allowMultipleSelection &&
-        selectedOriginOrg &&
-        !isUuidVisible(
-          { children, isOpen: false, uuid: parentUuid },
-          selectedOriginOrg.uuid
-        )
-      )  {
-        selectedOriginOrg = null
-        selectedDestinationsOrgs = []
-      } 
-      isOpen = false
-    }
-  } */
-  // "Code to reset the value in selectedOriginOrg when it's hidden due to a node being closed."
-  /*  function isUuidVisible(node: any, uuidToCheck: string): boolean {
-    if (node.uuid === uuidToCheck && node.isOpen) return true
-
-    if (node.children) {
-      for (let child of node.children) {
-        if (isUuidVisible(child, uuidToCheck)) {
-          return true
-        }
-      }
-    }
-    return false
-  } */
-
   $: if (selectedOriginOrg && allowMultipleSelection) {
     selectedDestinationsOrgs.forEach((destination) => {
       openParentNodes(destination.uuid)
@@ -123,51 +85,6 @@
     .slice()
     .sort((a, b) => (a.name > b.name ? 1 : a.name < b.name ? -1 : 0))
 </script>
-
-<!-- "Code to reset the value in selectedOriginOrg when it's hidden due to a node being closed." -->
-<!-- <li style="padding-left: {indent}px">
-  <div class="flex items-center">
-    <div
-      role="button"
-      tabindex="0"
-      class="flex items-center justify-center w-5 h-5 mr-2 mb-3"
-      on:click={isOpen ? closeNode : openNode}
-      on:keydown={(event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          isOpen ? closeNode() : openNode()
-          event.preventDefault()
-        }
-      }}
-    >
-      {#if children.length}
-        <Icon type="arrow" class={isOpen ? "transform rotate-90" : ""} />
-      {/if}
-    </div>
-
-    {#if allowMultipleSelection}
-      <div on:change={handleInputChange} class="ml-2">
-        <Checkbox
-          id={uuid}
-          title={name}
-          value="checked"
-          startValue={isSelectedDestination ? "checked" : "unchecked"}
-          disabled={!selectedOriginOrg || selectedOriginOrg.uuid === uuid}
-        />
-      </div>
-    {:else}
-      <div on:change={handleInputChange} class="ml-2">
-        <RadioButton
-          groupName="originUuid"
-          id={uuid}
-          title={name}
-          value="checked"
-  startValue={isSelectedOrigin ? "checked" : "unchecked"}
-/>
-      
-      </div>
-    {/if}
-  </div>
-</li> -->
 
 <li style="padding-left: {indent}px">
   <div class="flex items-center">
