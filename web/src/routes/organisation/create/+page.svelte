@@ -178,7 +178,12 @@
             extra_classes="basis-1/2"
             iterable={getClassesByFacetUserKey(facets, "org_unit_level")}
           />
-          <Input title="Enhedsnummer" id="org-unit-number" extra_classes="basis-1/2" />
+          <Input
+            title="Enhedsnummer"
+            placeholder="Udfyld eller auto"
+            id="org-unit-number"
+            extra_classes="basis-1/2"
+          />
         </div>
       </div>
     </div>
