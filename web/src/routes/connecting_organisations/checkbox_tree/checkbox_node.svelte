@@ -44,7 +44,6 @@
     if (hasMatchingDescendant({ uuid, children })) {
       isOpen = true
     }
-
     if (parentUuid !== "") {
       dispatch("openSelf", { parentUuid: parentUuid, currentUuid: currentUuid })
     }
