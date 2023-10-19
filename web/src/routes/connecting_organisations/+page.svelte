@@ -137,18 +137,10 @@
       }
 
       try {
-        const updatedData = {
-          ...result.data,
-          validity: {
-            ...result.data.validity,
-            from: $date,
-          },
-        }
         const mutation = await graphQLClient().request(UpdateRelatedUnitsDocument, {
-          input: updatedData,
+          input: result.data,
         })
-
-        // Checks if selectedDestinationsOrgs is empty to determine which success message should be sent.
+        // Check if selectedDestinationsOrgs is empty to determine which success message should be sent.
         if (selectedDestinationsOrgs.length === 0) {
           $success = {
             message: `Alle tilknytninger til ${selectedOriginOrg.name} blev fjernet.`,
@@ -188,7 +180,6 @@
         }
       }
     })
-
     selectedDestinationsOrgs = [...newDestinations]
     return selectedDestinationsOrgs
   }

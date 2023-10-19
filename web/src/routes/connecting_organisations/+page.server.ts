@@ -1,5 +1,7 @@
 import type { Actions, RequestEvent } from "@sveltejs/kit"
 import type { RelatedUnitsUpdateInput } from "$lib/graphql/types"
+import { date } from "$lib/stores/date"
+import { get } from "svelte/store"
 
 type UnpackedClass = {
   name: string
@@ -8,7 +10,6 @@ type UnpackedClass = {
 export const actions: Actions = {
   default: async ({ request }: RequestEvent): Promise<RelatedUnitsUpdateInput> => {
     const data = await request.formData()
-    const startDate = data.get("from")
     const originUuid = data.get("origin-uuid")
 
     const destinationUuids = (
@@ -16,7 +17,7 @@ export const actions: Actions = {
     ).map((v) => v.uuid)
 
     return {
-      validity: { from: startDate },
+      validity: { from: get(date) },
       origin: originUuid,
       destination: destinationUuids,
     }
