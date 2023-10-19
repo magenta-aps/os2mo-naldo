@@ -20,8 +20,8 @@
   }
 </script>
 
-<div class="pb-3">
-  <div class="form-control pb-1 {extra_classes}">
+<div class="form-control pb-3 {extra_classes}">
+  <div class="pb-1">
     {#if title || required}
       <label for={id} class="text-sm text-secondary pb-1">
         {title ? title : ""}
