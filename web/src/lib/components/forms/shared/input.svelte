@@ -13,30 +13,47 @@
   export let pattern: string | undefined = undefined
   export let patternMessage: string | undefined = undefined
   export let extra_classes = ""
+  export let errors: string[] = []
 
   const typeAction = (node: any) => {
     node.type = type
   }
 </script>
 
-<div class="form-control pb-4 {extra_classes}">
-  {#if title || required}
-    <label for={id} class="text-sm text-secondary pb-1">
-      {title ? title : ""}
-      {required ? "*" : ""}
-    </label>
-  {/if}
-  <input
-    use:typeAction
-    title={patternMessage}
-    {pattern}
-    {id}
-    {name}
-    {placeholder}
-    bind:value
-    type="text"
-    class="input input-bordered input-{size} rounded text-base text-secondary font-normal w-full active:outline-offset-0 active:input-primary focus:outline-offset-0 focus:input-primary"
-    {required}
-    {disabled}
-  />
+<div class="pb-3">
+  <div class="form-control pb-1 {extra_classes}">
+    {#if title || required}
+      <label for={id} class="text-sm text-secondary pb-1">
+        {title ? title : ""}
+        {required ? "*" : ""}
+      </label>
+    {/if}
+    <input
+      use:typeAction
+      title={patternMessage}
+      {pattern}
+      {id}
+      {name}
+      {placeholder}
+      bind:value
+      type="text"
+      class="input input-bordered input-{size} rounded text-base text-secondary font-normal w-full focus:outline-offset-0
+     {errors.length ? 'input-error' : 'focus:input-primary'}"
+      {disabled}
+    />
+  </div>
+
+  {#each errors as error}
+    {#if error === "required"}
+      <span class="label-text-alt text-error block">{title} skal udfyldes</span>
+    {/if}
+
+    {#if error === "not_an_email"}
+      <span class="label-text-alt text-error block">{title} er ikke gyldig</span>
+    {/if}
+
+    {#if error === "pattern"}
+      <span class="label-text-alt text-error block">{title} har forkert format</span>
+    {/if}
+  {/each}
 </div>

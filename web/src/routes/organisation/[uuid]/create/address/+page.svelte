@@ -15,11 +15,18 @@
   import { date } from "$lib/stores/date"
   import type { SubmitFunction } from "./$types"
   import DarSearch from "$lib/components/DARSearch.svelte"
+  import { form, field } from "svelte-forms"
+  import { required, email, pattern, url } from "svelte-forms/validators"
+  import { Addresses } from "$lib/util/addresses"
 
   let fromDate: string
   let toDate: string
   let addressType: { name: string; uuid?: any | null }
   $: addressUuid = addressType?.uuid
+
+  // update the field depending on address-type
+  let address = field("", "")
+  $: myForm = form(address)
 
   gql`
     query FacetsAndOrg($uuid: [UUID!], $fromDate: DateTime) {
@@ -60,25 +67,76 @@
     }
   `
 
+  $: switch (addressType?.name) {
+    case Addresses.AFDELINGSKODE:
+      address = field(Addresses.AFDELINGSKODE, "", [required()])
+      break
+    case Addresses.EAN_NUMMER:
+      address = field(Addresses.EAN_NUMMER, "", [required(), pattern(/^\d{13}$/)])
+      break
+    case Addresses.EMAIL:
+      address = field(Addresses.EMAIL, "", [required(), email()])
+      break
+    case Addresses.FAX:
+      // Jeg ved ikke hvordan en fax kan se ud, det gør MO heller ikke
+      address = field(Addresses.FAX, "", [required(), pattern(/\d+/)])
+      break
+    case Addresses.FORMAALSKODE:
+      address = field(Addresses.FORMAALSKODE, "", [required()])
+      break
+    case Addresses.HENVENDELSESSTED:
+      address = field(Addresses.HENVENDELSESSTED, "", [required()])
+      break
+    case Addresses.LOKATION:
+      address = field(Addresses.LOKATION, "", [required()])
+      break
+    case Addresses.P_NUMMER:
+      address = field(Addresses.P_NUMMER, "", [required(), pattern(/^\d{10}$/)])
+      break
+    case Addresses.POSTADRESSE:
+      address = field(Addresses.POSTADRESSE, "", [required()])
+      break
+    case Addresses.RETURADRESSE:
+      address = field(Addresses.RETURADRESSE, "", [required()])
+      break
+    case Addresses.SKOLEKODE:
+      address = field(Addresses.SKOLEKODE, "", [required()])
+      break
+    case Addresses.TELEFON:
+      // This regex is not perfect, as it allows ex. `12345678` and `+45123456`, but use it for now
+      address = field(Addresses.TELEFON, "", [required(), pattern(/(\+45)?\d{8}/)])
+      break
+    case Addresses.WEBADRESSE:
+      // URL skal have http(s), ftp, git eller svn :shrug: Skal vi acceptere `www.lol.dk`?
+      address = field(Addresses.WEBADRESSE, "", [required(), url()])
+      break
+    default:
+      break
+  }
+
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(CreateAddressDocument, {
-            input: result.data,
-          })
-          $success = {
-            message: `Adressen ${
-              mutation.address_create.objects[0]?.org_unit
-                ? `for ${mutation.address_create.objects[0].org_unit[0].name}`
-                : ""
-            } er oprettet fra d. ${fromDate}`,
-            uuid: $page.params.uuid,
-            type: "organisation",
+      // Await the validation, before we continue
+      await myForm.validate()
+      if ($myForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(CreateAddressDocument, {
+              input: result.data,
+            })
+            $success = {
+              message: `Adressen ${
+                mutation.address_create.objects[0]?.org_unit
+                  ? `for ${mutation.address_create.objects[0].org_unit[0].name}`
+                  : ""
+              } er oprettet fra d. ${fromDate}`,
+              uuid: $page.params.uuid,
+              type: "organisation",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -140,44 +198,20 @@
           <input hidden name="address-type-uuid" bind:value={addressUuid} />
         </div>
         {#if addressType}
-          {#if addressType.name == "Afdelingskode"}
-            <Input title="Afdelingskode" id="value" required={true} />
-          {:else if addressType.name == "Email"}
-            <Input title="Email" id="value" type="email" required={true} />
-          {:else if addressType.name == "P-nummer"}
-            <Input title="P-nummer" id="value" required={true} />
-          {:else if addressType.name == "Postadresse"}
-            <DarSearch title="Postadresse" />
-          {:else if addressType.name == "Webadresse"}
-            <Input
-              title="Weabdresse"
+          {#if addressType.name in [Addresses.HENVENDELSESSTED, Addresses.POSTADRESSE, Addresses.RETURADRESSE]}
+            <DarSearch
+              title={addressType.name}
               id="value"
-              type="url"
-              pattern="^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+\.[a-z]+(\/[a-zA-Z0-9#]+\/?)*$"
-              patternMessage="Indtast en gyldig url"
+              bind:darName={$address.value}
+              errors={$address.errors}
               required={true}
             />
-          {:else if addressType.name == "Formålskode"}
-            <Input title="Formålskode" id="value" required={true} />
-          {:else if addressType.name == "Lokation"}
-            <Input title="Lokation" id="value" required={true} />
-          {:else if addressType.name == "EAN-nummer"}
-            <Input title="EAN-nummer" id="value" required={true} />
-          {:else if addressType.name == "Skolekode"}
-            <Input title="Skolekode" id="value" required={true} />
-          {:else if addressType.name == "Fax"}
-            <Input title="Fax" id="value" required={true} />
-          {:else if addressType.name == "Returadresse"}
-            <DarSearch title="Returadresse" />
-          {:else if addressType.name == "Henvendelsessted"}
-            <DarSearch title="Henvendelsessted" />
-          {:else if addressType.name == "Telefon"}
+          {:else}
             <Input
-              title="Telefon"
+              title={addressType.name}
               id="value"
-              type="tel"
-              pattern="[0-9]+"
-              patternMessage="Kun tal & '+' er tilladt"
+              bind:value={$address.value}
+              errors={$address.errors}
               required={true}
             />
           {/if}
