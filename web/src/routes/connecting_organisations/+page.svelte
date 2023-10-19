@@ -126,40 +126,6 @@
     }
   }
 
-  /* const handler: SubmitFunction =
-      () =>
-      async ({ result }) => {
-        if (result.type !== "success" || !result.data) return
-
-        if (!selectedOriginOrg) {
-          console.warn("selectedOriginOrg is null or undefined")
-          return
-        }
-
-        try {
-          const mutation = await graphQLClient().request(UpdateRelatedUnitsDocument, {
-            input: result.data,
-          })
-          // Check if selectedDestinationsOrgs is empty to determine which success message should be sent.
-          if (selectedDestinationsOrgs.length === 0) {
-            $success = {
-              message: `Alle tilknytninger til ${selectedOriginOrg.name} blev fjernet.`,
-            }
-          } else {
-            $success = {
-              message: `${
-                selectedOriginOrg.name
-              } blev knyttet sammen med: ${formatDestinationNamesFromOrgs(
-                selectedDestinationsOrgs
-              )}`,
-            }
-          }
-        } catch (err) {
-          console.error(err)
-          $error = { message: err as string }
-        }
-      } */
-
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
@@ -273,8 +239,6 @@
     <div class=" min-w-fit bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-col sm:flex-row gap-6 w-full">
-          <!-- <input type="hidden" name="from" bind:value={$date} /> -->
-
           <div class="flex flex-col w-1/2">
             <CheckboxOrgTree
               allowMultipleSelection={false}
