@@ -1,41 +1,38 @@
 <script lang="ts">
   import { isAuth } from "$lib/stores/auth"
   import DrawerContent from "$lib/components/drawer_content.svelte"
-  import { onDestroy, onMount } from "svelte"
+  import { onMount } from "svelte"
 
   let isResizing = false
   let currentSidebarWidth = 320
   const standardSidebarWidth = 320
   const largeScreenBreakpoint = 1024
 
-  let drawerContentHeight = 0 // Not resizable by user; is set by drawerContent
-  let resizeHandleHeight = 0 // Not resizable by user; is set by drawerContent or screenHeight.
-
+  let drawerContentHeight = 0
+  let resizeHandleHeight = 0
   let isLgScreen: boolean
 
   $: {
     if (typeof window !== "undefined") {
       const vhValue = window.innerHeight
-      const calcValue = vhValue - 64 // Assuming 4rem is equal to 64px.
+      const calcValue = vhValue - 64
 
       resizeHandleHeight = Math.max(drawerContentHeight, calcValue)
-
       isLgScreen = window.innerWidth >= largeScreenBreakpoint
 
       if (isLgScreen) {
-        if (currentSidebarWidth === 0) {
-          currentSidebarWidth = standardSidebarWidth
-        }
+        currentSidebarWidth = standardSidebarWidth
       } else {
-        currentSidebarWidth = 0
+        const checkbox = <HTMLInputElement>document.getElementById("drawer")
+        currentSidebarWidth = checkbox && checkbox.checked ? standardSidebarWidth : 0
       }
     }
   }
 
   onMount(() => {
     document.addEventListener("mousemove", handleMouseMove)
-    document.addEventListener("mousedown", handleMouseDownOrUp) //Tracks mouse-button press
-    document.addEventListener("mouseup", handleMouseDownOrUp) //Tracks mouse-button press
+    document.addEventListener("mousedown", handleMouseDownOrUp)
+    document.addEventListener("mouseup", handleMouseDownOrUp)
     window.addEventListener("resize", checkScreenSize)
 
     checkScreenSize()
@@ -47,6 +44,8 @@
 
     if (wasLgScreen && !isLgScreen) {
       currentSidebarWidth = 0
+      const checkbox = <HTMLInputElement>document.getElementById("drawer")
+      if (checkbox) checkbox.checked = false // Luk drawer, hvis den er åben
     }
   }
 
@@ -75,13 +74,6 @@
       document.body.classList.remove("no-select")
     }
   }
-
-  /* onDestroy(() => {
-    document.removeEventListener("mousemove", handleMouseMove)
-    document.removeEventListener("mousedown", handleMouseDownOrUp)
-    document.removeEventListener("mouseup", handleMouseDownOrUp)
-    window.removeEventListener("resize", checkScreenSize)
-}) */
 </script>
 
 <div class="drawer lg:drawer-open h-[calc(100vh-4rem)]">
@@ -90,11 +82,18 @@
     type="checkbox"
     class="drawer-toggle"
     aria-label="Toggle sidebar"
+    on:change={() => {
+      const checkbox = document.getElementById("drawer")
+      if (checkbox && "checked" in checkbox && checkbox.checked) {
+        currentSidebarWidth = standardSidebarWidth
+      } else {
+        currentSidebarWidth = 0
+      }
+    }}
   />
   <label for="drawer" class="drawer-overlay cursor-pointer" aria-hidden="true" />
 
   <div class="drawer-content flex flex-col h-auto">
-    <!-- Page content here -->
     {#if $isAuth}
       <slot />
     {:else}
@@ -106,9 +105,12 @@
       </div>
     {/if}
   </div>
-  <div class="drawer-side relative" style="width: {currentSidebarWidth}px; h-min;">
+  <div
+    class="drawer-side relative"
+    style="width: {isLgScreen ? `${currentSidebarWidth}px` : '100%'};"
+    class:open={!isLgScreen && currentSidebarWidth > 0}
+  >
     <ul class="overflow-y-auto bg-base-100 min-h-[calc(100vh-4rem)] border">
-      <!-- Sidebar content here -->
       <div bind:clientHeight={drawerContentHeight}>
         <DrawerContent />
       </div>
@@ -126,7 +128,6 @@
   </div>
 </div>
 
-<!-- Disable text selection while resizing div. -->
 <style>
   :global(body.no-select) {
     user-select: none;
@@ -136,8 +137,28 @@
   }
 
   @media (max-width: 1023px) {
-    .drawer-side-resize-handle {
-      pointer-events: none;
+    .drawer-side {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 0;
+      overflow-x: hidden;
+      z-index: 1000;
+      transition: width 0.3s;
+      background-color: transparent; /* Ingen baggrund som standard */
+    }
+
+    .drawer-side.open {
+      width: 320px;
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    /* Sørger for at indholdet af skuffen ikke lukker skuffen, når den klikkes */
+    .drawer-side ul {
+      background-color: white; /* Eller enhver anden baggrundsfarve for din skuffe */
+      z-index: 2;
+      position: relative;
     }
   }
 </style>
