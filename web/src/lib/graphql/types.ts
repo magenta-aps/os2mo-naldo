@@ -148,6 +148,7 @@ export type Address = {
    *
    */
   person?: Maybe<Array<Employee>>;
+  resolve: ResolvedAddress;
   /**
    * The object type.
    *
@@ -1128,10 +1129,15 @@ export type AuditLog = {
   /**
    * Model of the modified entity.
    *
-   * Examples:
-   * * `"class"`
-   * * `"employee"`
-   * * `"org_unit"`
+   * Can be one of:
+   * * `"AuditLog"`
+   * * `"Bruger"`
+   * * `"Facet"`
+   * * `"ItSystem"`
+   * * `"Klasse"`
+   * * `"Organisation"`
+   * * `"OrganisationEnhed"`
+   * * `"OrganisationFunktion"`
    *
    */
   model: Scalars['String']['output'];
@@ -1191,6 +1197,16 @@ export type AuditLogFilter = {
    * Filter audit events by their model type.
    *
    * Can be used to select all reads for a data type.
+   *
+   * Can be one of:
+   * * `"AuditLog"`
+   * * `"Bruger"`
+   * * `"Facet"`
+   * * `"ItSystem"`
+   * * `"Klasse"`
+   * * `"Organisation"`
+   * * `"OrganisationEnhed"`
+   * * `"OrganisationFunktion"`
    *
    * | `models`      | Elements returned                            |
    * |--------------|----------------------------------------------|
@@ -1835,6 +1851,30 @@ export type ConfigurationPaged = {
   page_info: PageInfo;
 };
 
+export type DarAddress = ResolvedAddress & {
+  __typename?: 'DARAddress';
+  description: Scalars['String']['output'];
+  door?: Maybe<Scalars['String']['output']>;
+  floor?: Maybe<Scalars['String']['output']>;
+  house_number: Scalars['String']['output'];
+  href: Scalars['String']['output'];
+  latitude: Scalars['Float']['output'];
+  longitude: Scalars['Float']['output'];
+  municipality_code: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  road_code: Scalars['Int']['output'];
+  road_name: Scalars['String']['output'];
+  streetmap_href?: Maybe<Scalars['String']['output']>;
+  value: Scalars['String']['output'];
+  zip_code: Scalars['String']['output'];
+  zip_code_name: Scalars['String']['output'];
+};
+
+export type DefaultAddress = ResolvedAddress & {
+  __typename?: 'DefaultAddress';
+  value: Scalars['String']['output'];
+};
+
 /** Employee/identity specific information */
 export type Employee = {
   __typename?: 'Employee';
@@ -2083,15 +2123,6 @@ export type EmployeeFilter = {
   cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
-  /**
-   *
-   * Free text search.
-   *
-   * Does best effort lookup to find entities matching the query string.
-   * No quarantees are given w.r.t. the entries returned.
-   *
-   */
-  query?: InputMaybe<Scalars['String']['input']>;
   /** Limit the elements returned by their ending validity. */
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -5420,6 +5451,13 @@ export type ModelsUuidsBoundRegistrationFilter = {
   start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
+export type MultifieldAddress = ResolvedAddress & {
+  __typename?: 'MultifieldAddress';
+  name: Scalars['String']['output'];
+  value: Scalars['String']['output'];
+  value2: Scalars['String']['output'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   /** Creates an address. */
@@ -5647,6 +5685,8 @@ export type Mutation = {
   owner_refresh: UuidPaged;
   /** Refresh a related unit. */
   related_unit_refresh: UuidPaged;
+  /** Updates relations for an org_unit. */
+  related_units_update: RelatedUnitResponse;
   /** Creates a role. */
   role_create: RoleResponse;
   /** Refresh roles. */
@@ -6030,6 +6070,11 @@ export type MutationRelated_Unit_RefreshArgs = {
   filter?: InputMaybe<RelatedUnitFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationRelated_Units_UpdateArgs = {
+  input: RelatedUnitsUpdateInput;
 };
 
 
@@ -6689,15 +6734,6 @@ export type OrganisationUnitFilter = {
    *
    */
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  /**
-   *
-   * Free text search.
-   *
-   * Does best effort lookup to find entities matching the query string.
-   * No quarantees are given w.r.t. the entries returned.
-   *
-   */
-  query?: InputMaybe<Scalars['String']['input']>;
   /** Limit the elements returned by their ending validity. */
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -7134,7 +7170,6 @@ export type ParentsBoundFacetFilter = {
 export type ParentsBoundOrganisationUnitFilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  query?: InputMaybe<Scalars['String']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -7749,6 +7784,21 @@ export type RelatedUnitResponsePaged = {
   page_info: PageInfo;
 };
 
+export type RelatedUnitsUpdateInput = {
+  /** UUID of the units to create relations to. */
+  destination?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** UUID of the unit to create relations under. */
+  origin: Scalars['UUID']['input'];
+  /** UUID to be created. Will be autogenerated if not specified. */
+  uuid?: InputMaybe<Scalars['UUID']['input']>;
+  /** From date. */
+  validity: RaValidityInput;
+};
+
+export type ResolvedAddress = {
+  value: Scalars['String']['output'];
+};
+
 /** The role a person has within an organisation unit */
 export type Role = {
   __typename?: 'Role';
@@ -8108,7 +8158,6 @@ export type UuidsBoundClassFilter = {
 export type UuidsBoundEmployeeFilter = {
   cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
-  query?: InputMaybe<Scalars['String']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
@@ -8156,7 +8205,6 @@ export type UuidsBoundOrganisationUnitFilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  query?: InputMaybe<Scalars['String']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
