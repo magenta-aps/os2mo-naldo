@@ -4,30 +4,40 @@
   export let name = id
   export let value: string | number | undefined
   export let startValue: string | number | undefined = undefined
-  value ??= startValue
+  value = startValue ? startValue : value
   export let required = false
   export let disabled = false
   export let min = "1910-01-01"
   export let max: string | undefined = undefined
-  export let padding: string = "pb-4"
+  export let errors: string[] = []
+  // We changed from `pb-4` to having `pb-3` and `pb-1`, which messed with the navbar DateInput.
+  // This is a workaround.
+  export let noPadding: Boolean = false
 </script>
 
-<div class="form-control basis-1/2 {padding}">
-  {#if title || required}
-    <label for={id} class="text-sm text-secondary pb-1"
-      >{title ? title : ""} {required ? "*" : ""}</label
-    >
-  {/if}
-  <input
-    {id}
-    {name}
-    bind:value
-    type="date"
-    {min}
-    {max}
-    class="input input-bordered input-sm rounded text-base text-secondary font-normal w-full
+<div class="form-control basis-1/2 {noPadding ? '' : 'pb-3'}">
+  <div class={noPadding ? "" : "pb-1"}>
+    {#if title || required}
+      <label for={id} class="text-sm text-secondary pb-1">
+        {title ? title : ""}
+        {required ? "*" : ""}
+      </label>
+    {/if}
+    <input
+      {id}
+      {name}
+      bind:value
+      type="date"
+      {min}
+      {max}
+      class="input input-bordered input-sm rounded text-base text-secondary font-normal w-full
         active:outline-offset-0 active:input-primary focus:outline-offset-0 focus:input-primary"
-    {required}
-    {disabled}
-  />
+      {disabled}
+    />
+  </div>
+  {#each errors as error}
+    {#if error === "required"}
+      <span class="label-text-alt text-error block">{title} skal udfyldes</span>
+    {/if}
+  {/each}
 </div>

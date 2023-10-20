@@ -19,14 +19,14 @@
   import DarSearch from "$lib/components/DARSearch.svelte"
   import { Addresses } from "$lib/util/addresses"
 
-  let fromDate: string
   let toDate: string
   let addressType: { name: string; uuid?: any | null }
   $: addressUuid = addressType?.uuid
 
   // update the field depending on address-type
   let address = field("", "")
-  $: myForm = form(address)
+  const fromDate = field("from", "", [required()])
+  $: myForm = form(fromDate, address)
 
   gql`
     query FacetsAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
@@ -100,7 +100,7 @@
                 mutation.address_create.objects[0]?.employee
                   ? `for ${mutation.address_create.objects[0].employee?.[0].name}`
                   : ""
-              } er oprettet fra d. ${fromDate}`,
+              } er oprettet fra d. ${$fromDate.value}`,
               uuid: $page.params.uuid,
               type: "employee",
             }
@@ -133,19 +133,20 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            bind:value={fromDate}
             startValue={$date}
             title="Startdato"
             id="from"
+            bind:value={$fromDate.value}
+            errors={$fromDate.errors}
+            required={true}
             min={minDate}
             max={toDate ? toDate : maxDate}
-            required={true}
           />
           <DateInput
             bind:value={toDate}
             title="Slutdato"
             id="to"
-            min={fromDate ? fromDate : minDate}
+            min={$fromDate.value ? $fromDate.value : minDate}
             max={maxDate}
           />
         </div>

@@ -65,7 +65,7 @@
           bind:value={selectedDate}
           id="other-end-date"
           max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
-          padding=""
+          noPadding={true}
         />
       </div>
     </div>
