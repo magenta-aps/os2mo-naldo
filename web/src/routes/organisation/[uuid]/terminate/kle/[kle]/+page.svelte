@@ -10,8 +10,11 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
 
-  let toDate: string
+  const toDate = field("to", "", [required()])
+  $: myForm = form(toDate)
 
   gql`
     query KLE($uuid: [UUID!], $fromDate: DateTime!) {
@@ -48,23 +51,27 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(TerminateKleDocument, {
-            input: result.data,
-          })
+      // Await the validation, before we continue
+      await myForm.validate()
+      if ($myForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(TerminateKleDocument, {
+              input: result.data,
+            })
 
-          $success = {
-            message: `KLE-opmærkningen ${
-              mutation.kle_terminate.objects[0].org_unit
-                ? `for ${mutation.kle_terminate.objects[0].org_unit[0].name}`
-                : ""
-            } afsluttes d. ${toDate}`,
-            uuid: $page.params.uuid,
-            type: "organisation",
+            $success = {
+              message: `KLE-opmærkningen ${
+                mutation.kle_terminate.objects[0].org_unit
+                  ? `for ${mutation.kle_terminate.objects[0].org_unit[0].name}`
+                  : ""
+              } afsluttes d. ${$toDate.value}`,
+              uuid: $page.params.uuid,
+              type: "organisation",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -90,8 +97,9 @@
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <DateInput
-          bind:value={toDate}
           startValue={$date}
+          bind:value={$toDate.value}
+          errors={$toDate.errors}
           title="Slutdato"
           id="to"
           min={minDate}

@@ -5,7 +5,7 @@
   export let name = id
   export let value: string | number | null | undefined = undefined
   export let startValue: string | number | null | undefined = undefined
-  value = value ?? startValue // For flexibility when binding
+  value = startValue ? startValue : value
   export let required = false
   export let placeholder: string | undefined = undefined
   export let type = "text"
@@ -53,6 +53,10 @@
     {/if}
 
     {#if error === "pattern"}
+      <span class="label-text-alt text-error block">{title} har forkert format</span>
+    {/if}
+
+    {#if error === "url"}
       <span class="label-text-alt text-error block">{title} har forkert format</span>
     {/if}
   {/each}
