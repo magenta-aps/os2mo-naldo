@@ -10,8 +10,11 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import type { SubmitFunction } from "./$types"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
 
-  let toDate: string
+  const toDate = field("to", "", [required()])
+  $: myForm = form(toDate)
 
   gql`
     query Address($uuid: [UUID!], $fromDate: DateTime!, $org_unit_uuid: [UUID!]) {
@@ -56,23 +59,27 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(TerminateAddressDocument, {
-            input: result.data,
-          })
+      // Await the validation, before we continue
+      await myForm.validate()
+      if ($myForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(TerminateAddressDocument, {
+              input: result.data,
+            })
 
-          $success = {
-            message: `Adressen ${
-              mutation.address_terminate.objects[0].org_unit
-                ? `for ${mutation.address_terminate.objects[0].org_unit[0].name}`
-                : ""
-            } afsluttes d. ${toDate}`,
-            uuid: $page.params.uuid,
-            type: "organisation",
+            $success = {
+              message: `Adressen ${
+                mutation.address_terminate.objects[0].org_unit
+                  ? `for ${mutation.address_terminate.objects[0].org_unit[0].name}`
+                  : ""
+              } afsluttes d. ${$toDate.value}`,
+              uuid: $page.params.uuid,
+              type: "organisation",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -99,8 +106,9 @@
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <DateInput
-          bind:value={toDate}
           startValue={$date}
+          bind:value={$toDate.value}
+          errors={$toDate.errors}
           title="Slutdato"
           id="to"
           min={minDate}

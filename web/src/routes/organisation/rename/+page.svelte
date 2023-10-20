@@ -12,14 +12,14 @@
   import Input from "$lib/components/forms/shared/input.svelte"
   import { page } from "$app/stores"
   import { getUuidFromHash } from "$lib/util/helpers"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
 
-  let fromDate: string
-  let orgUnit: {
-    uuid: string
-    name: string
-    attrs: []
-  }
-  let name: string
+  const fromDate = field("from", "", [required()])
+  const name = field("name", "", [required()])
+  const newName = field("new_name", "", [required()])
+  $: myForm = form(fromDate, name, newName)
+
   const urlHashOrgUnitUuid = getUuidFromHash($page.url.hash)
 
   gql`
@@ -46,19 +46,23 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(UpdateOrgUnitDocument, {
-            input: result.data,
-          })
+      // Await the validation, before we continue
+      await myForm.validate()
+      if ($myForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(UpdateOrgUnitDocument, {
+              input: result.data,
+            })
 
-          $success = {
-            message: `${orgUnit.name} omdøbes til ${name} d. ${fromDate}`,
-            uuid: mutation.org_unit_update.uuid,
-            type: "organisation",
+            $success = {
+              message: `${$name.value} omdøbes til ${$newName.value} d. ${$fromDate.value}`,
+              uuid: mutation.org_unit_update.uuid,
+              type: "organisation",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -77,13 +81,15 @@
     <div class="p-8">
       <div class="flex flex-row gap-6">
         <DateInput
-          bind:value={fromDate}
           startValue={$date}
+          bind:value={$fromDate.value}
+          errors={$fromDate.errors}
           title="Startdato"
           id="from"
           max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
           required={true}
         />
+        <!-- FIXME: min/max -->
       </div>
       {#if urlHashOrgUnitUuid}
         {#await graphQLClient().request( OrgUnitDocument, { uuid: urlHashOrgUnitUuid, fromDate: $date } )}
@@ -103,15 +109,18 @@
               name: orgUnitUuidFromHash.name,
               attrs: [],
             }}
-            bind:value={orgUnit}
-            on:change={() => (name = orgUnit.name)}
+            bind:name={$name.value}
+            errors={$name.errors}
+            on:clear={() => ($name.value = "")}
+            on:change={() => ($newName.value = $name.value)}
             required={true}
           />
           <Input
             title="Nyt navn"
             id="name"
             startValue={orgUnitUuidFromHash.name}
-            bind:value={name}
+            bind:value={$newName.value}
+            errors={$newName.errors}
             required={true}
           />
         {/await}
@@ -119,10 +128,19 @@
         <Search
           type="org-unit"
           title="Angiv enhed"
-          bind:value={orgUnit}
-          on:change={() => (name = orgUnit.name)}
+          bind:name={$name.value}
+          errors={$name.errors}
+          on:clear={() => ($name.value = "")}
+          on:change={() => ($newName.value = $name.value)}
+          required={true}
         />
-        <Input title="Nyt navn" id="name" bind:value={name} />
+        <Input
+          title="Nyt navn"
+          id="name"
+          bind:value={$name.value}
+          errors={$name.errors}
+          required={true}
+        />
       {/if}
     </div>
   </div>

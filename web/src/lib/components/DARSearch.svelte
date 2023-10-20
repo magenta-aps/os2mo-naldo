@@ -6,7 +6,7 @@
   export let startValue: DarAddressResponse | undefined = undefined
   export let value: DarAddressResponse | undefined = startValue || undefined
   export let title: string
-  export let darName: string | undefined = undefined
+  export let darName: string | undefined | null = undefined
   export let id = `value`
   export let required = true
   export let disabled = false
@@ -73,6 +73,9 @@
       {disabled}
       {itemId}
       bind:value
+      on:clear={() => {
+        darName = undefined
+      }}
       hideEmptyState={true}
     >
       <div slot="item" let:item>

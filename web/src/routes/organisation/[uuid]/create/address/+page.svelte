@@ -19,14 +19,14 @@
   import { required, email, pattern, url } from "svelte-forms/validators"
   import { Addresses } from "$lib/util/addresses"
 
-  let fromDate: string
   let toDate: string
   let addressType: { name: string; uuid?: any | null }
   $: addressUuid = addressType?.uuid
 
   // update the field depending on address-type
-  let address = field("", "")
-  $: myForm = form(address)
+  let addressField = field("", "")
+  const fromDate = field("from", "", [required()])
+  $: myForm = form(fromDate, addressField)
 
   gql`
     query FacetsAndOrg($uuid: [UUID!], $fromDate: DateTime) {
@@ -69,46 +69,46 @@
 
   $: switch (addressType?.name) {
     case Addresses.AFDELINGSKODE:
-      address = field(Addresses.AFDELINGSKODE, "", [required()])
+      addressField = field(Addresses.AFDELINGSKODE, "", [required()])
       break
     case Addresses.EAN_NUMMER:
-      address = field(Addresses.EAN_NUMMER, "", [required(), pattern(/^\d{13}$/)])
+      addressField = field(Addresses.EAN_NUMMER, "", [required(), pattern(/^\d{13}$/)])
       break
     case Addresses.EMAIL:
-      address = field(Addresses.EMAIL, "", [required(), email()])
+      addressField = field(Addresses.EMAIL, "", [required(), email()])
       break
     case Addresses.FAX:
       // Jeg ved ikke hvordan en fax kan se ud, det gør MO heller ikke
-      address = field(Addresses.FAX, "", [required(), pattern(/\d+/)])
+      addressField = field(Addresses.FAX, "", [required(), pattern(/\d+/)])
       break
     case Addresses.FORMAALSKODE:
-      address = field(Addresses.FORMAALSKODE, "", [required()])
+      addressField = field(Addresses.FORMAALSKODE, "", [required()])
       break
     case Addresses.HENVENDELSESSTED:
-      address = field(Addresses.HENVENDELSESSTED, "", [required()])
+      addressField = field(Addresses.HENVENDELSESSTED, "", [required()])
       break
     case Addresses.LOKATION:
-      address = field(Addresses.LOKATION, "", [required()])
+      addressField = field(Addresses.LOKATION, "", [required()])
       break
     case Addresses.P_NUMMER:
-      address = field(Addresses.P_NUMMER, "", [required(), pattern(/^\d{10}$/)])
+      addressField = field(Addresses.P_NUMMER, "", [required(), pattern(/^\d{10}$/)])
       break
     case Addresses.POSTADRESSE:
-      address = field(Addresses.POSTADRESSE, "", [required()])
+      addressField = field(Addresses.POSTADRESSE, "", [required()])
       break
     case Addresses.RETURADRESSE:
-      address = field(Addresses.RETURADRESSE, "", [required()])
+      addressField = field(Addresses.RETURADRESSE, "", [required()])
       break
     case Addresses.SKOLEKODE:
-      address = field(Addresses.SKOLEKODE, "", [required()])
+      addressField = field(Addresses.SKOLEKODE, "", [required()])
       break
     case Addresses.TELEFON:
       // This regex is not perfect, as it allows ex. `12345678` and `+45123456`, but use it for now
-      address = field(Addresses.TELEFON, "", [required(), pattern(/(\+45)?\d{8}/)])
+      addressField = field(Addresses.TELEFON, "", [required(), pattern(/(\+45)?\d{8}/)])
       break
     case Addresses.WEBADRESSE:
       // URL skal have http(s), ftp, git eller svn :shrug: Skal vi acceptere `www.lol.dk`?
-      address = field(Addresses.WEBADRESSE, "", [required(), url()])
+      addressField = field(Addresses.WEBADRESSE, "", [required(), url()])
       break
     default:
       break
@@ -130,7 +130,7 @@
                 mutation.address_create.objects[0]?.org_unit
                   ? `for ${mutation.address_create.objects[0].org_unit[0].name}`
                   : ""
-              } er oprettet fra d. ${fromDate}`,
+              } er oprettet fra d. ${$fromDate.value}`,
               uuid: $page.params.uuid,
               type: "organisation",
             }
@@ -163,8 +163,9 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            bind:value={fromDate}
             startValue={$date}
+            bind:value={$fromDate.value}
+            errors={$fromDate.errors}
             title="Startdato"
             id="from"
             min={minDate}
@@ -175,7 +176,7 @@
             bind:value={toDate}
             title="Slutdato"
             id="to"
-            min={fromDate ? fromDate : minDate}
+            min={$fromDate.value ? $fromDate.value : minDate}
             max={maxDate}
           />
         </div>
@@ -198,20 +199,22 @@
           <input hidden name="address-type-uuid" bind:value={addressUuid} />
         </div>
         {#if addressType}
-          {#if addressType.name in [Addresses.HENVENDELSESSTED, Addresses.POSTADRESSE, Addresses.RETURADRESSE]}
+          {#if [Addresses.HENVENDELSESSTED, Addresses.POSTADRESSE, Addresses.RETURADRESSE]
+            .map(String)
+            .includes(addressType.name)}
             <DarSearch
               title={addressType.name}
               id="value"
-              bind:darName={$address.value}
-              errors={$address.errors}
+              bind:darName={$addressField.value}
+              errors={$addressField.errors}
               required={true}
             />
           {:else}
             <Input
               title={addressType.name}
               id="value"
-              bind:value={$address.value}
-              errors={$address.errors}
+              bind:value={$addressField.value}
+              errors={$addressField.errors}
               required={true}
             />
           {/if}

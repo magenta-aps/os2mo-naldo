@@ -13,8 +13,13 @@
   import { OrgUnitDocument } from "./query.generated"
   import Input from "$lib/components/forms/shared/input.svelte"
   import { getUuidFromHash } from "$lib/util/helpers"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
 
-  let fromDate: string
+  const fromDate = field("from", "", [required()])
+  const orgUnitField = field("org_unit", "", [required()])
+  $: myForm = form(fromDate, orgUnitField)
+
   const urlHashOrgUnitUuid = getUuidFromHash($page.url.hash)
 
   gql`
@@ -44,27 +49,31 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(UpdateOrgUnitDocument, {
-            input: result.data,
-          })
+      // Await the validation, before we continue
+      await myForm.validate()
+      if ($myForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(UpdateOrgUnitDocument, {
+              input: result.data,
+            })
 
-          $success = {
-            message: `Organisationsenheden ${
-              mutation.org_unit_update.objects[0].name
-                ? mutation.org_unit_update.objects[0].name
-                : ""
-            } flyttes til ${
-              mutation.org_unit_update.objects[0].parent
-                ? `${mutation.org_unit_update.objects[0].parent.name}`
-                : "roden"
-            } d. ${fromDate}`,
-            uuid: mutation.org_unit_update.uuid,
-            type: "organisation",
+            $success = {
+              message: `Organisationsenheden ${
+                mutation.org_unit_update.objects[0].name
+                  ? mutation.org_unit_update.objects[0].name
+                  : ""
+              } flyttes til ${
+                mutation.org_unit_update.objects[0].parent
+                  ? `${mutation.org_unit_update.objects[0].parent.name}`
+                  : "roden"
+              } d. ${$fromDate.value}`,
+              uuid: mutation.org_unit_update.uuid,
+              type: "organisation",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -84,13 +93,15 @@
       <div class="flex flex-row gap-6">
         <!-- These inputs needs to update, when org-unit is changed -->
         <DateInput
-          bind:value={fromDate}
           startValue={$date}
+          bind:value={$fromDate.value}
+          errors={$fromDate.errors}
           title="Flyttedato"
           id="from"
           max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
           required={true}
         />
+        <!-- FIXME: min/max -->
       </div>
       {#if urlHashOrgUnitUuid}
         {#await graphQLClient().request( OrgUnitDocument, { uuid: urlHashOrgUnitUuid, fromDate: $date } )}
@@ -111,11 +122,21 @@
               name: orgUnit.name,
               attrs: [],
             }}
+            bind:name={$orgUnitField.value}
+            on:clear={() => ($orgUnitField.value = "")}
+            errors={$orgUnitField.errors}
             required={true}
           />
         {/await}
       {:else}
-        <Search type="org-unit" title="Angiv enhed" required={true} />
+        <Search
+          type="org-unit"
+          title="Angiv enhed"
+          required={true}
+          bind:name={$orgUnitField.value}
+          on:clear={() => ($orgUnitField.value = "")}
+          errors={$orgUnitField.errors}
+        />
       {/if}
       <Search type="org-unit" id="select-parent-org-tree" title="Angiv ny overenhed" />
     </div>
