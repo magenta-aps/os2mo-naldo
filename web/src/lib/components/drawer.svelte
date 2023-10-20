@@ -2,10 +2,11 @@
   import { isAuth } from "$lib/stores/auth"
   import DrawerContent from "$lib/components/drawer_content.svelte"
   import { onMount } from "svelte"
+  import Icon from "./icon.svelte"
 
   let isResizing = false
-  let currentSidebarWidth = 320
-  const standardSidebarWidth = 320
+  let currentSidebarWidth = 314.95
+  const standardSidebarWidth = 314.95
   const largeScreenBreakpoint = 1024
 
   let drawerContentHeight = 0
@@ -117,14 +118,23 @@
     </ul>
     <div
       role="button"
-      class="drawer-side-resize-handle absolute top-0 right-0 cursor-ew-resize w-3 flex items-center justify-center bg-red-500 {isLgScreen
+      class="drawer-side-resize-handle absolute top-0 right-0 cursor-ew-resize w-1 flex items-center justify-center bg-gray-50 opacity-50 {isLgScreen
         ? ''
         : 'hidden'}"
       style="height: {resizeHandleHeight}px;"
       on:mousedown={() => (isResizing = true)}
       tabindex="0"
       aria-label="resize handle"
-    />
+    >
+      <!-- Tilføj din SVG her -->
+      <div class="flex flex-col">
+        <Icon
+          type="grid"
+          class="transform rotate-90 opacity-25 scale-50 mb-[-0.688rem]"
+        />
+        <Icon type="grid" class="transform rotate-90 opacity-25 scale-50" />
+      </div>
+    </div>
   </div>
 </div>
 
@@ -139,26 +149,12 @@
   @media (max-width: 1023px) {
     .drawer-side {
       position: fixed;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      width: 0;
-      overflow-x: hidden;
-      z-index: 1000;
-      transition: width 0.3s;
-      background-color: transparent; /* Ingen baggrund som standard */
+      top: 64px; /* sørger for at navbaren er synlig når skærmen er lille, så toggle knappen er tilgængelig */
     }
 
     .drawer-side.open {
       width: 320px;
       background-color: rgba(0, 0, 0, 0.7);
-    }
-
-    /* Sørger for at indholdet af skuffen ikke lukker skuffen, når den klikkes */
-    .drawer-side ul {
-      background-color: white; /* Eller enhver anden baggrundsfarve for din skuffe */
-      z-index: 2;
-      position: relative;
     }
   }
 </style>
