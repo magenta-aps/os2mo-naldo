@@ -53,10 +53,6 @@
               name
               uuid
             }
-            children {
-              name
-              uuid
-            }
           }
         }
       }
