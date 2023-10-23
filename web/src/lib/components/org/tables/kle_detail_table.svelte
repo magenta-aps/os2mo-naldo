@@ -38,7 +38,15 @@
   `
 </script>
 
-<DetailTable headers={["KLE aspekt", "KLE nummer", "Dato", "", ""]}>
+<DetailTable
+  headers={[
+    { title: "KLE aspekt" },
+    { title: "KLE nummer" },
+    { title: "Dato" },
+    { title: "" },
+    { title: "" },
+  ]}
+>
   {#await graphQLClient().request( KleDocument, { org_unit: uuid, ...tenseToValidity(tense, $date) } )}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>

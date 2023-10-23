@@ -30,7 +30,7 @@
   `
 </script>
 
-<DetailTable headers={["Relateret enhed", "Dato"]}>
+<DetailTable headers={[{ title: "Relateret enhed" }, { title: "Dato" }]}>
   {#await graphQLClient().request( RelatedUnitsDocument, { org_unit: uuid, fromDate: $date } )}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>

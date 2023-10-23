@@ -46,7 +46,15 @@
   `
 </script>
 
-<DetailTable headers={["Orlovstype", "Engagement", "Dato", "", ""]}>
+<DetailTable
+  headers={[
+    { title: "Orlovstype" },
+    { title: "Engagement" },
+    { title: "Dato" },
+    { title: "" },
+    { title: "" },
+  ]}
+>
   {#await graphQLClient().request( EmployeeLeavesDocument, { employee_uuid: uuid, ...tenseToValidity(tense, $date) } )}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>

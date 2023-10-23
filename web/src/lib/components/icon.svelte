@@ -19,6 +19,7 @@
   export let type: IconType
   export let size = "20"
   export let fill = "currentColor"
+  export let fillOpacity = "1"
 </script>
 
 {#if type == Icon.HOUSE}
@@ -141,13 +142,17 @@
 {:else if type == Icon.ARROW}
   <div class={$$props.class}>
     <svg
-      class="fill-secondary h-4 w-4"
       xmlns="http://www.w3.org/2000/svg"
+      {fill}
+      width={size}
+      height={size}
       viewBox="0 0 512 512"
     >
-      <!--! Font Awesome Pro 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path
+      <path
+        {fill}
+        fill-opacity={fillOpacity}
         d="M342.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L274.7 256 105.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"
-      /></svg
-    >
+      />
+    </svg>
   </div>
 {/if}

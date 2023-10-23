@@ -1,5 +1,24 @@
 <script lang="ts">
-  export let headers: string[]
+  import { sortKey, sortDirection } from "$lib/stores/sorting"
+  import Icon from "../icon.svelte"
+
+  // Will be sortable if given a sortPath
+  type Header = {
+    title: string
+    sortPath?: string
+  }
+
+  export let headers: Header[]
+
+  const sortTable = (key: string) => {
+    // If the same key is clicked, reverse the sort direction
+    if ($sortKey === key) {
+      $sortDirection = -$sortDirection
+    } else {
+      $sortKey = key
+      $sortDirection = 1
+    }
+  }
 </script>
 
 <div class="overflow-x-auto rounded border mb-8">
@@ -9,10 +28,36 @@
         <tr>
           {#each headers as header}
             <th
-              class="px-4 py-3 font-bold leading-4 tracking-wider text-left text-secondary border-slate-300 bg-slate-100"
+              on:click={() => {
+                sortTable(header.sortPath || "")
+              }}
+              class="{header.sortPath ? 'cursor-pointer' : ''} 
+                px-4 py-3 font-bold leading-4 tracking-wider text-left text-secondary border-slate-300 bg-slate-100"
             >
-              {header}</th
-            >
+              <div class="flex items-center">
+                {header.title}
+                {#if header.sortPath}
+                  <div class="flex flex-col items-center justify-center w-4 h-4 pl-2">
+                    <Icon
+                      type="arrow"
+                      size="12"
+                      class="-rotate-90"
+                      fillOpacity={$sortKey === header.sortPath && $sortDirection === -1
+                        ? "1"
+                        : "0.3"}
+                    />
+                    <Icon
+                      type="arrow"
+                      size="12"
+                      class="rotate-90"
+                      fillOpacity={$sortKey === header.sortPath && $sortDirection === 1
+                        ? "1"
+                        : "0.3"}
+                    />
+                  </div>
+                {/if}
+              </div>
+            </th>
           {/each}
         </tr>
       </thead>

@@ -16,7 +16,6 @@
   const isOrg = $page.route.id?.startsWith("/organisation")
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
-  const headers = ["IT system", "Kontonavn", "Primær", "Dato", "", ""]
 
   gql`
     query ITUsers(
@@ -55,7 +54,16 @@
   `
 </script>
 
-<DetailTable {headers}>
+<DetailTable
+  headers={[
+    { title: "IT system" },
+    { title: "Kontonavn" },
+    { title: "Primær" },
+    { title: "Dato" },
+    { title: "" },
+    { title: "" },
+  ]}
+>
   {#await graphQLClient().request( ItUsersDocument, { org_unit: org_unit, employee: employee, ...tenseToValidity(tense, $date) } )}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>

@@ -44,7 +44,16 @@
   `
 </script>
 
-<DetailTable headers={["Enhed", "Enhedstype", "Enhedsniveau", "Overenhed", "Dato", ""]}>
+<DetailTable
+  headers={[
+    { title: "Enhed" },
+    { title: "Enhedstype" },
+    { title: "Enhedsniveau" },
+    { title: "Overenhed" },
+    { title: "Dato" },
+    { title: "" },
+  ]}
+>
   {#await graphQLClient().request( OrgUnitDocument, { uuid: uuid, ...tenseToValidity(tense, $date) } )}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>

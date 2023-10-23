@@ -17,8 +17,24 @@
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
   const headers = isOrg
-    ? ["Navn", "Lederansvar", "Ledertype", "Lederniveau", "Dato", "", ""]
-    : ["Enhed", "Lederansvar", "Ledertype", "Lederniveau", "Dato", "", ""]
+    ? [
+        { title: "Navn" },
+        { title: "Lederansvar" },
+        { title: "Ledertype" },
+        { title: "Lederniveau" },
+        { title: "Dato" },
+        { title: "" },
+        { title: "" },
+      ]
+    : [
+        { title: "Enhed" },
+        { title: "Lederansvar" },
+        { title: "Ledertype" },
+        { title: "Lederniveau" },
+        { title: "Dato" },
+        { title: "" },
+        { title: "" },
+      ]
 
   gql`
     query Managers(

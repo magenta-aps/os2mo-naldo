@@ -17,8 +17,22 @@
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
   const headers = isOrg
-    ? ["Navn", "Tilknytningsrolle", "Primær", "Dato", "", ""]
-    : ["Enhed", "Rolle", "Primær", "Dato", "", ""]
+    ? [
+        { title: "Navn" },
+        { title: "Tilknytningsrolle" },
+        { title: "Primær" },
+        { title: "Dato" },
+        { title: "" },
+        { title: "" },
+      ]
+    : [
+        { title: "Enhed" },
+        { title: "Rolle" },
+        { title: "Primær" },
+        { title: "Dato" },
+        { title: "" },
+        { title: "" },
+      ]
 
   gql`
     query Associations(

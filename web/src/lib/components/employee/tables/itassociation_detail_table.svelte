@@ -54,14 +54,14 @@
 
 <DetailTable
   headers={[
-    "Enhed",
-    "Stillingsbetegnelse",
-    "IT System",
-    "Kontonavn",
-    "Primær",
-    "Dato",
-    "",
-    "",
+    { title: "Enhed" },
+    { title: "Stillingsbetegnelse" },
+    { title: "IT System" },
+    { title: "Kontonavn" },
+    { title: "Primær" },
+    { title: "Dato" },
+    { title: "" },
+    { title: "" },
   ]}
 >
   {#await graphQLClient().request( ItAssociationsDocument, { employee: uuid, ...tenseToValidity(tense, $date) } )}
