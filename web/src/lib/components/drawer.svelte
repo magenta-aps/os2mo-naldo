@@ -42,7 +42,7 @@
   <input id="drawer" type="checkbox" class="drawer-toggle" />
   <label for="drawer" class="drawer-overlay cursor-pointer" aria-hidden="true" />
 
-  <div class="drawer-content flex flex-col">
+  <div class="drawer-content flex flex-col border-l">
     <!-- Page content here -->
     {#if $isAuth}
       <slot />
@@ -55,14 +55,15 @@
       </div>
     {/if}
   </div>
+  <!-- Sidebar content here -->
   <div
-    class="drawer-side fixed lg:relative border"
+    class="drawer-side fixed lg:relative"
     style="width: {isLgScreen ? `${$drawerWidth}px` : '100%'};height: {drawerHeight}px"
     class:open={!isLgScreen && $drawerWidth > 0}
   >
     <label for="drawer" class="drawer-overlay" />
-    <ul class="overflow-y-auto bg-base-100 min-h-[calc(100vh-4rem)] border">
-      <!-- Sidebar content here -->
+    <ul class="overflow-y-auto bg-base-100 min-h-[calc(100vh-4rem)]">
+      <!-- Drawer indhold her -->
       <div>
         <DrawerContent />
       </div>
@@ -70,7 +71,7 @@
     <!-- Resize-handle -->
     <div
       role="button"
-      class="absolute top-0 right-0 cursor-ew-resize w-1 flex items-center justify-center bg-gray-50 opacity-50 {isLgScreen
+      class="absolute top-0 right-0 cursor-ew-resize w-1 flex items-center justify-center {isLgScreen
         ? ''
         : 'hidden'}"
       style="height: {drawerHeight}px;"
