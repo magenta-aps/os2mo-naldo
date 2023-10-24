@@ -5,66 +5,44 @@
   import Icon from "./icon.svelte"
   import { defaultDrawerWidth, drawerWidth } from "$lib/stores/drawer_width"
 
-  const largeScreenBreakpoint = 1024 // standard lg breakpoint in Tailwind
-  let drawerContentHeight = 0 // Not resizable by user; is set by drawerContent.
-  let resizeHandleHeight = 0 // Not resizable by user; is set by drawerContent or screenHeight depending on which is larger.
+  const largeScreenBreakpoint = 1024 // standard lg breakpoint i Tailwind
+  let drawerHeight = 0 // Not resizable by user; is set by screenHeight.
+  let isResizing: boolean = false
+  let isLgScreen: boolean = false
 
-  let isResizing = false
-  let isLgScreen: boolean
-
-  const checkScreenSize = () => {
+  const updateScreenSize = () => {
     isLgScreen = window.innerWidth >= largeScreenBreakpoint
+    drawerHeight = isLgScreen ? window.innerHeight - 64 : window.innerHeight
   }
 
   const handleMouseMove = (e: MouseEvent) => {
-    if (!isLgScreen) return
-    if (
-      isResizing &&
-      e.clientX > defaultDrawerWidth &&
-      e.clientX < largeScreenBreakpoint
-    ) {
-      $drawerWidth = e.clientX
+    if (!isLgScreen || !isResizing) return
+    const newWidth = Math.max(e.clientX, defaultDrawerWidth)
+    if (newWidth < largeScreenBreakpoint) {
+      $drawerWidth = newWidth
     }
   }
 
-  const handleMouseDownOrUp = (e: MouseEvent) => {
-    if (!isLgScreen) {
-      isResizing = false
-      return
-    }
-    // Disabling text-selection while resizing drawer
-    if (e.type === "mousedown" && isResizing) {
-      document.body.classList.add("no-select")
-    } else if (e.type === "mouseup") {
-      isResizing = false
-      document.body.classList.remove("no-select")
-    }
-  }
-
-  $: {
-    if (typeof window !== "undefined") {
-      const vhValue = window.innerHeight
-      const calcValue = vhValue - 64 // Assuming 4rem is equal to 64px.
-
-      resizeHandleHeight = Math.max(drawerContentHeight, calcValue)
-      isLgScreen = window.innerWidth >= largeScreenBreakpoint
-    }
+  //This function ensures that the resize stops no matter where in the window the user releases the mouse
+  //If it is only done in the HTML part, it can be difficult for the user to 'release' the resize
+  const handleMouseUp = () => {
+    if (!isLgScreen || !isResizing) return
+    isResizing = false
   }
 
   onMount(() => {
-    document.addEventListener("mousemove", handleMouseMove)
-    document.addEventListener("mousedown", handleMouseDownOrUp) //Track mouse-button press
-    document.addEventListener("mouseup", handleMouseDownOrUp) //Track mouse-button release
-    window.addEventListener("resize", checkScreenSize) //Checks if the resize handle should be hidden
-    checkScreenSize()
+    updateScreenSize()
+    window.addEventListener("mousemove", handleMouseMove)
+    window.addEventListener("mouseup", handleMouseUp) //Track mouse-button release
+    window.addEventListener("resize", updateScreenSize) //Checks if the resize handle should be hidden
   })
 </script>
 
-<div class="drawer lg:drawer-open h-[calc(100vh-4rem)]">
+<div class="drawer lg:drawer-open min-h-[calc(100vh-4rem)]">
   <input id="drawer" type="checkbox" class="drawer-toggle" />
   <label for="drawer" class="drawer-overlay cursor-pointer" aria-hidden="true" />
 
-  <div class="drawer-content flex flex-col h-6 min-h-[calc(100vh-4rem)]">
+  <div class="drawer-content flex flex-col">
     <!-- Page content here -->
     {#if $isAuth}
       <slot />
@@ -78,16 +56,14 @@
     {/if}
   </div>
   <div
-    class="drawer-side fixed lg:relative"
-    style="width: {isLgScreen
-      ? `${$drawerWidth}px`
-      : '100%'}; min-h-[calc(100vh-4rem)]; height: auto"
+    class="drawer-side fixed lg:relative border"
+    style="width: {isLgScreen ? `${$drawerWidth}px` : '100%'};height: {drawerHeight}px"
     class:open={!isLgScreen && $drawerWidth > 0}
   >
     <label for="drawer" class="drawer-overlay" />
     <ul class="overflow-y-auto bg-base-100 min-h-[calc(100vh-4rem)] border">
       <!-- Sidebar content here -->
-      <div bind:clientHeight={drawerContentHeight}>
+      <div>
         <DrawerContent />
       </div>
     </ul>
@@ -97,18 +73,25 @@
       class="absolute top-0 right-0 cursor-ew-resize w-1 flex items-center justify-center bg-gray-50 opacity-50 {isLgScreen
         ? ''
         : 'hidden'}"
-      style="height: {resizeHandleHeight}px;"
-      on:mousedown={() => (isResizing = true)}
+      style="height: {drawerHeight}px;"
+      on:mousedown={(e) => {
+        if (isLgScreen) {
+          isResizing = true
+          /* Disabling text-selection while resizing drawer*/
+          document.body.classList.add("no-select")
+        }
+      }}
+      on:mouseup={(e) => {
+        if (isLgScreen) {
+          isResizing = false
+          document.body.classList.remove("no-select")
+        }
+      }}
       tabindex="0"
       aria-label="resize handle"
     >
-      <!-- Temporary solution for the missing icon; it should be replaced with a better one once found -->
       <div class="flex flex-col">
-        <Icon
-          type="grid"
-          class="transform rotate-90 opacity-25 scale-50 mb-[-0.688rem]"
-        />
-        <Icon type="grid" class="transform rotate-90 opacity-25 scale-50" />
+        <Icon type="draghandle" />
       </div>
     </div>
   </div>
