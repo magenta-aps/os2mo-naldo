@@ -20,12 +20,38 @@
   import RolesDetailTable from "$lib/components/shared/detail_tables/roles_detail_table.svelte"
   import OrgUnitDetailTable from "$lib/components/org/tables/org_unit_detail_table.svelte"
   import { OrgUnitDocument } from "./query.generated"
+  import { onMount } from "svelte"
+  import { handleTabNavigation } from "$lib/util/tab_navigation"
+  import { tabStorage } from "$lib/stores/tab_storage"
 
   // Tabs
   let items = Object.values(OrgTab)
 
   let activeItem = $activeOrgTab
-  const tabChange = (e: CustomEvent) => ($activeOrgTab = activeItem = e.detail)
+
+  let currentUuid: string
+
+  const tabChange = (e: CustomEvent) => {
+    const newTab = subsiteOfCategory(e.detail) || ""
+    tabStorage.setTab(newTab)
+    activeItem = e.detail
+
+    const newUrl = `${$page.url.pathname}#${newTab.toLowerCase()}`
+    history.pushState({}, "", newUrl)
+  }
+
+  onMount(() => {
+    const { lookup, newUrl } = handleTabNavigation(OrgTab, $page.url)
+
+    activeItem = OrgTab[lookup as keyof typeof OrgTab]
+    history.replaceState({}, "", newUrl)
+    currentUuid = $page.params.uuid
+  })
+
+  $: if (currentUuid !== $page.params.uuid) {
+    localStorage.removeItem("currentTab")
+    currentUuid = $page.params.uuid
+  }
 
   // Used to make a dynamic create button
   const subsiteOfCategory = (category: OrgTab) => {
