@@ -80,9 +80,9 @@
   $: isSelectedOrigin = selectedOriginOrg && selectedOriginOrg.uuid === uuid
   $: isSelectedDestination = selectedDestinationsOrgs.some((obj) => obj.uuid === uuid)
 
-  $: sortedChildren = children
-    .slice()
-    .sort((a, b) => (a.name > b.name ? 1 : a.name < b.name ? -1 : 0))
+  $: sortedChildren = children.sort((a, b) =>
+    a.name > b.name ? 1 : a.name < b.name ? -1 : 0
+  )
 </script>
 
 <li style="padding-left: {indent}px">
@@ -90,7 +90,7 @@
     <div
       role="button"
       tabindex="0"
-      class="flex items-center justify-center w-5 h-5 mr-2 mb-3"
+      class="items-center justify-center w-5 h-5 mr-2 mb-3"
       on:click={toggleNode}
       on:keydown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
@@ -132,6 +132,7 @@
   {#each sortedChildren as child}
     <svelte:self
       {...child}
+      bind:orgTree
       indent={indent + 30}
       {allowMultipleSelection}
       bind:selectedDestinationsOrgs

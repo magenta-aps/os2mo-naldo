@@ -76,7 +76,6 @@
           uuid: org.uuid,
           parentUuid: org.objects[0].parent?.uuid,
           name: org.objects[0].name,
-          fromDate: $date,
         })
       }
       orgTree = convertListToTree(orgUnitList)
@@ -118,7 +117,7 @@
       updateSelectedDestinationUuids()
     } catch (err) {
       console.error(err)
-      $error = { message: err as string }
+      $error = { message: err }
     }
   }
 
@@ -152,7 +151,7 @@
         }
       } catch (err) {
         console.error(err)
-        $error = { message: err as string }
+        $error = { message: err }
       }
     }
 
@@ -226,13 +225,13 @@
     <div class=" min-w-fit bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-col sm:flex-row gap-6 w-full">
-          <div class="flex flex-col w-1/2">
+          <div class="w-1/2">
             <CheckboxOrgTree
               allowMultipleSelection={false}
               bind:orgTree
               bind:selectedDestinationsOrgs
               bind:selectedOriginOrg
-              labelText="Vælg enhed"
+              title="Vælg enhed"
             />
             <!-- Hidden field for origin-uuid -->
             <input
@@ -242,13 +241,13 @@
               value={selectedOriginOrg ? selectedOriginOrg.uuid : ""}
             />
           </div>
-          <div class="flex flex-col w-1/2">
+          <div class="w-1/2">
             <CheckboxOrgTree
               allowMultipleSelection={true}
               bind:orgTree
               bind:selectedDestinationsOrgs
               bind:selectedOriginOrg
-              labelText="Angiv hvilke enheder der skal sammenkobles med enheden til venstre"
+              title="Angiv hvilke enheder der skal sammenkobles med enheden til venstre"
             />
             <input
               type="hidden"
@@ -261,7 +260,7 @@
         <div class="text-sm text-secondary pb-1">{connectionText}</div>
       </div>
     </div>
-    <div class="flex py-6 gap-4">
+    <div class="py-6 gap-4">
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
