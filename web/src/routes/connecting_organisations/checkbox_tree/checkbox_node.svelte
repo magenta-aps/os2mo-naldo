@@ -19,28 +19,22 @@
 
   const dispatch = createEventDispatcher()
 
-  function handleInputChange(event: Event) {
+  const handleInputChange = (event: Event) => {
     const target = event.target as HTMLInputElement
     const isChecked = target.checked
     const uuid = target.id
 
     if (target.type === "radio") {
       selectedOriginOrg = isChecked ? { uuid, name } : null
-      dispatch("radioChanged", { isChecked, uuid })
     } else if (target.type === "checkbox") {
-      if (isChecked) {
-        selectedDestinationsOrgs.push({ uuid, name })
-        selectedDestinationsOrgs = [...selectedDestinationsOrgs]
-      } else {
-        selectedDestinationsOrgs = selectedDestinationsOrgs.filter(
-          (org) => org.uuid !== uuid
-        )
-      }
-      dispatch("checkboxChanged", { isChecked, uuid })
+      selectedDestinationsOrgs = isChecked
+        ? [...selectedDestinationsOrgs, { uuid, name }]
+        : selectedDestinationsOrgs.filter((org) => org.uuid !== uuid)
     }
   }
 
-  function openParentNodes(currentUuid: string): void {
+  const openParentNodes = (currentUuid: string) => {
+    // Opens parent nodes if they have matching children
     if (hasMatchingDescendant({ uuid, children })) {
       isOpen = true
     }
@@ -49,13 +43,14 @@
     }
   }
 
-  function hasMatchingDescendant(node: any): boolean {
+  const hasMatchingDescendant = (node: any) => {
     // Checks for children, and if there are children, checks recursively for match.
     if (node.children) {
       for (let child of node.children) {
-        if (selectedDestinationsOrgs.some((dest) => dest.uuid === child.uuid)) {
-          return true
-        } else if (hasMatchingDescendant(child)) {
+        if (
+          selectedDestinationsOrgs.some((dest) => dest.uuid === child.uuid) ||
+          hasMatchingDescendant(child)
+        ) {
           return true
         }
       }
@@ -103,7 +98,6 @@
         <Icon type="arrow" class={isOpen ? "transform rotate-90" : ""} />
       {/if}
     </div>
-
     {#if allowMultipleSelection}
       <div on:change={handleInputChange} class="ml-2">
         <Checkbox

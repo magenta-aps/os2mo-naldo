@@ -107,7 +107,7 @@
     return dataTree
   }
 
-  async function fetchRelatedUnits(originUuid: string) {
+  const fetchRelatedUnits = async (originUuid: string) => {
     try {
       const response = await graphQLClient().request(RelatedUnitsDocument, {
         org_unit: originUuid,
@@ -192,7 +192,7 @@
     selectedDestinationsOrgs
   )}`
 
-  function formatDestinationNamesFromOrgs(orgs: { name: string }[]): string {
+  function formatDestinationNamesFromOrgs(orgs: { name: string }[]) {
     const names = orgs.map((org) => org.name)
 
     if (!names.length) return ""
@@ -201,12 +201,12 @@
       : `${names.slice(0, -1).join(", ")} og ${names[names.length - 1]}`
   }
 
-  onDestroy(resetSelected) //reset selected-values when closing the page
-
-  function resetSelected() {
+  const resetSelected = () => {
     selectedOriginOrg = null
     selectedDestinationsOrgs = []
   }
+
+  onDestroy(resetSelected) //reset selected-values when closing the page
 </script>
 
 {#await fetchAll()}
