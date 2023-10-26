@@ -192,7 +192,7 @@
     selectedDestinationsOrgs
   )}`
 
-  function formatDestinationNamesFromOrgs(orgs: { name: string }[]) {
+  const formatDestinationNamesFromOrgs = (orgs: { name: string }[]): string => {
     const names = orgs.map((org) => org.name)
 
     if (!names.length) return ""

@@ -19,17 +19,22 @@
 
   const dispatch = createEventDispatcher()
 
-  const handleInputChange = (event: Event) => {
+  const handleRadioChange = (event: Event) => {
     const target = event.target as HTMLInputElement
-    const isChecked = target.checked
-    const uuid = target.id
+    selectedOriginOrg = { uuid: target.id, name }
+  }
 
-    if (target.type === "radio") {
-      selectedOriginOrg = isChecked ? { uuid, name } : null
-    } else if (target.type === "checkbox") {
-      selectedDestinationsOrgs = isChecked
-        ? [...selectedDestinationsOrgs, { uuid, name }]
-        : selectedDestinationsOrgs.filter((org) => org.uuid !== uuid)
+  const handleCheckboxChange = (event: Event) => {
+    const target = event.target as HTMLInputElement
+    if (target.checked) {
+      selectedDestinationsOrgs = [
+        ...selectedDestinationsOrgs,
+        { uuid: target.id, name },
+      ]
+    } else {
+      selectedDestinationsOrgs = selectedDestinationsOrgs.filter(
+        (org) => org.uuid !== target.id
+      )
     }
   }
 
@@ -99,23 +104,23 @@
       {/if}
     </div>
     {#if allowMultipleSelection}
-      <div on:change={handleInputChange} class="ml-2">
+      <div on:change={handleCheckboxChange} class="ml-2">
         <Checkbox
           id={uuid}
           title={name}
-          value="checked"
-          startValue={isSelectedDestination ? "checked" : "unchecked"}
+          value={uuid}
+          startValue={isSelectedDestination ? uuid : ""}
           disabled={!selectedOriginOrg || selectedOriginOrg.uuid === uuid}
         />
       </div>
     {:else}
-      <div on:change={handleInputChange} class="ml-2">
+      <div on:change={handleRadioChange} class="ml-2">
         <RadioButton
           groupName="originUuid"
           id={uuid}
           title={name}
-          value="checked"
-          startValue={isSelectedOrigin ? "checked" : "unchecked"}
+          value={uuid}
+          startValue={isSelectedOrigin ? uuid : ""}
         />
       </div>
     {/if}
