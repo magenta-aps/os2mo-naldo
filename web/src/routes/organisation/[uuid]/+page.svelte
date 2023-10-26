@@ -22,18 +22,14 @@
   import { OrgUnitDocument } from "./query.generated"
   import { onMount } from "svelte"
   import { handleTabNavigation } from "$lib/util/tab_navigation"
-  import { tabStorage } from "$lib/stores/tab_storage"
 
   // Tabs
   let items = Object.values(OrgTab)
 
   let activeItem = $activeOrgTab
 
-  /*   let currentUuid: string */
-
   const tabChange = (e: CustomEvent) => {
     const newTab = subsiteOfCategory(e.detail) || ""
-    /*  tabStorage.setTab(newTab) */
     activeItem = e.detail
 
     const newUrl = `${$page.url.pathname}#${newTab.toLowerCase()}`
@@ -44,7 +40,6 @@
     const { lookup, newUrl } = handleTabNavigation(OrgTab, $page.url)
     activeItem = OrgTab[lookup as keyof typeof OrgTab]
     history.replaceState({}, "", newUrl)
-    /* currentUuid = $page.params.uuid */
 
     const popstateHandler = () => {
       const { lookup } = handleTabNavigation(OrgTab, window.location)
@@ -52,15 +47,10 @@
     }
     window.addEventListener("popstate", popstateHandler)
 
-    /*   return () => {
+    return () => {
       window.removeEventListener("popstate", popstateHandler)
-    } */
+    }
   })
-
-  /*   $: if (currentUuid !== $page.params.uuid) {
-    localStorage.removeItem("currentTab")
-    currentUuid = $page.params.uuid
-  } */
 
   // Used to make a dynamic create button
   const subsiteOfCategory = (category: OrgTab) => {
