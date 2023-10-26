@@ -29,11 +29,11 @@
 
   let activeItem = $activeOrgTab
 
-  let currentUuid: string
+  /*   let currentUuid: string */
 
   const tabChange = (e: CustomEvent) => {
     const newTab = subsiteOfCategory(e.detail) || ""
-    tabStorage.setTab(newTab)
+    /*  tabStorage.setTab(newTab) */
     activeItem = e.detail
 
     const newUrl = `${$page.url.pathname}#${newTab.toLowerCase()}`
@@ -42,16 +42,25 @@
 
   onMount(() => {
     const { lookup, newUrl } = handleTabNavigation(OrgTab, $page.url)
-
     activeItem = OrgTab[lookup as keyof typeof OrgTab]
     history.replaceState({}, "", newUrl)
-    currentUuid = $page.params.uuid
+    /* currentUuid = $page.params.uuid */
+
+    const popstateHandler = () => {
+      const { lookup } = handleTabNavigation(OrgTab, window.location)
+      activeItem = OrgTab[lookup as keyof typeof OrgTab]
+    }
+    window.addEventListener("popstate", popstateHandler)
+
+    /*   return () => {
+      window.removeEventListener("popstate", popstateHandler)
+    } */
   })
 
-  $: if (currentUuid !== $page.params.uuid) {
+  /*   $: if (currentUuid !== $page.params.uuid) {
     localStorage.removeItem("currentTab")
     currentUuid = $page.params.uuid
-  }
+  } */
 
   // Used to make a dynamic create button
   const subsiteOfCategory = (category: OrgTab) => {
