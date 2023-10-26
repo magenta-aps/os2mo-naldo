@@ -1,4 +1,4 @@
-import { EmployeeTab, OrgTab } from "../stores/tab"
+import { EmployeeTab, OrgTab } from "$lib/stores/tab"
 
 type TabEnum = typeof EmployeeTab | typeof OrgTab
 type TabType = keyof typeof EmployeeTab | keyof typeof OrgTab
