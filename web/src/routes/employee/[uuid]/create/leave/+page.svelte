@@ -13,11 +13,15 @@
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import { CreateLeaveDocument, LeaveAndEmployeeDocument } from "./query.generated"
-  import Input from "$lib/components/forms/shared/input.svelte"
   import { getEngagementTitlesAndUuid } from "$lib/util/helpers"
+  import Search from "$lib/components/search.svelte"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
 
-  let fromDate: string
   let toDate: string
+
+  const fromDate = field("from", "", [required()])
+  $: svelteForm = form(fromDate)
 
   gql`
     query LeaveAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
@@ -75,26 +79,30 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(CreateLeaveDocument, {
-            input: result.data,
-          })
-          $success = {
-            message: `${
-              mutation.leave_create.objects[0]?.leave_type
-                ? mutation.leave_create.objects[0]?.leave_type.name
-                : "Orloven"
-            } ${
-              mutation.leave_create.objects[0]?.employee
-                ? `for ${mutation.leave_create.objects[0].employee[0].name}`
-                : ""
-            } er oprettet fra d. ${fromDate}`,
-            uuid: $page.params.uuid,
-            type: "employee",
+      // Await the validation, before we continue
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(CreateLeaveDocument, {
+              input: result.data,
+            })
+            $success = {
+              message: `${
+                mutation.leave_create.objects[0]?.leave_type
+                  ? mutation.leave_create.objects[0]?.leave_type.name
+                  : "Orloven"
+              } ${
+                mutation.leave_create.objects[0]?.employee
+                  ? `for ${mutation.leave_create.objects[0].employee[0].name}`
+                  : ""
+              } er oprettet fra d. ${$fromDate.value}`,
+              uuid: $page.params.uuid,
+              type: "employee",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -109,7 +117,6 @@
   {@const minDate = employee.validity.from.split("T")[0]}
   {@const maxDate = employee.validity?.to?.split("T")[0]}
   {@const engagements = employee.engagements}
-  {@const employeeName = employee.name}
 
   <title>Opret orlov | OS2mo</title>
 
@@ -124,8 +131,9 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            bind:value={fromDate}
             startValue={$date}
+            bind:value={$fromDate.value}
+            errors={$fromDate.errors}
             title="Startdato"
             id="from"
             min={minDate}
@@ -136,7 +144,7 @@
             bind:value={toDate}
             title="Slutdato"
             id="to"
-            min={fromDate ? fromDate : minDate}
+            min={$fromDate.value ? $fromDate.value : minDate}
             max={maxDate}
           />
         </div>
@@ -147,12 +155,15 @@
           iterable={getClassesByFacetUserKey(facets, "leave_type")}
           required={true}
         />
-        <!-- FIXME: Use new Search -->
-        <Input
-          title="Medarbejder"
-          id="employee-uuid"
-          startValue={employeeName}
+        <Search
+          type="employee"
+          startValue={{
+            uuid: employee.uuid,
+            name: employee.name,
+            attrs: [],
+          }}
           disabled
+          required={true}
         />
         <Select
           title="Engagementer"

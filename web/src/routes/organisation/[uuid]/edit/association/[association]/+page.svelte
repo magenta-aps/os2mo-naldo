@@ -98,7 +98,7 @@
                 mutation.association_update.objects[0].employee
                   ? `for ${mutation.association_update.objects[0].employee[0].name}`
                   : ""
-              } redigeres fra d. ${fromDate}`,
+              } redigeres fra d. ${$fromDate.value}`,
               uuid: $page.params.uuid,
               type: "organisation",
             }

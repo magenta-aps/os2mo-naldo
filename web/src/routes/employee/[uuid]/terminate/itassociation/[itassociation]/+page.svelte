@@ -14,8 +14,11 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { getITUserITSystemName } from "$lib/util/helpers"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
 
-  let toDate: string
+  const toDate = field("to", "", [required()])
+  const svelteForm = form(toDate)
 
   gql`
     query ITAssociation($uuid: [UUID!], $fromDate: DateTime!) {
@@ -63,25 +66,29 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(
-            TerminateItAssociationDocument,
-            {
-              input: result.data,
+      // Await the validation, before we continue
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(
+              TerminateItAssociationDocument,
+              {
+                input: result.data,
+              }
+            )
+            $success = {
+              message: `IT-tilknytningen ${
+                mutation.itassociation_terminate.objects[0].employee
+                  ? `for ${mutation.itassociation_terminate.objects[0].employee[0].name}`
+                  : ""
+              } afsluttes d. ${$toDate.value}`,
+              uuid: $page.params.uuid,
+              type: "employee",
             }
-          )
-          $success = {
-            message: `IT-tilknytningen ${
-              mutation.itassociation_terminate.objects[0].employee
-                ? `for ${mutation.itassociation_terminate.objects[0].employee[0].name}`
-                : ""
-            } afsluttes d. ${toDate}`,
-            uuid: $page.params.uuid,
-            type: "employee",
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -108,8 +115,9 @@
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <DateInput
-          bind:value={toDate}
           startValue={$date}
+          bind:value={$toDate.value}
+          errors={$toDate.errors}
           title="Slutdato"
           id="to"
           min={minDate}

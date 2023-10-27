@@ -22,6 +22,14 @@
   } from "$lib/util/helpers"
   import Search from "$lib/components/search.svelte"
   import { onMount } from "svelte"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
+
+  let toDate: string
+
+  const fromDate = field("from", "", [required()])
+  const employeeField = field("employee", "", [required()])
+  const svelteForm = form(fromDate, employeeField)
 
   let employee: {
     uuid: string
@@ -29,9 +37,6 @@
     attrs: []
   }
   let engagements: EngagementTitleAndUuid[] | undefined
-  let fromDate: string
-  let toDate: string
-
   gql`
     query LeaveTypeAndEmployee(
       $uuid: [UUID!]
@@ -57,6 +62,10 @@
           objects {
             uuid
             name
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -107,26 +116,30 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(CreateLeaveDocument, {
-            input: result.data,
-          })
-          $success = {
-            message: `${
-              mutation.leave_create.objects[0]?.leave_type
-                ? mutation.leave_create.objects[0]?.leave_type.name
-                : "Orloven"
-            } ${
-              mutation.leave_create.objects[0]?.employee
-                ? `for ${mutation.leave_create.objects[0].employee[0].name}`
-                : ""
-            } er oprettet fra d. ${fromDate}`,
-            uuid: mutation.leave_create.objects[0].employee[0].uuid,
-            type: "employee",
+      // Await the validation, before we continue
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(CreateLeaveDocument, {
+              input: result.data,
+            })
+            $success = {
+              message: `${
+                mutation.leave_create.objects[0]?.leave_type
+                  ? mutation.leave_create.objects[0]?.leave_type.name
+                  : "Orloven"
+              } ${
+                mutation.leave_create.objects[0]?.employee
+                  ? `for ${mutation.leave_create.objects[0].employee[0].name}`
+                  : ""
+              } er oprettet fra d. ${$fromDate.value}`,
+              uuid: mutation.leave_create.objects[0].employee[0].uuid,
+              type: "employee",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -163,17 +176,29 @@
   {:then data}
     {@const facets = data.facets.objects}
     {@const startValueEmployee = data.employees?.objects[0].objects[0]}
+    {@const minDate = startValueEmployee?.validity.from.split("T")[0]}
+    {@const maxDate = startValueEmployee?.validity?.to?.split("T")[0]}
 
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            bind:value={fromDate}
             startValue={$date}
+            bind:value={$fromDate.value}
+            errors={$fromDate.errors}
             title="Startdato"
             id="from"
+            min={minDate}
+            max={toDate ? toDate : maxDate}
+            required={true}
           />
-          <DateInput bind:value={toDate} title="Slutdato" id="to" />
+          <DateInput
+            bind:value={toDate}
+            title="Slutdato"
+            id="to"
+            min={$fromDate.value ? $fromDate.value : minDate}
+            max={maxDate}
+          />
         </div>
 
         <Select
@@ -183,7 +208,6 @@
           required={true}
         />
         <Search
-          title="Medarbejder"
           type="employee"
           startValue={startValueEmployee
             ? {
@@ -193,8 +217,14 @@
               }
             : undefined}
           bind:value={employee}
+          bind:name={$employeeField.value}
+          errors={$employeeField.errors}
           on:change={() => updateEngagements(employee.uuid)}
-          on:clear={() => (engagements = undefined)}
+          on:clear={() => {
+            $employeeField.value = ""
+            engagements = undefined
+          }}
+          required={true}
         />
         {#if engagements && engagements.length}
           {#key engagements}
@@ -207,7 +237,7 @@
             />
           {/key}
         {:else}
-          <Select title="Engagementer" id="engagement-uuid" disabled />
+          <Select title="Engagementer" id="engagement-uuid" disabled required={true} />
         {/if}
       </div>
     </div>

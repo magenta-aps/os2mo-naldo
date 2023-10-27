@@ -7,10 +7,13 @@
   import { graphQLClient } from "$lib/util/http"
   import { CreateEmployeeDocument } from "./query.generated"
   import { gql } from "graphql-request"
+  import { form, field } from "svelte-forms"
+  import { required, pattern } from "svelte-forms/validators"
 
-  let cprNumber: string
-  let firstName: string
-  let lastName: string
+  const cprNumber = field("cpr_number", "", [required(), pattern(/^\d{6}-?\d{4}$/)])
+  const firstName = field("first_name", "", [required()])
+  const lastName = field("last_name", "", [required()])
+  const svelteForm = form(cprNumber, firstName, lastName)
   let nicknameFirstName: string
   let nicknameLastName: string
 
@@ -28,22 +31,26 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(CreateEmployeeDocument, {
-            input: result.data,
-          })
-          $success = {
-            message: `Medarbejderen ${
-              mutation.employee_create.objects[0].name
-                ? mutation.employee_create.objects[0].name
-                : ""
-            } er blevet oprettet.`,
-            uuid: mutation.employee_create.objects[0].uuid,
-            type: "employee",
+      // Await the validation, before we continue
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(CreateEmployeeDocument, {
+              input: result.data,
+            })
+            $success = {
+              message: `Medarbejderen ${
+                mutation.employee_create.objects[0].name
+                  ? mutation.employee_create.objects[0].name
+                  : ""
+              } er blevet oprettet.`,
+              uuid: mutation.employee_create.objects[0].uuid,
+              type: "employee",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -59,37 +66,43 @@
 <form method="post" class="mx-6" use:enhance={handler}>
   <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
     <div class="p-8">
-      <Input title="CPR nummer" id="cpr-number" bind:value={cprNumber} />
+      <Input
+        title="CPR nummer"
+        id="cpr-number"
+        bind:value={$cprNumber.value}
+        errors={$cprNumber.errors}
+        required={true}
+      />
       <div class="flex flex-row gap-6">
         <Input
-          title="Navn"
-          placeholder="Fornavn"
+          title="Fornavn"
           id="first-name"
-          bind:value={firstName}
+          bind:value={$firstName.value}
+          errors={$firstName.errors}
           required={true}
           extra_classes="basis-1/2"
         />
         <Input
+          title="Efternavn(e)"
           id="last-name"
-          placeholder="Efternavn"
-          bind:value={lastName}
+          bind:value={$lastName.value}
+          errors={$lastName.errors}
           required={true}
           extra_classes="basis-1/2"
         />
       </div>
       <div class="flex flex-row gap-6">
         <Input
-          title="Kaldenavn"
+          title="Kaldenavn fornavn"
           id="nickname-first-name"
-          placeholder="Fornavn"
           bind:value={nicknameFirstName}
           extra_classes="basis-1/2"
         />
         <Input
+          title="Kaldenavn efternavn(e)"
           id="nickname-last-name"
-          placeholder="Efternavn"
           bind:value={nicknameLastName}
-          extra_classes="pt-6 basis-1/2"
+          extra_classes="basis-1/2"
         />
       </div>
     </div>

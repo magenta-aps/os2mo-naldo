@@ -19,9 +19,14 @@
   import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
   import { getClassUuidByUserKey } from "$lib/util/get_classes"
   import { getITSystemNames } from "$lib/util/helpers"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
 
-  let fromDate: string
   let toDate: string
+
+  const fromDate = field("from", "", [required()])
+  const accountName = field("accountName", "", [required()])
+  $: svelteForm = form(fromDate, accountName)
 
   gql`
     query ItSystemsClassAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
@@ -69,22 +74,26 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(CreateItUserDocument, {
-            input: result.data,
-          })
-          $success = {
-            message: `IT-kontoen ${
-              mutation.ituser_create.objects[0]?.employee
-                ? `for ${mutation.ituser_create.objects[0].employee[0].name}`
-                : ""
-            } er oprettet fra d. ${fromDate}`,
-            uuid: $page.params.uuid,
-            type: "employee",
+      // Await the validation, before we continue
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(CreateItUserDocument, {
+              input: result.data,
+            })
+            $success = {
+              message: `IT-kontoen ${
+                mutation.ituser_create.objects[0]?.employee
+                  ? `for ${mutation.ituser_create.objects[0].employee[0].name}`
+                  : ""
+              } er oprettet fra d. ${$fromDate.value}`,
+              uuid: $page.params.uuid,
+              type: "employee",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -110,9 +119,11 @@
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
+          <!-- FIXME: Fix dates min/max -->
           <DateInput
-            bind:value={fromDate}
             startValue={$date}
+            bind:value={$fromDate.value}
+            errors={$fromDate.errors}
             title="Startdato"
             id="from"
             min={minDate}
@@ -122,7 +133,7 @@
             bind:value={toDate}
             title="Slutdato"
             id="to"
-            min={fromDate ? fromDate : minDate}
+            min={$fromDate.value ? $fromDate.value : minDate}
           />
         </div>
         <div class="flex flex-row gap-6">
@@ -134,6 +145,8 @@
             required={true}
           />
           <Input
+            bind:value={$accountName.value}
+            errors={$accountName.errors}
             extra_classes="basis-1/2"
             title="Kontonavn"
             id="account-name"

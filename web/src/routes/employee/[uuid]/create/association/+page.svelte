@@ -18,9 +18,14 @@
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import Search from "$lib/components/search.svelte"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
 
-  let fromDate: string
   let toDate: string
+
+  const fromDate = field("from", "", [required()])
+  const orgUnit = field("org_unit", "", [required()])
+  $: svelteForm = form(fromDate, orgUnit)
 
   gql`
     query FacetAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
@@ -65,22 +70,26 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(CreateAssociationDocument, {
-            input: result.data,
-          })
-          $success = {
-            message: `Tilknytningen ${
-              mutation.association_create.objects[0]?.employee
-                ? `for ${mutation.association_create.objects[0].employee?.[0].name}`
-                : ""
-            } er oprettet fra d. ${fromDate}`,
-            uuid: $page.params.uuid,
-            type: "employee",
+      // Await the validation, before we continue
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(CreateAssociationDocument, {
+              input: result.data,
+            })
+            $success = {
+              message: `Tilknytningen ${
+                mutation.association_create.objects[0]?.employee
+                  ? `for ${mutation.association_create.objects[0].employee?.[0].name}`
+                  : ""
+              } er oprettet fra d. ${$fromDate.value}`,
+              uuid: $page.params.uuid,
+              type: "employee",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -91,7 +100,7 @@
   Henter data...
 {:then data}
   {@const facets = data.facets.objects}
-  {@const employeeName = data.employees.objects[0].objects[0].name}
+  {@const employee = data.employees.objects[0].objects[0]}
   {@const minDate = data.employees.objects[0].objects[0].validity.from.split("T")[0]}
 
   <title>Opret tilknytning | OS2mo</title>
@@ -107,8 +116,9 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            bind:value={fromDate}
             startValue={$date}
+            bind:value={$fromDate.value}
+            errors={$fromDate.errors}
             title="Startdato"
             id="from"
             min={minDate}
@@ -118,17 +128,30 @@
             can only be in the registrations of their parent org -->
           <!-- And I guess they also need to be dynamic, so they change depending
           which org_unit has been chosen -->
-          <DateInput bind:value={toDate} title="Slutdato" id="to" min={fromDate} />
+          <DateInput
+            bind:value={toDate}
+            title="Slutdato"
+            id="to"
+            min={$fromDate.value}
+          />
         </div>
-        <!-- FIXME: Use new Search -->
-        <Input
-          title="Medarbejder"
-          id="employee-uuid"
-          startValue={employeeName}
+        <Search
+          type="employee"
+          startValue={{
+            uuid: employee.uuid,
+            name: employee.name,
+            attrs: [],
+          }}
           disabled
           required={true}
         />
-        <Search type="org-unit" required={true} />
+        <Search
+          type="org-unit"
+          bind:name={$orgUnit.value}
+          errors={$orgUnit.errors}
+          on:clear={() => ($orgUnit.value = "")}
+          required={true}
+        />
         <div class="flex flex-row gap-6">
           <Select
             title="Tilknytningsrolle"

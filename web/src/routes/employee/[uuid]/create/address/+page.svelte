@@ -134,10 +134,10 @@
         <div class="flex flex-row gap-6">
           <DateInput
             startValue={$date}
-            title="Startdato"
-            id="from"
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
+            title="Startdato"
+            id="from"
             required={true}
             min={minDate}
             max={toDate ? toDate : maxDate}
