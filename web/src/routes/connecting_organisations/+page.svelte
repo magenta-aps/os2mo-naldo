@@ -267,7 +267,7 @@
         disabled={isDisabled}
         >Gem
       </button>
-      <!-- TODO: Where should goto: point to, if it's supposed to point somewhere? -->
+      <!-- FIXME: Where should goto: point to, if it's supposed to point somewhere? Additionally, it needs to be clarified what behavior is expected when cancel is triggered. -->
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"

@@ -24,6 +24,7 @@
     selectedOriginOrg = { uuid: target.id, name }
   }
 
+  /*  FIXME: Consider alternative solutions for this function; push does not work with Svelte, use a spread operator instead.*/
   const handleCheckboxChange = (event: Event) => {
     const target = event.target as HTMLInputElement
     if (target.checked) {
