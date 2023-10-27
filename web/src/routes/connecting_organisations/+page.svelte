@@ -272,7 +272,7 @@
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         disabled={isDisabled}
-        on:click={() => goto(`${base}/connecting-organisations/`)}
+        on:click={() => goto(`${base}/connecting_organisations/`)}
       >
         Annullér
       </button>
