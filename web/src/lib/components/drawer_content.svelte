@@ -9,7 +9,7 @@
     HOME = "/",
     EMPLOYEE = "/employee",
     ORGANISATION = "/organisation",
-    CONNECTING_ORGANISATIONS = "/connecting-organisations",
+    CONNECTING_ORGANISATIONS = "/connecting_organisations",
   }
 </script>
 
@@ -60,7 +60,6 @@
       href="{base}{SubPath.CONNECTING_ORGANISATIONS}"
     >
       <Icon type="sitemap" />
-      <!-- FIXME: Doesn't exist yet  -->
       <p>Organisationssammenkobling</p>
     </a>
   </li>
