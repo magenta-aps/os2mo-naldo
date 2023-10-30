@@ -21,7 +21,7 @@
 
   const fromDate = field("from", "", [required()])
   const employee = field("employee", "", [required()])
-  $: myForm = form(fromDate, employee)
+  $: svelteForm = form(fromDate, employee)
 
   gql`
     query FacetAndOrg($uuid: [UUID!], $fromDate: DateTime) {
@@ -66,8 +66,8 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      await myForm.validate()
-      if ($myForm.valid) {
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
         if (result.type === "success" && result.data) {
           try {
             const mutation = await graphQLClient().request(CreateAssociationDocument, {

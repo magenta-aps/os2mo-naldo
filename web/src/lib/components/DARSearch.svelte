@@ -63,7 +63,6 @@
       --border-radius="0.25rem"
       --placeholder-color="#00244E"
       --icons-color="#00244E"
-      --border-focused="solid 0px"
       --padding="0 0 0 0.75rem"
       placeholder="Søg efter adresse"
       id="dar-search"
@@ -101,9 +100,3 @@
     <input hidden name={id} bind:value={value.adresse.id} />
   {/if}
 {/if}
-
-<style>
-  :global(.svelte-select.focused) {
-    box-shadow: 0px 0px 0px 3px #1053ab;
-  }
-</style>

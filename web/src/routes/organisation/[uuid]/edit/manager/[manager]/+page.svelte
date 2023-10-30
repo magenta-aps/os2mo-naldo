@@ -21,7 +21,7 @@
   let toDate: string
   const fromDate = field("from", "", [required()])
   const responsibilitiesField = field("responsibilities", [], [required()])
-  $: myForm = form(fromDate, responsibilitiesField)
+  $: svelteForm = form(fromDate, responsibilitiesField)
 
   gql`
     query ManagerAndFacets($uuid: [UUID!], $fromDate: DateTime) {
@@ -91,8 +91,8 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      await myForm.validate()
-      if ($myForm.valid) {
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
         if (result.type === "success" && result.data) {
           try {
             const mutation = await graphQLClient().request(UpdateManagerDocument, {

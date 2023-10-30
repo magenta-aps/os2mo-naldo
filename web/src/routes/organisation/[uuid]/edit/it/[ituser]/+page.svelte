@@ -25,7 +25,7 @@
   let toDate: string
   const fromDate = field("from", "", [required()])
   const accountName = field("accountName", "", [required()])
-  $: myForm = form(fromDate, accountName)
+  $: svelteForm = form(fromDate, accountName)
 
   gql`
     query ITUserItSystemsOrgAndPrimary(
@@ -92,8 +92,8 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      await myForm.validate()
-      if ($myForm.valid) {
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
         if (result.type === "success" && result.data) {
           try {
             const mutation = await graphQLClient().request(UpdateItUserDocument, {

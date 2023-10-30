@@ -18,7 +18,7 @@
 
   let toDate: string
   const fromDate = field("from", "", [required()])
-  $: myForm = form(fromDate)
+  $: svelteForm = form(fromDate)
 
   gql`
     query FacetsAndOrg($uuid: [UUID!], $fromDate: DateTime) {
@@ -62,8 +62,8 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      await myForm.validate()
-      if ($myForm.valid) {
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
         if (result.type === "success" && result.data) {
           try {
             const mutation = await graphQLClient().request(CreateKleDocument, {

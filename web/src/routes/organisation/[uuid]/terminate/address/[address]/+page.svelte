@@ -14,7 +14,7 @@
   import { required } from "svelte-forms/validators"
 
   const toDate = field("to", "", [required()])
-  $: myForm = form(toDate)
+  $: svelteForm = form(toDate)
 
   gql`
     query Address($uuid: [UUID!], $fromDate: DateTime!, $org_unit_uuid: [UUID!]) {
@@ -60,8 +60,8 @@
     () =>
     async ({ result }) => {
       // Await the validation, before we continue
-      await myForm.validate()
-      if ($myForm.valid) {
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
         if (result.type === "success" && result.data) {
           try {
             const mutation = await graphQLClient().request(TerminateAddressDocument, {
