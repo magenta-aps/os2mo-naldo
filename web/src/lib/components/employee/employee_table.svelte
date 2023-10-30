@@ -19,7 +19,7 @@
   export let employees: any[]
 </script>
 
-<DetailTable headers={["Navn", "CPR", ""]}>
+<DetailTable headers={[{ title: "Navn" }, { title: "CPR" }, { title: "" }]}>
   <!-- TODO: Delete slice when pagination is implemented -->
   {#each employees.slice(0, 200) as employee}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">

@@ -17,8 +17,14 @@
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
   const headers = isOrg
-    ? ["Navn", "Rolletype", "Dato"]
-    : ["Enhed", "Rolletype", "Dato", "", ""]
+    ? [{ title: "Navn" }, { title: "Rolletype" }, { title: "Dato" }]
+    : [
+        { title: "Enhed" },
+        { title: "Rolletype" },
+        { title: "Dato" },
+        { title: "" },
+        { title: "" },
+      ]
 
   gql`
     query EmployeeAndOrgRoles(

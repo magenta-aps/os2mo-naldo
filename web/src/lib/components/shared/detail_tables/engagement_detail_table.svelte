@@ -17,8 +17,22 @@
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
   const headers = isOrg
-    ? ["Navn", "Stillingbetegnelse", "Engagementstype", "Primær", "Dato"]
-    : ["Enhed", "Stillingbetegnelse", "Engagementstype", "Primær", "Dato", "", ""]
+    ? [
+        { title: "Navn" },
+        { title: "Stillingbetegnelse" },
+        { title: "Engagementstype" },
+        { title: "Primær" },
+        { title: "Dato" },
+      ]
+    : [
+        { title: "Enhed" },
+        { title: "Stillingbetegnelse" },
+        { title: "Engagementstype" },
+        { title: "Primær" },
+        { title: "Dato" },
+        { title: "" },
+        { title: "" },
+      ]
 
   // Bør vi ikke tilføje noget tid til de her queries?
   gql`

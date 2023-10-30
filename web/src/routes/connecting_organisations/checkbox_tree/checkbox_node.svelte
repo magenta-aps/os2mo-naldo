@@ -101,7 +101,7 @@
       }}
     >
       {#if children.length}
-        <Icon type="arrow" class={isOpen ? "transform rotate-90" : ""} />
+        <Icon type="arrow" size="16" class={isOpen ? "transform rotate-90" : ""} />
       {/if}
     </div>
     {#if allowMultipleSelection}
