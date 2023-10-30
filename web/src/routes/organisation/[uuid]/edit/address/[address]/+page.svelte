@@ -26,7 +26,7 @@
   // update the field depending on address-type
   let addressField = field("", "")
   const fromDate = field("from", "", [required()])
-  $: myForm = form(fromDate, addressField)
+  $: svelteForm = form(fromDate, addressField)
 
   gql`
     query AddressAndFacets(
@@ -143,8 +143,8 @@
     () =>
     async ({ result }) => {
       // Await the validation, before we continue
-      await myForm.validate()
-      if ($myForm.valid) {
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
         if (result.type === "success" && result.data) {
           try {
             const mutation = await graphQLClient().request(UpdateAddressDocument, {

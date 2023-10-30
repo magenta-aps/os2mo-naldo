@@ -21,7 +21,7 @@
   let toDate: string
   const fromDate = field("from", "", [required()])
   const name = field("name", "", [required()])
-  $: myForm = form(fromDate, name)
+  $: svelteForm = form(fromDate, name)
 
   gql`
     query GetOrgUnitAndFacets($uuid: [UUID!], $fromDate: DateTime) {
@@ -79,8 +79,8 @@
     () =>
     async ({ result }) => {
       // Await the validation, before we continue
-      await myForm.validate()
-      if ($myForm.valid) {
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
         if (result.type === "success" && result.data) {
           try {
             const mutation = await graphQLClient().request(UpdateOrgUnitDocument, {

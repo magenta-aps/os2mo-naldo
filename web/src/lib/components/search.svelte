@@ -68,7 +68,6 @@
       --border-radius="0.25rem"
       --placeholder-color="#00244E"
       --icons-color="#00244E"
-      --border-focused="solid 0px"
       --padding="0 0.75rem 0 0.75rem"
       id="autocomplete"
       loadOptions={fetchAutocomplete}
@@ -79,7 +78,9 @@
       hideEmptyState={true}
       placeholder={`Søg efter ${type === "employee" ? "person" : "organisation"}`}
       on:change
-      on:clear
+      on:clear={() => {
+        name = undefined
+      }}
       on:select={() => {
         if (action === "goto" && value) {
           goto(
@@ -112,9 +113,3 @@
 {#if action === "select" && value}
   <input hidden {id} name={id} bind:value={value.uuid} />
 {/if}
-
-<style>
-  :global(.svelte-select.focused) {
-    box-shadow: 0px 0px 0px 3px #1053ab;
-  }
-</style>

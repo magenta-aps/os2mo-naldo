@@ -18,7 +18,7 @@
 
   const fromDate = field("from", "", [required()])
   const orgUnitField = field("org_unit", "", [required()])
-  $: myForm = form(fromDate, orgUnitField)
+  $: svelteForm = form(fromDate, orgUnitField)
 
   const urlHashOrgUnitUuid = getUuidFromHash($page.url.hash)
 
@@ -50,8 +50,8 @@
     () =>
     async ({ result }) => {
       // Await the validation, before we continue
-      await myForm.validate()
-      if ($myForm.valid) {
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
         if (result.type === "success" && result.data) {
           try {
             const mutation = await graphQLClient().request(UpdateOrgUnitDocument, {
