@@ -80,7 +80,7 @@
 
 <div class="m-12">
   <h1>Medarbejdere</h1>
-  <div class="h-screen min-w-full mt-8">
+  <div class="min-w-full mt-8">
     <EmployeeSearchInput bind:input bind:cardView />
     <div class="py-5">
       {#await fetchEmployees()}
