@@ -15,11 +15,18 @@
   import type { SubmitFunction } from "./$types"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import DarSearch from "$lib/components/DARSearch.svelte"
+  import { form, field } from "svelte-forms"
+  import { required, email, pattern, url } from "svelte-forms/validators"
+  import { Addresses } from "$lib/util/addresses"
 
-  let fromDate: string
   let toDate: string
   let addressType: { name: string; uuid?: any | null }
   $: addressUuid = addressType?.uuid
+
+  // update the field depending on address-type
+  let addressField = field("", "")
+  const fromDate = field("from", "", [required()])
+  $: svelteForm = form(fromDate, addressField)
 
   gql`
     query AddressAndFacets(
@@ -84,25 +91,77 @@
     }
   `
 
+  $: switch (addressType?.name) {
+    case Addresses.AFDELINGSKODE:
+      addressField = field(Addresses.AFDELINGSKODE, "", [required()])
+      break
+    case Addresses.EAN_NUMMER:
+      addressField = field(Addresses.EAN_NUMMER, "", [required(), pattern(/^\d{13}$/)])
+      break
+    case Addresses.EMAIL:
+      addressField = field(Addresses.EMAIL, "", [required(), email()])
+      break
+    case Addresses.FAX:
+      // Jeg ved ikke hvordan en fax kan se ud, det gør MO heller ikke
+      addressField = field(Addresses.FAX, "", [required(), pattern(/\d+/)])
+      break
+    case Addresses.FORMAALSKODE:
+      addressField = field(Addresses.FORMAALSKODE, "", [required()])
+      break
+    case Addresses.HENVENDELSESSTED:
+      addressField = field(Addresses.HENVENDELSESSTED, "", [required()])
+      break
+    case Addresses.LOKATION:
+      addressField = field(Addresses.LOKATION, "", [required()])
+      break
+    case Addresses.P_NUMMER:
+      addressField = field(Addresses.P_NUMMER, "", [required(), pattern(/^\d{10}$/)])
+      break
+    case Addresses.POSTADRESSE:
+      addressField = field(Addresses.POSTADRESSE, "", [required()])
+      break
+    case Addresses.RETURADRESSE:
+      addressField = field(Addresses.RETURADRESSE, "", [required()])
+      break
+    case Addresses.SKOLEKODE:
+      addressField = field(Addresses.SKOLEKODE, "", [required()])
+      break
+    case Addresses.TELEFON:
+      // This regex is not perfect, as it allows ex. `12345678` and `+45123456`, but use it for now
+      addressField = field(Addresses.TELEFON, "", [required(), pattern(/(\+45)?\d{8}/)])
+      break
+    case Addresses.WEBADRESSE:
+      // URL skal have http(s), ftp, git eller svn :shrug: Skal vi acceptere `www.lol.dk`?
+      // `url()` er måske lidt for aggressiv.
+      addressField = field(Addresses.WEBADRESSE, "", [required(), url()])
+      break
+    default:
+      break
+  }
+
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(UpdateAddressDocument, {
-            input: result.data,
-          })
-          $success = {
-            message: `Adressen ${
-              mutation.address_update.objects[0].org_unit
-                ? `for ${mutation.address_update.objects[0].org_unit[0].name}`
-                : ""
-            } redigeres fra d. ${fromDate}`,
-            uuid: $page.params.uuid,
-            type: "organisation",
+      // Await the validation, before we continue
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(UpdateAddressDocument, {
+              input: result.data,
+            })
+            $success = {
+              message: `Adressen ${
+                mutation.address_update.objects[0].org_unit
+                  ? `for ${mutation.address_update.objects[0].org_unit[0].name}`
+                  : ""
+              } redigeres fra d. ${$fromDate.value}`,
+              uuid: $page.params.uuid,
+              type: "organisation",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -130,8 +189,9 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            bind:value={fromDate}
             startValue={$date}
+            bind:value={$fromDate.value}
+            errors={$fromDate.errors}
             title="Startdato"
             id="from"
             min={minDate}
@@ -143,8 +203,8 @@
             startValue={address.validity.to ? address.validity.to.split("T")[0] : null}
             title="Slutdato"
             id="to"
-            min={fromDate}
-            max={maxDate ? maxDate : null}
+            min={$fromDate.value ? $fromDate.value : minDate}
+            max={maxDate}
           />
         </div>
         <div class="flex flex-row gap-6">
@@ -168,111 +228,28 @@
           <input hidden name="address-type-uuid" bind:value={addressUuid} />
         </div>
         {#if addressType}
-          <!-- FIXME: -->
-          <!-- Kan vi på en eller anden måde sørge for at det kun er den "rigtige" value der får startvalue? -->
-          <!-- Denne løsning gør at alle input-felter får adress.value, selvom valuen ikke passer til adressetypen -->
-          <!-- I praksis gør det bare at der ikke automatisk kommer et tomt felt, når man skifter adressetype -->
-          {#if addressType.name == "Afdelingskode"}
-            <Input
-              title="Afdelingskode"
-              id="value"
-              startValue={address.name}
-              required={true}
-            />
-          {:else if addressType.name == "Email"}
-            <Input
-              title="Email"
-              id="value"
-              type="email"
-              startValue={address.name}
-              required={true}
-            />
-          {:else if addressType.name == "P-nummer"}
-            <Input
-              title="P-nummer"
-              id="value"
-              startValue={address.name}
-              required={true}
-            />
-          {:else if addressType.name == "Postadresse"}
+          {#if [Addresses.HENVENDELSESSTED, Addresses.POSTADRESSE, Addresses.RETURADRESSE]
+            .map(String)
+            .includes(addressType.name)}
             <DarSearch
-              title="Postadresse"
               startValue={{
                 tekst: address.name,
                 adresse: { id: address.value },
                 adgangsadresse: { id: address.value },
               }}
-              required={true}
-            />
-          {:else if addressType.name == "Webadresse"}
-            <Input
-              title="Weabdresse"
+              bind:darName={$addressField.value}
+              errors={$addressField.errors}
+              title={addressType.name}
               id="value"
-              type="url"
-              pattern="^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+\.[a-z]+(\/[a-zA-Z0-9#]+\/?)*$"
-              patternMessage="Indtast en gyldig url"
-              startValue={address.name}
               required={true}
             />
-          {:else if addressType.name == "Formålskode"}
+          {:else}
             <Input
-              title="Formålskode"
-              id="value"
               startValue={address.name}
-              required={true}
-            />
-          {:else if addressType.name == "Lokation"}
-            <Input
-              title="Lokation"
+              bind:value={$addressField.value}
+              errors={$addressField.errors}
+              title={addressType.name}
               id="value"
-              startValue={address.name}
-              required={true}
-            />
-          {:else if addressType.name == "EAN-nummer"}
-            <Input
-              title="EAN-nummer"
-              id="value"
-              startValue={address.name}
-              required={true}
-            />
-          {:else if addressType.name == "Skolekode"}
-            <Input
-              title="Skolekode"
-              id="value"
-              startValue={address.name}
-              required={true}
-            />
-          {:else if addressType.name == "Fax"}
-            <Input title="Fax" id="value" startValue={address.name} required={true} />
-          {:else if addressType.name == "Returadresse"}
-            <DarSearch
-              title="Returadresse"
-              startValue={{
-                tekst: address.name,
-                adresse: { id: address.value },
-                adgangsadresse: { id: address.value },
-              }}
-              required={true}
-            />
-          {:else if addressType.name == "Henvendelsessted"}
-            <!-- TODO: DAR input field? -->
-            <DarSearch
-              title="Henvendelsessted"
-              startValue={{
-                tekst: address.name,
-                adresse: { id: address.value },
-                adgangsadresse: { id: address.value },
-              }}
-              required={true}
-            />
-          {:else if addressType.name == "Telefon"}
-            <Input
-              title="Telefon"
-              id="value"
-              type="tel"
-              pattern="[0-9]+"
-              patternMessage="Kun tal & '+' er tilladt"
-              startValue={address.name}
               required={true}
             />
           {/if}

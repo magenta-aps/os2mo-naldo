@@ -11,10 +11,15 @@
   import { date } from "$lib/stores/date"
   import Search from "$lib/components/search.svelte"
   import { getUuidFromHash } from "$lib/util/helpers"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
 
-  let toDate: string
+  const toDate = field("to", "", [required()])
+  const orgUnitField = field("org_unit", "", [required()])
+
+  $: svelteForm = form(toDate, orgUnitField)
+
   const urlHashOrgUnitUuid = getUuidFromHash($page.url.hash)
-  const includeOrgUnit = urlHashOrgUnitUuid ? true : false
 
   gql`
     query OrgUnit($uuid: [UUID!], $fromDate: DateTime!, $includeOrgUnit: Boolean!) {
@@ -55,23 +60,27 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(TerminateOrgUnitDocument, {
-            input: result.data,
-          })
+      // Await the validation, before we continue
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(TerminateOrgUnitDocument, {
+              input: result.data,
+            })
 
-          $success = {
-            message: `Organisationsenheden ${
-              mutation.org_unit_terminate.objects[0].name
-                ? mutation.org_unit_terminate.objects[0].name
-                : ""
-            } afsluttes d. ${toDate}`,
-            uuid: mutation.org_unit_terminate.objects[0].uuid,
-            type: "organisation",
+            $success = {
+              message: `Organisationsenheden ${
+                mutation.org_unit_terminate.objects[0].name
+                  ? mutation.org_unit_terminate.objects[0].name
+                  : ""
+              } afsluttes d. ${$toDate.value}`,
+              uuid: mutation.org_unit_terminate.objects[0].uuid,
+              type: "organisation",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -86,7 +95,7 @@
 <div class="divider p-0 m-0 mb-4 w-full" />
 
 <form method="post" class="mx-6" use:enhance={handler}>
-  {#await graphQLClient().request( OrgUnitDocument, { uuid: urlHashOrgUnitUuid, fromDate: $date, includeOrgUnit: includeOrgUnit } )}
+  {#await graphQLClient().request( OrgUnitDocument, { uuid: urlHashOrgUnitUuid, fromDate: $date, includeOrgUnit: urlHashOrgUnitUuid ? true : false } )}
     <!-- TODO: Should have a skeleton for the loading stage -->
     Henter data...
   {:then data}
@@ -98,8 +107,9 @@
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <DateInput
-          bind:value={toDate}
           startValue={$date}
+          bind:value={$toDate.value}
+          errors={$toDate.errors}
           title="Slutdato"
           id="to"
           min={minDate}
@@ -115,6 +125,9 @@
               name: orgUnit.name,
               attrs: [],
             }}
+            bind:name={$orgUnitField.value}
+            on:clear={() => ($orgUnitField.value = "")}
+            errors={$orgUnitField.errors}
             required={true}
           />
         {:else}
@@ -122,6 +135,9 @@
             type="org-unit"
             title="Angiv overenhed"
             id="parent-uuid"
+            bind:name={$orgUnitField.value}
+            on:clear={() => ($orgUnitField.value = "")}
+            errors={$orgUnitField.errors}
             required={true}
           />
         {/if}

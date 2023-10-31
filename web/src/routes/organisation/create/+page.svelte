@@ -14,7 +14,23 @@
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import Search from "$lib/components/search.svelte"
   import { getUuidFromHash } from "$lib/util/helpers"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
 
+  let toDate: string
+
+  const fromDate = field("from", "", [required()])
+  const name = field("name", "", [required()])
+  $: svelteForm = form(fromDate, name)
+
+  let parent: {
+    uuid: string
+    name: string
+    attrs: []
+  }
+
+  const urlHashOrgUnitUuid = getUuidFromHash($page.url.hash)
+  const includeOrgUnit = urlHashOrgUnitUuid ? true : false
   gql`
     query GetOrgUnitAndFacets(
       $uuid: [UUID!]
@@ -63,41 +79,34 @@
     }
   `
 
-  let fromDate: string
-  let toDate: string
-  let parent: {
-    uuid: string
-    name: string
-    attrs: []
-  }
-
-  const urlHashOrgUnitUuid = getUuidFromHash($page.url.hash)
-  const includeOrgUnit = urlHashOrgUnitUuid ? true : false
-
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(CreateOrgUnitDocument, {
-            input: result.data,
-          })
-          $success = {
-            message: `Organisationsenheden ${
-              mutation.org_unit_create.objects[0]?.name
-                ? mutation.org_unit_create.objects[0].name
-                : ""
-            } er blevet oprettet.`,
-            // TODO: Fix `parent` redirect, when `/organisation` is not a thing anymore
-            uuid: mutation.org_unit_create.objects[0]?.uuid
-              ? mutation.org_unit_create.objects[0].uuid
-              : parent
-              ? parent.uuid
-              : "",
-            type: "organisation",
+      // Await the validation, before we continue
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(CreateOrgUnitDocument, {
+              input: result.data,
+            })
+            $success = {
+              message: `Organisationsenheden ${
+                mutation.org_unit_create.objects[0]?.name
+                  ? mutation.org_unit_create.objects[0].name
+                  : ""
+              } er blevet oprettet.`,
+              // TODO: Fix `parent` redirect, when `/organisation` is not a thing anymore
+              uuid: mutation.org_unit_create.objects[0]?.uuid
+                ? mutation.org_unit_create.objects[0].uuid
+                : parent
+                ? parent.uuid
+                : "",
+              type: "organisation",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -126,8 +135,9 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            bind:value={fromDate}
             startValue={$date}
+            bind:value={$fromDate.value}
+            errors={$fromDate.errors}
             title="Startdato"
             id="from"
             min={minDate}
@@ -138,7 +148,7 @@
             bind:value={toDate}
             title="Slutdato"
             id="to"
-            min={fromDate ? fromDate : minDate}
+            min={$fromDate.value ? $fromDate.value : minDate}
             max={maxDate}
           />
         </div>
@@ -163,7 +173,13 @@
           />
         {/if}
 
-        <Input title="Navn" id="name" required={true} />
+        <Input
+          title="Navn"
+          id="name"
+          required={true}
+          bind:value={$name.value}
+          errors={$name.errors}
+        />
         <Select
           title="Enhedstype"
           id="org-unit-type"

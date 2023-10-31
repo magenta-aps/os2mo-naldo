@@ -15,9 +15,13 @@
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import Search from "$lib/components/search.svelte"
   import SelectMultiple from "$lib/components/forms/shared/selectMultiple.svelte"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
 
-  let fromDate: string
   let toDate: string
+  const fromDate = field("from", "", [required()])
+  const responsibilitiesField = field("responsibilities", [], [required()])
+  $: svelteForm = form(fromDate, responsibilitiesField)
 
   gql`
     query ManagerAndFacets($uuid: [UUID!], $fromDate: DateTime) {
@@ -87,23 +91,26 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(UpdateManagerDocument, {
-            input: result.data,
-          })
-          $success = {
-            // Ville gerne kunne skrive "gøres vakant" her, men det kan vi desværre ikke rigtig..
-            message: `Lederrollen ${
-              mutation.manager_update.objects[0].employee
-                ? `for ${mutation.manager_update.objects[0].employee[0].name} `
-                : ""
-            } redigeres fra d. ${fromDate}`,
-            uuid: $page.params.uuid,
-            type: "organisation",
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(UpdateManagerDocument, {
+              input: result.data,
+            })
+            $success = {
+              // Ville gerne kunne skrive "gøres vakant" her, men det kan vi desværre ikke rigtig..
+              message: `Lederrollen ${
+                mutation.manager_update.objects[0].employee
+                  ? `for ${mutation.manager_update.objects[0].employee[0].name} `
+                  : ""
+              } redigeres fra d. ${fromDate}`,
+              uuid: $page.params.uuid,
+              type: "organisation",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -132,8 +139,9 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            bind:value={fromDate}
             startValue={$date}
+            bind:value={$fromDate.value}
+            errors={$fromDate.errors}
             title="Startdato"
             id="from"
             min={minDate}
@@ -188,6 +196,8 @@
           />
         </div>
         <SelectMultiple
+          bind:responsibilities={$responsibilitiesField.value}
+          errors={$responsibilitiesField.errors}
           title="Lederansvar"
           id="responsibility"
           startValue={responsibilities}

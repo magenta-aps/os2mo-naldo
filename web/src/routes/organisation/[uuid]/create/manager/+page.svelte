@@ -15,9 +15,13 @@
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import Search from "$lib/components/search.svelte"
   import SelectMultiple from "$lib/components/forms/shared/selectMultiple.svelte"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
 
-  let fromDate: string
   let toDate: string
+  const fromDate = field("from", "", [required()])
+  const responsibilities = field("responsibilities", [], [required()])
+  $: svelteForm = form(fromDate, responsibilities)
 
   gql`
     query FacetsAndOrg($uuid: [UUID!], $fromDate: DateTime) {
@@ -62,22 +66,25 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(CreateManagerDocument, {
-            input: result.data,
-          })
-          $success = {
-            message: `${
-              mutation.manager_create.objects[0]?.employee
-                ? `Lederrollen for ${mutation.manager_create.objects[0].employee[0].name}`
-                : "Vakant lederrolle"
-            } er oprettet fra d. ${fromDate}`,
-            uuid: $page.params.uuid,
-            type: "organisation",
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(CreateManagerDocument, {
+              input: result.data,
+            })
+            $success = {
+              message: `${
+                mutation.manager_create.objects[0]?.employee
+                  ? `Lederrollen for ${mutation.manager_create.objects[0].employee[0].name}`
+                  : "Vakant lederrolle"
+              } er oprettet fra d. ${$fromDate.value}`,
+              uuid: $page.params.uuid,
+              type: "organisation",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -104,8 +111,9 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            bind:value={fromDate}
             startValue={$date}
+            bind:value={$fromDate.value}
+            errors={$fromDate.errors}
             title="Startdato"
             id="from"
             min={minDate}
@@ -116,7 +124,7 @@
             bind:value={toDate}
             title="Slutdato"
             id="to"
-            min={fromDate ? fromDate : minDate}
+            min={$fromDate.value ? $fromDate.value : minDate}
             max={maxDate}
           />
         </div>
@@ -138,6 +146,8 @@
           />
         </div>
         <SelectMultiple
+          bind:responsibilities={$responsibilities.value}
+          errors={$responsibilities.errors}
           title="Lederansvar"
           id="responsibility"
           iterable={getClassesByFacetUserKey(facets, "responsibility")}

@@ -17,9 +17,13 @@
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import Search from "$lib/components/search.svelte"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
 
-  let fromDate: string
   let toDate: string
+  const fromDate = field("from", "", [required()])
+  const employee = field("employee", "", [required()])
+  $: svelteForm = form(fromDate, employee)
 
   gql`
     query AssociationAndFacet($uuid: [UUID!], $fromDate: DateTime) {
@@ -81,22 +85,26 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(UpdateAssociationDocument, {
-            input: result.data,
-          })
-          $success = {
-            message: `Tilknytningen ${
-              mutation.association_update.objects[0].employee
-                ? `for ${mutation.association_update.objects[0].employee[0].name}`
-                : ""
-            } redigeres fra d. ${fromDate}`,
-            uuid: $page.params.uuid,
-            type: "organisation",
+      // Await the validation, before we continue
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(UpdateAssociationDocument, {
+              input: result.data,
+            })
+            $success = {
+              message: `Tilknytningen ${
+                mutation.association_update.objects[0].employee
+                  ? `for ${mutation.association_update.objects[0].employee[0].name}`
+                  : ""
+              } redigeres fra d. ${fromDate}`,
+              uuid: $page.params.uuid,
+              type: "organisation",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -124,8 +132,9 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            bind:value={fromDate}
             startValue={$date}
+            bind:value={$fromDate.value}
+            errors={$fromDate.errors}
             title="Startdato"
             id="from"
             min={minDate}
@@ -139,7 +148,7 @@
               : null}
             title="Slutdato"
             id="to"
-            min={fromDate}
+            min={$fromDate.value}
             max={maxDate ? maxDate : null}
           />
         </div>
@@ -150,6 +159,9 @@
             name: association.employee[0].name,
             attrs: [],
           }}
+          bind:name={$employee.value}
+          errors={$employee.errors}
+          on:clear={() => ($employee.value = "")}
           wantedAttrs={["Email"]}
           required={true}
         />

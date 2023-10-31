@@ -6,7 +6,7 @@
   export let startValue: DarAddressResponse | undefined = undefined
   export let value: DarAddressResponse | undefined = startValue || undefined
   export let title: string
-  export let darName: string | undefined = undefined
+  export let darName: string | undefined | null = undefined
   export let id = `value`
   export let required = true
   export let disabled = false
@@ -63,7 +63,6 @@
       --border-radius="0.25rem"
       --placeholder-color="#00244E"
       --icons-color="#00244E"
-      --border-focused="solid 0px"
       --padding="0 0 0 0.75rem"
       placeholder="Søg efter adresse"
       id="dar-search"
@@ -73,6 +72,9 @@
       {disabled}
       {itemId}
       bind:value
+      on:clear={() => {
+        darName = undefined
+      }}
       hideEmptyState={true}
     >
       <div slot="item" let:item>
@@ -98,9 +100,3 @@
     <input hidden name={id} bind:value={value.adresse.id} />
   {/if}
 {/if}
-
-<style>
-  :global(.svelte-select.focused) {
-    box-shadow: 0px 0px 0px 3px #1053ab;
-  }
-</style>

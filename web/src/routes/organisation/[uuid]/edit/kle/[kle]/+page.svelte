@@ -13,9 +13,12 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
 
-  let fromDate: string
   let toDate: string
+  const fromDate = field("from", "", [required()])
+  $: svelteForm = form(fromDate)
 
   gql`
     query KLEAndFacet($uuid: [UUID!], $fromDate: DateTime) {
@@ -72,22 +75,25 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(UpdateKleDocument, {
-            input: result.data,
-          })
-          $success = {
-            message: `KLE-opmærkningen ${
-              mutation.kle_update.objects[0].org_unit
-                ? `for ${mutation.kle_update.objects[0].org_unit[0].name}`
-                : ""
-            } redigeres fra d. ${fromDate}`,
-            uuid: $page.params.uuid,
-            type: "organisation",
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(UpdateKleDocument, {
+              input: result.data,
+            })
+            $success = {
+              message: `KLE-opmærkningen ${
+                mutation.kle_update.objects[0].org_unit
+                  ? `for ${mutation.kle_update.objects[0].org_unit[0].name}`
+                  : ""
+              } redigeres fra d. ${$fromDate.value}`,
+              uuid: $page.params.uuid,
+              type: "organisation",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -115,8 +121,9 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            bind:value={fromDate}
             startValue={$date}
+            bind:value={$fromDate.value}
+            errors={$fromDate.errors}
             title="Startdato"
             id="from"
             min={minDate}
@@ -128,7 +135,7 @@
             startValue={kle.validity.to ? kle.validity.to.split("T")[0] : null}
             title="Slutdato"
             id="to"
-            min={fromDate}
+            min={$fromDate.value ? $fromDate.value : minDate}
             max={maxDate}
           />
         </div>

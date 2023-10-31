@@ -26,7 +26,7 @@
   // update the field depending on address-type
   let address = field("", "")
   const fromDate = field("from", "", [required()])
-  $: myForm = form(fromDate, address)
+  $: svelteForm = form(fromDate, address)
 
   gql`
     query FacetsAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
@@ -88,8 +88,8 @@
     () =>
     async ({ result }) => {
       // Await the validation, before we continue
-      await myForm.validate()
-      if ($myForm.valid) {
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
         if (result.type === "success" && result.data) {
           try {
             const mutation = await graphQLClient().request(CreateAddressDocument, {
