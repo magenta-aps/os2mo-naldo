@@ -21,7 +21,7 @@
   let toDate: string
   const fromDate = field("from", "", [required()])
   const responsibilitiesField = field("responsibilities", [], [required()])
-  $: svelteForm = form(fromDate, responsibilitiesField)
+  const svelteForm = form(fromDate, responsibilitiesField)
 
   gql`
     query ManagerAndFacets($uuid: [UUID!], $fromDate: DateTime) {

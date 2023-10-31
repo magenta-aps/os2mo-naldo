@@ -18,7 +18,7 @@
 
   let toDate: string
   const fromDate = field("from", "", [required()])
-  $: svelteForm = form(fromDate)
+  const svelteForm = form(fromDate)
 
   gql`
     query FacetsAndOrg($uuid: [UUID!], $fromDate: DateTime) {

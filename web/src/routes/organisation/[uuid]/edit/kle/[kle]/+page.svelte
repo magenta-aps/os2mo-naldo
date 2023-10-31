@@ -18,7 +18,7 @@
 
   let toDate: string
   const fromDate = field("from", "", [required()])
-  $: svelteForm = form(fromDate)
+  const svelteForm = form(fromDate)
 
   gql`
     query KLEAndFacet($uuid: [UUID!], $fromDate: DateTime) {

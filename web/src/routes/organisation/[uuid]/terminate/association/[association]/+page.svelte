@@ -14,7 +14,7 @@
   import { required } from "svelte-forms/validators"
 
   const toDate = field("to", "", [required()])
-  $: svelteForm = form(toDate)
+  const svelteForm = form(toDate)
 
   gql`
     query Association($uuid: [UUID!], $fromDate: DateTime!) {

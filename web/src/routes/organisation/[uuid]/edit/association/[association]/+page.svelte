@@ -23,7 +23,7 @@
   let toDate: string
   const fromDate = field("from", "", [required()])
   const employee = field("employee", "", [required()])
-  $: svelteForm = form(fromDate, employee)
+  const svelteForm = form(fromDate, employee)
 
   gql`
     query AssociationAndFacet($uuid: [UUID!], $fromDate: DateTime) {

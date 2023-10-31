@@ -25,7 +25,7 @@
 
   const fromDate = field("from", "", [required()])
   const orgUnit = field("org_unit", "", [required()])
-  $: svelteForm = form(fromDate, orgUnit)
+  const svelteForm = form(fromDate, orgUnit)
 
   gql`
     query AssociationAndFacets($uuid: [UUID!], $fromDate: DateTime) {

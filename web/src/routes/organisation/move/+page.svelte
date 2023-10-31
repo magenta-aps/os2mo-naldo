@@ -18,7 +18,7 @@
 
   const fromDate = field("from", "", [required()])
   const orgUnitField = field("org_unit", "", [required()])
-  $: svelteForm = form(fromDate, orgUnitField)
+  const svelteForm = form(fromDate, orgUnitField)
 
   const urlHashOrgUnitUuid = getUuidFromHash($page.url.hash)
 
