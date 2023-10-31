@@ -5,7 +5,6 @@
   import { date } from "$lib/stores/date"
   import { EmployeeDocument } from "./query.generated"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
-  import { page } from "$app/stores"
   import Icon from "$lib/components/icon.svelte"
   import { base } from "$app/paths"
   import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
@@ -38,7 +37,6 @@
     { title: "Kaldenavn" },
     { title: "Dato" },
     { title: "" },
-    { title: "" },
   ]}
 >
   {#await graphQLClient().request( EmployeeDocument, { uuid: uuid, ...tenseToValidity(tense, $date) } )}
@@ -61,11 +59,6 @@
             <Icon type="pen" />
           </a>
         </td>
-        <td>
-          <a href="{base}/employee/{uuid}/terminate">
-            <Icon type="xmark" size="30" />
-          </a></td
-        >
       </tr>
     {/each}
   {/await}
