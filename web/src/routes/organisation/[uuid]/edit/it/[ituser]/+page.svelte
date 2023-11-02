@@ -184,7 +184,6 @@
             id="primary"
             startValue={itUser.primary_uuid}
             value={getClassUuidByUserKey(classes, "primary")}
-            extra_classes="checkbox-primary"
           />
         </div>
         <input

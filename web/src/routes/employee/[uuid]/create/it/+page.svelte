@@ -158,7 +158,6 @@
             title="Primær"
             id="primary"
             value={getClassUuidByUserKey(classes, "primary")}
-            extra_classes="checkbox-primary"
           />
         </div>
         <input
