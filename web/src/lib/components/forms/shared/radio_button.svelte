@@ -16,7 +16,7 @@
       name={groupName}
       {value}
       checked={startValue === value}
-      class="checkbox {extra_classes} rounded normal-case font-normal text-base text-base-100 checkbox-radio"
+      class="checkbox checkbox-primary {extra_classes} rounded normal-case font-normal text-base text-base-100 checkbox-radio"
     />
     {#if title}
       <label for={id}>{title}</label>

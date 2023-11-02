@@ -199,7 +199,6 @@
             title="Primær"
             id="primary"
             value={getClassUuidByUserKey(primaryClasses, "primary")}
-            extra_classes="checkbox-primary"
           />
           <input
             hidden

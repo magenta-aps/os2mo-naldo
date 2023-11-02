@@ -234,7 +234,6 @@
             id="primary"
             startValue={itassociation.primary?.uuid}
             value={getClassUuidByUserKey(classes, "primary")}
-            extra_classes="checkbox-primary"
           />
         </div>
         <input

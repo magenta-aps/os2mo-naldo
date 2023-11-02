@@ -15,7 +15,7 @@
       name={id}
       {value}
       checked={startValue === value}
-      class="checkbox {extra_classes} rounded normal-case font-normal text-base text-base-100"
+      class="checkbox checkbox-primary {extra_classes} rounded normal-case font-normal text-base text-base-100"
       {disabled}
     />
     {#if title}
