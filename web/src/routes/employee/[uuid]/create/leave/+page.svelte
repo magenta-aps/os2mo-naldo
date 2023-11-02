@@ -21,7 +21,7 @@
   let toDate: string
 
   const fromDate = field("from", "", [required()])
-  $: svelteForm = form(fromDate)
+  const svelteForm = form(fromDate)
 
   gql`
     query LeaveAndEmployee($uuid: [UUID!], $fromDate: DateTime) {

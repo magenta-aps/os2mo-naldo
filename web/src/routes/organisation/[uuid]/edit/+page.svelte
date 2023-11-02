@@ -21,7 +21,7 @@
   let toDate: string
   const fromDate = field("from", "", [required()])
   const name = field("name", "", [required()])
-  $: svelteForm = form(fromDate, name)
+  const svelteForm = form(fromDate, name)
 
   gql`
     query GetOrgUnitAndFacets($uuid: [UUID!], $fromDate: DateTime) {

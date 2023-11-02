@@ -23,7 +23,7 @@
   const fromDate = field("from", "", [required()])
   const orgUnit = field("org_unit", "", [required()])
   const responsibilitiesField = field("responsibilities", undefined, [required()])
-  $: svelteForm = form(fromDate, orgUnit, responsibilitiesField)
+  const svelteForm = form(fromDate, orgUnit, responsibilitiesField)
 
   gql`
     query ManagerAndFacets($uuid: [UUID!], $fromDate: DateTime) {

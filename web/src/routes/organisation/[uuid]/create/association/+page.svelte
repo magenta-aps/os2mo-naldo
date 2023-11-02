@@ -21,7 +21,7 @@
 
   const fromDate = field("from", "", [required()])
   const employee = field("employee", "", [required()])
-  $: svelteForm = form(fromDate, employee)
+  const svelteForm = form(fromDate, employee)
 
   gql`
     query FacetAndOrg($uuid: [UUID!], $fromDate: DateTime) {

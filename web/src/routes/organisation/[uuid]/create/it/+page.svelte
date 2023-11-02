@@ -23,7 +23,7 @@
 
   const fromDate = field("from", "", [required()])
   const accountName = field("accountName", "", [required()])
-  $: svelteForm = form(fromDate, accountName)
+  const svelteForm = form(fromDate, accountName)
 
   gql`
     query ItSystemsClassAndOrg($uuid: [UUID!], $fromDate: DateTime) {

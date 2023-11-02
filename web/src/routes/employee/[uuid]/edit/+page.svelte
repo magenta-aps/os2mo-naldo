@@ -20,7 +20,7 @@
   const fromDate = field("from", "", [required()])
   const firstName = field("first_name", "", [required()])
   const lastName = field("last_name", "", [required()])
-  $: svelteForm = form(fromDate, firstName, lastName)
+  const svelteForm = form(fromDate, firstName, lastName)
 
   gql`
     query Employee($uuid: [UUID!], $fromDate: DateTime) {
