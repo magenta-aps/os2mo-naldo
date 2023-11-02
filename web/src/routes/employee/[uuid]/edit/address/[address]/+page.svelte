@@ -14,11 +14,19 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import type { SubmitFunction } from "./$types"
+  import DarSearch from "$lib/components/DARSearch.svelte"
+  import { Addresses } from "$lib/util/addresses"
+  import { form, field } from "svelte-forms"
+  import { required, email, pattern } from "svelte-forms/validators"
 
-  let fromDate: string
   let toDate: string
   let addressType: { name: string; uuid?: any | null }
   $: addressUuid = addressType?.uuid
+
+  // update the field depending on address-type
+  let addressField = field("", "")
+  const fromDate = field("from", "", [required()])
+  $: svelteForm = form(fromDate, addressField)
 
   gql`
     query AddressAndFacets(
@@ -48,6 +56,7 @@
               uuid
             }
             name
+            value
             visibility {
               name
             }
@@ -82,25 +91,47 @@
     }
   `
 
+  $: switch (addressType?.name) {
+    case Addresses.EMAIL:
+      addressField = field(Addresses.EMAIL, "", [required(), email()])
+      break
+    case Addresses.LOKATION:
+      addressField = field(Addresses.LOKATION, "", [required()])
+      break
+    case Addresses.POSTADRESSE:
+      addressField = field(Addresses.POSTADRESSE, "", [required()])
+      break
+    case Addresses.TELEFON:
+      // This regex is not perfect, as it allows ex. `12345678` and `+45123456`, but use it for now
+      addressField = field(Addresses.TELEFON, "", [required(), pattern(/(\+45)?\d{8}/)])
+      break
+    default:
+      break
+  }
+
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(UpdateAddressDocument, {
-            input: result.data,
-          })
-          $success = {
-            message: `Adressen ${
-              mutation.address_update.objects[0].employee
-                ? `for ${mutation.address_update.objects[0].employee[0].name}`
-                : ""
-            } redigeres fra d. ${fromDate}`,
-            uuid: $page.params.uuid,
-            type: "employee",
+      // Await the validation, before we continue
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(UpdateAddressDocument, {
+              input: result.data,
+            })
+            $success = {
+              message: `Adressen ${
+                mutation.address_update.objects[0].employee
+                  ? `for ${mutation.address_update.objects[0].employee[0].name}`
+                  : ""
+              } redigeres fra d. ${$fromDate.value}`,
+              uuid: $page.params.uuid,
+              type: "employee",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -128,8 +159,9 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            bind:value={fromDate}
             startValue={$date}
+            bind:value={$fromDate.value}
+            errors={$fromDate.errors}
             title="Startdato"
             id="from"
             min={minDate}
@@ -141,7 +173,7 @@
             startValue={address.validity.to ? address.validity.to.split("T")[0] : null}
             title="Slutdato"
             id="to"
-            min={fromDate ? fromDate : minDate}
+            min={$fromDate.value ? $fromDate.value : minDate}
             max={maxDate}
           />
         </div>
@@ -166,36 +198,26 @@
           <input hidden name="address-type-uuid" bind:value={addressUuid} />
         </div>
         {#if addressType}
-          {#if addressType.name == "Email"}
-            <Input
-              title="Email"
+          {#if addressType.name === Addresses.POSTADRESSE}
+            <DarSearch
+              startValue={{
+                tekst: address.name,
+                adresse: { id: address.value },
+                adgangsadresse: { id: address.value },
+              }}
+              bind:darName={$addressField.value}
+              errors={$addressField.errors}
+              title={addressType.name}
               id="value"
-              type="email"
-              startValue={address.name}
               required={true}
             />
-          {:else if addressType.name == "Lokation"}
+          {:else}
             <Input
-              title="Lokation"
-              id="value"
               startValue={address.name}
-              required={true}
-            />
-          {:else if addressType.name == "Postadresse"}
-            <Input
-              title="Postadresse"
+              bind:value={$addressField.value}
+              errors={$addressField.errors}
+              title={addressType.name}
               id="value"
-              startValue={address.name}
-              required={true}
-            />
-          {:else if addressType.name == "Telefon"}
-            <Input
-              title="Telefon"
-              id="value"
-              type="tel"
-              pattern="[0-9]+"
-              patternMessage="Kun tal & '+' er tilladt"
-              startValue={address.name}
               required={true}
             />
           {/if}

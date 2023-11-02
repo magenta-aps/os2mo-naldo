@@ -12,9 +12,15 @@
   import { UpdateEmployeeDocument, EmployeeDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
 
-  let fromDate: string
   let toDate: string
+
+  const fromDate = field("from", "", [required()])
+  const firstName = field("first_name", "", [required()])
+  const lastName = field("last_name", "", [required()])
+  $: svelteForm = form(fromDate, firstName, lastName)
 
   gql`
     query Employee($uuid: [UUID!], $fromDate: DateTime) {
@@ -47,18 +53,22 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(UpdateEmployeeDocument, {
-            input: result.data,
-          })
-          $success = {
-            message: `Medarbejderen ${mutation.employee_update.objects[0].name} redigeres fra d. ${fromDate}`,
-            uuid: mutation.employee_update.objects[0].uuid,
-            type: "employee",
+      // Await the validation, before we continue
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(UpdateEmployeeDocument, {
+              input: result.data,
+            })
+            $success = {
+              message: `Medarbejderen ${mutation.employee_update.objects[0].name} redigeres fra d. ${$fromDate.value}`,
+              uuid: mutation.employee_update.objects[0].uuid,
+              type: "employee",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -82,8 +92,9 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            bind:value={fromDate}
             startValue={$date}
+            bind:value={$fromDate.value}
+            errors={$fromDate.errors}
             title="Startdato"
             id="from"
             required={true}
@@ -99,30 +110,36 @@
         </div>
         <div class="flex flex-row gap-6">
           <Input
-            title="Navn"
+            title="Fornavn"
             id="first-name"
             startValue={employee.given_name}
+            bind:value={$firstName.value}
+            errors={$firstName.errors}
             extra_classes="basis-1/2"
             required={true}
           />
           <Input
+            title="Efternavn(e)"
             id="last-name"
             startValue={employee.surname}
+            bind:value={$lastName.value}
+            errors={$lastName.errors}
             extra_classes="basis-1/2"
             required={true}
           />
         </div>
         <div class="flex flex-row gap-6">
           <Input
-            title="Kaldenavn"
+            title="Kaldenavn fornavn"
             id="nickname-first-name"
             startValue={employee.nickname_givenname}
             extra_classes="basis-1/2"
           />
           <Input
+            title="Kaldenavn efternavn(e)"
             id="nickname-last-name"
             startValue={employee.nickname_surname}
-            extra_classes="basis-1/2 pt-6"
+            extra_classes="basis-1/2"
           />
         </div>
       </div>

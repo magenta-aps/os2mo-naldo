@@ -17,6 +17,13 @@
   } from "$lib/util/helpers"
   import { onMount } from "svelte"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
+
+  const fromDate = field("from", "", [required()])
+  const employeeField = field("employee", "", [required()])
+  const orgUnitField = field("org_unit", "", [required()])
+  const svelteForm = form(fromDate, employeeField, orgUnitField)
 
   let employee: {
     uuid: string
@@ -24,7 +31,6 @@
     attrs: []
   }
   let engagements: EngagementTitleAndUuid[] | undefined
-  let fromDate: string
 
   const urlHashEmployeeUuid = getUuidFromHash($page.url.hash)
   const includeEmployee = urlHashEmployeeUuid ? true : false
@@ -79,22 +85,26 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(UpdateEngagementDocument, {
-            input: result.data,
-          })
-          $success = {
-            message: `Engagementet ${
-              mutation.engagement_update.objects[0].employee
-                ? `for ${mutation.engagement_update.objects[0].employee[0].name}`
-                : ""
-            } flyttes d. ${fromDate}`,
-            uuid: mutation.engagement_update.objects[0].employee[0].uuid,
-            type: "employee",
+      // Await the validation, before we continue
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(UpdateEngagementDocument, {
+              input: result.data,
+            })
+            $success = {
+              message: `Engagementet ${
+                mutation.engagement_update.objects[0].employee
+                  ? `for ${mutation.engagement_update.objects[0].employee[0].name}`
+                  : ""
+              } flyttes d. ${$fromDate.value}`,
+              uuid: mutation.engagement_update.objects[0].employee[0].uuid,
+              type: "employee",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -132,11 +142,13 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            bind:value={fromDate}
             startValue={$date}
+            bind:value={$fromDate.value}
+            errors={$fromDate.errors}
             title="Flyttedato"
             id="from"
             min={minDate ? minDate : null}
+            required={true}
           />
         </div>
         <Search
@@ -150,8 +162,14 @@
               }
             : undefined}
           bind:value={employee}
+          bind:name={$employeeField.value}
+          errors={$employeeField.errors}
           on:change={() => updateEngagements(employee.uuid)}
-          on:clear={() => (engagements = undefined)}
+          on:clear={() => {
+            $employeeField.value = ""
+            engagements = undefined
+          }}
+          required={true}
         />
         {#if engagements && engagements.length}
           {#key engagements}
@@ -164,9 +182,16 @@
             />
           {/key}
         {:else}
-          <Select title="Engagementer" id="engagement-uuid" disabled />
+          <Select title="Engagementer" id="engagement-uuid" disabled required={true} />
         {/if}
-        <Search type="org-unit" title="Flyt til" />
+        <Search
+          type="org-unit"
+          title="Flyt til"
+          bind:name={$orgUnitField.value}
+          errors={$orgUnitField.errors}
+          on:clear={() => ($orgUnitField.value = "")}
+          required={true}
+        />
       </div>
     </div>
     <div class="flex py-6 gap-4">

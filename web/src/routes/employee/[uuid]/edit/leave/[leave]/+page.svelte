@@ -12,12 +12,16 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
-  import Input from "$lib/components/forms/shared/input.svelte"
   import { LeaveAndFacetDocument, UpdateLeaveDocument } from "./query.generated"
   import { getEngagementTitlesAndUuid } from "$lib/util/helpers"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
+  import Search from "$lib/components/search.svelte"
 
-  let fromDate: string
   let toDate: string
+
+  const fromDate = field("from", "", [required()])
+  $: svelteForm = form(fromDate)
 
   gql`
     query LeaveAndFacet($uuid: [UUID!], $fromDate: DateTime) {
@@ -96,22 +100,26 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(UpdateLeaveDocument, {
-            input: result.data,
-          })
-          $success = {
-            message: `Orloven ${
-              mutation.leave_update.objects[0].person
-                ? `for ${mutation.leave_update.objects[0].person[0].name}`
-                : ""
-            } redigeres fra d. ${fromDate}`,
-            uuid: $page.params.uuid,
-            type: "employee",
+      // Await the validation, before we continue
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(UpdateLeaveDocument, {
+              input: result.data,
+            })
+            $success = {
+              message: `Orloven ${
+                mutation.leave_update.objects[0].person
+                  ? `for ${mutation.leave_update.objects[0].person[0].name}`
+                  : ""
+              } redigeres fra d. ${$fromDate.value}`,
+              uuid: $page.params.uuid,
+              type: "employee",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -126,7 +134,7 @@
   {@const minDate = leave.engagement.validity.from.split("T")[0]}
   {@const maxDate = leave.engagement.validity?.to?.split("T")[0]}
   {@const engagements = leave.person[0].engagements}
-  {@const employeeName = leave.person[0].name}
+  {@const employee = leave.person[0]}
   {@const engagementStartValue = getEngagementTitlesAndUuid([leave.engagement])[0]}
 
   <title>Rediger orlov | OS2mo</title>
@@ -141,9 +149,11 @@
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
+          <!-- TODO: Update min/max depending on chosen engagement -->
           <DateInput
-            bind:value={fromDate}
             startValue={$date}
+            bind:value={$fromDate.value}
+            errors={$fromDate.errors}
             title="Startdato"
             id="from"
             min={minDate}
@@ -155,7 +165,7 @@
             startValue={leave.validity.to ? leave.validity.to.split("T")[0] : null}
             title="Slutdato"
             id="to"
-            min={fromDate ? fromDate : minDate}
+            min={$fromDate.value ? $fromDate.value : minDate}
             max={maxDate}
           />
         </div>
@@ -167,15 +177,16 @@
           iterable={getClassesByFacetUserKey(facets, "leave_type")}
           required={true}
         />
-
-        <Input
-          title="Medarbejder"
-          id="employee-uuid"
-          startValue={employeeName}
+        <Search
+          type="employee"
+          startValue={{
+            uuid: employee.uuid,
+            name: employee.name,
+            attrs: [],
+          }}
           disabled
           required={true}
         />
-
         <Select
           title="Engagementer"
           id="engagement-uuid"

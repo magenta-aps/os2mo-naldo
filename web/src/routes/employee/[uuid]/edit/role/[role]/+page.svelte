@@ -14,9 +14,14 @@
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import { FacetsAndRoleDocument, UpdateRoleDocument } from "./query.generated"
   import Search from "$lib/components/search.svelte"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
 
-  let fromDate: string
   let toDate: string
+
+  const fromDate = field("from", "", [required()])
+  const orgUnit = field("org_unit", "", [required()])
+  $: svelteForm = form(fromDate, orgUnit)
 
   gql`
     query FacetsAndRole($uuid: [UUID!], $fromDate: DateTime) {
@@ -73,22 +78,26 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(UpdateRoleDocument, {
-            input: result.data,
-          })
-          $success = {
-            message: `Rollen ${
-              mutation.role_update.objects[0].employee
-                ? `for ${mutation.role_update.objects[0].employee[0].name}`
-                : ""
-            } redigeres fra d. ${fromDate}`,
-            uuid: $page.params.uuid,
-            type: "employee",
+      // Await the validation, before we continue
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(UpdateRoleDocument, {
+              input: result.data,
+            })
+            $success = {
+              message: `Rollen ${
+                mutation.role_update.objects[0].employee
+                  ? `for ${mutation.role_update.objects[0].employee[0].name}`
+                  : ""
+              } redigeres fra d. ${$fromDate.value}`,
+              uuid: $page.params.uuid,
+              type: "employee",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -100,7 +109,6 @@
 {:then data}
   {@const facets = data.facets.objects}
   {@const role = data.roles.objects[0].objects[0]}
-  {@const org_unit = data.roles.objects[0].objects[0].org_unit[0]}
   {@const minDate =
     data.roles.objects[0].objects[0].employee[0].validity?.from?.split("T")[0]}
   {@const maxDate =
@@ -119,8 +127,9 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            bind:value={fromDate}
             startValue={$date}
+            bind:value={$fromDate.value}
+            errors={$fromDate.errors}
             title="Startdato"
             id="from"
             min={minDate}
@@ -132,7 +141,7 @@
             startValue={role.validity?.to?.split("T")[0]}
             title="Slutdato"
             id="to"
-            min={fromDate ? fromDate : minDate}
+            min={$fromDate.value ? $fromDate.value : minDate}
             max={maxDate}
           />
         </div>
@@ -143,6 +152,9 @@
             name: role.org_unit[0].name,
             attrs: [],
           }}
+          bind:name={$orgUnit.value}
+          errors={$orgUnit.errors}
+          on:clear={() => ($orgUnit.value = "")}
           required={true}
         />
 

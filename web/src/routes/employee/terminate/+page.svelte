@@ -3,8 +3,6 @@
   import Error from "$lib/components/alerts/error.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
-  import { goto } from "$app/navigation"
-  import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
   import { EmployeeDocument, TerminateEmployeeDocument } from "./query.generated"
@@ -13,8 +11,13 @@
   import { date } from "$lib/stores/date"
   import Search from "$lib/components/search.svelte"
   import { getUuidFromHash } from "$lib/util/helpers"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
 
-  let toDate: string
+  const toDate = field("to", "", [required()])
+  const employeeField = field("employee", "", [required()])
+
+  const svelteForm = form(toDate, employeeField)
   const urlHashEmployeeUuid = getUuidFromHash($page.url.hash)
 
   gql`
@@ -50,23 +53,27 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(TerminateEmployeeDocument, {
-            input: result.data,
-          })
+      // Await the validation, before we continue
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(TerminateEmployeeDocument, {
+              input: result.data,
+            })
 
-          $success = {
-            message: `Medarbejderen ${
-              mutation.employee_terminate.objects[0].name
-                ? mutation.employee_terminate.objects[0].name
-                : ""
-            } afsluttes d. ${toDate}`,
-            uuid: mutation.employee_terminate.objects[0].uuid,
-            type: "employee",
+            $success = {
+              message: `${
+                mutation.employee_terminate.objects[0].name
+                  ? mutation.employee_terminate.objects[0].name
+                  : "Medarbejderen"
+              } opsiges d. ${$toDate.value}`,
+              uuid: mutation.employee_terminate.objects[0].uuid,
+              type: "employee",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -91,11 +98,13 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            bind:value={toDate}
             startValue={$date}
+            bind:value={$toDate.value}
+            errors={$toDate.errors}
             title="Slutdato"
             id="to"
             min={minDate}
+            required={true}
           />
         </div>
         {#if employee}
@@ -107,9 +116,20 @@
               name: employee.name,
               attrs: [],
             }}
+            bind:name={$employeeField.value}
+            on:clear={() => ($employeeField.value = "")}
+            errors={$employeeField.errors}
+            required={true}
           />
         {:else}
-          <Search type="employee" title="Medarbejder" />
+          <Search
+            type="employee"
+            title="Medarbejder"
+            bind:name={$employeeField.value}
+            on:clear={() => ($employeeField.value = "")}
+            errors={$employeeField.errors}
+            required={true}
+          />
         {/if}
       </div>
     </div>

@@ -16,9 +16,14 @@
   import type { SubmitFunction } from "./$types"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import Search from "$lib/components/search.svelte"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
 
-  let fromDate: string
   let toDate: string
+
+  const fromDate = field("from", "", [required()])
+  const orgUnit = field("org_unit", "", [required()])
+  $: svelteForm = form(fromDate, orgUnit)
 
   gql`
     query FacetAndOrg($uuid: [UUID!], $fromDate: DateTime) {
@@ -64,22 +69,26 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(CreateEngagementDocument, {
-            input: result.data,
-          })
-          $success = {
-            message: `Engagementet ${
-              mutation.engagement_create.objects[0]?.employee
-                ? `for ${mutation.engagement_create.objects[0].employee?.[0].name}`
-                : ""
-            } er oprettet fra d. ${fromDate}`,
-            uuid: $page.params.uuid,
-            type: "employee",
+      // Await the validation, before we continue
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(CreateEngagementDocument, {
+              input: result.data,
+            })
+            $success = {
+              message: `Engagementet ${
+                mutation.engagement_create.objects[0]?.employee
+                  ? `for ${mutation.engagement_create.objects[0].employee?.[0].name}`
+                  : ""
+              } er oprettet fra d. ${$fromDate.value}`,
+              uuid: $page.params.uuid,
+              type: "employee",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -107,8 +116,9 @@
         <div class="flex flex-row gap-6">
           <!-- TODO: Make input look at currently selected org_unit? Right now it's the employee's validity as a placeholder -->
           <DateInput
-            bind:value={fromDate}
             startValue={$date}
+            bind:value={$fromDate.value}
+            errors={$fromDate.errors}
             title="Startdato"
             id="from"
             min={minDate}
@@ -119,11 +129,17 @@
             bind:value={toDate}
             title="Slutdato"
             id="to"
-            min={fromDate ? fromDate : minDate}
+            min={$fromDate.value ? $fromDate.value : minDate}
             max={maxDate}
           />
         </div>
-        <Search type="org-unit" required={true} />
+        <Search
+          type="org-unit"
+          bind:name={$orgUnit.value}
+          errors={$orgUnit.errors}
+          on:clear={() => ($orgUnit.value = "")}
+          required={true}
+        />
         <div class="flex flex-row gap-6">
           <Input title="ID" id="user-key" extra_classes="basis-1/2" />
           <Select

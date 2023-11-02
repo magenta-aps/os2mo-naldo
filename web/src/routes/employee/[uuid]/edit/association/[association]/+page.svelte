@@ -18,9 +18,14 @@
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import Search from "$lib/components/search.svelte"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
 
-  let fromDate: string
   let toDate: string
+
+  const fromDate = field("from", "", [required()])
+  const orgUnit = field("org_unit", "", [required()])
+  $: svelteForm = form(fromDate, orgUnit)
 
   gql`
     query AssociationAndFacets($uuid: [UUID!], $fromDate: DateTime) {
@@ -84,22 +89,26 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(UpdateAssociationDocument, {
-            input: result.data,
-          })
-          $success = {
-            message: `Tilknytningen ${
-              mutation.association_update.objects[0].employee
-                ? `for ${mutation.association_update.objects[0].employee[0].name}`
-                : ""
-            } redigeres fra d. ${fromDate}`,
-            uuid: $page.params.uuid,
-            type: "employee",
+      // Await the validation, before we continue
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(UpdateAssociationDocument, {
+              input: result.data,
+            })
+            $success = {
+              message: `Tilknytningen ${
+                mutation.association_update.objects[0].employee
+                  ? `for ${mutation.association_update.objects[0].employee[0].name}`
+                  : ""
+              } redigeres fra d. ${$fromDate.value}`,
+              uuid: $page.params.uuid,
+              type: "employee",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -110,6 +119,7 @@
   Henter data...
 {:then data}
   {@const association = data.associations.objects[0].objects[0]}
+  {@const employee = association.employee[0]}
   {@const facets = data.facets.objects}
   {@const minDate = association.employee[0].validity.from.split("T")[0]}
 
@@ -126,8 +136,9 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            bind:value={fromDate}
             startValue={$date}
+            bind:value={$fromDate.value}
+            errors={$fromDate.errors}
             title="Startdato"
             id="from"
             min={minDate}
@@ -140,14 +151,16 @@
               : null}
             title="Slutdato"
             id="to"
-            min={fromDate}
+            min={$fromDate.value ? $fromDate.value : minDate}
           />
         </div>
-        <!-- FIXME: Use new Search -->
-        <Input
-          title="Medarbejder"
-          id="employee-uuid"
-          startValue={association.employee[0].name}
+        <Search
+          type="employee"
+          startValue={{
+            uuid: employee.uuid,
+            name: employee.name,
+            attrs: [],
+          }}
           disabled
           required={true}
         />
@@ -158,6 +171,9 @@
             name: association.org_unit[0].name,
             attrs: [],
           }}
+          bind:name={$orgUnit.value}
+          errors={$orgUnit.errors}
+          on:clear={() => ($orgUnit.value = "")}
           required={true}
         />
         <div class="flex flex-row gap-6">

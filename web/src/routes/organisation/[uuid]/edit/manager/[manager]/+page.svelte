@@ -104,7 +104,7 @@
                 mutation.manager_update.objects[0].employee
                   ? `for ${mutation.manager_update.objects[0].employee[0].name} `
                   : ""
-              } redigeres fra d. ${fromDate}`,
+              } redigeres fra d. ${$fromDate.value}`,
               uuid: $page.params.uuid,
               type: "organisation",
             }
@@ -152,7 +152,7 @@
             bind:value={toDate}
             title="Slutdato"
             id="to"
-            min={fromDate ? fromDate : minDate}
+            min={$fromDate.value ? $fromDate.value : minDate}
             max={maxDate}
           />
         </div>

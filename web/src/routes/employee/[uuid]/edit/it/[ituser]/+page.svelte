@@ -19,9 +19,14 @@
   import { date } from "$lib/stores/date"
   import { getClassUuidByUserKey } from "$lib/util/get_classes"
   import { getITSystemNames } from "$lib/util/helpers"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
 
-  let fromDate: string
   let toDate: string
+
+  const fromDate = field("from", "", [required()])
+  const accountName = field("accountName", "", [required()])
+  $: svelteForm = form(fromDate, accountName)
 
   gql`
     query ITUserItSystemsAndPrimary(
@@ -90,22 +95,26 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(UpdateItUserDocument, {
-            input: result.data,
-          })
-          $success = {
-            message: `IT-kontoen ${
-              mutation.ituser_update.objects[0].employee
-                ? `for ${mutation.ituser_update.objects[0].employee[0].name}`
-                : ""
-            } redigeres fra d. ${fromDate}`,
-            uuid: $page.params.uuid,
-            type: "employee",
+      // Await the validation, before we continue
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(UpdateItUserDocument, {
+              input: result.data,
+            })
+            $success = {
+              message: `IT-kontoen ${
+                mutation.ituser_update.objects[0].employee
+                  ? `for ${mutation.ituser_update.objects[0].employee[0].name}`
+                  : ""
+              } redigeres fra d. ${$fromDate.value}`,
+              uuid: $page.params.uuid,
+              type: "employee",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -132,8 +141,9 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            bind:value={fromDate}
             startValue={$date}
+            bind:value={$fromDate.value}
+            errors={$fromDate.errors}
             title="Startdato"
             id="from"
             min={minDate}
@@ -144,7 +154,7 @@
             startValue={itUser.validity.to ? itUser.validity.to.split("T")[0] : null}
             title="Slutdato"
             id="to"
-            min={fromDate ? fromDate : minDate}
+            min={$fromDate.value ? $fromDate.value : minDate}
           />
         </div>
         <div class="flex flex-row gap-6">
@@ -161,6 +171,8 @@
             id="account-name"
             extra_classes="basis-1/2"
             startValue={itUser.user_key}
+            bind:value={$accountName.value}
+            errors={$accountName.errors}
             required={true}
           />
         </div>

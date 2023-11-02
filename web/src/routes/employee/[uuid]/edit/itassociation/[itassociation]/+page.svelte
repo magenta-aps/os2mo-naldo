@@ -23,9 +23,14 @@
   import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
   import { getITUserITSystemName } from "$lib/util/helpers"
   import Search from "$lib/components/search.svelte"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
 
-  let fromDate: string
   let toDate: string
+
+  const fromDate = field("from", "", [required()])
+  const orgUnit = field("org_unit", "", [required()])
+  $: svelteForm = form(fromDate, orgUnit)
 
   gql`
     query ITAssociationAndFacets($uuid: [UUID!], $fromDate: DateTime) {
@@ -112,22 +117,29 @@
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
-      if (result.type === "success" && result.data) {
-        try {
-          const mutation = await graphQLClient().request(UpdateItAssociationDocument, {
-            input: result.data,
-          })
-          $success = {
-            message: `IT-tilknytningen ${
-              mutation.itassociation_update.objects[0].employee
-                ? `for ${mutation.itassociation_update.objects[0].employee[0].name}`
-                : ""
-            } redigeres fra d. ${fromDate}`,
-            uuid: $page.params.uuid,
-            type: "employee",
+      // Await the validation, before we continue
+      await svelteForm.validate()
+      if ($svelteForm.valid) {
+        if (result.type === "success" && result.data) {
+          try {
+            const mutation = await graphQLClient().request(
+              UpdateItAssociationDocument,
+              {
+                input: result.data,
+              }
+            )
+            $success = {
+              message: `IT-tilknytningen ${
+                mutation.itassociation_update.objects[0].employee
+                  ? `for ${mutation.itassociation_update.objects[0].employee[0].name}`
+                  : ""
+              } redigeres fra d. ${$fromDate.value}`,
+              uuid: $page.params.uuid,
+              type: "employee",
+            }
+          } catch (err) {
+            $error = { message: err }
           }
-        } catch (err) {
-          $error = { message: err }
         }
       }
     }
@@ -156,9 +168,11 @@
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
+          <!-- FIXME: DATES AGAIN :))) -->
           <DateInput
-            bind:value={fromDate}
             startValue={$date}
+            bind:value={$fromDate.value}
+            errors={$fromDate.errors}
             title="Startdato"
             id="from"
             min={minDate}
@@ -171,15 +185,18 @@
               : null}
             title="Slutdato"
             id="to"
-            min={fromDate}
+            min={$fromDate.value ? $fromDate.value : minDate}
           />
         </div>
-        <!-- FIXME: Use new Search -->
-        <Input
-          title="Medarbejder"
-          id="employee-uuid"
-          startValue={itassociation.employee[0].name}
+        <Search
+          type="employee"
+          startValue={{
+            uuid: itassociation.employee[0].uuid,
+            name: itassociation.employee[0].name,
+            attrs: [],
+          }}
           disabled
+          required={true}
         />
         <Search
           type="org-unit"
@@ -188,6 +205,9 @@
             name: itassociation.org_unit[0].name,
             attrs: [],
           }}
+          bind:name={$orgUnit.value}
+          errors={$orgUnit.errors}
+          on:clear={() => ($orgUnit.value = "")}
           required={true}
         />
         <div class="flex flex-row gap-6">
