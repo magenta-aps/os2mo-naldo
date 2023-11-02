@@ -19,12 +19,16 @@
   import LeavesDetailTable from "$lib/components/employee/tables/leaves_detail_table.svelte"
   import ManagerDetailTable from "$lib/components/shared/detail_tables/manager_detail_table.svelte"
   import RolesDetailTable from "$lib/components/shared/detail_tables/roles_detail_table.svelte"
+  import { onMount } from "svelte"
 
   // Tabs
   let items = Object.values(EmployeeTab)
 
   let activeItem = $activeEmployeeTab
   const tabChange = (e: CustomEvent) => ($activeEmployeeTab = activeItem = e.detail)
+
+  // Used to prevent an early history.replaceState on load with the wrong tab
+  let checkedHash = false
 
   // Used to make a dynamic create button
   const subsiteOfCategory = (category: EmployeeTab) => {
@@ -65,6 +69,24 @@
       }
     }
   `
+
+  onMount(() => {
+    // Will show up as #Tab&MaybeOtherStuff&Ect...
+    // In dev SvelteKit will add things like &state=<uuid>
+    if ($page.url.hash) {
+      const firstHash = $page.url.hash.slice(1).split("&")[0]
+      if (Object.values(EmployeeTab).some((v) => v === firstHash)) {
+        // Safe to assume the hash is an EmployeeTab
+        $activeEmployeeTab = activeItem = firstHash as EmployeeTab
+      }
+    }
+
+    checkedHash = true
+  })
+
+  $: if (checkedHash) {
+    history.replaceState({}, "", `#${$activeEmployeeTab}`)
+  }
 </script>
 
 <HeadTitle type="employee" />
