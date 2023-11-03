@@ -96,7 +96,7 @@
       <!-- Hidden hack to return the UUID while displaying the name -->
       <input hidden {id} name={id} bind:value={selectedOrg.uuid} />
       {#if isFocused}
-        <div
+        <button
           use:floatingContent
           class="w-96 max-w-full px-5"
           on:mouseleave={delayedUnfocus}
@@ -106,7 +106,7 @@
               <Node {...child} bind:selectedOrg />
             {/each}
           </ul>
-        </div>
+        </button>
       {/if}
     </div>
   </div>
