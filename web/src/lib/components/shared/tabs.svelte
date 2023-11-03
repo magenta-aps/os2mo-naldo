@@ -9,13 +9,13 @@
 
 <div class="tabs">
   {#each items as item}
-    <div
+    <button
       class="tab tab-bordered text-base {item === activeItem
         ? 'border-primary text-primary'
         : 'text-secondary'}"
       on:click={() => dispatch("tabChange", item)}
     >
       {item}
-    </div>
+    </button>
   {/each}
 </div>

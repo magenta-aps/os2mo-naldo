@@ -16,7 +16,7 @@
       {#each parents.reverse() as parent}
         <li>
           {#if orgSelector}
-            <div
+            <button
               class="cursor-pointer link text-primary"
               on:click={() => {
                 currentOrg = parent.name
@@ -24,7 +24,7 @@
               }}
             >
               {parent.name}
-            </div>
+            </button>
           {:else}
             <a href="{base}/organisation/{parent.uuid}">
               {parent.name}
