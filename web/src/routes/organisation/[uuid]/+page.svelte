@@ -20,12 +20,16 @@
   import RolesDetailTable from "$lib/components/shared/detail_tables/roles_detail_table.svelte"
   import OrgUnitDetailTable from "$lib/components/org/tables/org_unit_detail_table.svelte"
   import { OrgUnitDocument } from "./query.generated"
+  import { onMount } from "svelte"
 
   // Tabs
   let items = Object.values(OrgTab)
 
   let activeItem = $activeOrgTab
   const tabChange = (e: CustomEvent) => ($activeOrgTab = activeItem = e.detail)
+
+  // Used to prevent an early history.replaceState on load with the wrong tab
+  let checkedHash = false
 
   // Used to make a dynamic create button
   const subsiteOfCategory = (category: OrgTab) => {
@@ -65,6 +69,26 @@
       }
     }
   `
+  onMount(() => {
+    // Will show up as #Tab&MaybeOtherStuff&Ect...
+    // In dev SvelteKit will add things like &state=<uuid>
+    if ($page.url.hash) {
+      // The replace is to solve encoding issues with the 'æ' in KLE-opmærkninger
+      const firstHash = $page.url.hash.slice(1).split("&")[0].replace("%C3%A6", "æ")
+      if (Object.values(OrgTab).some((v) => v === firstHash)) {
+        // Safe to assume the hash is an OrgTab
+        $activeOrgTab = activeItem = firstHash as OrgTab
+      }
+    }
+
+    checkedHash = true
+  })
+
+  // checkedHash prevents early replaceState
+  // $page.params.uuid makes sure replaceState is re-run when jumping between orgs
+  $: if (checkedHash && $page.params.uuid) {
+    history.replaceState({}, "", `#${$activeOrgTab}`)
+  }
 </script>
 
 <HeadTitle type="organisation" />
