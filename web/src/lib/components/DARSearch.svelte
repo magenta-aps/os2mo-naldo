@@ -63,11 +63,12 @@
       --border-radius="0.25rem"
       --placeholder-color="#00244E"
       --icons-color="#00244E"
-      --padding="0 0 0 0.75rem"
+      --padding="0 0.75rem 0 0.75rem"
       placeholder="Søg efter adresse"
       id="dar-search"
       listAutoWidth={false}
       loadOptions={fetchDAR}
+      hasError={errors.length ? true : false}
       {floatingConfig}
       {disabled}
       {itemId}

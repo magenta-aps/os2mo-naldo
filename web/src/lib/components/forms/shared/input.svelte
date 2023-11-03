@@ -37,8 +37,8 @@
       {placeholder}
       bind:value
       type="text"
-      class="input input-bordered input-{size} rounded text-base text-secondary font-normal w-full focus:outline-offset-0
-     {errors.length ? 'input-error' : 'focus:input-primary'}"
+      class="input input-bordered input-{size} rounded text-base text-secondary font-normal w-full focus:outline-0
+      {errors.length ? 'input-error' : 'focus:input-primary'}"
       {disabled}
     />
   </div>

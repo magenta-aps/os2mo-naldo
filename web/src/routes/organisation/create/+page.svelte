@@ -4,7 +4,7 @@
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
-  import Select from "$lib/components/forms/shared/select.svelte"
+  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
   import { enhance } from "$app/forms"
   import { gql } from "graphql-request"
   import { GetOrgUnitAndFacetsDocument, CreateOrgUnitDocument } from "./query.generated"
@@ -21,7 +21,9 @@
 
   const fromDate = field("from", "", [required()])
   const name = field("name", "", [required()])
-  const svelteForm = form(fromDate, name)
+  const orgUnitType = field("org_unit_type", "", [required()])
+  const orgUnitLevel = field("org_unit_level", "", [required()])
+  const svelteForm = form(fromDate, name, orgUnitType, orgUnitLevel)
 
   let parent: {
     uuid: string
@@ -180,19 +182,29 @@
           bind:value={$name.value}
           errors={$name.errors}
         />
-        <Select
+        <SelectNew
           title="Enhedstype"
           id="org-unit-type"
+          bind:name={$orgUnitType.value}
+          errors={$orgUnitType.errors}
           iterable={getClassesByFacetUserKey(facets, "org_unit_type")}
+          extra_classes="basis-1/2"
+          isClearable={true}
           required={true}
+          on:clear={() => ($orgUnitType.value = "")}
         />
 
         <div class="flex flex-row gap-6">
-          <Select
+          <SelectNew
             title="Enhedsniveau"
             id="org-unit-level"
+            bind:name={$orgUnitLevel.value}
+            errors={$orgUnitLevel.errors}
             extra_classes="basis-1/2"
             iterable={getClassesByFacetUserKey(facets, "org_unit_level")}
+            isClearable={true}
+            required={true}
+            on:clear={() => ($orgUnitLevel.value = "")}
           />
           <Input
             title="Enhedsnummer"

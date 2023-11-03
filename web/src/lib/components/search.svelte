@@ -74,13 +74,12 @@
       {floatingConfig}
       {disabled}
       {itemId}
+      hasError={errors.length ? true : false}
       bind:value
       hideEmptyState={true}
       placeholder={`Søg efter ${type === "employee" ? "person" : "organisation"}`}
       on:change
-      on:clear={() => {
-        name = undefined
-      }}
+      on:clear
       on:select={() => {
         if (action === "goto" && value) {
           goto(

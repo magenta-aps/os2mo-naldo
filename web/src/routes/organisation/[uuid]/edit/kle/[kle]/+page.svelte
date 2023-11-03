@@ -1,7 +1,7 @@
 <script lang="ts">
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import Select from "$lib/components/forms/shared/select.svelte"
+  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { goto } from "$app/navigation"
@@ -18,7 +18,11 @@
 
   let toDate: string
   const fromDate = field("from", "", [required()])
-  const svelteForm = form(fromDate)
+  const kleNumber = field("kle_number", "", [required()])
+  const kleAspect = field("kle_aspect", "", [required()])
+  const svelteForm = form(fromDate, kleNumber, kleAspect)
+
+  // TODO: TEST THIS WITH KLE DATA
 
   gql`
     query KLEAndFacet($uuid: [UUID!], $fromDate: DateTime) {
@@ -41,9 +45,13 @@
             uuid
             kle_aspects {
               name
+              user_key
+              uuid
             }
             kle_number {
               name
+              user_key
+              uuid
             }
             validity {
               from
@@ -140,18 +148,23 @@
           />
         </div>
         <div class="flex flex-row gap-6">
-          <Select
+          <SelectNew
             title="KLE nummer"
             id="kle-number"
-            startValue={kle.kle_number.name}
+            startValue={kle.kle_number}
+            bind:name={$kleNumber.value}
+            errors={$kleNumber.errors}
             extra_classes="basis-1/2"
             iterable={getClassesByFacetUserKey(facets, "kle_number")}
             required={true}
           />
-          <Select
+          <!-- Select multiple? -->
+          <SelectNew
             title="KLE aspekt"
             id="kle-aspect"
-            startValue={kle.kle_aspects[0].name}
+            startValue={kle.kle_aspects[0]}
+            bind:name={$kleAspect.value}
+            errors={$kleAspect.errors}
             extra_classes="basis-1/2"
             iterable={getClassesByFacetUserKey(facets, "kle_aspect")}
             required={true}

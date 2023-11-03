@@ -35,7 +35,6 @@
     {/if}
     <SvelteSelect
       --font-size="1rem"
-      --height="2rem"
       --loading-height="1.5rem"
       --loading-width="1.5rem"
       --spinner-height="1.5rem"
@@ -46,7 +45,6 @@
       --border-radius="0.25rem"
       --placeholder-color="#00244E"
       --icons-color="#00244E"
-      --border-focused="solid 0px"
       --padding="0.75rem 0.75rem"
       {id}
       name={id}
@@ -59,6 +57,7 @@
       items={iterable}
       {multiple}
       searchable={false}
+      hasError={errors.length ? true : false}
       bind:value
       on:change
       on:clear={() => {
@@ -80,9 +79,3 @@
     {/if}
   {/each}
 </div>
-
-<style>
-  :global(.svelte-select.focused) {
-    box-shadow: 0px 0px 0px 3px #1053ab;
-  }
-</style>

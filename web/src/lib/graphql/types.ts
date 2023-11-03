@@ -53,6 +53,15 @@ export type Address = {
    */
   address_type_uuid: Scalars['UUID']['output'];
   /**
+   * Same as address_type, but with HACKs to enable validities.
+   *
+   * @deprecated Should only be used to query address_type when validity dates have been specified, "
+   * "ex from_date & to_date."
+   * "Will be removed when sub-query date handling is implemented.
+   *
+   */
+  address_type_validity?: Maybe<Class>;
+  /**
    * Connected employee.
    *
    * Note:
@@ -326,6 +335,11 @@ export type AddressCreateInput = {
 /** Address filter. */
 export type AddressFilter = {
   /**
+   * Address type filter limiting which entries are returned.
+   *
+   */
+  address_type?: InputMaybe<ClassFilter>;
+  /**
    * Address type user-key filter limiting which entries are returned.
    *
    * | `address_type_user_keys`      | Elements returned                            |
@@ -338,6 +352,7 @@ export type AddressFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'address_type' filter
    */
   address_type_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   /**
@@ -353,8 +368,14 @@ export type AddressFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'address_type' filter
    */
   address_types?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Employee filter limiting which entries are returned.
+   *
+   */
+  employee?: InputMaybe<EmployeeFilter>;
   /**
    * Employee UUID filter limiting which entries are returned.
    *
@@ -368,8 +389,14 @@ export type AddressFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'employee' filter
    */
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Engagement filter limiting which entries are returned.
+   *
+   */
+  engagement?: InputMaybe<EngagementFilter>;
   /**
    * Engagement UUID filter limiting which entries are returned.
    *
@@ -383,10 +410,16 @@ export type AddressFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'engagement' filter
    */
   engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Organisation Unit filter limiting which entries are returned.
+   *
+   */
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   /**
    * Organisational Unit UUID filter limiting which entries are returned.
    *
@@ -400,6 +433,7 @@ export type AddressFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'org_unit' filter
    */
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their ending validity. */
@@ -603,6 +637,15 @@ export type Association = {
    *
    */
   association_type_uuid?: Maybe<Scalars['UUID']['output']>;
+  /**
+   * Same as association_type, but with HACKs to enable validities.
+   *
+   * @deprecated Should only be used to query association_types when validity dates have been specified, "
+   * "ex from_date & to_date."
+   * "Will be removed when sub-query date handling is implemented.
+   *
+   */
+  association_type_validity?: Maybe<Class>;
   /**
    * List of arbitrary classes.
    *
@@ -858,6 +901,11 @@ export type AssociationCreateInput = {
 /** Association filter. */
 export type AssociationFilter = {
   /**
+   * Address type filter limiting which entries are returned.
+   *
+   */
+  association_type?: InputMaybe<ClassFilter>;
+  /**
    * Association type user-key filter limiting which entries are returned.
    *
    * | `association_type_user_keys`      | Elements returned                            |
@@ -870,6 +918,7 @@ export type AssociationFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'association_type' filter
    */
   association_type_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   /**
@@ -885,8 +934,14 @@ export type AssociationFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'association_type' filter
    */
   association_types?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Employee filter limiting which entries are returned.
+   *
+   */
+  employee?: InputMaybe<EmployeeFilter>;
   /**
    * Employee UUID filter limiting which entries are returned.
    *
@@ -900,6 +955,7 @@ export type AssociationFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'employee' filter
    */
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their starting validity. */
@@ -913,6 +969,11 @@ export type AssociationFilter = {
    */
   it_association?: InputMaybe<Scalars['Boolean']['input']>;
   /**
+   * Organisation Unit filter limiting which entries are returned.
+   *
+   */
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
+  /**
    * Organisational Unit UUID filter limiting which entries are returned.
    *
    * | `org_units`      | Elements returned                            |
@@ -925,6 +986,7 @@ export type AssociationFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'org_unit' filter
    */
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their ending validity. */
@@ -1507,6 +1569,11 @@ export type ClassCreateInput = {
 /** Class filter. */
 export type ClassFilter = {
   /**
+   * Facet filter limiting which entries are returned.
+   *
+   */
+  facet?: InputMaybe<FacetFilter>;
+  /**
    * Facet user-key filter limiting which entries are returned.
    *
    * | `facet_user_keys`      | Elements returned                            |
@@ -1519,6 +1586,7 @@ export type ClassFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'facet' filter
    */
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   /**
@@ -1534,10 +1602,16 @@ export type ClassFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'facet' filter
    */
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Parent filter limiting which entries are returned.
+   *
+   */
+  parent?: InputMaybe<ClassFilter>;
   /**
    * Parent user-key filter limiting which entries are returned.
    *
@@ -1551,6 +1625,7 @@ export type ClassFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'parent' filter
    */
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   /**
@@ -1566,6 +1641,7 @@ export type ClassFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'parent' filter
    */
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their ending validity. */
@@ -2095,7 +2171,6 @@ export type EmployeeFilter = {
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
-   *
    * Free text search.
    *
    * Does best effort lookup to find entities matching the query string.
@@ -2280,10 +2355,14 @@ export type EmployeeUpdateInput = {
 };
 
 export type EmployeesBoundAddressFilter = {
+  address_type?: InputMaybe<ClassFilter>;
   address_type_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   address_types?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  employee?: InputMaybe<EmployeeFilter>;
+  engagement?: InputMaybe<EngagementFilter>;
   engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -2291,10 +2370,13 @@ export type EmployeesBoundAddressFilter = {
 };
 
 export type EmployeesBoundAssociationFilter = {
+  association_type?: InputMaybe<ClassFilter>;
   association_type_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   association_types?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  employee?: InputMaybe<EmployeeFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   it_association?: InputMaybe<Scalars['Boolean']['input']>;
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -2302,7 +2384,9 @@ export type EmployeesBoundAssociationFilter = {
 };
 
 export type EmployeesBoundEngagementFilter = {
+  employee?: InputMaybe<EmployeeFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -2310,8 +2394,11 @@ export type EmployeesBoundEngagementFilter = {
 };
 
 export type EmployeesBoundItUserFilter = {
+  employee?: InputMaybe<EmployeeFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  itsystem?: InputMaybe<ItSystemFilter>;
   itsystem_uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -2319,7 +2406,9 @@ export type EmployeesBoundItUserFilter = {
 };
 
 export type EmployeesBoundLeaveFilter = {
+  employee?: InputMaybe<EmployeeFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -2327,7 +2416,9 @@ export type EmployeesBoundLeaveFilter = {
 };
 
 export type EmployeesBoundManagerFilter = {
+  employee?: InputMaybe<EmployeeFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -2335,7 +2426,9 @@ export type EmployeesBoundManagerFilter = {
 };
 
 export type EmployeesBoundRoleFilter = {
+  employee?: InputMaybe<EmployeeFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -2378,6 +2471,15 @@ export type Engagement = {
    *
    */
   engagement_type_uuid: Scalars['UUID']['output'];
+  /**
+   * Same as engagement_type, but with HACKs to enable validities.
+   *
+   * @deprecated Should only be used to query engagement_type when validity dates have been specified, "
+   * "ex from_date & to_date."
+   * "Will be removed when sub-query date handling is implemented.
+   *
+   */
+  engagement_type_validity?: Maybe<Class>;
   /** Optional extra information. */
   extension_1?: Maybe<Scalars['String']['output']>;
   /** Optional extra information. */
@@ -2681,6 +2783,11 @@ export type EngagementCreateInput = {
 /** Engagement filter. */
 export type EngagementFilter = {
   /**
+   * Employee filter limiting which entries are returned.
+   *
+   */
+  employee?: InputMaybe<EmployeeFilter>;
+  /**
    * Employee UUID filter limiting which entries are returned.
    *
    * | `employees`      | Elements returned                            |
@@ -2693,10 +2800,16 @@ export type EngagementFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'employee' filter
    */
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Organisation Unit filter limiting which entries are returned.
+   *
+   */
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   /**
    * Organisational Unit UUID filter limiting which entries are returned.
    *
@@ -2710,6 +2823,7 @@ export type EngagementFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'org_unit' filter
    */
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their ending validity. */
@@ -3103,6 +3217,11 @@ export type FacetFilter = {
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
+   * Parent filter limiting which entries are returned.
+   *
+   */
+  parent?: InputMaybe<FacetFilter>;
+  /**
    * Parent user-key filter limiting which entries are returned.
    *
    * | `parent_user_keys`      | Elements returned                            |
@@ -3115,6 +3234,7 @@ export type FacetFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'parent' filter
    */
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   /**
@@ -3130,6 +3250,7 @@ export type FacetFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'parent' filter
    */
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their ending validity. */
@@ -3299,8 +3420,10 @@ export type FacetUpdateInput = {
 };
 
 export type FacetsBoundClassFilter = {
+  facet?: InputMaybe<FacetFilter>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  parent?: InputMaybe<ClassFilter>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
@@ -3832,6 +3955,15 @@ export type ItUser = {
    */
   itsystem_uuid: Scalars['UUID']['output'];
   /**
+   * Same as itsystem, but with HACKs to enable validities.
+   *
+   * @deprecated Should only be used to query itsystem when validity dates have been specified, "
+   * "ex from_date & to_date."
+   * "Will be removed when sub-query date handling is implemented.
+   *
+   */
+  itsystem_validity: ItSystem;
+  /**
    * Organisation unit using the IT account.
    *
    * This is mostly set for service accounts.
@@ -4021,6 +4153,11 @@ export type ItUserCreateInput = {
 /** IT user filter. */
 export type ItUserFilter = {
   /**
+   * Employee filter limiting which entries are returned.
+   *
+   */
+  employee?: InputMaybe<EmployeeFilter>;
+  /**
    * Employee UUID filter limiting which entries are returned.
    *
    * | `employees`      | Elements returned                            |
@@ -4033,10 +4170,16 @@ export type ItUserFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'employee' filter
    */
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * ITSystem filter limiting which entries are returned.
+   *
+   */
+  itsystem?: InputMaybe<ItSystemFilter>;
   /**
    * Only return IT users of ITSystem with these UUIDs filter limiting which entries are returned.
    *
@@ -4050,8 +4193,14 @@ export type ItUserFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'itsystem' filter
    */
   itsystem_uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Organisation Unit filter limiting which entries are returned.
+   *
+   */
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   /**
    * Organisational Unit UUID filter limiting which entries are returned.
    *
@@ -4065,6 +4214,7 @@ export type ItUserFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'org_unit' filter
    */
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their ending validity. */
@@ -4493,6 +4643,11 @@ export type KleFilter = {
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
+   * Organisation Unit filter limiting which entries are returned.
+   *
+   */
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
+  /**
    * Organisational Unit UUID filter limiting which entries are returned.
    *
    * | `org_units`      | Elements returned                            |
@@ -4505,6 +4660,7 @@ export type KleFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'org_unit' filter
    */
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their ending validity. */
@@ -4832,6 +4988,11 @@ export type LeaveCreateInput = {
 /** Leave filter. */
 export type LeaveFilter = {
   /**
+   * Employee filter limiting which entries are returned.
+   *
+   */
+  employee?: InputMaybe<EmployeeFilter>;
+  /**
    * Employee UUID filter limiting which entries are returned.
    *
    * | `employees`      | Elements returned                            |
@@ -4844,10 +5005,16 @@ export type LeaveFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'employee' filter
    */
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Organisation Unit filter limiting which entries are returned.
+   *
+   */
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   /**
    * Organisational Unit UUID filter limiting which entries are returned.
    *
@@ -4861,6 +5028,7 @@ export type LeaveFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'org_unit' filter
    */
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their ending validity. */
@@ -5239,6 +5407,11 @@ export type ManagerCreateInput = {
 /** Manager filter. */
 export type ManagerFilter = {
   /**
+   * Employee filter limiting which entries are returned.
+   *
+   */
+  employee?: InputMaybe<EmployeeFilter>;
+  /**
    * Employee UUID filter limiting which entries are returned.
    *
    * | `employees`      | Elements returned                            |
@@ -5251,10 +5424,16 @@ export type ManagerFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'employee' filter
    */
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Organisation Unit filter limiting which entries are returned.
+   *
+   */
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   /**
    * Organisational Unit UUID filter limiting which entries are returned.
    *
@@ -5268,6 +5447,7 @@ export type ManagerFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'org_unit' filter
    */
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their ending validity. */
@@ -6585,39 +6765,51 @@ export type OpenValidity = {
 };
 
 export type OrgUnitsboundaddressfilter = {
+  address_type?: InputMaybe<ClassFilter>;
   address_type_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   address_types?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  employee?: InputMaybe<EmployeeFilter>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  engagement?: InputMaybe<EngagementFilter>;
   engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 export type OrgUnitsboundassociationfilter = {
+  association_type?: InputMaybe<ClassFilter>;
   association_type_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   association_types?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  employee?: InputMaybe<EmployeeFilter>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   it_association?: InputMaybe<Scalars['Boolean']['input']>;
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 export type OrgUnitsboundengagementfilter = {
+  employee?: InputMaybe<EmployeeFilter>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 export type OrgUnitsboundituserfilter = {
+  employee?: InputMaybe<EmployeeFilter>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  itsystem?: InputMaybe<ItSystemFilter>;
   itsystem_uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -6625,22 +6817,27 @@ export type OrgUnitsboundituserfilter = {
 
 export type OrgUnitsboundklefilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 export type OrgUnitsboundleavefilter = {
+  employee?: InputMaybe<EmployeeFilter>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 export type OrgUnitsboundownerfilter = {
+  employee?: InputMaybe<EmployeeFilter>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -6648,14 +6845,17 @@ export type OrgUnitsboundownerfilter = {
 
 export type OrgUnitsboundrelatedunitfilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 export type OrgUnitsboundrolefilter = {
+  employee?: InputMaybe<EmployeeFilter>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -7185,8 +7385,34 @@ export type OrganisationUnitFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'hierarchy' filter
    */
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Hierarchy filter limiting which entries are returned.
+   *
+   * Filter organisation units by their organisational hierarchy labels.
+   *
+   * Can be used to extract a subset of the organisational structure.
+   *
+   * Examples of user-keys:
+   * * `"Line-management"`
+   * * `"Self-owned institution"`
+   * * `"Outside organisation"`
+   * * `"Hidden"`
+   *
+   * Note:
+   * The organisation-gatekeeper integration is one option to keep hierarchy labels up-to-date.
+   *
+   */
+  hierarchy?: InputMaybe<ClassFilter>;
+  /**
+   * Parent filter limiting which entries are returned.
+   *
+   * Set to `None` to find root units.
+   *
+   */
+  parent?: InputMaybe<OrganisationUnitFilter>;
   /**
    * Parent UUID filter limiting which entries are returned.
    *
@@ -7200,10 +7426,10 @@ export type OrganisationUnitFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'parent' filter
    */
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /**
-   *
    * Free text search.
    *
    * Does best effort lookup to find entities matching the query string.
@@ -7431,6 +7657,11 @@ export type Owner = {
 /** Owner filter. */
 export type OwnerFilter = {
   /**
+   * Employee filter limiting which entries are returned.
+   *
+   */
+  employee?: InputMaybe<EmployeeFilter>;
+  /**
    * Employee UUID filter limiting which entries are returned.
    *
    * | `employees`      | Elements returned                            |
@@ -7443,10 +7674,16 @@ export type OwnerFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'employee' filter
    */
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Organisation Unit filter limiting which entries are returned.
+   *
+   */
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   /**
    * Organisational Unit UUID filter limiting which entries are returned.
    *
@@ -7460,6 +7697,7 @@ export type OwnerFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'org_unit' filter
    */
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their ending validity. */
@@ -7627,9 +7865,11 @@ export type PageInfo = {
 };
 
 export type ParentsBoundClassFilter = {
+  facet?: InputMaybe<FacetFilter>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  parent?: InputMaybe<ClassFilter>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -7638,6 +7878,7 @@ export type ParentsBoundClassFilter = {
 
 export type ParentsBoundFacetFilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  parent?: InputMaybe<FacetFilter>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -7647,6 +7888,8 @@ export type ParentsBoundFacetFilter = {
 export type ParentsBoundOrganisationUnitFilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  hierarchy?: InputMaybe<ClassFilter>;
+  parent?: InputMaybe<OrganisationUnitFilter>;
   query?: InputMaybe<Scalars['String']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -8109,6 +8352,11 @@ export type RelatedUnitFilter = {
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
+   * Organisation Unit filter limiting which entries are returned.
+   *
+   */
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
+  /**
    * Organisational Unit UUID filter limiting which entries are returned.
    *
    * | `org_units`      | Elements returned                            |
@@ -8121,6 +8369,7 @@ export type RelatedUnitFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'org_unit' filter
    */
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their ending validity. */
@@ -8411,6 +8660,11 @@ export type RoleCreateInput = {
 /** Role filter. */
 export type RoleFilter = {
   /**
+   * Employee filter limiting which entries are returned.
+   *
+   */
+  employee?: InputMaybe<EmployeeFilter>;
+  /**
    * Employee UUID filter limiting which entries are returned.
    *
    * | `employees`      | Elements returned                            |
@@ -8423,10 +8677,16 @@ export type RoleFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'employee' filter
    */
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Organisation Unit filter limiting which entries are returned.
+   *
+   */
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   /**
    * Organisational Unit UUID filter limiting which entries are returned.
    *
@@ -8440,6 +8700,7 @@ export type RoleFilter = {
    *
    * `*`: Elements returned depends on which elements were found.
    *
+   * @deprecated Replaced by the 'org_unit' filter
    */
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their ending validity. */
@@ -8631,9 +8892,11 @@ export type UuidPaged = {
 };
 
 export type UuidsBoundClassFilter = {
+  facet?: InputMaybe<FacetFilter>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  parent?: InputMaybe<ClassFilter>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
@@ -8649,8 +8912,10 @@ export type UuidsBoundEmployeeFilter = {
 };
 
 export type UuidsBoundEngagementFilter = {
+  employee?: InputMaybe<EmployeeFilter>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -8658,6 +8923,7 @@ export type UuidsBoundEngagementFilter = {
 
 export type UuidsBoundFacetFilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  parent?: InputMaybe<FacetFilter>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
@@ -8671,17 +8937,22 @@ export type UuidsBoundItSystemFilter = {
 };
 
 export type UuidsBoundItUserFilter = {
+  employee?: InputMaybe<EmployeeFilter>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  itsystem?: InputMaybe<ItSystemFilter>;
   itsystem_uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 export type UuidsBoundLeaveFilter = {
+  employee?: InputMaybe<EmployeeFilter>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -8690,6 +8961,8 @@ export type UuidsBoundLeaveFilter = {
 export type UuidsBoundOrganisationUnitFilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  hierarchy?: InputMaybe<ClassFilter>;
+  parent?: InputMaybe<OrganisationUnitFilter>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   query?: InputMaybe<Scalars['String']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;

@@ -3,6 +3,7 @@
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
   import Select from "$lib/components/forms/shared/select.svelte"
+  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { goto } from "$app/navigation"
@@ -21,7 +22,9 @@
   let toDate: string
   const fromDate = field("from", "", [required()])
   const name = field("name", "", [required()])
-  const svelteForm = form(fromDate, name)
+  const orgUnitType = field("org_unit_type", "", [required()])
+  const orgUnitLevel = field("org_unit_level", "", [required()])
+  const svelteForm = form(fromDate, name, orgUnitType, orgUnitLevel)
 
   gql`
     query GetOrgUnitAndFacets($uuid: [UUID!], $fromDate: DateTime) {
@@ -52,9 +55,13 @@
               }
             }
             unit_type {
+              uuid
+              user_key
               name
             }
             org_unit_level {
+              uuid
+              user_key
               name
             }
             validity {
@@ -161,20 +168,28 @@
         />
 
         <div class="flex flex-row gap-6">
-          <Select
+          <SelectNew
             title="Enhedsniveau"
             id="org-level"
-            startValue={orgUnit.org_unit_level?.name}
+            bind:name={$orgUnitLevel.value}
+            errors={$orgUnitLevel.errors}
+            startValue={orgUnit.org_unit_level ? orgUnit.org_unit_level : undefined}
+            on:clear={() => ($orgUnitLevel.value = "")}
             extra_classes="basis-1/2"
             iterable={getClassesByFacetUserKey(facets, "org_unit_level")}
+            isClearable={true}
             required={true}
           />
-          <Select
+          <SelectNew
             title="Enhedstype"
             id="org-type"
-            startValue={orgUnit.unit_type?.name}
+            bind:name={$orgUnitType.value}
+            errors={$orgUnitType.errors}
+            startValue={orgUnit.unit_type ? orgUnit.unit_type : undefined}
+            on:clear={() => ($orgUnitType.value = "")}
             extra_classes="basis-1/2"
             iterable={getClassesByFacetUserKey(facets, "org_unit_type")}
+            isClearable={true}
             required={true}
           />
         </div>
