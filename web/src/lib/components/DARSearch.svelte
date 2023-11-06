@@ -22,7 +22,7 @@
 
   const fetchDAR = async (filterText: string) => {
     if (!filterText.length) return []
-    if (filterText.length < 2) return []
+    if (filterText.length < 3) return []
     try {
       const res = await fetch(
         `https://api.dataforsyningen.dk/${url}/autocomplete/?q=${filterText}&global=1`
