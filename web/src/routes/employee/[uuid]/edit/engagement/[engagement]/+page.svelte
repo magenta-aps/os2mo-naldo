@@ -173,7 +173,6 @@
           startValue={{
             uuid: engagement.org_unit[0].uuid,
             name: engagement.org_unit[0].name,
-            attrs: [],
           }}
           bind:name={$orgUnit.value}
           errors={$orgUnit.errors}

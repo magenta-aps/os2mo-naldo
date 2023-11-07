@@ -116,7 +116,6 @@
             startValue={{
               uuid: orgUnitUuidFromHash.uuid,
               name: orgUnitUuidFromHash.name,
-              attrs: [],
             }}
             bind:name={$name.value}
             errors={$name.errors}

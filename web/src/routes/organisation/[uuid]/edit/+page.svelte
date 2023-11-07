@@ -153,7 +153,6 @@
             ? {
                 uuid: orgUnit.parent.uuid,
                 name: orgUnit.parent.name,
-                attrs: [],
               }
             : undefined}
         />

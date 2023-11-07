@@ -164,7 +164,6 @@
           startValue={{
             uuid: employee.uuid,
             name: employee.name,
-            attrs: [],
           }}
           disabled
           required={true}

@@ -123,7 +123,6 @@
             startValue={{
               uuid: orgUnit.uuid,
               name: orgUnit.name,
-              attrs: [],
             }}
             bind:name={$orgUnitField.value}
             on:clear={() => ($orgUnitField.value = "")}

@@ -197,7 +197,6 @@
           startValue={{
             uuid: itassociation.employee[0].uuid,
             name: itassociation.employee[0].name,
-            attrs: [],
           }}
           disabled
           required={true}
@@ -207,7 +206,6 @@
           startValue={{
             uuid: itassociation.org_unit[0].uuid,
             name: itassociation.org_unit[0].name,
-            attrs: [],
           }}
           bind:name={$orgUnit.value}
           errors={$orgUnit.errors}

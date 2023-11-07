@@ -37,7 +37,6 @@
   let employee: {
     uuid: string
     name: string
-    attrs: []
   }
   let engagements: EngagementTitleAndUuid[] | undefined
   gql`
@@ -218,7 +217,6 @@
             ? {
                 uuid: startValueEmployee.uuid,
                 name: startValueEmployee.name,
-                attrs: [],
               }
             : undefined}
           bind:value={employee}

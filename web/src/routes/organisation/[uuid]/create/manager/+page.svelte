@@ -130,7 +130,7 @@
             max={maxDate}
           />
         </div>
-        <Search type="employee" wantedAttrs={["Email"]} />
+        <Search type="employee" />
         <div class="flex flex-row gap-6">
           <SelectNew
             title="Ledertype"

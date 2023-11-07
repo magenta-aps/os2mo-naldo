@@ -114,7 +114,6 @@
             startValue={{
               uuid: employee.uuid,
               name: employee.name,
-              attrs: [],
             }}
             bind:name={$employeeField.value}
             on:clear={() => ($employeeField.value = "")}
