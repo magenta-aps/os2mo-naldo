@@ -6,13 +6,15 @@
   import { fetchInternal } from "$lib/util/http"
   import { date } from "$lib/stores/date"
   import { globalNavigation } from "$lib/stores/navigation"
+  import { gql } from "graphql-request"
+  import { graphQLClient } from "$lib/util/http"
+  import { SearchEmployeeDocument, SearchOrgUnitDocument } from "./query.generated"
 
-  export let startValue: Autocomplete | undefined = undefined
-  export let value: Autocomplete | undefined = startValue || undefined
+  export let startValue: SearchResult | undefined = undefined
+  export let value: SearchResult | undefined = startValue || undefined
   export let name: string | undefined = undefined
   export let type: "employee" | "org-unit"
   export let action: "select" | "goto" = "select" // Redirect for navigation, select for forms
-  export let wantedAttrs: string[] = [] // Names of attributes you want shown next the to the name ("Email", ect.)
   export let title: string = `Søg efter ${
     type === "employee" ? "person" : "organisation"
   }`
@@ -26,9 +28,51 @@
   }
 
   const itemId = "uuid" // Used by the component to differentiate between items
-  const url = type === "employee" ? "e/autocomplete/?query=" : "ou/autocomplete/?query="
 
-  const fetchAutocomplete = async (filterText: string): Promise<Autocomplete[]> => {
+  gql`
+    query SearchEmployee($fromDate: DateTime, $queryString: String!) {
+      employees(filter: { from_date: $fromDate, query: $queryString }) {
+        objects {
+          objects {
+            uuid
+            name
+          }
+        }
+      }
+    }
+    query SearchOrgUnit($fromDate: DateTime, $queryString: String!) {
+      org_units(filter: { from_date: $fromDate, query: $queryString }) {
+        objects {
+          objects {
+            uuid
+            name
+          }
+        }
+      }
+    }
+  `
+
+  const searchQuery =
+    type === "employee" ? SearchEmployeeDocument : SearchOrgUnitDocument
+  const searchItems = async (filterText: string): Promise<SearchResult[]> => {
+    if (!filterText.length) return []
+    if (filterText.length < 3) return []
+
+    const res = await graphQLClient().request(searchQuery, {
+      fromDate: $date,
+      queryString: filterText,
+    })
+    if (searchQuery === SearchEmployeeDocument) {
+      return res.employees.objects
+        .map((item) => item.objects[0])
+        .sort((a, b) => (a.name > b.name ? 1 : -1))
+    } else {
+      return res.org_units.objects
+        .map((item) => item.objects[0])
+        .sort((a, b) => (a.name > b.name ? 1 : -1))
+    }
+  }
+  const fetchSearchResult = async (filterText: string): Promise<SearchResult[]> => {
     if (!filterText.length) return []
     if (filterText.length < 3) return []
 
@@ -70,7 +114,7 @@
       --icons-color="#00244E"
       --padding="0 0.75rem 0 0.75rem"
       id="autocomplete"
-      loadOptions={fetchAutocomplete}
+      loadOptions={searchItems}
       {floatingConfig}
       {disabled}
       {itemId}
@@ -94,11 +138,11 @@
       }}
     >
       <div slot="item" let:item>
-        <SearchItem {item} {wantedAttrs} />
+        <SearchItem {item} />
       </div>
 
       <div slot="selection" let:selection>
-        <SearchItem item={selection} showAttrs={false} {wantedAttrs} />
+        <SearchItem item={selection} />
       </div>
     </SvelteSelect>
   </div>

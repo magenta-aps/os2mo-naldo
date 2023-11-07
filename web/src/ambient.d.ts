@@ -9,6 +9,14 @@ interface Autocomplete {
   path?: string[]
 }
 
+interface SearchResult {
+  uuid: string
+  name: string
+  // extra: {
+
+  // }[]
+}
+
 interface DarAddressResponse {
   tekst: string | null | undefined
   adresse: {
