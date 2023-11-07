@@ -15,6 +15,8 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
 
+  let toDate: string
+
   const fromDate = field("from", "", [required()])
   const name = field("name", "", [required()])
   const newName = field("new_name", "", [required()])
@@ -88,6 +90,13 @@
           id="from"
           max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
           required={true}
+        />
+        <DateInput
+          bind:value={toDate}
+          title="Slutdato"
+          id="to"
+          min={$fromDate.value ? $fromDate.value : undefined}
+          max={undefined}
         />
         <!-- FIXME: min/max -->
       </div>

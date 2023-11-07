@@ -7,11 +7,12 @@ export const actions: Actions = {
     const orgUnit = data.get("org-unit-uuid")
     const parent = data.get("select-parent-org-tree")
     const startDate = data.get("from")
+    const endDate = data.get("to")
 
     return {
       uuid: orgUnit,
       parent: parent,
-      validity: { from: startDate },
+      validity: { from: startDate, ...(endDate && { to: endDate }) },
     }
   },
 }
