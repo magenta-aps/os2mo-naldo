@@ -30,7 +30,7 @@
 
   const fetchAutocomplete = async (filterText: string): Promise<Autocomplete[]> => {
     if (!filterText.length) return []
-    if (filterText.length < 4) return []
+    if (filterText.length < 3) return []
 
     const res = await fetchInternal(url + filterText + "&at=" + $date)
     const json = await res.json()
