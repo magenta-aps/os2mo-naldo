@@ -1,7 +1,7 @@
 <script lang="ts">
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import Select from "$lib/components/forms/shared/select.svelte"
+  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
   import { enhance } from "$app/forms"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
@@ -21,7 +21,8 @@
 
   const fromDate = field("from", "", [required()])
   const orgUnit = field("org_unit", "", [required()])
-  const svelteForm = form(fromDate, orgUnit)
+  const roleType = field("role_type", "", [required()])
+  const svelteForm = form(fromDate, orgUnit, roleType)
 
   gql`
     query FacetsAndRole($uuid: [UUID!], $fromDate: DateTime) {
@@ -158,10 +159,12 @@
           required={true}
         />
 
-        <Select
+        <SelectNew
           title="Rolletype"
           id="role-type"
-          startValue={role.role_type.name}
+          startValue={role.role_type}
+          bind:name={$roleType.value}
+          errors={$roleType.errors}
           iterable={getClassesByFacetUserKey(facets, "role_type")}
           required={true}
         />

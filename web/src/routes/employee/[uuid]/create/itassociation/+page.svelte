@@ -1,8 +1,7 @@
 <script lang="ts">
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import Input from "$lib/components/forms/shared/input.svelte"
-  import Select from "$lib/components/forms/shared/select.svelte"
+  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { goto } from "$app/navigation"
@@ -30,7 +29,9 @@
 
   const fromDate = field("from", "", [required()])
   const orgUnit = field("org_unit", "", [required()])
-  const svelteForm = form(fromDate, orgUnit)
+  const itUser = field("it_user", "", [required()])
+  const jobFunction = field("job_function", "", [required()])
+  const svelteForm = form(fromDate, itUser, jobFunction, orgUnit)
 
   gql`
     query FacetClassesAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
@@ -179,16 +180,20 @@
           required={true}
         />
         <div class="flex flex-row gap-6">
-          <Select
+          <SelectNew
             title="IT-konto"
             id="it-user-uuid"
+            bind:name={$itUser.value}
+            errors={$itUser.errors}
             iterable={getITUserITSystemName(itusers)}
             required={true}
             extra_classes="basis-1/2"
           />
-          <Select
+          <SelectNew
             title="Stillingsbetegnelse"
             id="job-function"
+            bind:name={$jobFunction.value}
+            errors={$jobFunction.errors}
             iterable={getClassesByFacetUserKey(facets, "engagement_job_function")}
             required={true}
             extra_classes="basis-1/2"

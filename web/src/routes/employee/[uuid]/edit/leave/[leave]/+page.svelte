@@ -1,7 +1,7 @@
 <script lang="ts">
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import Select from "$lib/components/forms/shared/select.svelte"
+  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { goto } from "$app/navigation"
@@ -21,7 +21,9 @@
   let toDate: string
 
   const fromDate = field("from", "", [required()])
-  const svelteForm = form(fromDate)
+  const leaveType = field("leave_type", "", [required()])
+  const engagement = field("engagement", "", [required()])
+  const svelteForm = form(fromDate, leaveType, engagement)
 
   gql`
     query LeaveAndFacet($uuid: [UUID!], $fromDate: DateTime) {
@@ -56,8 +58,9 @@
               }
             }
             leave_type {
-              user_key
               uuid
+              user_key
+              name
             }
             validity {
               from
@@ -170,10 +173,12 @@
           />
         </div>
 
-        <Select
-          startValue={leave.leave_type.user_key}
+        <SelectNew
+          startValue={leave.leave_type}
           title="Orlovstype"
           id="leave-type-uuid"
+          bind:name={$leaveType.value}
+          errors={$leaveType.errors}
           iterable={getClassesByFacetUserKey(facets, "leave_type")}
           required={true}
         />
@@ -187,10 +192,12 @@
           disabled
           required={true}
         />
-        <Select
+        <SelectNew
           title="Engagementer"
           id="engagement-uuid"
-          startValue={engagementStartValue.name}
+          startValue={engagementStartValue}
+          bind:name={$engagement.value}
+          errors={$engagement.errors}
           iterable={getEngagementTitlesAndUuid(engagements)}
           required={true}
         />

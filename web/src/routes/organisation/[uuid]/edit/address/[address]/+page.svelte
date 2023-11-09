@@ -25,10 +25,9 @@
 
   // update the field depending on address-type
   const fromDate = field("from", "", [required()])
-  const visibility = field("visibility", "", [required()])
   const addressTypeField = field("address_type", "", [required()])
   let addressField = field("", "")
-  $: svelteForm = form(fromDate, visibility, addressTypeField, addressField)
+  $: svelteForm = form(fromDate, addressTypeField, addressField)
 
   gql`
     query AddressAndFacets(
