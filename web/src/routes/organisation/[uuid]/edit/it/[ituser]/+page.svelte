@@ -4,7 +4,7 @@
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
-  import Select from "$lib/components/forms/shared/select.svelte"
+  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
   import { enhance } from "$app/forms"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
@@ -24,8 +24,9 @@
 
   let toDate: string
   const fromDate = field("from", "", [required()])
-  const accountName = field("accountName", "", [required()])
-  const svelteForm = form(fromDate, accountName)
+  const itSystem = field("it_system", "", [required()])
+  const accountName = field("account_name", "", [required()])
+  const svelteForm = form(fromDate, itSystem, accountName)
 
   gql`
     query ITUserItSystemsOrgAndPrimary(
@@ -42,6 +43,7 @@
             primary_uuid
             itsystem {
               name
+              user_key
               uuid
             }
             validity {
@@ -160,11 +162,13 @@
 
         <!-- TODO: Should have the current value as default -->
         <div class="flex flex-row gap-6">
-          <Select
+          <SelectNew
             title="IT-systemer"
             id="it-system"
-            startValue={itUser.itsystem.name}
+            startValue={itUser.itsystem ? itUser.itsystem : undefined}
             extra_classes="basis-1/2"
+            bind:name={$itSystem.value}
+            errors={$itSystem.errors}
             iterable={getITSystemNames(itSystems)}
             required={true}
           />

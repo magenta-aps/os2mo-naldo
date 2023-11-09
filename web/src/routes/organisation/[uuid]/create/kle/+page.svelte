@@ -1,7 +1,7 @@
 <script lang="ts">
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import Select from "$lib/components/forms/shared/select.svelte"
+  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { goto } from "$app/navigation"
@@ -18,7 +18,9 @@
 
   let toDate: string
   const fromDate = field("from", "", [required()])
-  const svelteForm = form(fromDate)
+  const kleNumber = field("kle_number", "", [required()])
+  const kleAspect = field("kle_aspect", "", [required()])
+  const svelteForm = form(fromDate, kleNumber, kleAspect)
 
   gql`
     query FacetsAndOrg($uuid: [UUID!], $fromDate: DateTime) {
@@ -125,16 +127,20 @@
           />
         </div>
         <div class="flex flex-row gap-6">
-          <Select
+          <SelectNew
             title="KLE nummer"
             id="kle-number"
+            bind:name={$kleNumber.value}
+            errors={$kleNumber.errors}
             iterable={getClassesByFacetUserKey(facets, "kle_number")}
             extra_classes="basis-1/2"
             required={true}
           />
-          <Select
+          <SelectNew
             title="KLE aspekt"
             id="kle-aspect"
+            bind:name={$kleAspect.value}
+            errors={$kleAspect.errors}
             iterable={getClassesByFacetUserKey(facets, "kle_aspect")}
             extra_classes="basis-1/2"
             required={true}

@@ -31,3 +31,41 @@
     @apply text-base text-secondary;
   }
 }
+
+/* svelte-select overrides */
+/* I have no clue why this is needed, but it is and it sucks. */
+.svelte-select {
+  @apply !h-8 !border-slate-300;
+}
+
+.svelte-select.multi {
+  @apply !h-auto;
+}
+
+.svelte-select.hover {
+  @apply !border-slate-300;
+}
+
+.svelte-select.focused {
+  @apply !border-primary;
+}
+
+.svelte-select input {
+  @apply !cursor-pointer;
+}
+
+.svelte-select > * {
+  @apply !cursor-pointer;
+}
+
+.svelte-select input#dar-search {
+  @apply !cursor-text;
+}
+
+.svelte-select input#autocomplete {
+  @apply !cursor-text;
+}
+
+.svelte-select.error {
+  @apply !border-red-500;
+}

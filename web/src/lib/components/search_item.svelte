@@ -21,11 +21,5 @@
         {/if}
       {/each}
     {/if}
-    {#if showPath && item.path}
-      <br />
-      {#each item.path.slice(0, -1) as path}
-        <div class="inline-block text-primary text-xs">{path + "/"}</div>
-      {/each}
-    {/if}
   </div>
 </div>

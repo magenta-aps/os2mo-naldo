@@ -1,3 +1,4 @@
+<!-- RENAME COMPONENT WHEN ALL SELECTS ARE CHANGED -->
 <script lang="ts">
   import SvelteSelect from "svelte-select"
 
@@ -8,16 +9,20 @@
   }
   export let title: string | undefined = undefined
   export let id: string
+  export let name: string | undefined = undefined
   export let iterable: any[] | undefined = undefined
   export let required = false
   export let placeholder: string = ""
   export let disabled = false
-  export let extra: Class | undefined = undefined
-  if (extra && iterable) {
-    iterable = [extra, ...iterable]
-  }
   export let startValue: Class | undefined = undefined
   export let value: Class | undefined = startValue || undefined
+  export let isClearable: boolean | undefined = false
+  export let extra_classes = ""
+  export let errors: string[] = []
+
+  $: if (value?.name) {
+    name = value?.name
+  }
 
   const itemId = "uuid" // Used by the component to differentiate between items
 
@@ -27,57 +32,56 @@
   }
 </script>
 
-<div class="w-full pb-4 cursor-pointer">
-  {#if title}
-    <label for={id} class="text-sm text-secondary pb-1">
-      {title}
-    </label>
+<div class="pb-3 {extra_classes}">
+  <div class="form-control w-full pb-1">
+    {#if title || required}
+      <label for={id} class="text-sm text-secondary pb-1">
+        {title ? title : ""}
+        {required ? "*" : ""}
+      </label>
+    {/if}
+    <SvelteSelect
+      --font-size="1rem"
+      --height="2rem"
+      --item-padding="0.25rem 0.75rem 0.25rem 0.75rem"
+      --item-height="auto"
+      --item-line-height="auto"
+      --value-container-padding="0rem"
+      --clear-select-height="1.5rem"
+      --clear-select-width="1.5rem"
+      --border-radius="0.25rem"
+      --placeholder-color="#00244E"
+      --icons-color="#00244E"
+      --padding="0 0 0 0.75rem"
+      id="select"
+      {floatingConfig}
+      hasError={errors.length ? true : false}
+      {disabled}
+      {itemId}
+      showChevron={true}
+      clearable={isClearable}
+      {placeholder}
+      items={iterable}
+      searchable={false}
+      bind:value
+      on:change
+      on:clear
+    >
+      <div slot="item" let:item class="cursor-pointer">
+        {item.name}
+      </div>
+
+      <div slot="selection" let:selection class="cursor-pointer">
+        {selection.name}
+      </div>
+    </SvelteSelect>
+  </div>
+  {#if value}
+    <input hidden {id} name={id} bind:value={value.uuid} />
   {/if}
-  <SvelteSelect
-    --font-size="1rem"
-    --height="2rem"
-    --loading-height="1.5rem"
-    --loading-width="1.5rem"
-    --spinner-height="1.5rem"
-    --spinner-width="1.5rem"
-    --item-padding="0.25rem 0.75rem 0.25rem 0.75rem"
-    --item-height="auto"
-    --item-line-height="auto"
-    --clear-select-height="1.5rem"
-    --clear-select-width="1.5rem"
-    --value-container-padding="0rem"
-    --border-radius="0.25rem"
-    --placeholder-color="#00244E"
-    --icons-color="#00244E"
-    --border-focused="solid 0px"
-    --padding="0 0.75rem 0 0.75rem"
-    {id}
-    name={id}
-    {floatingConfig}
-    {required}
-    {disabled}
-    {itemId}
-    showChevron={true}
-    clearable={false}
-    {placeholder}
-    items={iterable}
-    searchable={false}
-    bind:value
-    on:change
-    on:clear
-  >
-    <div slot="item" let:item class="cursor-pointer">
-      {item.name}
-    </div>
-
-    <div slot="selection" let:selection class="cursor-pointer">
-      {selection.name}
-    </div>
-  </SvelteSelect>
+  {#each errors as error}
+    {#if error === "required"}
+      <span class="label-text-alt text-error block">{title} skal udfyldes</span>
+    {/if}
+  {/each}
 </div>
-
-<style>
-  :global(.svelte-select.focused) {
-    box-shadow: 0px 0px 0px 3px #1053ab;
-  }
-</style>

@@ -30,8 +30,9 @@
       type="date"
       {min}
       {max}
-      class="input input-bordered input-sm rounded text-base text-secondary font-normal w-full
-        active:outline-offset-0 active:input-primary focus:outline-offset-0 focus:input-primary"
+      class="input input-bordered input-sm rounded text-base text-secondary font-normal w-full cursor-pointer focus:outline-0 {errors.length
+        ? 'input-error'
+        : 'focus:input-primary'}"
       {disabled}
     />
   </div>

@@ -113,7 +113,6 @@
       bind:value={orgUnitHierachy}
       startValue={brutto}
       iterable={getClassesByFacetUserKey(facets, "org_unit_hierarchy")}
-      extra={brutto}
       on:change={() =>
         (refreshableOrgTree = fetchOrgTree($date, null, orgUnitHierachy?.uuid))}
     />

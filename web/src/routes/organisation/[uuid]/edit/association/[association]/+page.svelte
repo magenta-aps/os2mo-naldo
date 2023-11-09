@@ -1,7 +1,7 @@
 <script lang="ts">
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import Select from "$lib/components/forms/shared/select.svelte"
+  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { goto } from "$app/navigation"
@@ -23,7 +23,8 @@
   let toDate: string
   const fromDate = field("from", "", [required()])
   const employee = field("employee", "", [required()])
-  const svelteForm = form(fromDate, employee)
+  const associationType = field("association_type", "", [required()])
+  const svelteForm = form(fromDate, employee, associationType)
 
   gql`
     query AssociationAndFacet($uuid: [UUID!], $fromDate: DateTime) {
@@ -49,10 +50,13 @@
               name
             }
             association_type {
+              uuid
+              user_key
               name
             }
             primary {
               uuid
+              user_key
               name
             }
             validity {
@@ -166,18 +170,22 @@
           required={true}
         />
         <div class="flex flex-row gap-6">
-          <Select
+          <SelectNew
             title="Tilknytningsrolle"
             id="association-type"
-            startValue={association.association_type?.name}
+            startValue={association.association_type
+              ? association.association_type
+              : undefined}
+            bind:name={$associationType.value}
+            errors={$associationType.errors}
             iterable={getClassesByFacetUserKey(facets, "association_type")}
             extra_classes="basis-1/2"
             required={true}
           />
-          <Select
+          <SelectNew
             title="Primær"
             id="primary"
-            startValue={association.primary?.name}
+            startValue={association.primary ? association.primary : undefined}
             iterable={getClassesByFacetUserKey(facets, "primary_type")}
             extra_classes="basis-1/2"
           />

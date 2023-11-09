@@ -111,7 +111,10 @@
             }}
             bind:name={$name.value}
             errors={$name.errors}
-            on:clear={() => ($name.value = "")}
+            on:clear={() => {
+              $name.value = ""
+              $newName.value = ""
+            }}
             on:change={() => ($newName.value = $name.value)}
             required={true}
           />
@@ -130,15 +133,18 @@
           title="Angiv enhed"
           bind:name={$name.value}
           errors={$name.errors}
-          on:clear={() => ($name.value = "")}
+          on:clear={() => {
+            $name.value = ""
+            $newName.value = ""
+          }}
           on:change={() => ($newName.value = $name.value)}
           required={true}
         />
         <Input
           title="Nyt navn"
           id="name"
-          bind:value={$name.value}
-          errors={$name.errors}
+          bind:value={$newName.value}
+          errors={$newName.errors}
           required={true}
         />
       {/if}

@@ -2,7 +2,7 @@
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
-  import Select from "$lib/components/forms/shared/select.svelte"
+  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
   import { enhance } from "$app/forms"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
@@ -20,13 +20,15 @@
   import { Addresses } from "$lib/util/addresses"
 
   let toDate: string
-  let addressType: { name: string; uuid?: any | null }
-  $: addressUuid = addressType?.uuid
+  let addressType: { name: string; user_key: string; uuid: string }
+  $: addressTypeUuid = addressType?.uuid
 
   // update the field depending on address-type
-  let addressField = field("", "")
   const fromDate = field("from", "", [required()])
-  $: svelteForm = form(fromDate, addressField)
+  const visibility = field("visibility", "", [required()])
+  const addressTypeField = field("address_type", "", [required()])
+  let addressField = field("", "")
+  $: svelteForm = form(fromDate, visibility, addressTypeField, addressField)
 
   gql`
     query AddressAndFacets(
@@ -56,9 +58,12 @@
             address_type {
               name
               uuid
+              user_key
             }
             visibility {
               name
+              user_key
+              uuid
             }
             validity {
               from
@@ -208,30 +213,32 @@
           />
         </div>
         <div class="flex flex-row gap-6">
-          <Select
+          <SelectNew
             title="Synlighed"
             id="visibility"
-            startValue={address.visibility?.name}
+            startValue={address.visibility ? address.visibility : undefined}
             iterable={getClassesByFacetUserKey(facets, "visibility")}
             extra_classes="basis-1/2"
           />
-          <Select
+          <SelectNew
             title="Adressetype"
             id="address-type"
+            startValue={address.address_type ? address.address_type : undefined}
             bind:value={addressType}
-            startValue={address.address_type.name}
+            bind:name={$addressTypeField.value}
+            errors={$addressTypeField.errors}
             iterable={getClassesByFacetUserKey(facets, "org_unit_address_type")}
             extra_classes="basis-1/2"
-            returnType="object"
             required={true}
           />
-          <input hidden name="address-type-uuid" bind:value={addressUuid} />
+          <input hidden name="address-type-uuid" bind:value={addressTypeUuid} />
         </div>
         {#if addressType}
           {#if [Addresses.HENVENDELSESSTED, Addresses.POSTADRESSE, Addresses.RETURADRESSE]
             .map(String)
             .includes(addressType.name)}
             <DarSearch
+              title={addressType.name}
               startValue={{
                 tekst: address.name,
                 adresse: { id: address.value },
@@ -239,16 +246,15 @@
               }}
               bind:darName={$addressField.value}
               errors={$addressField.errors}
-              title={addressType.name}
               id="value"
               required={true}
             />
           {:else}
             <Input
+              title={addressType.name}
               startValue={address.name}
               bind:value={$addressField.value}
               errors={$addressField.errors}
-              title={addressType.name}
               id="value"
               required={true}
             />

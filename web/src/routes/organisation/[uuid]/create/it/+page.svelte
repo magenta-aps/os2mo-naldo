@@ -2,7 +2,7 @@
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
-  import Select from "$lib/components/forms/shared/select.svelte"
+  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { goto } from "$app/navigation"
@@ -22,8 +22,9 @@
   let toDate: string
 
   const fromDate = field("from", "", [required()])
-  const accountName = field("accountName", "", [required()])
-  const svelteForm = form(fromDate, accountName)
+  const itSystem = field("it_system", "", [required()])
+  const accountName = field("account_name", "", [required()])
+  const svelteForm = form(fromDate, itSystem, accountName)
 
   gql`
     query ItSystemsClassAndOrg($uuid: [UUID!], $fromDate: DateTime) {
@@ -131,9 +132,11 @@
           />
         </div>
         <div class="flex flex-row gap-6">
-          <Select
+          <SelectNew
             title="IT-system"
             id="it-system"
+            bind:name={$itSystem.value}
+            errors={$itSystem.errors}
             iterable={getITSystemNames(itSystems)}
             extra_classes="basis-1/2"
             required={true}
