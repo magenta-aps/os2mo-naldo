@@ -1,7 +1,7 @@
 <script lang="ts">
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
+  import Select from "$lib/components/forms/shared/select.svelte"
   import { enhance } from "$app/forms"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
@@ -135,7 +135,7 @@
           on:clear={() => ($orgUnit.value = "")}
           required={true}
         />
-        <SelectNew
+        <Select
           title="Rolletype"
           id="role-type"
           bind:name={$roleType.value}

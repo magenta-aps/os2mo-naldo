@@ -80,7 +80,6 @@
       })
       filteredAddresses.push(...filtered)
     }
-    // TODO: Du mangler at få "data"-flowet til at virke med det her
     data = filteredAddresses
   })
 </script>

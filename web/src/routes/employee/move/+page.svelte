@@ -1,6 +1,6 @@
 <script lang="ts">
   import Error from "$lib/components/alerts/error.svelte"
-  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
+  import Select from "$lib/components/forms/shared/select.svelte"
   import { enhance } from "$app/forms"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
@@ -173,7 +173,7 @@
         />
         {#if engagements && engagements.length}
           {#key engagements}
-            <SelectNew
+            <Select
               title="Engagementer"
               id="engagement-uuid"
               bind:name={$engagement.value}
@@ -184,7 +184,7 @@
             />
           {/key}
         {:else}
-          <SelectNew
+          <Select
             title="Engagementer"
             id="engagement-uuid"
             bind:name={$engagement.value}

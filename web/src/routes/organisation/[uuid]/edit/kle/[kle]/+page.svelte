@@ -1,7 +1,7 @@
 <script lang="ts">
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
+  import Select from "$lib/components/forms/shared/select.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { goto } from "$app/navigation"
@@ -21,7 +21,6 @@
   const kleNumber = field("kle_number", "", [required()])
   const kleAspect = field("kle_aspect", "", [required()])
   const svelteForm = form(fromDate, kleNumber, kleAspect)
-
   // TODO: TEST THIS WITH KLE DATA
 
   gql`
@@ -148,7 +147,7 @@
           />
         </div>
         <div class="flex flex-row gap-6">
-          <SelectNew
+          <Select
             title="KLE nummer"
             id="kle-number"
             startValue={kle.kle_number}
@@ -159,7 +158,7 @@
             required={true}
           />
           <!-- Select multiple? -->
-          <SelectNew
+          <Select
             title="KLE aspekt"
             id="kle-aspect"
             startValue={kle.kle_aspects[0]}

@@ -4,7 +4,7 @@
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
-  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
+  import Select from "$lib/components/forms/shared/select.svelte"
   import { enhance } from "$app/forms"
   import { gql } from "graphql-request"
   import { GetOrgUnitAndFacetsDocument, CreateOrgUnitDocument } from "./query.generated"
@@ -180,7 +180,7 @@
           bind:value={$name.value}
           errors={$name.errors}
         />
-        <SelectNew
+        <Select
           title="Enhedstype"
           id="org-unit-type"
           bind:name={$orgUnitType.value}
@@ -193,7 +193,7 @@
         />
 
         <div class="flex flex-row gap-6">
-          <SelectNew
+          <Select
             title="Enhedsniveau"
             id="org-unit-level"
             bind:name={$orgUnitLevel.value}

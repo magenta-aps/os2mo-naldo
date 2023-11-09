@@ -1,7 +1,7 @@
 <script lang="ts">
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
+  import Select from "$lib/components/forms/shared/select.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
   import { enhance } from "$app/forms"
   import { goto } from "$app/navigation"
@@ -182,13 +182,13 @@
           />
         </div>
         <div class="flex flex-row gap-6">
-          <SelectNew
+          <Select
             title="Synlighed"
             id="visibility"
             iterable={getClassesByFacetUserKey(facets, "visibility")}
             extra_classes="basis-1/2"
           />
-          <SelectNew
+          <Select
             title="Adressetype"
             id="address-type"
             bind:value={addressType}

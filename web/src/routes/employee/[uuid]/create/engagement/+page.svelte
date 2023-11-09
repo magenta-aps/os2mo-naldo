@@ -2,7 +2,7 @@
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
-  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
+  import Select from "$lib/components/forms/shared/select.svelte"
   import { enhance } from "$app/forms"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
@@ -143,7 +143,7 @@
         />
         <div class="flex flex-row gap-6">
           <Input title="ID" id="user-key" extra_classes="basis-1/2" />
-          <SelectNew
+          <Select
             title="Stillingsbetegnelse"
             id="job-function"
             bind:name={$jobFunction.value}
@@ -154,7 +154,7 @@
           />
         </div>
         <div class="flex flex-row gap-6">
-          <SelectNew
+          <Select
             title="Engagementstype"
             id="engagement-type"
             bind:name={$engagementType.value}
@@ -163,7 +163,7 @@
             required={true}
             extra_classes="basis-1/2"
           />
-          <SelectNew
+          <Select
             title="Primær"
             id="primary"
             iterable={getClassesByFacetUserKey(facets, "primary_type")}

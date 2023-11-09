@@ -1,7 +1,7 @@
 <script lang="ts">
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
+  import Select from "$lib/components/forms/shared/select.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { goto } from "$app/navigation"
@@ -180,7 +180,7 @@
           required={true}
         />
         <div class="flex flex-row gap-6">
-          <SelectNew
+          <Select
             title="Ledertype"
             id="manager-type"
             startValue={manager.manager_type}
@@ -190,7 +190,7 @@
             extra_classes="basis-1/2"
             required={true}
           />
-          <SelectNew
+          <Select
             title="Lederniveau"
             id="manager-level"
             startValue={manager.manager_level}
