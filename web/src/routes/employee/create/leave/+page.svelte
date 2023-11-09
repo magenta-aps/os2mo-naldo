@@ -1,7 +1,7 @@
 <script lang="ts">
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import Select from "$lib/components/forms/shared/select.svelte"
+  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { success, error } from "$lib/stores/alert"
@@ -29,8 +29,11 @@
 
   const fromDate = field("from", "", [required()])
   const employeeField = field("employee", "", [required()])
-  const svelteForm = form(fromDate, employeeField)
+  const leaveType = field("leave_type", "", [required()])
+  const engagement = field("engagement", "", [required()])
+  const svelteForm = form(fromDate, employeeField, leaveType, engagement)
 
+  $: console.log($engagement)
   let employee: {
     uuid: string
     name: string
@@ -201,9 +204,11 @@
           />
         </div>
 
-        <Select
+        <SelectNew
           title="Orlovstype"
           id="leave-type-uuid"
+          bind:name={$leaveType.value}
+          errors={$leaveType.errors}
           iterable={getClassesByFacetUserKey(facets, "leave_type")}
           required={true}
         />
@@ -222,22 +227,32 @@
           on:change={() => updateEngagements(employee.uuid)}
           on:clear={() => {
             $employeeField.value = ""
+            $engagement.value = ""
             engagements = undefined
           }}
           required={true}
         />
         {#if engagements && engagements.length}
           {#key engagements}
-            <Select
+            <SelectNew
               title="Engagementer"
               id="engagement-uuid"
-              startValue={getEngagementTitlesAndUuid(engagements)[0].name}
+              bind:name={$engagement.value}
+              errors={$engagement.errors}
+              startValue={getEngagementTitlesAndUuid(engagements)[0]}
               iterable={getEngagementTitlesAndUuid(engagements)}
               required={true}
             />
           {/key}
         {:else}
-          <Select title="Engagementer" id="engagement-uuid" disabled required={true} />
+          <SelectNew
+            title="Engagementer"
+            id="engagement-uuid"
+            bind:name={$engagement.value}
+            errors={$engagement.errors}
+            disabled
+            required={true}
+          />
         {/if}
       </div>
     </div>

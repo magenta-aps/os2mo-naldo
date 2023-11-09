@@ -1,6 +1,6 @@
 <script lang="ts">
   import Error from "$lib/components/alerts/error.svelte"
-  import Select from "$lib/components/forms/shared/select.svelte"
+  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
   import { enhance } from "$app/forms"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
@@ -22,8 +22,9 @@
 
   const fromDate = field("from", "", [required()])
   const employeeField = field("employee", "", [required()])
+  const engagement = field("engagement", "", [required()])
   const orgUnitField = field("org_unit", "", [required()])
-  const svelteForm = form(fromDate, employeeField, orgUnitField)
+  const svelteForm = form(fromDate, employeeField, engagement, orgUnitField)
 
   let employee: {
     uuid: string
@@ -167,22 +168,32 @@
           on:change={() => updateEngagements(employee.uuid)}
           on:clear={() => {
             $employeeField.value = ""
+            $engagement.value = ""
             engagements = undefined
           }}
           required={true}
         />
         {#if engagements && engagements.length}
           {#key engagements}
-            <Select
+            <SelectNew
               title="Engagementer"
               id="engagement-uuid"
-              startValue={getEngagementTitlesAndUuid(engagements)[0].name}
+              bind:name={$engagement.value}
+              errors={$engagement.errors}
+              startValue={getEngagementTitlesAndUuid(engagements)[0]}
               iterable={getEngagementTitlesAndUuid(engagements)}
               required={true}
             />
           {/key}
         {:else}
-          <Select title="Engagementer" id="engagement-uuid" disabled required={true} />
+          <SelectNew
+            title="Engagementer"
+            id="engagement-uuid"
+            bind:name={$engagement.value}
+            errors={$engagement.errors}
+            disabled
+            required={true}
+          />
         {/if}
         <Search
           type="org-unit"

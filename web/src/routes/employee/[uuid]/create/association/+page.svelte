@@ -1,8 +1,7 @@
 <script lang="ts">
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import Input from "$lib/components/forms/shared/input.svelte"
-  import Select from "$lib/components/forms/shared/select.svelte"
+  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { goto } from "$app/navigation"
@@ -25,7 +24,8 @@
 
   const fromDate = field("from", "", [required()])
   const orgUnit = field("org_unit", "", [required()])
-  const svelteForm = form(fromDate, orgUnit)
+  const associationType = field("association_type", "", [required()])
+  const svelteForm = form(fromDate, orgUnit, associationType)
 
   gql`
     query FacetAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
@@ -153,14 +153,16 @@
           required={true}
         />
         <div class="flex flex-row gap-6">
-          <Select
+          <SelectNew
             title="Tilknytningsrolle"
             id="association-type"
+            bind:name={$associationType.value}
+            errors={$associationType.errors}
             iterable={getClassesByFacetUserKey(facets, "association_type")}
             required={true}
             extra_classes="basis-1/2"
           />
-          <Select
+          <SelectNew
             title="Primær"
             id="primary"
             iterable={getClassesByFacetUserKey(facets, "primary_type")}

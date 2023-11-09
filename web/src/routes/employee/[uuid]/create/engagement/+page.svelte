@@ -2,8 +2,7 @@
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
-  import Select from "$lib/components/forms/shared/select.svelte"
-  import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
+  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
   import { enhance } from "$app/forms"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
@@ -23,7 +22,9 @@
 
   const fromDate = field("from", "", [required()])
   const orgUnit = field("org_unit", "", [required()])
-  const svelteForm = form(fromDate, orgUnit)
+  const jobFunction = field("job_function", "", [required()])
+  const engagementType = field("engagement_type", "", [required()])
+  const svelteForm = form(fromDate, orgUnit, jobFunction, engagementType)
 
   gql`
     query FacetAndOrg($uuid: [UUID!], $fromDate: DateTime) {
@@ -142,23 +143,27 @@
         />
         <div class="flex flex-row gap-6">
           <Input title="ID" id="user-key" extra_classes="basis-1/2" />
-          <Select
+          <SelectNew
             title="Stillingsbetegnelse"
             id="job-function"
+            bind:name={$jobFunction.value}
+            errors={$jobFunction.errors}
             iterable={getClassesByFacetUserKey(facets, "engagement_job_function")}
             required={true}
             extra_classes="basis-1/2"
           />
         </div>
         <div class="flex flex-row gap-6">
-          <Select
+          <SelectNew
             title="Engagementstype"
             id="engagement-type"
+            bind:name={$engagementType.value}
+            errors={$engagementType.errors}
             iterable={getClassesByFacetUserKey(facets, "engagement_type")}
             required={true}
             extra_classes="basis-1/2"
           />
-          <Select
+          <SelectNew
             title="Primær"
             id="primary"
             iterable={getClassesByFacetUserKey(facets, "primary_type")}

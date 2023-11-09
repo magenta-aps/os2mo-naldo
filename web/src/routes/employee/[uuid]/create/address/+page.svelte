@@ -1,7 +1,7 @@
 <script lang="ts">
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import Select from "$lib/components/forms/shared/select.svelte"
+  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
   import { enhance } from "$app/forms"
   import { goto } from "$app/navigation"
@@ -20,13 +20,14 @@
   import { Addresses } from "$lib/util/addresses"
 
   let toDate: string
-  let addressType: { name: string; uuid?: any | null }
-  $: addressUuid = addressType?.uuid
+  let addressType: { name: string; user_key: string; uuid: string }
+  $: addressTypeUuid = addressType?.uuid
 
   // update the field depending on address-type
-  let address = field("", "")
   const fromDate = field("from", "", [required()])
-  $: svelteForm = form(fromDate, address)
+  const addressTypeField = field("address_type", "", [required()])
+  let addressField = field("", "")
+  $: svelteForm = form(fromDate, addressTypeField, addressField)
 
   gql`
     query FacetsAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
@@ -68,17 +69,17 @@
   `
   $: switch (addressType?.name) {
     case Addresses.EMAIL:
-      address = field(Addresses.EMAIL, "", [required(), email()])
+      addressField = field(Addresses.EMAIL, "", [required(), email()])
       break
     case Addresses.LOKATION:
-      address = field(Addresses.LOKATION, "", [required()])
+      addressField = field(Addresses.LOKATION, "", [required()])
       break
     case Addresses.POSTADRESSE:
-      address = field(Addresses.POSTADRESSE, "", [required()])
+      addressField = field(Addresses.POSTADRESSE, "", [required()])
       break
     case Addresses.TELEFON:
       // This regex is not perfect, as it allows ex. `12345678` and `+45123456`, but use it for now
-      address = field(Addresses.TELEFON, "", [required(), pattern(/(\+45)?\d{8}/)])
+      addressField = field(Addresses.TELEFON, "", [required(), pattern(/(\+45)?\d{8}/)])
       break
     default:
       break
@@ -151,38 +152,39 @@
           />
         </div>
         <div class="flex flex-row gap-6">
-          <Select
+          <SelectNew
             title="Synlighed"
             id="visibility"
             iterable={getClassesByFacetUserKey(facets, "visibility")}
             extra_classes="basis-1/2"
           />
-          <Select
+          <SelectNew
             title="Adressetype"
             id="address-type"
             bind:value={addressType}
+            bind:name={$addressTypeField.value}
+            errors={$addressTypeField.errors}
             iterable={getClassesByFacetUserKey(facets, "employee_address_type")}
-            required={true}
             extra_classes="basis-1/2"
-            returnType="object"
+            required={true}
           />
-          <input hidden name="address-type-uuid" bind:value={addressUuid} />
+          <input hidden name="address-type-uuid" bind:value={addressTypeUuid} />
         </div>
         {#if addressType}
           {#if addressType.name === Addresses.POSTADRESSE}
             <DarSearch
               title={addressType.name}
               id="value"
-              bind:darName={$address.value}
-              errors={$address.errors}
+              bind:darName={$addressField.value}
+              errors={$addressField.errors}
               required={true}
             />
           {:else}
             <Input
               title={addressType.name}
               id="value"
-              bind:value={$address.value}
-              errors={$address.errors}
+              bind:value={$addressField.value}
+              errors={$addressField.errors}
               required={true}
             />
           {/if}

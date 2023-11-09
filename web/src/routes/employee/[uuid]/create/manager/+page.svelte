@@ -1,7 +1,7 @@
 <script lang="ts">
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import Select from "$lib/components/forms/shared/select.svelte"
+  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { goto } from "$app/navigation"
@@ -22,8 +22,16 @@
 
   const fromDate = field("from", "", [required()])
   const orgUnit = field("org_unit", "", [required()])
+  const managerType = field("manager_type", "", [required()])
+  const managerLevel = field("manager_level", "", [required()])
   const responsibilities = field("responsibilities", undefined, [required()])
-  const svelteForm = form(fromDate, orgUnit, responsibilities)
+  const svelteForm = form(
+    fromDate,
+    orgUnit,
+    managerType,
+    managerLevel,
+    responsibilities
+  )
 
   gql`
     query FacetsAndOrg($uuid: [UUID!], $fromDate: DateTime) {
@@ -142,16 +150,20 @@
           required={true}
         />
         <div class="flex flex-row gap-6">
-          <Select
+          <SelectNew
             title="Ledertype"
             id="manager-type"
+            bind:name={$managerType.value}
+            errors={$managerType.errors}
             iterable={getClassesByFacetUserKey(facets, "manager_type")}
             extra_classes="basis-1/2"
             required={true}
           />
-          <Select
+          <SelectNew
             title="Lederniveau"
             id="manager-level"
+            bind:name={$managerLevel.value}
+            errors={$managerLevel.errors}
             iterable={getClassesByFacetUserKey(facets, "manager_level")}
             extra_classes="basis-1/2"
             required={true}

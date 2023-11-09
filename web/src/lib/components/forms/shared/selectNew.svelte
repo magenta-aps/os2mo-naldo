@@ -2,10 +2,10 @@
 <script lang="ts">
   import SvelteSelect from "svelte-select"
 
-  type Class = {
+  type Value = {
     uuid: string | null
     name: string
-    user_key: string | null
+    user_key?: string | null
   }
   export let title: string | undefined = undefined
   export let id: string
@@ -14,8 +14,8 @@
   export let required = false
   export let placeholder: string = ""
   export let disabled = false
-  export let startValue: Class | undefined = undefined
-  export let value: Class | undefined = startValue || undefined
+  export let startValue: Value | undefined = undefined
+  export let value: Value | undefined = startValue || undefined
   export let isClearable: boolean | undefined = false
   export let extra_classes = ""
   export let errors: string[] = []

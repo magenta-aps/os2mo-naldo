@@ -2,7 +2,7 @@
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
-  import Select from "$lib/components/forms/shared/select.svelte"
+  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
   import { enhance } from "$app/forms"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
@@ -25,7 +25,9 @@
 
   const fromDate = field("from", "", [required()])
   const orgUnit = field("org_unit", "", [required()])
-  const svelteForm = form(fromDate, orgUnit)
+  const jobFunction = field("job_function", "", [required()])
+  const engagementType = field("engagement_type", "", [required()])
+  const svelteForm = form(fromDate, orgUnit, jobFunction, engagementType)
 
   gql`
     query EngagementAndFacet($uuid: [UUID!], $fromDate: DateTime) {
@@ -56,9 +58,11 @@
               name
             }
             engagement_type {
+              uuid
               name
             }
             job_function {
+              uuid
               name
             }
             primary {
@@ -183,28 +187,32 @@
             startValue={engagement.user_key}
             extra_classes="basis-1/2"
           />
-          <Select
+          <SelectNew
             title="Stillingsbetegnelse"
             id="job-function"
-            startValue={engagement.job_function.name}
+            startValue={engagement.job_function}
+            bind:name={$jobFunction.value}
+            errors={$jobFunction.errors}
             iterable={getClassesByFacetUserKey(facets, "engagement_job_function")}
             extra_classes="basis-1/2"
             required={true}
           />
         </div>
         <div class="flex flex-row gap-6">
-          <Select
+          <SelectNew
             title="Engagementstype"
             id="engagement-type"
-            startValue={engagement.engagement_type.name}
+            startValue={engagement.engagement_type}
+            bind:name={$engagementType.value}
+            errors={$engagementType.errors}
             iterable={getClassesByFacetUserKey(facets, "engagement_type")}
             extra_classes="basis-1/2"
             required={true}
           />
-          <Select
+          <SelectNew
             title="Primær"
             id="primary"
-            startValue={engagement.primary?.name}
+            startValue={engagement.primary ? engagement.primary : undefined}
             iterable={getClassesByFacetUserKey(facets, "primary_type")}
             extra_classes="basis-1/2"
           />
