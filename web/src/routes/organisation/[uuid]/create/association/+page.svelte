@@ -132,7 +132,6 @@
         </div>
         <Search
           type="employee"
-          wantedAttrs={["Email"]}
           bind:name={$employee.value}
           errors={$employee.errors}
           on:clear={() => ($employee.value = "")}

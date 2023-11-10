@@ -151,7 +151,6 @@
           startValue={{
             uuid: role.org_unit[0].uuid,
             name: role.org_unit[0].name,
-            attrs: [],
           }}
           bind:name={$orgUnit.value}
           errors={$orgUnit.errors}

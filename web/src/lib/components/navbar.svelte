@@ -57,7 +57,7 @@
         {#if orgChecked}
           <Search action="goto" type={"org-unit"} />
         {:else}
-          <Search action="goto" type={"employee"} wantedAttrs={["Email"]} />
+          <Search action="goto" type={"employee"} />
         {/if}
       </div>
       <div>

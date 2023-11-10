@@ -7,11 +7,12 @@ export const actions: Actions = {
     const orgUnit = data.get("org-unit-uuid")
     const name = data.get("name") as string
     const startDate = data.get("from")
+    const endDate = data.get("to")
 
     return {
       uuid: orgUnit,
       name: name,
-      validity: { from: startDate },
+      validity: { from: startDate, ...(endDate && { to: endDate }) },
     }
   },
 }

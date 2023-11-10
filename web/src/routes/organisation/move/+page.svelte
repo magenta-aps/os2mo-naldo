@@ -16,6 +16,8 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
 
+  let toDate: string
+
   const fromDate = field("from", "", [required()])
   const orgUnitField = field("org_unit", "", [required()])
   const svelteForm = form(fromDate, orgUnitField)
@@ -101,6 +103,13 @@
           max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
           required={true}
         />
+        <DateInput
+          bind:value={toDate}
+          title="Slutdato"
+          id="to"
+          min={$fromDate.value ? $fromDate.value : undefined}
+          max={undefined}
+        />
         <!-- FIXME: min/max -->
       </div>
       {#if urlHashOrgUnitUuid}
@@ -120,7 +129,6 @@
             startValue={{
               uuid: orgUnit.uuid,
               name: orgUnit.name,
-              attrs: [],
             }}
             bind:name={$orgUnitField.value}
             on:clear={() => ($orgUnitField.value = "")}

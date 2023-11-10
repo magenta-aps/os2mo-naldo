@@ -29,7 +29,6 @@
   let employee: {
     uuid: string
     name: string
-    attrs: []
   }
   let engagements: EngagementTitleAndUuid[] | undefined
 
@@ -159,7 +158,6 @@
             ? {
                 uuid: startValueEmployee.uuid,
                 name: startValueEmployee.name,
-                attrs: [],
               }
             : undefined}
           bind:value={employee}

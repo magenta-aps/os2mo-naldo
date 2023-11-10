@@ -2,16 +2,6 @@ import { env } from "$env/dynamic/public"
 import { keycloak } from "$lib/util/keycloak"
 import { GraphQLClient } from "graphql-request"
 
-export const fetchInternal = async (path: string) => {
-  const token = keycloak ? keycloak.token : "Keycloak disabled"
-  return await fetch(`${env.PUBLIC_BASE_URL}/service/${path}`, {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + token,
-    },
-  })
-}
-
 export const postRest = async (path: string, payload: any) => {
   const token = keycloak ? keycloak.token : "Keycloak disabled"
   return await fetch(`${env.PUBLIC_BASE_URL}/service/${path}`, {

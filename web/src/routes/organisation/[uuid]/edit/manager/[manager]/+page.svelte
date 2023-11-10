@@ -168,7 +168,6 @@
           startValue={{
             uuid: manager.org_unit[0].uuid,
             name: manager.org_unit[0].name,
-            attrs: [],
           }}
           required={true}
         />
@@ -178,10 +177,8 @@
             ? {
                 uuid: manager.employee[0].uuid,
                 name: manager.employee[0].name,
-                attrs: [],
               }
             : undefined}
-          wantedAttrs={["Email"]}
         />
         <div class="flex flex-row gap-6">
           <SelectNew

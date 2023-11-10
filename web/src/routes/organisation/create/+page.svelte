@@ -28,7 +28,6 @@
   let parent: {
     uuid: string
     name: string
-    attrs: []
   }
 
   const urlHashOrgUnitUuid = getUuidFromHash($page.url.hash)
@@ -163,7 +162,6 @@
             startValue={{
               uuid: orgUnit.uuid,
               name: orgUnit.name,
-              attrs: [],
             }}
           />
         {:else}

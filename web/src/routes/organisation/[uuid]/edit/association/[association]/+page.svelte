@@ -161,12 +161,10 @@
           startValue={{
             uuid: association.employee[0].uuid,
             name: association.employee[0].name,
-            attrs: [],
           }}
           bind:name={$employee.value}
           errors={$employee.errors}
           on:clear={() => ($employee.value = "")}
-          wantedAttrs={["Email"]}
           required={true}
         />
         <div class="flex flex-row gap-6">
