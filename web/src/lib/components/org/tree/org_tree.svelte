@@ -124,7 +124,7 @@
         <span class="sr-only">Loading...</span>
       </div>
     {:then orgTree}
-      {#each orgTree as child}
+      {#each orgTree.sort( (a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1) ) as child}
         <Node {...child} />
       {/each}
     {/await}
