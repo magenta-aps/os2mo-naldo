@@ -119,7 +119,7 @@
 </a>
 
 {#if open}
-  {#each children as child}
+  {#each children.sort( (a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1) ) as child}
     <svelte:self {...child} {breadcrumbs} {fromDate} indent={indent + 24} />
   {/each}
 {/if}
