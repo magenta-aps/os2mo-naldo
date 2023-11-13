@@ -41,11 +41,13 @@
             })
             $success = {
               message: `Medarbejderen ${
-                mutation.employee_create.objects[0].name
+                mutation.employee_create.objects.length
                   ? mutation.employee_create.objects[0].name
                   : ""
               } er blevet oprettet.`,
-              uuid: mutation.employee_create.objects[0].uuid,
+              uuid: mutation.employee_create.objects.length
+                ? mutation.employee_create.objects[0].uuid
+                : null,
               type: "employee",
             }
           } catch (err) {
