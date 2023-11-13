@@ -1,7 +1,5 @@
-export const formatDate = (date: string): string => {
-  const dt = new Date(date).toLocaleDateString("da-DK", {
-    dateStyle: "short",
-  })
+import { formatInTimeZone } from "date-fns-tz"
 
-  return dt.split(".").join("-")
+export const formatDate = (date: string): string => {
+  return formatInTimeZone(date, "Europe/Copenhagen", "dd-MM-yyyy")
 }
