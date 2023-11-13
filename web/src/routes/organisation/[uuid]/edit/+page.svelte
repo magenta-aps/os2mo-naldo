@@ -2,7 +2,7 @@
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
-  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
+  import Select from "$lib/components/forms/shared/select.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { goto } from "$app/navigation"
@@ -166,7 +166,7 @@
         />
 
         <div class="flex flex-row gap-6">
-          <SelectNew
+          <Select
             title="Enhedsniveau"
             id="org-level"
             bind:name={$orgUnitLevel.value}
@@ -178,7 +178,7 @@
             isClearable={true}
             required={true}
           />
-          <SelectNew
+          <Select
             title="Enhedstype"
             id="org-type"
             bind:name={$orgUnitType.value}

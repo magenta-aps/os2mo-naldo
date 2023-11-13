@@ -121,10 +121,7 @@
       {/if}
     </div>
 
-    <!-- TODO: Implement past present future for employees -->
     {#if activeItem === EmployeeTab.EMPLOYEE}
-      <!-- TODO: future and past does not work. 
-      Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
         <EmployeeDetailTable tense="future" uuid={$page.params.uuid} />
@@ -138,8 +135,6 @@
         <EmployeeDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
     {:else if activeItem === EmployeeTab.ENGAGEMENT}
-      <!-- TODO: future and past does not work. 
-      Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
         <EngagementDetailTable tense="future" uuid={$page.params.uuid} />
@@ -153,8 +148,6 @@
         <EngagementDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
     {:else if activeItem === EmployeeTab.ADDRESS}
-      <!-- TODO: future and past does not work. 
-      Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
         <AddressDetailTable tense="future" uuid={$page.params.uuid} />
@@ -168,8 +161,6 @@
         <AddressDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
     {:else if activeItem === EmployeeTab.ASSOCIATION}
-      <!-- TODO: future and past does not work. 
-      Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
         <AssociationDetailTable tense="future" uuid={$page.params.uuid} />
@@ -183,8 +174,6 @@
         <AssociationDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
     {:else if activeItem === EmployeeTab.ITASSOCIATION}
-      <!-- TODO: future and past does not work. 
-      Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
         <ItAssociationDetailTable tense="future" uuid={$page.params.uuid} />
@@ -198,8 +187,6 @@
         <ItAssociationDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
     {:else if activeItem === EmployeeTab.ROLE}
-      <!-- TODO: future and past does not work. 
-      Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
         <RolesDetailTable tense="future" uuid={$page.params.uuid} />
@@ -226,8 +213,6 @@
         <ItUserDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
     {:else if activeItem === EmployeeTab.LEAVE}
-      <!-- TODO: future and past does not work. 
-      Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
         <LeavesDetailTable tense="future" uuid={$page.params.uuid} />
@@ -241,8 +226,6 @@
         <LeavesDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
     {:else if activeItem === EmployeeTab.MANAGER}
-      <!-- TODO: future and past does not work. 
-      Waiting to see if this can be done through GraphQL -->
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
         <ManagerDetailTable tense="future" uuid={$page.params.uuid} />

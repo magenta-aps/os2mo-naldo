@@ -1,7 +1,7 @@
 <script lang="ts">
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
-  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
+  import Select from "$lib/components/forms/shared/select.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { goto } from "$app/navigation"
@@ -173,7 +173,7 @@
           />
         </div>
 
-        <SelectNew
+        <Select
           startValue={leave.leave_type}
           title="Orlovstype"
           id="leave-type-uuid"
@@ -191,7 +191,7 @@
           disabled
           required={true}
         />
-        <SelectNew
+        <Select
           title="Engagementer"
           id="engagement-uuid"
           startValue={engagementStartValue}

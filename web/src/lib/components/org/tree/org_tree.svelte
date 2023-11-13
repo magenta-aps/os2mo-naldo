@@ -12,7 +12,7 @@
     OrgUnitHierarchiesDocument,
   } from "./query.generated"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
-  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
+  import Select from "$lib/components/forms/shared/select.svelte"
 
   const brutto = { uuid: null, name: "Bruttoorganisation", user_key: null }
   let orgUnitHierachy = brutto
@@ -108,7 +108,7 @@
 {#await graphQLClient().request(OrgUnitHierarchiesDocument) then data}
   {#if data.facets.objects[0].objects[0].classes.length}
     {@const facets = data.facets.objects}
-    <SelectNew
+    <Select
       id="org-unit-hierarchy"
       bind:value={orgUnitHierachy}
       startValue={brutto}

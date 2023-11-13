@@ -2,7 +2,7 @@
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
-  import SelectNew from "$lib/components/forms/shared/selectNew.svelte"
+  import Select from "$lib/components/forms/shared/select.svelte"
   import { enhance } from "$app/forms"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
@@ -212,14 +212,14 @@
           />
         </div>
         <div class="flex flex-row gap-6">
-          <SelectNew
+          <Select
             title="Synlighed"
             id="visibility"
             startValue={address.visibility ? address.visibility : undefined}
             iterable={getClassesByFacetUserKey(facets, "visibility")}
             extra_classes="basis-1/2"
           />
-          <SelectNew
+          <Select
             title="Adressetype"
             id="address-type"
             startValue={address.address_type ? address.address_type : undefined}

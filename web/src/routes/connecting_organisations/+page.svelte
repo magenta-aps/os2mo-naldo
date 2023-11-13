@@ -267,12 +267,11 @@
         disabled={isDisabled}
         >Gem
       </button>
-      <!-- FIXME: Where should goto: point to, if it's supposed to point somewhere? Additionally, it needs to be clarified what behavior is expected when cancel is triggered. -->
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         disabled={isDisabled}
-        on:click={() => goto(`${base}/connecting_organisations/`)}
+        on:click={() => history.back()}
       >
         Annullér
       </button>
