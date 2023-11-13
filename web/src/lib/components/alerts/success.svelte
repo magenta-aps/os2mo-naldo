@@ -17,7 +17,7 @@
     // Will redirect if the successful action was on an organisation or employee
     if ($success.type == "organisation" || $success.type == "employee") {
       setTimeout(() => {
-        if ($success.uuid !== null) {
+        if ($success.uuid) {
           setTimeout(() => goto(`${base}/${$success.type}/${$success.uuid}`), 200)
         } else {
           setTimeout(() => goto(`${base}/`), 200)
@@ -34,10 +34,10 @@
 {#if $success.message}
   <div class="toast toast-end" transition:slide>
     {#if $success.type == "organisation" || $success.type == "employee"}
-      {#if $success.uuid !== null}
+      {#if $success.uuid}
         <a
           href={`/${$success.type}/${$success.uuid}`}
-          class="alert alert-success shadow-lg"
+          class="shadow-lg alert alert-success"
         >
           <div>
             <Icon type="success" />
@@ -45,7 +45,7 @@
           </div>
         </a>
       {:else}
-        <a href="/" class="alert alert-success shadow-lg">
+        <a href="/" class="shadow-lg alert alert-success">
           <div>
             <Icon type="success" />
             <span>{$success.message}</span>
@@ -53,7 +53,7 @@
         </a>
       {/if}
     {:else}
-      <div class="alert alert-success shadow-lg">
+      <div class="shadow-lg alert alert-success">
         <div>
           <Icon type="success" />
           <span>{$success.message}</span>
