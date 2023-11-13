@@ -25,11 +25,9 @@
   // Tabs
   let items = Object.values(OrgTab)
 
+  let uuidFromUrl = $page.params.uuid
   let activeItem = $activeOrgTab
   const tabChange = (e: CustomEvent) => ($activeOrgTab = activeItem = e.detail)
-
-  // Used to prevent an early history.replaceState on load with the wrong tab
-  let checkedHash = false
 
   // Used to make a dynamic create button
   const subsiteOfCategory = (category: OrgTab) => {
@@ -80,21 +78,18 @@
         $activeOrgTab = activeItem = firstHash as OrgTab
       }
     }
-
-    checkedHash = true
   })
 
-  // checkedHash prevents early replaceState
-  // $page.params.uuid makes sure replaceState is re-run when jumping between orgs
-  $: if (checkedHash && $page.params.uuid) {
-    history.replaceState({}, "", `#${$activeOrgTab}`)
+  // Prevents the #await from re-fetching when the tabs changes the hash in the URL
+  $: if (uuidFromUrl !== $page.params.uuid) {
+    uuidFromUrl = $page.params.uuid
   }
 </script>
 
 <HeadTitle type="organisation" />
 
 <div class="px-12 pt-6">
-  {#await graphQLClient().request( OrgUnitDocument, { uuid: $page.params.uuid, fromDate: $date } )}
+  {#await graphQLClient().request( OrgUnitDocument, { uuid: uuidFromUrl, fromDate: $date } )}
     <p>Loader organisation...</p>
   {:then data}
     <div class="flex gap-5">
