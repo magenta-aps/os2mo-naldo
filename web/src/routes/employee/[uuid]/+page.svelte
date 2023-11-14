@@ -23,12 +23,10 @@
 
   // Tabs
   let items = Object.values(EmployeeTab)
+  let uuidFromUrl = $page.params.uuid
 
   let activeItem = $activeEmployeeTab
   const tabChange = (e: CustomEvent) => ($activeEmployeeTab = activeItem = e.detail)
-
-  // Used to prevent an early history.replaceState on load with the wrong tab
-  let checkedHash = false
 
   // Used to make a dynamic create button
   const subsiteOfCategory = (category: EmployeeTab) => {
@@ -80,19 +78,18 @@
         $activeEmployeeTab = activeItem = firstHash as EmployeeTab
       }
     }
-
-    checkedHash = true
   })
 
-  $: if (checkedHash) {
-    history.replaceState({}, "", `#${$activeEmployeeTab}`)
+  // Prevents the #await from re-fetching when the tabs changes the hash in the URL
+  $: if (uuidFromUrl !== $page.params.uuid) {
+    uuidFromUrl = $page.params.uuid
   }
 </script>
 
 <HeadTitle type="employee" />
 
 <div class="px-12 pt-6">
-  {#await graphQLClient().request( EmployeeDocument, { uuid: $page.params.uuid, fromDate: $date } )}
+  {#await graphQLClient().request( EmployeeDocument, { uuid: uuidFromUrl, fromDate: $date } )}
     <p>Loader medarbejder...</p>
   {:then data}
     {@const employee = data.employees.objects[0].objects[0]}

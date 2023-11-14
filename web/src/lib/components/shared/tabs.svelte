@@ -9,13 +9,14 @@
 
 <div class="tabs">
   {#each items as item}
-    <button
-      class="tab tab-bordered text-base {item === activeItem
-        ? 'border-primary text-primary'
-        : 'text-secondary'}"
+    <a
+      href="#{item}"
+      data-sveltekit-replacestate
+      class="tab tab-bordered text-base hover:no-underline
+      {item === activeItem ? 'border-primary text-primary' : 'text-secondary'}"
       on:click={() => dispatch("tabChange", item)}
     >
       {item}
-    </button>
+    </a>
   {/each}
 </div>
