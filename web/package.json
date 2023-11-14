@@ -41,7 +41,7 @@
     "daisyui": "^3.9.4",
     "date-fns": "^2.30.0",
     "date-fns-tz": "^2.0.0",
-    "graphql": "^16.8.0",
+    "graphql": "^16.8.1",
     "graphql-request": "^6.0.0",
     "keycloak-js": "^22.0.5",
     "prettier": "<3.0.0",
