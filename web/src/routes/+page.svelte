@@ -45,7 +45,7 @@
             >
           </li>
           <li>
-            <a href="{base}/employee/create/terminate" class="hover:no-underline">
+            <a href="{base}/employee/terminate" class="hover:no-underline">
               Opsig medarbejder</a
             >
           </li>
