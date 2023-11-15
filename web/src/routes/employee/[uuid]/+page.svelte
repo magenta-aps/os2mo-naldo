@@ -106,16 +106,16 @@
 
     <div class="flex justify-between">
       <TenseTabs />
-      {#if activeItem !== EmployeeTab.EMPLOYEE}
-        <a
-          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
-          href={`${base}/employee/${$page.params.uuid}/create/${subsiteOfCategory(
-            activeItem
-          )}`}
-        >
-          Tilføj {activeItem}
-        </a>
-      {/if}
+      <a
+        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
+        href={`${base}/employee/${
+          activeItem === EmployeeTab.EMPLOYEE
+            ? "create"
+            : `${$page.params.uuid}/create/${subsiteOfCategory(activeItem)}`
+        }`}
+      >
+        Tilføj {activeItem}
+      </a>
     </div>
 
     {#if activeItem === EmployeeTab.EMPLOYEE}

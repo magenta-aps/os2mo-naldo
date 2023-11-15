@@ -16,23 +16,15 @@
   const isOrg = $page.route.id?.startsWith("/organisation")
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
-  const headers = isOrg
-    ? [
-        { title: "Navn" },
-        { title: "Stillingbetegnelse" },
-        { title: "Engagementstype" },
-        { title: "Primær" },
-        { title: "Dato" },
-      ]
-    : [
-        { title: "Enhed" },
-        { title: "Stillingbetegnelse" },
-        { title: "Engagementstype" },
-        { title: "Primær" },
-        { title: "Dato" },
-        { title: "" },
-        { title: "" },
-      ]
+  const headers = [
+    isOrg ? { title: "Navn" } : { title: "Enhed" },
+    { title: "Stillingbetegnelse" },
+    { title: "Engagementstype" },
+    { title: "Primær" },
+    { title: "Dato" },
+    { title: "" },
+    { title: "" },
+  ]
 
   // Bør vi ikke tilføje noget tid til de her queries?
   gql`
@@ -96,29 +88,33 @@
             <a href="{base}/employee/{engagement.employee[0].uuid}">
               <td class="p-4">{engagement.employee[0].name}</td>
             </a>
-            <td class="p-4">{engagement.job_function.name}</td>
-            <td class="p-4">{engagement.engagement_type.name}</td>
-            <td class="p-4">{engagement.primary ? engagement.primary.name : ""}</td>
-            <ValidityTableCell validity={engagement.validity} />
           {:else}
             <a href="{base}/organisation/{engagement.org_unit[0].uuid}">
               <td class="p-4">{engagement.org_unit[0].name}</td>
             </a>
-            <td class="p-4">{engagement.job_function.name}</td>
-            <td class="p-4">{engagement.engagement_type.name}</td>
-            <td class="p-4">{engagement.primary ? engagement.primary.name : ""}</td>
-            <ValidityTableCell validity={engagement.validity} />
-            <td>
-              <a href="{base}/employee/{uuid}/edit/engagement/{engagement.uuid}">
-                <Icon type="pen" />
-              </a>
-            </td>
-            <td>
-              <a href="{base}/employee/{uuid}/terminate/engagement/{engagement.uuid}">
-                <Icon type="xmark" size="30" />
-              </a>
-            </td>
           {/if}
+          <td class="p-4">{engagement.job_function.name}</td>
+          <td class="p-4">{engagement.engagement_type.name}</td>
+          <td class="p-4">{engagement.primary ? engagement.primary.name : ""}</td>
+          <ValidityTableCell validity={engagement.validity} />
+          <td>
+            <a
+              href="{base}/{$page.route.id?.split(
+                '/'
+              )[1]}/{uuid}/edit/engagement/{engagement.uuid}"
+            >
+              <Icon type="pen" />
+            </a>
+          </td>
+          <td>
+            <a
+              href="{base}/{$page.route.id?.split(
+                '/'
+              )[1]}/{uuid}/terminate/engagement/{engagement.uuid}"
+            >
+              <Icon type="xmark" size="30" />
+            </a>
+          </td>
         </tr>
       {/each}
     {/each}
