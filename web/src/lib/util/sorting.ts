@@ -1,13 +1,27 @@
 /**
- * Retrieves the value at a given path of an object.
+ * Retrieves the value at a specified path within an object.
  *
- * @param obj - The object from which to retrieve the value.
- * @param path - The path (as a dot-separated string) to the value in the object.
+ * @param obj - The object from which the value is to be retrieved.
+ * @param path - The string path within the object, where each property and array index is separated by a dot or enclosed in square brackets.
+ * @return The value at the specified path within the object, or undefined if the path does not exist.
  *
- * @returns The value at the specified path in the object, or `undefined` if the path does not exist.
+ * @example
+ * const obj = { a: [{ b: 2 }, { c: 3 }] };
+ * const path = "a[1].c";
+ * console.log(getValueAtPath(obj, path));  // Outputs: 3
  */
 export const getValueAtPath = (obj: any, path: string) => {
-  return path.split(".").reduce((o, p) => (o || {})[p], obj)
+  path = path.replace(/\[(\w+)\]/g, ".$1") // convert indexes to properties
+  path = path.replace(/^\./, "") // strip a leading dot
+  const pathKeys = path.split(".")
+  for (const key of pathKeys) {
+    if (key in obj) {
+      obj = obj[key]
+    } else {
+      return
+    }
+  }
+  return obj
 }
 
 /**

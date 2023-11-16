@@ -1,6 +1,6 @@
 <script lang="ts">
   import { sortKey, sortDirection } from "$lib/stores/sorting"
-  import Icon from "../icon.svelte"
+  import Icon from "$lib/components/icon.svelte"
 
   // Will be sortable if given a sortPath
   type Header = {
@@ -19,6 +19,7 @@
       $sortDirection = 1
     }
   }
+  console.log("headers!", headers)
 </script>
 
 <div class="overflow-x-auto rounded border mb-8">

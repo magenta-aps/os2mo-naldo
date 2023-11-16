@@ -5,10 +5,19 @@
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
-  import { EmployeeAndOrgRolesDocument } from "./query.generated"
+  import {
+    EmployeeAndOrgRolesDocument,
+    type EmployeeAndOrgRolesQuery,
+  } from "./query.generated"
   import Icon from "$lib/components/icon.svelte"
   import { date } from "$lib/stores/date"
   import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
+  import { onMount } from "svelte"
+  import { sortData } from "$lib/util/sorting"
+  import { sortDirection, sortKey } from "$lib/stores/sorting"
+
+  type Roles = EmployeeAndOrgRolesQuery["roles"]["objects"][0]["objects"]
+  let data: Roles
 
   export let uuid: string
   export let tense: Tense
@@ -62,50 +71,69 @@
       }
     }
   `
+
+  $: {
+    if (data) {
+      data = sortData(data, $sortKey, $sortDirection)
+    }
+  }
+
+  onMount(async () => {
+    const res = await graphQLClient().request(EmployeeAndOrgRolesDocument, {
+      org_uuid: org_unit,
+      employee_uuid: employee,
+      ...tenseToValidity(tense, $date),
+    })
+    const roles: Roles = []
+
+    // Filters and flattens the data
+    for (const outer of res.roles.objects) {
+      // TODO: Remove when GraphQL is able to do this for us
+      const filtered = outer.objects.filter((obj) => {
+        return tenseFilter(obj, tense)
+      })
+      roles.push(...filtered)
+    }
+    data = roles
+  })
 </script>
 
 <DetailTable {headers}>
-  {#await graphQLClient().request( EmployeeAndOrgRolesDocument, { org_uuid: org_unit, employee_uuid: employee, ...tenseToValidity(tense, $date) } )}
+  {#if !data}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
-  {:then data}
-    {#each data.roles.objects as outer}
-      <!-- TODO: Remove when GraphQL is able to do this for us -->
-      {@const filteredObjects = outer.objects.filter((obj) => tenseFilter(obj, tense))}
-      {#each filteredObjects as role}
-        <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-          {#if isOrg}
-            <a href="{base}/employee/{role.employee[0].uuid}">
-              <td class="p-4">{role.employee[0].name}</td>
-            </a>
-          {:else}
-            <a href="{base}/organisation/{role.org_unit[0].uuid}">
-              <td class="p-4">
-                {role.org_unit[0].name}
-              </td>
-            </a>
-          {/if}
-          <td class="p-4">{role.role_type.name}</td>
-          <ValidityTableCell validity={role.validity} />
-          <td>
-            <a
-              href="{base}/{$page.route.id?.split('/')[1]}/{uuid}/edit/role/{role.uuid}"
-            >
-              <Icon type="pen" />
-            </a>
-          </td>
-          <td>
-            <a
-              href="{base}/{$page.route.id?.split(
-                '/'
-              )[1]}/{uuid}/terminate/role/{role.uuid}"
-            >
-              <Icon type="xmark" size="30" />
-            </a>
-          </td>
-        </tr>
-      {/each}
+  {:else}
+    {#each data as role}
+      <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+        {#if isOrg}
+          <a href="{base}/employee/{role.employee[0].uuid}">
+            <td class="p-4">{role.employee[0].name}</td>
+          </a>
+        {:else}
+          <a href="{base}/organisation/{role.org_unit[0].uuid}">
+            <td class="p-4">
+              {role.org_unit[0].name}
+            </td>
+          </a>
+        {/if}
+        <td class="p-4">{role.role_type.name}</td>
+        <ValidityTableCell validity={role.validity} />
+        <td>
+          <a aria-disabled href="{base}/employee/{uuid}/edit/role/{role.uuid}">
+            <Icon type="pen" />
+          </a>
+        </td>
+        <td>
+          <a
+            href="{base}/{$page.route.id?.split(
+              '/'
+            )[1]}/{uuid}/terminate/role/{role.uuid}"
+          >
+            <Icon type="xmark" size="30" />
+          </a>
+        </td>
+      </tr>
     {/each}
-  {/await}
+  {/if}
 </DetailTable>
