@@ -1,8 +1,9 @@
 import type { PlaywrightTestConfig } from "@playwright/test"
 
 const config: PlaywrightTestConfig = {
+  testDir: "./tests/",
   webServer: {
-    command: "npm run build && npm run preview",
+    command: "yarn run build && yarn run preview",
     port: 4173,
   },
 }
