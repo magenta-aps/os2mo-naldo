@@ -98,6 +98,8 @@
               input: result.data,
             })
             $success = {
+              // FIXME: Maybe use objects.lenght? This fails when editing future objects.
+              // I'm not sure if this will be fixed, when "time" is fixed in MO.
               message: `Tilknytningen ${
                 mutation.association_update.objects[0].employee
                   ? `for ${mutation.association_update.objects[0].employee[0].name}`
