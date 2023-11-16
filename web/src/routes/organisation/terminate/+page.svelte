@@ -133,7 +133,6 @@
           <Search
             type="org-unit"
             title="Angiv overenhed"
-            id="parent-uuid"
             bind:name={$orgUnitField.value}
             on:clear={() => ($orgUnitField.value = "")}
             errors={$orgUnitField.errors}
