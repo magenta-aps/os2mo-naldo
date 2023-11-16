@@ -5,6 +5,9 @@
   import { gql } from "graphql-request"
   import { VersionDocument } from "./query.generated"
   import { env } from "$env/dynamic/public"
+  import { _ } from "svelte-i18n"
+
+  // Set the current locale to en-US
   import Icon from "$lib/components/icon.svelte"
 
   gql`
@@ -22,7 +25,7 @@
 
 <div class="flex flex-row px-12 pt-6 gap-20">
   <div class="basis-9/12">
-    <h1 class="mb-10">Velkommen til MO</h1>
+    <h1 class="mb-10">{$_("page.home.title")}</h1>
     <!-- This image needs to be remade, right now it's smaller than how we use it, which means it might pixelate -->
     <img class="w-full" src={indexPageImage} alt="velkommen tilbage til os2mo" />
   </div>

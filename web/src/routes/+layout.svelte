@@ -6,6 +6,17 @@
   import { initKeycloak } from "$lib/util/keycloak"
   import Favicon from "$lib/assets/favicon.png"
   import Drawer from "$lib/components/drawer.svelte"
+  import { browser } from "$app/environment"
+  import "$lib/i18n" // Import to initialize. Important :)
+  import { locale, waitLocale } from "svelte-i18n"
+  import type { LayoutData } from "./$types"
+
+  export const load: LayoutData = async () => {
+    if (browser) {
+      locale.set(window.navigator.language)
+    }
+    await waitLocale()
+  }
 
   onMount(async () => {
     await initKeycloak()
