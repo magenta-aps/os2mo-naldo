@@ -23,15 +23,16 @@
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
   const headers = [
-    isOrg ? { title: "Navn" } : { title: "Enhed" },
-    { title: "Stillingbetegnelse" },
+    isOrg
+      ? { title: "Navn", sortPath: "employee[0].name" }
+      : { title: "Enhed", sortPath: "org_unit[0].name" },
+    { title: "Stillingsbetegnelse", sortPath: "job_function.name" },
     { title: "Engagementstype" },
     { title: "Primær" },
-    { title: "Dato" },
+    { title: "Dato", sortPath: "validity.from" },
     { title: "" },
     { title: "" },
   ]
-
   // Bør vi ikke tilføje noget tid til de her queries?
   gql`
     query Engagements(

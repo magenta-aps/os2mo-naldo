@@ -49,6 +49,7 @@
     }
   `
 
+  // Tror aldrig der kan være mere end 1 org i nutid, der kan dog godt være flere af samme org i datid og fremtid I guess.
   $: {
     if (data) {
       data = sortData(data, $sortKey, $sortDirection)

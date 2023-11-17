@@ -88,6 +88,7 @@
   headers={[
     { title: "Adressetype", sortPath: "address_type.name" },
     { title: "Adresse", sortPath: "name" },
+    // TODO: Make it possible to sort optional fields maybe? visibility and primary for example
     { title: "Synlighed" },
     { title: "Dato", sortPath: "validity.from" },
     { title: "" },

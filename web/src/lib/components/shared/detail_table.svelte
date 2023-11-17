@@ -19,7 +19,6 @@
       $sortDirection = 1
     }
   }
-  console.log("headers!", headers)
 </script>
 
 <div class="overflow-x-auto rounded border mb-8">

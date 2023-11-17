@@ -38,6 +38,7 @@
   `
 </script>
 
+<!-- TODO: Sorting -->
 <DetailTable
   headers={[
     { title: "KLE aspekt" },

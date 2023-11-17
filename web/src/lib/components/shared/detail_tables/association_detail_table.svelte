@@ -22,23 +22,16 @@
   const isOrg = $page.route.id?.startsWith("/organisation")
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
-  const headers = isOrg
-    ? [
-        { title: "Navn", sortPath: "employee[0].name" },
-        { title: "Tilknytningsrolle", sortPath: "association_type.name" },
-        { title: "Primær" },
-        { title: "Dato", sortPath: "validity.from" },
-        { title: "" },
-        { title: "" },
-      ]
-    : [
-        { title: "Enhed", sortPath: "org_unit[0].name" },
-        { title: "Rolle", sortPath: "association_type.name" },
-        { title: "Primær" },
-        { title: "Dato", sortPath: "validity.from" },
-        { title: "" },
-        { title: "" },
-      ]
+  const headers = [
+    isOrg
+      ? { title: "Navn", sortPath: "employee[0].name" }
+      : { title: "Enhed", sortPath: "org_unit[0].name" },
+    { title: "Tilknytningsrolle", sortPath: "association_type.name" },
+    { title: "Primær" },
+    { title: "Dato", sortPath: "validity.from" },
+    { title: "" },
+    { title: "" },
+  ]
 
   gql`
     query Associations(

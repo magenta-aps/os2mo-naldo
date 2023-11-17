@@ -23,11 +23,13 @@
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
   const headers = [
-    isOrg ? { title: "Navn" } : { title: "Enhed" },
+    isOrg
+      ? { title: "Navn", sortPath: "employee[0].name" }
+      : { title: "Enhed", sortPath: "org_unit[0].name" },
     { title: "Lederansvar" },
-    { title: "Ledertype" },
-    { title: "Lederniveau" },
-    { title: "Dato" },
+    { title: "Ledertype", sortPath: "manager_type.name" },
+    { title: "Lederniveau", sortPath: "manager_level.name" },
+    { title: "Dato", sortPath: "validity.from" },
     { title: "" },
     { title: "" },
   ]
