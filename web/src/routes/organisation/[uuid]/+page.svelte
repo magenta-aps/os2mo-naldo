@@ -104,17 +104,21 @@
 
     <div class="flex justify-between">
       <TenseTabs />
-      <!-- We wont show the create button on these tabs -->
-      {#if ![OrgTab.ORG_UNIT, OrgTab.ENGAGEMENT, OrgTab.ROLE, OrgTab.RELATED_UNIT].includes(activeItem)}
-        <a
-          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
-          href={`${base}/organisation/${$page.params.uuid}/create/${subsiteOfCategory(
-            activeItem
-          )}`}
-        >
-          Tilføj {activeItem}
-        </a>
-      {/if}
+      <!-- Links are different on `org_unit` and `related`-tabs -->
+      <a
+        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
+        href={`${base}/${
+          activeItem === OrgTab.ORG_UNIT
+            ? "organisation/create"
+            : activeItem === OrgTab.RELATED_UNIT
+            ? "connecting_organisations"
+            : `organisation/${$page.params.uuid}/create/${subsiteOfCategory(
+                activeItem
+              )}`
+        }`}
+      >
+        Tilføj {activeItem}
+      </a>
     </div>
 
     {#if activeItem === OrgTab.ORG_UNIT}

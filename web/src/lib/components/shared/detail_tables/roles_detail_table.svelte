@@ -16,15 +16,13 @@
   const isOrg = $page.route.id?.startsWith("/organisation")
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
-  const headers = isOrg
-    ? [{ title: "Navn" }, { title: "Rolletype" }, { title: "Dato" }]
-    : [
-        { title: "Enhed" },
-        { title: "Rolletype" },
-        { title: "Dato" },
-        { title: "" },
-        { title: "" },
-      ]
+  const headers = [
+    isOrg ? { title: "Navn" } : { title: "Enhed" },
+    { title: "Rolletype" },
+    { title: "Dato" },
+    { title: "" },
+    { title: "" },
+  ]
 
   gql`
     query EmployeeAndOrgRoles(
@@ -81,27 +79,31 @@
             <a href="{base}/employee/{role.employee[0].uuid}">
               <td class="p-4">{role.employee[0].name}</td>
             </a>
-            <td class="p-4">{role.role_type.name}</td>
-            <ValidityTableCell validity={role.validity} />
           {:else}
             <a href="{base}/organisation/{role.org_unit[0].uuid}">
               <td class="p-4">
                 {role.org_unit[0].name}
               </td>
             </a>
-            <td class="p-4">{role.role_type.name}</td>
-            <ValidityTableCell validity={role.validity} />
-            <td>
-              <a aria-disabled href="{base}/employee/{uuid}/edit/role/{role.uuid}">
-                <Icon type="pen" />
-              </a>
-            </td>
-            <td>
-              <a href="{base}/employee/{uuid}/terminate/role/{role.uuid}">
-                <Icon type="xmark" size="30" />
-              </a></td
-            >
           {/if}
+          <td class="p-4">{role.role_type.name}</td>
+          <ValidityTableCell validity={role.validity} />
+          <td>
+            <a
+              href="{base}/{$page.route.id?.split('/')[1]}/{uuid}/edit/role/{role.uuid}"
+            >
+              <Icon type="pen" />
+            </a>
+          </td>
+          <td>
+            <a
+              href="{base}/{$page.route.id?.split(
+                '/'
+              )[1]}/{uuid}/terminate/role/{role.uuid}"
+            >
+              <Icon type="xmark" size="30" />
+            </a>
+          </td>
         </tr>
       {/each}
     {/each}

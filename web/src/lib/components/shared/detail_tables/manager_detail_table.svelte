@@ -16,25 +16,15 @@
   const isOrg = $page.route.id?.startsWith("/organisation")
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
-  const headers = isOrg
-    ? [
-        { title: "Navn" },
-        { title: "Lederansvar" },
-        { title: "Ledertype" },
-        { title: "Lederniveau" },
-        { title: "Dato" },
-        { title: "" },
-        { title: "" },
-      ]
-    : [
-        { title: "Enhed" },
-        { title: "Lederansvar" },
-        { title: "Ledertype" },
-        { title: "Lederniveau" },
-        { title: "Dato" },
-        { title: "" },
-        { title: "" },
-      ]
+  const headers = [
+    isOrg ? { title: "Navn" } : { title: "Enhed" },
+    { title: "Lederansvar" },
+    { title: "Ledertype" },
+    { title: "Lederniveau" },
+    { title: "Dato" },
+    { title: "" },
+    { title: "" },
+  ]
 
   gql`
     query Managers(
@@ -99,65 +89,43 @@
             >
               <td class="p-4">{manager.employee ? manager.employee[0].name : ""}</td>
             </a>
-            <td class="p-4">
-              <ul>
-                {#each manager.responsibilities as responsibility}
-                  <li>
-                    • {responsibility.name}
-                  </li>
-                {/each}
-              </ul>
-            </td>
-            <td class="p-4">{manager.manager_type.name}</td>
-            <td class="p-4">{manager.manager_level.name}</td>
-            <ValidityTableCell validity={manager.validity} />
-            <td>
-              <a
-                href="{base}/organisation/{$page.params
-                  .uuid}/edit/manager/{manager.uuid}"
-              >
-                <Icon type="pen" />
-              </a>
-            </td>
-            <td>
-              <a
-                href="{base}/organisation/{$page.params
-                  .uuid}/terminate/manager/{manager.uuid}"
-              >
-                <Icon type="xmark" size="30" />
-              </a>
-            </td>
           {:else}
             <a href="{base}/organisation/{manager.org_unit[0].uuid}">
-              <td class="p-4">{manager.org_unit[0].name}</td>
+              <td class="p-4">
+                {manager.org_unit[0].name}
+              </td>
             </a>
-            <!-- This needs to return a list -->
-            <td class="p-4">
-              <ul>
-                {#each manager.responsibilities as responsibility}
-                  <li>
-                    • {responsibility.name}
-                  </li>
-                {/each}
-              </ul>
-            </td>
-            <td class="p-4">{manager.manager_type.name}</td>
-            <td class="p-4">{manager.manager_level.name}</td>
-            <ValidityTableCell validity={manager.validity} />
-            <td>
-              <a href="{base}/employee/{$page.params.uuid}/edit/manager/{manager.uuid}">
-                <Icon type="pen" />
-              </a>
-            </td>
-            <td>
-              <a
-                href="{base}/employee/{$page.params
-                  .uuid}/terminate/manager/{manager.uuid}"
-              >
-                <Icon type="xmark" size="30" />
-              </a>
-            </td>
           {/if}
+          <td class="p-4">
+            <ul>
+              {#each manager.responsibilities as responsibility}
+                <li>
+                  • {responsibility.name}
+                </li>
+              {/each}
+            </ul>
+          </td>
+          <td class="p-4">{manager.manager_type.name}</td>
+          <td class="p-4">{manager.manager_level.name}</td>
+          <ValidityTableCell validity={manager.validity} />
+          <td>
+            <a
+              href="{base}/{$page.route.id?.split(
+                '/'
+              )[1]}/{uuid}/edit/manager/{manager.uuid}"
+            >
+              <Icon type="pen" />
+            </a>
+          </td>
+          <td>
+            <a
+              href="{base}/{$page.route.id?.split(
+                '/'
+              )[1]}/{uuid}/terminate/manager/{manager.uuid}"
+            >
+              <Icon type="xmark" size="30" />
+            </a>
+          </td>
         </tr>
       {/each}
     {/each}
