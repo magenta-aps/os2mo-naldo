@@ -58,6 +58,7 @@
       {multiple}
       searchable={false}
       hasError={errors.length ? true : false}
+      clearFilterTextOnBlur={false}
       bind:value
       on:change
       on:clear={() => {
