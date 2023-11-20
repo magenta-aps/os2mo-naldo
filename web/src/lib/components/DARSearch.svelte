@@ -69,6 +69,7 @@
       listAutoWidth={false}
       loadOptions={fetchDAR}
       hasError={errors.length ? true : false}
+      clearFilterTextOnBlur={false}
       {floatingConfig}
       {disabled}
       {itemId}

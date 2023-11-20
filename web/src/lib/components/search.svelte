@@ -221,6 +221,7 @@
       bind:value
       hideEmptyState={true}
       placeholder={`Søg efter ${type === "employee" ? "person" : "organisation"}`}
+      clearFilterTextOnBlur={false}
       on:change
       on:clear
       bind:items

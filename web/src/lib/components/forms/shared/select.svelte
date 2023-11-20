@@ -62,6 +62,7 @@
       {placeholder}
       items={iterable}
       searchable={false}
+      clearFilterTextOnBlur={false}
       bind:value
       on:change
       on:clear
