@@ -4,9 +4,15 @@
   import { page } from "$app/stores"
   import { base } from "$app/paths"
   import { graphQLClient } from "$lib/util/http"
-  import { RelatedUnitsDocument } from "./query.generated"
+  import { RelatedUnitsDocument, type RelatedUnitsQuery } from "./query.generated"
   import { gql } from "graphql-request"
   import { date } from "$lib/stores/date"
+  import { sortDirection, sortKey } from "$lib/stores/sorting"
+  import { sortData } from "$lib/util/sorting"
+  import { onMount } from "svelte"
+
+  type RelatedUnits = RelatedUnitsQuery["related_units"]["objects"][0]["objects"]
+  let data: RelatedUnits
 
   export let uuid: string
 
@@ -28,17 +34,42 @@
       }
     }
   `
+
+  $: {
+    if (data) {
+      data = sortData(data, $sortKey, $sortDirection)
+    }
+  }
+
+  onMount(async () => {
+    const res = await graphQLClient().request(RelatedUnitsDocument, {
+      org_unit: uuid,
+      fromDate: $date,
+    })
+    const engagements: RelatedUnits = []
+
+    // Filters and flattens the data
+    for (const outer of res.related_units.objects) {
+      // TODO: Remove when GraphQL is able to do this for us
+      const filtered = outer.objects.filter((obj) => {
+        return obj
+      })
+      engagements.push(...filtered)
+    }
+    data = engagements
+  })
 </script>
 
-<DetailTable headers={[{ title: "Relateret enhed" }, { title: "Dato" }]}>
-  {#await graphQLClient().request( RelatedUnitsDocument, { org_unit: uuid, fromDate: $date } )}
+<!-- TODO: We can't sort on name, since we don't know if we use [0] or [1] -->
+<DetailTable
+  headers={[{ title: "Relateret enhed" }, { title: "Dato", sortPath: "validity.from" }]}
+>
+  {#if !data}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
-  {:then data}
-    {@const related_units = data.related_units.objects}
-    {#each related_units as related}
-      {@const related_unit = related.objects[0]}
+  {:else}
+    {#each data as related_unit}
       <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
         {#if related_unit.org_units[0].uuid == $page.params.uuid}
           <a href="{base}/organisation/{related_unit.org_units[1].uuid}">
@@ -52,5 +83,5 @@
         <ValidityTableCell validity={related_unit.validity} />
       </tr>
     {/each}
-  {/await}
+  {/if}
 </DetailTable>

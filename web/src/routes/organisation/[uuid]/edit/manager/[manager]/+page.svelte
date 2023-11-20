@@ -203,7 +203,7 @@
           />
         </div>
         <SelectMultiple
-          bind:responsibilities={$responsibilitiesField.value}
+          bind:name={$responsibilitiesField.value}
           errors={$responsibilitiesField.errors}
           title="Lederansvar"
           id="responsibility"
