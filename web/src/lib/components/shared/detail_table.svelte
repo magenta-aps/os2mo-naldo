@@ -32,7 +32,7 @@
                 sortTable(header.sortPath || "")
               }}
               class="{header.sortPath ? 'cursor-pointer' : ''} 
-                px-4 py-3 font-bold leading-4 tracking-wider text-left text-secondary border-slate-300 bg-slate-100"
+                px-4 py-3 font-bold leading-4 tracking-wider text-left text-secondary border-slate-300 bg-slate-300"
             >
               <div class="flex items-center">
                 {header.title}
@@ -62,6 +62,7 @@
         </tr>
       </thead>
     {/if}
+    <!-- FIXME: nth child should be deeper, so it doesn't affect tenses -->
     <tbody
       class="[&>*:nth-child(even)]:bg-slate-100 border-slate-300 min-h-64 text-slate-600"
     >

@@ -139,18 +139,7 @@
         <EmployeeDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
     {:else if activeItem === EmployeeTab.ENGAGEMENT}
-      {#if $tenses.future}
-        <h2 class="mb-4">Fremtid</h2>
-        <EngagementDetailTable tense="future" uuid={$page.params.uuid} />
-      {/if}
-      {#if $tenses.present}
-        <h2 class="mb-4">Nutid</h2>
-        <EngagementDetailTable tense="present" uuid={$page.params.uuid} />
-      {/if}
-      {#if $tenses.past}
-        <h2 class="mb-4">Fortid</h2>
-        <EngagementDetailTable tense="past" uuid={$page.params.uuid} />
-      {/if}
+      <EngagementDetailTable uuid={$page.params.uuid} />
     {:else if activeItem === EmployeeTab.ADDRESS}
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>
