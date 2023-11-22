@@ -3817,10 +3817,10 @@ svelte-select@^5.7.0:
     "@floating-ui/dom" "^1.2.1"
     svelte-floating-ui "1.2.8"
 
-svelte2tsx@^0.6.22:
-  version "0.6.22"
-  resolved "https://registry.yarnpkg.com/svelte2tsx/-/svelte2tsx-0.6.22.tgz#7a5f93394fe891fcab24f37fe711eaf482462f9e"
-  integrity sha512-eFCfz0juaWeanbwGeQV21kPMwH3LKhfrUYRy1PqRmlieuHvJs8VeK7CaoHJdpBZWCXba2cltHVdywJmwOGhbww==
+svelte2tsx@^0.6.26:
+  version "0.6.26"
+  resolved "https://registry.yarnpkg.com/svelte2tsx/-/svelte2tsx-0.6.26.tgz#bf99d0642e2ad25266ec4feab97f937e711bf626"
+  integrity sha512-6EWEZmfdAggtGJ9YwjZkX06mqZvMdmm5XWq1UEAoznC67mDE6wPUJnyX1erpTWU00X/N1T6qsYPAZOUWJs9IaA==
   dependencies:
     dedent-js "^1.0.1"
     pascal-case "^3.1.1"
