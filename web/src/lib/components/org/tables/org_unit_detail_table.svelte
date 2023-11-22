@@ -5,10 +5,16 @@
   import { base } from "$app/paths"
   import { page } from "$app/stores"
   import { graphQLClient } from "$lib/util/http"
-  import { OrgUnitDocument } from "./query.generated"
+  import { OrgUnitDocument, type OrgUnitQuery } from "./query.generated"
   import { gql } from "graphql-request"
   import { date } from "$lib/stores/date"
   import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
+  import { onMount } from "svelte"
+  import { sortData } from "$lib/util/sorting"
+  import { sortDirection, sortKey } from "$lib/stores/sorting"
+
+  type OrgUnits = OrgUnitQuery["org_units"]["objects"][0]["objects"]
+  let data: OrgUnits
 
   export let uuid: string
   export let tense: Tense
@@ -42,50 +48,69 @@
       }
     }
   `
+
+  $: {
+    if (data) {
+      data = sortData(data, $sortKey, $sortDirection)
+    }
+  }
+
+  onMount(async () => {
+    const res = await graphQLClient().request(OrgUnitDocument, {
+      uuid: uuid,
+      ...tenseToValidity(tense, $date),
+    })
+
+    const orgUnits: OrgUnits = []
+
+    // Filters and flattens the data
+    for (const outer of res.org_units.objects) {
+      // TODO: Remove when GraphQL is able to do this for us
+      const filtered = outer.objects.filter((obj) => {
+        return tenseFilter(obj, tense)
+      })
+      orgUnits.push(...filtered)
+    }
+    data = orgUnits
+  })
 </script>
 
 <DetailTable
   headers={[
-    { title: "Enhed" },
-    { title: "Enhedstype" },
-    { title: "Enhedsniveau" },
+    { title: "Enhed", sortPath: "name" },
+    { title: "Enhedstype", sortPath: "unit_type.name" },
+    { title: "Enhedsniveau", sortPath: "org_unit_level.name" },
     { title: "Overenhed" },
-    { title: "Dato" },
+    { title: "Dato", sortPath: "validity.from" },
     { title: "" },
   ]}
 >
-  {#await graphQLClient().request( OrgUnitDocument, { uuid: uuid, ...tenseToValidity(tense, $date) } )}
+  {#if !data}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
-  {:then data}
-    {#each data.org_units.objects as outer}
-      <!-- TODO: Remove when GraphQL is able to do this for us -->
-      {@const filteredObjects = outer.objects.filter((obj) => tenseFilter(obj, tense))}
-      {#each filteredObjects as org_unit}
-        <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-          <td class="p-4">{org_unit.name}</td>
-          <td class="p-4"
-            >{org_unit.unit_type ? org_unit.unit_type.name : "Ikke sat"}</td
-          >
-          <td class="p-4"
-            >{org_unit.org_unit_level ? org_unit.org_unit_level.name : "Ikke sat"}</td
-          >
-          {#if org_unit.parent}
-            <a href="{base}/organisation/{org_unit.parent.uuid}">
-              <td class="p-4">{org_unit.parent.name}</td>
-            </a>
-          {:else}
-            <td class="p-4">Ingen overenhed</td>
-          {/if}
-          <ValidityTableCell validity={org_unit.validity} />
-          <td>
-            <a href="{base}/organisation/{$page.params.uuid}/edit">
-              <Icon type="pen" />
-            </a>
-          </td>
-        </tr>
-      {/each}
+  {:else}
+    {#each data as org_unit}
+      <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+        <td class="p-4">{org_unit.name}</td>
+        <td class="p-4">{org_unit.unit_type ? org_unit.unit_type.name : "Ikke sat"}</td>
+        <td class="p-4"
+          >{org_unit.org_unit_level ? org_unit.org_unit_level.name : "Ikke sat"}</td
+        >
+        {#if org_unit.parent}
+          <a href="{base}/organisation/{org_unit.parent.uuid}">
+            <td class="p-4">{org_unit.parent.name}</td>
+          </a>
+        {:else}
+          <td class="p-4">Ingen overenhed</td>
+        {/if}
+        <ValidityTableCell validity={org_unit.validity} />
+        <td>
+          <a href="{base}/organisation/{$page.params.uuid}/edit">
+            <Icon type="pen" />
+          </a>
+        </td>
+      </tr>
     {/each}
-  {/await}
+  {/if}
 </DetailTable>

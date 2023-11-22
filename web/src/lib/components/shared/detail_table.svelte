@@ -1,6 +1,6 @@
 <script lang="ts">
   import { sortKey, sortDirection } from "$lib/stores/sorting"
-  import Icon from "../icon.svelte"
+  import Icon from "$lib/components/icon.svelte"
 
   // Will be sortable if given a sortPath
   type Header = {

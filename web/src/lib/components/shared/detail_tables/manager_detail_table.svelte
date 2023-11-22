@@ -6,9 +6,15 @@
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
-  import { ManagersDocument } from "./query.generated"
+  import { ManagersDocument, type ManagersQuery } from "./query.generated"
   import { date } from "$lib/stores/date"
   import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
+  import { sortData } from "$lib/util/sorting"
+  import { sortDirection, sortKey } from "$lib/stores/sorting"
+  import { onMount } from "svelte"
+
+  type Managers = ManagersQuery["managers"]["objects"][0]["objects"]
+  let data: Managers
 
   export let uuid: string
   export let tense: Tense
@@ -17,11 +23,13 @@
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
   const headers = [
-    isOrg ? { title: "Navn" } : { title: "Enhed" },
+    isOrg
+      ? { title: "Navn", sortPath: "employee[0].name" }
+      : { title: "Enhed", sortPath: "org_unit[0].name" },
     { title: "Lederansvar" },
-    { title: "Ledertype" },
-    { title: "Lederniveau" },
-    { title: "Dato" },
+    { title: "Ledertype", sortPath: "manager_type.name" },
+    { title: "Lederniveau", sortPath: "manager_level.name" },
+    { title: "Dato", sortPath: "validity.from" },
     { title: "" },
     { title: "" },
   ]
@@ -70,64 +78,83 @@
       }
     }
   `
+
+  $: {
+    if (data) {
+      data = sortData(data, $sortKey, $sortDirection)
+    }
+  }
+
+  onMount(async () => {
+    const res = await graphQLClient().request(ManagersDocument, {
+      org_unit: org_unit,
+      employee: employee,
+      ...tenseToValidity(tense, $date),
+    })
+    const managers: Managers = []
+
+    // Filters and flattens the data
+    for (const outer of res.managers.objects) {
+      // TODO: Remove when GraphQL is able to do this for us
+      const filtered = outer.objects.filter((obj) => {
+        return tenseFilter(obj, tense)
+      })
+      managers.push(...filtered)
+    }
+    data = managers
+  })
 </script>
 
 <DetailTable {headers}>
-  {#await graphQLClient().request( ManagersDocument, { org_unit: org_unit, employee: employee, ...tenseToValidity(tense, $date) } )}
+  {#if !data}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
-  {:then data}
-    {#each data.managers.objects as outer}
-      <!-- TODO: Remove when GraphQL is able to do this for us -->
-      {@const filteredObjects = outer.objects.filter((obj) => tenseFilter(obj, tense))}
-      {#each filteredObjects as manager}
-        <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
-          {#if isOrg}
-            <a
-              href="{base}/employee/{manager.employee ? manager.employee[0].uuid : ''}"
-            >
-              <td class="p-4">{manager.employee ? manager.employee[0].name : ""}</td>
-            </a>
-          {:else}
-            <a href="{base}/organisation/{manager.org_unit[0].uuid}">
-              <td class="p-4">
-                {manager.org_unit[0].name}
-              </td>
-            </a>
-          {/if}
-          <td class="p-4">
-            <ul>
-              {#each manager.responsibilities as responsibility}
-                <li>
-                  • {responsibility.name}
-                </li>
-              {/each}
-            </ul>
-          </td>
-          <td class="p-4">{manager.manager_type.name}</td>
-          <td class="p-4">{manager.manager_level.name}</td>
-          <ValidityTableCell validity={manager.validity} />
-          <td>
-            <a
-              href="{base}/{$page.route.id?.split(
-                '/'
-              )[1]}/{uuid}/edit/manager/{manager.uuid}"
-            >
-              <Icon type="pen" />
-            </a>
-          </td>
-          <td>
-            <a
-              href="{base}/{$page.route.id?.split(
-                '/'
-              )[1]}/{uuid}/terminate/manager/{manager.uuid}"
-            >
-              <Icon type="xmark" size="30" />
-            </a>
-          </td>
-        </tr>
-      {/each}
+  {:else}
+    {#each data as manager}
+      <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
+        {#if isOrg}
+          <a href="{base}/employee/{manager.employee ? manager.employee[0].uuid : ''}">
+            <td class="p-4">{manager.employee ? manager.employee[0].name : ""}</td>
+          </a>
+        {:else}
+          <a href="{base}/organisation/{manager.org_unit[0].uuid}">
+            <td class="p-4">
+              {manager.org_unit[0].name}
+            </td>
+          </a>
+        {/if}
+        <td class="p-4">
+          <ul>
+            {#each manager.responsibilities as responsibility}
+              <li>
+                • {responsibility.name}
+              </li>
+            {/each}
+          </ul>
+        </td>
+        <td class="p-4">{manager.manager_type.name}</td>
+        <td class="p-4">{manager.manager_level.name}</td>
+        <ValidityTableCell validity={manager.validity} />
+        <td>
+          <a
+            href="{base}/{$page.route.id?.split(
+              '/'
+            )[1]}/{uuid}/edit/manager/{manager.uuid}"
+          >
+            <Icon type="pen" />
+          </a>
+        </td>
+        <td>
+          <a
+            href="{base}/{$page.route.id?.split(
+              '/'
+            )[1]}/{uuid}/terminate/manager/{manager.uuid}"
+          >
+            <Icon type="xmark" size="30" />
+          </a>
+        </td>
+      </tr>
     {/each}
-  {/await}
+  {/if}
 </DetailTable>

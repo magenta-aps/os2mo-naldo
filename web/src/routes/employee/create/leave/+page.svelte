@@ -33,7 +33,6 @@
   const engagement = field("engagement", "", [required()])
   const svelteForm = form(fromDate, employeeField, leaveType, engagement)
 
-  $: console.log($engagement)
   let employee: {
     uuid: string
     name: string
