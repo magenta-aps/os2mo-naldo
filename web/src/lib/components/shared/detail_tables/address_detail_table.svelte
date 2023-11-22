@@ -65,22 +65,22 @@
   }
 
   onMount(async () => {
-    const addressQuery = await graphQLClient().request(AddressDocument, {
+    const res = await graphQLClient().request(AddressDocument, {
       org_unit: org_unit,
       employee: employee,
       ...tenseToValidity(tense, $date),
     })
-    const filteredAddresses: Addresses = []
+    const addresses: Addresses = []
 
     // Filters and flattens the data
-    for (let outer of addressQuery.addresses.objects) {
+    for (const outer of res.addresses.objects) {
       // TODO: Remove when GraphQL is able to do this for us
       const filtered = outer.objects.filter((obj) => {
         return tenseFilter(obj, tense)
       })
-      filteredAddresses.push(...filtered)
+      addresses.push(...filtered)
     }
-    data = filteredAddresses
+    data = addresses
   })
 </script>
 
@@ -88,6 +88,7 @@
   headers={[
     { title: "Adressetype", sortPath: "address_type.name" },
     { title: "Adresse", sortPath: "name" },
+    // TODO: Make it possible to sort optional fields maybe? visibility and primary for example
     { title: "Synlighed" },
     { title: "Dato", sortPath: "validity.from" },
     { title: "" },

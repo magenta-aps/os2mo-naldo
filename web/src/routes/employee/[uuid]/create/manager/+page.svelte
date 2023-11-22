@@ -170,7 +170,7 @@
           />
         </div>
         <SelectMultiple
-          bind:responsibilities={$responsibilities.value}
+          bind:name={$responsibilities.value}
           errors={$responsibilities.errors}
           on:clear={() => ($responsibilities.value = undefined)}
           title="Lederansvar"

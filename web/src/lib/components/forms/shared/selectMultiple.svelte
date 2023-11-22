@@ -3,10 +3,11 @@
   export let title: string | undefined = undefined
   export let id: string
   export let iterable: any[] | undefined = undefined
-  export let responsibilities: string[] | undefined | null = undefined
+  export let name: string[] | undefined | null = undefined
   export let required = false
   export let placeholder: string = ""
   export let disabled = false
+  // TODO: Why is multiple false in 'SelectMultiple'?
   export let multiple = false
   // TODO: Types needs to be fixed OVERALL
   export let startValue: any[] | undefined = undefined
@@ -14,7 +15,7 @@
   export let errors: string[] = []
 
   $: if (value) {
-    responsibilities = value
+    name = value
   }
 
   const itemId = "uuid" // Used by the component to differentiate between items
@@ -62,7 +63,7 @@
       bind:value
       on:change
       on:clear={() => {
-        responsibilities = undefined
+        name = undefined
       }}
     >
       <div slot="item" let:item class="cursor-pointer">

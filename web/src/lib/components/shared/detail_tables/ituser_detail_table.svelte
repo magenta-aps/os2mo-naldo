@@ -6,9 +6,15 @@
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
-  import { ItUsersDocument } from "./query.generated"
+  import { ItUsersDocument, type ItUsersQuery } from "./query.generated"
   import { date } from "$lib/stores/date"
   import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
+  import { sortData } from "$lib/util/sorting"
+  import { sortDirection, sortKey } from "$lib/stores/sorting"
+  import { onMount } from "svelte"
+
+  type ITUsers = ItUsersQuery["itusers"]["objects"][0]["objects"]
+  let data: ITUsers
 
   export let uuid: string
   export let tense: Tense
@@ -52,50 +58,69 @@
       }
     }
   `
+
+  $: {
+    if (data) {
+      data = sortData(data, $sortKey, $sortDirection)
+    }
+  }
+
+  onMount(async () => {
+    const res = await graphQLClient().request(ItUsersDocument, {
+      org_unit: org_unit,
+      employee: employee,
+      ...tenseToValidity(tense, $date),
+    })
+    const itUsers: ITUsers = []
+
+    // Filters and flattens the data
+    for (const outer of res.itusers.objects) {
+      // TODO: Remove when GraphQL is able to do this for us
+      const filtered = outer.objects.filter((obj) => {
+        return tenseFilter(obj, tense)
+      })
+      itUsers.push(...filtered)
+    }
+    data = itUsers
+  })
 </script>
 
 <DetailTable
   headers={[
-    { title: "IT system" },
-    { title: "Kontonavn" },
+    { title: "IT system", sortPath: "itsystem.name" },
+    { title: "Kontonavn", sortPath: "user_key" },
     { title: "Primær" },
-    { title: "Dato" },
+    { title: "Dato", sortPath: "validity.from" },
     { title: "" },
     { title: "" },
   ]}
 >
-  {#await graphQLClient().request( ItUsersDocument, { org_unit: org_unit, employee: employee, ...tenseToValidity(tense, $date) } )}
+  {#if !data}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">Henter data...</td>
     </tr>
-  {:then data}
-    {#each data.itusers.objects as outer}
-      <!-- TODO: Remove when GraphQL is able to do this for us -->
-      {@const filteredObjects = outer.objects.filter((obj) => tenseFilter(obj, tense))}
-      {#each filteredObjects as ituser}
-        <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-          <td class="p-4">{ituser.itsystem.name}</td>
-          <td class="p-4">{ituser.user_key}</td>
-          <td class="p-4">{ituser.primary ? ituser.primary.name : ""}</td>
-          <ValidityTableCell validity={ituser.validity} />
-          <td>
-            <a
-              href="{base}/{$page.route.id?.split('/')[1]}/{uuid}/edit/it/{ituser.uuid}"
-            >
-              <Icon type="pen" />
-            </a>
-          </td>
-          <td>
-            <a
-              href="{base}/{$page.route.id?.split(
-                '/'
-              )[1]}/{uuid}/terminate/it/{ituser.uuid}"
-            >
-              <Icon type="xmark" size="30" />
-            </a>
-          </td>
-        </tr>
-      {/each}
+  {:else}
+    {#each data as ituser}
+      <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+        <td class="p-4">{ituser.itsystem.name}</td>
+        <td class="p-4">{ituser.user_key}</td>
+        <td class="p-4">{ituser.primary ? ituser.primary.name : ""}</td>
+        <ValidityTableCell validity={ituser.validity} />
+        <td>
+          <a href="{base}/{$page.route.id?.split('/')[1]}/{uuid}/edit/it/{ituser.uuid}">
+            <Icon type="pen" />
+          </a>
+        </td>
+        <td>
+          <a
+            href="{base}/{$page.route.id?.split(
+              '/'
+            )[1]}/{uuid}/terminate/it/{ituser.uuid}"
+          >
+            <Icon type="xmark" size="30" />
+          </a>
+        </td>
+      </tr>
     {/each}
-  {/await}
+  {/if}
 </DetailTable>

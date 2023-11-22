@@ -13,15 +13,15 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import SelectMultiple from "$lib/components/forms/shared/selectMultiple.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
 
   let toDate: string
   const fromDate = field("from", "", [required()])
   const kleNumber = field("kle_number", "", [required()])
-  const kleAspect = field("kle_aspect", "", [required()])
-  const svelteForm = form(fromDate, kleNumber, kleAspect)
-  // TODO: TEST THIS WITH KLE DATA
+  const kleAspects = field("kle_aspects", undefined, [required()])
+  const svelteForm = form(fromDate, kleNumber, kleAspects)
 
   gql`
     query KLEAndFacet($uuid: [UUID!], $fromDate: DateTime) {
@@ -146,29 +146,25 @@
             max={maxDate}
           />
         </div>
-        <div class="flex flex-row gap-6">
-          <Select
-            title="KLE nummer"
-            id="kle-number"
-            startValue={kle.kle_number}
-            bind:name={$kleNumber.value}
-            errors={$kleNumber.errors}
-            extra_classes="basis-1/2"
-            iterable={getClassesByFacetUserKey(facets, "kle_number")}
-            required={true}
-          />
-          <!-- Select multiple? -->
-          <Select
-            title="KLE aspekt"
-            id="kle-aspect"
-            startValue={kle.kle_aspects[0]}
-            bind:name={$kleAspect.value}
-            errors={$kleAspect.errors}
-            extra_classes="basis-1/2"
-            iterable={getClassesByFacetUserKey(facets, "kle_aspect")}
-            required={true}
-          />
-        </div>
+        <Select
+          title="KLE nummer"
+          id="kle-number"
+          startValue={kle.kle_number}
+          bind:name={$kleNumber.value}
+          errors={$kleNumber.errors}
+          iterable={getClassesByFacetUserKey(facets, "kle_number")}
+          required={true}
+        />
+        <SelectMultiple
+          bind:name={$kleAspects.value}
+          errors={$kleAspects.errors}
+          title="KLE aspekt"
+          id="kle-aspects"
+          startValue={kle.kle_aspects}
+          iterable={getClassesByFacetUserKey(facets, "kle_aspect")}
+          multiple={true}
+          required={true}
+        />
       </div>
     </div>
     <div class="flex py-6 gap-4">
