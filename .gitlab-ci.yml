@@ -70,3 +70,9 @@ SvelteKit build:
     - cd web/
     - yarn
     - yarn build
+
+Build Naldo:
+  extends:
+    - .build-docker
+  variables:
+    BUILD_DOCKER_EXTRA_FLAGS: --build-arg=COMMIT_TAG=${CI_COMMIT_TAG}
