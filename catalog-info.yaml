@@ -1,0 +1,29 @@
+# SPDX-FileCopyrightText: Magenta ApS <https://magenta.dk>
+# SPDX-License-Identifier: MPL-2.0
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: os2mo-naldo
+  title: MOnaldo
+  description: |
+    MOnaldo is a new frontend for os2mo
+  annotations:
+    github.com/project-slug: magenta-aps/os2mo-naldo
+    github.com/team-slug: magenta-aps/rammearkitektur
+    sentry.io/project-slug: magenta/rammearkitektur
+    backstage.io/source-location: url:https://git.magenta.dk/rammearkitektur/os2mo-naldo
+    backstage.io/view-url: https://git.magenta.dk/rammearkitektur/os2mo/-/blob/master/catalog-info.yaml
+    backstage.io/edit-url: https://git.magenta.dk/rammearkitektur/os2mo/-/edit/master/catalog-info.yaml
+  tags:
+    - os2mo
+    - svelte
+    - typescript
+spec:
+  type: website
+  lifecycle: experimental
+  owner: user:default/mb
+  system: os2mo-core
+  consumesApis:
+    - service-api
+    - os2mo-graphql-v20
