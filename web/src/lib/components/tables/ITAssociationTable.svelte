@@ -1,5 +1,4 @@
 <script lang="ts">
-  import DetailTable from "$lib/components/shared/detail_table.svelte"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { ItAssociationsDocument, type ItAssociationsQuery } from "./query.generated"
@@ -11,12 +10,14 @@
   import { onMount } from "svelte"
   import { sortKey, sortDirection } from "$lib/stores/sorting"
   import { sortData } from "$lib/util/sorting"
+  import { page } from "$app/stores"
 
-  export let uuid: string
   export let tense: Tense
 
   type ItAssociations = ItAssociationsQuery["associations"]["objects"][0]["objects"]
   let data: ItAssociations
+
+  const uuid = $page.params.uuid
 
   gql`
     query ITAssociations($employee: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
@@ -82,44 +83,36 @@
   })
 </script>
 
-<DetailTable
-  headers={[
-    { title: "Enhed", sortPath: "org_unit[0].name" },
-    { title: "Stillingsbetegnelse", sortPath: "job_function.name" },
-    { title: "IT system", sortPath: "it_user[0].itsystem.name" },
-    { title: "Kontonavn", sortPath: "it_user[0].user_key" },
-    { title: "Primær" },
-    { title: "Dato", sortPath: "validity.from" },
-    { title: "" },
-    { title: "" },
-  ]}
->
-  {#if !data}
+{#if !data}
+  <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+    <td class="p-4">Henter data...</td>
+  </tr>
+{:else}
+  {#each data as itassociation}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-      <td class="p-4">Henter data...</td>
+      <a href="{base}/organisation/{itassociation.org_unit[0].uuid}">
+        <td class="p-4">{itassociation.org_unit[0].name}</td>
+      </a>
+      <td class="p-4">{itassociation.job_function?.name}</td>
+      <td class="p-4">{itassociation.it_user[0].itsystem.name}</td>
+      <td class="p-4">{itassociation.it_user[0].user_key}</td>
+      <td class="p-4">{itassociation.primary ? itassociation.primary?.name : ""}</td>
+      <ValidityTableCell validity={itassociation.validity} />
+      <td>
+        <a href="{base}/employee/{uuid}/edit/itassociation/{itassociation.uuid}">
+          <Icon type="pen" />
+        </a>
+      </td>
+      <td>
+        <a href="{base}/employee/{uuid}/terminate/itassociation/{itassociation.uuid}">
+          <Icon type="xmark" size="30" />
+        </a>
+      </td>
     </tr>
   {:else}
-    {#each data as itassociation}
-      <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-        <a href="{base}/organisation/{itassociation.org_unit[0].uuid}">
-          <td class="p-4">{itassociation.org_unit[0].name}</td>
-        </a>
-        <td class="p-4">{itassociation.job_function?.name}</td>
-        <td class="p-4">{itassociation.it_user[0].itsystem.name}</td>
-        <td class="p-4">{itassociation.it_user[0].user_key}</td>
-        <td class="p-4">{itassociation.primary ? itassociation.primary?.name : ""}</td>
-        <ValidityTableCell validity={itassociation.validity} />
-        <td>
-          <a href="{base}/employee/{uuid}/edit/itassociation/{itassociation.uuid}">
-            <Icon type="pen" />
-          </a>
-        </td>
-        <td>
-          <a href="{base}/employee/{uuid}/terminate/itassociation/{itassociation.uuid}">
-            <Icon type="xmark" size="30" />
-          </a>
-        </td>
-      </tr>
-    {/each}
-  {/if}
-</DetailTable>
+    <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
+      <!-- TODO: Add translated "No <type> in <tense>"-message" -->
+      <td class="p-4">Ingen IT-tilknytninger</td>
+    </tr>
+  {/each}
+{/if}

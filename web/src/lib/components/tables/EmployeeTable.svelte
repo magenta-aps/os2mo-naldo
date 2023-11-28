@@ -1,5 +1,4 @@
 <script lang="ts">
-  import DetailTable from "$lib/components/shared/detail_table.svelte"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { date } from "$lib/stores/date"
@@ -11,12 +10,14 @@
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { sortData } from "$lib/util/sorting"
   import { onMount } from "svelte"
+  import { page } from "$app/stores"
 
   type Employees = EmployeeQuery["employees"]["objects"][0]["objects"]
   let data: Employees
 
-  export let uuid: string
   export let tense: Tense
+
+  const uuid = $page.params.uuid
 
   gql`
     query Employee($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
@@ -61,32 +62,28 @@
   })
 </script>
 
-<DetailTable
-  headers={[
-    { title: "Navn", sortPath: "name" },
-    { title: "Kaldenavn", sortPath: "nickname" },
-    { title: "Dato", sortPath: "validity.from" },
-    { title: "" },
-  ]}
->
-  {#if !data}
+{#if !data}
+  <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+    <td class="p-4">Henter data...</td>
+  </tr>
+{:else}
+  {#each data as employee}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-      <td class="p-4">Henter data...</td>
+      <td class="p-4">
+        {employee.name}
+      </td>
+      <td class="p-4">{employee.nickname}</td>
+      <ValidityTableCell validity={employee.validity} />
+      <td>
+        <a aria-disabled href="{base}/employee/{uuid}/edit">
+          <Icon type="pen" />
+        </a>
+      </td>
     </tr>
   {:else}
-    {#each data as employee}
-      <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-        <td class="p-4">
-          {employee.name}
-        </td>
-        <td class="p-4">{employee.nickname}</td>
-        <ValidityTableCell validity={employee.validity} />
-        <td>
-          <a aria-disabled href="{base}/employee/{uuid}/edit">
-            <Icon type="pen" />
-          </a>
-        </td>
-      </tr>
-    {/each}
-  {/if}
-</DetailTable>
+    <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
+      <!-- TODO: Add translated "No <type> in <tense>"-message" -->
+      <td class="p-4">Ingen medarbejder</td>
+    </tr>
+  {/each}
+{/if}
