@@ -1,5 +1,4 @@
 <script lang="ts">
-  import DetailTable from "$lib/components/shared/detail_table.svelte"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
   import Icon from "$lib/components/icon.svelte"
   import { base } from "$app/paths"
@@ -99,9 +98,12 @@
     <td class="p-4">Henter data...</td>
   </tr>
 {:else}
-  {#each data as engagement}
+  {#each data as engagement, i}
     <!-- TODO: If no engagements "No past engagements found"-ish -->
-    <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
+    <tr
+      class="{i % 2 === 0 ? '' : 'bg-slate-100'} 
+      py-4 leading-5 border-t border-slate-300 text-secondary"
+    >
       {#if isOrg}
         <a href="{base}/employee/{engagement.employee[0].uuid}">
           <td class="p-4">{engagement.employee[0].name}</td>
@@ -133,6 +135,10 @@
           <Icon type="xmark" size="30" />
         </a>
       </td>
+    </tr>
+  {:else}
+    <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
+      <td class="p-4">Ingen engagementer</td>
     </tr>
   {/each}
 {/if}
