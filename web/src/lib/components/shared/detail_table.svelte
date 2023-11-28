@@ -2,12 +2,6 @@
   import { sortKey, sortDirection } from "$lib/stores/sorting"
   import Icon from "$lib/components/icon.svelte"
 
-  // Will be sortable if given a sortPath
-  type Header = {
-    title: string
-    sortPath?: string
-  }
-
   export let headers: Header[]
 
   const sortTable = (key: string) => {

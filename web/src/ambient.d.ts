@@ -16,3 +16,9 @@ interface DarAddressResponse {
 ;[]
 
 type Tense = "past" | "present" | "future"
+
+// Will be sortable if given a sortPath
+type Header = {
+  title: string
+  sortPath?: string
+}

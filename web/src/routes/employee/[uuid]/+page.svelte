@@ -14,13 +14,14 @@
   import AddressDetailTable from "$lib/components/shared/detail_tables/address_detail_table.svelte"
   import AssociationDetailTable from "$lib/components/shared/detail_tables/association_detail_table.svelte"
   import EmployeeDetailTable from "$lib/components/employee/tables/employee_detail_table.svelte"
-  import EngagementDetailTable from "$lib/components/shared/detail_tables/engagement_detail_table.svelte"
   import ItAssociationDetailTable from "$lib/components/employee/tables/itassociation_detail_table.svelte"
   import ItUserDetailTable from "$lib/components/shared/detail_tables/ituser_detail_table.svelte"
   import LeavesDetailTable from "$lib/components/employee/tables/leaves_detail_table.svelte"
   import ManagerDetailTable from "$lib/components/shared/detail_tables/manager_detail_table.svelte"
   import RolesDetailTable from "$lib/components/shared/detail_tables/roles_detail_table.svelte"
   import { onMount } from "svelte"
+  import TableTensesWrapper from "$lib/components/tables/TableTensesWrapper.svelte"
+  import EngagementTable from "$lib/components/tables/EngagementTable.svelte"
 
   // Tabs
   let items = Object.values(EmployeeTab)
@@ -139,7 +140,18 @@
         <EmployeeDetailTable tense="past" uuid={$page.params.uuid} />
       {/if}
     {:else if activeItem === EmployeeTab.ENGAGEMENT}
-      <EngagementDetailTable uuid={$page.params.uuid} />
+      <TableTensesWrapper
+        table={EngagementTable}
+        headers={[
+          { title: "Enhed", sortPath: "org_unit[0].name" },
+          { title: "Stillingsbetegnelse", sortPath: "job_function.name" },
+          { title: "Engagementstype", sortPath: "engagement_type.name" },
+          { title: "Primær" },
+          { title: "Dato", sortPath: "validity.from" },
+          { title: "" },
+          { title: "" },
+        ]}
+      />
     {:else if activeItem === EmployeeTab.ADDRESS}
       {#if $tenses.future}
         <h2 class="mb-4">Fremtid</h2>

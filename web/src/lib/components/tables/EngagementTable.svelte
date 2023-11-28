@@ -15,9 +15,9 @@
   type Engagements = EngagementsQuery["engagements"]["objects"][0]["objects"]
   let data: Engagements
 
-  export let uuid: string
   export let tense: Tense
 
+  const uuid = $page.params.uuid
   const isOrg = $page.route.id?.startsWith("/organisation")
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
