@@ -138,6 +138,7 @@
     </tr>
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
+      <!-- TODO: Add translated "No engagements in <tense>"-message" -->
       <td class="p-4">Ingen engagementer</td>
     </tr>
   {/each}
