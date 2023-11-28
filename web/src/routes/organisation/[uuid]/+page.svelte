@@ -7,6 +7,7 @@
   import { OrgTab, activeOrgTab } from "$lib/stores/tab"
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
+  import { env } from "$env/dynamic/public"
   import { gql } from "graphql-request"
   import { graphQLClient } from "$lib/util/http"
   import { tenses } from "$lib/stores/tenses"
@@ -24,6 +25,11 @@
 
   // Tabs
   let items = Object.values(OrgTab)
+
+  // TODO: Move tab logic into tabs.svelte
+  if (env.PUBLIC_SHOW_KLE_TAB === "false") {
+    items = items.filter((tab) => tab !== OrgTab.KLE)
+  }
 
   let uuidFromUrl = $page.params.uuid
   let activeItem = $activeOrgTab

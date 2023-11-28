@@ -8,6 +8,7 @@
   import { EmployeeDocument } from "./query.generated"
   import TenseTabs from "$lib/components/shared/tense_tabs.svelte"
   import { tenses } from "$lib/stores/tenses"
+  import { env } from "$env/dynamic/public"
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
   import AddressDetailTable from "$lib/components/shared/detail_tables/address_detail_table.svelte"
@@ -23,6 +24,12 @@
 
   // Tabs
   let items = Object.values(EmployeeTab)
+
+  // TODO: Move tab logic into tabs.svelte
+  if (env.PUBLIC_SHOW_ITASSOCIATION_TAB === "false") {
+    items = items.filter((tab) => tab !== EmployeeTab.ITASSOCIATION)
+  }
+
   let uuidFromUrl = $page.params.uuid
 
   let activeItem = $activeEmployeeTab
