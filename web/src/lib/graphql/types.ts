@@ -2331,6 +2331,8 @@ export type EmployeeTerminateInput = {
   to: Scalars['DateTime']['input'];
   /** UUID for the employee we want to terminate. */
   uuid: Scalars['UUID']['input'];
+  /** Mark related manager functions as vacated */
+  vacate?: Scalars['Boolean']['input'];
 };
 
 export type EmployeeUpdateInput = {

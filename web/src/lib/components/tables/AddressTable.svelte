@@ -1,5 +1,4 @@
 <script lang="ts">
-  import DetailTable from "$lib/components/shared/detail_table.svelte"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
   import Icon from "$lib/components/icon.svelte"
   import { base } from "$app/paths"
@@ -13,9 +12,9 @@
   import { sortKey, sortDirection } from "$lib/stores/sorting"
   import { sortData } from "$lib/util/sorting"
 
-  export let uuid: string
   export let tense: Tense
 
+  const uuid = $page.params.uuid
   const isOrg = $page.route.id?.startsWith("/organisation")
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
@@ -84,48 +83,44 @@
   })
 </script>
 
-<DetailTable
-  headers={[
-    { title: "Adressetype", sortPath: "address_type.name" },
-    { title: "Adresse", sortPath: "name" },
-    // TODO: Make it possible to sort optional fields maybe? visibility and primary for example
-    { title: "Synlighed" },
-    { title: "Dato", sortPath: "validity.from" },
-    { title: "" },
-    { title: "" },
-  ]}
->
-  {#if !data}
-    <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-      <td class="p-4">Henter data...</td>
+{#if !data}
+  <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+    <td class="p-4">Henter data...</td>
+  </tr>
+{:else}
+  {#each data as address, i}
+    <tr
+      class="{i % 2 === 0 ? '' : 'bg-slate-100'} 
+      p-4 leading-5 border-t border-slate-300 text-secondary"
+    >
+      <td class="p-4">{address.address_type.name}</td>
+      <td class="p-4">{address.name}</td>
+      <td class="p-4">{address.visibility ? address.visibility.name : "Ikke sat"}</td>
+      <ValidityTableCell validity={address.validity} />
+      <td>
+        <a
+          href="{base}/{$page.route.id?.split(
+            '/'
+          )[1]}/{uuid}/edit/address/{address.uuid}"
+        >
+          <Icon type="pen" />
+        </a>
+      </td>
+      <td>
+        <a
+          href="{base}/{$page.route.id?.split(
+            '/'
+          )[1]}/{uuid}/terminate/address/{address.uuid}"
+          class="hover:slate-300"
+        >
+          <Icon type="xmark" size="30" />
+        </a>
+      </td>
     </tr>
   {:else}
-    {#each data as address}
-      <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-        <td class="p-4">{address.address_type.name}</td>
-        <td class="p-4">{address.name}</td>
-        <td class="p-4">{address.visibility ? address.visibility.name : "Ikke sat"}</td>
-        <ValidityTableCell validity={address.validity} />
-        <td>
-          <a
-            href="{base}/{$page.route.id?.split(
-              '/'
-            )[1]}/{uuid}/edit/address/{address.uuid}"
-          >
-            <Icon type="pen" />
-          </a>
-        </td>
-        <td>
-          <a
-            href="{base}/{$page.route.id?.split(
-              '/'
-            )[1]}/{uuid}/terminate/address/{address.uuid}"
-            class="hover:slate-300"
-          >
-            <Icon type="xmark" size="30" />
-          </a>
-        </td>
-      </tr>
-    {/each}
-  {/if}
-</DetailTable>
+    <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
+      <!-- TODO: Add translated "No <type> in <tense>"-message" -->
+      <td class="p-4">Ingen adresser</td>
+    </tr>
+  {/each}
+{/if}

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import DetailTable from "$lib/components/shared/detail_table.svelte"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { EmployeeLeavesDocument, type EmployeeLeavesQuery } from "./query.generated"
@@ -11,10 +10,11 @@
   import { onMount } from "svelte"
   import { sortKey, sortDirection } from "$lib/stores/sorting"
   import { sortData } from "$lib/util/sorting"
+  import { page } from "$app/stores"
 
-  export let uuid: string
   export let tense: Tense
 
+  const uuid = $page.params.uuid
   type Leaves = EmployeeLeavesQuery["leaves"]["objects"][0]["objects"]
   let data: Leaves
 
@@ -76,42 +76,32 @@
   })
 </script>
 
-<DetailTable
-  headers={[
-    { title: "Orlovstype", sortPath: "leave_type.name" },
-    { title: "Engagement", sortPath: "engagement.job_function.name" },
-    { title: "Dato", sortPath: "validity.from" },
-    { title: "" },
-    { title: "" },
-  ]}
->
-  {#if !data}
+{#if !data}
+  <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+    <td class="p-4">Henter data...</td>
+  </tr>
+{:else}
+  {#each data as leave}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-      <td class="p-4">Henter data...</td>
+      <td class="p-4">
+        {leave.leave_type.name}
+      </td>
+      <td class="p-4">
+        {#if leave.engagement}
+          {leave.engagement.job_function.name}, {leave.engagement.org_unit[0].name}
+        {/if}
+      </td>
+      <ValidityTableCell validity={leave.validity} />
+      <td>
+        <a aria-disabled href="{base}/employee/{uuid}/edit/leave/{leave.uuid}">
+          <Icon type="pen" />
+        </a>
+      </td>
+      <td>
+        <a href="{base}/employee/{uuid}/terminate/leave/{leave.uuid}">
+          <Icon type="xmark" size="30" />
+        </a></td
+      >
     </tr>
-  {:else}
-    {#each data as leave}
-      <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-        <td class="p-4">
-          {leave.leave_type.name}
-        </td>
-        <td class="p-4">
-          {#if leave.engagement}
-            {leave.engagement.job_function.name}, {leave.engagement.org_unit[0].name}
-          {/if}
-        </td>
-        <ValidityTableCell validity={leave.validity} />
-        <td>
-          <a aria-disabled href="{base}/employee/{uuid}/edit/leave/{leave.uuid}">
-            <Icon type="pen" />
-          </a>
-        </td>
-        <td>
-          <a href="{base}/employee/{uuid}/terminate/leave/{leave.uuid}">
-            <Icon type="xmark" size="30" />
-          </a></td
-        >
-      </tr>
-    {/each}
-  {/if}
-</DetailTable>
+  {/each}
+{/if}

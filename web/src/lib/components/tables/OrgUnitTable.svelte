@@ -1,5 +1,4 @@
 <script lang="ts">
-  import DetailTable from "$lib/components/shared/detail_table.svelte"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
   import Icon from "$lib/components/icon.svelte"
   import { base } from "$app/paths"
@@ -16,8 +15,9 @@
   type OrgUnits = OrgUnitQuery["org_units"]["objects"][0]["objects"]
   let data: OrgUnits
 
-  export let uuid: string
   export let tense: Tense
+
+  const uuid = $page.params.uuid
 
   gql`
     query OrgUnit($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
@@ -75,42 +75,36 @@
   })
 </script>
 
-<DetailTable
-  headers={[
-    { title: "Enhed", sortPath: "name" },
-    { title: "Enhedstype", sortPath: "unit_type.name" },
-    { title: "Enhedsniveau", sortPath: "org_unit_level.name" },
-    { title: "Overenhed" },
-    { title: "Dato", sortPath: "validity.from" },
-    { title: "" },
-  ]}
->
-  {#if !data}
+{#if !data}
+  <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+    <td class="p-4">Henter data...</td>
+  </tr>
+{:else}
+  {#each data as org_unit}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-      <td class="p-4">Henter data...</td>
+      <td class="p-4">{org_unit.name}</td>
+      <td class="p-4">{org_unit.unit_type ? org_unit.unit_type.name : "Ikke sat"}</td>
+      <td class="p-4"
+        >{org_unit.org_unit_level ? org_unit.org_unit_level.name : "Ikke sat"}</td
+      >
+      {#if org_unit.parent}
+        <a href="{base}/organisation/{org_unit.parent.uuid}">
+          <td class="p-4">{org_unit.parent.name}</td>
+        </a>
+      {:else}
+        <td class="p-4">Ingen overenhed</td>
+      {/if}
+      <ValidityTableCell validity={org_unit.validity} />
+      <td>
+        <a href="{base}/organisation/{$page.params.uuid}/edit">
+          <Icon type="pen" />
+        </a>
+      </td>
     </tr>
   {:else}
-    {#each data as org_unit}
-      <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-        <td class="p-4">{org_unit.name}</td>
-        <td class="p-4">{org_unit.unit_type ? org_unit.unit_type.name : "Ikke sat"}</td>
-        <td class="p-4"
-          >{org_unit.org_unit_level ? org_unit.org_unit_level.name : "Ikke sat"}</td
-        >
-        {#if org_unit.parent}
-          <a href="{base}/organisation/{org_unit.parent.uuid}">
-            <td class="p-4">{org_unit.parent.name}</td>
-          </a>
-        {:else}
-          <td class="p-4">Ingen overenhed</td>
-        {/if}
-        <ValidityTableCell validity={org_unit.validity} />
-        <td>
-          <a href="{base}/organisation/{$page.params.uuid}/edit">
-            <Icon type="pen" />
-          </a>
-        </td>
-      </tr>
-    {/each}
-  {/if}
-</DetailTable>
+    <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
+      <!-- TODO: Add translated "No <type> in <tense>"-message" -->
+      <td class="p-4">Ingen enheder</td>
+    </tr>
+  {/each}
+{/if}

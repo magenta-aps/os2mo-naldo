@@ -1,5 +1,4 @@
 <script lang="ts">
-  import DetailTable from "$lib/components/shared/detail_table.svelte"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
   import { page } from "$app/stores"
   import { base } from "$app/paths"
@@ -14,7 +13,7 @@
   type RelatedUnits = RelatedUnitsQuery["related_units"]["objects"][0]["objects"]
   let data: RelatedUnits
 
-  export let uuid: string
+  const uuid = $page.params.uuid
 
   gql`
     query RelatedUnits($org_unit: [UUID!], $fromDate: DateTime) {
@@ -61,27 +60,28 @@
 </script>
 
 <!-- TODO: We can't sort on name, since we don't know if we use [0] or [1] -->
-<DetailTable
-  headers={[{ title: "Relateret enhed" }, { title: "Dato", sortPath: "validity.from" }]}
->
-  {#if !data}
+{#if !data}
+  <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+    <td class="p-4">Henter data...</td>
+  </tr>
+{:else}
+  {#each data as related_unit}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-      <td class="p-4">Henter data...</td>
+      {#if related_unit.org_units[0].uuid == $page.params.uuid}
+        <a href="{base}/organisation/{related_unit.org_units[1].uuid}">
+          <td class="p-4">{related_unit.org_units[1].name}</td>
+        </a>
+      {:else}
+        <a href="{base}/organisation/{related_unit.org_units[0].uuid}">
+          <td class="p-4">{related_unit.org_units[0].name}</td>
+        </a>
+      {/if}
+      <ValidityTableCell validity={related_unit.validity} />
     </tr>
   {:else}
-    {#each data as related_unit}
-      <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-        {#if related_unit.org_units[0].uuid == $page.params.uuid}
-          <a href="{base}/organisation/{related_unit.org_units[1].uuid}">
-            <td class="p-4">{related_unit.org_units[1].name}</td>
-          </a>
-        {:else}
-          <a href="{base}/organisation/{related_unit.org_units[0].uuid}">
-            <td class="p-4">{related_unit.org_units[0].name}</td>
-          </a>
-        {/if}
-        <ValidityTableCell validity={related_unit.validity} />
-      </tr>
-    {/each}
-  {/if}
-</DetailTable>
+    <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
+      <!-- TODO: Add translated "No related units in <tense>"-message" -->
+      <td class="p-4">Ingen relaterede enheder</td>
+    </tr>
+  {/each}
+{/if}

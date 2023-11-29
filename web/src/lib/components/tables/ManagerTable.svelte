@@ -1,5 +1,4 @@
 <script lang="ts">
-  import DetailTable from "$lib/components/shared/detail_table.svelte"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
   import Icon from "$lib/components/icon.svelte"
   import { base } from "$app/paths"
@@ -16,23 +15,12 @@
   type Managers = ManagersQuery["managers"]["objects"][0]["objects"]
   let data: Managers
 
-  export let uuid: string
   export let tense: Tense
 
+  const uuid = $page.params.uuid
   const isOrg = $page.route.id?.startsWith("/organisation")
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
-  const headers = [
-    isOrg
-      ? { title: "Navn", sortPath: "employee[0].name" }
-      : { title: "Enhed", sortPath: "org_unit[0].name" },
-    { title: "Lederansvar" },
-    { title: "Ledertype", sortPath: "manager_type.name" },
-    { title: "Lederniveau", sortPath: "manager_level.name" },
-    { title: "Dato", sortPath: "validity.from" },
-    { title: "" },
-    { title: "" },
-  ]
 
   gql`
     query Managers(
@@ -105,56 +93,59 @@
   })
 </script>
 
-<DetailTable {headers}>
-  {#if !data}
-    <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-      <td class="p-4">Henter data...</td>
+{#if !data}
+  <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+    <td class="p-4">Henter data...</td>
+  </tr>
+{:else}
+  {#each data as manager}
+    <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
+      {#if isOrg}
+        <a href="{base}/employee/{manager.employee ? manager.employee[0].uuid : ''}">
+          <td class="p-4">{manager.employee ? manager.employee[0].name : ""}</td>
+        </a>
+      {:else}
+        <a href="{base}/organisation/{manager.org_unit[0].uuid}">
+          <td class="p-4">
+            {manager.org_unit[0].name}
+          </td>
+        </a>
+      {/if}
+      <td class="p-4">
+        <ul>
+          {#each manager.responsibilities as responsibility}
+            <li>
+              • {responsibility.name}
+            </li>
+          {/each}
+        </ul>
+      </td>
+      <td class="p-4">{manager.manager_type.name}</td>
+      <td class="p-4">{manager.manager_level.name}</td>
+      <ValidityTableCell validity={manager.validity} />
+      <td>
+        <a
+          href="{base}/{$page.route.id?.split(
+            '/'
+          )[1]}/{uuid}/edit/manager/{manager.uuid}"
+        >
+          <Icon type="pen" />
+        </a>
+      </td>
+      <td>
+        <a
+          href="{base}/{$page.route.id?.split(
+            '/'
+          )[1]}/{uuid}/terminate/manager/{manager.uuid}"
+        >
+          <Icon type="xmark" size="30" />
+        </a>
+      </td>
     </tr>
   {:else}
-    {#each data as manager}
-      <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
-        {#if isOrg}
-          <a href="{base}/employee/{manager.employee ? manager.employee[0].uuid : ''}">
-            <td class="p-4">{manager.employee ? manager.employee[0].name : ""}</td>
-          </a>
-        {:else}
-          <a href="{base}/organisation/{manager.org_unit[0].uuid}">
-            <td class="p-4">
-              {manager.org_unit[0].name}
-            </td>
-          </a>
-        {/if}
-        <td class="p-4">
-          <ul>
-            {#each manager.responsibilities as responsibility}
-              <li>
-                • {responsibility.name}
-              </li>
-            {/each}
-          </ul>
-        </td>
-        <td class="p-4">{manager.manager_type.name}</td>
-        <td class="p-4">{manager.manager_level.name}</td>
-        <ValidityTableCell validity={manager.validity} />
-        <td>
-          <a
-            href="{base}/{$page.route.id?.split(
-              '/'
-            )[1]}/{uuid}/edit/manager/{manager.uuid}"
-          >
-            <Icon type="pen" />
-          </a>
-        </td>
-        <td>
-          <a
-            href="{base}/{$page.route.id?.split(
-              '/'
-            )[1]}/{uuid}/terminate/manager/{manager.uuid}"
-          >
-            <Icon type="xmark" size="30" />
-          </a>
-        </td>
-      </tr>
-    {/each}
-  {/if}
-</DetailTable>
+    <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
+      <!-- TODO: Add translated "No <type> in <tense>"-message" -->
+      <td class="p-4">Ingen ledere</td>
+    </tr>
+  {/each}
+{/if}

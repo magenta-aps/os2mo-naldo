@@ -10,18 +10,18 @@
   import { env } from "$env/dynamic/public"
   import { gql } from "graphql-request"
   import { graphQLClient } from "$lib/util/http"
-  import { tenses } from "$lib/stores/tenses"
-  import AddressDetailTable from "$lib/components/shared/detail_tables/address_detail_table.svelte"
-  import AssociationDetailTable from "$lib/components/shared/detail_tables/association_detail_table.svelte"
-  import EngagementDetailTable from "$lib/components/shared/detail_tables/engagement_detail_table.svelte"
-  import ItUserDetailTable from "$lib/components/shared/detail_tables/ituser_detail_table.svelte"
-  import KleDetailTable from "$lib/components/org/tables/kle_detail_table.svelte"
-  import ManagerDetailTable from "$lib/components/shared/detail_tables/manager_detail_table.svelte"
-  import RelatedUnitsDetailTable from "$lib/components/org/tables/related_units_detail_table.svelte"
-  import RolesDetailTable from "$lib/components/shared/detail_tables/roles_detail_table.svelte"
-  import OrgUnitDetailTable from "$lib/components/org/tables/org_unit_detail_table.svelte"
   import { OrgUnitDocument } from "./query.generated"
   import { onMount } from "svelte"
+  import TableTensesWrapper from "$lib/components/tables/TableTensesWrapper.svelte"
+  import EngagementTable from "$lib/components/tables/EngagementTable.svelte"
+  import ItUserTable from "$lib/components/tables/ITUserTable.svelte"
+  import AddressTable from "$lib/components/tables/AddressTable.svelte"
+  import AssociationTable from "$lib/components/tables/AssociationTable.svelte"
+  import RoleTable from "$lib/components/tables/RoleTable.svelte"
+  import ManagerTable from "$lib/components/tables/ManagerTable.svelte"
+  import OrgUnitTable from "$lib/components/tables/OrgUnitTable.svelte"
+  import KleTable from "$lib/components/tables/KLETable.svelte"
+  import RelatedUnitsTable from "$lib/components/tables/RelatedUnitsTable.svelte"
 
   // Tabs
   let items = Object.values(OrgTab)
@@ -128,114 +128,111 @@
     </div>
 
     {#if activeItem === OrgTab.ORG_UNIT}
-      {#if $tenses.future}
-        <h2 class="mb-4">Fremtid</h2>
-        <OrgUnitDetailTable tense="future" uuid={$page.params.uuid} />
-      {/if}
-      {#if $tenses.present}
-        <h2 class="mb-4">Nutid</h2>
-        <OrgUnitDetailTable tense="present" uuid={$page.params.uuid} />
-      {/if}
-      {#if $tenses.past}
-        <h2 class="mb-4">Fortid</h2>
-        <OrgUnitDetailTable tense="past" uuid={$page.params.uuid} />
-      {/if}
+      <TableTensesWrapper
+        table={OrgUnitTable}
+        headers={[
+          { title: "Enhed", sortPath: "name" },
+          { title: "Enhedstype", sortPath: "unit_type.name" },
+          { title: "Enhedsniveau", sortPath: "org_unit_level.name" },
+          { title: "Overenhed" },
+          { title: "Dato", sortPath: "validity.from" },
+          { title: "" },
+        ]}
+      />
     {:else if activeItem === OrgTab.ADDRESS}
-      {#if $tenses.future}
-        <h2 class="mb-4">Fremtid</h2>
-        <AddressDetailTable tense="future" uuid={$page.params.uuid} />
-      {/if}
-      {#if $tenses.present}
-        <h2 class="mb-4">Nutid</h2>
-        <AddressDetailTable tense="present" uuid={$page.params.uuid} />
-      {/if}
-      {#if $tenses.past}
-        <h2 class="mb-4">Fortid</h2>
-        <AddressDetailTable tense="past" uuid={$page.params.uuid} />
-      {/if}
+      <TableTensesWrapper
+        table={AddressTable}
+        headers={[
+          { title: "Adressetype", sortPath: "address_type.name" },
+          { title: "Adresse", sortPath: "name" },
+          // TODO: Make it possible to sort optional fields maybe? visibility and primary for example
+          { title: "Synlighed" },
+          { title: "Dato", sortPath: "validity.from" },
+          { title: "" },
+          { title: "" },
+        ]}
+      />
     {:else if activeItem === OrgTab.ENGAGEMENT}
-      {#if $tenses.future}
-        <h2 class="mb-4">Fremtid</h2>
-        <EngagementDetailTable tense="future" uuid={$page.params.uuid} />
-      {/if}
-      {#if $tenses.present}
-        <h2 class="mb-4">Nutid</h2>
-        <EngagementDetailTable tense="present" uuid={$page.params.uuid} />
-      {/if}
-      {#if $tenses.past}
-        <h2 class="mb-4">Fortid</h2>
-        <EngagementDetailTable tense="past" uuid={$page.params.uuid} />
-      {/if}
+      <TableTensesWrapper
+        table={EngagementTable}
+        headers={[
+          { title: "Navn", sortPath: "employee[0].name" },
+          { title: "Stillingsbetegnelse", sortPath: "job_function.name" },
+          { title: "Engagementstype", sortPath: "engagement_type.name" },
+          { title: "Primær" },
+          { title: "Dato", sortPath: "validity.from" },
+          { title: "" },
+          { title: "" },
+        ]}
+      />
     {:else if activeItem === OrgTab.ASSOCIATION}
-      {#if $tenses.future}
-        <h2 class="mb-4">Fremtid</h2>
-        <AssociationDetailTable tense="future" uuid={$page.params.uuid} />
-      {/if}
-      {#if $tenses.present}
-        <h2 class="mb-4">Nutid</h2>
-        <AssociationDetailTable tense="present" uuid={$page.params.uuid} />
-      {/if}
-      {#if $tenses.past}
-        <h2 class="mb-4">Fortid</h2>
-        <AssociationDetailTable tense="past" uuid={$page.params.uuid} />
-      {/if}
+      <TableTensesWrapper
+        table={AssociationTable}
+        headers={[
+          { title: "Navn", sortPath: "employee[0].name" },
+          { title: "Tilknytningsrolle", sortPath: "association_type.name" },
+          { title: "Primær" },
+          { title: "Dato", sortPath: "validity.from" },
+          { title: "" },
+          { title: "" },
+        ]}
+      />
     {:else if activeItem === OrgTab.IT}
-      {#if $tenses.future}
-        <h2 class="mb-4">Fremtid</h2>
-        <ItUserDetailTable tense="future" uuid={$page.params.uuid} />
-      {/if}
-      {#if $tenses.present}
-        <h2 class="mb-4">Nutid</h2>
-        <ItUserDetailTable tense="present" uuid={$page.params.uuid} />
-      {/if}
-      {#if $tenses.past}
-        <h2 class="mb-4">Fortid</h2>
-        <ItUserDetailTable tense="past" uuid={$page.params.uuid} />
-      {/if}
+      <TableTensesWrapper
+        table={ItUserTable}
+        headers={[
+          { title: "IT system", sortPath: "itsystem.name" },
+          { title: "Kontonavn", sortPath: "user_key" },
+          { title: "Primær" },
+          { title: "Dato", sortPath: "validity.from" },
+          { title: "" },
+          { title: "" },
+        ]}
+      />
     {:else if activeItem === OrgTab.ROLE}
-      {#if $tenses.future}
-        <h2 class="mb-4">Fremtid</h2>
-        <RolesDetailTable tense="future" uuid={$page.params.uuid} />
-      {/if}
-      {#if $tenses.present}
-        <h2 class="mb-4">Nutid</h2>
-        <RolesDetailTable tense="present" uuid={$page.params.uuid} />
-      {/if}
-      {#if $tenses.past}
-        <h2 class="mb-4">Fortid</h2>
-        <RolesDetailTable tense="past" uuid={$page.params.uuid} />
-      {/if}
+      <TableTensesWrapper
+        table={RoleTable}
+        headers={[
+          { title: "Navn", sortPath: "employee[0].name" },
+          { title: "Rolletype", sortPath: "role_type.name" },
+          { title: "Dato", sortPath: "validity.from" },
+          { title: "" },
+          { title: "" },
+        ]}
+      />
     {:else if activeItem === OrgTab.MANAGER}
-      {#if $tenses.future}
-        <h2 class="mb-4">Fremtid</h2>
-        <ManagerDetailTable tense="future" uuid={$page.params.uuid} />
-      {/if}
-      {#if $tenses.present}
-        <h2 class="mb-4">Nutid</h2>
-        <ManagerDetailTable tense="present" uuid={$page.params.uuid} />
-      {/if}
-      {#if $tenses.past}
-        <h2 class="mb-4">Fortid</h2>
-        <ManagerDetailTable tense="past" uuid={$page.params.uuid} />
-      {/if}
+      <TableTensesWrapper
+        table={ManagerTable}
+        headers={[
+          { title: "Navn", sortPath: "employee[0].name" },
+          { title: "Lederansvar" },
+          { title: "Ledertype", sortPath: "manager_type.name" },
+          { title: "Lederniveau", sortPath: "manager_level.name" },
+          { title: "Dato", sortPath: "validity.from" },
+          { title: "" },
+          { title: "" },
+        ]}
+      />
     {:else if activeItem === OrgTab.KLE}
-      {#if $tenses.future}
-        <h2 class="mb-4">Fremtid</h2>
-        <KleDetailTable tense="future" uuid={$page.params.uuid} />
-      {/if}
-      {#if $tenses.present}
-        <h2 class="mb-4">Nutid</h2>
-        <KleDetailTable tense="present" uuid={$page.params.uuid} />
-      {/if}
-      {#if $tenses.past}
-        <h2 class="mb-4">Fortid</h2>
-        <KleDetailTable tense="past" uuid={$page.params.uuid} />
-      {/if}
+      <TableTensesWrapper
+        table={KleTable}
+        headers={[
+          { title: "KLE aspekt", sortPath: "kle_aspects[0].name" },
+          { title: "KLE nummer", sortPath: "kle_number.name" },
+          { title: "Dato", sortPath: "validity.from" },
+          { title: "" },
+          { title: "" },
+        ]}
+      />
     {:else if activeItem === OrgTab.RELATED_UNIT}
-      {#if $tenses.present}
-        <h2 class="my-4">Nutid</h2>
-        <RelatedUnitsDetailTable uuid={$page.params.uuid} />
-      {/if}
+      <TableTensesWrapper
+        table={RelatedUnitsTable}
+        onlyPresent={true}
+        headers={[
+          { title: "Relateret enhed" },
+          { title: "Dato", sortPath: "validity.from" },
+        ]}
+      />
     {/if}
   {/await}
 </div>

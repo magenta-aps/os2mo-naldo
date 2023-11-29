@@ -1,5 +1,4 @@
 <script lang="ts">
-  import DetailTable from "$lib/components/shared/detail_table.svelte"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
   import Icon from "$lib/components/icon.svelte"
   import { base } from "$app/paths"
@@ -16,9 +15,9 @@
   type ITUsers = ItUsersQuery["itusers"]["objects"][0]["objects"]
   let data: ITUsers
 
-  export let uuid: string
   export let tense: Tense
 
+  const uuid = $page.params.uuid
   const isOrg = $page.route.id?.startsWith("/organisation")
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
@@ -85,42 +84,39 @@
   })
 </script>
 
-<DetailTable
-  headers={[
-    { title: "IT system", sortPath: "itsystem.name" },
-    { title: "Kontonavn", sortPath: "user_key" },
-    { title: "Primær" },
-    { title: "Dato", sortPath: "validity.from" },
-    { title: "" },
-    { title: "" },
-  ]}
->
-  {#if !data}
-    <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-      <td class="p-4">Henter data...</td>
+{#if !data}
+  <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+    <td class="p-4">Henter data...</td>
+  </tr>
+{:else}
+  {#each data as ituser, i}
+    <tr
+      class="{i % 2 === 0 ? '' : 'bg-slate-100'} 
+      p-4 leading-5 border-t border-slate-300 text-secondary"
+    >
+      <td class="p-4">{ituser.itsystem.name}</td>
+      <td class="p-4">{ituser.user_key}</td>
+      <td class="p-4">{ituser.primary ? ituser.primary.name : ""}</td>
+      <ValidityTableCell validity={ituser.validity} />
+      <td>
+        <a href="{base}/{$page.route.id?.split('/')[1]}/{uuid}/edit/it/{ituser.uuid}">
+          <Icon type="pen" />
+        </a>
+      </td>
+      <td>
+        <a
+          href="{base}/{$page.route.id?.split(
+            '/'
+          )[1]}/{uuid}/terminate/it/{ituser.uuid}"
+        >
+          <Icon type="xmark" size="30" />
+        </a>
+      </td>
     </tr>
   {:else}
-    {#each data as ituser}
-      <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-        <td class="p-4">{ituser.itsystem.name}</td>
-        <td class="p-4">{ituser.user_key}</td>
-        <td class="p-4">{ituser.primary ? ituser.primary.name : ""}</td>
-        <ValidityTableCell validity={ituser.validity} />
-        <td>
-          <a href="{base}/{$page.route.id?.split('/')[1]}/{uuid}/edit/it/{ituser.uuid}">
-            <Icon type="pen" />
-          </a>
-        </td>
-        <td>
-          <a
-            href="{base}/{$page.route.id?.split(
-              '/'
-            )[1]}/{uuid}/terminate/it/{ituser.uuid}"
-          >
-            <Icon type="xmark" size="30" />
-          </a>
-        </td>
-      </tr>
-    {/each}
-  {/if}
-</DetailTable>
+    <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
+      <!-- TODO: Add translated "No IT users in <tense>"-message" -->
+      <td class="p-4">Ingen IT brugere</td>
+    </tr>
+  {/each}
+{/if}

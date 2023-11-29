@@ -1,5 +1,4 @@
 <script lang="ts">
-  import DetailTable from "$lib/components/shared/detail_table.svelte"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
   import { base } from "$app/paths"
   import { graphQLClient } from "$lib/util/http"
@@ -19,21 +18,12 @@
   type Roles = EmployeeAndOrgRolesQuery["roles"]["objects"][0]["objects"]
   let data: Roles
 
-  export let uuid: string
   export let tense: Tense
 
+  const uuid = $page.params.uuid
   const isOrg = $page.route.id?.startsWith("/organisation")
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
-  const headers = [
-    isOrg
-      ? { title: "Navn", sortPath: "employee[0].name" }
-      : { title: "Enhed", sortpath: "org_unit[0].name" },
-    { title: "Rolletype", sortPath: "role_type.name" },
-    { title: "Dato", sortPath: "validity.from" },
-    { title: "" },
-    { title: "" },
-  ]
 
   gql`
     query EmployeeAndOrgRoles(
@@ -100,42 +90,45 @@
   })
 </script>
 
-<DetailTable {headers}>
-  {#if !data}
+{#if !data}
+  <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+    <td class="p-4">Henter data...</td>
+  </tr>
+{:else}
+  {#each data as role}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-      <td class="p-4">Henter data...</td>
+      {#if isOrg}
+        <a href="{base}/employee/{role.employee[0].uuid}">
+          <td class="p-4">{role.employee[0].name}</td>
+        </a>
+      {:else}
+        <a href="{base}/organisation/{role.org_unit[0].uuid}">
+          <td class="p-4">
+            {role.org_unit[0].name}
+          </td>
+        </a>
+      {/if}
+      <td class="p-4">{role.role_type.name}</td>
+      <ValidityTableCell validity={role.validity} />
+      <td>
+        <a aria-disabled href="{base}/employee/{uuid}/edit/role/{role.uuid}">
+          <Icon type="pen" />
+        </a>
+      </td>
+      <td>
+        <a
+          href="{base}/{$page.route.id?.split(
+            '/'
+          )[1]}/{uuid}/terminate/role/{role.uuid}"
+        >
+          <Icon type="xmark" size="30" />
+        </a>
+      </td>
     </tr>
   {:else}
-    {#each data as role}
-      <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-        {#if isOrg}
-          <a href="{base}/employee/{role.employee[0].uuid}">
-            <td class="p-4">{role.employee[0].name}</td>
-          </a>
-        {:else}
-          <a href="{base}/organisation/{role.org_unit[0].uuid}">
-            <td class="p-4">
-              {role.org_unit[0].name}
-            </td>
-          </a>
-        {/if}
-        <td class="p-4">{role.role_type.name}</td>
-        <ValidityTableCell validity={role.validity} />
-        <td>
-          <a aria-disabled href="{base}/employee/{uuid}/edit/role/{role.uuid}">
-            <Icon type="pen" />
-          </a>
-        </td>
-        <td>
-          <a
-            href="{base}/{$page.route.id?.split(
-              '/'
-            )[1]}/{uuid}/terminate/role/{role.uuid}"
-          >
-            <Icon type="xmark" size="30" />
-          </a>
-        </td>
-      </tr>
-    {/each}
-  {/if}
-</DetailTable>
+    <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
+      <!-- TODO: Add translated "No roles in <tense>"-message" -->
+      <td class="p-4">Ingen roller</td>
+    </tr>
+  {/each}
+{/if}
