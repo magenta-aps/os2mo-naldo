@@ -21,6 +21,7 @@
   import RoleTable from "$lib/components/tables/RoleTable.svelte"
   import ManagerTable from "$lib/components/tables/ManagerTable.svelte"
   import LeaveTable from "$lib/components/tables/LeaveTable.svelte"
+  import OwnerTable from "$lib/components/tables/OwnerTable.svelte"
 
   // Tabs
   let items = Object.values(EmployeeTab)
@@ -56,6 +57,8 @@
         return "leave"
       case EmployeeTab.MANAGER:
         return "manager"
+      case EmployeeTab.OWNER:
+        return "owner"
       default:
         console.warn("The tab doesn't match a subsite")
         return
@@ -229,6 +232,17 @@
           { title: "Lederansvar" },
           { title: "Ledertype", sortPath: "manager_type.name" },
           { title: "Lederniveau", sortPath: "manager_level.name" },
+          { title: "Dato", sortPath: "validity.from" },
+          { title: "" },
+          { title: "" },
+        ]}
+      />
+    {:else if activeItem === EmployeeTab.OWNER}
+      <TableTensesWrapper
+        table={OwnerTable}
+        headers={[
+          { title: "Navn", sortPath: "owner[0].name" },
+          { title: "Udledt via." },
           { title: "Dato", sortPath: "validity.from" },
           { title: "" },
           { title: "" },
