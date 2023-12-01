@@ -9,6 +9,7 @@ export enum OrgTab {
   ROLE = "Roller",
   MANAGER = "Ledere",
   KLE = "KLE-opmærkninger",
+  OWNER = "Ejere",
   RELATED_UNIT = "Relateret",
 }
 
@@ -24,6 +25,7 @@ export enum EmployeeTab {
   IT = "IT",
   LEAVE = "Orlov",
   MANAGER = "Ledere",
+  OWNER = "Ejere",
 }
 
 export const activeEmployeeTab = writable(EmployeeTab.EMPLOYEE)
