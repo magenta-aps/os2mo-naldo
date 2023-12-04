@@ -5873,6 +5873,8 @@ export type Mutation = {
   owner_create: OwnerResponse;
   /** Refresh owners. */
   owner_refresh: UuidPaged;
+  /** Terminates an owner. */
+  owner_terminate: OwnerResponse;
   /** Updates an owner. */
   owner_update: OwnerResponse;
   /** Refresh a related unit. */
@@ -6679,6 +6681,18 @@ export type MutationOwner_RefreshArgs = {
   filter?: InputMaybe<OwnerFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationOwner_TerminateArgs = {
+  input: OwnerTerminateInput;
 };
 
 
@@ -7989,6 +8003,15 @@ export type OwnerResponsePaged = {
    *
    */
   page_info: PageInfo;
+};
+
+export type OwnerTerminateInput = {
+  /** Start date of the validity. */
+  from?: InputMaybe<Scalars['DateTime']['input']>;
+  /** When the validity should end - required when terminating */
+  to: Scalars['DateTime']['input'];
+  /** UUID of the owner we want to terminate. */
+  uuid: Scalars['UUID']['input'];
 };
 
 export type OwnerUpdateInput = {
