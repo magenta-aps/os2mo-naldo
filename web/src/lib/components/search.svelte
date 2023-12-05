@@ -31,9 +31,7 @@
   export let name: string | undefined = undefined
   export let type: "employee" | "org-unit"
   export let action: "select" | "goto" = "select" // Redirect for navigation, select for forms
-  export let title: string = `Søg efter ${
-    type === "employee" ? "person" : "organisation"
-  }`
+  export let title: string = `${type === "employee" ? "Person" : "Organisation"}`
   export let id = `${type}-uuid`
   export let required = false
   export let disabled = false
