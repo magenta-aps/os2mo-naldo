@@ -243,7 +243,7 @@
       </div>
 
       <div slot="selection" let:selection>
-        <SearchItem item={selection} />
+        {selection.name}
       </div>
     </SvelteSelect>
   </div>
