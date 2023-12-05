@@ -89,7 +89,7 @@
   Henter data...
 {:then data}
   {@const engagement = data.engagements.objects[0].objects[0]}
-  {@const minDate = engagement.org_unit[0].validity.from.split("T")[0]}
+  {@const minDate = engagement.validity.from.split("T")[0]}
   {@const maxDate = engagement.org_unit[0].validity.to?.split("T")[0]}
 
   <title>Afslut engagement for {engagement?.employee[0].name} | OS2mo</title>

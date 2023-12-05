@@ -100,7 +100,7 @@
 {:then data}
   {@const itassociation = data.associations.objects[0].objects[0]}
   {@const ituser = getITUserITSystemName(itassociation.it_user)}
-  {@const minDate = itassociation.org_unit[0].validity.from.split("T")[0]}
+  {@const minDate = itassociation.validity.from.split("T")[0]}
   {@const maxDate = itassociation.org_unit[0].validity.to?.split("T")[0]}
 
   <title>Afslut IT-tilknytning til {ituser[0].name} | OS2mo</title>

@@ -82,7 +82,7 @@
   Henter data...
 {:then data}
   {@const kle = data.kles.objects[0].objects[0]}
-  {@const minDate = kle.org_unit[0].validity.from.split("T")[0]}
+  {@const minDate = kle.validity.from.split("T")[0]}
   {@const maxDate = kle.org_unit[0].validity.to?.split("T")[0]}
 
   <title>Afslut KLE-opmærkning | OS2mo</title>

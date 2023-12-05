@@ -86,7 +86,7 @@
   Henter data...
 {:then data}
   {@const ituser = data.itusers.objects[0].objects[0]}
-  {@const minDate = data.employees.objects[0].objects[0].validity.from.split("T")[0]}
+  {@const minDate = ituser.validity.from.split("T")[0]}
 
   <title>Afslut IT-konto: {ituser.user_key} | OS2mo</title>
 

@@ -90,7 +90,7 @@
   Henter data...
 {:then data}
   {@const address = data.addresses.objects[0].objects[0]}
-  {@const minDate = data.org_units.objects[0].objects[0].validity.from.split("T")[0]}
+  {@const minDate = address.validity.from.split("T")[0]}
   {@const maxDate = data.org_units.objects[0].objects[0].validity.to?.split("T")[0]}
   <title>Afslut adresse | OS2mo</title>
 

@@ -32,6 +32,10 @@
                 name
               }
             }
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -80,7 +84,7 @@
   Henter data...
 {:then data}
   {@const leave = data.leaves.objects[0].objects[0]}
-  {@const minDate = leave.engagement.validity.from.split("T")[0]}
+  {@const minDate = leave.validity.from.split("T")[0]}
   {@const maxDate = leave.engagement.validity?.to?.split("T")[0]}
   {@const employeeName = leave.engagement.person[0].name}
 
