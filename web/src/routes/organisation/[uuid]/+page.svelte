@@ -21,6 +21,7 @@
   import ManagerTable from "$lib/components/tables/ManagerTable.svelte"
   import OrgUnitTable from "$lib/components/tables/OrgUnitTable.svelte"
   import KleTable from "$lib/components/tables/KLETable.svelte"
+  import OwnerTable from "$lib/components/tables/OwnerTable.svelte"
   import RelatedUnitsTable from "$lib/components/tables/RelatedUnitsTable.svelte"
 
   // Tabs
@@ -54,6 +55,8 @@
         return "manager"
       case OrgTab.KLE:
         return "kle"
+      case OrgTab.OWNER:
+        return "owner"
       case OrgTab.RELATED_UNIT:
         return "related_units"
       default:
@@ -219,6 +222,16 @@
         headers={[
           { title: "KLE aspekt", sortPath: "kle_aspects[0].name" },
           { title: "KLE nummer", sortPath: "kle_number.name" },
+          { title: "Dato", sortPath: "validity.from" },
+          { title: "" },
+          { title: "" },
+        ]}
+      />
+    {:else if activeItem === OrgTab.OWNER}
+      <TableTensesWrapper
+        table={OwnerTable}
+        headers={[
+          { title: "Navn", sortPath: "person[0].name" },
           { title: "Dato", sortPath: "validity.from" },
           { title: "" },
           { title: "" },

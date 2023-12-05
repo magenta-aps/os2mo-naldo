@@ -5869,8 +5869,12 @@ export type Mutation = {
   org_unit_terminate: OrganisationUnitResponse;
   /** Updates an organisation unit. */
   org_unit_update: OrganisationUnitResponse;
+  /** Creates an owner. */
+  owner_create: OwnerResponse;
   /** Refresh owners. */
   owner_refresh: UuidPaged;
+  /** Updates an owner. */
+  owner_update: OwnerResponse;
   /** Refresh a related unit. */
   related_unit_refresh: UuidPaged;
   /** Updates relations for an org_unit. */
@@ -6658,11 +6662,35 @@ export type MutationOrg_Unit_UpdateArgs = {
  * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
  *
  */
+export type MutationOwner_CreateArgs = {
+  input: OwnerCreateInput;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationOwner_RefreshArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<OwnerFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationOwner_UpdateArgs = {
+  input: OwnerUpdateInput;
 };
 
 
@@ -6840,6 +6868,7 @@ export type OrgUnitsboundownerfilter = {
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
+  owner?: InputMaybe<EmployeeFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -7617,7 +7646,7 @@ export type OrganisationUnitUpdateInput = {
 
 /**
  *
- * Owner of organisation units and their connected identities.
+ * Owner of organisation units/employees and their connected identities.
  *
  */
 export type Owner = {
@@ -7630,12 +7659,51 @@ export type Owner = {
    */
   employee_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
+   * The owned organisation unit.
+   *
+   * Note:
+   * This field is mutually exclusive with the `employee` field.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  org_unit?: Maybe<Array<OrganisationUnit>>;
+  /**
    * UUID of the organisation unit related to the owner.
    * @deprecated Will be removed in a future version of GraphQL.
    * Use `org_unit {uuid}` instead.
    *
    */
   org_unit_uuid?: Maybe<Scalars['UUID']['output']>;
+  /**
+   * Owner of the connected person or organisation unit.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  owner?: Maybe<Array<Employee>>;
+  /** Inference priority, if set: `engagement_priority` or `association_priority` */
+  owner_inference_priority?: Maybe<OwnerInferencePriority>;
+  /**
+   * UUID of the owner.
+   * @deprecated Will be removed in a future version of GraphQL.
+   * Use `owner {uuid}` instead.
+   *
+   */
+  owner_uuid?: Maybe<Scalars['UUID']['output']>;
+  /**
+   * The owned person.
+   *
+   * Note:
+   * This field is mutually exclusive with the `org_unit` field.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  person?: Maybe<Array<Employee>>;
   /**
    *
    * The object type.
@@ -7654,6 +7722,59 @@ export type Owner = {
   uuid: Scalars['UUID']['output'];
   /** Validity of the owner object. */
   validity: Validity;
+};
+
+
+/**
+ *
+ * Owner of organisation units/employees and their connected identities.
+ *
+ */
+export type OwnerOrg_UnitArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<UuidsBoundOrganisationUnitFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ *
+ * Owner of organisation units/employees and their connected identities.
+ *
+ */
+export type OwnerOwnerArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<UuidsBoundEmployeeFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ *
+ * Owner of organisation units/employees and their connected identities.
+ *
+ */
+export type OwnerPersonArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<UuidsBoundEmployeeFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+export type OwnerCreateInput = {
+  /** Inference priority, if set: `engagement_priority` or `association_priority` */
+  inference_priority?: InputMaybe<OwnerInferencePriority>;
+  /** UUID of the org_unit */
+  org_unit?: InputMaybe<Scalars['UUID']['input']>;
+  /** UUID of the owner */
+  owner?: InputMaybe<Scalars['UUID']['input']>;
+  /** UUID of the person */
+  person?: InputMaybe<Scalars['UUID']['input']>;
+  /** Extra info or uuid. */
+  user_key?: InputMaybe<Scalars['String']['input']>;
+  /** UUID to be created. Will be autogenerated if not specified. */
+  uuid?: InputMaybe<Scalars['UUID']['input']>;
+  /** Validity range for the owner. */
+  validity: RaValidityInput;
 };
 
 /** Owner filter. */
@@ -7702,6 +7823,11 @@ export type OwnerFilter = {
    * @deprecated Replaced by the 'org_unit' filter
    */
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Owner filter limiting which entries are returned.
+   *
+   */
+  owner?: InputMaybe<EmployeeFilter>;
   /** Limit the elements returned by their ending validity. */
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -7735,6 +7861,23 @@ export type OwnerFilter = {
    */
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
+
+/**
+ * Enum for the supported inference priorities.
+ *
+ */
+export enum OwnerInferencePriority {
+  /**
+   * The association priority.
+   *
+   */
+  Association = 'ASSOCIATION',
+  /**
+   * The engagement priority.
+   *
+   */
+  Engagement = 'ENGAGEMENT'
+}
 
 /**
  * Top-level container for (bi)-temporal and actual state data access.
@@ -7846,6 +7989,23 @@ export type OwnerResponsePaged = {
    *
    */
   page_info: PageInfo;
+};
+
+export type OwnerUpdateInput = {
+  /** Inference priority, if set: `engagement_priority` or `association_priority` */
+  inference_priority?: InputMaybe<OwnerInferencePriority>;
+  /** UUID of the org_unit */
+  org_unit?: InputMaybe<Scalars['UUID']['input']>;
+  /** UUID of the owner */
+  owner?: InputMaybe<Scalars['UUID']['input']>;
+  /** UUID of the person */
+  person?: InputMaybe<Scalars['UUID']['input']>;
+  /** Extra info or uuid. */
+  user_key?: InputMaybe<Scalars['String']['input']>;
+  /** UUID of the role to be updated. */
+  uuid: Scalars['UUID']['input'];
+  /** Validity range for the owner. */
+  validity: RaValidityInput;
 };
 
 /**
