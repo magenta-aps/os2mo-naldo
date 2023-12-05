@@ -82,7 +82,7 @@
   Henter data...
 {:then data}
   {@const owner = data.owners.objects[0].objects[0]}
-  {@const minDate = owner.person?.[0].validity.from.split("T")[0]}
+  {@const minDate = owner.validity.from.split("T")[0]}
   {@const maxDate = owner.person?.[0].validity.to?.split("T")[0]}
 
   <title>Afslut ejer {owner.person ? `for ${owner.person[0].name}` : ""} | OS2mo</title>

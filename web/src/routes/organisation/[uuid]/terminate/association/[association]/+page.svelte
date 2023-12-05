@@ -88,7 +88,7 @@
   Henter data...
 {:then data}
   {@const association = data.associations.objects[0].objects[0]}
-  {@const minDate = association.org_unit[0].validity.from.split("T")[0]}
+  {@const minDate = association.validity.from.split("T")[0]}
   {@const maxDate = association.org_unit[0].validity.to?.split("T")[0]}
 
   <title>Afslut tilknytning for {association?.employee[0].name} | OS2mo</title>

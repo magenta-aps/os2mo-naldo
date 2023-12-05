@@ -86,7 +86,7 @@
   Henter data...
 {:then data}
   {@const manager = data.managers.objects[0].objects[0]}
-  {@const minDate = manager.org_unit[0].validity.from.split("T")[0]}
+  {@const minDate = manager.validity.from.split("T")[0]}
   {@const maxDate = manager.org_unit[0].validity.to?.split("T")[0]}
 
   <title

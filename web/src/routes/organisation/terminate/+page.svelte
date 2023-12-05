@@ -101,7 +101,7 @@
   {:then data}
     {@const orgUnit = data.org_units?.objects[0].objects[0]}
     <!-- De her dates skal opdateres afhængig af hvilken org_unit man vælger, nu når det ikke skal loades ind -->
-    {@const minDate = orgUnit?.parent?.validity.from.split("T")[0]}
+    {@const minDate = orgUnit?.validity.from.split("T")[0]}
     {@const maxDate = orgUnit?.parent?.validity.to?.split("T")[0]}
 
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">

@@ -86,7 +86,7 @@
   Henter data...
 {:then data}
   {@const role = data.roles.objects[0].objects[0]}
-  {@const minDate = role.org_unit[0].validity.from.split("T")[0]}
+  {@const minDate = role.validity.from.split("T")[0]}
   {@const maxDate = role.org_unit[0].validity.to?.split("T")[0]}
 
   <title
