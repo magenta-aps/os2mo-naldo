@@ -168,6 +168,7 @@
             id="primary"
             iterable={getClassesByFacetUserKey(facets, "primary_type")}
             extra_classes="basis-1/2"
+            isClearable={true}
           />
         </div>
       </div>

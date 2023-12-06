@@ -196,6 +196,7 @@
             startValue={association.primary ? association.primary : undefined}
             iterable={getClassesByFacetUserKey(facets, "primary_type")}
             extra_classes="basis-1/2"
+            isClearable={true}
           />
         </div>
       </div>

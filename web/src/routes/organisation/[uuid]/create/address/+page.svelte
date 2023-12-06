@@ -187,6 +187,7 @@
             id="visibility"
             iterable={getClassesByFacetUserKey(facets, "visibility")}
             extra_classes="basis-1/2"
+            isClearable={true}
           />
           <Select
             title="Adressetype"
