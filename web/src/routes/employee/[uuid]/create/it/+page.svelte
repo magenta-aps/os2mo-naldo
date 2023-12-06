@@ -12,6 +12,7 @@
   import {
     ItSystemsClassAndEmployeeDocument,
     CreateItUserDocument,
+    GetItSystemRolesDocument,
   } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
@@ -19,17 +20,26 @@
   import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
   import { getClassUuidByUserKey } from "$lib/util/get_classes"
   import { getITSystemNames } from "$lib/util/helpers"
+  import type { UnpackedClass } from "$lib/util/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
   import TextArea from "$lib/components/forms/shared/textArea.svelte"
 
+  let itSystem: {
+    uuid: string | null
+    name: string
+    user_key?: string | null
+  }
   let toDate: string
 
   const fromDate = field("from", "", [required()])
-  const itSystem = field("it_system", "", [required()])
+  const itSystemField = field("itSystem", "", [required()])
   const accountName = field("accountName", "", [required()])
-  const svelteForm = form(fromDate, itSystem, accountName)
+  const itSystemRole = field("itSystemRole", "", [required()])
+  const svelteForm = form(fromDate, itSystemField, accountName, itSystemRole)
+
+  let itSystemRoles: UnpackedClass | undefined
 
   gql`
     query ItSystemsClassAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
@@ -56,6 +66,18 @@
               from
               to
             }
+          }
+        }
+      }
+    }
+
+    query GetITSystemRoles($itSystemUuid: [UUID!]) {
+      classes(filter: { facet_user_keys: "role_type"}, it_system: { uuids: $itSystemUuid } }) {
+        objects {
+          objects {
+            uuid
+            user_key
+            name
           }
         }
       }
@@ -100,6 +122,13 @@
         }
       }
     }
+
+  async function updateITSystemRoles(itSystemUuid: string | undefined | null) {
+    const res = await graphQLClient().request(GetItSystemRolesDocument, {
+      itSystemUuid: itSystemUuid,
+    })
+    itSystemRoles = res.classes?.objects[0]?.objects
+  }
 </script>
 
 <title>Opret IT-konto | OS2mo</title>
@@ -156,9 +185,11 @@
           <Select
             title="IT-system"
             id="it-system"
-            bind:name={$itSystem.value}
-            errors={$itSystem.errors}
+            bind:value={itSystem}
+            bind:name={$itSystemField.value}
+            errors={$itSystemField.errors}
             iterable={getITSystemNames(itSystems)}
+            on:change={() => updateITSystemRoles(itSystem.uuid)}
             extra_classes="basis-1/2"
             required={true}
           />
@@ -171,6 +202,27 @@
             required={true}
           />
         </div>
+        {#if itSystemRoles && itSystemRoles.length}
+          {#key itSystemRoles}
+            <Select
+              title="IT-roller"
+              id="it-system-role-uuid"
+              bind:name={$itSystemRole.value}
+              errors={$itSystemRole.errors}
+              iterable={itSystemRoles}
+              required={true}
+            />
+          {/key}
+        {:else}
+          <Select
+            title="IT-roller"
+            id="it-system-role-uuid"
+            bind:name={$itSystemRole.value}
+            errors={$itSystemRole.errors}
+            disabled
+            required={true}
+          />
+        {/if}
         <div class="flex">
           <Checkbox
             title="Primær"
