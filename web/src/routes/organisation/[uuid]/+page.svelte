@@ -118,7 +118,7 @@
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
         href={`${base}/${
           activeItem === OrgTab.ORG_UNIT
-            ? "organisation/create"
+            ? `organisation/create#uuid=${$page.params.uuid}`
             : activeItem === OrgTab.RELATED_UNIT
             ? "connecting_organisations"
             : `organisation/${$page.params.uuid}/create/${subsiteOfCategory(
