@@ -5,7 +5,8 @@
   import { gql } from "graphql-request"
   import { onMount } from "svelte"
   import { OrgUnitChildrenDocument } from "./query.generated"
-  import Icon from "$lib/components/icon.svelte"
+  import Icon from "@iconify/svelte"
+  import keyboardArrowDownRounded from "@iconify/icons-material-symbols/keyboard-arrow-down-rounded"
 
   export let name = ""
   export let children: any[] = []
@@ -83,7 +84,7 @@
 </script>
 
 <a
-  class=" m-0 p-0 block w-full h-full hover:no-underline"
+  class="m-0 p-0 block w-full h-full hover:no-underline"
   href={`${base}/organisation/${uuid}`}
 >
   <li
@@ -97,19 +98,19 @@
       id={$page.params.uuid === uuid ? "active" : ""}
     >
       {#if loading}
-        <div class="animate-spin rounded-full h-4 w-4 border-b-4 border-secondary" />
+        <div class="loading loading-spinner h-5 w-5" />
       {:else if children.length}
         {#if open}
-          <button class="h-4 w-4" on:click|preventDefault={toggleOpen}>
-            <Icon type="arrow" size="16" class="transform rotate-90 " />
+          <button on:click|preventDefault={toggleOpen}>
+            <Icon icon={keyboardArrowDownRounded} width="20" height="20" rotate={0} />
           </button>
         {:else}
-          <button class="h-4 w-4" on:click|preventDefault={toggleOpen}>
-            <Icon type="arrow" size="16" />
+          <button on:click|preventDefault={toggleOpen}>
+            <Icon icon={keyboardArrowDownRounded} width="20" height="20" rotate={3} />
           </button>
         {/if}
       {:else}
-        <div class="h-4 w-4" />
+        <div class="h-5 w-5" />
       {/if}
       <p class="text-secondary break-words">
         {name}

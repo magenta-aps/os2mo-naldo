@@ -210,8 +210,7 @@
 </script>
 
 {#await fetchAll()}
-  Henter data...
-  <span class="animate-spin rounded-full h-6 w-6 border-b-4 border-primary" />
+  <p>Henter data...</p>
 {:then data}
   <title>Organisationssammenkobling | OS2mo</title>
 

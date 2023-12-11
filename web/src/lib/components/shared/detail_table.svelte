@@ -1,6 +1,8 @@
 <script lang="ts">
   import { sortKey, sortDirection } from "$lib/stores/sorting"
-  import Icon from "$lib/components/icon.svelte"
+  import Icon from "@iconify/svelte"
+  import keyboardArrowUpRounded from "@iconify/icons-material-symbols/keyboard-arrow-up-rounded"
+  import keyboardArrowDownRounded from "@iconify/icons-material-symbols/keyboard-arrow-down-rounded"
 
   export let headers: Header[]
 
@@ -30,22 +32,26 @@
             <div class="flex items-center">
               {header.title}
               {#if header.sortPath}
-                <div class="flex flex-col items-center justify-center w-4 h-4 pl-2">
+                <div class="flex flex-col items-center justify-center pl-1">
                   <Icon
-                    type="arrow"
-                    size="12"
-                    class="-rotate-90"
-                    fillOpacity={$sortKey === header.sortPath && $sortDirection === -1
-                      ? "1"
-                      : "0.3"}
+                    icon={keyboardArrowUpRounded}
+                    width="16"
+                    height="16"
+                    class="relative top-1 {$sortKey === header.sortPath &&
+                    $sortDirection === -1
+                      ? 'opacity-100'
+                      : 'opacity-30'}
+                    "
                   />
                   <Icon
-                    type="arrow"
-                    size="12"
-                    class="rotate-90"
-                    fillOpacity={$sortKey === header.sortPath && $sortDirection === 1
-                      ? "1"
-                      : "0.3"}
+                    icon={keyboardArrowDownRounded}
+                    width="16"
+                    height="16"
+                    class="relative bottom-1 {$sortKey === header.sortPath &&
+                    $sortDirection === 1
+                      ? 'opacity-100'
+                      : 'opacity-30'}
+                    "
                   />
                 </div>
               {/if}

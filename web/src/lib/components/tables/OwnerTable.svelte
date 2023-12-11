@@ -8,12 +8,14 @@
     EmployeeAndOrgOwnerDocument,
     type EmployeeAndOrgOwnerQuery,
   } from "./query.generated"
-  import Icon from "$lib/components/icon.svelte"
   import { date } from "$lib/stores/date"
   import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
   import { onMount } from "svelte"
   import { sortData } from "$lib/util/sorting"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
+  import Icon from "@iconify/svelte"
+  import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
+  import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
 
   type Owner = EmployeeAndOrgOwnerQuery["owners"]["objects"][0]["objects"]
   let data: Owner
@@ -109,7 +111,7 @@
             '/'
           )[1]}/{uuid}/edit/owner/{ownerObj.uuid}"
         >
-          <Icon type="pen" />
+          <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>
       </td>
       <td>
@@ -118,7 +120,7 @@
             '/'
           )[1]}/{uuid}/terminate/owner/{ownerObj.uuid}"
         >
-          <Icon type="xmark" size="30" />
+          <Icon icon={cancelOutlineRounded} width="25" height="25" />
         </a>
       </td>
     </tr>

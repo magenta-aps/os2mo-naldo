@@ -1378,6 +1378,20 @@ export type Class = {
    */
   full_name: Scalars['String']['output'];
   /**
+   * The IT-System associated with the class.
+   *
+   * This is intended to be used for (IT) roles.
+   *
+   */
+  it_system?: Maybe<ItSystem>;
+  /**
+   * The IT-System associated with the class.
+   * @deprecated Will be removed in a future version of GraphQL.
+   * Use `it_system {uuid}` instead.
+   *
+   */
+  it_system_uuid?: Maybe<Scalars['UUID']['output']>;
+  /**
    * Human readable name of the class.
    *
    * This is the value that should be shown to users in UIs.
@@ -1537,6 +1551,19 @@ export type ClassFacetArgs = {
  * Classes can also be thought of as the value component of the facet/class key-value setup.
  *
  */
+export type ClassIt_SystemArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<UuidsBoundItSystemFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * A value in the facet sample space.
+ *
+ * Classes can also be thought of as the value component of the facet/class key-value setup.
+ *
+ */
 export type ClassParentArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<UuidsBoundClassFilter>;
@@ -1548,6 +1575,8 @@ export type ClassCreateInput = {
   example?: InputMaybe<Scalars['String']['input']>;
   /** UUID of the related facet. */
   facet_uuid: Scalars['UUID']['input'];
+  /** UUID of the associated IT-system. */
+  it_system_uuid?: InputMaybe<Scalars['UUID']['input']>;
   /** Mo-class name. */
   name: Scalars['String']['input'];
   /** Owner of class */
@@ -1607,6 +1636,11 @@ export type ClassFilter = {
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * IT-System filter limiting which entries are returned.
+   *
+   */
+  it_system?: InputMaybe<ItSystemFilter>;
   /**
    * Parent filter limiting which entries are returned.
    *
@@ -1804,6 +1838,8 @@ export type ClassUpdateInput = {
   example?: InputMaybe<Scalars['String']['input']>;
   /** UUID of the related facet. */
   facet_uuid: Scalars['UUID']['input'];
+  /** UUID of the associated IT-system. */
+  it_system_uuid?: InputMaybe<Scalars['UUID']['input']>;
   /** Mo-class name. */
   name: Scalars['String']['input'];
   /** Owner of class */
@@ -3425,6 +3461,7 @@ export type FacetsBoundClassFilter = {
   facet?: InputMaybe<FacetFilter>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  it_system?: InputMaybe<ItSystemFilter>;
   parent?: InputMaybe<ClassFilter>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -7777,7 +7814,7 @@ export type OwnerPersonArgs = {
 export type OwnerCreateInput = {
   /** Inference priority, if set: `engagement_priority` or `association_priority` */
   inference_priority?: InputMaybe<OwnerInferencePriority>;
-  /** UUID of the org_unit */
+  /** UUID of the org unit */
   org_unit?: InputMaybe<Scalars['UUID']['input']>;
   /** UUID of the owner */
   owner?: InputMaybe<Scalars['UUID']['input']>;
@@ -8017,7 +8054,7 @@ export type OwnerTerminateInput = {
 export type OwnerUpdateInput = {
   /** Inference priority, if set: `engagement_priority` or `association_priority` */
   inference_priority?: InputMaybe<OwnerInferencePriority>;
-  /** UUID of the org_unit */
+  /** UUID of the org unit */
   org_unit?: InputMaybe<Scalars['UUID']['input']>;
   /** UUID of the owner */
   owner?: InputMaybe<Scalars['UUID']['input']>;
@@ -8025,7 +8062,7 @@ export type OwnerUpdateInput = {
   person?: InputMaybe<Scalars['UUID']['input']>;
   /** Extra info or uuid. */
   user_key?: InputMaybe<Scalars['String']['input']>;
-  /** UUID of the role to be updated. */
+  /** UUID of the owner to be updated. */
   uuid: Scalars['UUID']['input'];
   /** Validity range for the owner. */
   validity: RaValidityInput;
@@ -8054,6 +8091,7 @@ export type ParentsBoundClassFilter = {
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  it_system?: InputMaybe<ItSystemFilter>;
   parent?: InputMaybe<ClassFilter>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
@@ -9081,6 +9119,7 @@ export type UuidsBoundClassFilter = {
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  it_system?: InputMaybe<ItSystemFilter>;
   parent?: InputMaybe<ClassFilter>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;

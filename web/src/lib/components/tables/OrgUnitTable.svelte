@@ -1,6 +1,5 @@
 <script lang="ts">
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
-  import Icon from "$lib/components/icon.svelte"
   import { base } from "$app/paths"
   import { page } from "$app/stores"
   import { graphQLClient } from "$lib/util/http"
@@ -11,6 +10,8 @@
   import { onMount } from "svelte"
   import { sortData } from "$lib/util/sorting"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
+  import Icon from "@iconify/svelte"
+  import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
 
   type OrgUnits = OrgUnitQuery["org_units"]["objects"][0]["objects"]
   let data: OrgUnits
@@ -97,7 +98,7 @@
       <ValidityTableCell validity={org_unit.validity} />
       <td>
         <a href="{base}/organisation/{$page.params.uuid}/edit">
-          <Icon type="pen" />
+          <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>
       </td>
     </tr>

@@ -1,6 +1,5 @@
 <script lang="ts">
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
-  import Icon from "$lib/components/icon.svelte"
   import { base } from "$app/paths"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
@@ -11,6 +10,9 @@
   import { sortData } from "$lib/util/sorting"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { onMount } from "svelte"
+  import Icon from "@iconify/svelte"
+  import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
+  import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
 
   type Managers = ManagersQuery["managers"]["objects"][0]["objects"]
   let data: Managers
@@ -129,7 +131,7 @@
             '/'
           )[1]}/{uuid}/edit/manager/{manager.uuid}"
         >
-          <Icon type="pen" />
+          <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>
       </td>
       <td>
@@ -138,7 +140,7 @@
             '/'
           )[1]}/{uuid}/terminate/manager/{manager.uuid}"
         >
-          <Icon type="xmark" size="30" />
+          <Icon icon={cancelOutlineRounded} width="25" height="25" />
         </a>
       </td>
     </tr>

@@ -8,7 +8,7 @@
 </script>
 
 <!--using  checkbox-class to make radioButton and checkbox look visually identical -->
-<div class="form-control pb-4">
+<div class="form-control">
   <label class="label cursor-pointer p-0 gap-4">
     <input
       type="radio"

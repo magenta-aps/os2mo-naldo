@@ -1,10 +1,10 @@
 <script lang="ts">
   import { slide } from "svelte/transition"
   import { success } from "$lib/stores/alert"
-  import Icon from "$lib/components/icon.svelte"
   import { goto } from "$app/navigation"
-  import { page } from "$app/stores"
   import { base } from "$app/paths"
+  import Icon from "@iconify/svelte"
+  import checkCircleOutlineRounded from "@iconify/icons-material-symbols/check-circle-outline-rounded"
 
   const startTimeout = () => {
     setTimeout(
@@ -40,14 +40,14 @@
           class="shadow-lg alert alert-success"
         >
           <div>
-            <Icon type="success" />
+            <Icon icon={checkCircleOutlineRounded} width="20" height="20" />
             <span>{$success.message}</span>
           </div>
         </a>
       {:else}
         <a href="/" class="shadow-lg alert alert-success">
           <div>
-            <Icon type="success" />
+            <Icon icon={checkCircleOutlineRounded} width="20" height="20" />
             <span>{$success.message}</span>
           </div>
         </a>
@@ -55,7 +55,7 @@
     {:else}
       <div class="shadow-lg alert alert-success">
         <div>
-          <Icon type="success" />
+          <Icon icon={checkCircleOutlineRounded} width="20" height="20" />
           <span>{$success.message}</span>
         </div>
       </div>
