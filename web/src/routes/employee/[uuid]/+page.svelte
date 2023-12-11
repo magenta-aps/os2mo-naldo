@@ -242,7 +242,6 @@
         table={OwnerTable}
         headers={[
           { title: "Navn", sortPath: "owner[0].name" },
-          { title: "Udledt via." },
           { title: "Dato", sortPath: "validity.from" },
           { title: "" },
           { title: "" },

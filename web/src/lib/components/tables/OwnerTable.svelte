@@ -102,9 +102,6 @@
       <a href="{base}/employee/{ownerObj.owner ? ownerObj.owner[0].uuid : ''}">
         <td class="p-4">{ownerObj.owner ? ownerObj.owner[0].name : ""}</td>
       </a>
-      {#if !isOrg}
-        <td />
-      {/if}
       <ValidityTableCell validity={ownerObj.validity} />
       <td>
         <a
