@@ -60,7 +60,7 @@
 >
   <div>
     {#if loading}
-      <div class="animate-spin rounded-full h-5 w-5 border-b-4 border-primary" />
+      <div class="loading loading-spinner h-4 w-4" />
     {:else if children.length}
       <p on:click={toggleOpen}>{open ? "⌄" : "➤"}</p>
     {/if}

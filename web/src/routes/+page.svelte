@@ -5,7 +5,6 @@
   import { gql } from "graphql-request"
   import { VersionDocument } from "./query.generated"
   import { env } from "$env/dynamic/public"
-  import Icon from "$lib/components/icon.svelte"
 
   gql`
     query Version {

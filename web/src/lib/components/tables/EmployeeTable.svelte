@@ -4,13 +4,14 @@
   import { date } from "$lib/stores/date"
   import { EmployeeDocument, type EmployeeQuery } from "./query.generated"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
-  import Icon from "$lib/components/icon.svelte"
   import { base } from "$app/paths"
   import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { sortData } from "$lib/util/sorting"
   import { onMount } from "svelte"
   import { page } from "$app/stores"
+  import Icon from "@iconify/svelte"
+  import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
 
   type Employees = EmployeeQuery["employees"]["objects"][0]["objects"]
   let data: Employees
@@ -75,8 +76,8 @@
       <td class="p-4">{employee.nickname}</td>
       <ValidityTableCell validity={employee.validity} />
       <td>
-        <a aria-disabled href="{base}/employee/{uuid}/edit">
-          <Icon type="pen" />
+        <a href="{base}/employee/{uuid}/edit">
+          <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>
       </td>
     </tr>

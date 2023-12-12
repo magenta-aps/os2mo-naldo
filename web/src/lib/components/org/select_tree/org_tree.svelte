@@ -73,7 +73,7 @@
   <div class="form-control pb-4">
     <label for={id} class="text-sm text-secondary pb-1">
       {labelText}
-      <span class="animate-spin rounded-full h-6 w-6 border-b-4 border-primary" />
+      <span class="loading loading-spinner h-4 w-4" />
     </label>
     <input disabled class="input input-bordered input-sm rounded w-full" />
   </div>

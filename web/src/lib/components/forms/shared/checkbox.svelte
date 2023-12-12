@@ -7,7 +7,7 @@
   export let disabled: boolean = false
 </script>
 
-<div class="form-control pb-4">
+<div class="form-control">
   <label class="label cursor-pointer p-0 gap-4 {disabled ? 'text-gray-400' : ''}">
     <input
       type="checkbox"

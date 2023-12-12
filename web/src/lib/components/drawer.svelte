@@ -1,9 +1,10 @@
 <script lang="ts">
   import { isAuth } from "$lib/stores/auth"
   import DrawerContent from "$lib/components/drawer_content.svelte"
-  import Icon from "$lib/components/icon.svelte"
   import { defaultDrawerWidth, drawerWidth } from "$lib/stores/drawer_width"
   import { onMount } from "svelte"
+  import Icon from "@iconify/svelte"
+  import dragIndicator from "@iconify/icons-material-symbols/drag-indicator"
 
   let screenSize: number
   let isResizing = false
@@ -38,10 +39,10 @@
       <slot />
     {:else}
       <div class="m-auto justify-center">
-        <div
-          class="animate-spin rounded-full h-32 w-32 border-b-8 border-primary mb-6"
+        <span
+          class="loading loading-spinner text-secondary h-32 w-32 border-primary mb-6"
         />
-        <span>Authenticating...</span>
+        <p>Authenticating...</p>
       </div>
     {/if}
   </div>
@@ -58,14 +59,14 @@
     {#if isLargeScreen}
       <!-- Only show resize button in desktop view -->
       <button
-        class="absolute top-0 right-0 cursor-ew-resize w-1 flex items-center justify-center h-screen"
+        class="absolute top-0 right-1 cursor-ew-resize w-1 flex items-center justify-center h-screen"
         on:mousedown={() => {
           isResizing = true
         }}
         tabindex="0"
       >
         <div class="flex flex-col">
-          <Icon type="draghandle" size="16" />
+          <Icon icon={dragIndicator} width="20" height="20" />
         </div>
       </button>
     {/if}

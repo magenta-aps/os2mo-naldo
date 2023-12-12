@@ -1,6 +1,5 @@
 <script lang="ts">
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
-  import Icon from "$lib/components/icon.svelte"
   import { base } from "$app/paths"
   import { page } from "$app/stores"
   import { graphQLClient } from "$lib/util/http"
@@ -11,6 +10,9 @@
   import { onMount } from "svelte"
   import { sortData } from "$lib/util/sorting"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
+  import Icon from "@iconify/svelte"
+  import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
+  import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
 
   type KLEs = KleQuery["kles"]["objects"][0]["objects"]
   let data: KLEs
@@ -86,12 +88,12 @@
       <ValidityTableCell validity={kle.validity} />
       <td>
         <a href="{base}/organisation/{$page.params.uuid}/edit/kle/{kle.uuid}">
-          <Icon type="pen" />
+          <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>
       </td>
       <td>
         <a href="{base}/organisation/{$page.params.uuid}/terminate/kle/{kle.uuid}">
-          <Icon type="xmark" size="30" />
+          <Icon icon={cancelOutlineRounded} width="25" height="25" />
         </a>
       </td>
     </tr>

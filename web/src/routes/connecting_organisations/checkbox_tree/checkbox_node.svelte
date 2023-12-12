@@ -2,7 +2,8 @@
   import { createEventDispatcher } from "svelte"
   import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
   import RadioButton from "$lib/components/forms/shared/radio_button.svelte"
-  import Icon from "$lib/components/icon.svelte"
+  import Icon from "@iconify/svelte"
+  import keyboardArrowDownRounded from "@iconify/icons-material-symbols/keyboard-arrow-down-rounded"
 
   export let name = ""
   export let children: any[] = []
@@ -91,7 +92,7 @@
     <div
       role="button"
       tabindex="0"
-      class="items-center justify-center w-5 h-5 mr-2 mb-3"
+      class="items-center justify-center mr-2"
       on:click={toggleNode}
       on:keydown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
@@ -101,7 +102,15 @@
       }}
     >
       {#if children.length}
-        <Icon type="arrow" size="16" class={isOpen ? "transform rotate-90" : ""} />
+        <Icon
+          icon={keyboardArrowDownRounded}
+          width="20"
+          height="20"
+          rotate={isOpen ? 0 : 3}
+        />
+      {:else}
+        <!-- This creates the same space as if there was an arrow, so the tree is aligned -->
+        <div class="w-5 w-5" />
       {/if}
     </div>
     {#if allowMultipleSelection}
