@@ -16,8 +16,13 @@
   import Search from "$lib/components/search.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
+  import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
 
   let toDate: string
+  let selectedOrgUnit: {
+    uuid: string
+    name: string
+  }
 
   const fromDate = field("from", "", [required()])
   const orgUnit = field("org_unit", "", [required()])
@@ -133,8 +138,10 @@
           bind:name={$orgUnit.value}
           errors={$orgUnit.errors}
           on:clear={() => ($orgUnit.value = "")}
+          bind:value={selectedOrgUnit}
           required={true}
         />
+        <Breadcrumbs orgUnit={selectedOrgUnit} />
         <Select
           title="Rolletype"
           id="role-type"

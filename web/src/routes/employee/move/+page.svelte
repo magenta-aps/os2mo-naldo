@@ -19,6 +19,12 @@
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
+  import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
+
+  let selectedOrgUnit: {
+    uuid: string
+    name: string
+  }
 
   const fromDate = field("from", "", [required()])
   const employeeField = field("employee", "", [required()])
@@ -199,8 +205,10 @@
           bind:name={$orgUnitField.value}
           errors={$orgUnitField.errors}
           on:clear={() => ($orgUnitField.value = "")}
+          bind:value={selectedOrgUnit}
           required={true}
         />
+        <Breadcrumbs orgUnit={selectedOrgUnit} />
       </div>
     </div>
     <div class="flex py-6 gap-4">

@@ -14,8 +14,13 @@
   import { getUuidFromHash } from "$lib/util/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
+  import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
 
   let toDate: string
+  let selectedOrgUnit: {
+    uuid: string
+    name: string
+  }
 
   const fromDate = field("from", "", [required()])
   const name = field("name", "", [required()])
@@ -124,8 +129,10 @@
               $newName.value = ""
             }}
             on:change={() => ($newName.value = $name.value)}
+            bind:value={selectedOrgUnit}
             required={true}
           />
+          <Breadcrumbs orgUnit={selectedOrgUnit} />
           <Input
             title="Nyt navn"
             id="name"
@@ -146,8 +153,10 @@
             $newName.value = ""
           }}
           on:change={() => ($newName.value = $name.value)}
+          bind:value={selectedOrgUnit}
           required={true}
         />
+        <Breadcrumbs orgUnit={selectedOrgUnit} />
         <Input
           title="Nyt navn"
           id="name"

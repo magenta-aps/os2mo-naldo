@@ -23,6 +23,7 @@
   import KleTable from "$lib/components/tables/KLETable.svelte"
   import OwnerTable from "$lib/components/tables/OwnerTable.svelte"
   import RelatedUnitsTable from "$lib/components/tables/RelatedUnitsTable.svelte"
+  import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
 
   // Tabs
   let items = Object.values(OrgTab)
@@ -71,6 +72,7 @@
         objects {
           objects {
             name
+            uuid
           }
         }
       }
@@ -101,12 +103,12 @@
   {#await graphQLClient().request( OrgUnitDocument, { uuid: uuidFromUrl, fromDate: $date } )}
     <p>Loader organisation...</p>
   {:then data}
+    {@const orgUnit = data.org_units.objects[0].objects[0]}
+
+    <Breadcrumbs {orgUnit} link={true} />
     <div class="flex gap-5">
-      <h1 class="pb-4">{data.org_units.objects[0].objects[0].name}</h1>
-      <CopyToClipboard
-        uuid={$page.params.uuid}
-        name={data.org_units.objects[0].objects[0].name}
-      />
+      <h1 class="pb-4">{orgUnit.name}</h1>
+      <CopyToClipboard uuid={orgUnit.uuid} name={orgUnit.name} />
     </div>
 
     <Tabs {activeItem} {items} on:tabChange={tabChange} />
