@@ -1,5 +1,5 @@
 import Keycloak from "keycloak-js"
-import { isAuth } from "$lib/stores/auth"
+import { isAuth, isAdmin } from "$lib/stores/auth"
 import { env } from "$env/dynamic/public"
 
 const instance = `${env.PUBLIC_BASE_URL}/service/keycloak.json`
@@ -23,6 +23,12 @@ export const initKeycloak = async () => {
       isAuth.set(true)
       console.info("Authenticated:", authenticated)
 
+      // Weak check if user is admin
+      // FIXME: Make correct check maybe?
+      if (keycloak.tokenParsed?.realm_access?.roles.includes("class_admin")) {
+        isAdmin.set(true)
+      }
+
       // Token refresh
       setInterval(() => {
         keycloak.updateToken(15).catch(() => {
@@ -32,6 +38,7 @@ export const initKeycloak = async () => {
     })
     .catch((error) => {
       isAuth.set(false)
+      isAdmin.set(false)
       console.error("Failed to auth:", error)
       alert("failed to auth")
     })
@@ -39,5 +46,6 @@ export const initKeycloak = async () => {
 
 export const logoutKeycloak = () => {
   isAuth.set(false)
+  isAdmin.set(false)
   keycloak.logout()
 }

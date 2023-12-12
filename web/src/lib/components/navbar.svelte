@@ -1,6 +1,8 @@
 <script lang="ts">
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
+  import { isAdmin } from "$lib/stores/auth"
+  import { keycloak } from "$lib/util/keycloak"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Avatar from "$lib/components/navbar/avatar.svelte"
   import Search from "$lib/components/search.svelte"
@@ -8,6 +10,7 @@
   import personOutlineRounded from "@iconify/icons-material-symbols/person-outline-rounded"
   import homeWorkOutlineRounded from "@iconify/icons-material-symbols/home-work-outline-rounded"
   import menuRounded from "@iconify/icons-material-symbols/menu-rounded"
+  import adminPanelSettingsOutlineRounded from "@iconify/icons-material-symbols/admin-panel-settings-outline-rounded"
 
   let orgChecked: boolean
 
@@ -63,7 +66,12 @@
     </div>
   </div>
 
-  <div class="navbar-end">
+  <div class="navbar-end flex">
+    {#if $isAdmin}
+      <a class="text-base-100 pr-4" href="/admin"
+        ><Icon icon={adminPanelSettingsOutlineRounded} width="25" height="25" /></a
+      >
+    {/if}
     <Avatar />
   </div>
 </div>

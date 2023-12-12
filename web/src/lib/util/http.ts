@@ -16,7 +16,7 @@ export const postRest = async (path: string, payload: any) => {
 
 export const fetchGraph = async (query: string | object | any): Promise<Response> => {
   const token = keycloak ? keycloak.token : "Keycloak disabled"
-  return await fetch(`${env.PUBLIC_BASE_URL}/graphql/v19`, {
+  return await fetch(`${env.PUBLIC_BASE_URL}/graphql/v20`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -34,7 +34,7 @@ export const fetchGraph = async (query: string | object | any): Promise<Response
 
 // Is exported as a function to delay evaluation of till the client is ready
 export const graphQLClient = () => {
-  return new GraphQLClient(`${env.PUBLIC_BASE_URL}/graphql/v19`, {
+  return new GraphQLClient(`${env.PUBLIC_BASE_URL}/graphql/v20`, {
     headers: {
       "Content-Type": "application/json",
       Authorization: "Bearer " + keycloak?.token,
