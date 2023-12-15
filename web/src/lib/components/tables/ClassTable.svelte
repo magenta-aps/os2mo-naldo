@@ -47,7 +47,6 @@
     }
   }
 
-  // FIXME: TENSE DOESN'T WORK ON CLASSES?
   onMount(async () => {
     const res = await graphQLClient().request(ClassDocument, {
       // TODO: When more classes are added to the admin site, change this to be dynamic

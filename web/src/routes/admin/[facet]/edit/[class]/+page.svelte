@@ -15,15 +15,13 @@
   import { UpdateClassDocument, ClassDocument } from "./query.generated"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
-  import { getFacetUserKeys } from "$lib/util/helpers"
-  import { getSpecificFacet } from "$lib/util/get_classes"
 
   let toDate: string
 
   const fromDate = field("from", "", [required()])
-  const userKey = field("user_key", "", [required()])
+  // const userKey = field("user_key", "", [required()])
   const name = field("name", "", [required()])
-  const svelteForm = form(fromDate, userKey, name)
+  const svelteForm = form(fromDate, name)
 
   gql`
     query Class($uuid: [UUID!], $fromDate: DateTime) {
@@ -64,7 +62,7 @@
               input: result.data,
             })
             $success = {
-              message: `Klassen ${
+              message: `Stillingsbetegnelse ${
                 mutation.class_update.objects[0]?.name
                   ? `${mutation.class_update.objects[0].name}`
                   : ""
@@ -85,10 +83,10 @@
 {:then data}
   {@const cls = data.classes.objects[0].objects[0]}
 
-  <title>Opret klasse | OS2mo</title>
+  <title>Redigér stillingsbetegnelse | OS2mo</title>
 
   <div class="flex align-center px-6 pt-6 pb-4">
-    <h3 class="flex-1">Opret klasse</h3>
+    <h3 class="flex-1">Redigér stillingsbetegnelse</h3>
   </div>
 
   <div class="divider p-0 m-0 mb-4 w-full" />
@@ -116,17 +114,17 @@
             max={undefined}
           />
         </div>
-        <div class="flex flex-row gap-6">
-          <Input
-            title="Navn"
-            id="name"
-            extra_classes="basis-1/2"
-            bind:value={$name.value}
-            startValue={cls.name}
-            errors={$name.errors}
-            required={true}
-          />
-          <Input
+        <!-- <div class="flex flex-row gap-6"> -->
+        <Input
+          title="Navn"
+          id="name"
+          bind:value={$name.value}
+          startValue={cls.name}
+          errors={$name.errors}
+          required={true}
+        />
+        <!-- TODO: user_key removed for now - should probably be a possibility in the future -->
+        <!-- <Input
             title="User key"
             id="user-key"
             extra_classes="basis-1/2"
@@ -134,8 +132,8 @@
             startValue={cls.user_key}
             errors={$userKey.errors}
             required={true}
-          />
-        </div>
+          /> -->
+        <!-- </div> -->
         <input type="hidden" id="facet-uuid" name="facet-uuid" value={cls.facet_uuid} />
       </div>
     </div>
@@ -143,7 +141,7 @@
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >Redigér klasse</button
+        >Redigér stillingsbetegnelse</button
       >
       <button
         type="button"

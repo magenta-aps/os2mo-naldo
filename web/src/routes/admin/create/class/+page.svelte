@@ -21,10 +21,10 @@
   let toDate: string
 
   const fromDate = field("from", "", [required()])
-  const userKey = field("user_key", "", [required()])
   const name = field("name", "", [required()])
-  const facetField = field("facet", "", [required()])
-  const svelteForm = form(fromDate, userKey, name, facetField)
+  // const userKey = field("user_key", "", [required()])
+  // const facetField = field("facet", "", [required()])
+  const svelteForm = form(fromDate, name)
 
   gql`
     query Facet($fromDate: DateTime) {
@@ -64,7 +64,7 @@
               input: result.data,
             })
             $success = {
-              message: `Klassen ${
+              message: `Stillingsbetegnelsen ${
                 mutation.class_create.objects[0]?.name
                   ? `${mutation.class_create.objects[0].name}`
                   : ""
@@ -84,13 +84,14 @@
   Henter data...
 {:then data}
   {@const facets = data.facets.objects}
+  {@const jobFunction = getSpecificFacet(facets, "engagement_job_function")}
   {@const minDate = facets[0].objects[0].validity?.from?.split("T")[0]}
   {@const maxDate = facets[0].objects[0].validity?.to?.split("T")[0]}
 
-  <title>Opret klasse | OS2mo</title>
+  <title>Opret stillingsbetegnelse | OS2mo</title>
 
   <div class="flex align-center px-6 pt-6 pb-4">
-    <h3 class="flex-1">Opret klasse</h3>
+    <h3 class="flex-1">Opret stillingsbetegnelse</h3>
   </div>
 
   <div class="divider p-0 m-0 mb-4 w-full" />
@@ -117,7 +118,9 @@
             max={maxDate}
           />
         </div>
-        <Select
+        <!-- TODO: when we allow creating classes for different facets, add this back -->
+        <input type="hidden" id="facet" name="facet" value={jobFunction.uuid} />
+        <!-- <Select
           title="Facet"
           id="facet"
           bind:name={$facetField.value}
@@ -126,32 +129,31 @@
           iterable={getFacetUserKeys(facets)}
           disabled
           required={true}
+        /> -->
+        <!-- <div class="flex flex-row gap-6"> -->
+        <Input
+          title="Navn"
+          id="name"
+          bind:value={$name.value}
+          errors={$name.errors}
+          required={true}
         />
-        <div class="flex flex-row gap-6">
-          <Input
-            title="Navn"
-            id="name"
-            extra_classes="basis-1/2"
-            bind:value={$name.value}
-            errors={$name.errors}
-            required={true}
-          />
-          <Input
+        <!-- TODO: user_key removed for now - should probably be a possibility in the future -->
+        <!-- <Input
             title="User key"
             id="user-key"
             extra_classes="basis-1/2"
             bind:value={$userKey.value}
             errors={$userKey.errors}
-            required={true}
-          />
-        </div>
+          /> -->
+        <!-- </div> -->
       </div>
     </div>
     <div class="flex py-6 gap-4">
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >Opret klasse</button
+        >Opret stillingsbetegnelse</button
       >
       <button
         type="button"
