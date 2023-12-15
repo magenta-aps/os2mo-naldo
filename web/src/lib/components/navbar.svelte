@@ -68,7 +68,7 @@
 
   <div class="navbar-end flex">
     {#if $isAdmin}
-      <a class="text-base-100 pr-4" href="/admin"
+      <a class="text-base-100 pr-4" href="{base}/admin"
         ><Icon icon={adminPanelSettingsOutlineRounded} width="25" height="25" /></a
       >
     {/if}
