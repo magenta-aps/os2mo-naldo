@@ -15,10 +15,16 @@
     )
 
     // Will redirect if the successful action was on an organisation or employee
-    if ($success.type == "organisation" || $success.type == "employee") {
+    if (
+      $success.type == "organisation" ||
+      $success.type == "employee" ||
+      $success.type == "admin"
+    ) {
       setTimeout(() => {
         if ($success.uuid) {
           setTimeout(() => goto(`${base}/${$success.type}/${$success.uuid}`), 200)
+        } else if ($success.type == "admin") {
+          setTimeout(() => goto(`${base}/${$success.type}`), 200)
         } else {
           setTimeout(() => goto(`${base}/`), 200)
         }

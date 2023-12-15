@@ -3,7 +3,7 @@ import { writable } from "svelte/store"
 interface SuccessAlert {
   message: string
   uuid?: string | null
-  type?: "employee" | "organisation" | "clipboard"
+  type?: "employee" | "organisation" | "admin" | "clipboard"
   timeOutTime?: number
 }
 

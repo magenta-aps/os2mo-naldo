@@ -1,6 +1,7 @@
 import type { OpenValidity, Validity } from "$lib/graphql/types"
 import { date } from "$lib/stores/date"
 import { get } from "svelte/store"
+import type { Facet } from "$lib/util/get_classes"
 
 export const getUuidFromHash = (hash: string) => {
   let uuidFromHash = hash.split("&").find((e) => e.startsWith("#uuid="))
@@ -85,3 +86,10 @@ export type UnpackedClass = {
   uuid: string
   user_key: string
 }[]
+
+export const getFacetUserKeys = (facets: Facet[]) => {
+  return facets.map((facet) => ({
+    uuid: facet.objects[0].uuid,
+    name: facet.objects[0].user_key,
+  }))
+}
