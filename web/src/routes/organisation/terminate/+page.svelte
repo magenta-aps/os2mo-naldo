@@ -13,6 +13,12 @@
   import { getUuidFromHash } from "$lib/util/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
+  import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
+
+  let selectedOrgUnit: {
+    uuid: string
+    name: string
+  }
 
   const toDate = field("to", "", [required()])
   const orgUnitField = field("org_unit", "", [required()])
@@ -129,6 +135,7 @@
             bind:name={$orgUnitField.value}
             on:clear={() => ($orgUnitField.value = "")}
             errors={$orgUnitField.errors}
+            bind:value={selectedOrgUnit}
             required={true}
           />
         {:else}
@@ -138,9 +145,11 @@
             bind:name={$orgUnitField.value}
             on:clear={() => ($orgUnitField.value = "")}
             errors={$orgUnitField.errors}
+            bind:value={selectedOrgUnit}
             required={true}
           />
         {/if}
+        <Breadcrumbs orgUnit={selectedOrgUnit} />
       </div>
     </div>
     <div class="flex py-6 gap-4">

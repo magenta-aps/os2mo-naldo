@@ -15,8 +15,17 @@
   import { getUuidFromHash } from "$lib/util/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
+  import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
 
   let toDate: string
+  let selectedOrgUnit: {
+    uuid: string
+    name: string
+  }
+  let parent: {
+    uuid: string
+    name: string
+  }
 
   const fromDate = field("from", "", [required()])
   const orgUnitField = field("org_unit", "", [required()])
@@ -133,6 +142,7 @@
             bind:name={$orgUnitField.value}
             on:clear={() => ($orgUnitField.value = "")}
             errors={$orgUnitField.errors}
+            bind:value={selectedOrgUnit}
             required={true}
           />
         {/await}
@@ -140,13 +150,27 @@
         <Search
           type="org-unit"
           title="Angiv enhed"
-          required={true}
           bind:name={$orgUnitField.value}
           on:clear={() => ($orgUnitField.value = "")}
           errors={$orgUnitField.errors}
+          bind:value={selectedOrgUnit}
+          required={true}
         />
       {/if}
-      <Search type="org-unit" id="select-parent-org-tree" title="Angiv ny overenhed" />
+      <Breadcrumbs orgUnit={selectedOrgUnit} />
+
+      <Search
+        type="org-unit"
+        id="select-parent-org-tree"
+        title="Angiv ny overenhed"
+        bind:value={parent}
+      />
+      <Breadcrumbs
+        orgUnit={parent}
+        emptyMessage="{selectedOrgUnit
+          ? selectedOrgUnit.name
+          : 'Organisationsenheden'} flyttes til roden"
+      />
     </div>
   </div>
   <div class="flex py-6 gap-4">

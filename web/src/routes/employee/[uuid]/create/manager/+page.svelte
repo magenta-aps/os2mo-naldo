@@ -17,8 +17,13 @@
   import SelectMultiple from "$lib/components/forms/shared/selectMultiple.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
+  import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
 
   let toDate: string
+  let selectedOrgUnit: {
+    uuid: string
+    name: string
+  }
 
   const fromDate = field("from", "", [required()])
   const orgUnit = field("org_unit", "", [required()])
@@ -147,8 +152,10 @@
           bind:name={$orgUnit.value}
           errors={$orgUnit.errors}
           on:clear={() => ($orgUnit.value = "")}
+          bind:value={selectedOrgUnit}
           required={true}
         />
+        <Breadcrumbs orgUnit={selectedOrgUnit} />
         <div class="flex flex-row gap-6">
           <Select
             title="Ledertype"

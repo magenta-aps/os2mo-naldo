@@ -17,8 +17,14 @@
   import Search from "$lib/components/search.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
+  import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
 
   let toDate: string
+  let parent: {
+    uuid: string
+    name: string
+  }
+
   const fromDate = field("from", "", [required()])
   const name = field("name", "", [required()])
   const orgUnitType = field("org_unit_type", "", [required()])
@@ -147,7 +153,7 @@
           />
         </div>
         <Search
-          title="Overenhed"
+          title="Angiv overenhed"
           type="org-unit"
           startValue={orgUnit.parent
             ? {
@@ -155,6 +161,11 @@
                 name: orgUnit.parent.name,
               }
             : undefined}
+          bind:value={parent}
+        />
+        <Breadcrumbs
+          orgUnit={parent}
+          emptyMessage="Organisationsenheden placeres i roden"
         />
         <Input
           title="Navn"
