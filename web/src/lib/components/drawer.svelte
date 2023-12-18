@@ -30,11 +30,11 @@
 
 <svelte:window bind:innerWidth={screenSize} />
 
-<div class="drawer lg:drawer-open min-h-[calc(100vh-4rem)]">
+<div class="drawer lg:drawer-open">
   <input id="drawer" type="checkbox" class="drawer-toggle" />
   <label for="drawer" class="drawer-overlay cursor-pointer" aria-hidden="true" />
 
-  <div class="drawer-content flex flex-col border-l overflow-hidden">
+  <div class="drawer-content flex flex-col border-l">
     {#if $isAuth}
       <slot />
     {:else}
@@ -47,19 +47,20 @@
     {/if}
   </div>
   <div
-    class="drawer-side fixed lg:h-[calc(100vh-4rem)]"
+    class="drawer-side fixed lg:h-[calc(100vh-4rem)] overflow-x-hidden"
     style="width: {isLargeScreen ? `${$drawerWidth}px` : '100%'}"
   >
     <label for="drawer" class="drawer-overlay" />
-    <ul class="overflow-y-auto bg-base-100 min-h-full lg:min-h-[calc(100vh-4rem)]">
+    <ul class="bg-base-100">
       <div>
         <DrawerContent />
       </div>
     </ul>
     {#if isLargeScreen}
       <!-- Only show resize button in desktop view -->
+      <!-- TODO: Fix resize button, should be clickable on whole y-axis. -->
       <button
-        class="absolute top-0 right-1 cursor-ew-resize w-1 flex items-center justify-center h-screen"
+        class="absolute top-[50%] right-1 cursor-ew-resize w-1 flex items-center justify-center"
         on:mousedown={() => {
           isResizing = true
         }}
