@@ -15,7 +15,7 @@
   }
 </script>
 
-<div class="navbar bg-primary min-h-8 h-8 py-5 text-base-100">
+<div class="navbar bg-primary min-h-0 text-base-100">
   <div class="flex-1">
     <a
       href={`${base}/organisation/${Form.CREATE}${
