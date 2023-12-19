@@ -45,7 +45,7 @@
     "date-fns-tz": "^2.0.0",
     "graphql": "^16.8.1",
     "graphql-request": "^6.0.0",
-    "keycloak-js": "^23.0.1",
+    "keycloak-js": "^23.0.3",
     "prettier": "<3.0.0",
     "prettier-plugin-svelte": "<3.0.0",
     "svelte-forms": "^2.3.1",
