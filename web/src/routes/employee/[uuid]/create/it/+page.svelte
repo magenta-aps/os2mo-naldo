@@ -2,6 +2,7 @@
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
+  import TextArea from "$lib/components/forms/shared/textArea.svelte"
   import Select from "$lib/components/forms/shared/select.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
@@ -24,7 +25,6 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
-  import TextArea from "$lib/components/forms/shared/textArea.svelte"
 
   let itSystem: {
     uuid: string | null
@@ -210,18 +210,17 @@
               bind:name={$itSystemRole.value}
               errors={$itSystemRole.errors}
               iterable={itSystemRoles}
-              required={true}
             />
           {/key}
         {:else}
-          <Select
+          <Select title="IT-roller" id="it-system-role-uuid" disabled />
+          <!-- <Select
             title="IT-roller"
             id="it-system-role-uuid"
             bind:name={$itSystemRole.value}
             errors={$itSystemRole.errors}
             disabled
-            required={true}
-          />
+          /> -->
         {/if}
         <div class="flex">
           <Checkbox

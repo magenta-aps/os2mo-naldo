@@ -28,7 +28,7 @@
       {placeholder}
       bind:value
       class="textarea textarea-bordered max-h-96 textarea-{size} rounded text-base font-normal w-full focus:outline-0
-          {errors.length ? 'textarea-error' : 'focus:textarea-primary'}"
+        {errors.length ? 'textarea-error' : 'focus:textarea-primary'}"
       {disabled}
     />
   </div>
