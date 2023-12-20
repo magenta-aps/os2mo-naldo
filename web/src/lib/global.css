@@ -66,6 +66,10 @@
   @apply !cursor-text;
 }
 
+.svelte-select input#cpr-lookup {
+  @apply !cursor-text;
+}
+
 .svelte-select.error {
   @apply !border-red-500;
 }

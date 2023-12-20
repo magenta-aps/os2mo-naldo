@@ -2,8 +2,9 @@
   export let title: string | undefined = undefined
   export let size: string = "sm"
   export let id: string
-  export let name = id
+  export let name: string = id
   export let value: string | number | null | undefined = undefined
+  export let cprName: string | number | null | undefined = undefined
   export let startValue: string | number | null | undefined = undefined
   value = startValue ? startValue : value
   export let required = false
@@ -13,10 +14,16 @@
   export let pattern: string | undefined = undefined
   export let patternMessage: string | undefined = undefined
   export let extra_classes = ""
+  export let readonly = false
   export let errors: string[] = []
 
   const typeAction = (node: any) => {
     node.type = type
+  }
+
+  // This is only for the name inputs in create employee
+  $: if (value) {
+    cprName = value
   }
 </script>
 
@@ -39,6 +46,7 @@
       type="text"
       class="input input-bordered input-{size} rounded text-base text-secondary font-normal w-full focus:outline-0
       {errors.length ? 'input-error' : 'focus:input-primary'}"
+      {readonly}
       {disabled}
     />
   </div>

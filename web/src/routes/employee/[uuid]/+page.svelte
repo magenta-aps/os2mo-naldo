@@ -71,7 +71,7 @@
         objects {
           objects {
             name
-            cpr_no
+            cpr_number
           }
         }
       }
@@ -106,8 +106,8 @@
     <h1 class="mb-4">
       {employee.name}
       <span class="text-slate-600">
-        {employee.cpr_no
-          ? `(${employee.cpr_no.slice(0, 6)}-${employee.cpr_no.slice(-4)})`
+        {employee.cpr_number
+          ? `(${employee.cpr_number.slice(0, 6)}-${employee.cpr_number.slice(-4)})`
           : ""}
       </span>
     </h1>

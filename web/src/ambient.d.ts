@@ -15,6 +15,11 @@ interface DarAddressResponse {
 }
 ;[]
 
+interface CprLookupResponse {
+  name: string | null | undefined
+  cpr_no: string | null | undefined
+}
+
 type Tense = "past" | "present" | "future"
 
 // Will be sortable if given a sortPath
