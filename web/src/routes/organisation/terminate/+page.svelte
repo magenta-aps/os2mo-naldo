@@ -14,6 +14,7 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
+  import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
 
   let selectedOrgUnit: {
     uuid: string
@@ -102,16 +103,21 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-<form method="post" class="mx-6" use:enhance={handler}>
-  {#await graphQLClient().request( OrgUnitDocument, { uuid: urlHashOrgUnitUuid, fromDate: $date, includeOrgUnit: urlHashOrgUnitUuid ? true : false } )}
-    <!-- TODO: Should have a skeleton for the loading stage -->
-    Henter data...
-  {:then data}
-    {@const orgUnit = data.org_units?.objects[0].objects[0]}
-    <!-- De her dates skal opdateres afhængig af hvilken org_unit man vælger, nu når det ikke skal loades ind -->
-    {@const minDate = orgUnit?.validity.from.split("T")[0]}
-    {@const maxDate = orgUnit?.parent?.validity.to?.split("T")[0]}
-
+{#await graphQLClient().request( OrgUnitDocument, { uuid: urlHashOrgUnitUuid, fromDate: $date, includeOrgUnit: urlHashOrgUnitUuid ? true : false } )}
+  <div class="mx-6">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+      <div class="p-8">
+        <Skeleton />
+        <Skeleton />
+      </div>
+    </div>
+  </div>
+{:then data}
+  {@const orgUnit = data.org_units?.objects[0].objects[0]}
+  <!-- De her dates skal opdateres afhængig af hvilken org_unit man vælger, nu når det ikke skal loades ind -->
+  {@const minDate = orgUnit?.validity.from.split("T")[0]}
+  {@const maxDate = orgUnit?.parent?.validity.to?.split("T")[0]}
+  <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <DateInput
@@ -167,5 +173,5 @@
       </button>
       <Error />
     </div>
-  {/await}
-</form>
+  </form>
+{/await}

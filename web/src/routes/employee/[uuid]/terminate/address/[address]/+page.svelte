@@ -12,6 +12,7 @@
   import type { SubmitFunction } from "./$types"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
+  import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
 
   const toDate = field("to", "", [required()])
   const svelteForm = form(toDate)
@@ -76,24 +77,27 @@
     }
 </script>
 
+<title>Afslut adresse | OS2mo</title>
+
+<div class="flex align-center px-6 pt-6 pb-4">
+  <h3 class="flex-1">Afslut adresse</h3>
+</div>
+
+<div class="divider p-0 m-0 mb-4 w-full" />
+
 {#await graphQLClient().request( AddressDocument, { uuid: $page.params.address, fromDate: $date } )}
-  <!-- TODO: Should have a skeleton for the loading stage -->
-  Henter data...
+  <div class="mx-6">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+      <div class="p-8">
+        <Skeleton />
+      </div>
+    </div>
+  </div>
 {:then data}
   {@const address = data.addresses.objects[0].objects[0]}
   {@const minDate = address.validity.from.split("T")[0]}
   {@const addressValue =
     address.address_type.scope === "DAR" ? address.name : address.value}
-
-  <title>Afslut adresse | OS2mo</title>
-
-  <div class="flex align-center px-6 pt-6 pb-4">
-    <h3 class="flex-1">
-      Afslut adressen - {address.address_type.name}: {addressValue}
-    </h3>
-  </div>
-
-  <div class="divider p-0 m-0 mb-4 w-full" />
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">

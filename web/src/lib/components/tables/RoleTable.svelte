@@ -113,7 +113,10 @@
       <td class="p-4">{role.role_type.name}</td>
       <ValidityTableCell validity={role.validity} />
       <td>
-        <a aria-disabled href="{base}/employee/{uuid}/edit/role/{role.uuid}">
+        <a
+          aria-disabled
+          href="{base}/{$page.route.id?.split('/')[1]}/{uuid}/edit/role/{role.uuid}"
+        >
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>
       </td>

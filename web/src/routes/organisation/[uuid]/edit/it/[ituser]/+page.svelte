@@ -21,6 +21,7 @@
   import { getITSystemNames } from "$lib/util/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
+  import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
 
   let toDate: string
   const fromDate = field("from", "", [required()])
@@ -119,22 +120,35 @@
     }
 </script>
 
+<title>Rediger IT-konto | OS2mo</title>
+
+<div class="flex align-center px-6 pt-6 pb-4">
+  <h3 class="flex-1">Rediger IT-konto</h3>
+</div>
+
+<div class="divider p-0 m-0 mb-4 w-full" />
+
 {#await graphQLClient().request( ItUserItSystemsOrgAndPrimaryDocument, { uuid: $page.params.ituser, fromDate: $date, org_uuid: $page.params.uuid } )}
-  Henter data...
+  <div class="mx-6">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+      <div class="p-8">
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+      </div>
+    </div>
+  </div>
 {:then data}
   {@const itUser = data.itusers.objects[0].objects[0]}
   {@const classes = data.classes.objects}
   {@const itSystems = data.itsystems.objects}
   {@const minDate = data.org_units.objects[0].objects[0].validity.from.split("T")[0]}
   {@const maxDate = data.org_units.objects[0].objects[0].validity.to?.split("T")[0]}
-
-  <title>Rediger {itUser.itsystem.name} | OS2mo</title>
-
-  <div class="flex align-center px-6 pt-6 pb-4">
-    <h3 class="flex-1">Rediger {itUser.itsystem.name}</h3>
-  </div>
-
-  <div class="divider p-0 m-0 mb-4 w-full" />
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">

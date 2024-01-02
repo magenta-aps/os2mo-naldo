@@ -12,6 +12,7 @@
   import { date } from "$lib/stores/date"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
+  import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
 
   const toDate = field("to", "", [required()])
   const svelteForm = form(toDate)
@@ -81,23 +82,24 @@
     }
 </script>
 
+<title>Afslut rolle | OS2mo</title>
+
+<div class="flex align-center px-6 pt-6 pb-4">
+  <h3 class="flex-1">Afslut rolle</h3>
+</div>
+
 {#await graphQLClient().request( RoleDocument, { uuid: $page.params.role, fromDate: $date } )}
-  <!-- TODO: Should have a skeleton for the loading stage -->
-  Henter data...
+  <div class="mx-6">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+      <div class="p-8">
+        <Skeleton />
+      </div>
+    </div>
+  </div>
 {:then data}
   {@const role = data.roles.objects[0].objects[0]}
   {@const minDate = role.validity.from.split("T")[0]}
   {@const maxDate = role.org_unit[0].validity.to?.split("T")[0]}
-
-  <title
-    >Afslut rolle {role.employee ? `for ${role.employee[0].name}` : ""} | OS2mo</title
-  >
-
-  <div class="flex align-center px-6 pt-6 pb-4">
-    <h3 class="flex-1">
-      Afslut rolle {role.employee ? `for ${role.employee[0].name}` : ""}
-    </h3>
-  </div>
 
   <div class="divider p-0 m-0 mb-4 w-full" />
 
