@@ -26,7 +26,7 @@
     "@playwright/test": "^1.40.1",
     "@sveltejs/kit": "^1.30.3",
     "autoprefixer": "^10.4.16",
-    "postcss": "^8.4.32",
+    "postcss": "^8.4.33",
     "svelte": "^4.2.8",
     "svelte-check": "^3.6.2",
     "svelte-preprocess": "^5.0.4",
