@@ -13,6 +13,7 @@
   import { getUuidFromHash } from "$lib/util/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
+  import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
 
   const toDate = field("to", "", [required()])
   const employeeField = field("employee", "", [required()])
@@ -87,10 +88,17 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
+<!-- LOOKATME: FIXME: SOMETHING: Form here or inside await? -->
 <form method="post" class="mx-6" use:enhance={handler}>
   {#await graphQLClient().request( EmployeeDocument, { uuid: urlHashEmployeeUuid, fromDate: $date, includeEmployee: urlHashEmployeeUuid ? true : false } )}
-    <!-- TODO: Should have a skeleton for the loading stage -->
-    Henter data...
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+      <div class="p-8">
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+        <Skeleton />
+      </div>
+    </div>
   {:then data}
     {@const employee = data.employees?.objects[0].objects[0]}
     {@const minDate = employee?.validity.from.split("T")[0]}

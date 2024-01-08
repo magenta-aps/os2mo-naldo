@@ -16,6 +16,7 @@
   import SelectMultiple from "$lib/components/forms/shared/selectMultiple.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
+  import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
 
   let toDate: string
   const fromDate = field("from", "", [required()])
@@ -106,22 +107,34 @@
     }
 </script>
 
+<title>Rediger KLE-opmærkning | OS2mo</title>
+
+<div class="flex align-center px-6 pt-6 pb-4">
+  <h3 class="flex-1">Rediger KLE-opmærkning</h3>
+</div>
+
+<div class="divider p-0 m-0 mb-4 w-full" />
+
 {#await graphQLClient().request( KleAndFacetDocument, { uuid: $page.params.kle, fromDate: $date } )}
-  <!-- TODO: Should have a skeleton for the loading stage -->
-  Henter data...
+  <div class="mx-6">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+      <div class="p-8">
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+      </div>
+    </div>
+  </div>
 {:then data}
   {@const kle = data.kles.objects[0].objects[0]}
   {@const facets = data.facets.objects}
   {@const minDate = kle.org_unit[0].validity.from.split("T")[0]}
   {@const maxDate = kle.org_unit[0].validity.to?.split("T")[0]}
-
-  <title>Rediger KLE-opmærkning | OS2mo</title>
-
-  <div class="flex align-center px-6 pt-6 pb-4">
-    <h3 class="flex-1">Rediger KLE-opmærkning</h3>
-  </div>
-
-  <div class="divider p-0 m-0 mb-4 w-full" />
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">

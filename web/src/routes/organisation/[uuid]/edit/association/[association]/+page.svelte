@@ -19,6 +19,7 @@
   import Search from "$lib/components/search.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
+  import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
 
   let toDate: string
   const fromDate = field("from", "", [required()])
@@ -117,8 +118,21 @@
 </script>
 
 {#await graphQLClient().request( AssociationAndFacetDocument, { uuid: $page.params.association, fromDate: $date } )}
-  <!-- TODO: Should have a skeleton for the loading stage -->
-  Henter data...
+  <div class="mx-6">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+      <div class="p-8">
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+        <Skeleton />
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+      </div>
+    </div>
+  </div>
 {:then data}
   {@const association = data.associations.objects[0].objects[0]}
   {@const facets = data.facets.objects}

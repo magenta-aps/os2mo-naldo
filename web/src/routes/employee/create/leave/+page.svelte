@@ -24,6 +24,7 @@
   import { onMount } from "svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
+  import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
 
   let toDate: string
 
@@ -170,10 +171,20 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
+<!-- LOOKATME: FIXME: SOMETHING: Form here or inside await? -->
 <form method="post" class="mx-6" use:enhance={handler}>
   {#await graphQLClient().request( LeaveTypeAndEmployeeDocument, { uuid: urlHashEmployeeUuid, fromDate: $date, includeEmployee: includeEmployee } )}
-    <!-- TODO: Should have a skeleton for the loading stage -->
-    Henter data...
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+      <div class="p-8">
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+        <Skeleton />
+        <Skeleton />
+        <Skeleton />
+      </div>
+    </div>
   {:then data}
     {@const facets = data.facets.objects}
     {@const startValueEmployee = data.employees?.objects[0].objects[0]}

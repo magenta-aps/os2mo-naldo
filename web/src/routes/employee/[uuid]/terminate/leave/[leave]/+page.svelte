@@ -12,6 +12,7 @@
   import { LeaveDocument, TerminateLeaveDocument } from "./query.generated"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
+  import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
 
   const toDate = field("to", "", [required()])
   const svelteForm = form(toDate)
@@ -79,22 +80,27 @@
     }
 </script>
 
+<title>Afslut orlov | OS2mo</title>
+
+<div class="flex align-center px-6 pt-6 pb-4">
+  <h3 class="flex-1">Afslut orlov</h3>
+</div>
+
+<div class="divider p-0 m-0 mb-4 w-full" />
+
 {#await graphQLClient().request( LeaveDocument, { uuid: $page.params.leave, fromDate: $date } )}
-  <!-- TODO: Should have a skeleton for the loading stage -->
-  Henter data...
+  <div class="mx-6">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+      <div class="p-8">
+        <Skeleton />
+      </div>
+    </div>
+  </div>
 {:then data}
   {@const leave = data.leaves.objects[0].objects[0]}
   {@const minDate = leave.validity.from.split("T")[0]}
   {@const maxDate = leave.engagement.validity?.to?.split("T")[0]}
   {@const employeeName = leave.engagement.person[0].name}
-
-  <title>Afslut orlov for {employeeName} | OS2mo</title>
-
-  <div class="flex align-center px-6 pt-6 pb-4">
-    <h3 class="flex-1">Afslut orlov for {employeeName}</h3>
-  </div>
-
-  <div class="divider p-0 m-0 mb-4 w-full" />
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
