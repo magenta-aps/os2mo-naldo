@@ -186,7 +186,7 @@
   {@const itusers = itassociation.employee[0].itusers}
   {@const facets = data.facets.objects}
   {@const classes = data.classes.objects}
-  {@const minDate = itassociation.employee[0].validity.from.split("T")[0]}
+  {@const minDate = itassociation.employee[0].validity?.from?.split("T")[0]}
   {@const itUserStartValue = getITUserITSystemName(itassociation.it_user)}
 
   <form method="post" class="mx-6" use:enhance={handler}>

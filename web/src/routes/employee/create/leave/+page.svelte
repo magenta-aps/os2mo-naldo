@@ -188,7 +188,7 @@
   {:then data}
     {@const facets = data.facets.objects}
     {@const startValueEmployee = data.employees?.objects[0].objects[0]}
-    {@const minDate = startValueEmployee?.validity.from.split("T")[0]}
+    {@const minDate = startValueEmployee?.validity?.from?.split("T")[0]}
     {@const maxDate = startValueEmployee?.validity?.to?.split("T")[0]}
 
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">

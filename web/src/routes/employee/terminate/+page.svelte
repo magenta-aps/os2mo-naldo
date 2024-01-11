@@ -101,7 +101,7 @@
     </div>
   {:then data}
     {@const employee = data.employees?.objects[0].objects[0]}
-    {@const minDate = employee?.validity.from.split("T")[0]}
+    {@const minDate = employee?.validity?.from?.split("T")[0]}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">

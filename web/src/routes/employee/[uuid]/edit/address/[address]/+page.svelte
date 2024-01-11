@@ -169,7 +169,7 @@
 {:then data}
   {@const address = data.addresses.objects[0].objects[0]}
   {@const facets = data.facets.objects}
-  {@const minDate = data.employees.objects[0].objects[0].validity?.from.split("T")[0]}
+  {@const minDate = data.employees.objects[0].objects[0].validity?.from?.split("T")[0]}
   {@const maxDate = data.employees.objects[0].objects[0].validity?.to?.split("T")[0]}
 
   <form method="post" class="mx-6" use:enhance={handler}>
