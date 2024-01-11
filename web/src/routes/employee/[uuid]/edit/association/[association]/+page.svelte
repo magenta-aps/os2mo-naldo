@@ -151,7 +151,7 @@
   {@const association = data.associations.objects[0].objects[0]}
   {@const employee = association.employee[0]}
   {@const facets = data.facets.objects}
-  {@const minDate = association.employee[0].validity.from.split("T")[0]}
+  {@const minDate = association.employee[0].validity?.from?.split("T")[0]}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">

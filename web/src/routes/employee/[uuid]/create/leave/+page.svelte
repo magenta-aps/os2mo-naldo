@@ -136,7 +136,7 @@
 {:then data}
   {@const facets = data.facets.objects}
   {@const employee = data.employees.objects[0].objects[0]}
-  {@const minDate = employee.validity.from.split("T")[0]}
+  {@const minDate = employee.validity?.from?.split("T")[0]}
   {@const maxDate = employee.validity?.to?.split("T")[0]}
   {@const engagements = employee.engagements}
 

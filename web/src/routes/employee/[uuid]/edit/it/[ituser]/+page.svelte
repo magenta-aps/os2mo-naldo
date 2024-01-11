@@ -149,7 +149,7 @@
   {@const itUser = data.itusers.objects[0].objects[0]}
   {@const classes = data.classes.objects}
   {@const itSystems = data.itsystems.objects}
-  {@const minDate = data.employees.objects[0].objects[0].validity.from.split("T")[0]}
+  {@const minDate = data.employees.objects[0].objects[0].validity?.from?.split("T")[0]}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
