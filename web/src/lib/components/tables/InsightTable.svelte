@@ -8,13 +8,13 @@
   import { sortData } from "$lib/util/sorting"
   import { onMount } from "svelte"
 
-  type Engagements = GetEngagementsQuery["engagements"]["objects"][0]["current"]
+  type Engagements = GetEngagementsQuery["engagements"]["objects"][0]["current"][]
   let data: Engagements
 
   export let name: string, jobFunctionUuid: string, orgUnitUuid: string
 
-  // query bliver langsom når "query" er med. Nok pga. sammensætningen af flere filtre, for den er ret snappy i søgning normalt.
-  // EDIT: Det ligner at både `null` og `""` gør den langsom, selvom den reelt ikke skal gøre noget.
+  // As of now, the query is slow when it includes "query". My guess is that it's the nested filters in `job_function` that does this.
+  // Both `null` and `""` makes it slow.
 
   gql`
     query GetEngagements(
@@ -91,21 +91,26 @@
     [key: string]: any
   }
 
+  // TODO: Allow multiple managers in CSV
+
+  // Function to flatten nested objects
   const flattenObject = (obj: any, parentKey: string = ""): FlattenedObject => {
     return Object.keys(obj).reduce((acc: FlattenedObject, key: string) => {
       const newKey = parentKey ? `${parentKey}.${key}` : key
+
       if (typeof obj[key] === "object" && obj[key] !== null) {
         Object.assign(acc, flattenObject(obj[key], newKey))
       } else {
         acc[newKey] = obj[key]
       }
+
       return acc
     }, {})
   }
 
+  // Function to extract unique fields from an array of objects
   const extractFields = (data: any[]): string[] => {
     const flattenedData: FlattenedObject[] = data.map((item) => flattenObject(item))
-    console.log(flattenedData)
 
     const allFields: string[] = flattenedData.reduce(
       (acc: string[], item: FlattenedObject) => {
@@ -118,10 +123,13 @@
       },
       []
     )
+
     return allFields
   }
 
-  const json2csv = (data: any[], headers: Header[]) => {
+  // Function to convert JSON data to CSV format
+  const json2csv = (data: any[], headers: Header[]): string => {
+    // Filter headers based on the presence of data
     const includedHeaders: Header[] = headers.filter((header) =>
       data.some((item) => {
         const value = header.key
@@ -134,6 +142,7 @@
       })
     )
 
+    // Generate CSV content
     const csvContent: string = [
       includedHeaders.map((header) => header.label).join(","),
       ...data.map((item) => {
@@ -153,19 +162,22 @@
     return csvContent
   }
 
+  // Function to handle the download action
   const downloadHandler = (): void => {
     const currentDataHeaders: Header[] = allPossibleHeaders.map((definedHeader) => {
+      // Check if definedHeader.key is present in the data
       const matchedHeader = extractFields(data).includes(definedHeader.key)
         ? definedHeader
         : null
-      return matchedHeader || { key: definedHeader.key, label: definedHeader.key } // Use the key as the label if no match found
+      return matchedHeader || { key: definedHeader.key, label: definedHeader.key }
     })
 
+    // Generate CSV and trigger download
     const csvData: string = json2csv(data, currentDataHeaders)
     const blob: Blob = new Blob([csvData], { type: "text/csv" })
     const link: HTMLAnchorElement = document.createElement("a")
     link.href = URL.createObjectURL(blob)
-    link.download = "output.csv"
+    link.download = "insights.csv"
     link.click()
   }
 
@@ -202,26 +214,32 @@
   </tr>
 {:else}
   {#each data as engagement, i}
-    <tr
-      class="{i % 2 === 0 ? '' : 'bg-slate-100'} 
+    {#if engagement}
+      <tr
+        class="{i % 2 === 0 ? '' : 'bg-slate-100'} 
       py-4 leading-5 border-t border-slate-300 text-secondary"
-    >
-      <td class="p-4">
-        {engagement.person[0].name}
-      </td>
-      <td class="p-4">
-        {engagement.job_function.name}
-      </td>
-      <td class="p-4">
-        {engagement.org_unit[0].name}
-      </td>
-      <td class="p-4">
-        {#if engagement.org_unit[0].managers.length}
-          {engagement.org_unit[0].managers[0].person[0].name}
-        {/if}
-      </td>
-      <ValidityTableCell validity={engagement.validity} />
-    </tr>
+      >
+        <td class="p-4">
+          {engagement.person[0].name}
+        </td>
+        <td class="p-4">
+          {engagement.job_function.name}
+        </td>
+        <td class="p-4">
+          {engagement.org_unit[0].name}
+        </td>
+        <td class="p-4">
+          {#if engagement.org_unit[0].managers.length}
+            {#each engagement.org_unit[0].managers as manager}
+              <p>
+                {manager.person?.[0].name}
+              </p>
+            {/each}
+          {/if}
+        </td>
+        <ValidityTableCell validity={engagement.validity} />
+      </tr>
+    {/if}
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
       <!-- TODO: Add translated "No <type> in <tense>"-message" -->

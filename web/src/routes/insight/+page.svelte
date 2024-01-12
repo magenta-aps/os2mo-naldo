@@ -46,8 +46,8 @@
   `
 </script>
 
-<!-- TODO: admin HeadTitle -->
-<!-- <HeadTitle type="admin" /> -->
+<!-- TODO: insight HeadTitle -->
+<!-- <HeadTitle type="insight" /> -->
 
 <div class="px-12 pt-6">
   <h1 class="mb-4">Insights</h1>
@@ -68,19 +68,14 @@
             bind:value={jobFunction}
             iterable={getClassesByFacetUserKey(facets, "engagement_job_function")}
           />
+          <!-- TODO: Allow searching for multiple units -->
+          <!-- TODO: Allow searching for children of x -->
           <Search
             type="org-unit"
             title="Enhed"
             id="filter-org-unit"
             bind:value={orgUnit}
           />
-          <button
-            class="btn btn-sm btn-outline bg-base-100 rounded normal-case font-normal border-slate-300 text-secondary text-base ml-auto hover:btn-primary"
-            >Nulstil</button
-          >
-          <!-- Søg efter: -->
-          <!-- Navn/org_unit - engagements(filter: {employee: {query: ""}, org_unit: {query: ""}}) -->
-          <!-- Leder - managers(filter: {employee: {query: ""}}) -->
         </div>
       </div>
     </div>
