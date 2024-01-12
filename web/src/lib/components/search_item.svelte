@@ -26,12 +26,21 @@
   const isLazy = (obj: SearchItem): obj is LazyEmployee | LazyOrgUnit => {
     return "addresses" in obj
   }
+  const isLazyOrg = (obj: SearchItem): obj is LazyOrgUnit => {
+    return "addresses" in obj
+  }
 </script>
 
 <div class="flex items-center cursor-pointer text-ellipsis">
   <div class="text-ellipsis">
     <div class="inline-block text-secondary">{item.name}</div>
     {#if isLazy(item)}
+      {#if isLazyOrg(item) && item.parent}
+        <br />
+        <div class="inline-block text-primary text-sm">
+          Overenhed: {item.parent.name}
+        </div>
+      {/if}
       {#each item.addresses as address}
         <br />
         <div class="inline-block text-primary text-sm">

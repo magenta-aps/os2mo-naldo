@@ -436,6 +436,11 @@ export type AddressFilter = {
    * @deprecated Replaced by the 'org_unit' filter
    */
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Registration filter limiting which entries are returned.
+   *
+   */
+  registration?: InputMaybe<AddressRegistrationFilter>;
   /** Limit the elements returned by their ending validity. */
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -468,6 +473,31 @@ export type AddressFilter = {
    *
    */
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+/** Address registration filter. */
+export type AddressRegistrationFilter = {
+  /**
+   * Filter registrations by their changing actor.
+   *
+   * Can be used to select all changes made by a particular user or integration.
+   *
+   * | `actors`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  /** Limit the elements returned by their starting validity. */
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /**
@@ -989,6 +1019,11 @@ export type AssociationFilter = {
    * @deprecated Replaced by the 'org_unit' filter
    */
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Registration filter limiting which entries are returned.
+   *
+   */
+  registration?: InputMaybe<AssociationRegistrationFilter>;
   /** Limit the elements returned by their ending validity. */
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -1021,6 +1056,31 @@ export type AssociationFilter = {
    *
    */
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+/** Association registration filter. */
+export type AssociationRegistrationFilter = {
+  /**
+   * Filter registrations by their changing actor.
+   *
+   * Can be used to select all changes made by a particular user or integration.
+   *
+   * | `actors`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  /** Limit the elements returned by their starting validity. */
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /**
@@ -1678,6 +1738,26 @@ export type ClassFilter = {
    * @deprecated Replaced by the 'parent' filter
    */
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Registration filter limiting which entries are returned.
+   *
+   */
+  registration?: InputMaybe<ClassRegistrationFilter>;
+  /**
+   * Scope filter limiting which entries are returned.
+   *
+   * | `scope`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  scope?: InputMaybe<Array<Scalars['String']['input']>>;
   /** Limit the elements returned by their ending validity. */
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -1710,6 +1790,31 @@ export type ClassFilter = {
    *
    */
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+/** Class registration filter. */
+export type ClassRegistrationFilter = {
+  /**
+   * Filter registrations by their changing actor.
+   *
+   * Can be used to select all changes made by a particular user or integration.
+   *
+   * | `actors`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  /** Limit the elements returned by their starting validity. */
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /**
@@ -2214,6 +2319,11 @@ export type EmployeeFilter = {
    *
    */
   query?: InputMaybe<Scalars['String']['input']>;
+  /**
+   * Registration filter limiting which entries are returned.
+   *
+   */
+  registration?: InputMaybe<EmployeeRegistrationFilter>;
   /** Limit the elements returned by their ending validity. */
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -2246,6 +2356,31 @@ export type EmployeeFilter = {
    *
    */
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+/** Employee registration filter. */
+export type EmployeeRegistrationFilter = {
+  /**
+   * Filter registrations by their changing actor.
+   *
+   * Can be used to select all changes made by a particular user or integration.
+   *
+   * | `actors`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  /** Limit the elements returned by their starting validity. */
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /**
@@ -2402,6 +2537,7 @@ export type EmployeesBoundAddressFilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  registration?: InputMaybe<AddressRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -2416,6 +2552,7 @@ export type EmployeesBoundAssociationFilter = {
   it_association?: InputMaybe<Scalars['Boolean']['input']>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  registration?: InputMaybe<AssociationRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -2426,6 +2563,7 @@ export type EmployeesBoundEngagementFilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  registration?: InputMaybe<EngagementRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -2438,6 +2576,7 @@ export type EmployeesBoundItUserFilter = {
   itsystem_uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  registration?: InputMaybe<ItUserRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -2448,6 +2587,7 @@ export type EmployeesBoundLeaveFilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  registration?: InputMaybe<LeaveRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -2458,6 +2598,8 @@ export type EmployeesBoundManagerFilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  registration?: InputMaybe<ManagerRegistrationFilter>;
+  responsibility?: InputMaybe<ClassFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -2468,6 +2610,7 @@ export type EmployeesBoundRoleFilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  registration?: InputMaybe<RoleRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -2864,6 +3007,11 @@ export type EngagementFilter = {
    * @deprecated Replaced by the 'org_unit' filter
    */
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Registration filter limiting which entries are returned.
+   *
+   */
+  registration?: InputMaybe<EngagementRegistrationFilter>;
   /** Limit the elements returned by their ending validity. */
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -2896,6 +3044,31 @@ export type EngagementFilter = {
    *
    */
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+/** Engagement registration filter. */
+export type EngagementRegistrationFilter = {
+  /**
+   * Filter registrations by their changing actor.
+   *
+   * Can be used to select all changes made by a particular user or integration.
+   *
+   * | `actors`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  /** Limit the elements returned by their starting validity. */
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /**
@@ -3291,6 +3464,11 @@ export type FacetFilter = {
    * @deprecated Replaced by the 'parent' filter
    */
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Registration filter limiting which entries are returned.
+   *
+   */
+  registration?: InputMaybe<FacetRegistrationFilter>;
   /** Limit the elements returned by their ending validity. */
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -3323,6 +3501,31 @@ export type FacetFilter = {
    *
    */
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+/** Facet registration filter. */
+export type FacetRegistrationFilter = {
+  /**
+   * Filter registrations by their changing actor.
+   *
+   * Can be used to select all changes made by a particular user or integration.
+   *
+   * | `actors`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  /** Limit the elements returned by their starting validity. */
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /**
@@ -3465,6 +3668,8 @@ export type FacetsBoundClassFilter = {
   parent?: InputMaybe<ClassFilter>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  registration?: InputMaybe<ClassRegistrationFilter>;
+  scope?: InputMaybe<Array<Scalars['String']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -3771,6 +3976,11 @@ export type ItSystemCreateInput = {
 export type ItSystemFilter = {
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Registration filter limiting which entries are returned.
+   *
+   */
+  registration?: InputMaybe<ItSystemRegistrationFilter>;
   /** Limit the elements returned by their ending validity. */
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -3803,6 +4013,31 @@ export type ItSystemFilter = {
    *
    */
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+/** ITSystem registration filter. */
+export type ItSystemRegistrationFilter = {
+  /**
+   * Filter registrations by their changing actor.
+   *
+   * Can be used to select all changes made by a particular user or integration.
+   *
+   * | `actors`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  /** Limit the elements returned by their starting validity. */
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /**
@@ -4256,6 +4491,11 @@ export type ItUserFilter = {
    * @deprecated Replaced by the 'org_unit' filter
    */
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Registration filter limiting which entries are returned.
+   *
+   */
+  registration?: InputMaybe<ItUserRegistrationFilter>;
   /** Limit the elements returned by their ending validity. */
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -4288,6 +4528,31 @@ export type ItUserFilter = {
    *
    */
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+/** ITUser registration filter. */
+export type ItUserRegistrationFilter = {
+  /**
+   * Filter registrations by their changing actor.
+   *
+   * Can be used to select all changes made by a particular user or integration.
+   *
+   * | `actors`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  /** Limit the elements returned by their starting validity. */
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /**
@@ -4702,6 +4967,11 @@ export type KleFilter = {
    * @deprecated Replaced by the 'org_unit' filter
    */
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Registration filter limiting which entries are returned.
+   *
+   */
+  registration?: InputMaybe<KleRegistrationFilter>;
   /** Limit the elements returned by their ending validity. */
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -4734,6 +5004,31 @@ export type KleFilter = {
    *
    */
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+/** KLE registration filter. */
+export type KleRegistrationFilter = {
+  /**
+   * Filter registrations by their changing actor.
+   *
+   * Can be used to select all changes made by a particular user or integration.
+   *
+   * | `actors`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  /** Limit the elements returned by their starting validity. */
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /**
@@ -5070,6 +5365,11 @@ export type LeaveFilter = {
    * @deprecated Replaced by the 'org_unit' filter
    */
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Registration filter limiting which entries are returned.
+   *
+   */
+  registration?: InputMaybe<LeaveRegistrationFilter>;
   /** Limit the elements returned by their ending validity. */
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -5102,6 +5402,31 @@ export type LeaveFilter = {
    *
    */
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+/** Leave registration filter. */
+export type LeaveRegistrationFilter = {
+  /**
+   * Filter registrations by their changing actor.
+   *
+   * Can be used to select all changes made by a particular user or integration.
+   *
+   * | `actors`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  /** Limit the elements returned by their starting validity. */
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /**
@@ -5489,6 +5814,16 @@ export type ManagerFilter = {
    * @deprecated Replaced by the 'org_unit' filter
    */
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Registration filter limiting which entries are returned.
+   *
+   */
+  registration?: InputMaybe<ManagerRegistrationFilter>;
+  /**
+   * Responsibility filter limiting which entries are returned.
+   *
+   */
+  responsibility?: InputMaybe<ClassFilter>;
   /** Limit the elements returned by their ending validity. */
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -5521,6 +5856,31 @@ export type ManagerFilter = {
    *
    */
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+/** Manager registration filter. */
+export type ManagerRegistrationFilter = {
+  /**
+   * Filter registrations by their changing actor.
+   *
+   * Can be used to select all changes made by a particular user or integration.
+   *
+   * | `actors`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  /** Limit the elements returned by their starting validity. */
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /**
@@ -6855,6 +7215,7 @@ export type OrgUnitsboundaddressfilter = {
   engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
+  registration?: InputMaybe<AddressRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -6869,6 +7230,7 @@ export type OrgUnitsboundassociationfilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   it_association?: InputMaybe<Scalars['Boolean']['input']>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
+  registration?: InputMaybe<AssociationRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -6879,6 +7241,7 @@ export type OrgUnitsboundengagementfilter = {
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
+  registration?: InputMaybe<EngagementRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -6891,6 +7254,7 @@ export type OrgUnitsboundituserfilter = {
   itsystem?: InputMaybe<ItSystemFilter>;
   itsystem_uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
+  registration?: InputMaybe<ItUserRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -6899,6 +7263,7 @@ export type OrgUnitsboundituserfilter = {
 export type OrgUnitsboundklefilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
+  registration?: InputMaybe<KleRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -6909,6 +7274,7 @@ export type OrgUnitsboundleavefilter = {
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
+  registration?: InputMaybe<LeaveRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -6938,6 +7304,7 @@ export type OrgUnitsboundrolefilter = {
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
+  registration?: InputMaybe<RoleRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -7351,6 +7718,7 @@ export type OrganisationUnitLeavesArgs = {
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitManagersArgs = {
+  filter?: InputMaybe<ManagerFilter>;
   inherit?: Scalars['Boolean']['input'];
 };
 
@@ -7519,6 +7887,11 @@ export type OrganisationUnitFilter = {
    *
    */
   query?: InputMaybe<Scalars['String']['input']>;
+  /**
+   * Registration filter limiting which entries are returned.
+   *
+   */
+  registration?: InputMaybe<OrganisationUnitRegistrationFilter>;
   /** Limit the elements returned by their ending validity. */
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -7551,6 +7924,31 @@ export type OrganisationUnitFilter = {
    *
    */
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+/** OrganisationUnit registration filter. */
+export type OrganisationUnitRegistrationFilter = {
+  /**
+   * Filter registrations by their changing actor.
+   *
+   * Can be used to select all changes made by a particular user or integration.
+   *
+   * | `actors`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  /** Limit the elements returned by their starting validity. */
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /**
@@ -8094,6 +8492,8 @@ export type ParentsBoundClassFilter = {
   it_system?: InputMaybe<ItSystemFilter>;
   parent?: InputMaybe<ClassFilter>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  registration?: InputMaybe<ClassRegistrationFilter>;
+  scope?: InputMaybe<Array<Scalars['String']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -8103,6 +8503,7 @@ export type ParentsBoundFacetFilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   parent?: InputMaybe<FacetFilter>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  registration?: InputMaybe<FacetRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -8114,6 +8515,7 @@ export type ParentsBoundOrganisationUnitFilter = {
   hierarchy?: InputMaybe<ClassFilter>;
   parent?: InputMaybe<OrganisationUnitFilter>;
   query?: InputMaybe<Scalars['String']['input']>;
+  registration?: InputMaybe<OrganisationUnitRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -8926,6 +9328,11 @@ export type RoleFilter = {
    * @deprecated Replaced by the 'org_unit' filter
    */
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Registration filter limiting which entries are returned.
+   *
+   */
+  registration?: InputMaybe<RoleRegistrationFilter>;
   /** Limit the elements returned by their ending validity. */
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -8958,6 +9365,31 @@ export type RoleFilter = {
    *
    */
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+/** Role registration filter. */
+export type RoleRegistrationFilter = {
+  /**
+   * Filter registrations by their changing actor.
+   *
+   * Can be used to select all changes made by a particular user or integration.
+   *
+   * | `actors`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  /** Limit the elements returned by their starting validity. */
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /**
@@ -9123,6 +9555,8 @@ export type UuidsBoundClassFilter = {
   parent?: InputMaybe<ClassFilter>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  registration?: InputMaybe<ClassRegistrationFilter>;
+  scope?: InputMaybe<Array<Scalars['String']['input']>>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
@@ -9131,6 +9565,7 @@ export type UuidsBoundEmployeeFilter = {
   cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   query?: InputMaybe<Scalars['String']['input']>;
+  registration?: InputMaybe<EmployeeRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
@@ -9141,6 +9576,7 @@ export type UuidsBoundEngagementFilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  registration?: InputMaybe<EngagementRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
@@ -9150,12 +9586,14 @@ export type UuidsBoundFacetFilter = {
   parent?: InputMaybe<FacetFilter>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  registration?: InputMaybe<FacetRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 export type UuidsBoundItSystemFilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  registration?: InputMaybe<ItSystemRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
@@ -9168,6 +9606,7 @@ export type UuidsBoundItUserFilter = {
   itsystem_uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  registration?: InputMaybe<ItUserRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
@@ -9178,6 +9617,7 @@ export type UuidsBoundLeaveFilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  registration?: InputMaybe<LeaveRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
@@ -9189,6 +9629,7 @@ export type UuidsBoundOrganisationUnitFilter = {
   parent?: InputMaybe<OrganisationUnitFilter>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   query?: InputMaybe<Scalars['String']['input']>;
+  registration?: InputMaybe<OrganisationUnitRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };
