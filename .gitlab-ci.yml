@@ -37,7 +37,6 @@ include:
       - gitlab-ci-templates/common/config-updater-salt.v1.yml
       - gitlab-ci-templates/common/config-updater-flux.v1.yml
 
-
 # Workflow
 ###########
 workflow:
@@ -59,7 +58,7 @@ Pre-commit:
     - pre-commit run --all-files
 
 Svelte-check:
-  image: node:18
+  image: node:20
   stage: lint
   script:
     - cd web/
@@ -67,7 +66,7 @@ Svelte-check:
     - yarn run check
 
 SvelteKit build:
-  image: node:18
+  image: node:20
   stage: build
   script:
     - cd web/
