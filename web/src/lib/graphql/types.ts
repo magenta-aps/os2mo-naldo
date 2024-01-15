@@ -2561,6 +2561,7 @@ export type EmployeesBoundAssociationFilter = {
 export type EmployeesBoundEngagementFilter = {
   employee?: InputMaybe<EmployeeFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  job_function?: InputMaybe<ClassFilter>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   registration?: InputMaybe<EngagementRegistrationFilter>;
@@ -2986,6 +2987,11 @@ export type EngagementFilter = {
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Job function filter limiting which entries are returned.
+   *
+   */
+  job_function?: InputMaybe<ClassFilter>;
   /**
    * Organisation Unit filter limiting which entries are returned.
    *
@@ -7240,6 +7246,7 @@ export type OrgUnitsboundengagementfilter = {
   employee?: InputMaybe<EmployeeFilter>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  job_function?: InputMaybe<ClassFilter>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   registration?: InputMaybe<EngagementRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
@@ -9574,6 +9581,7 @@ export type UuidsBoundEngagementFilter = {
   employee?: InputMaybe<EmployeeFilter>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  job_function?: InputMaybe<ClassFilter>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   registration?: InputMaybe<EngagementRegistrationFilter>;
