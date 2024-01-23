@@ -1,7 +1,7 @@
 {
   "welcome_message": "Velkommen til MO",
   "welcome_tagline": "Medarbejder | Organisation",
-  "organization_overview": "Organisationsoverblik",
+  "organisation_overview": "Organisationsoverblik",
   "address": "Adresse | Adresser",
   "association": "Tilknytning | Tilknytninger",
   "itassociation": "IT-tilknytning | IT-tilknytninger",
@@ -62,5 +62,16 @@
   "seniority": "Anciennitet",
   "none": "Ingen",
   "admin_panel": "Administrator Panel",
-  "feature_flag_title": "Funktion vælger"
+  "feature_flag_title": "Funktion vælger",
+  "navigation": {
+    "create_employee": "Ny medarbejder",
+    "leave": "Orlov",
+    "move_engagement": "Flyt engagement",
+    "terminate_employee": "Opsig medarbejder",
+    "create_unit": "Opret enhed",
+    "rename_unit": "Omdøb enhed",
+    "move_unit": "Flyt enhed",
+    "terminate_unit": "Afslut enhed",
+    "connecting_organisations": "Organisationssammenkobling"
+  }
 }

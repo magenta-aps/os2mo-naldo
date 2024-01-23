@@ -6,6 +6,7 @@
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import swapHorizRounded from "@iconify/icons-material-symbols/swap-horiz-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
+  import { _ } from "svelte-i18n"
 
   enum Form {
     CREATE = "create",
@@ -24,7 +25,7 @@
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal align-middle"
     >
       <Icon icon={addCircleOutlineRounded} width="20" height="20" />
-      <p class="text-base-100">Opret enhed</p>
+      <p class="text-base-100">{$_("navigation.create_unit")}</p>
     </a>
     <a
       href={`${base}/organisation/${Form.RENAME}${
@@ -33,7 +34,7 @@
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <Icon icon={editSquareOutlineRounded} width="20" height="20" />
-      <p class="text-base-100">Omdøb enhed</p>
+      <p class="text-base-100">{$_("navigation.rename_unit")}</p>
     </a>
     <a
       href={`${base}/organisation/${Form.MOVE}${
@@ -42,7 +43,7 @@
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <Icon icon={swapHorizRounded} width="20" height="20" />
-      <p class="text-base-100">Flyt enhed</p>
+      <p class="text-base-100">{$_("navigation.move_unit")}</p>
     </a>
     <a
       href={`${base}/organisation/${Form.TERMINATE}${
@@ -51,7 +52,7 @@
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <Icon icon={cancelOutlineRounded} width="20" height="20" />
-      <p class="text-base-100">Afslut enhed</p>
+      <p class="text-base-100">{$_("navigation.terminate_unit")}</p>
     </a>
   </div>
 </div>

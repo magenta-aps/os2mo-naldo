@@ -6,7 +6,7 @@
 
 <ul class="menu pt-6 px-4 overflow-y-auto bg-base-100 text-base-content">
   <p class="font-bold text-secondary pb-4">
-    {$_("organization_overview")}
+    {$_("organisation_overview")}
   </p>
 
   {#if $isAuth}
