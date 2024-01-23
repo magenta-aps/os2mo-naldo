@@ -5,6 +5,7 @@
   enum Title {
     ORGANISATION = "organisation",
     EMPLOYEE = "employee",
+    INSIGHT = "insight",
   }
 
   type TitleType = `${Title}`
@@ -41,6 +42,10 @@
         return fetchGraph(query)
           .then((res) => res.json())
           .then((json) => json.data.employees.objects[0].objects[0].name)
+
+      case Title.INSIGHT:
+        // TODO: Insight or Insights? The URL is insight, but the title is Insights
+        return "Insights"
 
       default:
         throw TypeError("Wrong or no title type used")
