@@ -1,16 +1,16 @@
 import { writable } from "svelte/store"
 
 export enum OrgTab {
-  ORG_UNIT = "Enhed",
-  ADDRESS = "Adresser",
-  ENGAGEMENT = "Engagementer",
-  ASSOCIATION = "Tilknytninger",
-  IT = "IT",
-  ROLE = "Roller",
-  MANAGER = "Ledere",
-  KLE = "KLE-opmærkninger",
-  OWNER = "Ejere",
-  RELATED_UNIT = "Relateret",
+  ORG_UNIT = "org_unit",
+  ADDRESS = "address",
+  ENGAGEMENT = "engagement",
+  ASSOCIATION = "association",
+  IT = "it",
+  ROLE = "role",
+  MANAGER = "manager",
+  KLE = "kle",
+  OWNER = "owner",
+  RELATED_UNIT = "related_unit",
 }
 
 export const activeOrgTab = writable(OrgTab.ORG_UNIT)

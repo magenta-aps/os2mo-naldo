@@ -1,6 +1,5 @@
 <script lang="ts">
   import { page } from "$app/stores"
-  import Tabs from "$lib/components/shared/tabs.svelte"
   import HeadTitle from "$lib/components/shared/head_title.svelte"
   import CopyToClipboard from "$lib/components/copy_to_clipboard.svelte"
   import TenseTabs from "$lib/components/shared/tense_tabs.svelte"
@@ -24,9 +23,25 @@
   import OwnerTable from "$lib/components/tables/OwnerTable.svelte"
   import RelatedUnitsTable from "$lib/components/tables/RelatedUnitsTable.svelte"
   import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
+  import { _ } from "svelte-i18n"
+  import NewTabs from "$lib/components/shared/new_tabs.svelte"
 
   // Tabs
   let items = Object.values(OrgTab)
+
+  let newItems = [
+    { label: $_("unit"), value: "org_unit" },
+    { label: $_("address"), value: "address" },
+    { label: $_("engagement"), value: "engagement" },
+    { label: $_("association"), value: "association" },
+    { label: $_("it"), value: "it" },
+    { label: $_("role"), value: "role" },
+    { label: $_("kle"), value: "kle" },
+    { label: $_("manager"), value: "manager" },
+    { label: $_("related_unit"), value: "related_unit" },
+  ]
+
+  console.log(items, newItems)
 
   // TODO: Move tab logic into tabs.svelte
   if (env.PUBLIC_SHOW_KLE_TAB === "false") {
@@ -111,7 +126,7 @@
       <CopyToClipboard uuid={orgUnit.uuid} name={orgUnit.name} />
     </div>
 
-    <Tabs {activeItem} {items} on:tabChange={tabChange} />
+    <NewTabs {activeItem} items={newItems} on:tabChange={tabChange} />
 
     <div class="flex justify-between">
       <TenseTabs />
@@ -123,12 +138,10 @@
             ? `organisation/create#uuid=${$page.params.uuid}`
             : activeItem === OrgTab.RELATED_UNIT
             ? "connecting_organisations"
-            : `organisation/${$page.params.uuid}/create/${subsiteOfCategory(
-                activeItem
-              )}`
+            : `organisation/${$page.params.uuid}/create/${activeItem}`
         }`}
       >
-        Tilføj {activeItem}
+        Tilføj {newItems.find((item) => item.value === activeItem)?.label}
       </a>
     </div>
 

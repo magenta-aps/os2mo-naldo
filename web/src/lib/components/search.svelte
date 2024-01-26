@@ -15,6 +15,7 @@
     LazySearchDocument,
     type LazySearchQuery,
   } from "./query.generated"
+  import { _ } from "svelte-i18n"
 
   type Employees = SearchEmployeeQuery["employees"]["objects"][0]["objects"]
   type OrgUnits = SearchOrgUnitQuery["org_units"]["objects"][0]["objects"]
@@ -220,7 +221,9 @@
       {loading}
       bind:value
       hideEmptyState={true}
-      placeholder={`Søg efter ${type === "employee" ? "person" : "organisation"}`}
+      placeholder={type === "employee"
+        ? $_("search.person")
+        : $_("search.organisation")}
       clearFilterTextOnBlur={false}
       on:change
       on:clear
