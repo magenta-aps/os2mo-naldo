@@ -1,13 +1,7 @@
 <script lang="ts">
-  import { page } from "$app/stores"
-  import { date } from "$lib/stores/date"
-  import { base } from "$app/paths"
   import { gql } from "graphql-request"
   import { graphQLClient } from "$lib/util/http"
   import HeadTitle from "$lib/components/shared/head_title.svelte"
-  import TenseTabs from "$lib/components/shared/tense_tabs.svelte"
-  import ClassTable from "$lib/components/tables/ClassTable.svelte"
-  import TableTensesWrapper from "$lib/components/tables/TableTensesWrapper.svelte"
   import DetailTable from "$lib/components/shared/detail_table.svelte"
   import InsightTable from "$lib/components/tables/InsightTable.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
@@ -15,6 +9,8 @@
   import { GetClassesDocument } from "./query.generated"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import Search from "$lib/components/search.svelte"
+  import { engagements } from "$lib/stores/csv"
+  import { downloadHandler } from "$lib/util/csv"
 
   let name: string,
     jobFunction: { uuid: string; name: string; user_key?: string | null },
@@ -44,10 +40,19 @@
       }
     }
   `
+
+  const allPossibleHeaders = [
+    { key: "person.0.name", label: "Person Name" },
+    { key: "primary.name", label: "Primary" },
+    { key: "job_function.name", label: "Job Function Name" },
+    { key: "org_unit.0.name", label: "Organization Unit Name" },
+    { key: "org_unit.0.managers.0.person.0.name", label: "Manager Name" },
+    { key: "validity.from", label: "Validity From" },
+    { key: "validity.to", label: "Validity To" },
+  ]
 </script>
 
-<!-- TODO: insight HeadTitle -->
-<!-- <HeadTitle type="insight" /> -->
+<HeadTitle type="insight" />
 
 <div class="px-12 pt-6">
   <h1 class="mb-4">Insights</h1>
@@ -92,4 +97,11 @@
       <svelte:component this={InsightTable} {name} {jobFunctionUuid} {orgUnitUuid} />
     </DetailTable>
   {/await}
+
+  <button
+    class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+    disabled={!$engagements.length}
+    on:click={(event) => downloadHandler(event, $engagements, allPossibleHeaders)}
+    >Download CSV</button
+  >
 </div>
