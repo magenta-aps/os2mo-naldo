@@ -1,4 +1,5 @@
 import type { OpenValidity, Validity } from "$lib/graphql/types"
+import { env } from "$env/dynamic/public"
 import { date } from "$lib/stores/date"
 import { get } from "svelte/store"
 import type { Facet } from "$lib/util/get_classes"
@@ -108,4 +109,10 @@ export const debounce = async (
       resolve(func(...args))
     }
   })
+}
+
+export const cprLookup = async (cpr: string) => {
+  const res = await fetch(`${env.PUBLIC_BASE_URL}/service/e/cpr_lookup/?q=${cpr}`)
+  // FIXME: Maybe return empty array, if call fails?
+  return [await res.json()]
 }

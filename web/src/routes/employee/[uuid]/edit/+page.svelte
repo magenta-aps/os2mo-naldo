@@ -32,7 +32,7 @@
             surname
             nickname_givenname
             nickname_surname
-            cpr_no
+            cpr_number
             validity {
               from
               to

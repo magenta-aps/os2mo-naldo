@@ -5,19 +5,38 @@
   import type { SubmitFunction } from "./$types"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
-  import { CreateEmployeeDocument } from "./query.generated"
+  import { GetSpConfigDocument, CreateEmployeeDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { form, field } from "svelte-forms"
   import { required, pattern } from "svelte-forms/validators"
+  import CprLookup from "$lib/components/CPRLookup.svelte"
 
-  const cprNumber = field("cpr_number", "", [required(), pattern(/^\d{6}-?\d{4}$/)])
-  const firstName = field("first_name", "", [required()])
-  const lastName = field("last_name", "", [required()])
-  const svelteForm = form(cprNumber, firstName, lastName)
+  let person: CprLookupResponse
   let nicknameFirstName: string
   let nicknameLastName: string
 
+  let seperatedFirstName: string | null | undefined
+  let seperatedLastName: string | null | undefined
+  $: {
+    seperatedFirstName = person?.name?.split(" ").slice(0, -1).join(" ")
+    seperatedLastName = person?.name?.split(" ").slice(-1).join(" ")
+  }
+
+  const cprNumber = field("cpr_number", "", [required(), pattern(/^\d{6}\d{4}$/)])
+  const firstName = field("first_name", "", [required()])
+  const lastName = field("last_name", "", [required()])
+  const svelteForm = form(cprNumber, firstName, lastName)
+
   gql`
+    query GetSPConfig {
+      configuration(filter: { identifiers: "enable_sp" }) {
+        objects {
+          jsonified_value
+          key
+        }
+      }
+    }
+
     mutation CreateEmployee($input: EmployeeCreateInput!) {
       employee_create(input: $input) {
         objects {
@@ -65,63 +84,103 @@
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
+
 <form method="post" class="mx-6" use:enhance={handler}>
-  <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
-    <div class="p-8">
-      <Input
-        title="CPR nummer"
-        id="cpr-number"
-        bind:value={$cprNumber.value}
-        errors={$cprNumber.errors}
-        required={true}
-      />
-      <div class="flex flex-row gap-6">
-        <Input
-          title="Fornavn"
-          id="first-name"
-          bind:value={$firstName.value}
-          errors={$firstName.errors}
-          required={true}
-          extra_classes="basis-1/2"
-        />
-        <Input
-          title="Efternavn(e)"
-          id="last-name"
-          bind:value={$lastName.value}
-          errors={$lastName.errors}
-          required={true}
-          extra_classes="basis-1/2"
-        />
-      </div>
-      <div class="flex flex-row gap-6">
-        <Input
-          title="Kaldenavn fornavn"
-          id="nickname-first-name"
-          bind:value={nicknameFirstName}
-          extra_classes="basis-1/2"
-        />
-        <Input
-          title="Kaldenavn efternavn(e)"
-          id="nickname-last-name"
-          bind:value={nicknameLastName}
-          extra_classes="basis-1/2"
-        />
+  {#await graphQLClient().request(GetSpConfigDocument)}
+    <!-- TODO: Should have a skeleton for the loading stage -->
+    Henter data...
+  {:then data}
+    {@const SpEnabled = data.configuration.objects[0].jsonified_value === "true"}
+
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+      <div class="p-8">
+        {#if SpEnabled}
+          <CprLookup
+            title="CPR"
+            id="cpr-number"
+            bind:value={person}
+            bind:cprNumber={$cprNumber.value}
+            errors={$cprNumber.errors}
+          />
+          <div class="flex flex-row gap-6">
+            <Input
+              title="Fornavn(e)"
+              id="first-name"
+              bind:value={seperatedFirstName}
+              bind:cprName={$firstName.value}
+              errors={$firstName.errors}
+              extra_classes="basis-1/2"
+              required={true}
+              readonly
+            />
+            <Input
+              title="Efternavn"
+              id="last-name"
+              bind:value={seperatedLastName}
+              bind:cprName={$lastName.value}
+              errors={$lastName.errors}
+              extra_classes="basis-1/2"
+              required={true}
+              readonly
+            />
+          </div>
+        {:else}
+          <Input
+            title="CPR nummer"
+            id="cpr-number"
+            bind:value={$cprNumber.value}
+            errors={$cprNumber.errors}
+            required={true}
+          />
+          <div class="flex flex-row gap-6">
+            <Input
+              title="Fornavn(e)"
+              id="first-name"
+              bind:cprName={$firstName.value}
+              errors={$firstName.errors}
+              extra_classes="basis-1/2"
+              required={true}
+            />
+            <Input
+              title="Efternavn"
+              id="last-name"
+              bind:cprName={$lastName.value}
+              errors={$lastName.errors}
+              extra_classes="basis-1/2"
+              required={true}
+            />
+          </div>
+        {/if}
+        <div class="flex flex-row gap-6">
+          <Input
+            title="Kaldenavn fornavn"
+            id="nickname-first-name"
+            bind:value={nicknameFirstName}
+            extra_classes="basis-1/2"
+          />
+          <Input
+            title="Kaldenavn efternavn(e)"
+            id="nickname-last-name"
+            bind:value={nicknameLastName}
+            extra_classes="basis-1/2"
+          />
+        </div>
       </div>
     </div>
-  </div>
-  <div class="flex py-6 gap-4">
-    <button
-      type="submit"
-      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-      >Opret medarbejder</button
-    >
-    <button
-      type="button"
-      class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-      on:click={() => history.back()}
-    >
-      Annullér
-    </button>
-  </div>
-  <Error />
+    <div class="flex py-6 gap-4">
+      <button
+        type="submit"
+        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+        >Opret medarbejder</button
+      >
+      <button
+        type="button"
+        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+        on:click={() => history.back()}
+      >
+        Annullér
+      </button>
+    </div>
+    <Error />
+  {/await}
 </form>
