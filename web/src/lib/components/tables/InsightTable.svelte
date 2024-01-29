@@ -1,15 +1,10 @@
 <script lang="ts">
-  import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
-  import { date } from "$lib/stores/date"
-  import { GetEngagementsDocument, type GetEngagementsQuery } from "./query.generated"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { sortData } from "$lib/util/sorting"
   import { onMount } from "svelte"
   import { engagements } from "$lib/stores/csv"
-
-  type Engagements = GetEngagementsQuery["engagements"]["objects"][0]["current"][]
 
   export let name: string, jobFunctionUuid: string, orgUnitUuid: string
 
@@ -67,35 +62,6 @@
       $engagements = sortData($engagements, $sortKey, $sortDirection)
     }
   }
-
-  $: (async () => {
-    $engagements = await filterEngagements(name, jobFunctionUuid, orgUnitUuid)
-  })()
-
-  const filterEngagements = async (
-    name: string | undefined | null,
-    jobFunctionUuid: string | undefined | null,
-    orgUnitUuid: string | undefined | null
-  ): Promise<Engagements> => {
-    const res = await graphQLClient().request(GetEngagementsDocument, {
-      queryString: name,
-      jobFunction: jobFunctionUuid,
-      orgUnit: orgUnitUuid,
-      fromDate: $date,
-    })
-    const filteredEngagements: Engagements = []
-
-    // Filters and flattens the data
-    for (const outer of res.engagements.objects) {
-      filteredEngagements.push(outer.current)
-    }
-
-    return filteredEngagements
-  }
-
-  onMount(async () => {
-    $engagements = await filterEngagements(name, jobFunctionUuid, orgUnitUuid)
-  })
 </script>
 
 {#if !$engagements}
@@ -105,30 +71,32 @@
 {:else}
   {#each $engagements as engagement, i}
     {#if engagement}
-      <tr
-        class="{i % 2 === 0 ? '' : 'bg-slate-100'} 
+      {#key $engagements}
+        <tr
+          class="{i % 2 === 0 ? '' : 'bg-slate-100'} 
       py-4 leading-5 border-t border-slate-300 text-secondary"
-      >
-        <td class="p-4">
-          {engagement.person[0].name}
-        </td>
-        <td class="p-4">
-          {engagement.job_function.name}
-        </td>
-        <td class="p-4">
-          {engagement.org_unit[0].name}
-        </td>
-        <td class="p-4">
-          {#if engagement.org_unit[0].managers.length}
-            {#each engagement.org_unit[0].managers as manager}
-              <p>
-                {manager.person?.[0].name}
-              </p>
-            {/each}
-          {/if}
-        </td>
-        <ValidityTableCell validity={engagement.validity} />
-      </tr>
+        >
+          <td class="p-4">
+            {engagement.person[0].name}
+          </td>
+          <td class="p-4">
+            {engagement.job_function.name}
+          </td>
+          <td class="p-4">
+            {engagement.org_unit[0].name}
+          </td>
+          <td class="p-4">
+            {#if engagement.org_unit[0].managers.length}
+              {#each engagement.org_unit[0].managers as manager}
+                <p>
+                  {manager.person?.[0].name}
+                </p>
+              {/each}
+            {/if}
+          </td>
+          <ValidityTableCell validity={engagement.validity} />
+        </tr>
+      {/key}
     {/if}
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">

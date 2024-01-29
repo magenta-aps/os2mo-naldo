@@ -44,8 +44,7 @@
           .then((json) => json.data.employees.objects[0].objects[0].name)
 
       case Title.INSIGHT:
-        // TODO: Insight or Insights? The URL is insight, but the title is Insights
-        return "Insights"
+        return "Insight"
 
       default:
         throw TypeError("Wrong or no title type used")

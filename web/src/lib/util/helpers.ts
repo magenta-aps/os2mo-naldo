@@ -93,3 +93,19 @@ export const getFacetUserKeys = (facets: Facet[]) => {
     name: facet.objects[0].user_key,
   }))
 }
+
+let lastCalledAt: number | null = null
+
+export const debounce = async (
+  func: (...args: any[]) => Promise<any>,
+  ...args: any[]
+): Promise<void> => {
+  const now = Date.now()
+
+  return new Promise<void>((resolve) => {
+    if (!lastCalledAt || now - lastCalledAt >= 500) {
+      lastCalledAt = now
+      resolve(func(...args))
+    }
+  })
+}
