@@ -53,6 +53,7 @@
   "kle_number": "KLE number",
   "kle": "KLE-tagging",
   "add_more": "Add more",
+  "add": "Add",
   "substitute": "Substitute",
   "it": "IT",
   "main_organisation": "Main organisation",
@@ -77,5 +78,6 @@
   "search": {
     "person": "Search for person",
     "organisation": "Search for organisation"
-  }
+  },
+  "visibility": "Visibility"
 }

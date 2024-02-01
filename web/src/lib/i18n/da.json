@@ -53,6 +53,7 @@
   "kle_number": "KLE nummer",
   "kle": "KLE-opmærkning",
   "add_more": "Tilføj flere",
+  "add": "Tilføj",
   "substitute": "Stedfortræder",
   "it": "IT",
   "main_organisation": "hovedorganisationen",
@@ -77,5 +78,7 @@
   "search": {
     "person": "Søg efter person",
     "organisation": "Søg efter organisation"
-  }
+  },
+  "visibility": "Synlighed",
+  "account_name": "Account name"
 }

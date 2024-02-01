@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte"
 
-  export let items: string[]
+  export let items: { label: string; value: string }[]
   export let activeItem: string
 
   let dispatch = createEventDispatcher()
@@ -10,13 +10,13 @@
 <div class="tabs tabs-bordered">
   {#each items as item}
     <a
-      href="#{item}"
+      href="#{item.value}"
       data-sveltekit-replacestate
       class="tab text-base hover:no-underline
-      {item === activeItem ? 'tab-active text-primary' : 'text-secondary'}"
-      on:click={() => dispatch("tabChange", item)}
+      {item.value === activeItem ? 'tab-active text-primary' : 'text-secondary'}"
+      on:click={() => dispatch("tabChange", item.value)}
     >
-      {item}
+      {item.label}
     </a>
   {/each}
 </div>

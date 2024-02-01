@@ -16,16 +16,16 @@ export enum OrgTab {
 export const activeOrgTab = writable(OrgTab.ORG_UNIT)
 
 export enum EmployeeTab {
-  EMPLOYEE = "Medarbejder",
-  ENGAGEMENT = "Engagementer",
-  ADDRESS = "Adresser",
-  ASSOCIATION = "Tilknytninger",
-  ITASSOCIATION = "IT-Tilknytninger",
-  ROLE = "Roller",
-  IT = "IT",
-  LEAVE = "Orlov",
-  MANAGER = "Ledere",
-  OWNER = "Ejere",
+  EMPLOYEE = "employee",
+  ENGAGEMENT = "engagement",
+  ADDRESS = "address",
+  ASSOCIATION = "association",
+  ITASSOCIATION = "itassociation",
+  ROLE = "role",
+  IT = "it",
+  LEAVE = "leave",
+  MANAGER = "manager",
+  OWNER = "owner",
 }
 
 export const activeEmployeeTab = writable(EmployeeTab.EMPLOYEE)

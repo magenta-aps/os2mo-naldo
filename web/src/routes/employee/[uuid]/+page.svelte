@@ -22,48 +22,31 @@
   import ManagerTable from "$lib/components/tables/ManagerTable.svelte"
   import LeaveTable from "$lib/components/tables/LeaveTable.svelte"
   import OwnerTable from "$lib/components/tables/OwnerTable.svelte"
+  import { _ } from "svelte-i18n"
 
   // Tabs
-  let items = Object.values(EmployeeTab)
+  let items = [
+    { label: $_("employee"), value: "employee" },
+    { label: $_("engagement"), value: "engagement" },
+    { label: $_("address"), value: "address" },
+    { label: $_("association"), value: "association" },
+    { label: $_("itassociation"), value: "itassociation" },
+    { label: $_("role"), value: "role" },
+    { label: $_("it"), value: "it" },
+    { label: $_("leave"), value: "leave" },
+    { label: $_("manager"), value: "manager" },
+    { label: $_("owner"), value: "owner" },
+  ]
 
   // TODO: Move tab logic into tabs.svelte
   if (env.PUBLIC_SHOW_ITASSOCIATION_TAB === "false") {
-    items = items.filter((tab) => tab !== EmployeeTab.ITASSOCIATION)
+    items = items.filter((tab) => tab.value !== EmployeeTab.ITASSOCIATION)
   }
 
   let uuidFromUrl = $page.params.uuid
 
   let activeItem = $activeEmployeeTab
   const tabChange = (e: CustomEvent) => ($activeEmployeeTab = activeItem = e.detail)
-
-  // Used to make a dynamic create button
-  const subsiteOfCategory = (category: EmployeeTab) => {
-    switch (category) {
-      case EmployeeTab.EMPLOYEE:
-        return "employee"
-      case EmployeeTab.ENGAGEMENT:
-        return "engagement"
-      case EmployeeTab.ADDRESS:
-        return "address"
-      case EmployeeTab.ASSOCIATION:
-        return "association"
-      case EmployeeTab.ITASSOCIATION:
-        return "itassociation"
-      case EmployeeTab.ROLE:
-        return "role"
-      case EmployeeTab.IT:
-        return "it"
-      case EmployeeTab.LEAVE:
-        return "leave"
-      case EmployeeTab.MANAGER:
-        return "manager"
-      case EmployeeTab.OWNER:
-        return "owner"
-      default:
-        console.warn("The tab doesn't match a subsite")
-        return
-    }
-  }
 
   gql`
     query Employee($uuid: [UUID!], $fromDate: DateTime) {
@@ -121,10 +104,11 @@
         href={`${base}/employee/${
           activeItem === EmployeeTab.EMPLOYEE
             ? "create"
-            : `${$page.params.uuid}/create/${subsiteOfCategory(activeItem)}`
+            : `${$page.params.uuid}/create/${activeItem}`
         }`}
       >
-        Tilføj {activeItem}
+        {$_("add")}
+        {activeItem}
       </a>
     </div>
 
@@ -132,9 +116,9 @@
       <TableTensesWrapper
         table={EmployeeTable}
         headers={[
-          { title: "Navn", sortPath: "name" },
-          { title: "Kaldenavn", sortPath: "nickname" },
-          { title: "Dato", sortPath: "validity.from" },
+          { title: $_("name"), sortPath: "name" },
+          { title: $_("nickname"), sortPath: "nickname" },
+          { title: $_("date.date"), sortPath: "validity.from" },
           { title: "" },
         ]}
       />
@@ -142,11 +126,11 @@
       <TableTensesWrapper
         table={EngagementTable}
         headers={[
-          { title: "Enhed", sortPath: "org_unit[0].name" },
-          { title: "Stillingsbetegnelse", sortPath: "job_function.name" },
-          { title: "Engagementstype", sortPath: "engagement_type.name" },
-          { title: "Primær" },
-          { title: "Dato", sortPath: "validity.from" },
+          { title: $_("unit"), sortPath: "org_unit[0].name" },
+          { title: $_("job_function"), sortPath: "job_function.name" },
+          { title: $_("engagement_type"), sortPath: "engagement_type.name" },
+          { title: $_("primary") },
+          { title: $_("date.date"), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
@@ -155,11 +139,11 @@
       <TableTensesWrapper
         table={AddressTable}
         headers={[
-          { title: "Adressetype", sortPath: "address_type.name" },
-          { title: "Adresse", sortPath: "name" },
+          { title: $_("address_type"), sortPath: "address_type.name" },
+          { title: $_("address"), sortPath: "name" },
           // TODO: Make it possible to sort optional fields maybe? visibility and primary for example
-          { title: "Synlighed" },
-          { title: "Dato", sortPath: "validity.from" },
+          { title: $_("visibility") },
+          { title: $_("date.date"), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
@@ -168,10 +152,10 @@
       <TableTensesWrapper
         table={AssociationTable}
         headers={[
-          { title: "Enhed", sortPath: "org_unit[0].name" },
-          { title: "Tilknytningsrolle", sortPath: "association_type.name" },
-          { title: "Primær" },
-          { title: "Dato", sortPath: "validity.from" },
+          { title: $_("unit"), sortPath: "org_unit[0].name" },
+          { title: $_("association_type"), sortPath: "association_type.name" },
+          { title: $_("primary") },
+          { title: $_("date.date"), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
@@ -180,12 +164,12 @@
       <TableTensesWrapper
         table={ItAssociationTable}
         headers={[
-          { title: "Enhed", sortPath: "org_unit[0].name" },
-          { title: "Stillingsbetegnelse", sortPath: "job_function.name" },
-          { title: "IT system", sortPath: "it_user[0].itsystem.name" },
-          { title: "Kontonavn", sortPath: "it_user[0].user_key" },
-          { title: "Primær" },
-          { title: "Dato", sortPath: "validity.from" },
+          { title: $_("unit"), sortPath: "org_unit[0].name" },
+          { title: $_("job_function"), sortPath: "job_function.name" },
+          { title: $_("it_system"), sortPath: "it_user[0].itsystem.name" },
+          { title: $_("account_name"), sortPath: "it_user[0].user_key" },
+          { title: $_("primary") },
+          { title: $_("date.date"), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
@@ -194,9 +178,9 @@
       <TableTensesWrapper
         table={RoleTable}
         headers={[
-          { title: "Enhed", sortPath: "org_unit[0].name" },
-          { title: "Rolletype", sortPath: "role_type.name" },
-          { title: "Dato", sortPath: "validity.from" },
+          { title: $_("unit"), sortPath: "org_unit[0].name" },
+          { title: $_("role_type"), sortPath: "role_type.name" },
+          { title: $_("date.date"), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
@@ -205,10 +189,10 @@
       <TableTensesWrapper
         table={ItUserTable}
         headers={[
-          { title: "IT system", sortPath: "itsystem.name" },
-          { title: "Kontonavn", sortPath: "user_key" },
-          { title: "Primær" },
-          { title: "Dato", sortPath: "validity.from" },
+          { title: $_("it_system"), sortPath: "itsystem.name" },
+          { title: $_("account_name"), sortPath: "user_key" },
+          { title: $_("primary") },
+          { title: $_("date.date"), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
@@ -217,9 +201,9 @@
       <TableTensesWrapper
         table={LeaveTable}
         headers={[
-          { title: "Orlovstype", sortPath: "leave_type.name" },
-          { title: "Engagement", sortPath: "engagement.job_function.name" },
-          { title: "Dato", sortPath: "validity.from" },
+          { title: $_("leave_type"), sortPath: "leave_type.name" },
+          { title: $_("engagement"), sortPath: "engagement.job_function.name" },
+          { title: $_("date.date"), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
@@ -228,11 +212,11 @@
       <TableTensesWrapper
         table={ManagerTable}
         headers={[
-          { title: "Enhed", sortPath: "org_unit[0].name" },
-          { title: "Lederansvar" },
-          { title: "Ledertype", sortPath: "manager_type.name" },
-          { title: "Lederniveau", sortPath: "manager_level.name" },
-          { title: "Dato", sortPath: "validity.from" },
+          { title: $_("unit"), sortPath: "org_unit[0].name" },
+          { title: $_("manager_responsibility") },
+          { title: $_("manager_type"), sortPath: "manager_type.name" },
+          { title: $_("manager_level"), sortPath: "manager_level.name" },
+          { title: $_("date.date"), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
@@ -241,8 +225,8 @@
       <TableTensesWrapper
         table={OwnerTable}
         headers={[
-          { title: "Navn", sortPath: "owner[0].name" },
-          { title: "Dato", sortPath: "validity.from" },
+          { title: $_("name"), sortPath: "owner[0].name" },
+          { title: $_("date.date"), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
