@@ -7,14 +7,18 @@ export const actions: Actions = {
     const facet = data.get("facet-uuid")
     const name = data.get("name") as string
     const startDate = data.get("from")
-    const endDate = data.get("to")
+    // const endDate = data.get("to")
 
     return {
       uuid: params.class,
       facet_uuid: facet,
       name: name,
       user_key: name,
-      validity: { from: startDate, ...(endDate && { to: endDate }) },
+      validity: { from: startDate },
+      // FIXME: (don't know which prefix to use)
+      // Commented out for now, but will probably be needed at some point:
+      // https://redmine.magenta.dk/issues/58396
+      // validity: { from: startDate, ...(endDate && { to: endDate }) },
     }
   },
 }
