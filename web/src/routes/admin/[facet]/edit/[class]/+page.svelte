@@ -66,7 +66,7 @@
                 mutation.class_update.objects[0]?.name
                   ? `${mutation.class_update.objects[0].name}`
                   : ""
-              } er oprettet fra d. ${$fromDate.value}`,
+              } er redigeret fra d. ${$fromDate.value}`,
               type: "admin",
             }
           } catch (err) {
@@ -105,14 +105,17 @@
             max={toDate ? toDate : undefined}
             required={true}
           />
-          <DateInput
+          <!-- FIXME: (don't know which prefix to use) -->
+          <!-- Commented out for now, but will probably be needed at some point: -->
+          <!-- https://redmine.magenta.dk/issues/58396 -->
+          <!-- <DateInput
             bind:value={toDate}
             title="Slutdato"
             id="to"
             startValue={cls.validity.to ? cls.validity.to.split("T")[0] : null}
             min={$fromDate.value ? $fromDate.value : undefined}
             max={undefined}
-          />
+          /> -->
         </div>
         <!-- <div class="flex flex-row gap-6"> -->
         <Input

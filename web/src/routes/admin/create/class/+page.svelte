@@ -110,13 +110,16 @@
             max={toDate ? toDate : maxDate}
             required={true}
           />
-          <DateInput
+          <!-- FIXME: (don't know which prefix to use) -->
+          <!-- Commented out for now, but will probably be needed at some point: -->
+          <!-- https://redmine.magenta.dk/issues/58396 -->
+          <!-- <DateInput
             bind:value={toDate}
             title="Slutdato"
             id="to"
             min={$fromDate.value ? $fromDate.value : minDate}
             max={maxDate}
-          />
+          /> -->
         </div>
         <!-- TODO: when we allow creating classes for different facets, add this back -->
         <input type="hidden" id="facet" name="facet" value={jobFunction.uuid} />
