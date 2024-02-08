@@ -16,9 +16,9 @@
 </script>
 
 <div class="form-control basis-1/2 {noPadding ? '' : 'pb-3'}">
-  <div class={noPadding ? "" : "pb-1"}>
+  <div class="text-secondary {noPadding ? '' : 'pb-1'}">
     {#if title || required}
-      <label for={id} class="text-sm text-secondary pb-1">
+      <label for={id} class="text-sm pb-1">
         {title ? title : ""}
         {required ? "*" : ""}
       </label>
