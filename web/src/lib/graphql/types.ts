@@ -543,6 +543,10 @@ export type AddressResponse = {
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
    *
+   * @deprecated
+   * Will be removed in a future version of GraphQL.
+   * Use validities instead.
+   *
    */
   objects: Array<Address>;
   /**
@@ -565,6 +569,19 @@ export type AddressResponse = {
   registrations: Array<Registration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
+  /**
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Address>;
 };
 
 
@@ -1126,6 +1143,10 @@ export type AssociationResponse = {
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
    *
+   * @deprecated
+   * Will be removed in a future version of GraphQL.
+   * Use validities instead.
+   *
    */
   objects: Array<Association>;
   /**
@@ -1148,6 +1169,19 @@ export type AssociationResponse = {
   registrations: Array<Registration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
+  /**
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Association>;
 };
 
 
@@ -1860,6 +1894,10 @@ export type ClassResponse = {
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
    *
+   * @deprecated
+   * Will be removed in a future version of GraphQL.
+   * Use validities instead.
+   *
    */
   objects: Array<Class>;
   /**
@@ -1882,6 +1920,19 @@ export type ClassResponse = {
   registrations: Array<Registration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
+  /**
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Class>;
 };
 
 
@@ -2426,6 +2477,10 @@ export type EmployeeResponse = {
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
    *
+   * @deprecated
+   * Will be removed in a future version of GraphQL.
+   * Use validities instead.
+   *
    */
   objects: Array<Employee>;
   /**
@@ -2448,6 +2503,19 @@ export type EmployeeResponse = {
   registrations: Array<Registration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
+  /**
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Employee>;
 };
 
 
@@ -3120,6 +3188,10 @@ export type EngagementResponse = {
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
    *
+   * @deprecated
+   * Will be removed in a future version of GraphQL.
+   * Use validities instead.
+   *
    */
   objects: Array<Engagement>;
   /**
@@ -3142,6 +3214,19 @@ export type EngagementResponse = {
   registrations: Array<Registration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
+  /**
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Engagement>;
 };
 
 
@@ -3577,6 +3662,10 @@ export type FacetResponse = {
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
    *
+   * @deprecated
+   * Will be removed in a future version of GraphQL.
+   * Use validities instead.
+   *
    */
   objects: Array<Facet>;
   /**
@@ -3599,6 +3688,19 @@ export type FacetResponse = {
   registrations: Array<Registration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
+  /**
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Facet>;
 };
 
 
@@ -4089,6 +4191,10 @@ export type ItSystemResponse = {
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
    *
+   * @deprecated
+   * Will be removed in a future version of GraphQL.
+   * Use validities instead.
+   *
    */
   objects: Array<ItSystem>;
   /**
@@ -4111,6 +4217,19 @@ export type ItSystemResponse = {
   registrations: Array<Registration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
+  /**
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<ItSystem>;
 };
 
 
@@ -4416,6 +4535,8 @@ export type ItUserCreateInput = {
   engagement?: InputMaybe<Scalars['UUID']['input']>;
   /** Reference to the IT system for the IT user. */
   itsystem: Scalars['UUID']['input'];
+  /** Note associated with the creation of this IT user. */
+  note?: InputMaybe<Scalars['String']['input']>;
   /** Reference to the organisation unit of the IT user (if any). */
   org_unit?: InputMaybe<Scalars['UUID']['input']>;
   /** Reference to the employee for the IT user (if any). */
@@ -4604,6 +4725,10 @@ export type ItUserResponse = {
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
    *
+   * @deprecated
+   * Will be removed in a future version of GraphQL.
+   * Use validities instead.
+   *
    */
   objects: Array<ItUser>;
   /**
@@ -4626,6 +4751,19 @@ export type ItUserResponse = {
   registrations: Array<Registration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
+  /**
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<ItUser>;
 };
 
 
@@ -4687,6 +4825,8 @@ export type ItUserUpdateInput = {
   engagement?: InputMaybe<Scalars['UUID']['input']>;
   /** Reference to the IT system for the IT user. */
   itsystem?: InputMaybe<Scalars['UUID']['input']>;
+  /** Note associated with the update of this IT user. */
+  note?: InputMaybe<Scalars['String']['input']>;
   /** Reference to the organisation unit of the IT user (if any). */
   org_unit?: InputMaybe<Scalars['UUID']['input']>;
   /** Reference to the employee for the IT user (if any). */
@@ -5080,6 +5220,10 @@ export type KleResponse = {
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
    *
+   * @deprecated
+   * Will be removed in a future version of GraphQL.
+   * Use validities instead.
+   *
    */
   objects: Array<Kle>;
   /**
@@ -5102,6 +5246,19 @@ export type KleResponse = {
   registrations: Array<Registration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
+  /**
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Kle>;
 };
 
 
@@ -5478,6 +5635,10 @@ export type LeaveResponse = {
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
    *
+   * @deprecated
+   * Will be removed in a future version of GraphQL.
+   * Use validities instead.
+   *
    */
   objects: Array<Leave>;
   /**
@@ -5500,6 +5661,19 @@ export type LeaveResponse = {
   registrations: Array<Registration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
+  /**
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Leave>;
 };
 
 
@@ -5932,6 +6106,10 @@ export type ManagerResponse = {
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
    *
+   * @deprecated
+   * Will be removed in a future version of GraphQL.
+   * Use validities instead.
+   *
    */
   objects: Array<Manager>;
   /**
@@ -5954,6 +6132,19 @@ export type ManagerResponse = {
   registrations: Array<Registration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
+  /**
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Manager>;
 };
 
 
@@ -8001,6 +8192,10 @@ export type OrganisationUnitResponse = {
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
    *
+   * @deprecated
+   * Will be removed in a future version of GraphQL.
+   * Use validities instead.
+   *
    */
   objects: Array<OrganisationUnit>;
   /**
@@ -8023,6 +8218,19 @@ export type OrganisationUnitResponse = {
   registrations: Array<Registration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
+  /**
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<OrganisationUnit>;
 };
 
 
@@ -8378,6 +8586,10 @@ export type OwnerResponse = {
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
    *
+   * @deprecated
+   * Will be removed in a future version of GraphQL.
+   * Use validities instead.
+   *
    */
   objects: Array<Owner>;
   /**
@@ -8400,6 +8612,19 @@ export type OwnerResponse = {
   registrations: Array<Registration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
+  /**
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Owner>;
 };
 
 
@@ -8820,6 +9045,8 @@ export type Registration = {
    *
    */
   model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
   /**
    * Internal registration ID for the registration.
    *
@@ -9081,6 +9308,10 @@ export type RelatedUnitResponse = {
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
    *
+   * @deprecated
+   * Will be removed in a future version of GraphQL.
+   * Use validities instead.
+   *
    */
   objects: Array<RelatedUnit>;
   /**
@@ -9103,6 +9334,19 @@ export type RelatedUnitResponse = {
   registrations: Array<Registration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
+  /**
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<RelatedUnit>;
 };
 
 
@@ -9442,6 +9686,10 @@ export type RoleResponse = {
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
    *
+   * @deprecated
+   * Will be removed in a future version of GraphQL.
+   * Use validities instead.
+   *
    */
   objects: Array<Role>;
   /**
@@ -9464,6 +9712,19 @@ export type RoleResponse = {
   registrations: Array<Registration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
+  /**
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Role>;
 };
 
 
