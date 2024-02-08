@@ -106,7 +106,7 @@
 </script>
 
 {#await graphQLClient().request(OrgUnitHierarchiesDocument) then data}
-  {#if data.facets.objects[0].objects[0].classes.length}
+  {#if data.facets.objects.length && data.facets.objects[0].objects[0].classes.length}
     {@const facets = data.facets.objects}
     <Select
       id="org-unit-hierarchy"
