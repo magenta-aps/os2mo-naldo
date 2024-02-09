@@ -21,6 +21,8 @@
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import SelectGroup from "$lib/components/forms/shared/SelectGroup.svelte"
+  import SvelteSelect from "svelte-select"
 
   let toDate: string
   let selectedOrgUnit: {
@@ -56,6 +58,22 @@
             validity {
               from
               to
+            }
+          }
+        }
+      }
+      classes(filter: { facet: { user_keys: "medarbejder_organisation3" } }) {
+        objects {
+          objects {
+            top_level_facet {
+              uuid
+              user_key
+            }
+            name
+            children {
+              name
+              user_key
+              uuid
             }
           }
         }
@@ -130,6 +148,7 @@
   {@const facets = data.facets.objects}
   {@const employee = data.employees.objects[0].objects[0]}
   {@const minDate = data.employees.objects[0].objects[0].validity?.from?.split("T")[0]}
+  {@const topLevelFacets = data.classes.objects}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -191,6 +210,13 @@
             isClearable={true}
           />
         </div>
+        <!-- TODO: Add this back when GraphQL is ready and we know if everyone should have it, or it should be FF'd -->
+        <!-- Functionality should be fine, simply uncomment to test -->
+        <!-- <SelectGroup
+          id="med-org"
+          title="Hovedorganisation/Faglig organisation"
+          iterable={topLevelFacets}
+        /> -->
       </div>
     </div>
     <div class="flex py-6 gap-4">

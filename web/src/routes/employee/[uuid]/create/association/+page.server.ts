@@ -10,6 +10,9 @@ export const actions: Actions = {
     const associationType = data.get("association-type")
     const orgUnitUuid = data.get("org-unit-uuid")
     const primary = data.get("primary")
+    // TODO: Uncomment when graphQL is ready
+    // Also add in the `return`
+    // const medOrg = data.get("med-org")
     const startDate = data.get("from")
     const endDate = data.get("to")
 
