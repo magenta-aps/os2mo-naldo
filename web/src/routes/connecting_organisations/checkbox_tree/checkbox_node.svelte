@@ -120,6 +120,7 @@
           title={name}
           value={uuid}
           startValue={isSelectedDestination ? uuid : ""}
+          noPadding={true}
           disabled={!selectedOriginOrg || selectedOriginOrg.uuid === uuid}
         />
       </div>

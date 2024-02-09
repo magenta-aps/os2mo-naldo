@@ -2,28 +2,15 @@
   export let title: string | undefined = undefined
   export let size: string = "sm"
   export let id: string
-  export let name: string = id
+  export let name = id
   export let value: string | number | null | undefined = undefined
-  export let cprName: string | number | null | undefined = undefined
   export let startValue: string | number | null | undefined = undefined
   value = startValue ? startValue : value
   export let required = false
   export let placeholder: string | undefined = undefined
-  export let type = "text"
   export let disabled = false
-  export let pattern: string | undefined = undefined
   export let extra_classes = ""
-  export let readonly = false
   export let errors: string[] = []
-
-  const typeAction = (node: any) => {
-    node.type = type
-  }
-
-  // This is only for the name inputs in create employee
-  $: if (value) {
-    cprName = value
-  }
 </script>
 
 <div class="form-control pb-3 {extra_classes}">
@@ -34,37 +21,20 @@
         {required ? "*" : ""}
       </label>
     {/if}
-    <input
-      use:typeAction
+    <textarea
       {title}
-      {pattern}
       {id}
       {name}
       {placeholder}
       bind:value
-      type="text"
-      class="input input-bordered input-{size} rounded text-base font-normal w-full focus:outline-0
-      {errors.length ? 'input-error' : 'focus:input-primary'}"
-      {readonly}
+      class="textarea textarea-bordered max-h-96 textarea-{size} rounded text-base font-normal w-full focus:outline-0
+          {errors.length ? 'textarea-error' : 'focus:textarea-primary'}"
       {disabled}
     />
   </div>
-
   {#each errors as error}
     {#if error === "required"}
       <span class="label-text-alt text-error block">{title} skal udfyldes</span>
-    {/if}
-
-    {#if error === "not_an_email"}
-      <span class="label-text-alt text-error block">{title} er ikke gyldig</span>
-    {/if}
-
-    {#if error === "pattern"}
-      <span class="label-text-alt text-error block">{title} har forkert format</span>
-    {/if}
-
-    {#if error === "url"}
-      <span class="label-text-alt text-error block">{title} har forkert format</span>
     {/if}
   {/each}
 </div>
