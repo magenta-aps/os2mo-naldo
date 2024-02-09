@@ -33,16 +33,18 @@
   }
 
   // Flattening data
-  const flatData = iterable.flatMap((group) => {
-    return group.objects.flatMap((parent: Class) => {
-      const groupName = parent.name
-      return parent.children.map((child) => ({
-        group: groupName,
-        label: child.name,
-        uuid: child.uuid,
-      }))
+  const flatData = iterable
+    .flatMap((group) => {
+      return group.objects.flatMap((parent: Class) => {
+        const groupName = parent.name
+        return parent.children.map((child) => ({
+          group: groupName,
+          label: child.name,
+          uuid: child.uuid,
+        }))
+      })
     })
-  })
+    .sort((a, b) => (a.label > b.label ? 1 : -1))
 
   const groupBy = (item: any) => item.group
 </script>
