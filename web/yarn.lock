@@ -1340,6 +1340,13 @@
   resolved "https://registry.yarnpkg.com/@graphql-typed-document-node/core/-/core-3.2.0.tgz#5f3d96ec6b2354ad6d8a28bf216a1d97b5426861"
   integrity sha512-mB9oAsNCm9aM3/SOv4YtBMqZbYj10R7dkq8byBqxGY/ncFwhf2oQzMV+LCRlWoDSEBJ3COiR1yeDvMtsoOsuFQ==
 
+"@iconify/icons-circle-flags@^1.2.41":
+  version "1.2.41"
+  resolved "https://registry.yarnpkg.com/@iconify/icons-circle-flags/-/icons-circle-flags-1.2.41.tgz#41c780bff1745c308462025cec6c4c67f170cbbc"
+  integrity sha512-0a+X0tZQy8wWXw16jOpUr/Y/vr/3W6RcWm1VPdu+EaHpkmpXERroXq4k/V2Dpyboc+RRD5owX3jaDXjKqhTIqw==
+  dependencies:
+    "@iconify/types" "*"
+
 "@iconify/icons-material-symbols@^1.2.58":
   version "1.2.58"
   resolved "https://registry.yarnpkg.com/@iconify/icons-material-symbols/-/icons-material-symbols-1.2.58.tgz#7e94bffecba976f173035e2c06a817b8452fd400"
