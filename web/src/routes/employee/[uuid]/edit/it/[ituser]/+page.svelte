@@ -22,6 +22,7 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import TextArea from "$lib/components/forms/shared/textArea.svelte"
 
   let toDate: string
 
@@ -34,7 +35,7 @@
     query ITUserItSystemsAndPrimary(
       $uuid: [UUID!]
       $fromDate: DateTime
-      $employee_uuid: [UUID!]
+      $employeeUuid: [UUID!]
     ) {
       itusers(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
@@ -52,9 +53,12 @@
               to
             }
           }
+          registrations {
+            note
+          }
         }
       }
-      employees(filter: { uuids: $employee_uuid }) {
+      employees(filter: { uuids: $employeeUuid }) {
         objects {
           objects {
             validity {
@@ -130,7 +134,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ItUserItSystemsAndPrimaryDocument, { uuid: $page.params.ituser, fromDate: $date, employee_uuid: $page.params.uuid } )}
+{#await graphQLClient().request( ItUserItSystemsAndPrimaryDocument, { uuid: $page.params.ituser, fromDate: $date, employeeUuid: $page.params.uuid } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -147,6 +151,12 @@
   </div>
 {:then data}
   {@const itUser = data.itusers.objects[0].objects[0]}
+  {@const notes = data.itusers.objects[0].registrations}
+  <!-- Always return latest note
+  This might not be the "correct" solution, but I can't
+  figure out a way to always pair notes with the correct ITUser. 
+  This might be the wanted behaviour, as the note is always updated? -->
+  {@const note = notes[notes.length - 1].note}
   {@const classes = data.classes.objects}
   {@const itSystems = data.itsystems.objects}
   {@const minDate = data.employees.objects[0].objects[0].validity?.from?.split("T")[0]}
@@ -207,6 +217,7 @@
           id="non-primary"
           value={getClassUuidByUserKey(classes, "non-primary")}
         />
+        <TextArea title="Noter" id="notes" startValue={note} />
       </div>
     </div>
     <div class="flex py-6 gap-4">

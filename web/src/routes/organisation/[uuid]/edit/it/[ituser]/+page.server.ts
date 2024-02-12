@@ -7,6 +7,7 @@ export const actions: Actions = {
     const itSystem = data.get("it-system")
     const accountName = data.get("account-name") as string
     const primary = data.get("primary") ? data.get("primary") : data.get("non-primary")
+    const notes = data.get("notes") as string
     const startDate = data.get("from")
     const endDate = data.get("to")
 
@@ -15,6 +16,7 @@ export const actions: Actions = {
       primary: primary,
       ...(accountName && { user_key: accountName }),
       ...(itSystem && { itsystem: itSystem }),
+      ...(notes && { note: notes }),
       validity: { from: startDate, ...(endDate && { to: endDate }) },
     }
   },
