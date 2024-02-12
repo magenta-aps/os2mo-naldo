@@ -1,6 +1,5 @@
 <script lang="ts">
   import { page } from "$app/stores"
-  import Tabs from "$lib/components/shared/tabs.svelte"
   import HeadTitle from "$lib/components/shared/head_title.svelte"
   import CopyToClipboard from "$lib/components/copy_to_clipboard.svelte"
   import TenseTabs from "$lib/components/shared/tense_tabs.svelte"
@@ -24,47 +23,30 @@
   import OwnerTable from "$lib/components/tables/OwnerTable.svelte"
   import RelatedUnitsTable from "$lib/components/tables/RelatedUnitsTable.svelte"
   import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
+  import { _ } from "svelte-i18n"
+  import Tabs from "$lib/components/shared/tabs.svelte"
 
   // Tabs
-  let items = Object.values(OrgTab)
+  let items = [
+    { label: $_("unit"), value: "org_unit" },
+    { label: $_("address"), value: "address" },
+    { label: $_("engagement"), value: "engagement" },
+    { label: $_("association"), value: "association" },
+    { label: $_("it"), value: "it" },
+    { label: $_("role"), value: "role" },
+    { label: $_("kle"), value: "kle" },
+    { label: $_("manager"), value: "manager" },
+    { label: $_("related_unit"), value: "related_unit" },
+  ]
 
   // TODO: Move tab logic into tabs.svelte
   if (env.PUBLIC_SHOW_KLE_TAB === "false") {
-    items = items.filter((tab) => tab !== OrgTab.KLE)
+    items = items.filter((tab) => tab.value !== OrgTab.KLE)
   }
 
   let uuidFromUrl = $page.params.uuid
   let activeItem = $activeOrgTab
   const tabChange = (e: CustomEvent) => ($activeOrgTab = activeItem = e.detail)
-
-  // Used to make a dynamic create button
-  const subsiteOfCategory = (category: OrgTab) => {
-    switch (category) {
-      case OrgTab.ORG_UNIT:
-        return "org_unit"
-      case OrgTab.ADDRESS:
-        return "address"
-      case OrgTab.ENGAGEMENT:
-        return "engagement"
-      case OrgTab.ASSOCIATION:
-        return "association"
-      case OrgTab.IT:
-        return "it"
-      case OrgTab.ROLE:
-        return "role"
-      case OrgTab.MANAGER:
-        return "manager"
-      case OrgTab.KLE:
-        return "kle"
-      case OrgTab.OWNER:
-        return "owner"
-      case OrgTab.RELATED_UNIT:
-        return "related_units"
-      default:
-        console.warn("The tab doesn't match a subsite")
-        return
-    }
-  }
 
   gql`
     query OrgUnit($uuid: [UUID!], $fromDate: DateTime) {
@@ -123,12 +105,11 @@
             ? `organisation/create#uuid=${$page.params.uuid}`
             : activeItem === OrgTab.RELATED_UNIT
             ? "connecting_organisations"
-            : `organisation/${$page.params.uuid}/create/${subsiteOfCategory(
-                activeItem
-              )}`
+            : `organisation/${$page.params.uuid}/create/${activeItem}`
         }`}
       >
-        Tilføj {activeItem}
+        {$_("add")}
+        {items.find((item) => item.value === activeItem)?.label}
       </a>
     </div>
 

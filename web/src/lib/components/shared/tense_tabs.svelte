@@ -1,5 +1,6 @@
 <script lang="ts">
   import { tenses } from "$lib/stores/tenses"
+  import { _ } from "svelte-i18n"
 </script>
 
 <div class="tabs p-0 bg-base-100 border-primary border rounded my-5 w-fit">
@@ -10,7 +11,7 @@
       $tenses.future = !$tenses.future
     }}
   >
-    Fremtid
+    {$_("future")}
   </button>
   <button
     class="tab text-slate-600 hover:text-secondary
@@ -19,7 +20,7 @@
       $tenses.present = !$tenses.present
     }}
   >
-    Nutid
+    {$_("present")}
   </button>
   <button
     class="border-primary border-l text-slate-600 hover:text-secondary tab
@@ -28,6 +29,6 @@
       $tenses.past = !$tenses.past
     }}
   >
-    Fortid
+    {$_("past")}
   </button>
 </div>

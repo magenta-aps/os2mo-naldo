@@ -10,7 +10,10 @@
   import personOutlineRounded from "@iconify/icons-material-symbols/person-outline-rounded"
   import homeWorkOutlineRounded from "@iconify/icons-material-symbols/home-work-outline-rounded"
   import menuRounded from "@iconify/icons-material-symbols/menu-rounded"
+  import circleFlagsGb from "@iconify/icons-circle-flags/gb"
+  import circleFlagsDa from "@iconify/icons-circle-flags/da"
   import adminPanelSettingsOutlineRounded from "@iconify/icons-material-symbols/admin-panel-settings-outline-rounded"
+  import { locale } from "svelte-i18n"
 
   let orgChecked: boolean
 
@@ -24,6 +27,10 @@
     timeout = setTimeout(() => {
       $date = selectedDate
     }, 500)
+  }
+
+  function changeLanguage(event: any) {
+    locale.set(event.currentTarget.value)
   }
 </script>
 
@@ -67,6 +74,31 @@
   </div>
 
   <div class="navbar-end flex">
+    <div class="join gap-2 pr-4">
+      <input
+        type="radio"
+        id="lang-en"
+        name="lang"
+        value="en"
+        class="join-item hidden"
+        on:change={changeLanguage}
+      />
+      <label for="lang-en">
+        <Icon class="cursor-pointer" icon={circleFlagsGb} width="25" height="25" />
+      </label>
+      <input
+        type="radio"
+        id="lang-da"
+        name="lang"
+        value="da"
+        class="join-item hidden"
+        on:change={changeLanguage}
+      />
+      <label for="lang-da">
+        <Icon class="cursor-pointer" icon={circleFlagsDa} width="25" height="25" />
+      </label>
+    </div>
+
     {#if $isAdmin}
       <a class="text-base-100 pr-4" href="{base}/admin"
         ><Icon icon={adminPanelSettingsOutlineRounded} width="25" height="25" /></a

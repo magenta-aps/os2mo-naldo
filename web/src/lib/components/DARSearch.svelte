@@ -2,6 +2,7 @@
   import { env } from "$env/dynamic/public"
   import SvelteSelect from "svelte-select"
   import DarItem from "./DARItem.svelte"
+  import { _ } from "svelte-i18n"
 
   export let startValue: DarAddressResponse | undefined = undefined
   export let value: DarAddressResponse | undefined = startValue || undefined
@@ -63,7 +64,7 @@
       --border-radius="0.25rem"
       --icons-color="#00244E"
       --padding="0 0.75rem 0 0.75rem"
-      placeholder="Søg efter adresse"
+      placeholder={$_("search.person")}
       id="dar-search"
       listAutoWidth={false}
       loadOptions={fetchDAR}

@@ -5,6 +5,7 @@
   import { gql } from "graphql-request"
   import { VersionDocument } from "./query.generated"
   import { env } from "$env/dynamic/public"
+  import { _ } from "svelte-i18n"
 
   gql`
     query Version {
@@ -21,61 +22,65 @@
 
 <div class="flex flex-row px-12 pt-6 gap-20">
   <div class="basis-9/12">
-    <h1 class="mb-10">Velkommen til MO</h1>
+    <h1 class="mb-10">
+      {$_("welcome_message")}
+    </h1>
     <!-- This image needs to be remade, right now it's smaller than how we use it, which means it might pixelate -->
     <img class="w-full" src={indexPageImage} alt="velkommen tilbage til os2mo" />
   </div>
   <div class="card basis-3/12 bg-slate-100 rounded-lg">
     <div class="card-body">
       <div>
-        <h3 class="text-lg">Medarbejder</h3>
+        <h3 class="text-lg">{$_("employee")}</h3>
         <ul class="menu p-0">
           <li>
             <a href="{base}/employee/create" class="hover:no-underline">
-              Ny medarbejder</a
+              {$_("navigation.create_employee")}</a
             >
           </li>
           <li>
-            <a href="{base}/employee/create/leave" class="hover:no-underline"> Orlov</a>
+            <a href="{base}/employee/create/leave" class="hover:no-underline">
+              {$_("navigation.leave")}</a
+            >
           </li>
           <li>
-            <a href="{base}/employee/create/leave" class="hover:no-underline">
-              Flyt engagement</a
+            <a href="{base}/employee/move" class="hover:no-underline">
+              {$_("navigation.move_engagement")}</a
             >
           </li>
           <li>
             <a href="{base}/employee/terminate" class="hover:no-underline">
-              Opsig medarbejder</a
+              {$_("navigation.terminate_employee")}</a
             >
           </li>
         </ul>
       </div>
       <div>
-        <h3 class="mt-2 text-lg">Organisation</h3>
+        <h3 class="mt-2 text-lg">{$_("organisation")}</h3>
         <ul class="menu p-0">
           <li>
             <a href="{base}/organisation/create" class="hover:no-underline">
-              Opret enhed</a
+              {$_("navigation.create_unit")}</a
             >
           </li>
           <li>
             <a href="{base}/organisation/rename" class="hover:no-underline">
-              Omdøb enhed</a
+              {$_("navigation.create_unit")}</a
             >
           </li>
           <li>
             <a href="{base}/organisation/move" class="hover:no-underline">
-              Flyt enhed</a
+              {$_("navigation.move_unit")}</a
             >
           </li>
           <li>
             <a href="{base}/organisation/terminate" class="hover:no-underline">
-              Afslut enhed</a
+              {$_("navigation.terminate_unit")}</a
             >
           </li>
           <li>
             <a href="{base}/connecting_organisations" class="hover:no-underline">
-              Organisationssammenkobling</a
+              {$_("navigation.connecting_organisations")}</a
             >
           </li>
         </ul>

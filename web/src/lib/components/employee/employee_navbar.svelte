@@ -4,9 +4,9 @@
   import Icon from "@iconify/svelte"
   import personAddOutlineRounded from "@iconify/icons-material-symbols/person-add-outline-rounded"
   import personCancelOutlineRounded from "@iconify/icons-material-symbols/person-cancel-outline-rounded"
-  import personRaisedHandOutlineRounded from "@iconify/icons-material-symbols/person-raised-hand-outline-rounded"
   import personAlertOutlineRounded from "@iconify/icons-material-symbols/person-alert-outline-rounded"
   import swapHorizRounded from "@iconify/icons-material-symbols/swap-horiz-rounded"
+  import { _ } from "svelte-i18n"
 
   enum Form {
     CREATE = "create",
@@ -22,7 +22,7 @@
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <Icon icon={personAddOutlineRounded} width="20" height="20" />
-      <p class="text-base-100">Ny medarbejder</p>
+      <p class="text-base-100">{$_("navigation.create_employee")}</p>
     </a>
     <a
       href={`${base}/employee/${Form.CREATE}/leave/${
@@ -31,7 +31,7 @@
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <Icon icon={personAlertOutlineRounded} width="20" height="20" />
-      <p class="text-base-100">Orlov</p>
+      <p class="text-base-100">{$_("navigation.leave")}</p>
     </a>
     <a
       href={`${base}/employee/${Form.MOVE}${
@@ -40,7 +40,7 @@
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <Icon icon={swapHorizRounded} width="20" height="20" />
-      <p class="text-base-100">Flyt engagement</p>
+      <p class="text-base-100">{$_("navigation.move_engagement")}</p>
     </a>
     <a
       href={`${base}/employee/${Form.TERMINATE}${
@@ -49,7 +49,7 @@
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <Icon icon={personCancelOutlineRounded} width="20" height="20" />
-      <p class="text-base-100">Opsig medarbejder</p>
+      <p class="text-base-100">{$_("navigation.terminate_employee")}</p>
     </a>
   </div>
 </div>
