@@ -19,6 +19,7 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import TextArea from "$lib/components/forms/shared/textArea.svelte"
 
   let toDate: string
 
@@ -176,6 +177,7 @@
           id="non-primary"
           value={getClassUuidByUserKey(classes, "non-primary")}
         />
+        <TextArea title="Noter" id="notes" />
       </div>
     </div>
     <div class="flex py-6 gap-4">

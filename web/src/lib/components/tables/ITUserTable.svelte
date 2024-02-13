@@ -22,19 +22,19 @@
   const uuid = $page.params.uuid
   const isOrg = $page.route.id?.startsWith("/organisation")
   const employee = isOrg ? null : uuid
-  const org_unit = isOrg ? uuid : null
+  const orgUnit = isOrg ? uuid : null
 
   gql`
     query ITUsers(
       $employee: [UUID!]
-      $org_unit: [UUID!]
+      $orgUnit: [UUID!]
       $fromDate: DateTime
       $toDate: DateTime
     ) {
       itusers(
         filter: {
           employees: $employee
-          org_units: $org_unit
+          org_units: $orgUnit
           from_date: $fromDate
           to_date: $toDate
         }
@@ -68,7 +68,7 @@
 
   onMount(async () => {
     const res = await graphQLClient().request(ItUsersDocument, {
-      org_unit: org_unit,
+      orgUnit: orgUnit,
       employee: employee,
       ...tenseToValidity(tense, $date),
     })
