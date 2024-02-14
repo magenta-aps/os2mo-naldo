@@ -33,7 +33,8 @@
   "role": "Rolle",
   "unit": "Enhed",
   "leave": "Orlov",
-  "related_unit": "Relateret",
+  "related_unit": "Relateret enhed",
+  "related_units": "Relateret",
   "manager_function": "Lederfunktion",
   "overview": "Overblik",
   "organisation_mapping": "Organisationssammenkobling",
@@ -80,5 +81,6 @@
     "organisation": "Søg efter organisation"
   },
   "visibility": "Synlighed",
-  "account_name": "Account name"
+  "account_name": "Account name",
+  "parent": "Overenhed"
 }

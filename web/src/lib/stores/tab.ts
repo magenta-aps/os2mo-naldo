@@ -1,7 +1,7 @@
 import { writable } from "svelte/store"
 
 export enum OrgTab {
-  ORG_UNIT = "org_unit",
+  ORG_UNIT = "unit",
   ADDRESS = "address",
   ENGAGEMENT = "engagement",
   ASSOCIATION = "association",
