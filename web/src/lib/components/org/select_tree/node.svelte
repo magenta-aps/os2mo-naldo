@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { OrgChildrenDocument } from "./query.generated"

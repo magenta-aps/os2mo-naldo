@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
@@ -137,7 +138,7 @@
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
-            title="Startdato"
+            title={$_("date.start_date")}
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
@@ -145,7 +146,7 @@
           />
           <DateInput
             bind:value={toDate}
-            title="Slutdato"
+            title={$_("date.end_date")}
             id="to"
             min={$fromDate.value ? $fromDate.value : minDate}
             max={maxDate}
@@ -161,7 +162,7 @@
         <div class="flex flex-row gap-6">
           <Input title="ID" id="user-key" extra_classes="basis-1/2" />
           <Select
-            title="Stillingsbetegnelse"
+            title={$_("job_function")}
             id="job-function"
             bind:name={$jobFunction.value}
             errors={$jobFunction.errors}
@@ -172,7 +173,7 @@
         </div>
         <div class="flex flex-row gap-6">
           <Select
-            title="Engagementstype"
+            title={$_("engagement_type")}
             id="engagement-type"
             bind:name={$engagementType.value}
             errors={$engagementType.errors}
@@ -181,7 +182,7 @@
             extra_classes="basis-1/2"
           />
           <Select
-            title="Primær"
+            title={$_("primary")}
             id="primary"
             iterable={getClassesByFacetUserKey(facets, "primary_type")}
             extra_classes="basis-1/2"
@@ -201,7 +202,7 @@
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         on:click={() => goto(`${base}/organisation/${$page.params.uuid}`)}
       >
-        Annullér
+        {$_("cancel")}
       </button>
     </div>
     <Error />

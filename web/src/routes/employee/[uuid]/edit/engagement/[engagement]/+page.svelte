@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
@@ -132,10 +133,10 @@
     }
 </script>
 
-<title>Rediger engagement | OS2mo</title>
+<title>{$_("edit")} {$_("engagement")} | OS2mo</title>
 
 <div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">Rediger engagement</h3>
+  <h3 class="flex-1">{$_("edit")} {$_("engagement")}</h3>
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
@@ -176,7 +177,7 @@
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
-            title="Startdato"
+            title={$_("date.start_date")}
             id="from"
             min={minDate}
             max={maxDate ? maxDate : null}
@@ -187,7 +188,7 @@
             startValue={engagement.validity.to
               ? engagement.validity.to.split("T")[0]
               : null}
-            title="Slutdato"
+            title={$_("date.end_date")}
             id="to"
             min={$fromDate.value ? $fromDate.value : minDate}
             max={maxDate ? maxDate : null}
@@ -214,7 +215,7 @@
             extra_classes="basis-1/2"
           />
           <Select
-            title="Stillingsbetegnelse"
+            title={$_("job_function")}
             id="job-function"
             startValue={engagement.job_function}
             bind:name={$jobFunction.value}
@@ -226,7 +227,7 @@
         </div>
         <div class="flex flex-row gap-6">
           <Select
-            title="Engagementstype"
+            title={$_("engagement_type")}
             id="engagement-type"
             startValue={engagement.engagement_type}
             bind:name={$engagementType.value}
@@ -236,7 +237,7 @@
             required={true}
           />
           <Select
-            title="Primær"
+            title={$_("primary")}
             id="primary"
             startValue={engagement.primary ? engagement.primary : undefined}
             iterable={getClassesByFacetUserKey(facets, "primary_type")}
@@ -250,14 +251,14 @@
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >Rediger engagement</button
+        >{$_("edit")} {$_("engagement")}</button
       >
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         on:click={() => goto(`${base}/employee/${$page.params.uuid}`)}
       >
-        Annullér
+        {$_("cancel")}
       </button>
     </div>
     <Error />

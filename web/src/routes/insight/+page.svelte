@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import { gql } from "graphql-request"
   import { graphQLClient } from "$lib/util/http"
   import { date } from "$lib/stores/date"
@@ -148,7 +149,7 @@
         <div class="grid grid-cols-4 gap-4">
           <Input title="Navn" id="filter-name" bind:value={name} />
           <Select
-            title="Stillingsbetegnelse"
+            title={$_("job_function")}
             id="filter-job-function"
             bind:value={jobFunction}
             iterable={getClassesByFacetUserKey(facets, "engagement_job_function")}

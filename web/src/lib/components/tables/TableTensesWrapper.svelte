@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import DetailTable from "$lib/components/shared/detail_table.svelte"
   import { tenses } from "$lib/stores/tenses"
   import type { ComponentType, SvelteComponent } from "svelte"

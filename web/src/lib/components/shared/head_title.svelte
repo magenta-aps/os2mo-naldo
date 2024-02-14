@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import { page } from "$app/stores"
   import { fetchGraph } from "$lib/util/http"
 

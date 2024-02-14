@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import { graphQLClient } from "$lib/util/http"
   import Node from "$lib/components/org/select_tree/node.svelte"
   import { offset, flip, shift } from "@floating-ui/dom"

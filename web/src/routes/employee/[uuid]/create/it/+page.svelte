@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
@@ -102,10 +103,10 @@
     }
 </script>
 
-<title>Opret IT-konto | OS2mo</title>
+<title>{$_("create")} {$_("it_account")} | OS2mo</title>
 
 <div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">Opret IT-konto</h3>
+  <h3 class="flex-1">{$_("create")} {$_("it_account")}</h3>
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
@@ -140,21 +141,21 @@
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
-            title="Startdato"
+            title={$_("date.start_date")}
             id="from"
             min={minDate}
             required={true}
           />
           <DateInput
             bind:value={toDate}
-            title="Slutdato"
+            title={$_("date.end_date")}
             id="to"
             min={$fromDate.value ? $fromDate.value : minDate}
           />
         </div>
         <div class="flex flex-row gap-6">
           <Select
-            title="IT-system"
+            title={$_("it_system")}
             id="it-system"
             bind:name={$itSystem.value}
             errors={$itSystem.errors}
@@ -166,14 +167,14 @@
             bind:value={$accountName.value}
             errors={$accountName.errors}
             extra_classes="basis-1/2"
-            title="Kontonavn"
+            title={$_("account_name")}
             id="account-name"
             required={true}
           />
         </div>
         <div class="flex">
           <Checkbox
-            title="Primær"
+            title={$_("primary")}
             id="primary"
             value={getClassUuidByUserKey(classes, "primary")}
           />
@@ -184,21 +185,21 @@
           id="non-primary"
           value={getClassUuidByUserKey(classes, "non-primary")}
         />
-        <TextArea title="Noter" id="notes" />
+        <TextArea title={$_("notes")} id="notes" />
       </div>
     </div>
     <div class="flex py-6 gap-4">
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >Opret IT-konto</button
+        >{$_("create")} {$_("it_account")}</button
       >
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         on:click={() => goto(`${base}/employee/${$page.params.uuid}`)}
       >
-        Annullér
+        {$_("cancel")}
       </button>
     </div>
     <Error />

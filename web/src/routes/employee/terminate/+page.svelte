@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import { enhance } from "$app/forms"
@@ -80,10 +81,10 @@
     }
 </script>
 
-<title>Opsig medarbejder | OS2mo</title>
+<title>{$_("navigation.terminate_employee")} | OS2mo</title>
 
 <div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">Opsig medarbejder</h3>
+  <h3 class="flex-1">{$_("navigation.terminate_employee")}</h3>
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
@@ -109,7 +110,7 @@
             startValue={$date}
             bind:value={$toDate.value}
             errors={$toDate.errors}
-            title="Slutdato"
+            title={$_("date.end_date")}
             id="to"
             min={minDate}
             required={true}
@@ -118,7 +119,7 @@
         {#if employee}
           <Search
             type="employee"
-            title="Medarbejder"
+            title={$_("employee")}
             startValue={{
               uuid: employee.uuid,
               name: employee.name,
@@ -131,7 +132,7 @@
         {:else}
           <Search
             type="employee"
-            title="Medarbejder"
+            title={$_("employee")}
             bind:name={$employeeField.value}
             on:clear={() => ($employeeField.value = "")}
             errors={$employeeField.errors}
@@ -144,14 +145,14 @@
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >Opsig medarbejder</button
+        >{$_("navigation.terminate_employee")}</button
       >
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         on:click={() => history.back()}
       >
-        Annullér
+        {$_("cancel")}
       </button>
     </div>
     <Error />

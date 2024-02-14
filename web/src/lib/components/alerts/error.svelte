@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import { slide } from "svelte/transition"
   import { error } from "$lib/stores/alert"
 

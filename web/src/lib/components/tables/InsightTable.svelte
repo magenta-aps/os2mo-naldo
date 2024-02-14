@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import { gql } from "graphql-request"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
   import { sortDirection, sortKey } from "$lib/stores/sorting"

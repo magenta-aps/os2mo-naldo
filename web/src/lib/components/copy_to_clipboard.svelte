@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import { success } from "$lib/stores/alert"
   import Icon from "@iconify/svelte"
   import fileCopyOutlineRounded from "@iconify/icons-material-symbols/file-copy-outline-rounded"

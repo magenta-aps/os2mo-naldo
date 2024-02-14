@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import { createEventDispatcher } from "svelte"
   import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
   import RadioButton from "$lib/components/forms/shared/radio_button.svelte"

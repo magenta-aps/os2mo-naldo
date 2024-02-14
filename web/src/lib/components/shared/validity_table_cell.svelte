@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import { formatDate } from "$lib/util/date"
 
   interface Validity {

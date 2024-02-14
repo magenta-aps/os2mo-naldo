@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
@@ -124,10 +125,10 @@
     }
 </script>
 
-<title>Rediger IT-konto | OS2mo</title>
+<title>{$_("edit")} {$_("it_account")} | OS2mo</title>
 
 <div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">Rediger IT-konto</h3>
+  <h3 class="flex-1">{$_("edit")} {$_("it_account")}</h3>
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
@@ -168,7 +169,7 @@
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
-            title="Startdato"
+            title={$_("date.start_date")}
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
@@ -177,7 +178,7 @@
           <DateInput
             bind:value={toDate}
             startValue={itUser.validity.to ? itUser.validity.to.split("T")[0] : null}
-            title="Slutdato"
+            title={$_("date.end_date")}
             id="to"
             min={$fromDate.value ? $fromDate.value : minDate}
             max={maxDate}
@@ -187,7 +188,7 @@
         <!-- TODO: Should have the current value as default -->
         <div class="flex flex-row gap-6">
           <Select
-            title="IT-systemer"
+            title={$_("it_system")}
             id="it-system"
             startValue={itUser.itsystem ? itUser.itsystem : undefined}
             extra_classes="basis-1/2"
@@ -197,7 +198,7 @@
             required={true}
           />
           <Input
-            title="Kontonavn"
+            title={$_("account_name")}
             id="account-name"
             extra_classes="basis-1/2"
             startValue={itUser.user_key}
@@ -208,7 +209,7 @@
         </div>
         <div class="flex">
           <Checkbox
-            title="Primær"
+            title={$_("primary")}
             id="primary"
             startValue={itUser.primary_uuid}
             value={getClassUuidByUserKey(classes, "primary")}
@@ -220,21 +221,21 @@
           id="non-primary"
           value={getClassUuidByUserKey(classes, "non-primary")}
         />
-        <TextArea title="Noter" id="notes" startValue={note} />
+        <TextArea title={$_("notes")} id="notes" startValue={note} />
       </div>
     </div>
     <div class="flex py-6 gap-4">
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >Rediger IT-konto</button
+        >{$_("edit")} {$_("it_account")}</button
       >
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         on:click={() => goto(`${base}/organisation/${$page.params.uuid}`)}
       >
-        Annullér
+        {$_("cancel")}
       </button>
     </div>
     <Error />

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import { isAuth } from "$lib/stores/auth"
   import { logoutKeycloak, keycloak } from "$lib/util/keycloak"
 

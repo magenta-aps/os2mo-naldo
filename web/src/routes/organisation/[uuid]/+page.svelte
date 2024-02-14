@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import { page } from "$app/stores"
   import HeadTitle from "$lib/components/shared/head_title.svelte"
   import CopyToClipboard from "$lib/components/copy_to_clipboard.svelte"
@@ -23,7 +24,6 @@
   import OwnerTable from "$lib/components/tables/OwnerTable.svelte"
   import RelatedUnitsTable from "$lib/components/tables/RelatedUnitsTable.svelte"
   import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
-  import { _ } from "svelte-i18n"
   import Tabs from "$lib/components/shared/tabs.svelte"
 
   // Tabs

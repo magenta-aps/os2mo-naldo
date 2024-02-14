@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Select from "$lib/components/forms/shared/select.svelte"
@@ -150,7 +151,7 @@
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
-            title="Startdato"
+            title={$_("date.start_date")}
             id="from"
             required={true}
             min={minDate}
@@ -158,7 +159,7 @@
           />
           <DateInput
             bind:value={toDate}
-            title="Slutdato"
+            title={$_("date.end_date")}
             id="to"
             min={$fromDate.value ? $fromDate.value : minDate}
             max={maxDate}
@@ -166,14 +167,14 @@
         </div>
         <div class="flex flex-row gap-6">
           <Select
-            title="Synlighed"
+            title={$_("visibility")}
             id="visibility"
             iterable={getClassesByFacetUserKey(facets, "visibility")}
             extra_classes="basis-1/2"
             isClearable={true}
           />
           <Select
-            title="Adressetype"
+            title={$_("address_type")}
             id="address-type"
             bind:value={addressType}
             bind:name={$addressTypeField.value}
@@ -184,6 +185,7 @@
           />
           <input hidden name="address-type-uuid" bind:value={addressTypeUuid} />
         </div>
+        <!-- FIXME: Translate address_types -->
         {#if addressType}
           {#if addressType.name === Addresses.POSTADRESSE}
             <DarSearch
@@ -216,7 +218,7 @@
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         on:click={() => goto(`${base}/employee/${$page.params.uuid}`)}
       >
-        Annullér
+        {$_("cancel")}
       </button>
     </div>
     <Error />

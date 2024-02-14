@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import { sortKey, sortDirection } from "$lib/stores/sorting"
   import Icon from "@iconify/svelte"
   import keyboardArrowUpRounded from "@iconify/icons-material-symbols/keyboard-arrow-up-rounded"

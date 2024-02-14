@@ -1,8 +1,8 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import { env } from "$env/dynamic/public"
   import SvelteSelect from "svelte-select"
   import DarItem from "./DARItem.svelte"
-  import { _ } from "svelte-i18n"
 
   export let startValue: DarAddressResponse | undefined = undefined
   export let value: DarAddressResponse | undefined = startValue || undefined

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import { isAuth } from "$lib/stores/auth"
   import DrawerContent from "$lib/components/drawer_content.svelte"
   import { defaultDrawerWidth, drawerWidth } from "$lib/stores/drawer_width"

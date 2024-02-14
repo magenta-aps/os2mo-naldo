@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import SvelteSelect from "svelte-select"
   import type { Class } from "$lib/graphql/types"
 

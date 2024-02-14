@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
@@ -75,10 +76,10 @@
     }
 </script>
 
-<title>Redigér Medarbejder | OS2mo</title>
+<title>{$_("edit")} {$_("employee")} | OS2mo</title>
 
 <div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">Redigér medarbejder</h3>
+  <h3 class="flex-1">{$_("edit")} {$_("employee")}</h3>
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
@@ -112,7 +113,7 @@
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
-            title="Startdato"
+            title={$_("date.start_date")}
             id="from"
             required={true}
           />
@@ -121,13 +122,13 @@
             startValue={employee.validity.to
               ? employee.validity.to.split("T")[0]
               : null}
-            title="Slutdato"
+            title={$_("date.end_date")}
             id="to"
           />
         </div>
         <div class="flex flex-row gap-6">
           <Input
-            title="Fornavn"
+            title={$_("givenname(s)")}
             id="first-name"
             startValue={employee.given_name}
             bind:value={$firstName.value}
@@ -136,7 +137,7 @@
             required={true}
           />
           <Input
-            title="Efternavn(e)"
+            title={$_("surname")}
             id="last-name"
             startValue={employee.surname}
             bind:value={$lastName.value}
@@ -147,13 +148,13 @@
         </div>
         <div class="flex flex-row gap-6">
           <Input
-            title="Kaldenavn fornavn"
+            title={$_("nickname_givenname(s)")}
             id="nickname-first-name"
             startValue={employee.nickname_givenname}
             extra_classes="basis-1/2"
           />
           <Input
-            title="Kaldenavn efternavn(e)"
+            title={$_("nickname_surname")}
             id="nickname-last-name"
             startValue={employee.nickname_surname}
             extra_classes="basis-1/2"
@@ -165,14 +166,14 @@
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >Redigér medarbejder</button
+        >{$_("edit")} {$_("employee")}</button
       >
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         on:click={() => goto(`${base}/employee/${$page.params.uuid}`)}
       >
-        Annullér
+        {$_("cancel")}
       </button>
     </div>
     <Error />

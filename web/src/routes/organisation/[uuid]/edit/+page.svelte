@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
@@ -153,7 +154,7 @@
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
-            title="Startdato"
+            title={$_("date.start_date")}
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
@@ -161,7 +162,7 @@
           />
           <DateInput
             bind:value={toDate}
-            title="Slutdato"
+            title={$_("date.end_date")}
             startValue={orgUnit.validity.to ? orgUnit.validity.to.split("T")[0] : null}
             id="to"
             min={$fromDate.value}
@@ -231,7 +232,7 @@
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         on:click={() => goto(`${base}/organisation/${orgUnit.uuid}`)}
       >
-        Annullér
+        {$_("cancel")}
       </button>
     </div>
     <Error />

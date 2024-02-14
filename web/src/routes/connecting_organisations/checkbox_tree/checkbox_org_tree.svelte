@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import CheckboxNode from "./checkbox_node.svelte"
 
   export let title = "Vælg enhed"

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
   import { base } from "$app/paths"
   import { page } from "$app/stores"

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
@@ -115,10 +116,10 @@
     }
 </script>
 
-<title>Opret enhed | OS2mo</title>
+<title>{$_("create")} {$_("unit")} | OS2mo</title>
 
 <div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">Opret enhed</h3>
+  <h3 class="flex-1">{$_("create")} {$_("unit")}</h3>
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
@@ -157,7 +158,7 @@
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
-            title="Startdato"
+            title={$_("date.start_date")}
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
@@ -165,7 +166,7 @@
           />
           <DateInput
             bind:value={toDate}
-            title="Slutdato"
+            title={$_("date.start_date")}
             id="to"
             min={$fromDate.value ? $fromDate.value : minDate}
             max={maxDate}
@@ -174,7 +175,7 @@
         {#if orgUnit}
           <Search
             type="org-unit"
-            title="Angiv overenhed"
+            title="{$_('specify')} {$_('parent')}"
             id="parent-uuid"
             bind:value={parent}
             startValue={{
@@ -185,7 +186,7 @@
         {:else}
           <Search
             type="org-unit"
-            title="Angiv overenhed"
+            title="{$_('specify')} {$_('parent')}"
             id="parent-uuid"
             bind:value={parent}
           />
@@ -195,14 +196,14 @@
           emptyMessage="Organisationsenheden placeres i roden"
         />
         <Input
-          title="Navn"
+          title={$_("name")}
           id="name"
           required={true}
           bind:value={$name.value}
           errors={$name.errors}
         />
         <Select
-          title="Enhedstype"
+          title={$_("org_unit_type")}
           id="org-unit-type"
           bind:name={$orgUnitType.value}
           errors={$orgUnitType.errors}
@@ -215,7 +216,7 @@
 
         <div class="flex flex-row gap-6">
           <Select
-            title="Enhedsniveau"
+            title={$_("org_unit_level")}
             id="org-unit-level"
             bind:name={$orgUnitLevel.value}
             errors={$orgUnitLevel.errors}
@@ -226,7 +227,7 @@
             on:clear={() => ($orgUnitLevel.value = "")}
           />
           <Input
-            title="Enhedsnummer"
+            title={$_("org_unit_number")}
             placeholder="Udfyld eller auto"
             id="org-unit-number"
             extra_classes="basis-1/2"
@@ -238,14 +239,14 @@
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >Opret enhed</button
+        >{$_("create")} {$_("unit")}</button
       >
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         on:click={() => history.back()}
       >
-        Annullér
+        {$_("cancel")}
       </button>
     </div>
     <Error />

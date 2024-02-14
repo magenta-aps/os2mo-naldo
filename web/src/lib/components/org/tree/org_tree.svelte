@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import { page } from "$app/stores"
   import { graphQLClient } from "$lib/util/http"
   import { fetchParentTree } from "$lib/util/parent_tree.js"

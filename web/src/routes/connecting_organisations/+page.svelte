@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import Error from "$lib/components/alerts/error.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "../connecting_organisations/$types"
@@ -272,7 +273,7 @@
         disabled={isDisabled}
         on:click={() => history.back()}
       >
-        Annullér
+        {$_("cancel")}
       </button>
       <Error />
     </div>

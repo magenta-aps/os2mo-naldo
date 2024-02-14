@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   export let item: CprLookupResponse
   export let slot: string
 </script>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import Tabs from "$lib/components/shared/tabs.svelte"
   import { EmployeeTab, activeEmployeeTab } from "$lib/stores/tab"
   import HeadTitle from "$lib/components/shared/head_title.svelte"
@@ -22,7 +23,6 @@
   import ManagerTable from "$lib/components/tables/ManagerTable.svelte"
   import LeaveTable from "$lib/components/tables/LeaveTable.svelte"
   import OwnerTable from "$lib/components/tables/OwnerTable.svelte"
-  import { _ } from "svelte-i18n"
 
   // Tabs
   let items = [

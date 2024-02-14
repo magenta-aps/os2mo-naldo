@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import { enhance } from "$app/forms"
@@ -82,10 +83,10 @@
     }
 </script>
 
-<title>Afslut IT-konto | OS2mo</title>
+<title>{$_("terminate")} {$_("it_account")} | OS2mo</title>
 
 <div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">Afslut IT-konto</h3>
+  <h3 class="flex-1">{$_("terminate")} {$_("it_account")}</h3>
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
@@ -109,7 +110,7 @@
           startValue={$date}
           bind:value={$toDate.value}
           errors={$toDate.errors}
-          title="Slutdato"
+          title={$_("date.end_date")}
           id="to"
           min={minDate}
           required={true}
@@ -120,12 +121,12 @@
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >Afslut IT-konto</button
+        >{$_("terminate")} {$_("it_account")}</button
       >
       <a
         href={`${base}/employee/${$page.params.uuid}`}
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        >Annullér</a
+        >{$_("cancel")}</a
       >
     </div>
     <Error />

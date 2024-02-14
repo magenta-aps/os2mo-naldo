@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { tenses } from "$lib/stores/tenses"
   import { _ } from "svelte-i18n"
+  import { tenses } from "$lib/stores/tenses"
 </script>
 
 <div class="tabs p-0 bg-base-100 border-primary border rounded my-5 w-fit">

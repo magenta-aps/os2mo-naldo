@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Select from "$lib/components/forms/shared/select.svelte"
@@ -155,7 +156,7 @@
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
-            title="Startdato"
+            title={$_("date.start_date")}
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
@@ -166,7 +167,7 @@
             startValue={association.validity.to
               ? association.validity.to.split("T")[0]
               : null}
-            title="Slutdato"
+            title={$_("date.end_date")}
             id="to"
             min={$fromDate.value}
             max={maxDate ? maxDate : null}
@@ -185,7 +186,7 @@
         />
         <div class="flex flex-row gap-6">
           <Select
-            title="Tilknytningsrolle"
+            title={$_("association_type")}
             id="association-type"
             startValue={association.association_type
               ? association.association_type
@@ -197,7 +198,7 @@
             required={true}
           />
           <Select
-            title="Primær"
+            title={$_("primary")}
             id="primary"
             startValue={association.primary ? association.primary : undefined}
             iterable={getClassesByFacetUserKey(facets, "primary_type")}
@@ -218,7 +219,7 @@
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         on:click={() => goto(`${base}/organisation/${$page.params.uuid}`)}
       >
-        Annullér
+        {$_("cancel")}
       </button>
     </div>
     <Error />

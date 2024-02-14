@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import SvelteSelect from "svelte-select"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
@@ -15,7 +16,6 @@
     LazySearchDocument,
     type LazySearchQuery,
   } from "./query.generated"
-  import { _ } from "svelte-i18n"
 
   type Employees = SearchEmployeeQuery["employees"]["objects"][0]["objects"]
   type OrgUnits = SearchOrgUnitQuery["org_units"]["objects"][0]["objects"]

@@ -1,11 +1,11 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import { base } from "$app/paths"
   import indexPageImage from "$lib/assets/index_page_image.png"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { VersionDocument } from "./query.generated"
   import { env } from "$env/dynamic/public"
-  import { _ } from "svelte-i18n"
 
   gql`
     query Version {

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { ItAssociationsDocument, type ItAssociationsQuery } from "./query.generated"

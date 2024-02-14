@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
@@ -131,7 +132,7 @@
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
-            title="Startdato"
+            title={$_("date.start_date")}
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
@@ -139,7 +140,7 @@
           />
           <DateInput
             bind:value={toDate}
-            title="Slutdato"
+            title={$_("date.end_date")}
             id="to"
             min={$fromDate.value ? $fromDate.value : minDate}
             max={maxDate}
@@ -147,7 +148,7 @@
         </div>
         <div class="flex flex-row gap-6">
           <Select
-            title="IT-system"
+            title={$_("it_system")}
             id="it-system"
             bind:name={$itSystem.value}
             errors={$itSystem.errors}
@@ -159,14 +160,14 @@
             bind:value={$accountName.value}
             errors={$accountName.errors}
             extra_classes="basis-1/2"
-            title="Kontonavn"
+            title={$_("account_name")}
             id="account-name"
             required={true}
           />
         </div>
         <div class="flex">
           <Checkbox
-            title="Primær"
+            title={$_("primary")}
             id="primary"
             value={getClassUuidByUserKey(classes, "primary")}
           />
@@ -177,7 +178,7 @@
           id="non-primary"
           value={getClassUuidByUserKey(classes, "non-primary")}
         />
-        <TextArea title="Noter" id="notes" />
+        <TextArea title={$_("notes")} id="notes" />
       </div>
     </div>
     <div class="flex py-6 gap-4">
@@ -191,7 +192,7 @@
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         on:click={() => goto(`${base}/organisation/${$page.params.uuid}`)}
       >
-        Annullér
+        {$_("cancel")}
       </button>
     </div>
     <Error />
