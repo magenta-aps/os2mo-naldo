@@ -33,7 +33,8 @@
   "role": "Role",
   "unit": "Unit",
   "leave": "Leave",
-  "related_unit": "Related units",
+  "related_unit": "Related unit",
+  "related_units": "Related units",
   "manager_function": "Manager function",
   "overview": "Overview",
   "organisation_mapping": "Connecting organisations",
@@ -79,5 +80,6 @@
     "person": "Search for person",
     "organisation": "Search for organisation"
   },
-  "visibility": "Visibility"
+  "visibility": "Visibility",
+  "parent": "Parent unit"
 }

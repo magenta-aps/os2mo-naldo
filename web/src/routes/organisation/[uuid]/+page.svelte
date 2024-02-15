@@ -28,15 +28,15 @@
 
   // Tabs
   let items = [
-    { label: $_("unit"), value: "org_unit" },
-    { label: $_("address"), value: "address" },
-    { label: $_("engagement"), value: "engagement" },
-    { label: $_("association"), value: "association" },
-    { label: $_("it"), value: "it" },
-    { label: $_("role"), value: "role" },
-    { label: $_("kle"), value: "kle" },
-    { label: $_("manager"), value: "manager" },
-    { label: $_("related_unit"), value: "related_unit" },
+    { label: "unit", value: "unit" },
+    { label: "address", value: "address" },
+    { label: "engagement", value: "engagement" },
+    { label: "association", value: "association" },
+    { label: "it", value: "it" },
+    { label: "role", value: "role" },
+    { label: "kle", value: "kle" },
+    { label: "manager", value: "manager" },
+    { label: "related_unit", value: "related_unit" },
   ]
 
   // TODO: Move tab logic into tabs.svelte
@@ -109,7 +109,7 @@
         }`}
       >
         {$_("add")}
-        {items.find((item) => item.value === activeItem)?.label}
+        {$_(items.find((item) => item.value === activeItem)?.label || "")}
       </a>
     </div>
 
@@ -117,11 +117,11 @@
       <TableTensesWrapper
         table={OrgUnitTable}
         headers={[
-          { title: "Enhed", sortPath: "name" },
-          { title: "Enhedstype", sortPath: "unit_type.name" },
-          { title: "Enhedsniveau", sortPath: "org_unit_level.name" },
-          { title: "Overenhed" },
-          { title: "Dato", sortPath: "validity.from" },
+          { title: $_("unit"), sortPath: "name" },
+          { title: $_("org_unit_type"), sortPath: "unit_type.name" },
+          { title: $_("org_unit_level"), sortPath: "org_unit_level.name" },
+          { title: $_("parent") },
+          { title: $_("date.date"), sortPath: "validity.from" },
           { title: "" },
         ]}
       />
@@ -129,11 +129,11 @@
       <TableTensesWrapper
         table={AddressTable}
         headers={[
-          { title: "Adressetype", sortPath: "address_type.name" },
-          { title: "Adresse", sortPath: "name" },
+          { title: $_("address_type"), sortPath: "address_type.name" },
+          { title: $_("address"), sortPath: "name" },
           // TODO: Make it possible to sort optional fields maybe? visibility and primary for example
-          { title: "Synlighed" },
-          { title: "Dato", sortPath: "validity.from" },
+          { title: $_("visibility") },
+          { title: $_("date.date"), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
@@ -142,11 +142,11 @@
       <TableTensesWrapper
         table={EngagementTable}
         headers={[
-          { title: "Navn", sortPath: "employee[0].name" },
-          { title: "Stillingsbetegnelse", sortPath: "job_function.name" },
-          { title: "Engagementstype", sortPath: "engagement_type.name" },
-          { title: "Primær" },
-          { title: "Dato", sortPath: "validity.from" },
+          { title: $_("name"), sortPath: "employee[0].name" },
+          { title: $_("job_function"), sortPath: "job_function.name" },
+          { title: $_("engagement_type"), sortPath: "engagement_type.name" },
+          { title: $_("primary") },
+          { title: $_("date.date"), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
@@ -155,10 +155,10 @@
       <TableTensesWrapper
         table={AssociationTable}
         headers={[
-          { title: "Navn", sortPath: "employee[0].name" },
-          { title: "Tilknytningsrolle", sortPath: "association_type.name" },
-          { title: "Primær" },
-          { title: "Dato", sortPath: "validity.from" },
+          { title: $_("name"), sortPath: "employee[0].name" },
+          { title: $_("association_type"), sortPath: "association_type.name" },
+          { title: $_("primary") },
+          { title: $_("date.date"), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
@@ -167,10 +167,10 @@
       <TableTensesWrapper
         table={ItUserTable}
         headers={[
-          { title: "IT system", sortPath: "itsystem.name" },
-          { title: "Kontonavn", sortPath: "user_key" },
-          { title: "Primær" },
-          { title: "Dato", sortPath: "validity.from" },
+          { title: $_("it_system"), sortPath: "itsystem.name" },
+          { title: $_("account_name"), sortPath: "user_key" },
+          { title: $_("primary") },
+          { title: $_("date.date"), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
@@ -179,9 +179,9 @@
       <TableTensesWrapper
         table={RoleTable}
         headers={[
-          { title: "Navn", sortPath: "employee[0].name" },
-          { title: "Rolletype", sortPath: "role_type.name" },
-          { title: "Dato", sortPath: "validity.from" },
+          { title: $_("name"), sortPath: "employee[0].name" },
+          { title: $_("role_type"), sortPath: "role_type.name" },
+          { title: $_("date.date"), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
@@ -190,11 +190,11 @@
       <TableTensesWrapper
         table={ManagerTable}
         headers={[
-          { title: "Navn", sortPath: "employee[0].name" },
-          { title: "Lederansvar" },
-          { title: "Ledertype", sortPath: "manager_type.name" },
-          { title: "Lederniveau", sortPath: "manager_level.name" },
-          { title: "Dato", sortPath: "validity.from" },
+          { title: $_("name"), sortPath: "employee[0].name" },
+          { title: $_("manager_responsibility") },
+          { title: $_("manager_type"), sortPath: "manager_type.name" },
+          { title: $_("manager_level"), sortPath: "manager_level.name" },
+          { title: $_("date.date"), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
@@ -203,9 +203,9 @@
       <TableTensesWrapper
         table={KleTable}
         headers={[
-          { title: "KLE aspekt", sortPath: "kle_aspects[0].name" },
-          { title: "KLE nummer", sortPath: "kle_number.name" },
-          { title: "Dato", sortPath: "validity.from" },
+          { title: $_("kle_aspect"), sortPath: "kle_aspects[0].name" },
+          { title: $_("kle_number"), sortPath: "kle_number.name" },
+          { title: $_("date.date"), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
@@ -214,8 +214,8 @@
       <TableTensesWrapper
         table={OwnerTable}
         headers={[
-          { title: "Navn", sortPath: "person[0].name" },
-          { title: "Dato", sortPath: "validity.from" },
+          { title: $_("name"), sortPath: "person[0].name" },
+          { title: $_("date.date"), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
@@ -225,8 +225,8 @@
         table={RelatedUnitsTable}
         onlyPresent={true}
         headers={[
-          { title: "Relateret enhed" },
-          { title: "Dato", sortPath: "validity.from" },
+          { title: $_("related_unit") },
+          { title: $_("date.date"), sortPath: "validity.from" },
         ]}
       />
     {/if}
