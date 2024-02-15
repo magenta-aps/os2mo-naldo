@@ -1,5 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
   import { base } from "$app/paths"
   import { graphQLClient } from "$lib/util/http"
@@ -98,7 +99,7 @@
 
 {#if !data}
   <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-    <td class="p-4">Henter data...</td>
+    <td class="p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
   {#each data as engagement, i}
@@ -142,7 +143,11 @@
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
       <!-- TODO: Add translated "No engagements in <tense>"-message" -->
-      <td class="p-4">Ingen engagementer</td>
+      <td class="p-4"
+        >{capital(
+          $_("no_item", { values: { item: $_("engagement", { values: { n: 2 } }) } })
+        )}</td
+      >
     </tr>
   {/each}
 {/if}

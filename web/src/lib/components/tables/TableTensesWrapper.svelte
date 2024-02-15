@@ -1,5 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import DetailTable from "$lib/components/shared/detail_table.svelte"
   import { tenses } from "$lib/stores/tenses"
   import type { ComponentType, SvelteComponent } from "svelte"
@@ -15,7 +16,7 @@
       <tr>
         <th
           class="px-4 py-3 text-left font-bold text-secondary bg-slate-200"
-          colSpan={10}>Fremtid</th
+          colSpan={10}>{capital($_("future"))}</th
         >
       </tr>
       <svelte:component this={table} tense="future" />
@@ -24,7 +25,7 @@
   {#if $tenses.present}
     <tr>
       <th class="px-4 py-3 text-left font-bold text-secondary bg-slate-200" colSpan={10}
-        >Nutid</th
+        >{capital($_("present"))}</th
       ></tr
     >
     <svelte:component this={table} tense="present" />
@@ -34,7 +35,7 @@
       <tr>
         <th
           class="px-4 py-3 text-left font-bold text-secondary bg-slate-200"
-          colSpan={10}>Fortid</th
+          colSpan={10}>{capital($_("past"))}</th
         >
       </tr>
       <svelte:component this={table} tense="past" />

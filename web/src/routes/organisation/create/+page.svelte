@@ -1,5 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
@@ -116,10 +117,22 @@
     }
 </script>
 
-<title>{$_("create")} {$_("unit")} | OS2mo</title>
+<title
+  >{capital(
+    $_("create_item", {
+      values: { item: $_("unit", { values: { n: 1 } }) },
+    })
+  )} | OS2mo</title
+>
 
 <div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">{$_("create")} {$_("unit")}</h3>
+  <h3 class="flex-1">
+    {capital(
+      $_("create_item", {
+        values: { item: $_("unit", { values: { n: 1 } }) },
+      })
+    )}
+  </h3>
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
@@ -158,7 +171,7 @@
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
-            title={$_("date.start_date")}
+            title={capital($_("date.start_date"))}
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
@@ -166,7 +179,7 @@
           />
           <DateInput
             bind:value={toDate}
-            title={$_("date.start_date")}
+            title={capital($_("date.start_date"))}
             id="to"
             min={$fromDate.value ? $fromDate.value : minDate}
             max={maxDate}
@@ -175,7 +188,7 @@
         {#if orgUnit}
           <Search
             type="org-unit"
-            title="{$_('specify')} {$_('parent')}"
+            title="{capital($_('specify'))} {$_('parent')}"
             id="parent-uuid"
             bind:value={parent}
             startValue={{
@@ -186,24 +199,26 @@
         {:else}
           <Search
             type="org-unit"
-            title="{$_('specify')} {$_('parent')}"
+            title="{capital($_('specify'))} {$_('parent')}"
             id="parent-uuid"
             bind:value={parent}
           />
         {/if}
         <Breadcrumbs
           orgUnit={parent}
-          emptyMessage="Organisationsenheden placeres i roden"
+          emptyMessage="{capital(
+            $name.value ? $name.value : $_('unit', { values: { n: 0 } })
+          )} {$_('empty_breadcrumbs')}"
         />
         <Input
-          title={$_("name")}
+          title={capital($_("name"))}
           id="name"
           required={true}
           bind:value={$name.value}
           errors={$name.errors}
         />
         <Select
-          title={$_("org_unit_type")}
+          title={capital($_("org_unit_type"))}
           id="org-unit-type"
           bind:name={$orgUnitType.value}
           errors={$orgUnitType.errors}
@@ -216,7 +231,7 @@
 
         <div class="flex flex-row gap-6">
           <Select
-            title={$_("org_unit_level")}
+            title={capital($_("org_unit_level"))}
             id="org-unit-level"
             bind:name={$orgUnitLevel.value}
             errors={$orgUnitLevel.errors}
@@ -227,8 +242,8 @@
             on:clear={() => ($orgUnitLevel.value = "")}
           />
           <Input
-            title={$_("org_unit_number")}
-            placeholder="Udfyld eller auto"
+            title={capital($_("org_unit_number"))}
+            placeholder={capital($_("fill_or_auto"))}
             id="org-unit-number"
             extra_classes="basis-1/2"
           />
@@ -239,14 +254,18 @@
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >{$_("create")} {$_("unit")}</button
+        >{capital(
+          $_("create_item", {
+            values: { item: $_("unit", { values: { n: 1 } }) },
+          })
+        )}</button
       >
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         on:click={() => history.back()}
       >
-        {$_("cancel")}
+        {capital($_("cancel"))}
       </button>
     </div>
     <Error />

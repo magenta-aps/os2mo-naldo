@@ -1,5 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import { enhance } from "$app/forms"
@@ -87,10 +88,22 @@
     }
 </script>
 
-<title>{$_("terminate")} {$_("address")} | OS2mo</title>
+<title
+  >{capital(
+    $_("terminate_item", {
+      values: { item: $_("address", { values: { n: 1 } }) },
+    })
+  )} | OS2mo</title
+>
 
 <div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">{$_("terminate")} {$_("address")}</h3>
+  <h3 class="flex-1">
+    {capital(
+      $_("terminate_item", {
+        values: { item: $_("address", { values: { n: 1 } }) },
+      })
+    )}
+  </h3>
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
@@ -115,7 +128,7 @@
           startValue={$date}
           bind:value={$toDate.value}
           errors={$toDate.errors}
-          title={$_("date.end_date")}
+          title={capital($_("date.end_date"))}
           id="to"
           min={minDate}
           max={maxDate ? maxDate : null}
@@ -127,12 +140,16 @@
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >{$_("terminate")} {$_("address")}</button
+        >{capital(
+          $_("terminate_item", {
+            values: { item: $_("address", { values: { n: 1 } }) },
+          })
+        )}</button
       >
       <a
         href={`${base}/organisation/${$page.params.uuid}`}
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        >{$_("cancel")}</a
+        >{capital($_("cancel"))}</a
       >
     </div>
     <Error />

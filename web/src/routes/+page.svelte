@@ -1,5 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import { base } from "$app/paths"
   import indexPageImage from "$lib/assets/index_page_image.png"
   import { graphQLClient } from "$lib/util/http"
@@ -31,7 +32,7 @@
   <div class="card basis-3/12 bg-slate-100 rounded-lg">
     <div class="card-body">
       <div>
-        <h3 class="text-lg">{$_("employee")}</h3>
+        <h3 class="text-lg">{capital($_("employee", { values: { n: 1 } }))}</h3>
         <ul class="menu p-0">
           <li>
             <a href="{base}/employee/create" class="hover:no-underline">
@@ -56,7 +57,7 @@
         </ul>
       </div>
       <div>
-        <h3 class="mt-2 text-lg">{$_("organisation")}</h3>
+        <h3 class="mt-2 text-lg">{capital($_("organisation"))}</h3>
         <ul class="menu p-0">
           <li>
             <a href="{base}/organisation/create" class="hover:no-underline">
@@ -65,7 +66,7 @@
           </li>
           <li>
             <a href="{base}/organisation/rename" class="hover:no-underline">
-              {$_("navigation.create_unit")}</a
+              {$_("navigation.rename_unit")}</a
             >
           </li>
           <li>

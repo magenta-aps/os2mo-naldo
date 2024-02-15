@@ -1,5 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Select from "$lib/components/forms/shared/select.svelte"
@@ -124,10 +125,22 @@
     }
 </script>
 
-<title>{$_("edit")} {$_("association")} | OS2mo</title>
+<title
+  >{capital(
+    $_("edit_item", {
+      values: { item: $_("association", { values: { n: 1 } }) },
+    })
+  )} | OS2mo</title
+>
 
 <div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">{$_("edit")} {$_("association")}</h3>
+  <h3 class="flex-1">
+    {capital(
+      $_("edit_item", {
+        values: { item: $_("association", { values: { n: 1 } }) },
+      })
+    )}
+  </h3>
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
@@ -162,7 +175,7 @@
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
-            title={$_("date.start_date")}
+            title={capital($_("date.start_date"))}
             id="from"
             min={minDate}
             required={true}
@@ -172,7 +185,7 @@
             startValue={association.validity.to
               ? association.validity.to.split("T")[0]
               : null}
-            title={$_("date.end_date")}
+            title={capital($_("date.end_date"))}
             id="to"
             min={$fromDate.value ? $fromDate.value : minDate}
           />
@@ -201,7 +214,7 @@
         <Breadcrumbs orgUnit={selectedOrgUnit} />
         <div class="flex flex-row gap-6">
           <Select
-            title={$_("association_type")}
+            title={capital($_("association_type"))}
             id="association-type"
             startValue={association.association_type
               ? association.association_type
@@ -213,7 +226,7 @@
             required={true}
           />
           <Select
-            title={$_("primary")}
+            title={capital($_("primary"))}
             id="primary"
             startValue={association.primary ? association.primary : undefined}
             iterable={getClassesByFacetUserKey(facets, "primary_type")}
@@ -227,14 +240,18 @@
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >{$_("edit")} {$_("association")}</button
+        >{capital(
+          $_("edit_item", {
+            values: { item: $_("association", { values: { n: 1 } }) },
+          })
+        )}</button
       >
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         on:click={() => goto(`${base}/employee/${$page.params.uuid}`)}
       >
-        {$_("cancel")}
+        {capital($_("cancel"))}
       </button>
     </div>
     <Error />

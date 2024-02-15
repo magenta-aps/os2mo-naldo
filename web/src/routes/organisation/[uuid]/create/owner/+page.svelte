@@ -1,5 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import { enhance } from "$app/forms"
@@ -74,10 +75,22 @@
     }
 </script>
 
-<title>{$_("create")} {$_("owner")} | OS2mo</title>
+<title
+  >{capital(
+    $_("create_item", {
+      values: { item: $_("owner", { values: { n: 1 } }) },
+    })
+  )} | OS2mo</title
+>
 
 <div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">{$_("create")} {$_("owner")}</h3>
+  <h3 class="flex-1">
+    {capital(
+      $_("create_item", {
+        values: { item: $_("owner", { values: { n: 1 } }) },
+      })
+    )}
+  </h3>
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
@@ -107,7 +120,7 @@
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
-            title={$_("date.start_date")}
+            title={capital($_("date.start_date"))}
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
@@ -115,7 +128,7 @@
           />
           <DateInput
             bind:value={toDate}
-            title={$_("date.end_date")}
+            title={capital($_("date.end_date"))}
             id="to"
             min={$fromDate.value ? $fromDate.value : minDate}
             max={maxDate}
@@ -128,14 +141,18 @@
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >{$_("create")} {$_("owner")}</button
+        >{capital(
+          $_("create_item", {
+            values: { item: $_("owner", { values: { n: 1 } }) },
+          })
+        )}</button
       >
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         on:click={() => goto(`${base}/organisation/${$page.params.uuid}`)}
       >
-        {$_("cancel")}
+        {capital($_("cancel"))}
       </button>
     </div>
     <Error />

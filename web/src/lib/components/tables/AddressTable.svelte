@@ -1,5 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
   import { base } from "$app/paths"
   import { graphQLClient } from "$lib/util/http"
@@ -88,7 +89,7 @@
 
 {#if !data}
   <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-    <td class="p-4">Henter data...</td>
+    <td class="p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
   {#each data as address, i}
@@ -98,7 +99,9 @@
     >
       <td class="p-4">{address.address_type.name}</td>
       <td class="p-4">{address.name}</td>
-      <td class="p-4">{address.visibility ? address.visibility.name : "Ikke sat"}</td>
+      <td class="p-4"
+        >{address.visibility ? address.visibility.name : capital($_("not_set"))}</td
+      >
       <ValidityTableCell validity={address.validity} />
       <td>
         <a
@@ -123,7 +126,11 @@
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
       <!-- TODO: Add translated "No <type> in <tense>"-message" -->
-      <td class="p-4">Ingen adresser</td>
+      <td class="p-4"
+        >{capital(
+          $_("no_item", { values: { item: $_("address", { values: { n: 2 } }) } })
+        )}</td
+      >
     </tr>
   {/each}
 {/if}

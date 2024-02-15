@@ -1,5 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import { base } from "$app/paths"
   import { page } from "$app/stores"
   import Icon from "@iconify/svelte"

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import { page } from "$app/stores"
   import { fetchGraph } from "$lib/util/http"
 
@@ -45,7 +46,7 @@
           .then((json) => json.data.employees.objects[0].objects[0].name)
 
       case Title.INSIGHT:
-        return "Insight"
+        return capital($_("insight"))
 
       default:
         throw TypeError("Wrong or no title type used")

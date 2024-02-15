@@ -1,5 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import { gql } from "graphql-request"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
@@ -67,7 +68,7 @@
 
 {#if !$engagements}
   <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-    <td class="p-4">Henter data...</td>
+    <td class="p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
   {#each $engagements as engagement, i}
@@ -102,7 +103,11 @@
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
       <!-- TODO: Add translated "No <type> in <tense>"-message" -->
-      <td class="p-4">Ingen medarbejder</td>
+      <td class="p-4"
+        >{capital(
+          $_("no_item", { values: { item: $_("employee", { values: { n: 2 } }) } })
+        )}</td
+      >
     </tr>
   {/each}
 {/if}

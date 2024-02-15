@@ -1,5 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import Error from "$lib/components/alerts/error.svelte"
   import Select from "$lib/components/forms/shared/select.svelte"
   import { enhance } from "$app/forms"
@@ -162,7 +163,7 @@
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
-            title={$_("date.move_date")}
+            title={capital($_("date.move_date"))}
             id="from"
             min={minDate ? minDate : null}
             required={true}
@@ -170,7 +171,7 @@
         </div>
         <Search
           type="employee"
-          title={$_("employee")}
+          title={capital($_("employee", { values: { n: 1 } }))}
           startValue={startValueEmployee
             ? {
                 uuid: startValueEmployee.uuid,
@@ -191,7 +192,7 @@
         {#if engagements && engagements.length}
           {#key engagements}
             <Select
-              title={$_("engagements")}
+              title={capital($_("engagements", { values: { n: 2 } }))}
               id="engagement-uuid"
               bind:name={$engagement.value}
               errors={$engagement.errors}
@@ -202,7 +203,7 @@
           {/key}
         {:else}
           <Select
-            title={$_("engagements")}
+            title={capital($_("engagements", { values: { n: 2 } }))}
             id="engagement-uuid"
             bind:name={$engagement.value}
             errors={$engagement.errors}
@@ -212,7 +213,7 @@
         {/if}
         <Search
           type="org-unit"
-          title="{$_('move')} {$_('to')}"
+          title="{capital($_('move'))} {$_('to')}"
           bind:name={$orgUnitField.value}
           errors={$orgUnitField.errors}
           on:clear={() => ($orgUnitField.value = "")}
@@ -233,7 +234,7 @@
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         on:click={() => history.back()}
       >
-        {$_("cancel")}
+        {capital($_("cancel"))}
       </button>
     </div>
     <Error />

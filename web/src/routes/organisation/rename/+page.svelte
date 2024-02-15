@@ -1,5 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import { enhance } from "$app/forms"
@@ -76,10 +77,10 @@
     }
 </script>
 
-<title>Omdøb organisationsenhed | OS2mo</title>
+<title>{capital($_("rename"))} {$_("org_unit", { values: { n: 1 } })} | OS2mo</title>
 
 <div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">Omdøb organisationsenhed</h3>
+  <h3 class="flex-1">{capital($_("rename"))} {$_("org_unit", { values: { n: 1 } })}</h3>
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
@@ -92,14 +93,14 @@
           startValue={$date}
           bind:value={$fromDate.value}
           errors={$fromDate.errors}
-          title={$_("date.start_date")}
+          title={capital($_("date.start_date"))}
           id="from"
           max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
           required={true}
         />
         <DateInput
           bind:value={toDate}
-          title={$_("date.end_date")}
+          title={capital($_("date.end_date"))}
           id="to"
           min={$fromDate.value ? $fromDate.value : undefined}
           max={undefined}
@@ -109,15 +110,15 @@
       {#if urlHashOrgUnitUuid}
         {#await graphQLClient().request( OrgUnitDocument, { uuid: urlHashOrgUnitUuid, fromDate: $date } )}
           <Input
-            title="Angiv enhed"
+            title="{capital($_('specify'))} {$_('unit', { values: { n: 1 } })}"
             id="organisation-uuid"
             disabled
-            placeholder="Henter organisation..."
+            placeholder="{$_('loading')} {$_('organisation')}..."
           />
         {:then data}
           {@const orgUnitUuidFromHash = data.org_units.objects[0].objects[0]}
           <Search
-            title="Angiv enhed"
+            title="{capital($_('specify'))} {$_('unit', { values: { n: 1 } })}"
             type="org-unit"
             startValue={{
               uuid: orgUnitUuidFromHash.uuid,
@@ -135,7 +136,7 @@
           />
           <Breadcrumbs orgUnit={selectedOrgUnit} />
           <Input
-            title="Nyt navn"
+            title="{capital($_('new2'))} {$_('name')}"
             id="name"
             startValue={orgUnitUuidFromHash.name}
             bind:value={$newName.value}
@@ -146,7 +147,7 @@
       {:else}
         <Search
           type="org-unit"
-          title="Angiv enhed"
+          title="{capital($_('specify'))} {$_('unit', { values: { n: 1 } })}"
           bind:name={$name.value}
           errors={$name.errors}
           on:clear={() => {
@@ -159,7 +160,7 @@
         />
         <Breadcrumbs orgUnit={selectedOrgUnit} />
         <Input
-          title="Nyt navn"
+          title="{capital($_('new2'))} {$_('name')}"
           id="name"
           bind:value={$newName.value}
           errors={$newName.errors}
@@ -172,14 +173,14 @@
     <button
       type="submit"
       class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-      >Omdøb enhed</button
+      >{capital($_("rename"))} {$_("unit", { values: { n: 1 } })}</button
     >
     <button
       type="button"
       class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
       on:click={() => history.back()}
     >
-      {$_("cancel")}
+      {capital($_("cancel"))}
     </button>
   </div>
   <Error />

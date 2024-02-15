@@ -1,5 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Select from "$lib/components/forms/shared/select.svelte"
@@ -82,17 +83,29 @@
 
 {#await graphQLClient().request(FacetDocument, { fromDate: $date })}
   <!-- TODO: Should have a skeleton for the loading stage -->
-  Henter data...
+  {capital($_("loading"))}
 {:then data}
   {@const facets = data.facets.objects}
   {@const jobFunction = getSpecificFacet(facets, "engagement_job_function")}
   {@const minDate = facets[0].objects[0].validity?.from?.split("T")[0]}
   {@const maxDate = facets[0].objects[0].validity?.to?.split("T")[0]}
 
-  <title>Opret stillingsbetegnelse | OS2mo</title>
+  <title
+    >{capital(
+      $_("create_item", {
+        values: { item: $_("job_function", { values: { n: 1 } }) },
+      })
+    )} | OS2mo</title
+  >
 
   <div class="flex align-center px-6 pt-6 pb-4">
-    <h3 class="flex-1">Opret stillingsbetegnelse</h3>
+    <h3 class="flex-1">
+      {capital(
+        $_("create_item", {
+          values: { item: $_("job_function", { values: { n: 1 } }) },
+        })
+      )}
+    </h3>
   </div>
 
   <div class="divider p-0 m-0 mb-4 w-full" />
@@ -105,7 +118,7 @@
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
-            title={$_("date.start_date")}
+            title={capital($_("date.start_date"))}
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
@@ -116,7 +129,7 @@
           <!-- https://redmine.magenta.dk/issues/58396 -->
           <!-- <DateInput
             bind:value={toDate}
-            title={$_("date.end_date")}
+            title={capital($_("date.end_date"))}
             id="to"
             min={$fromDate.value ? $fromDate.value : minDate}
             max={maxDate}
@@ -136,7 +149,7 @@
         /> -->
         <!-- <div class="flex flex-row gap-6"> -->
         <Input
-          title="Navn"
+          title={capital($_("name"))}
           id="name"
           bind:value={$name.value}
           errors={$name.errors}
@@ -157,14 +170,18 @@
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >Opret stillingsbetegnelse</button
+        >{capital(
+          $_("create_item", {
+            values: { item: $_("job_function", { values: { n: 1 } }) },
+          })
+        )}</button
       >
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         on:click={() => goto(`${base}/admin`)}
       >
-        {$_("cancel")}
+        {capital($_("cancel"))}
       </button>
     </div>
     <Error />

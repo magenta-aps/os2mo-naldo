@@ -53,19 +53,27 @@
 
   {#each errors as error}
     {#if error === "required"}
-      <span class="label-text-alt text-error block">{title} skal udfyldes</span>
+      <span class="label-text-alt text-error block"
+        >{$_("validation.is_required", { values: { field: title } })}</span
+      >
     {/if}
 
     {#if error === "not_an_email"}
-      <span class="label-text-alt text-error block">{title} er ikke gyldig</span>
+      <span class="label-text-alt text-error block"
+        >{$_("validation.is_invalid", { values: { field: title } })}</span
+      >
     {/if}
 
     {#if error === "pattern"}
-      <span class="label-text-alt text-error block">{title} har forkert format</span>
+      <span class="label-text-alt text-error block"
+        >{$_("validation.is_wrong_format", { values: { field: title } })}</span
+      >
     {/if}
 
     {#if error === "url"}
-      <span class="label-text-alt text-error block">{title} har forkert format</span>
+      <span class="label-text-alt text-error block"
+        >{$_("validation.is_wrong_format", { values: { field: title } })}</span
+      >
     {/if}
   {/each}
 </div>

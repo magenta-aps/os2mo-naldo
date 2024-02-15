@@ -1,5 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
   import { page } from "$app/stores"
   import { base } from "$app/paths"
@@ -63,7 +64,7 @@
 <!-- TODO: We can't sort on name, since we don't know if we use [0] or [1] -->
 {#if !data}
   <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-    <td class="p-4">Henter data...</td>
+    <td class="p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
   {#each data as related_unit}
@@ -82,7 +83,11 @@
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
       <!-- TODO: Add translated "No related units in <tense>"-message" -->
-      <td class="p-4">Ingen relaterede enheder</td>
+      <td class="p-4"
+        >{capital(
+          $_("no_item", { values: { item: $_("related_unit", { values: { n: 2 } }) } })
+        )}</td
+      >
     </tr>
   {/each}
 {/if}

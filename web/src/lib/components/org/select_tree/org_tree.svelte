@@ -1,5 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import { graphQLClient } from "$lib/util/http"
   import Node from "$lib/components/org/select_tree/node.svelte"
   import { offset, flip, shift } from "@floating-ui/dom"
@@ -14,7 +15,7 @@
     uuid: "",
   }
   selectedOrg = selectedOrg ?? startOrg // For flexibility when binding
-  export let labelText = "Angiv overenhed"
+  export let labelText = `${capital($_("specify"))} ${$_("parent")}`
   export let id = "select-org-tree"
   export let required = true
   let orgTree: any[] = []

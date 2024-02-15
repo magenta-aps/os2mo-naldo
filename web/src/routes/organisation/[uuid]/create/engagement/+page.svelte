@@ -1,5 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
@@ -97,10 +98,22 @@
     }
 </script>
 
-<title>Opret engagement | OS2mo</title>
+<title
+  >{capital(
+    $_("create_item", {
+      values: { item: $_("engagement", { values: { n: 1 } }) },
+    })
+  )} | OS2mo</title
+>
 
 <div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">Opret engagement</h3>
+  <h3 class="flex-1">
+    {capital(
+      $_("create_item", {
+        values: { item: $_("engagement", { values: { n: 1 } }) },
+      })
+    )}
+  </h3>
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
@@ -138,7 +151,7 @@
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
-            title={$_("date.start_date")}
+            title={capital($_("date.start_date"))}
             id="from"
             min={minDate}
             max={toDate ? toDate : maxDate}
@@ -146,7 +159,7 @@
           />
           <DateInput
             bind:value={toDate}
-            title={$_("date.end_date")}
+            title={capital($_("date.end_date"))}
             id="to"
             min={$fromDate.value ? $fromDate.value : minDate}
             max={maxDate}
@@ -162,7 +175,7 @@
         <div class="flex flex-row gap-6">
           <Input title="ID" id="user-key" extra_classes="basis-1/2" />
           <Select
-            title={$_("job_function")}
+            title={capital($_("job_function", { values: { n: 1 } }))}
             id="job-function"
             bind:name={$jobFunction.value}
             errors={$jobFunction.errors}
@@ -173,7 +186,7 @@
         </div>
         <div class="flex flex-row gap-6">
           <Select
-            title={$_("engagement_type")}
+            title={capital($_("engagement_type"))}
             id="engagement-type"
             bind:name={$engagementType.value}
             errors={$engagementType.errors}
@@ -182,7 +195,7 @@
             extra_classes="basis-1/2"
           />
           <Select
-            title={$_("primary")}
+            title={capital($_("primary"))}
             id="primary"
             iterable={getClassesByFacetUserKey(facets, "primary_type")}
             extra_classes="basis-1/2"
@@ -195,14 +208,18 @@
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >Opret engagement</button
+        >{capital(
+          $_("create_item", {
+            values: { item: $_("engagement", { values: { n: 1 } }) },
+          })
+        )}</button
       >
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         on:click={() => goto(`${base}/organisation/${$page.params.uuid}`)}
       >
-        {$_("cancel")}
+        {capital($_("cancel"))}
       </button>
     </div>
     <Error />

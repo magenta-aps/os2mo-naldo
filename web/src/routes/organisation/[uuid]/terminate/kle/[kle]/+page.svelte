@@ -1,5 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import { enhance } from "$app/forms"
@@ -107,7 +108,7 @@
           startValue={$date}
           bind:value={$toDate.value}
           errors={$toDate.errors}
-          title={$_("date.end_date")}
+          title={capital($_("date.end_date"))}
           id="to"
           min={minDate}
           max={maxDate ? maxDate : null}
@@ -124,7 +125,7 @@
       <a
         href={`${base}/organisation/${$page.params.uuid}`}
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        >{$_("cancel")}</a
+        >{capital($_("cancel"))}</a
       >
     </div>
     <Error />

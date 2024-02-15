@@ -1,8 +1,9 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import CheckboxNode from "./checkbox_node.svelte"
 
-  export let title = "Vælg enhed"
+  export let title = `${capital($_("specify"))} ${$_("unit", { values: { n: 1 } })}`
   export let id = "checkbox_org_tree"
   export let allowMultipleSelection: boolean = false
   export let orgTree: any[] = []

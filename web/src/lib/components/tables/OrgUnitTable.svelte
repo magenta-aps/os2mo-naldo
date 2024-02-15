@@ -1,5 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
   import { base } from "$app/paths"
   import { page } from "$app/stores"
@@ -79,22 +80,30 @@
 
 {#if !data}
   <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-    <td class="p-4">Henter data...</td>
+    <td class="p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
   {#each data as org_unit}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">{org_unit.name}</td>
-      <td class="p-4">{org_unit.unit_type ? org_unit.unit_type.name : "Ikke sat"}</td>
       <td class="p-4"
-        >{org_unit.org_unit_level ? org_unit.org_unit_level.name : "Ikke sat"}</td
+        >{org_unit.unit_type ? org_unit.unit_type.name : capital($_("not_set"))}</td
+      >
+      <td class="p-4"
+        >{org_unit.org_unit_level
+          ? org_unit.org_unit_level.name
+          : capital($_("not_set"))}</td
       >
       {#if org_unit.parent}
         <a href="{base}/organisation/{org_unit.parent.uuid}">
           <td class="p-4">{org_unit.parent.name}</td>
         </a>
       {:else}
-        <td class="p-4">Ingen overenhed</td>
+        <td class="p-4"
+          >{capital(
+            $_("no_item", { values: { item: $_("parent", { values: { n: 1 } }) } })
+          )}</td
+        >
       {/if}
       <ValidityTableCell validity={org_unit.validity} />
       <td>
@@ -106,7 +115,11 @@
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
       <!-- TODO: Add translated "No <type> in <tense>"-message" -->
-      <td class="p-4">Ingen enheder</td>
+      <td class="p-4"
+        >{capital(
+          $_("no_item", { values: { item: $_("org_unit", { values: { n: 2 } }) } })
+        )}</td
+      >
     </tr>
   {/each}
 {/if}
