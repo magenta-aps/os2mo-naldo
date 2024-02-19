@@ -2,11 +2,20 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import { createEventDispatcher } from "svelte"
+  import { MOConfig } from "$lib/stores/config"
+  import { OrgTab, EmployeeTab } from "$lib/stores/tab"
 
   export let items: { label: string; value: string; n: number }[]
   export let activeItem: string
 
   let dispatch = createEventDispatcher()
+
+  if ($MOConfig.confdb_show_kle === "false") {
+    items = items.filter((tab) => tab.value !== OrgTab.KLE)
+  }
+  if ($MOConfig.show_it_associations_tab === "false") {
+    items = items.filter((tab) => tab.value !== EmployeeTab.ITASSOCIATION)
+  }
 </script>
 
 <div class="tabs tabs-bordered">

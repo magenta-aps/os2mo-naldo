@@ -40,11 +40,6 @@
     { label: "owner", value: "owner", n: 2 },
   ]
 
-  // TODO: Move tab logic into tabs.svelte
-  if (env.PUBLIC_SHOW_ITASSOCIATION_TAB === "false") {
-    items = items.filter((tab) => tab.value !== EmployeeTab.ITASSOCIATION)
-  }
-
   let uuidFromUrl = $page.params.uuid
 
   let activeItem = $activeEmployeeTab

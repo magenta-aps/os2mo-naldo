@@ -40,11 +40,6 @@
     { label: "related_unit", value: "related_unit", n: 2 },
   ]
 
-  // TODO: Move tab logic into tabs.svelte
-  if (env.PUBLIC_SHOW_KLE_TAB === "false") {
-    items = items.filter((tab) => tab.value !== OrgTab.KLE)
-  }
-
   let uuidFromUrl = $page.params.uuid
   let activeItem = $activeOrgTab
   const tabChange = (e: CustomEvent) => ($activeOrgTab = activeItem = e.detail)
