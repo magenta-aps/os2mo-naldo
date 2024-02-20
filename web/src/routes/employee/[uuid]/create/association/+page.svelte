@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Select from "$lib/components/forms/shared/select.svelte"
@@ -22,7 +24,6 @@
   import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
   import SelectGroup from "$lib/components/forms/shared/SelectGroup.svelte"
-  import SvelteSelect from "svelte-select"
 
   let toDate: string
   let selectedOrgUnit: {
@@ -119,10 +120,22 @@
     }
 </script>
 
-<title>Opret tilknytning | OS2mo</title>
+<title
+  >{capital(
+    $_("create_item", {
+      values: { item: $_("association", { values: { n: 1 } }) },
+    })
+  )} | OS2mo</title
+>
 
 <div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">Opret tilknytning</h3>
+  <h3 class="flex-1">
+    {capital(
+      $_("create_item", {
+        values: { item: $_("association", { values: { n: 1 } }) },
+      })
+    )}
+  </h3>
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
@@ -158,7 +171,7 @@
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
-            title="Startdato"
+            title={capital($_("date.start_date"))}
             id="from"
             min={minDate}
             required={true}
@@ -169,7 +182,7 @@
           which org_unit has been chosen -->
           <DateInput
             bind:value={toDate}
-            title="Slutdato"
+            title={capital($_("date.end_date"))}
             id="to"
             min={$fromDate.value}
           />
@@ -194,7 +207,7 @@
         <Breadcrumbs orgUnit={selectedOrgUnit} />
         <div class="flex flex-row gap-6">
           <Select
-            title="Tilknytningsrolle"
+            title={capital($_("association_type"))}
             id="association-type"
             bind:name={$associationType.value}
             errors={$associationType.errors}
@@ -203,7 +216,7 @@
             extra_classes="basis-1/2"
           />
           <Select
-            title="Primær"
+            title={capital($_("primary"))}
             id="primary"
             iterable={getClassesByFacetUserKey(facets, "primary_type")}
             extra_classes="basis-1/2"
@@ -223,14 +236,18 @@
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >Opret tilknytning</button
+        >{capital(
+          $_("create_item", {
+            values: { item: $_("association", { values: { n: 1 } }) },
+          })
+        )}</button
       >
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         on:click={() => goto(`${base}/employee/${$page.params.uuid}`)}
       >
-        Annullér
+        {capital($_("cancel"))}
       </button>
     </div>
     <Error />

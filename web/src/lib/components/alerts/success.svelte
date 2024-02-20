@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import { slide } from "svelte/transition"
   import { success } from "$lib/stores/alert"
   import { goto } from "$app/navigation"

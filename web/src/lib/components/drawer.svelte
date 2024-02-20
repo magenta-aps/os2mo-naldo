@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import { isAuth } from "$lib/stores/auth"
   import DrawerContent from "$lib/components/drawer_content.svelte"
   import { defaultDrawerWidth, drawerWidth } from "$lib/stores/drawer_width"
@@ -42,7 +44,7 @@
         <span
           class="loading loading-spinner text-secondary h-32 w-32 border-primary mb-6"
         />
-        <p>Authenticating...</p>
+        <p>{capital($_("authenticating"))}...</p>
       </div>
     {/if}
   </div>

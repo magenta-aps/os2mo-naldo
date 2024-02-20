@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import Tabs from "$lib/components/shared/tabs.svelte"
   import { EmployeeTab, activeEmployeeTab } from "$lib/stores/tab"
   import HeadTitle from "$lib/components/shared/head_title.svelte"
@@ -22,20 +24,20 @@
   import ManagerTable from "$lib/components/tables/ManagerTable.svelte"
   import LeaveTable from "$lib/components/tables/LeaveTable.svelte"
   import OwnerTable from "$lib/components/tables/OwnerTable.svelte"
-  import { _ } from "svelte-i18n"
 
   // Tabs
+  // "n" used for deciding which translation to use in Tabs
   let items = [
-    { label: $_("employee"), value: "employee" },
-    { label: $_("engagement"), value: "engagement" },
-    { label: $_("address"), value: "address" },
-    { label: $_("association"), value: "association" },
-    { label: $_("itassociation"), value: "itassociation" },
-    { label: $_("role"), value: "role" },
-    { label: $_("it"), value: "it" },
-    { label: $_("leave"), value: "leave" },
-    { label: $_("manager"), value: "manager" },
-    { label: $_("owner"), value: "owner" },
+    { label: "employee", value: "employee", n: 1 },
+    { label: "engagement", value: "engagement", n: 2 },
+    { label: "address", value: "address", n: 2 },
+    { label: "association", value: "association", n: 2 },
+    { label: "itassociation", value: "itassociation", n: 2 },
+    { label: "role", value: "role", n: 2 },
+    { label: "ituser", value: "ituser", n: 2 },
+    { label: "leave", value: "leave", n: 2 },
+    { label: "manager", value: "manager", n: 2 },
+    { label: "owner", value: "owner", n: 2 },
   ]
 
   // TODO: Move tab logic into tabs.svelte
@@ -83,9 +85,15 @@
 
 <div class="px-12 pt-6">
   {#await graphQLClient().request( EmployeeDocument, { uuid: uuidFromUrl, fromDate: $date } )}
-    <p>Loader medarbejder...</p>
+    <p>
+      {capital($_("loading"))}
+      {$_("employee", { values: { n: 1 } })}...
+    </p>
   {:then data}
     {@const employee = data.employees.objects[0].objects[0]}
+    <!-- Find activeItem in `items` -->
+    <!-- Fallback "" is just to make TypeScript happy - shouldn't ever happen -->
+    {@const item = items.find((item) => item.value === activeItem)?.label || ""}
     <h1 class="mb-4">
       {employee.name}
       <span class="text-slate-600">
@@ -107,8 +115,11 @@
             : `${$page.params.uuid}/create/${activeItem}`
         }`}
       >
-        {$_("add")}
-        {activeItem}
+        {capital(
+          $_("create_item", {
+            values: { item: $_(item, { values: { n: 1 } }) },
+          })
+        )}
       </a>
     </div>
 
@@ -116,9 +127,9 @@
       <TableTensesWrapper
         table={EmployeeTable}
         headers={[
-          { title: $_("name"), sortPath: "name" },
-          { title: $_("nickname"), sortPath: "nickname" },
-          { title: $_("date.date"), sortPath: "validity.from" },
+          { title: capital($_("name")), sortPath: "name" },
+          { title: capital($_("nickname")), sortPath: "nickname" },
+          { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
         ]}
       />
@@ -126,11 +137,17 @@
       <TableTensesWrapper
         table={EngagementTable}
         headers={[
-          { title: $_("unit"), sortPath: "org_unit[0].name" },
-          { title: $_("job_function"), sortPath: "job_function.name" },
-          { title: $_("engagement_type"), sortPath: "engagement_type.name" },
-          { title: $_("primary") },
-          { title: $_("date.date"), sortPath: "validity.from" },
+          {
+            title: capital($_("unit", { values: { n: 1 } })),
+            sortPath: "org_unit[0].name",
+          },
+          {
+            title: capital($_("job_function", { values: { n: 1 } })),
+            sortPath: "job_function.name",
+          },
+          { title: capital($_("engagement_type")), sortPath: "engagement_type.name" },
+          { title: capital($_("primary")) },
+          { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
@@ -139,11 +156,11 @@
       <TableTensesWrapper
         table={AddressTable}
         headers={[
-          { title: $_("address_type"), sortPath: "address_type.name" },
-          { title: $_("address"), sortPath: "name" },
+          { title: capital($_("address_type")), sortPath: "address_type.name" },
+          { title: capital($_("address", { values: { n: 1 } })), sortPath: "name" },
           // TODO: Make it possible to sort optional fields maybe? visibility and primary for example
-          { title: $_("visibility") },
-          { title: $_("date.date"), sortPath: "validity.from" },
+          { title: capital($_("visibility")) },
+          { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
@@ -152,10 +169,13 @@
       <TableTensesWrapper
         table={AssociationTable}
         headers={[
-          { title: $_("unit"), sortPath: "org_unit[0].name" },
-          { title: $_("association_type"), sortPath: "association_type.name" },
-          { title: $_("primary") },
-          { title: $_("date.date"), sortPath: "validity.from" },
+          {
+            title: capital($_("unit", { values: { n: 1 } })),
+            sortPath: "org_unit[0].name",
+          },
+          { title: capital($_("association_type")), sortPath: "association_type.name" },
+          { title: capital($_("primary")) },
+          { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
@@ -164,12 +184,18 @@
       <TableTensesWrapper
         table={ItAssociationTable}
         headers={[
-          { title: $_("unit"), sortPath: "org_unit[0].name" },
-          { title: $_("job_function"), sortPath: "job_function.name" },
-          { title: $_("it_system"), sortPath: "it_user[0].itsystem.name" },
-          { title: $_("account_name"), sortPath: "it_user[0].user_key" },
-          { title: $_("primary") },
-          { title: $_("date.date"), sortPath: "validity.from" },
+          {
+            title: capital($_("unit", { values: { n: 1 } })),
+            sortPath: "org_unit[0].name",
+          },
+          {
+            title: capital($_("job_function", { values: { n: 1 } })),
+            sortPath: "job_function.name",
+          },
+          { title: capital($_("it_system")), sortPath: "it_user[0].itsystem.name" },
+          { title: capital($_("account_name")), sortPath: "it_user[0].user_key" },
+          { title: capital($_("primary")) },
+          { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
@@ -178,9 +204,12 @@
       <TableTensesWrapper
         table={RoleTable}
         headers={[
-          { title: $_("unit"), sortPath: "org_unit[0].name" },
-          { title: $_("role_type"), sortPath: "role_type.name" },
-          { title: $_("date.date"), sortPath: "validity.from" },
+          {
+            title: capital($_("unit", { values: { n: 1 } })),
+            sortPath: "org_unit[0].name",
+          },
+          { title: capital($_("role_type")), sortPath: "role_type.name" },
+          { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
@@ -189,10 +218,10 @@
       <TableTensesWrapper
         table={ItUserTable}
         headers={[
-          { title: $_("it_system"), sortPath: "itsystem.name" },
-          { title: $_("account_name"), sortPath: "user_key" },
-          { title: $_("primary") },
-          { title: $_("date.date"), sortPath: "validity.from" },
+          { title: capital($_("it_system")), sortPath: "itsystem.name" },
+          { title: capital($_("account_name")), sortPath: "user_key" },
+          { title: capital($_("primary")) },
+          { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
@@ -201,9 +230,12 @@
       <TableTensesWrapper
         table={LeaveTable}
         headers={[
-          { title: $_("leave_type"), sortPath: "leave_type.name" },
-          { title: $_("engagement"), sortPath: "engagement.job_function.name" },
-          { title: $_("date.date"), sortPath: "validity.from" },
+          { title: capital($_("leave_type")), sortPath: "leave_type.name" },
+          {
+            title: capital($_("engagement", { values: { n: 1 } })),
+            sortPath: "engagement.job_function.name",
+          },
+          { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
@@ -212,11 +244,14 @@
       <TableTensesWrapper
         table={ManagerTable}
         headers={[
-          { title: $_("unit"), sortPath: "org_unit[0].name" },
-          { title: $_("manager_responsibility") },
-          { title: $_("manager_type"), sortPath: "manager_type.name" },
-          { title: $_("manager_level"), sortPath: "manager_level.name" },
-          { title: $_("date.date"), sortPath: "validity.from" },
+          {
+            title: capital($_("unit", { values: { n: 1 } })),
+            sortPath: "org_unit[0].name",
+          },
+          { title: capital($_("manager_responsibility")) },
+          { title: capital($_("manager_type")), sortPath: "manager_type.name" },
+          { title: capital($_("manager_level")), sortPath: "manager_level.name" },
+          { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}
@@ -225,8 +260,8 @@
       <TableTensesWrapper
         table={OwnerTable}
         headers={[
-          { title: $_("name"), sortPath: "owner[0].name" },
-          { title: $_("date.date"), sortPath: "validity.from" },
+          { title: capital($_("name")), sortPath: "owner[0].name" },
+          { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
         ]}

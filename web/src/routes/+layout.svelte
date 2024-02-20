@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import "$lib/global.css"
   import SuccessAlert from "$lib/components/alerts/success.svelte"
   import Navbar from "$lib/components/navbar.svelte"

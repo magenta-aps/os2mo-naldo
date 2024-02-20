@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Select from "$lib/components/forms/shared/select.svelte"
@@ -79,14 +81,26 @@
 
 {#await graphQLClient().request( ClassDocument, { uuid: $page.params.class, fromDate: $date } )}
   <!-- TODO: Should have a skeleton for the loading stage -->
-  Henter data...
+  {capital($_("loading"))}
 {:then data}
   {@const cls = data.classes.objects[0].objects[0]}
 
-  <title>Redigér stillingsbetegnelse | OS2mo</title>
+  <title
+    >{capital(
+      $_("edit_item", {
+        values: { item: $_("job_function", { values: { n: 1 } }) },
+      })
+    )}} | OS2mo</title
+  >
 
   <div class="flex align-center px-6 pt-6 pb-4">
-    <h3 class="flex-1">Redigér stillingsbetegnelse</h3>
+    <h3 class="flex-1">
+      {capital(
+        $_("edit_item", {
+          values: { item: $_("job_function", { values: { n: 1 } }) },
+        })
+      )}}
+    </h3>
   </div>
 
   <div class="divider p-0 m-0 mb-4 w-full" />
@@ -99,7 +113,7 @@
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
-            title="Startdato"
+            title={capital($_("date.start_date"))}
             id="from"
             min={undefined}
             max={toDate ? toDate : undefined}
@@ -110,7 +124,7 @@
           <!-- https://redmine.magenta.dk/issues/58396 -->
           <!-- <DateInput
             bind:value={toDate}
-            title="Slutdato"
+            title={capital($_("date.end_date"))}
             id="to"
             startValue={cls.validity.to ? cls.validity.to.split("T")[0] : null}
             min={$fromDate.value ? $fromDate.value : undefined}
@@ -119,7 +133,7 @@
         </div>
         <!-- <div class="flex flex-row gap-6"> -->
         <Input
-          title="Navn"
+          title={capital($_("name"))}
           id="name"
           bind:value={$name.value}
           startValue={cls.name}
@@ -144,14 +158,18 @@
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >Redigér stillingsbetegnelse</button
+        >{capital(
+          $_("edit_item", {
+            values: { item: $_("job_function", { values: { n: 1 } }) },
+          })
+        )}}</button
       >
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         on:click={() => goto(`${base}/admin`)}
       >
-        Annullér
+        {capital($_("cancel"))}
       </button>
     </div>
     <Error />

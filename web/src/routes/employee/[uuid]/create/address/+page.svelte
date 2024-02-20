@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import Select from "$lib/components/forms/shared/select.svelte"
@@ -114,10 +116,22 @@
     }
 </script>
 
-<title>Opret adresse | OS2mo</title>
+<title
+  >{capital(
+    $_("create_item", {
+      values: { item: $_("address", { values: { n: 1 } }) },
+    })
+  )} | OS2mo</title
+>
 
 <div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">Opret adresse</h3>
+  <h3 class="flex-1">
+    {capital(
+      $_("create_item", {
+        values: { item: $_("address", { values: { n: 1 } }) },
+      })
+    )}
+  </h3>
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
@@ -150,7 +164,7 @@
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
-            title="Startdato"
+            title={capital($_("date.start_date"))}
             id="from"
             required={true}
             min={minDate}
@@ -158,7 +172,7 @@
           />
           <DateInput
             bind:value={toDate}
-            title="Slutdato"
+            title={capital($_("date.end_date"))}
             id="to"
             min={$fromDate.value ? $fromDate.value : minDate}
             max={maxDate}
@@ -166,14 +180,14 @@
         </div>
         <div class="flex flex-row gap-6">
           <Select
-            title="Synlighed"
+            title={capital($_("visibility"))}
             id="visibility"
             iterable={getClassesByFacetUserKey(facets, "visibility")}
             extra_classes="basis-1/2"
             isClearable={true}
           />
           <Select
-            title="Adressetype"
+            title={capital($_("address_type"))}
             id="address-type"
             bind:value={addressType}
             bind:name={$addressTypeField.value}
@@ -184,6 +198,7 @@
           />
           <input hidden name="address-type-uuid" bind:value={addressTypeUuid} />
         </div>
+        <!-- FIXME: Translate address_types -->
         {#if addressType}
           {#if addressType.name === Addresses.POSTADRESSE}
             <DarSearch
@@ -209,14 +224,18 @@
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >Opret adresse</button
+        >{capital(
+          $_("create_item", {
+            values: { item: $_("address", { values: { n: 1 } }) },
+          })
+        )}</button
       >
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         on:click={() => goto(`${base}/employee/${$page.params.uuid}`)}
       >
-        Annullér
+        {capital($_("cancel"))}
       </button>
     </div>
     <Error />

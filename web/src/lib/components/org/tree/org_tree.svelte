@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import { page } from "$app/stores"
   import { graphQLClient } from "$lib/util/http"
   import { fetchParentTree } from "$lib/util/parent_tree.js"
@@ -14,7 +16,11 @@
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import Select from "$lib/components/forms/shared/select.svelte"
 
-  const brutto = { uuid: null, name: "Bruttoorganisation", user_key: null }
+  const brutto = {
+    uuid: null,
+    name: capital($_("entire_organisation")),
+    user_key: null,
+  }
   let orgUnitHierachy = brutto
 
   gql`
@@ -121,7 +127,7 @@
     {#await refreshableOrgTree}
       <div role="status" class="max-w-sm animate-pulse">
         <div class="h-10 bg-base-100 rounded dark:bg-accent max-w-4 mb-2.5" />
-        <span class="sr-only">Loading...</span>
+        <span class="sr-only">{capital($_("loading"))}...</span>
       </div>
     {:then orgTree}
       {#each orgTree.sort( (a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1) ) as child}

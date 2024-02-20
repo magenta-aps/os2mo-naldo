@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
   import { fetchParentTree } from "$lib/util/parent_tree"
@@ -10,7 +12,7 @@
 
 {#if orgUnit}
   {#await fetchParentTree(orgUnit.uuid, $date)}
-    <div class="text-secondary pb-4">Loading breadcrumbs...</div>
+    <div class="text-secondary pb-4">{capital($_("loading"))}...</div>
   {:then parents}
     <div class=" breadcrumbs text-secondary pb-4 pt-0">
       <ul>

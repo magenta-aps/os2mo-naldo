@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import SvelteSelect from "svelte-select"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
@@ -15,7 +17,6 @@
     LazySearchDocument,
     type LazySearchQuery,
   } from "./query.generated"
-  import { _ } from "svelte-i18n"
 
   type Employees = SearchEmployeeQuery["employees"]["objects"][0]["objects"]
   type OrgUnits = SearchOrgUnitQuery["org_units"]["objects"][0]["objects"]
@@ -222,8 +223,8 @@
       bind:value
       hideEmptyState={true}
       placeholder={type === "employee"
-        ? $_("search.person")
-        : $_("search.organisation")}
+        ? capital($_("search.person"))
+        : capital($_("search.organisation"))}
       clearFilterTextOnBlur={false}
       on:change
       on:clear
@@ -252,7 +253,9 @@
   </div>
   {#each errors as error}
     {#if error === "required"}
-      <span class="label-text-alt text-error block">{title} skal udfyldes</span>
+      <span class="label-text-alt text-error block"
+        >{$_("validation.is_required", { values: { field: title } })}</span
+      >
     {/if}
   {/each}
 </div>

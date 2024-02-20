@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { tenses } from "$lib/stores/tenses"
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
+  import { tenses } from "$lib/stores/tenses"
 </script>
 
 <div class="tabs p-0 bg-base-100 border-primary border rounded my-5 w-fit">
@@ -11,7 +12,7 @@
       $tenses.future = !$tenses.future
     }}
   >
-    {$_("future")}
+    {capital($_("future"))}
   </button>
   <button
     class="tab text-slate-600 hover:text-secondary
@@ -20,7 +21,7 @@
       $tenses.present = !$tenses.present
     }}
   >
-    {$_("present")}
+    {capital($_("present"))}
   </button>
   <button
     class="border-primary border-l text-slate-600 hover:text-secondary tab
@@ -29,6 +30,6 @@
       $tenses.past = !$tenses.past
     }}
   >
-    {$_("past")}
+    {capital($_("past"))}
   </button>
 </div>

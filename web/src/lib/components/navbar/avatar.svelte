@@ -1,10 +1,12 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import { isAuth } from "$lib/stores/auth"
   import { logoutKeycloak, keycloak } from "$lib/util/keycloak"
 
   $: fullName = (): string => {
     if (!$isAuth) {
-      return "Loading..."
+      return `${capital($_("loading"))}...`
     }
     if (keycloak && keycloak.idTokenParsed) {
       return keycloak.idTokenParsed.name

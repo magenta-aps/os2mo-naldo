@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import Error from "$lib/components/alerts/error.svelte"
   import Input from "$lib/components/forms/shared/input.svelte"
   import { enhance } from "$app/forms"
@@ -77,10 +79,22 @@
     }
 </script>
 
-<title>Opret Medarbejder | OS2mo</title>
+<title
+  >{capital(
+    $_("create_item", {
+      values: { item: $_("employee", { values: { n: 1 } }) },
+    })
+  )} | OS2mo</title
+>
 
 <div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">Opret ny medarbejder</h3>
+  <h3 class="flex-1">
+    {capital(
+      $_("create_item", {
+        values: { item: $_("employee", { values: { n: 1 } }) },
+      })
+    )}
+  </h3>
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
@@ -88,7 +102,7 @@
 <form method="post" class="mx-6" use:enhance={handler}>
   {#await graphQLClient().request(GetSpConfigDocument)}
     <!-- TODO: Should have a skeleton for the loading stage -->
-    Henter data...
+    {capital($_("loading"))}
   {:then data}
     {@const SpEnabled = data.configuration.objects[0].jsonified_value === "true"}
 
@@ -96,7 +110,7 @@
       <div class="p-8">
         {#if SpEnabled}
           <CprLookup
-            title="CPR"
+            title={capital($_("cpr_number"))}
             id="cpr-number"
             bind:value={person}
             bind:cprNumber={$cprNumber.value}
@@ -104,7 +118,7 @@
           />
           <div class="flex flex-row gap-6">
             <Input
-              title="Fornavn(e)"
+              title={capital($_("givenname", { values: { n: 2 } }))}
               id="first-name"
               bind:value={seperatedFirstName}
               bind:cprName={$firstName.value}
@@ -114,7 +128,7 @@
               readonly
             />
             <Input
-              title="Efternavn"
+              title={capital($_("surname"))}
               id="last-name"
               bind:value={seperatedLastName}
               bind:cprName={$lastName.value}
@@ -126,7 +140,7 @@
           </div>
         {:else}
           <Input
-            title="CPR nummer"
+            title={capital($_("cpr_number"))}
             id="cpr-number"
             bind:value={$cprNumber.value}
             errors={$cprNumber.errors}
@@ -134,7 +148,7 @@
           />
           <div class="flex flex-row gap-6">
             <Input
-              title="Fornavn(e)"
+              title={capital($_("givenname", { values: { n: 2 } }))}
               id="first-name"
               bind:cprName={$firstName.value}
               errors={$firstName.errors}
@@ -142,7 +156,7 @@
               required={true}
             />
             <Input
-              title="Efternavn"
+              title={capital($_("surname"))}
               id="last-name"
               bind:cprName={$lastName.value}
               errors={$lastName.errors}
@@ -153,13 +167,13 @@
         {/if}
         <div class="flex flex-row gap-6">
           <Input
-            title="Kaldenavn fornavn"
+            title={capital($_("nickname_givenname", { values: { n: 2 } }))}
             id="nickname-first-name"
             bind:value={nicknameFirstName}
             extra_classes="basis-1/2"
           />
           <Input
-            title="Kaldenavn efternavn(e)"
+            title={capital($_("nickname_surname"))}
             id="nickname-last-name"
             bind:value={nicknameLastName}
             extra_classes="basis-1/2"
@@ -171,14 +185,18 @@
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >Opret medarbejder</button
+        >{capital(
+          $_("create_item", {
+            values: { item: $_("employee", { values: { n: 1 } }) },
+          })
+        )}</button
       >
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         on:click={() => history.back()}
       >
-        Annullér
+        {capital($_("cancel"))}
       </button>
     </div>
     <Error />

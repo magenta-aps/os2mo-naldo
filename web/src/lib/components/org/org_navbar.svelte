@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
   import { base } from "$app/paths"
   import { page } from "$app/stores"
   import Icon from "@iconify/svelte"
@@ -6,7 +7,6 @@
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import swapHorizRounded from "@iconify/icons-material-symbols/swap-horiz-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
-  import { _ } from "svelte-i18n"
 
   enum Form {
     CREATE = "create",

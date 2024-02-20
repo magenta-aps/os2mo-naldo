@@ -1,8 +1,9 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import { env } from "$env/dynamic/public"
   import SvelteSelect from "svelte-select"
   import DarItem from "./DARItem.svelte"
-  import { _ } from "svelte-i18n"
 
   export let startValue: DarAddressResponse | undefined = undefined
   export let value: DarAddressResponse | undefined = startValue || undefined
@@ -64,7 +65,7 @@
       --border-radius="0.25rem"
       --icons-color="#00244E"
       --padding="0 0.75rem 0 0.75rem"
-      placeholder={$_("search.person")}
+      placeholder={capital($_("search.address"))}
       id="dar-search"
       listAutoWidth={false}
       loadOptions={fetchDAR}
@@ -90,7 +91,9 @@
   </div>
   {#each errors as error}
     {#if error === "required"}
-      <span class="label-text-alt text-error block">{title} skal udfyldes</span>
+      <span class="label-text-alt text-error block"
+        >{$_("validation.is_required", { values: { field: title } })}</span
+      >
     {/if}
   {/each}
 </div>

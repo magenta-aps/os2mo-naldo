@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
   import { isAdmin } from "$lib/stores/auth"

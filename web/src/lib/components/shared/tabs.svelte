@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte"
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
+  import { createEventDispatcher } from "svelte"
 
-  export let items: { value: string }[]
+  export let items: { label: string; value: string; n: number }[]
   export let activeItem: string
 
   let dispatch = createEventDispatcher()
@@ -17,7 +18,7 @@
       {item.value === activeItem ? 'tab-active text-primary' : 'text-secondary'}"
       on:click={() => dispatch("tabChange", item.value)}
     >
-      {$_(item.value)}
+      {capital($_(item.value, { values: { n: item.n } }))}
     </a>
   {/each}
 </div>

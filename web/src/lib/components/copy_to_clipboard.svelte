@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import { success } from "$lib/stores/alert"
   import Icon from "@iconify/svelte"
   import fileCopyOutlineRounded from "@iconify/icons-material-symbols/file-copy-outline-rounded"
@@ -8,12 +10,12 @@
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(uuid).then(() => {
-      $success = { message: `${name} blev kopieret`, type: "clipboard" }
+      $success = { message: `${name} ${$_("copied")}`, type: "clipboard" }
     })
   }
 </script>
 
-<div class="tooltip tooltip-bottom" data-tip="Kopier {name} uuid">
+<div class="tooltip tooltip-bottom" data-tip="{capital($_('copy'))} {name} uuid">
   <button
     on:click={copyToClipboard}
     class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"

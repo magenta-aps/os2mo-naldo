@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { EmployeeLeavesDocument, type EmployeeLeavesQuery } from "./query.generated"
@@ -80,7 +82,7 @@
 
 {#if !data}
   <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-    <td class="p-4">Henter data...</td>
+    <td class="p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
   {#each data as leave}

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Error from "$lib/components/alerts/error.svelte"
   import { enhance } from "$app/forms"
@@ -6,7 +8,7 @@
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
-  import { ItUserDocument, TerminateItUserDocument } from "./query.generated"
+  import { ItUserAndOrgDocument, TerminateItUserDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
@@ -18,12 +20,15 @@
   const svelteForm = form(toDate)
 
   gql`
-    query ITUser($uuid: [UUID!], $fromDate: DateTime!, $employee_uuid: [UUID!]) {
+    query ITUserAndOrg($uuid: [UUID!], $fromDate: DateTime!, $org_unit_uuid: [UUID!]) {
       itusers(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
           objects {
             user_key
             uuid
+            employee {
+              name
+            }
             validity {
               from
               to
@@ -31,10 +36,9 @@
           }
         }
       }
-      employees(filter: { uuids: $employee_uuid }) {
+      org_units(filter: { uuids: $org_unit_uuid, from_date: $fromDate }) {
         objects {
           objects {
-            name
             validity {
               from
               to
@@ -46,8 +50,8 @@
 
     mutation TerminateITUser($input: ITUserTerminateInput!) {
       ituser_terminate(input: $input) {
+        uuid
         objects {
-          uuid
           user_key
         }
       }
@@ -68,11 +72,11 @@
             $success = {
               message: `IT-kontoen ${
                 mutation.ituser_terminate.objects[0].user_key
-                  ? mutation.ituser_terminate.objects[0].user_key
+                  ? `for ${mutation.ituser_terminate.objects[0].user_key}`
                   : ""
               } afsluttes d. ${$toDate.value}`,
               uuid: $page.params.uuid,
-              type: "employee",
+              type: "organisation",
             }
           } catch (err) {
             $error = { message: err }
@@ -82,15 +86,27 @@
     }
 </script>
 
-<title>Afslut IT-konto | OS2mo</title>
+<title
+  >{capital(
+    $_("terminate_item", {
+      values: { item: $_("ituser", { values: { n: 1 } }) },
+    })
+  )} | OS2mo</title
+>
 
 <div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">Afslut IT-konto</h3>
+  <h3 class="flex-1">
+    {capital(
+      $_("terminate_item", {
+        values: { item: $_("ituser", { values: { n: 1 } }) },
+      })
+    )}
+  </h3>
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ItUserDocument, { uuid: $page.params.ituser, fromDate: $date, employee_uuid: $page.params.uuid } )}
+{#await graphQLClient().request( ItUserAndOrgDocument, { uuid: $page.params.ituser, fromDate: $date, org_unit_uuid: $page.params.uuid } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -101,6 +117,7 @@
 {:then data}
   {@const ituser = data.itusers.objects[0].objects[0]}
   {@const minDate = ituser.validity.from.split("T")[0]}
+  {@const maxDate = data.org_units.objects[0].objects[0].validity.to?.split("T")[0]}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -109,9 +126,10 @@
           startValue={$date}
           bind:value={$toDate.value}
           errors={$toDate.errors}
-          title="Slutdato"
+          title={capital($_("date.end_date"))}
           id="to"
           min={minDate}
+          max={maxDate ? maxDate : null}
           required={true}
         />
       </div>
@@ -120,12 +138,16 @@
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >Afslut IT-konto</button
+        >{capital(
+          $_("terminate_item", {
+            values: { item: $_("ituser", { values: { n: 1 } }) },
+          })
+        )}</button
       >
       <a
-        href={`${base}/employee/${$page.params.uuid}`}
+        href={`${base}/organisation/${$page.params.uuid}`}
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        >Annullér</a
+        >{capital($_("cancel"))}</a
       >
     </div>
     <Error />

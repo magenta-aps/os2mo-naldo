@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import Error from "$lib/components/alerts/error.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "../connecting_organisations/$types"
@@ -184,13 +186,13 @@
     previousUuid = selectedOriginOrg.uuid
   }
 
-  $: originName = selectedOriginOrg ? selectedOriginOrg.name : "Enheden"
-
   $: isDisabled = !selectedOriginOrg
 
-  $: connectionText = `${originName} kobles sammen med: ${formatDestinationNamesFromOrgs(
-    selectedDestinationsOrgs
-  )}`
+  $: connectionText = `${
+    selectedOriginOrg
+      ? selectedOriginOrg.name
+      : capital($_("unit", { values: { n: 0 } }))
+  } ${$_("connect_with")} ${formatDestinationNamesFromOrgs(selectedDestinationsOrgs)}`
 
   const formatDestinationNamesFromOrgs = (orgs: { name: string }[]): string => {
     const names = orgs.map((org) => org.name)
@@ -198,7 +200,7 @@
     if (!names.length) return ""
     return names.length === 1
       ? names[0]
-      : `${names.slice(0, -1).join(", ")} og ${names[names.length - 1]}`
+      : `${names.slice(0, -1).join(", ")} ${$_("and")} ${names[names.length - 1]}`
   }
 
   const resetSelected = () => {
@@ -210,12 +212,12 @@
 </script>
 
 {#await fetchAll()}
-  <p>Henter data...</p>
+  <p>{capital($_("loading"))}</p>
 {:then data}
-  <title>Organisationssammenkobling | OS2mo</title>
+  <title>{$_("navigation.connecting_organisations")} | OS2mo</title>
 
   <div class="flex align-center px-6 pt-6 pb-4">
-    <h3 class="flex-1">Organisationssammenkobling</h3>
+    <h3 class="flex-1">{$_("navigation.connecting_organisations")}</h3>
   </div>
 
   <div class="divider p-0 m-0 mb-4 w-full" />
@@ -230,8 +232,9 @@
               bind:orgTree
               bind:selectedDestinationsOrgs
               bind:selectedOriginOrg
-              title="Vælg enhed"
+              title="{capital($_('specify'))} {$_('unit', { values: { n: 1 } })}"
             />
+            <!-- FIXME: -->
             <!-- Hidden field for origin-uuid -->
             <input
               type="hidden"
@@ -246,7 +249,9 @@
               bind:orgTree
               bind:selectedDestinationsOrgs
               bind:selectedOriginOrg
-              title="Angiv hvilke enheder der skal sammenkobles med enheden til venstre"
+              title={selectedOriginOrg
+                ? `${capital($_("connection_text"))} ${selectedOriginOrg.name}`
+                : `${capital($_("specify"))} ${$_("unit", { values: { n: 2 } })}`}
             />
             <input
               type="hidden"
@@ -264,7 +269,7 @@
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
         disabled={isDisabled}
-        >Gem
+        >{capital($_("save"))}
       </button>
       <button
         type="button"
@@ -272,7 +277,7 @@
         disabled={isDisabled}
         on:click={() => history.back()}
       >
-        Annullér
+        {capital($_("cancel"))}
       </button>
       <Error />
     </div>

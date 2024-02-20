@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import SvelteSelect from "svelte-select"
 
   type Value = {
@@ -80,7 +82,9 @@
   {/if}
   {#each errors as error}
     {#if error === "required"}
-      <span class="label-text-alt text-error block">{title} skal udfyldes</span>
+      <span class="label-text-alt text-error block"
+        >{$_("validation.is_required", { values: { field: title } })}</span
+      >
     {/if}
   {/each}
 </div>

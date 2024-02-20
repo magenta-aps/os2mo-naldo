@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import { gql } from "graphql-request"
   import { graphQLClient } from "$lib/util/http"
   import { date } from "$lib/stores/date"
@@ -136,7 +138,7 @@
   <h1 class="mb-4">Insight</h1>
   {#await graphQLClient().request(GetClassesDocument)}
     <!-- TODO: Should have a skeleton for the loading stage -->
-    Henter data...
+    {capital($_("loading"))}
   {:then data}
     {@const facets = data.facets.objects}
     <div class="collapse bg-slate-100 rounded shadow-sm my-4">
@@ -146,9 +148,9 @@
       </div>
       <div class="collapse-content">
         <div class="grid grid-cols-4 gap-4">
-          <Input title="Navn" id="filter-name" bind:value={name} />
+          <Input title={capital($_("name"))} id="filter-name" bind:value={name} />
           <Select
-            title="Stillingsbetegnelse"
+            title={capital($_("job_function", { values: { n: 1 } }))}
             id="filter-job-function"
             bind:value={jobFunction}
             iterable={getClassesByFacetUserKey(facets, "engagement_job_function")}
@@ -157,7 +159,7 @@
           <!-- TODO: Allow searching for children of x -->
           <Search
             type="org-unit"
-            title="Enhed"
+            title={capital($_("unit", { values: { n: 1 } }))}
             id="filter-org-unit"
             bind:value={orgUnit}
           />

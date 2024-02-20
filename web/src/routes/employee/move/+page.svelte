@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import Error from "$lib/components/alerts/error.svelte"
   import Select from "$lib/components/forms/shared/select.svelte"
   import { enhance } from "$app/forms"
@@ -129,10 +131,10 @@
   })
 </script>
 
-<title>Flyt engagement | OS2mo</title>
+<title>{$_("navigation.move_engagement")} | OS2mo</title>
 
 <div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">Flyt engagement</h3>
+  <h3 class="flex-1">{$_("navigation.move_engagement")}</h3>
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
@@ -161,7 +163,7 @@
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
-            title="Flyttedato"
+            title={capital($_("date.move_date"))}
             id="from"
             min={minDate ? minDate : null}
             required={true}
@@ -169,7 +171,7 @@
         </div>
         <Search
           type="employee"
-          title="Medarbejder"
+          title={capital($_("employee", { values: { n: 1 } }))}
           startValue={startValueEmployee
             ? {
                 uuid: startValueEmployee.uuid,
@@ -190,7 +192,7 @@
         {#if engagements && engagements.length}
           {#key engagements}
             <Select
-              title="Engagementer"
+              title={capital($_("engagements", { values: { n: 2 } }))}
               id="engagement-uuid"
               bind:name={$engagement.value}
               errors={$engagement.errors}
@@ -201,7 +203,7 @@
           {/key}
         {:else}
           <Select
-            title="Engagementer"
+            title={capital($_("engagements", { values: { n: 2 } }))}
             id="engagement-uuid"
             bind:name={$engagement.value}
             errors={$engagement.errors}
@@ -211,7 +213,7 @@
         {/if}
         <Search
           type="org-unit"
-          title="Flyt til"
+          title="{capital($_('move'))} {$_('to')}"
           bind:name={$orgUnitField.value}
           errors={$orgUnitField.errors}
           on:clear={() => ($orgUnitField.value = "")}
@@ -225,14 +227,14 @@
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >Flyt engagement</button
+        >{$_("navigation.move_engagement")}</button
       >
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         on:click={() => history.back()}
       >
-        Annullér
+        {capital($_("cancel"))}
       </button>
     </div>
     <Error />
