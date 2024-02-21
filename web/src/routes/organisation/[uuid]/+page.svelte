@@ -99,7 +99,7 @@
       <TenseTabs />
       <!-- Links are different on `org_unit` and `related`-tabs -->
       <a
-        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
+        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5 hover:no-underline"
         href={`${base}/${
           activeItem === OrgTab.ORG_UNIT
             ? `organisation/create#uuid=${$page.params.uuid}`
