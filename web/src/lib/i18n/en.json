@@ -46,6 +46,7 @@
 	"kle_number": "KLE number",
 	"leave": "{n, plural, =0 {the leave} one {leave} other {leaves}}",
 	"leave_type": "leave type",
+	"link": "{n, plural, =0 {the link} one {link} other {links}}",
 	"loading": "loading",
 	"manager": "{n, plural, =0 {the manager} one {manager} other {managers}}",
 	"manager_level": "manager level",
