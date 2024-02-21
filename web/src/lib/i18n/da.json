@@ -85,6 +85,7 @@
 	"primary": "primær",
 	"related_unit": "{n, plural, =0 {den relaterede enhed} one {relateret enhed} other {relaterede enheder}}",
 	"rename": "omdøb",
+	"report": "{n, plural, one {rapport} other {rapporter}}",
 	"role": "{n, plural, =0 {rollen} one {rolle} other {roller}}",
 	"role_type": "rolletype",
 	"save": "gem",
