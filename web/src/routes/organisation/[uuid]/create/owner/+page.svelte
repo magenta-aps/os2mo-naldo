@@ -59,11 +59,14 @@
               input: result.data,
             })
             $success = {
-              message: `Ejeren ${
-                mutation.owner_create.objects[0]?.org_unit
-                  ? `for ${mutation.owner_create.objects[0].org_unit[0].name}`
-                  : ""
-              } er oprettet fra d. ${$fromDate.value}`,
+              message: capital(
+                $_("success_create", {
+                  values: {
+                    item: $_("owner", { values: { n: 0 } }),
+                    name: mutation.owner_create.objects[0]?.org_unit?.[0].name,
+                  },
+                })
+              ),
               uuid: $page.params.uuid,
               type: "organisation",
             }

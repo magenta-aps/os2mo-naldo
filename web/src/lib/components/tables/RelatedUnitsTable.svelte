@@ -82,7 +82,6 @@
     </tr>
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
-      <!-- TODO: Add translated "No related units in <tense>"-message" -->
       <td class="p-4"
         >{capital(
           $_("no_item", { values: { item: $_("related_unit", { values: { n: 2 } }) } })

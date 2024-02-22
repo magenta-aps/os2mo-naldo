@@ -98,11 +98,8 @@
       engagement_update(input: $input) {
         objects {
           uuid
-          employee {
+          person {
             name
-          }
-          org_unit {
-            uuid
           }
         }
       }
@@ -121,14 +118,15 @@
               input: result.data,
             })
             $success = {
-              message: `Engagementet ${
-                mutation.engagement_update.objects[0].employee
-                  ? `for ${mutation.engagement_update.objects[0].employee[0].name}`
-                  : ""
-              } redigeres fra d. ${$fromDate.value}`,
-              uuid: mutation.engagement_update.objects[0].org_unit[0]?.uuid
-                ? mutation.engagement_update.objects[0].org_unit[0].uuid
-                : $page.params.uuid,
+              message: capital(
+                $_("success_edit", {
+                  values: {
+                    item: $_("engagement", { values: { n: 0 } }),
+                    name: mutation.engagement_update.objects[0]?.person?.[0].name,
+                  },
+                })
+              ),
+              uuid: $page.params.uuid,
               type: "organisation",
             }
           } catch (err) {
@@ -139,7 +137,6 @@
     }
 </script>
 
-<!-- VIGTIGT: skal vi lade dem blive i await og så have navne på, eller? -->
 <title
   >{capital(
     $_("edit_item", {

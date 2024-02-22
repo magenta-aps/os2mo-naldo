@@ -76,11 +76,14 @@
               input: result.data,
             })
             $success = {
-              message: `KLE-opmærkningen ${
-                mutation.kle_create.objects[0]?.org_unit
-                  ? `for ${mutation.kle_create.objects[0].org_unit[0].name}`
-                  : ""
-              } er oprettet fra d. ${$fromDate.value}`,
+              message: capital(
+                $_("success_create", {
+                  values: {
+                    item: $_("kle", { values: { n: 0 } }),
+                    name: mutation.kle_create.objects[0]?.org_unit?.[0].name,
+                  },
+                })
+              ),
               uuid: $page.params.uuid,
               type: "organisation",
             }

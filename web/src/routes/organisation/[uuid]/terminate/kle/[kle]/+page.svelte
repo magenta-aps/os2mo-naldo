@@ -64,11 +64,14 @@
             })
 
             $success = {
-              message: `KLE-opmærkningen ${
-                mutation.kle_terminate.objects[0].org_unit
-                  ? `for ${mutation.kle_terminate.objects[0].org_unit[0].name}`
-                  : ""
-              } afsluttes d. ${$toDate.value}`,
+              message: capital(
+                $_("success_terminate", {
+                  values: {
+                    item: $_("kle", { values: { n: 0 } }),
+                    name: mutation.kle_terminate.objects[0]?.org_unit?.[0].name,
+                  },
+                })
+              ),
               uuid: $page.params.uuid,
               type: "organisation",
             }
@@ -80,10 +83,22 @@
     }
 </script>
 
-<title>Afslut KLE-opmærkning | OS2mo</title>
+<title
+  >{capital(
+    $_("terminate_item", {
+      values: { item: $_("kle", { values: { n: 1 } }) },
+    })
+  )} | OS2mo</title
+>
 
 <div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">KLE-opmærkning</h3>
+  <h3 class="flex-1">
+    {capital(
+      $_("terminate_item", {
+        values: { item: $_("kle", { values: { n: 1 } }) },
+      })
+    )}
+  </h3>
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
@@ -120,7 +135,11 @@
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >Afslut KLE-opmærkning</button
+        >{capital(
+          $_("terminate_item", {
+            values: { item: $_("kle", { values: { n: 1 } }) },
+          })
+        )}</button
       >
       <a
         href={`${base}/organisation/${$page.params.uuid}`}

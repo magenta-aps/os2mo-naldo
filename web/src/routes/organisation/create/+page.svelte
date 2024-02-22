@@ -96,11 +96,14 @@
               input: result.data,
             })
             $success = {
-              message: `Organisationsenheden ${
-                mutation.org_unit_create.objects[0]?.name
-                  ? mutation.org_unit_create.objects[0].name
-                  : ""
-              } er blevet oprettet.`,
+              message: capital(
+                $_("success_create", {
+                  values: {
+                    item: $_("org_unit", { values: { n: 0 } }),
+                    name: undefined,
+                  },
+                })
+              ),
               // TODO: Fix `parent` redirect, when `/organisation` is not a thing anymore
               uuid: mutation.org_unit_create.objects[0]?.uuid
                 ? mutation.org_unit_create.objects[0].uuid

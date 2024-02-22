@@ -66,11 +66,14 @@
               input: result.data,
             })
             $success = {
-              message: `Orloven ${
-                mutation.leave_terminate.objects[0].person
-                  ? `for ${mutation.leave_terminate.objects[0].person[0].name}`
-                  : ""
-              } afsluttes d. ${$toDate.value}`,
+              message: capital(
+                $_("success_terminate", {
+                  values: {
+                    item: $_("leave", { values: { n: 0 } }),
+                    name: mutation.leave_terminate.objects[0]?.person?.[0].name,
+                  },
+                })
+              ),
               uuid: $page.params.uuid,
               type: "employee",
             }

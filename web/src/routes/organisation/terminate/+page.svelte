@@ -79,11 +79,14 @@
             })
 
             $success = {
-              message: `Organisationsenheden ${
-                mutation.org_unit_terminate.objects[0]?.name
-                  ? mutation.org_unit_terminate.objects[0].name
-                  : ""
-              } afsluttes d. ${$toDate.value}`,
+              message: capital(
+                $_("success_terminate", {
+                  values: {
+                    item: $_("org_unit", { values: { n: 0 } }),
+                    name: undefined,
+                  },
+                })
+              ),
               uuid: mutation.org_unit_terminate.objects[0]?.uuid
                 ? mutation.org_unit_terminate.objects[0].uuid
                 : "",

@@ -65,7 +65,14 @@
               input: result.data,
             })
             $success = {
-              message: `Medarbejderen ${mutation.employee_update.objects[0].name} redigeres fra d. ${$fromDate.value}`,
+              message: capital(
+                $_("success_edit", {
+                  values: {
+                    item: $_("employee", { values: { n: 0 } }),
+                    name: undefined,
+                  },
+                })
+              ),
               uuid: mutation.employee_update.objects[0].uuid,
               type: "employee",
             }

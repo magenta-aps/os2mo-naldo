@@ -59,7 +59,7 @@
     mutation CreateAssociation($input: AssociationCreateInput!) {
       association_create(input: $input) {
         objects {
-          employee {
+          person {
             name
           }
         }
@@ -78,11 +78,14 @@
               input: result.data,
             })
             $success = {
-              message: `Tilknytningen ${
-                mutation.association_create.objects[0]?.employee
-                  ? `til ${mutation.association_create.objects[0].employee[0].name}`
-                  : ""
-              } er oprettet fra d. ${$fromDate.value}`,
+              message: capital(
+                $_("success_create", {
+                  values: {
+                    item: $_("association", { values: { n: 0 } }),
+                    name: mutation.association_create.objects[0]?.person?.[0].name,
+                  },
+                })
+              ),
               uuid: $page.params.uuid,
               type: "organisation",
             }

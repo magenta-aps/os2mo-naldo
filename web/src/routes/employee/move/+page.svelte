@@ -82,7 +82,7 @@
       engagement_update(input: $input) {
         objects {
           uuid
-          employee {
+          person {
             name
             uuid
           }
@@ -103,12 +103,15 @@
               input: result.data,
             })
             $success = {
-              message: `Engagementet ${
-                mutation.engagement_update.objects[0].employee
-                  ? `for ${mutation.engagement_update.objects[0].employee[0].name}`
-                  : ""
-              } flyttes d. ${$fromDate.value}`,
-              uuid: mutation.engagement_update.objects[0].employee[0].uuid,
+              message: capital(
+                $_("success_move", {
+                  values: {
+                    item: $_("engagement", { values: { n: 0 } }),
+                    name: mutation.engagement_update.objects[0]?.person?.[0].name,
+                  },
+                })
+              ),
+              uuid: mutation.engagement_update.objects[0].person[0].uuid,
               type: "employee",
             }
           } catch (err) {

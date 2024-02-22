@@ -70,11 +70,14 @@
               input: result.data,
             })
             $success = {
-              message: `Ejeren ${
-                mutation.owner_update.objects[0].person
-                  ? `for ${mutation.owner_update.objects[0].person[0].name}`
-                  : ""
-              } redigeres fra d. ${$fromDate.value}`,
+              message: capital(
+                $_("success_edit", {
+                  values: {
+                    item: $_("owner", { values: { n: 0 } }),
+                    name: mutation.owner_update.objects[0]?.person?.[0].name,
+                  },
+                })
+              ),
               uuid: $page.params.uuid,
               type: "employee",
             }

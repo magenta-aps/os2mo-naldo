@@ -65,7 +65,15 @@
             })
 
             $success = {
-              message: `${$name.value} omdøbes til ${$newName.value} d. ${$fromDate.value}`,
+              // TODO: Make more specified translation e.g. `$name.value is renamed to $newName.value`
+              message: capital(
+                $_("success_rename", {
+                  values: {
+                    item: $_("org_unit", { values: { n: 0 } }),
+                    name: undefined,
+                  },
+                })
+              ),
               uuid: mutation.org_unit_update.uuid,
               type: "organisation",
             }

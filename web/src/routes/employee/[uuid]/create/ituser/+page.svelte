@@ -88,11 +88,14 @@
               input: result.data,
             })
             $success = {
-              message: `IT-kontoen ${
-                mutation.ituser_create.objects[0]?.employee
-                  ? `for ${mutation.ituser_create.objects[0].employee[0].name}`
-                  : ""
-              } er oprettet fra d. ${$fromDate.value}`,
+              message: capital(
+                $_("success_create", {
+                  values: {
+                    item: $_("ituser", { values: { n: 0 } }),
+                    name: mutation.ituser_create.objects[0]?.employee?.[0].name,
+                  },
+                })
+              ),
               uuid: $page.params.uuid,
               type: "employee",
             }

@@ -77,7 +77,7 @@
     mutation UpdateRole($input: RoleUpdateInput!) {
       role_update(input: $input) {
         objects {
-          employee {
+          person {
             name
           }
           org_unit {
@@ -99,11 +99,14 @@
               input: result.data,
             })
             $success = {
-              message: `Rollen ${
-                mutation.role_update.objects[0].employee
-                  ? `for ${mutation.role_update.objects[0].employee[0].name}`
-                  : ""
-              } redigeres fra d. ${$fromDate.value}`,
+              message: capital(
+                $_("success_edit", {
+                  values: {
+                    item: $_("role", { values: { n: 0 } }),
+                    name: mutation.role_update.objects[0]?.person?.[0].name,
+                  },
+                })
+              ),
               uuid: mutation.role_update.objects[0].org_unit[0]?.uuid
                 ? mutation.role_update.objects[0].org_unit[0].uuid
                 : $page.params.uuid,

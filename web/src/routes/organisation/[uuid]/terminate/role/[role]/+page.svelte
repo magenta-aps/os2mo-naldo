@@ -48,7 +48,7 @@
       role_terminate(input: $input) {
         objects {
           uuid
-          employee {
+          person {
             name
           }
         }
@@ -68,11 +68,14 @@
             })
 
             $success = {
-              message: `Rollen ${
-                mutation.role_terminate.objects[0].employee
-                  ? `for ${mutation.role_terminate.objects[0].employee[0].name}`
-                  : ""
-              } afsluttes d. ${$toDate.value}`,
+              message: capital(
+                $_("success_terminate", {
+                  values: {
+                    item: $_("role", { values: { n: 0 } }),
+                    name: mutation.role_terminate.objects[0]?.person?.[0].name,
+                  },
+                })
+              ),
               uuid: $page.params.uuid,
               type: "organisation",
             }

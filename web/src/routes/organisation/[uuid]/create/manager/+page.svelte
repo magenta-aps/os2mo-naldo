@@ -60,7 +60,7 @@
     mutation CreateManager($input: ManagerCreateInput!) {
       manager_create(input: $input) {
         objects {
-          employee {
+          person {
             name
           }
         }
@@ -79,11 +79,14 @@
               input: result.data,
             })
             $success = {
-              message: `${
-                mutation.manager_create.objects[0]?.employee
-                  ? `Lederrollen for ${mutation.manager_create.objects[0].employee[0].name}`
-                  : "Vakant lederrolle"
-              } er oprettet fra d. ${$fromDate.value}`,
+              message: capital(
+                $_("success_create", {
+                  values: {
+                    item: $_("manager", { values: { n: 0 } }),
+                    name: mutation.manager_create.objects[0]?.person?.[0].name,
+                  },
+                })
+              ),
               uuid: $page.params.uuid,
               type: "organisation",
             }

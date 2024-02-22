@@ -63,8 +63,10 @@
     mutation CreateItUser($input: ITUserCreateInput!) {
       ituser_create(input: $input) {
         objects {
-          user_key
           uuid
+          person {
+            name
+          }
         }
       }
     }
@@ -80,11 +82,14 @@
               input: result.data,
             })
             $success = {
-              message: `IT-kontoen ${
-                mutation.ituser_create.objects[0]?.user_key
-                  ? `til ${mutation.ituser_create.objects[0].user_key}`
-                  : ""
-              } er oprettet fra d. ${$fromDate.value}`,
+              message: capital(
+                $_("success_create", {
+                  values: {
+                    item: $_("ituser", { values: { n: 0 } }),
+                    name: mutation.ituser_create.objects[0]?.person?.[0].name,
+                  },
+                })
+              ),
               uuid: $page.params.uuid,
               type: "organisation",
             }

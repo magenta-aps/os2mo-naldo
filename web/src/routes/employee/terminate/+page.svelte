@@ -66,11 +66,14 @@
             })
 
             $success = {
-              message: `${
-                mutation.employee_terminate.objects[0].name
-                  ? mutation.employee_terminate.objects[0].name
-                  : "Medarbejderen"
-              } opsiges d. ${$toDate.value}`,
+              message: capital(
+                $_("success_terminate", {
+                  values: {
+                    item: $_("employee", { values: { n: 0 } }),
+                    name: undefined,
+                  },
+                })
+              ),
               uuid: mutation.employee_terminate.objects[0].uuid,
               type: "employee",
             }

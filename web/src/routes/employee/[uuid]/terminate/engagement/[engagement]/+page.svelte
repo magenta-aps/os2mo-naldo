@@ -71,11 +71,14 @@
             )
 
             $success = {
-              message: `Engagementet ${
-                mutation.engagement_terminate.objects[0].employee
-                  ? `for ${mutation.engagement_terminate.objects[0].employee[0].name}`
-                  : ""
-              } afsluttes d. ${$toDate.value}`,
+              message: capital(
+                $_("success_terminate", {
+                  values: {
+                    item: $_("engagement", { values: { n: 0 } }),
+                    name: mutation.engagement_terminate.objects[0]?.employee?.[0].name,
+                  },
+                })
+              ),
               uuid: $page.params.uuid,
               type: "employee",
             }

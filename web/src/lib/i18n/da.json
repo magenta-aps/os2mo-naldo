@@ -32,6 +32,7 @@
 	"enter_cpr": "indtast CPR nummer",
 	"entire_organisation": "bruttoorganisation",
 	"fill_or_auto": "udfyld eller auto",
+	"for": "for",
 	"future": "fremtid",
 	"givenname": "{n, plural, one {fornavn} other {fornavn(e)}}",
 	"insight": "indsigt",
@@ -95,6 +96,9 @@
 		"address": "Søg efter adresse"
 	},
 	"specify": "angiv",
+	"success_create": "{item} {for} er blevet oprettet.",
+	"success_edit": "{item} {for} er blevet redigeret.",
+	"success_terminate": "{item} {for} er blevet afsluttet.",
 	"surname": "efternavn",
 	"terminate_item": "afslut {item}",
 	"time_planning": "tidsregistrering",

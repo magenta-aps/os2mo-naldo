@@ -93,11 +93,14 @@
               input: result.data,
             })
             $success = {
-              message: `KLE-opmærkningen ${
-                mutation.kle_update.objects[0].org_unit
-                  ? `for ${mutation.kle_update.objects[0].org_unit[0].name}`
-                  : ""
-              } redigeres fra d. ${$fromDate.value}`,
+              message: capital(
+                $_("success_edit", {
+                  values: {
+                    item: $_("kle", { values: { n: 0 } }),
+                    name: mutation.kle_update.objects[0]?.org_unit?.[0].name,
+                  },
+                })
+              ),
               uuid: $page.params.uuid,
               type: "organisation",
             }

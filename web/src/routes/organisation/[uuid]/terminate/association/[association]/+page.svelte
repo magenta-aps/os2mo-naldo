@@ -47,7 +47,7 @@
     mutation TerminateAssociation($input: AssociationTerminateInput!) {
       association_terminate(input: $input) {
         objects {
-          employee {
+          person {
             name
             uuid
           }
@@ -70,11 +70,14 @@
               }
             )
             $success = {
-              message: `Tilknytningen ${
-                mutation.association_terminate.objects[0].employee
-                  ? `for ${mutation.association_terminate.objects[0].employee[0].name}`
-                  : ""
-              } afsluttes d. ${$toDate.value}`,
+              message: capital(
+                $_("success_terminate", {
+                  values: {
+                    item: $_("association", { values: { n: 0 } }),
+                    name: mutation.association_terminate.objects[0]?.person?.[0].name,
+                  },
+                })
+              ),
               uuid: $page.params.uuid,
               type: "organisation",
             }
