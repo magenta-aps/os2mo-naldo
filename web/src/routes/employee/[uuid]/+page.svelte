@@ -24,6 +24,7 @@
   import ManagerTable from "$lib/components/tables/ManagerTable.svelte"
   import LeaveTable from "$lib/components/tables/LeaveTable.svelte"
   import OwnerTable from "$lib/components/tables/OwnerTable.svelte"
+  import { MOConfig } from "$lib/stores/config"
 
   // Tabs
   // "n" used for deciding which translation to use in Tabs
@@ -91,11 +92,13 @@
     {@const item = items.find((item) => item.value === activeItem)?.label || ""}
     <h1 class="mb-4">
       {employee.name}
-      <span class="text-slate-600">
-        {employee.cpr_number
-          ? `(${employee.cpr_number.slice(0, 6)}-${employee.cpr_number.slice(-4)})`
-          : ""}
-      </span>
+      {#if $MOConfig.confdb_show_cpr_no === "true"}
+        <span class="text-slate-600">
+          {employee.cpr_number
+            ? `(${employee.cpr_number.slice(0, 6)}-${employee.cpr_number.slice(-4)})`
+            : ""}
+        </span>
+      {/if}
     </h1>
 
     <Tabs {activeItem} {items} on:tabChange={tabChange} />
