@@ -91,6 +91,7 @@
 	"save": "save",
 	"search": {
 		"person": "Search for person",
+		"plain": "Search",
 		"organisation": "Search for organisation",
 		"address": "Search for address"
 	},

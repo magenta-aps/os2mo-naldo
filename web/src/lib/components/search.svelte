@@ -31,6 +31,7 @@
   export let startValue: SearchItem | undefined = undefined
   export let value: SearchItem | undefined = startValue || undefined
   export let name: string | undefined = undefined
+  export let uuid: string | undefined = undefined
   export let type: "employee" | "org-unit"
   export let action: "select" | "goto" = "select" // Redirect for navigation, select for forms
   export let title: string = `${type === "employee" ? "Person" : "Organisation"}`
@@ -41,6 +42,9 @@
 
   $: if (value?.name) {
     name = value?.name
+  }
+  $: if (value?.uuid) {
+    uuid = value?.uuid
   }
 
   const itemId = "uuid" // Used by the component to differentiate between items
