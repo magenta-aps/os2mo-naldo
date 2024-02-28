@@ -26,4 +26,4 @@ spec:
   system: os2mo-core
   consumesApis:
     - service-api
-    - os2mo-graphql-v20
+    - os2mo-graphql-v21
