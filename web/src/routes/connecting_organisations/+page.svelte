@@ -92,6 +92,9 @@
     const dataTree: any[] = [] // Variable holding the resulting tree
     const hashTable = Object.create(null) // Temporary holding place used in the main loop
 
+    // Sort org_units
+    orgUnitList.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))
+
     // Add an empty list called "children" to each org unit in the flat list
     orgUnitList.forEach(
       (orgUnit) => (hashTable[orgUnit.uuid] = { ...orgUnit, children: [] })
