@@ -78,7 +78,7 @@
   </div>
 
   <div class="navbar-end flex">
-    <div class="pr-4">
+    <div class="flex gap-1 pr-4">
       <a
         class="text-base-100"
         href="{base}/reports"
@@ -86,6 +86,11 @@
       >
         <Icon class="cursor-pointer" icon={filePresentRounded} width="25" height="25" />
       </a>
+      {#if $isAdmin}
+        <a class="text-base-100" href="{base}/admin"
+          ><Icon icon={adminPanelSettingsOutlineRounded} width="25" height="25" /></a
+        >
+      {/if}
     </div>
     <div class="join gap-2 pr-4">
       <input
@@ -112,11 +117,6 @@
       </label>
     </div>
 
-    {#if $isAdmin}
-      <a class="text-base-100 pr-4" href="{base}/admin"
-        ><Icon icon={adminPanelSettingsOutlineRounded} width="25" height="25" /></a
-      >
-    {/if}
     <Avatar />
   </div>
 </div>
