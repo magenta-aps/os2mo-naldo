@@ -20,6 +20,7 @@
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import { MOConfig } from "$lib/stores/config"
 
   let toDate: string
 
@@ -220,29 +221,29 @@
           bind:value={$name.value}
           errors={$name.errors}
         />
-        <Select
-          title={capital($_("org_unit_type"))}
-          id="org-unit-type"
-          bind:name={$orgUnitType.value}
-          errors={$orgUnitType.errors}
-          iterable={getClassesByFacetUserKey(facets, "org_unit_type")}
-          extra_classes="basis-1/2"
-          isClearable={true}
-          required={true}
-          on:clear={() => ($orgUnitType.value = "")}
-        />
-
-        <div class="flex flex-row gap-6">
+        {#if $MOConfig.confdb_show_level === "true"}
           <Select
             title={capital($_("org_unit_level"))}
             id="org-unit-level"
             bind:name={$orgUnitLevel.value}
             errors={$orgUnitLevel.errors}
-            extra_classes="basis-1/2"
             iterable={getClassesByFacetUserKey(facets, "org_unit_level")}
             isClearable={true}
             required={true}
             on:clear={() => ($orgUnitLevel.value = "")}
+          />
+        {/if}
+        <div class="flex flex-row gap-6">
+          <Select
+            title={capital($_("org_unit_type"))}
+            id="org-unit-type"
+            bind:name={$orgUnitType.value}
+            errors={$orgUnitType.errors}
+            iterable={getClassesByFacetUserKey(facets, "org_unit_type")}
+            extra_classes="basis-1/2"
+            isClearable={true}
+            required={true}
+            on:clear={() => ($orgUnitType.value = "")}
           />
           <Input
             title={capital($_("org_unit_number"))}
