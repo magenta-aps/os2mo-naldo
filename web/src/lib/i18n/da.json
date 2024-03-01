@@ -105,6 +105,7 @@
 	"time_planning": "tidsregistrering",
 	"to": "til",
 	"unit": "{n, plural, =0 {enheden} one {enhed} other {enheder}}",
+	"unit_number": "enhedsnummer",
 	"user_key": "userkey",
 	"validation": {
 		"is_required": "{field} er obligatorisk",
