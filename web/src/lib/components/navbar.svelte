@@ -15,6 +15,7 @@
   import circleFlagsGb from "@iconify/icons-circle-flags/gb"
   import circleFlagsDa from "@iconify/icons-circle-flags/da"
   import adminPanelSettingsOutlineRounded from "@iconify/icons-material-symbols/admin-panel-settings-outline-rounded"
+  import filePresentRounded from "@iconify/icons-material-symbols/file-present-rounded"
   import { locale } from "svelte-i18n"
 
   let orgChecked: boolean
@@ -36,6 +37,7 @@
   }
 </script>
 
+<!-- TODO: think about UX on navbar -->
 <div class="navbar bg-secondary shadow-xl">
   <div class="navbar-start text-base-100">
     <label for="drawer" class="btn btn-square btn-ghost lg:hidden">
@@ -76,6 +78,15 @@
   </div>
 
   <div class="navbar-end flex">
+    <div class="pr-4">
+      <a
+        class="text-base-100"
+        href="{base}/reports"
+        title={capital($_("report", { values: { n: 2 } }))}
+      >
+        <Icon class="cursor-pointer" icon={filePresentRounded} width="25" height="25" />
+      </a>
+    </div>
     <div class="join gap-2 pr-4">
       <input
         type="radio"
