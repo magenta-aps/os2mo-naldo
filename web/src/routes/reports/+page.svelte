@@ -92,7 +92,7 @@
 <div class="px-12 pt-6">
   <h1 class="mb-4">{capital($_("report", { values: { n: 2 } }))}</h1>
   {#await graphQLClient().request(GetFileNamesDocument)}
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">lol</div>
+    <p>{capital($_("loading"))}...</p>
   {:then data}
     {#each data.files.objects as file}
       <div>
