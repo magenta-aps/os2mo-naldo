@@ -2,6 +2,7 @@ import type { OpenValidity, Validity } from "$lib/graphql/types"
 import { env } from "$env/dynamic/public"
 import { date } from "$lib/stores/date"
 import { get } from "svelte/store"
+import { parseISO, isValid, min, max, format } from "date-fns"
 import type { Facet } from "$lib/util/get_classes"
 
 export const getUuidFromHash = (hash: string) => {
@@ -115,4 +116,39 @@ export const cprLookup = async (cpr: string) => {
   const res = await fetch(`${env.PUBLIC_BASE_URL}/service/e/cpr_lookup/?q=${cpr}`)
   // FIXME: Maybe return empty array, if call fails?
   return [await res.json()]
+}
+
+export const getMinMaxValidities = (
+  validities: { validity: Validity }[] | undefined | null
+) => {
+  // This handles optional person/org_unit validities
+  if (!validities) {
+    console.error("Validities are null or undefined")
+    return {
+      from: undefined,
+      to: undefined,
+    }
+  }
+
+  let minDate
+  let maxDate
+
+  for (const validity of validities) {
+    const fromDate = parseISO(validity.validity.from)
+    const toDate = validity.validity.to ? parseISO(validity.validity.to) : null
+
+    if (isValid(fromDate) && (!minDate || fromDate < minDate)) {
+      minDate = fromDate
+    }
+
+    if (!isValid(toDate) || maxDate === null) {
+      maxDate = null
+    } else if (maxDate === undefined || toDate! > maxDate) {
+      maxDate = toDate
+    }
+  }
+  return {
+    from: minDate ? format(minDate, "yyyy-MM-dd") : undefined,
+    to: maxDate ? format(maxDate, "yyyy-MM-dd") : undefined,
+  }
 }

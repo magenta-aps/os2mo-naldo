@@ -15,6 +15,7 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import { getMinMaxValidities } from "$lib/util/helpers"
 
   const toDate = field("to", "", [required()])
   const svelteForm = form(toDate)
@@ -23,17 +24,12 @@
     query Engagement($uuid: [UUID!], $fromDate: DateTime!) {
       engagements(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          objects {
-            uuid
-            employee {
-              uuid
-              name
-            }
+          validities {
             validity {
               from
               to
             }
-            org_unit {
+            org_unit(filter: { from_date: null, to_date: null }) {
               validity {
                 from
                 to
@@ -119,9 +115,12 @@
     </div>
   </div>
 {:then data}
-  {@const engagement = data.engagements.objects[0].objects[0]}
-  {@const minDate = engagement.validity.from.split("T")[0]}
-  {@const maxDate = engagement.org_unit[0].validity.to?.split("T")[0]}
+  {@const engagementValidities = getMinMaxValidities(
+    data.engagements.objects[0].validities
+  )}
+  {@const validities = getMinMaxValidities(
+    data.engagements.objects[0].validities[0].org_unit
+  )}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -132,8 +131,8 @@
           errors={$toDate.errors}
           title={capital($_("date.end_date"))}
           id="to"
-          min={minDate}
-          max={maxDate ? maxDate : null}
+          min={engagementValidities.from}
+          max={validities.to}
           required={true}
         />
       </div>

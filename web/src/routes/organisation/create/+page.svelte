@@ -15,7 +15,7 @@
   import type { SubmitFunction } from "./$types"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import Search from "$lib/components/search.svelte"
-  import { getUuidFromHash } from "$lib/util/helpers"
+  import { getMinMaxValidities, getUuidFromHash } from "$lib/util/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
@@ -38,11 +38,7 @@
   const urlHashOrgUnitUuid = getUuidFromHash($page.url.hash)
   const includeOrgUnit = urlHashOrgUnitUuid ? true : false
   gql`
-    query GetOrgUnitAndFacets(
-      $uuid: [UUID!]
-      $fromDate: DateTime
-      $includeOrgUnit: Boolean!
-    ) {
+    query GetOrgUnitAndFacets($uuid: [UUID!], $includeOrgUnit: Boolean!) {
       facets(filter: { user_keys: ["org_unit_level", "org_unit_type"] }) {
         objects {
           objects {
@@ -60,12 +56,14 @@
     }
 
     fragment getOrgUnit on Query {
-      org_units(filter: { uuids: $uuid, from_date: $fromDate })
+      org_units(filter: { uuids: $uuid, from_date: null, to_date: null })
         @include(if: $includeOrgUnit) {
         objects {
-          objects {
+          current {
             name
             uuid
+          }
+          validities {
             validity {
               from
               to
@@ -143,7 +141,7 @@
 
 <!-- LOOKATME: FIXME: SOMETHING: Form here or inside await? -->
 <form method="post" class="mx-6" use:enhance={handler}>
-  {#await graphQLClient().request( GetOrgUnitAndFacetsDocument, { uuid: urlHashOrgUnitUuid, fromDate: $date, includeOrgUnit: includeOrgUnit } )}
+  {#await graphQLClient().request( GetOrgUnitAndFacetsDocument, { uuid: urlHashOrgUnitUuid, includeOrgUnit: includeOrgUnit } )}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
@@ -162,11 +160,10 @@
       </div>
     </div>
   {:then data}
-    {@const orgUnit = data.org_units?.objects[0].objects[0]}
+    {@const orgUnit = data.org_units?.objects[0].current}
     {@const facets = data.facets.objects}
     <!-- TODO: these dates needs to be dynamically linked to the `parent.validity` -->
-    {@const minDate = orgUnit?.validity.from.split("T")[0]}
-    {@const maxDate = orgUnit?.validity.to?.split("T")[0]}
+    {@const validities = getMinMaxValidities(data.org_units?.objects[0].validities)}
 
     <div class="sm:w-full md:w-3/4 xl:w-1/2 mb-6 bg-slate-100 rounded">
       <div class="p-8">
@@ -177,16 +174,16 @@
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={minDate}
-            max={toDate ? toDate : maxDate}
+            min={validities.from}
+            max={toDate ? toDate : validities.to}
             required={true}
           />
           <DateInput
             bind:value={toDate}
             title={capital($_("date.start_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : minDate}
-            max={maxDate}
+            min={$fromDate.value}
+            max={validities.to}
           />
         </div>
         {#if orgUnit}

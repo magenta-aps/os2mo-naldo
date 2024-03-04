@@ -8090,6 +8090,13 @@ export type OrganisationUnitFilter = {
    *
    */
   registration?: InputMaybe<OrganisationUnitRegistrationFilter>;
+  /**
+   * Filter organisation units, returning all matches along with their ancestors.
+   *
+   * Can be used to find organisation units together with the context of their organisational placement.
+   *
+   */
+  subtree?: InputMaybe<OrganisationUnitFilter>;
   /** Limit the elements returned by their ending validity. */
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -8748,6 +8755,7 @@ export type ParentsBoundOrganisationUnitFilter = {
   parent?: InputMaybe<OrganisationUnitFilter>;
   query?: InputMaybe<Scalars['String']['input']>;
   registration?: InputMaybe<OrganisationUnitRegistrationFilter>;
+  subtree?: InputMaybe<OrganisationUnitFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -9899,6 +9907,7 @@ export type UuidsBoundOrganisationUnitFilter = {
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   query?: InputMaybe<Scalars['String']['input']>;
   registration?: InputMaybe<OrganisationUnitRegistrationFilter>;
+  subtree?: InputMaybe<OrganisationUnitFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
 };

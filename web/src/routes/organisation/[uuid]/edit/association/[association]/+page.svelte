@@ -22,6 +22,7 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import { getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string
   const fromDate = field("from", "", [required()])
@@ -46,9 +47,9 @@
       }
       associations(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          objects {
+          validities {
             uuid
-            employee {
+            person {
               uuid
               name
             }
@@ -66,7 +67,7 @@
               from
               to
             }
-            org_unit {
+            org_unit(filter: { from_date: null, to_date: null }) {
               validity {
                 from
                 to
@@ -137,10 +138,11 @@
     </div>
   </div>
 {:then data}
-  {@const association = data.associations.objects[0].objects[0]}
+  {@const association = data.associations.objects[0].validities[0]}
   {@const facets = data.facets.objects}
-  {@const minDate = association.org_unit[0].validity.from.split("T")[0]}
-  {@const maxDate = association.org_unit[0].validity.to?.split("T")[0]}
+  {@const validities = getMinMaxValidities(
+    data.associations.objects[0].validities[0].org_unit
+  )}
 
   <title
     >{capital(
@@ -172,8 +174,8 @@
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={minDate}
-            max={toDate ? toDate : maxDate}
+            min={validities.from}
+            max={toDate ? toDate : validities.to}
             required={true}
           />
           <DateInput
@@ -184,14 +186,14 @@
             title={capital($_("date.end_date"))}
             id="to"
             min={$fromDate.value}
-            max={maxDate ? maxDate : null}
+            max={validities.to}
           />
         </div>
         <Search
           type="employee"
           startValue={{
-            uuid: association.employee[0].uuid,
-            name: association.employee[0].name,
+            uuid: association.person[0].uuid,
+            name: association.person[0].name,
           }}
           bind:name={$employee.value}
           errors={$employee.errors}

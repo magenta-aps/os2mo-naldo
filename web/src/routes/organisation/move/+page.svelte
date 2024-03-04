@@ -103,6 +103,7 @@
   <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
     <div class="p-8">
       <div class="flex flex-row gap-6">
+        <!-- TODO: getMinMaxValidities -->
         <!-- These inputs needs to update, when org-unit is changed -->
         <DateInput
           startValue={$date}

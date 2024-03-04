@@ -21,6 +21,7 @@
   import { required, email, pattern, url } from "svelte-forms/validators"
   import { Addresses } from "$lib/util/addresses"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import { getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string
   let addressType: { name: string; user_key: string; uuid: string }
@@ -33,11 +34,7 @@
   $: svelteForm = form(fromDate, addressTypeField, addressField)
 
   gql`
-    query AddressAndFacets(
-      $uuid: [UUID!]
-      $org_unit_uuid: [UUID!]
-      $fromDate: DateTime
-    ) {
+    query AddressAndFacets($uuid: [UUID!], $fromDate: DateTime) {
       facets(filter: { user_keys: ["org_unit_address_type", "visibility"] }) {
         objects {
           objects {
@@ -53,7 +50,7 @@
       }
       addresses(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          objects {
+          validities {
             uuid
             value
             name
@@ -71,15 +68,11 @@
               from
               to
             }
-          }
-        }
-      }
-      org_units(filter: { uuids: $org_unit_uuid }) {
-        objects {
-          objects {
-            validity {
-              from
-              to
+            org_unit(filter: { from_date: null, to_date: null }) {
+              validity {
+                from
+                to
+              }
             }
           }
         }
@@ -197,7 +190,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( AddressAndFacetsDocument, { uuid: $page.params.address, fromDate: $date, org_unit_uuid: $page.params.uuid } )}
+{#await graphQLClient().request( AddressAndFacetsDocument, { uuid: $page.params.address, fromDate: $date } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -214,10 +207,11 @@
     </div>
   </div>
 {:then data}
-  {@const address = data.addresses.objects[0].objects[0]}
+  {@const address = data.addresses.objects[0].validities[0]}
   {@const facets = data.facets.objects}
-  {@const minDate = data.org_units.objects[0].objects[0].validity.from.split("T")[0]}
-  {@const maxDate = data.org_units.objects[0].objects[0].validity.to?.split("T")[0]}
+  {@const validities = getMinMaxValidities(
+    data.addresses.objects[0].validities[0].org_unit
+  )}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -229,8 +223,8 @@
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={minDate}
-            max={toDate ? toDate : maxDate}
+            min={validities.from}
+            max={toDate ? toDate : validities.to}
             required={true}
           />
           <DateInput
@@ -238,8 +232,8 @@
             startValue={address.validity.to ? address.validity.to.split("T")[0] : null}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : minDate}
-            max={maxDate}
+            min={$fromDate.value}
+            max={validities.to}
           />
         </div>
         <div class="flex flex-row gap-6">

@@ -12,7 +12,7 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import Search from "$lib/components/search.svelte"
-  import { getUuidFromHash } from "$lib/util/helpers"
+  import { getMinMaxValidities, getUuidFromHash } from "$lib/util/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
@@ -39,7 +39,7 @@
       org_units(filter: { uuids: $uuid, from_date: $fromDate })
         @include(if: $includeOrgUnit) {
         objects {
-          objects {
+          validities {
             uuid
             name
             validity {
@@ -130,10 +130,13 @@
     </div>
   </div>
 {:then data}
-  {@const orgUnit = data.org_units?.objects[0].objects[0]}
-  <!-- De her dates skal opdateres afhængig af hvilken org_unit man vælger, nu når det ikke skal loades ind -->
-  {@const minDate = orgUnit?.validity.from.split("T")[0]}
-  {@const maxDate = orgUnit?.parent?.validity.to?.split("T")[0]}
+  {@const orgUnit = data.org_units?.objects[0].validities[0]}
+  <!-- TODO: Fix this when: https://redmine.magenta.dk/issues/58621 is done -->
+  <!-- We can't use getMinMaxValidities since `parent` can't be a list, or it'll crash -->
+  <!-- Update dates depending on chosen org_unit -->
+  {@const orgUnitValidities = getMinMaxValidities(
+    data.org_units?.objects[0].validities
+  )}
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -143,8 +146,8 @@
           errors={$toDate.errors}
           title={capital($_("date.end_date"))}
           id="to"
-          min={minDate}
-          max={maxDate ? maxDate : null}
+          min={orgUnitValidities.from}
+          max={undefined}
           required={true}
         />
         {#if orgUnit}
