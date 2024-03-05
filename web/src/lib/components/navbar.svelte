@@ -17,6 +17,7 @@
   import adminPanelSettingsOutlineRounded from "@iconify/icons-material-symbols/admin-panel-settings-outline-rounded"
   import filePresentRounded from "@iconify/icons-material-symbols/file-present-rounded"
   import { locale } from "svelte-i18n"
+  import { MOConfig } from "$lib/stores/config"
 
   let orgChecked: boolean
 
@@ -47,6 +48,25 @@
     <a class="btn btn-ghost normal-case text-xl hover:no-underline" href="{base}/"
       >OS2mo</a
     >
+    {#if $MOConfig && $MOConfig.navlinks.length}
+      {@const links = JSON.parse($MOConfig.navlinks)}
+      <ul class="menu menu-horizontal px-1">
+        <li>
+          <details>
+            <summary class="flex">{capital($_("link", { values: { n: 2 } }))}</summary>
+            <ul class="dropdown-content p-2 menu z-[1] rounded w-max">
+              {#each links as link}
+                <li>
+                  <a class="w-100 text-secondary hover:no-underline" href={link.href}
+                    >{link.text}</a
+                  >
+                </li>
+              {/each}
+            </ul>
+          </details>
+        </li>
+      </ul>
+    {/if}
   </div>
 
   <div class="navbar-center">

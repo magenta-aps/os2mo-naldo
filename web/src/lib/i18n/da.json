@@ -46,6 +46,7 @@
 	"kle_number": "KLE nummer",
 	"leave": "{n, plural, =0 {orloven} one {orlov} other {orlover}}",
 	"leave_type": "orlovstype",
+	"link": "{n, plural, =0 {linket} one {link} other {links}}",
 	"loading": "henter",
 	"manager": "{n, plural, =0 {lederen} one {leder} other {ledere}}",
 	"manager_level": "lederniveau",
