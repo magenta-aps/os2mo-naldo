@@ -158,11 +158,14 @@
               input: result.data,
             })
             $success = {
-              message: `Adressen ${
-                mutation.address_update.objects[0].org_unit
-                  ? `for ${mutation.address_update.objects[0].org_unit[0].name}`
-                  : ""
-              } redigeres fra d. ${$fromDate.value}`,
+              message: capital(
+                $_("success_edit", {
+                  values: {
+                    item: $_("address", { values: { n: 0 } }),
+                    name: mutation.address_update.objects[0]?.org_unit?.[0].name,
+                  },
+                })
+              ),
               uuid: $page.params.uuid,
               type: "organisation",
             }

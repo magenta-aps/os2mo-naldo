@@ -16,6 +16,7 @@
   const fetchTitleName = async (uuid: string): Promise<String> => {
     let query: string
 
+    // TODO: FIX THIS!!!!!!!!!!!
     switch (type) {
       case Title.ORGANISATION:
         query = `{
@@ -30,7 +31,7 @@
         return fetchGraph(query)
           .then((res) => res.json())
           .then((json) => json.data.org_units.objects[0].objects[0].name)
-
+      // TODO: FIX THIS!!!!!!!!!!!
       case Title.EMPLOYEE:
         query = `{
           employees(filter: { uuids: "${uuid}" }) {

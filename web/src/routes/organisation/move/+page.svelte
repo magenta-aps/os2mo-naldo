@@ -72,15 +72,14 @@
             })
 
             $success = {
-              message: `Organisationsenheden ${
-                mutation.org_unit_update.objects[0].name
-                  ? mutation.org_unit_update.objects[0].name
-                  : ""
-              } flyttes til ${
-                mutation.org_unit_update.objects[0].parent
-                  ? `${mutation.org_unit_update.objects[0].parent.name}`
-                  : "roden"
-              } d. ${$fromDate.value}`,
+              message: capital(
+                $_("success_move", {
+                  values: {
+                    item: $_("org_unit", { values: { n: 0 } }),
+                    name: undefined,
+                  },
+                })
+              ),
               uuid: mutation.org_unit_update.uuid,
               type: "organisation",
             }

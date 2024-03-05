@@ -92,7 +92,9 @@
       ituser_update(input: $input) {
         uuid
         objects {
-          user_key
+          person {
+            name
+          }
         }
       }
     }
@@ -110,11 +112,14 @@
             })
 
             $success = {
-              message: `IT-kontoen ${
-                mutation.ituser_update.objects[0].user_key
-                  ? `for ${mutation.ituser_update.objects[0].user_key}`
-                  : ""
-              } redigeres fra d. ${$fromDate.value}`,
+              message: capital(
+                $_("success_edit", {
+                  values: {
+                    item: $_("ituser", { values: { n: 0 } }),
+                    name: mutation.ituser_update.objects[0]?.person?.[0].name,
+                  },
+                })
+              ),
               uuid: $page.params.uuid,
               type: "organisation",
             }

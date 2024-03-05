@@ -103,8 +103,15 @@
             })
 
             $success = {
-              message: `Organisationsenheden ${$name.value} redigeres fra d. ${$fromDate.value}`,
-              uuid: mutation.org_unit_update.uuid,
+              message: capital(
+                $_("success_edit", {
+                  values: {
+                    item: $_("org_unit", { values: { n: 0 } }),
+                    name: undefined,
+                  },
+                })
+              ),
+              uuid: $page.params.uuid,
               type: "organisation",
             }
           } catch (err) {

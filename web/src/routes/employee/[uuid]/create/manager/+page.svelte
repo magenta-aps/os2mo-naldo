@@ -96,11 +96,14 @@
               input: result.data,
             })
             $success = {
-              message: `Lederrollen ${
-                mutation.manager_create.objects[0]?.employee
-                  ? `for ${mutation.manager_create.objects[0].employee[0].name}`
-                  : ""
-              } er oprettet fra d. ${$fromDate.value}`,
+              message: capital(
+                $_("success_create", {
+                  values: {
+                    item: $_("manager", { values: { n: 0 } }),
+                    name: mutation.manager_create.objects[0]?.employee?.[0].name,
+                  },
+                })
+              ),
               uuid: $page.params.uuid,
               type: "employee",
             }

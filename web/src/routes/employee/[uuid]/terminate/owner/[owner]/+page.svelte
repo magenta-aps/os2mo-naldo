@@ -64,11 +64,14 @@
             })
 
             $success = {
-              message: `Rollen ${
-                mutation.owner_terminate.objects[0].person
-                  ? `for ${mutation.owner_terminate.objects[0].person[0].name}`
-                  : ""
-              } afsluttes d. ${$toDate.value}`,
+              message: capital(
+                $_("success_terminate", {
+                  values: {
+                    item: $_("owner", { values: { n: 0 } }),
+                    name: mutation.owner_terminate.objects[0]?.person?.[0].name,
+                  },
+                })
+              ),
               uuid: $page.params.uuid,
               type: "employee",
             }

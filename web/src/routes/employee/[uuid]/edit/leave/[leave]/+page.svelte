@@ -115,11 +115,14 @@
               input: result.data,
             })
             $success = {
-              message: `Orloven ${
-                mutation.leave_update.objects[0].person
-                  ? `for ${mutation.leave_update.objects[0].person[0].name}`
-                  : ""
-              } redigeres fra d. ${$fromDate.value}`,
+              message: capital(
+                $_("success_edit", {
+                  values: {
+                    item: $_("leave", { values: { n: 0 } }),
+                    name: mutation.leave_update.objects[0]?.person?.[0].name,
+                  },
+                })
+              ),
               uuid: $page.params.uuid,
               type: "employee",
             }

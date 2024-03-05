@@ -72,11 +72,14 @@
             })
 
             $success = {
-              message: `Adressen ${
-                mutation.address_terminate.objects[0].org_unit
-                  ? `for ${mutation.address_terminate.objects[0].org_unit[0].name}`
-                  : ""
-              } afsluttes d. ${$toDate.value}`,
+              message: capital(
+                $_("success_terminate", {
+                  values: {
+                    item: $_("address", { values: { n: 0 } }),
+                    name: mutation.address_terminate.objects[0]?.org_unit?.[0].name,
+                  },
+                })
+              ),
               uuid: $page.params.uuid,
               type: "organisation",
             }

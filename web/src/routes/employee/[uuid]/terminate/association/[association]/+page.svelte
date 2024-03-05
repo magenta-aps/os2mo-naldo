@@ -69,11 +69,14 @@
               }
             )
             $success = {
-              message: `Tilknytningen ${
-                mutation.association_terminate.objects[0].employee
-                  ? `for ${mutation.association_terminate.objects[0].employee[0].name}`
-                  : ""
-              } afsluttes d. ${$toDate.value}`,
+              message: capital(
+                $_("success_terminate", {
+                  values: {
+                    item: $_("association", { values: { n: 0 } }),
+                    name: mutation.association_terminate.objects[0]?.employee?.[0].name,
+                  },
+                })
+              ),
               uuid: $page.params.uuid,
               type: "employee",
             }

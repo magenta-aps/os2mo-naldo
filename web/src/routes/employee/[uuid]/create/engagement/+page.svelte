@@ -87,11 +87,14 @@
               input: result.data,
             })
             $success = {
-              message: `Engagementet ${
-                mutation.engagement_create.objects[0]?.employee
-                  ? `for ${mutation.engagement_create.objects[0].employee?.[0].name}`
-                  : ""
-              } er oprettet fra d. ${$fromDate.value}`,
+              message: capital(
+                $_("success_create", {
+                  values: {
+                    item: $_("engagement", { values: { n: 0 } }),
+                    name: mutation.engagement_create.objects[0]?.employee?.[0].name,
+                  },
+                })
+              ),
               uuid: $page.params.uuid,
               type: "employee",
             }

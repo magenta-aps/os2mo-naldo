@@ -81,7 +81,7 @@
       association_update(input: $input) {
         objects {
           uuid
-          employee {
+          person {
             name
           }
         }
@@ -101,13 +101,14 @@
               input: result.data,
             })
             $success = {
-              // FIXME: Maybe use objects.lenght? This fails when editing future objects.
-              // I'm not sure if this will be fixed, when "time" is fixed in MO.
-              message: `Tilknytningen ${
-                mutation.association_update.objects[0].employee
-                  ? `for ${mutation.association_update.objects[0].employee[0].name}`
-                  : ""
-              } redigeres fra d. ${$fromDate.value}`,
+              message: capital(
+                $_("success_edit", {
+                  values: {
+                    item: $_("association", { values: { n: 0 } }),
+                    name: mutation.association_update.objects[0]?.person?.[0].name,
+                  },
+                })
+              ),
               uuid: $page.params.uuid,
               type: "organisation",
             }

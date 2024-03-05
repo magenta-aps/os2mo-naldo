@@ -141,11 +141,14 @@
               }
             )
             $success = {
-              message: `IT-tilknytningen ${
-                mutation.itassociation_update.objects[0].employee
-                  ? `for ${mutation.itassociation_update.objects[0].employee[0].name}`
-                  : ""
-              } redigeres fra d. ${$fromDate.value}`,
+              message: capital(
+                $_("success_edit", {
+                  values: {
+                    item: $_("itassociation", { values: { n: 0 } }),
+                    name: mutation.itassociation_update.objects[0]?.employee?.[0].name,
+                  },
+                })
+              ),
               uuid: $page.params.uuid,
               type: "employee",
             }

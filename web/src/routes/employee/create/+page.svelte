@@ -61,11 +61,14 @@
               input: result.data,
             })
             $success = {
-              message: `Medarbejderen ${
-                mutation.employee_create.objects.length
-                  ? mutation.employee_create.objects[0].name
-                  : ""
-              } er blevet oprettet.`,
+              message: capital(
+                $_("success_create", {
+                  values: {
+                    item: $_("employee", { values: { n: 0 } }),
+                    name: mutation.employee_create.objects[0]?.name,
+                  },
+                })
+              ),
               uuid: mutation.employee_create.objects.length
                 ? mutation.employee_create.objects[0].uuid
                 : null,

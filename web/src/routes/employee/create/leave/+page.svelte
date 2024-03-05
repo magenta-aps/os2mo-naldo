@@ -105,12 +105,9 @@
     mutation CreateLeave($input: LeaveCreateInput!) {
       leave_create(input: $input) {
         objects {
-          employee {
+          person {
             name
             uuid
-          }
-          leave_type {
-            name
           }
         }
       }
@@ -129,16 +126,15 @@
               input: result.data,
             })
             $success = {
-              message: `${
-                mutation.leave_create.objects[0]?.leave_type
-                  ? mutation.leave_create.objects[0]?.leave_type.name
-                  : "Orloven"
-              } ${
-                mutation.leave_create.objects[0]?.employee
-                  ? `for ${mutation.leave_create.objects[0].employee[0].name}`
-                  : ""
-              } er oprettet fra d. ${$fromDate.value}`,
-              uuid: mutation.leave_create.objects[0].employee[0].uuid,
+              message: capital(
+                $_("success_create", {
+                  values: {
+                    item: $_("leave", { values: { n: 0 } }),
+                    name: mutation.leave_create.objects[0]?.person?.[0].name,
+                  },
+                })
+              ),
+              uuid: mutation.leave_create.objects[0].person[0].uuid,
               type: "employee",
             }
           } catch (err) {

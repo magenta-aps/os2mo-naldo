@@ -50,7 +50,9 @@
       ituser_terminate(input: $input) {
         objects {
           uuid
-          user_key
+          person {
+            name
+          }
         }
       }
     }
@@ -68,11 +70,14 @@
             })
 
             $success = {
-              message: `IT-kontoen ${
-                mutation.ituser_terminate.objects[0].user_key
-                  ? mutation.ituser_terminate.objects[0].user_key
-                  : ""
-              } afsluttes d. ${$toDate.value}`,
+              message: capital(
+                $_("success_terminate", {
+                  values: {
+                    item: $_("ituser", { values: { n: 0 } }),
+                    name: mutation.ituser_terminate.objects[0]?.person?.[0].name,
+                  },
+                })
+              ),
               uuid: $page.params.uuid,
               type: "employee",
             }

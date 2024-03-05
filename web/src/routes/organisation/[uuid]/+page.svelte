@@ -37,6 +37,7 @@
     { label: "role", value: "role", n: 2 },
     { label: "kle", value: "kle", n: 2 },
     { label: "manager", value: "manager", n: 2 },
+    { label: "owner", value: "owner", n: 2 },
     { label: "related_unit", value: "related_unit", n: 2 },
   ]
 
