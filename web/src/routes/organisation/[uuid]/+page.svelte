@@ -90,7 +90,7 @@
     {@const item = items.find((item) => item.value === activeItem)?.label || ""}
 
     <div>
-      {#if $MOConfig.confdb_show_user_key === "true"}
+      {#if $MOConfig && $MOConfig.confdb_show_user_key === "true"}
         {capital($_("unit_number"))}: {orgUnit.user_key}
       {/if}
       <Breadcrumbs {orgUnit} link={true} />

@@ -92,7 +92,7 @@
     {@const item = items.find((item) => item.value === activeItem)?.label || ""}
     <h1 class="mb-4">
       {employee.name}
-      {#if $MOConfig.confdb_show_cpr_no === "true"}
+      {#if $MOConfig && $MOConfig.confdb_show_cpr_no === "true"}
         <span class="text-slate-600">
           {employee.cpr_number
             ? `(${employee.cpr_number.slice(0, 6)}-${employee.cpr_number.slice(-4)})`

@@ -1,6 +1,5 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
   import "$lib/global.css"
   import SuccessAlert from "$lib/components/alerts/success.svelte"
   import Navbar from "$lib/components/navbar.svelte"
@@ -12,6 +11,7 @@
   import { gql } from "graphql-request"
   import { GetConfigDocument } from "./query.generated"
   import { graphQLClient } from "$lib/util/http"
+  import { isAuth } from "$lib/stores/auth"
 
   gql`
     query GetConfig {
@@ -24,22 +24,26 @@
     }
   `
 
-  async function getConfig() {
+  const getConfig = async () => {
     try {
       const config = await graphQLClient().request(GetConfigDocument)
       return formatConfig(config)
     } catch (error) {
       console.error("Error fetching configuration:", error)
-      return {}
+      return null
     }
   }
 
   onMount(async () => {
     await initKeycloak()
-    // Will run into race conditions if store is not
-    // retrieved inside an onMount, when used elsewhere
-    $MOConfig = await getConfig()
   })
+
+  // Makes sure keycloak has had a chance to load before fetching the config
+  $: if ($isAuth) {
+    ;(async () => {
+      $MOConfig = await getConfig()
+    })()
+  }
 </script>
 
 <svelte:head>
