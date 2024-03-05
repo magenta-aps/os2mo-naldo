@@ -5,6 +5,7 @@
   import TenseTabs from "$lib/components/shared/tense_tabs.svelte"
   import ClassTable from "$lib/components/tables/ClassTable.svelte"
   import TableTensesWrapper from "$lib/components/tables/TableTensesWrapper.svelte"
+  import DetailTable from "$lib/components/shared/detail_table.svelte"
 </script>
 
 <!-- TODO: admin HeadTitle -->
@@ -13,8 +14,7 @@
 <div class="px-12 pt-6">
   <h1 class="mb-4">{capital($_("job_function", { values: { n: 2 } }))}</h1>
 
-  <div class="flex justify-between">
-    <TenseTabs />
+  <div class="flex justify-end">
     <a
       class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
       href={`${base}/admin/create/class`}
@@ -26,13 +26,16 @@
       )}
     </a>
   </div>
-  <TableTensesWrapper
-    table={ClassTable}
+  <!-- If tenses are added to admin-page, refer to following MR for easy revert -->
+  <!-- https://git.magenta.dk/rammearkitektur/os2mo-naldo/-/merge_requests/539 -->
+  <DetailTable
     headers={[
       { title: capital($_("name")), sortPath: "name" },
       { title: capital($_("user_key")), sortPath: "user_key" },
       { title: capital($_("date.date")), sortPath: "validity.from" },
       { title: "" },
     ]}
-  />
+  >
+    <svelte:component this={ClassTable} tense="present" />
+  </DetailTable>
 </div>
