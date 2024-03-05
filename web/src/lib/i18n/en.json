@@ -107,6 +107,7 @@
 	"time_planning": "time planning",
 	"to": "to",
 	"unit": "{n, plural, =0 {the unit} one {unit} other {units}}",
+	"unit_number": "unit number",
 	"user_key": "userkey",
 	"validation": {
 		"is_required": "{field} is required",

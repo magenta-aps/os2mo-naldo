@@ -26,6 +26,7 @@
   import RelatedUnitsTable from "$lib/components/tables/RelatedUnitsTable.svelte"
   import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
   import Tabs from "$lib/components/shared/tabs.svelte"
+  import { MOConfig } from "$lib/stores/config"
 
   // Tabs
   let items = [
@@ -51,6 +52,7 @@
         objects {
           objects {
             name
+            user_key
             uuid
           }
         }
@@ -87,7 +89,12 @@
     <!-- Fallback "" is just to make TypeScript happy - shouldn't ever happen -->
     {@const item = items.find((item) => item.value === activeItem)?.label || ""}
 
-    <Breadcrumbs {orgUnit} link={true} />
+    <div>
+      {#if $MOConfig.confdb_show_user_key === "true"}
+        {capital($_("unit_number"))}: {orgUnit.user_key}
+      {/if}
+      <Breadcrumbs {orgUnit} link={true} />
+    </div>
     <div class="flex gap-5">
       <h1 class="pb-4">{orgUnit.name}</h1>
       <CopyToClipboard uuid={orgUnit.uuid} name={orgUnit.name} />
