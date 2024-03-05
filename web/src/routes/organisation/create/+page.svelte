@@ -221,7 +221,7 @@
           bind:value={$name.value}
           errors={$name.errors}
         />
-        {#if $MOConfig.confdb_show_level === "true"}
+        {#if $MOConfig && $MOConfig.confdb_show_level === "true"}
           <Select
             title={capital($_("org_unit_level"))}
             id="org-unit-level"

@@ -17,4 +17,4 @@ export function formatConfig(configObjects: GetConfigQuery) {
   return formattedConfig
 }
 
-export const MOConfig: Writable<ConfigObject> = writable()
+export const MOConfig: Writable<ConfigObject | null> = writable()

@@ -4,7 +4,6 @@
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
   import { isAdmin } from "$lib/stores/auth"
-  import { keycloak } from "$lib/util/keycloak"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Avatar from "$lib/components/navbar/avatar.svelte"
   import Search from "$lib/components/search.svelte"

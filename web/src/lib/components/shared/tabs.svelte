@@ -10,10 +10,10 @@
 
   let dispatch = createEventDispatcher()
 
-  if ($MOConfig.confdb_show_kle === "false") {
+  if ($MOConfig && $MOConfig.confdb_show_kle === "false") {
     items = items.filter((tab) => tab.value !== OrgTab.KLE)
   }
-  if ($MOConfig.show_it_associations_tab === "false") {
+  if ($MOConfig && $MOConfig.show_it_associations_tab === "false") {
     items = items.filter((tab) => tab.value !== EmployeeTab.ITASSOCIATION)
   }
 </script>
