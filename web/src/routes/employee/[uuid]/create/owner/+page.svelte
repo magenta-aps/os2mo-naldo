@@ -18,6 +18,7 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import { getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string
 
@@ -25,10 +26,10 @@
   const svelteForm = form(fromDate)
 
   gql`
-    query Employee($uuid: [UUID!], $fromDate: DateTime) {
-      employees(filter: { uuids: $uuid, from_date: $fromDate }) {
+    query Employee($uuid: [UUID!]) {
+      employees(filter: { uuids: $uuid, from_date: null, to_date: null }) {
         objects {
-          objects {
+          validities {
             validity {
               from
               to
@@ -99,7 +100,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( EmployeeDocument, { uuid: $page.params.uuid, fromDate: $date } )}
+{#await graphQLClient().request(EmployeeDocument, { uuid: $page.params.uuid })}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -112,30 +113,29 @@
     </div>
   </div>
 {:then data}
-  {@const minDate = data.employees.objects[0].objects[0].validity?.from?.split("T")[0]}
-  {@const maxDate = data.employees.objects[0].objects[0].validity?.to?.split("T")[0]}
+  {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
-          <!-- TODO: Make input look at currently selected org_unit? Right now it's the employee's validity as a placeholder -->
+          <!-- TODO: dynamically change dates depending on which org has been chosen -->
           <DateInput
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={minDate}
-            max={toDate ? toDate : maxDate}
+            min={validities.from}
+            max={toDate ? toDate : validities.to}
             required={true}
           />
           <DateInput
             bind:value={toDate}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : minDate}
-            max={maxDate}
+            min={$fromDate.value ? $fromDate.value : validities.from}
+            max={validities.to}
           />
         </div>
         <Search type="employee" />

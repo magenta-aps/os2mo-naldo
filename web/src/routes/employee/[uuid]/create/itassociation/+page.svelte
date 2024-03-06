@@ -28,6 +28,7 @@
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import { getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string
   let selectedOrgUnit: {
@@ -42,7 +43,7 @@
   const svelteForm = form(fromDate, itUser, jobFunction, orgUnit)
 
   gql`
-    query FacetClassesAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
+    query FacetClassesAndEmployee($uuid: [UUID!]) {
       facets(filter: { user_keys: "engagement_job_function" }) {
         objects {
           objects {
@@ -64,9 +65,9 @@
           }
         }
       }
-      employees(filter: { uuids: $uuid, from_date: $fromDate }) {
+      employees(filter: { uuids: $uuid, from_date: null, to_date: null }) {
         objects {
-          objects {
+          current {
             uuid
             name
             itusers {
@@ -76,6 +77,8 @@
               user_key
               uuid
             }
+          }
+          validities {
             validity {
               from
               to
@@ -150,7 +153,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( FacetClassesAndEmployeeDocument, { uuid: $page.params.uuid, fromDate: $date } )}
+{#await graphQLClient().request( FacetClassesAndEmployeeDocument, { uuid: $page.params.uuid } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -169,41 +172,41 @@
   </div>
 {:then data}
   {@const facets = data.facets.objects}
-  {@const itusers = data.employees.objects[0].objects[0].itusers}
+  {@const itusers = data.employees.objects[0].current?.itusers}
   {@const primaryClasses = data.classes.objects}
-  {@const employee = data.employees.objects[0].objects[0]}
-  {@const minDate = data.employees.objects[0].objects[0].validity?.from?.split("T")[0]}
+  {@const employee = data.employees.objects[0].current}
+  {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
+          <!-- TODO: dynamically change dates depending on which org has been chosen -->
           <DateInput
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={minDate}
+            min={validities.from}
+            max={toDate ? toDate : validities.to}
             required={true}
           />
-          <!-- FIXME: -->
-          <!-- These inputs needs to change, so their dates 
-            can only be in the registrations of their parent org -->
-          <!-- And I guess they also need to be dynamic, so they change depending
-          which org_unit has been chosen -->
           <DateInput
             bind:value={toDate}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value}
+            min={$fromDate.value ? $fromDate.value : validities.from}
+            max={validities.to}
           />
         </div>
+        <!-- FIXME: Either allow undefined or use `validities` when datepickers -->
+        <!-- use org_unit validities instead of employee -->
         <Search
           type="employee"
           startValue={{
-            uuid: employee.uuid,
-            name: employee.name,
+            uuid: employee ? employee.uuid : undefined,
+            name: employee ? employee.name : "",
           }}
           disabled
           required={true}
@@ -218,12 +221,14 @@
         />
         <Breadcrumbs orgUnit={selectedOrgUnit} />
         <div class="flex flex-row gap-6">
+          <!-- FIXME: Either allow undefined or use `validities` when datepickers -->
+          <!-- use org_unit validities instead of employee -->
           <Select
             title={capital($_("ituser", { values: { n: 1 } }))}
             id="it-user-uuid"
             bind:name={$itUser.value}
             errors={$itUser.errors}
-            iterable={getITUserITSystemName(itusers)}
+            iterable={getITUserITSystemName(itusers ? itusers : [])}
             required={true}
             extra_classes="basis-1/2"
           />

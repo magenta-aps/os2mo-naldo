@@ -20,6 +20,7 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import { getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string
 
@@ -29,7 +30,7 @@
   const svelteForm = form(fromDate, leaveType, engagement)
 
   gql`
-    query LeaveAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
+    query LeaveAndEmployee($uuid: [UUID!]) {
       facets(filter: { user_keys: ["leave_type"] }) {
         objects {
           objects {
@@ -43,9 +44,9 @@
           }
         }
       }
-      employees(filter: { uuids: $uuid, from_date: $fromDate }) {
+      employees(filter: { uuids: $uuid, from_date: null, to_date: null }) {
         objects {
-          objects {
+          current {
             uuid
             name
             engagements {
@@ -59,6 +60,8 @@
                 name
               }
             }
+          }
+          validities {
             validity {
               from
               to
@@ -132,7 +135,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( LeaveAndEmployeeDocument, { uuid: $page.params.uuid, fromDate: $date } )}
+{#await graphQLClient().request(LeaveAndEmployeeDocument, { uuid: $page.params.uuid })}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -148,31 +151,31 @@
   </div>
 {:then data}
   {@const facets = data.facets.objects}
-  {@const employee = data.employees.objects[0].objects[0]}
-  {@const minDate = employee.validity?.from?.split("T")[0]}
-  {@const maxDate = employee.validity?.to?.split("T")[0]}
-  {@const engagements = employee.engagements}
+  {@const employee = data.employees.objects[0].current}
+  {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
+  {@const engagements = employee?.engagements}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
+          <!-- TODO: dynamically change dates depending on which org has been chosen -->
           <DateInput
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={minDate}
-            max={toDate ? toDate : maxDate}
+            min={validities.from}
+            max={toDate ? toDate : validities.to}
             required={true}
           />
           <DateInput
             bind:value={toDate}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : minDate}
-            max={maxDate}
+            min={$fromDate.value ? $fromDate.value : validities.from}
+            max={validities.to}
           />
         </div>
 
@@ -184,21 +187,25 @@
           iterable={getClassesByFacetUserKey(facets, "leave_type")}
           required={true}
         />
+        <!-- FIXME: Either allow undefined or use `validities` when datepickers -->
+        <!-- use org_unit validities instead of employee -->
         <Search
           type="employee"
           startValue={{
-            uuid: employee.uuid,
-            name: employee.name,
+            uuid: employee ? employee.uuid : undefined,
+            name: employee ? employee.name : "",
           }}
           disabled
           required={true}
         />
+        <!-- FIXME: Either allow undefined or use `validities` when datepickers -->
+        <!-- use org_unit validities instead of employee -->
         <Select
           title={capital($_("engagements", { values: { n: 2 } }))}
           id="engagement-uuid"
           bind:name={$engagement.value}
           errors={$engagement.errors}
-          iterable={getEngagementTitlesAndUuid(engagements)}
+          iterable={getEngagementTitlesAndUuid(engagements ? engagements : [])}
           required={true}
         />
       </div>

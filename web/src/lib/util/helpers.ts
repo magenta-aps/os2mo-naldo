@@ -119,11 +119,13 @@ export const cprLookup = async (cpr: string) => {
 }
 
 export const getMinMaxValidities = (
-  validities: { validity: Validity }[] | undefined | null
+  validities: { validity: Validity | OpenValidity }[] | undefined | null
 ) => {
   // This handles optional person/org_unit validities
+  // Changed this from error to warning, since this isn't always an error
+  // For example when we create objects without specifying uuid (org_unit and leave)
   if (!validities) {
-    console.error("Validities are null or undefined")
+    console.warn("Validities are null or undefined")
     return {
       from: undefined,
       to: undefined,

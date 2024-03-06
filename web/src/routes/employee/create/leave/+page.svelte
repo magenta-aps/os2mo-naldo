@@ -21,6 +21,7 @@
     getEngagementTitlesAndUuid,
     type EngagementTitleAndUuid,
     getUuidFromHash,
+    getMinMaxValidities,
   } from "$lib/util/helpers"
   import Search from "$lib/components/search.svelte"
   import { onMount } from "svelte"
@@ -42,11 +43,7 @@
   }
   let engagements: EngagementTitleAndUuid[] | undefined
   gql`
-    query LeaveTypeAndEmployee(
-      $uuid: [UUID!]
-      $fromDate: DateTime
-      $includeEmployee: Boolean!
-    ) {
+    query LeaveTypeAndEmployee($uuid: [UUID!], $includeEmployee: Boolean!) {
       facets(filter: { user_keys: ["leave_type"] }) {
         objects {
           objects {
@@ -60,12 +57,14 @@
           }
         }
       }
-      employees(filter: { uuids: $uuid, from_date: $fromDate })
+      employees(filter: { uuids: $uuid, from_date: null, to_date: null })
         @include(if: $includeEmployee) {
         objects {
-          objects {
+          current {
             uuid
             name
+          }
+          validities {
             validity {
               from
               to
@@ -75,11 +74,11 @@
       }
     }
 
-    query GetEmployee($uuid: [UUID!], $fromDate: DateTime, $includeEmployee: Boolean!) {
-      employees(filter: { uuids: $uuid, from_date: $fromDate })
+    query GetEmployee($uuid: [UUID!], $includeEmployee: Boolean!) {
+      employees(filter: { uuids: $uuid, from_date: null, to_date: null })
         @include(if: $includeEmployee) {
         objects {
-          objects {
+          current {
             uuid
             name
             engagements {
@@ -93,6 +92,8 @@
                 name
               }
             }
+          }
+          validities {
             validity {
               from
               to
@@ -150,10 +151,9 @@
   async function updateEngagements(employeeUuid: string | undefined | null) {
     const res = await graphQLClient().request(GetEmployeeDocument, {
       uuid: employeeUuid,
-      fromDate: $date,
       includeEmployee: employeeUuid ? true : false,
     })
-    engagements = res.employees?.objects[0].objects[0].engagements
+    engagements = res.employees?.objects[0].current?.engagements
   }
 
   onMount(async () => {
@@ -183,7 +183,7 @@
 
 <!-- LOOKATME: FIXME: SOMETHING: Form here or inside await? -->
 <form method="post" class="mx-6" use:enhance={handler}>
-  {#await graphQLClient().request( LeaveTypeAndEmployeeDocument, { uuid: urlHashEmployeeUuid, fromDate: $date, includeEmployee: includeEmployee } )}
+  {#await graphQLClient().request( LeaveTypeAndEmployeeDocument, { uuid: urlHashEmployeeUuid, includeEmployee: includeEmployee } )}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
@@ -197,29 +197,29 @@
     </div>
   {:then data}
     {@const facets = data.facets.objects}
-    {@const startValueEmployee = data.employees?.objects[0].objects[0]}
-    {@const minDate = startValueEmployee?.validity?.from?.split("T")[0]}
-    {@const maxDate = startValueEmployee?.validity?.to?.split("T")[0]}
+    {@const startValueEmployee = data.employees?.objects[0].current}
+    {@const validities = getMinMaxValidities(data.employees?.objects[0].validities)}
 
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
+          <!-- TODO: dynamically change dates depending on which engagement has been chosen -->
           <DateInput
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={minDate}
-            max={toDate ? toDate : maxDate}
+            min={validities.from}
+            max={toDate ? toDate : validities.to}
             required={true}
           />
           <DateInput
             bind:value={toDate}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : minDate}
-            max={maxDate}
+            min={$fromDate.value}
+            max={validities.to}
           />
         </div>
 

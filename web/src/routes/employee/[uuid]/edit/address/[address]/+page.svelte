@@ -21,6 +21,7 @@
   import { form, field } from "svelte-forms"
   import { required, email, pattern } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import { getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string
   let addressType: { name: string; user_key: string; uuid: string }
@@ -53,7 +54,7 @@
       }
       addresses(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          objects {
+          validities {
             uuid
             address_type {
               uuid
@@ -74,9 +75,9 @@
           }
         }
       }
-      employees(filter: { uuids: $employee_uuid, from_date: $fromDate }) {
+      employees(filter: { uuids: $employee_uuid, from_date: null, to_date: null }) {
         objects {
-          objects {
+          validities {
             validity {
               from
               to
@@ -184,10 +185,9 @@
     </div>
   </div>
 {:then data}
-  {@const address = data.addresses.objects[0].objects[0]}
+  {@const address = data.addresses.objects[0].validities[0]}
   {@const facets = data.facets.objects}
-  {@const minDate = data.employees.objects[0].objects[0].validity?.from?.split("T")[0]}
-  {@const maxDate = data.employees.objects[0].objects[0].validity?.to?.split("T")[0]}
+  {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -199,8 +199,8 @@
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={minDate}
-            max={toDate ? toDate : maxDate}
+            min={validities.from}
+            max={toDate ? toDate : validities.to}
             required={true}
           />
           <DateInput
@@ -208,8 +208,8 @@
             startValue={address.validity.to ? address.validity.to.split("T")[0] : null}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : minDate}
-            max={maxDate}
+            min={$fromDate.value ? $fromDate.value : validities.from}
+            max={validities.to}
           />
         </div>
         <div class="flex flex-row gap-6">

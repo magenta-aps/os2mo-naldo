@@ -21,8 +21,8 @@
   const svelteForm = form(toDate)
 
   gql`
-    query Address($uuid: [UUID!], $fromDate: DateTime!) {
-      addresses(filter: { uuids: $uuid, from_date: $fromDate }) {
+    query Address($uuid: [UUID!]) {
+      addresses(filter: { uuids: $uuid, from_date: null, to_date: null }) {
         objects {
           validities {
             validity {
