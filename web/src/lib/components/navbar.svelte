@@ -47,7 +47,7 @@
     <a class="btn btn-ghost normal-case text-xl hover:no-underline" href="{base}/"
       >OS2mo</a
     >
-    {#if $MOConfig && $MOConfig.navlinks.length}
+    {#if $MOConfig && JSON.parse($MOConfig.navlinks).length}
       {@const links = JSON.parse($MOConfig.navlinks)}
       <ul class="menu menu-horizontal px-1">
         <li>
