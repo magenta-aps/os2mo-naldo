@@ -4,6 +4,7 @@ import { date } from "$lib/stores/date"
 import { get } from "svelte/store"
 import { parseISO, isValid, min, max, format } from "date-fns"
 import type { Facet } from "$lib/util/get_classes"
+import { keycloak } from "$lib/util/keycloak"
 
 export const getUuidFromHash = (hash: string) => {
   let uuidFromHash = hash.split("&").find((e) => e.startsWith("#uuid="))
@@ -113,7 +114,9 @@ export const debounce = async (
 }
 
 export const cprLookup = async (cpr: string) => {
-  const res = await fetch(`${env.PUBLIC_BASE_URL}/service/e/cpr_lookup/?q=${cpr}`)
+  const res = await fetch(`${env.PUBLIC_BASE_URL}/service/e/cpr_lookup/?q=${cpr}`, {
+    headers: { Authorization: `Bearer ${keycloak.token}` },
+  })
   // FIXME: Maybe return empty array, if call fails?
   return [await res.json()]
 }
