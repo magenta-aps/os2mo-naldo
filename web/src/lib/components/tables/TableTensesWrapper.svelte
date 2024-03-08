@@ -5,6 +5,8 @@
   import { tenses } from "$lib/stores/tenses"
   import type { ComponentType, SvelteComponent } from "svelte"
   import { MOConfig } from "$lib/stores/config"
+  import AssociationTable from "$lib/components/tables/AssociationTable.svelte"
+  import EngagementTable from "$lib/components/tables/EngagementTable.svelte"
 
   export let headers: Header[]
   export let table: ComponentType<SvelteComponent>
@@ -12,6 +14,21 @@
 
   if ($MOConfig && $MOConfig.confdb_show_level === "false") {
     headers = headers.filter((header) => header.title !== capital($_("org_unit_level")))
+  }
+
+  if (
+    $MOConfig &&
+    $MOConfig.confdb_show_primary_engagement === "false" &&
+    table == EngagementTable
+  ) {
+    headers = headers.filter((header) => header.title !== capital($_("primary")))
+  }
+  if (
+    $MOConfig &&
+    $MOConfig.confdb_show_primary_association === "false" &&
+    table == AssociationTable
+  ) {
+    headers = headers.filter((header) => header.title !== capital($_("primary")))
   }
 </script>
 

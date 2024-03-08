@@ -15,6 +15,7 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
+  import { MOConfig } from "$lib/stores/config"
 
   type Engagements = EngagementsQuery["engagements"]["objects"][0]["objects"]
   let data: Engagements
@@ -119,7 +120,9 @@
       {/if}
       <td class="p-4">{engagement.job_function.name}</td>
       <td class="p-4">{engagement.engagement_type.name}</td>
-      <td class="p-4">{engagement.primary ? engagement.primary.name : ""}</td>
+      {#if $MOConfig && $MOConfig.confdb_show_primary_engagement === "true"}
+        <td class="p-4">{engagement.primary ? engagement.primary.name : ""}</td>
+      {/if}
       <ValidityTableCell validity={engagement.validity} />
       <td>
         <a
