@@ -20,6 +20,7 @@
   import { required } from "svelte-forms/validators"
   import Search from "$lib/components/search.svelte"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import { getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string
 
@@ -29,7 +30,7 @@
   const svelteForm = form(fromDate, leaveType, engagement)
 
   gql`
-    query LeaveAndFacet($uuid: [UUID!], $fromDate: DateTime) {
+    query LeaveAndFacet($uuid: [UUID!], $employeeUuid: [UUID!], $fromDate: DateTime) {
       facets(filter: { user_keys: ["leave_type"] }) {
         objects {
           objects {
@@ -45,7 +46,7 @@
       }
       leaves(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          objects {
+          validities {
             engagement {
               uuid
               validity {
@@ -83,6 +84,16 @@
                   name
                 }
               }
+            }
+          }
+        }
+      }
+      employees(filter: { uuids: $employeeUuid, from_date: null, to_date: null }) {
+        objects {
+          validities {
+            validity {
+              from
+              to
             }
           }
         }
@@ -154,7 +165,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( LeaveAndFacetDocument, { uuid: $page.params.leave, fromDate: $date } )}
+{#await graphQLClient().request( LeaveAndFacetDocument, { uuid: $page.params.leave, employeeUuid: $page.params.uuid, fromDate: $date } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -169,27 +180,26 @@
     </div>
   </div>
 {:then data}
-  {@const leave = data.leaves.objects[0].objects[0]}
+  {@const leave = data.leaves.objects[0].validities[0]}
   {@const facets = data.facets.objects}
-  {@const minDate = leave.engagement.validity.from.split("T")[0]}
-  {@const maxDate = leave.engagement.validity?.to?.split("T")[0]}
   {@const engagements = leave.person[0].engagements}
   {@const employee = leave.person[0]}
   {@const engagementStartValue = getEngagementTitlesAndUuid([leave.engagement])[0]}
+  {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
-          <!-- TODO: Update min/max depending on chosen engagement -->
+          <!-- TODO: dynamically change dates depending on which org has been chosen -->
           <DateInput
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={minDate}
-            max={toDate ? toDate : maxDate}
+            min={validities.from}
+            max={toDate ? toDate : validities.to}
             required={true}
           />
           <DateInput
@@ -197,8 +207,8 @@
             startValue={leave.validity.to ? leave.validity.to.split("T")[0] : null}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : minDate}
-            max={maxDate}
+            min={$fromDate.value ? $fromDate.value : validities.from}
+            max={validities.to}
           />
         </div>
 

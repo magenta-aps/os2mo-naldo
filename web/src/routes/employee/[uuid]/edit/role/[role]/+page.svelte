@@ -20,6 +20,7 @@
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import { getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string
   let selectedOrgUnit: {
@@ -33,7 +34,7 @@
   const svelteForm = form(fromDate, orgUnit, roleType)
 
   gql`
-    query FacetsAndRole($uuid: [UUID!], $fromDate: DateTime) {
+    query FacetsAndRole($uuid: [UUID!], $employeeUuid: [UUID!], $fromDate: DateTime) {
       facets(filter: { user_keys: "role_type" }) {
         objects {
           objects {
@@ -49,14 +50,7 @@
       }
       roles(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          objects {
-            employee {
-              name
-              validity {
-                from
-                to
-              }
-            }
+          validities {
             org_unit {
               name
               uuid
@@ -65,6 +59,16 @@
               name
               uuid
             }
+            validity {
+              from
+              to
+            }
+          }
+        }
+      }
+      employees(filter: { uuids: $employeeUuid, from_date: null, to_date: null }) {
+        objects {
+          validities {
             validity {
               from
               to
@@ -135,7 +139,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( FacetsAndRoleDocument, { uuid: $page.params.role, fromDate: $date } )}
+{#await graphQLClient().request( FacetsAndRoleDocument, { uuid: $page.params.role, employeeUuid: $page.params.uuid, fromDate: $date } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -152,24 +156,22 @@
   </div>
 {:then data}
   {@const facets = data.facets.objects}
-  {@const role = data.roles.objects[0].objects[0]}
-  {@const minDate =
-    data.roles.objects[0].objects[0].employee[0].validity?.from?.split("T")[0]}
-  {@const maxDate =
-    data.roles.objects[0].objects[0].employee[0].validity?.to?.split("T")[0]}
+  {@const role = data.roles.objects[0].validities[0]}
+  {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
+          <!-- TODO: dynamically change dates depending on which org has been chosen -->
           <DateInput
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={minDate}
-            max={toDate ? toDate : maxDate}
+            min={validities.from}
+            max={toDate ? toDate : validities.to}
             required={true}
           />
           <DateInput
@@ -177,8 +179,8 @@
             startValue={role.validity?.to?.split("T")[0]}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : minDate}
-            max={maxDate}
+            min={$fromDate.value ? $fromDate.value : validities.from}
+            max={validities.to}
           />
         </div>
         <Search

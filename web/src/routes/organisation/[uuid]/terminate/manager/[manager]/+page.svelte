@@ -15,6 +15,7 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import { getMinMaxValidities } from "$lib/util/helpers"
 
   const toDate = field("to", "", [required()])
   const svelteForm = form(toDate)
@@ -23,17 +24,12 @@
     query Manager($uuid: [UUID!], $fromDate: DateTime!) {
       managers(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          objects {
-            uuid
-            employee {
-              uuid
-              name
-            }
+          validities {
             validity {
               from
               to
             }
-            org_unit {
+            org_unit(filter: { from_date: null, to_date: null }) {
               validity {
                 from
                 to
@@ -114,9 +110,10 @@
     </div>
   </div>
 {:then data}
-  {@const manager = data.managers.objects[0].objects[0]}
-  {@const minDate = manager.validity.from.split("T")[0]}
-  {@const maxDate = manager.org_unit[0].validity.to?.split("T")[0]}
+  {@const managerValidities = getMinMaxValidities(data.managers.objects[0].validities)}
+  {@const validities = getMinMaxValidities(
+    data.managers.objects[0].validities[0].org_unit
+  )}
 
   <div class="divider p-0 m-0 mb-4 w-full" />
 
@@ -129,8 +126,8 @@
           errors={$toDate.errors}
           title={capital($_("date.end_date"))}
           id="to"
-          min={minDate}
-          max={maxDate ? maxDate : null}
+          min={managerValidities.from}
+          max={validities.to}
           required={true}
         />
       </div>

@@ -21,6 +21,7 @@
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import { getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string
   let parent: {
@@ -51,7 +52,7 @@
       }
       org_units(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          objects {
+          validities {
             uuid
             name
             parent {
@@ -161,8 +162,10 @@
     </div>
   </div>
 {:then data}
-  {@const orgUnit = data.org_units.objects[0].objects[0]}
+  {@const orgUnit = data.org_units.objects[0].validities[0]}
   {@const facets = data.facets.objects}
+  <!-- TODO: Fix this when: https://redmine.magenta.dk/issues/58621 is done -->
+  <!-- We can't use getMinMaxValidities since `parent` can't be a list, or it'll crash -->
   {@const minDate = orgUnit.parent?.validity.from.split("T")[0]}
   {@const maxDate = orgUnit.parent?.validity.to?.split("T")[0]}
 

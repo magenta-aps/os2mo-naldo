@@ -24,6 +24,7 @@
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import { getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string
   let selectedOrgUnit: {
@@ -38,7 +39,11 @@
   const svelteForm = form(fromDate, orgUnit, jobFunction, engagementType)
 
   gql`
-    query EngagementAndFacet($uuid: [UUID!], $fromDate: DateTime) {
+    query EngagementAndFacet(
+      $uuid: [UUID!]
+      $orgUnitUuid: [UUID!]
+      $fromDate: DateTime
+    ) {
       facets(
         filter: {
           user_keys: ["engagement_type", "engagement_job_function", "primary_type"]
@@ -58,10 +63,10 @@
       }
       engagements(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          objects {
+          validities {
             uuid
             user_key
-            employee {
+            person {
               uuid
               name
             }
@@ -84,10 +89,16 @@
             org_unit {
               uuid
               name
-              validity {
-                from
-                to
-              }
+            }
+          }
+        }
+      }
+      org_units(filter: { uuids: $orgUnitUuid, from_date: null, to_date: null }) {
+        objects {
+          validities {
+            validity {
+              from
+              to
             }
           }
         }
@@ -157,7 +168,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( EngagementAndFacetDocument, { uuid: $page.params.engagement, fromDate: $date } )}
+{#await graphQLClient().request( EngagementAndFacetDocument, { uuid: $page.params.engagement, orgUnitUuid: $page.params.uuid, fromDate: $date } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -179,24 +190,24 @@
     </div>
   </div>
 {:then data}
-  {@const engagement = data.engagements.objects[0].objects[0]}
+  {@const engagement = data.engagements.objects[0].validities[0]}
   {@const facets = data.facets.objects}
-  {@const minDate = engagement.org_unit[0].validity.from.split("T")[0]}
-  {@const maxDate = engagement.org_unit[0].validity.to?.split("T")[0]}
+  {@const validities = getMinMaxValidities(data.org_units.objects[0].validities)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <!-- FIXME: Dates should be dynamic -->
+          <!-- Meaning they should update, if org_unit is changed -->
           <DateInput
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={minDate}
-            max={maxDate ? maxDate : null}
+            min={validities.from}
+            max={toDate ? toDate : validities.to}
             required={true}
           />
           <DateInput
@@ -206,8 +217,8 @@
               : null}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : minDate}
-            max={maxDate ? maxDate : null}
+            min={$fromDate.value}
+            max={validities.to}
           />
         </div>
         <Search

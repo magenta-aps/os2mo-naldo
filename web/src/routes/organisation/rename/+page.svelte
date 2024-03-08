@@ -85,6 +85,8 @@
     }
 </script>
 
+<!-- TODO: getMinMaxValidities -->
+
 <title>{capital($_("rename"))} {$_("org_unit", { values: { n: 1 } })} | OS2mo</title>
 
 <div class="flex align-center px-6 pt-6 pb-4">

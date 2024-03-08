@@ -20,7 +20,7 @@
   import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
   import { date } from "$lib/stores/date"
   import { getClassUuidByUserKey } from "$lib/util/get_classes"
-  import { getITSystemNames } from "$lib/util/helpers"
+  import { getITSystemNames, getMinMaxValidities } from "$lib/util/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
@@ -33,18 +33,14 @@
   const svelteForm = form(fromDate, itSystem, accountName)
 
   gql`
-    query ITUserItSystemsOrgAndPrimary(
-      $uuid: [UUID!]
-      $fromDate: DateTime
-      $orgUuid: [UUID!]
-    ) {
+    query ITUserItSystemsOrgAndPrimary($uuid: [UUID!], $fromDate: DateTime) {
       itusers(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          uuid
-          objects {
-            uuid
+          validities {
             user_key
-            primary_uuid
+            primary {
+              uuid
+            }
             itsystem {
               name
               user_key
@@ -54,22 +50,19 @@
               from
               to
             }
+            org_unit(filter: { from_date: null, to_date: null }) {
+              validity {
+                from
+                to
+              }
+            }
           }
           registrations {
             note
           }
         }
       }
-      org_units(filter: { uuids: $orgUuid }) {
-        objects {
-          objects {
-            validity {
-              from
-              to
-            }
-          }
-        }
-      }
+
       itsystems {
         objects {
           objects {
@@ -151,7 +144,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ItUserItSystemsOrgAndPrimaryDocument, { uuid: $page.params.ituser, fromDate: $date, orgUuid: $page.params.uuid } )}
+{#await graphQLClient().request( ItUserItSystemsOrgAndPrimaryDocument, { uuid: $page.params.ituser, fromDate: $date } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -167,7 +160,10 @@
     </div>
   </div>
 {:then data}
-  {@const itUser = data.itusers.objects[0].objects[0]}
+  {@const itUser = data.itusers.objects[0].validities[0]}
+  {@const validities = getMinMaxValidities(
+    data.itusers.objects[0].validities[0].org_unit
+  )}
   {@const notes = data.itusers.objects[0].registrations}
   <!-- Always return latest note
   This might not be the "correct" solution, but I can't
@@ -176,8 +172,6 @@
   {@const note = notes[notes.length - 1].note}
   {@const classes = data.classes.objects}
   {@const itSystems = data.itsystems.objects}
-  {@const minDate = data.org_units.objects[0].objects[0].validity.from.split("T")[0]}
-  {@const maxDate = data.org_units.objects[0].objects[0].validity.to?.split("T")[0]}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -189,8 +183,8 @@
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={minDate}
-            max={toDate ? toDate : maxDate}
+            min={validities.from}
+            max={toDate ? toDate : validities.to}
             required={true}
           />
           <DateInput
@@ -198,12 +192,10 @@
             startValue={itUser.validity.to ? itUser.validity.to.split("T")[0] : null}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : minDate}
-            max={maxDate}
+            min={$fromDate.value}
+            max={validities.to}
           />
         </div>
-
-        <!-- TODO: Should have the current value as default -->
         <div class="flex flex-row gap-6">
           <Select
             title={capital($_("it_system"))}
@@ -229,7 +221,7 @@
           <Checkbox
             title={capital($_("primary"))}
             id="primary"
-            startValue={itUser.primary_uuid}
+            startValue={itUser.primary?.uuid}
             value={getClassUuidByUserKey(classes, "primary")}
           />
         </div>

@@ -21,6 +21,7 @@
   import DarSearch from "$lib/components/DARSearch.svelte"
   import { Addresses } from "$lib/util/addresses"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import { getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string
   let addressType: { name: string; user_key: string; uuid: string }
@@ -33,7 +34,7 @@
   $: svelteForm = form(fromDate, addressTypeField, addressField)
 
   gql`
-    query FacetsAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
+    query FacetsAndEmployee($uuid: [UUID!]) {
       facets(filter: { user_keys: ["employee_address_type", "visibility"] }) {
         objects {
           objects {
@@ -47,9 +48,9 @@
           }
         }
       }
-      employees(filter: { uuids: $uuid, from_date: $fromDate }) {
+      employees(filter: { uuids: $uuid, from_date: null, to_date: null }) {
         objects {
-          objects {
+          validities {
             validity {
               from
               to
@@ -139,7 +140,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( FacetsAndEmployeeDocument, { uuid: $page.params.uuid, fromDate: $date } )}
+{#await graphQLClient().request(FacetsAndEmployeeDocument, { uuid: $page.params.uuid })}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -156,8 +157,7 @@
   </div>
 {:then data}
   {@const facets = data.facets.objects}
-  {@const minDate = data.employees.objects[0].objects[0].validity?.from?.split("T")[0]}
-  {@const maxDate = data.employees.objects[0].objects[0].validity?.to?.split("T")[0]}
+  {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -169,16 +169,16 @@
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
+            min={validities.from}
+            max={toDate ? toDate : validities.to}
             required={true}
-            min={minDate}
-            max={toDate ? toDate : maxDate}
           />
           <DateInput
             bind:value={toDate}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : minDate}
-            max={maxDate}
+            min={$fromDate.value ? $fromDate.value : validities.from}
+            max={validities.to}
           />
         </div>
         <div class="flex flex-row gap-6">

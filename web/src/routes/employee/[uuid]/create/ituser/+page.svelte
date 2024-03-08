@@ -25,6 +25,7 @@
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
   import TextArea from "$lib/components/forms/shared/textArea.svelte"
+  import { getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string
 
@@ -34,7 +35,7 @@
   const svelteForm = form(fromDate, itSystem, accountName)
 
   gql`
-    query ItSystemsClassAndEmployee($uuid: [UUID!], $fromDate: DateTime) {
+    query ItSystemsClassAndEmployee($uuid: [UUID!]) {
       itsystems {
         objects {
           objects {
@@ -51,9 +52,9 @@
           }
         }
       }
-      employees(filter: { uuids: $uuid, from_date: $fromDate }) {
+      employees(filter: { uuids: $uuid, from_date: null, to_date: null }) {
         objects {
-          objects {
+          validities {
             validity {
               from
               to
@@ -127,7 +128,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ItSystemsClassAndEmployeeDocument, { uuid: $page.params.uuid, fromDate: $date } )}
+{#await graphQLClient().request( ItSystemsClassAndEmployeeDocument, { uuid: $page.params.uuid } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -146,27 +147,30 @@
 {:then data}
   {@const itSystems = data.itsystems.objects}
   {@const classes = data.classes.objects}
-  {@const minDate = data.employees.objects[0].objects[0].validity?.from?.split("T")[0]}
+  {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
-          <!-- FIXME: Fix dates min/max -->
+          <!-- TODO: At some point ITUsers will be linked to engagements, -->
+          <!-- when this happens, datepickers needs to use engagement -> org_unit validities -->
           <DateInput
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={minDate}
+            min={validities.from}
+            max={toDate ? toDate : validities.to}
             required={true}
           />
           <DateInput
             bind:value={toDate}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : minDate}
+            min={$fromDate.value ? $fromDate.value : validities.from}
+            max={validities.to}
           />
         </div>
         <div class="flex flex-row gap-6">

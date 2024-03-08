@@ -19,6 +19,7 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import { getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string
   const fromDate = field("from", "", [required()])
@@ -43,7 +44,7 @@
       }
       kles(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          objects {
+          validities {
             uuid
             kle_aspects {
               name
@@ -59,7 +60,7 @@
               from
               to
             }
-            org_unit {
+            org_unit(filter: { from_date: null, to_date: null }) {
               validity {
                 from
                 to
@@ -148,10 +149,9 @@
     </div>
   </div>
 {:then data}
-  {@const kle = data.kles.objects[0].objects[0]}
+  {@const kle = data.kles.objects[0].validities[0]}
   {@const facets = data.facets.objects}
-  {@const minDate = kle.org_unit[0].validity.from.split("T")[0]}
-  {@const maxDate = kle.org_unit[0].validity.to?.split("T")[0]}
+  {@const validities = getMinMaxValidities(data.kles.objects[0].validities[0].org_unit)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -163,8 +163,8 @@
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={minDate}
-            max={toDate ? toDate : maxDate}
+            min={validities.from}
+            max={toDate ? toDate : validities.to}
             required={true}
           />
           <DateInput
@@ -172,8 +172,8 @@
             startValue={kle.validity.to ? kle.validity.to.split("T")[0] : null}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : minDate}
-            max={maxDate}
+            min={$fromDate.value}
+            max={validities.to}
           />
         </div>
         <Select

@@ -17,6 +17,7 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import { getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string
 
@@ -26,15 +27,21 @@
   const svelteForm = form(fromDate, firstName, lastName)
 
   gql`
-    query Employee($uuid: [UUID!], $fromDate: DateTime) {
-      employees(filter: { uuids: $uuid, from_date: $fromDate }) {
+    query Employee($uuid: [UUID!]) {
+      employees(filter: { uuids: $uuid, from_date: null, to_date: null }) {
         objects {
-          objects {
+          current {
             given_name
             surname
             nickname_givenname
             nickname_surname
             cpr_number
+            validity {
+              from
+              to
+            }
+          }
+          validities {
             validity {
               from
               to
@@ -104,7 +111,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( EmployeeDocument, { uuid: $page.params.uuid, fromDate: $date } )}
+{#await graphQLClient().request(EmployeeDocument, { uuid: $page.params.uuid })}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -124,7 +131,9 @@
     </div>
   </div>
 {:then data}
-  {@const employee = data.employees.objects[0].objects[0]}
+  {@const employee = data.employees.objects[0].current}
+  {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
+
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -135,22 +144,26 @@
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
+            min={validities.from}
+            max={toDate ? toDate : validities.to}
             required={true}
           />
           <DateInput
             bind:value={toDate}
-            startValue={employee.validity.to
-              ? employee.validity.to.split("T")[0]
+            startValue={employee?.validity.to
+              ? employee?.validity.to.split("T")[0]
               : null}
             title={capital($_("date.end_date"))}
             id="to"
+            min={$fromDate.value ? $fromDate.value : validities.from}
+            max={validities.to}
           />
         </div>
         <div class="flex flex-row gap-6">
           <Input
             title={capital($_("givenname", { values: { n: 2 } }))}
             id="first-name"
-            startValue={employee.given_name}
+            startValue={employee?.given_name}
             bind:value={$firstName.value}
             errors={$firstName.errors}
             extra_classes="basis-1/2"
@@ -159,7 +172,7 @@
           <Input
             title={capital(capital($_("surname")))}
             id="last-name"
-            startValue={employee.surname}
+            startValue={employee?.surname}
             bind:value={$lastName.value}
             errors={$lastName.errors}
             extra_classes="basis-1/2"
@@ -170,13 +183,13 @@
           <Input
             title={capital($_("nickname_givenname", { values: { n: 2 } }))}
             id="nickname-first-name"
-            startValue={employee.nickname_givenname}
+            startValue={employee?.nickname_givenname}
             extra_classes="basis-1/2"
           />
           <Input
             title={capital($_("nickname_surname"))}
             id="nickname-last-name"
-            startValue={employee.nickname_surname}
+            startValue={employee?.nickname_surname}
             extra_classes="basis-1/2"
           />
         </div>

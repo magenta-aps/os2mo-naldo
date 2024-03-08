@@ -15,25 +15,25 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import { getMinMaxValidities } from "$lib/util/helpers"
 
   const toDate = field("to", "", [required()])
   const svelteForm = form(toDate)
 
   gql`
-    query Address($uuid: [UUID!], $fromDate: DateTime!) {
-      addresses(filter: { uuids: $uuid, from_date: $fromDate }) {
+    query Address($uuid: [UUID!]) {
+      addresses(filter: { uuids: $uuid, from_date: null, to_date: null }) {
         objects {
-          objects {
-            uuid
-            value
-            name
-            address_type {
-              name
-              scope
-            }
+          validities {
             validity {
               from
               to
+            }
+            person(filter: { from_date: null, to_date: null }) {
+              validity {
+                from
+                to
+              }
             }
           }
         }
@@ -102,7 +102,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( AddressDocument, { uuid: $page.params.address, fromDate: $date } )}
+{#await graphQLClient().request(AddressDocument, { uuid: $page.params.address })}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -111,11 +111,10 @@
     </div>
   </div>
 {:then data}
-  {@const address = data.addresses.objects[0].objects[0]}
-  {@const minDate = address.validity.from.split("T")[0]}
-  {@const addressValue =
-    address.address_type.scope === "DAR" ? address.name : address.value}
-
+  {@const addressValidities = getMinMaxValidities(data.addresses.objects[0].validities)}
+  {@const validities = getMinMaxValidities(
+    data.addresses.objects[0].validities[0].person
+  )}
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -125,7 +124,8 @@
           errors={$toDate.errors}
           title={capital($_("date.end_date"))}
           id="to"
-          min={minDate}
+          min={addressValidities.from}
+          max={validities.to}
           required={true}
         />
       </div>

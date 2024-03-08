@@ -20,6 +20,7 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import { getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string
   const fromDate = field("from", "", [required()])
@@ -29,7 +30,7 @@
   const svelteForm = form(fromDate, managerType, managerLevel, responsibilitiesField)
 
   gql`
-    query ManagerAndFacets($uuid: [UUID!], $fromDate: DateTime) {
+    query ManagerAndFacets($uuid: [UUID!], $orgUnitUuid: [UUID!], $fromDate: DateTime) {
       facets(
         filter: { user_keys: ["manager_type", "manager_level", "responsibility"] }
       ) {
@@ -47,9 +48,9 @@
       }
       managers(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          objects {
+          validities {
             uuid
-            employee {
+            person {
               uuid
               name
             }
@@ -75,10 +76,16 @@
             org_unit {
               uuid
               name
-              validity {
-                from
-                to
-              }
+            }
+          }
+        }
+      }
+      org_units(filter: { uuids: $orgUnitUuid, from_date: null, to_date: null }) {
+        objects {
+          validities {
+            validity {
+              from
+              to
             }
           }
         }
@@ -147,7 +154,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ManagerAndFacetsDocument, { uuid: $page.params.manager, fromDate: $date } )}
+{#await graphQLClient().request( ManagerAndFacetsDocument, { uuid: $page.params.manager, orgUnitUuid: $page.params.uuid, fromDate: $date } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -166,11 +173,10 @@
     </div>
   </div>
 {:then data}
-  {@const manager = data.managers.objects[0].objects[0]}
+  {@const manager = data.managers.objects[0].validities[0]}
   {@const responsibilities = manager.responsibilities}
   {@const facets = data.facets.objects}
-  {@const minDate = manager.org_unit[0].validity.from.split("T")[0]}
-  {@const maxDate = manager.org_unit[0].validity?.to?.split("T")[0]}
+  {@const validities = getMinMaxValidities(data.org_units.objects[0].validities)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -182,16 +188,16 @@
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={minDate}
-            max={toDate ? toDate : maxDate}
+            min={validities.from}
+            max={toDate ? toDate : validities.to}
             required={true}
           />
           <DateInput
             bind:value={toDate}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : minDate}
-            max={maxDate}
+            min={$fromDate.value}
+            max={validities.to}
           />
         </div>
         <Search
@@ -205,10 +211,10 @@
         />
         <Search
           type="employee"
-          startValue={manager.employee
+          startValue={manager.person
             ? {
-                uuid: manager.employee[0].uuid,
-                name: manager.employee[0].name,
+                uuid: manager.person[0].uuid,
+                name: manager.person[0].name,
               }
             : undefined}
         />

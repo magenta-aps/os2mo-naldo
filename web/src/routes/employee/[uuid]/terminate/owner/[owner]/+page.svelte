@@ -15,22 +15,21 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import { getMinMaxValidities } from "$lib/util/helpers"
 
   const toDate = field("to", "", [required()])
   const svelteForm = form(toDate)
 
   gql`
-    query Owner($uuid: [UUID!], $fromDate: DateTime!) {
-      owners(filter: { uuids: $uuid, from_date: $fromDate }) {
+    query Owner($uuid: [UUID!]) {
+      owners(filter: { uuids: $uuid, from_date: null, to_date: null }) {
         objects {
-          objects {
-            uuid
+          validities {
             validity {
               from
               to
             }
-            person {
-              name
+            person(filter: { from_date: null, to_date: null }) {
               validity {
                 from
                 to
@@ -103,7 +102,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( OwnerDocument, { uuid: $page.params.owner, fromDate: $date } )}
+{#await graphQLClient().request(OwnerDocument, { uuid: $page.params.owner })}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -112,9 +111,8 @@
     </div>
   </div>
 {:then data}
-  {@const owner = data.owners.objects[0].objects[0]}
-  {@const minDate = owner.validity.from.split("T")[0]}
-  {@const maxDate = owner.person?.[0].validity.to?.split("T")[0]}
+  {@const ownerValidities = getMinMaxValidities(data.owners.objects[0].validities)}
+  {@const validities = getMinMaxValidities(data.owners.objects[0].validities[0].person)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -125,8 +123,8 @@
           errors={$toDate.errors}
           title={capital($_("date.end_date"))}
           id="to"
-          min={minDate}
-          max={maxDate ? maxDate : null}
+          min={ownerValidities.from}
+          max={validities.to}
           required={true}
         />
       </div>
