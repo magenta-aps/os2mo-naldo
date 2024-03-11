@@ -43,7 +43,7 @@
     "@sveltejs/vite-plugin-svelte": "^2.4.5",
     "daisyui": "^4.4.24",
     "date-fns": "^2.30.0",
-    "date-fns-tz": "^2.0.0",
+    "date-fns-tz": "^2.0.1",
     "graphql": "^16.8.1",
     "graphql-request": "^6.0.0",
     "json2csv": "^6.0.0-alpha.2",
