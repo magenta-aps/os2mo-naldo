@@ -65,7 +65,7 @@
       --border-radius="0.25rem"
       --icons-color="#00244E"
       --padding="0 0.75rem 0 0.75rem"
-      placeholder={capital($_("search.address"))}
+      placeholder={capital($_("search_for.address"))}
       id="dar-search"
       listAutoWidth={false}
       loadOptions={fetchDAR}

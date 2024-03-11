@@ -1,104 +1,67 @@
-interface FlattenedObject {
-  [key: string]: any
-}
+import { _ } from "svelte-i18n"
+import { capital } from "$lib/util/translationUtils"
+import { get } from "svelte/store"
+import { resolveFieldValue, type Field } from "$lib/util/helpers"
 
-interface Header {
-  key: string
-  label: string
-}
-
-// TODO: Allow multiple managers in CSV
-
-// Function to flatten nested objects
-export const flattenObject = (obj: any, parentKey: string = ""): FlattenedObject => {
-  return Object.keys(obj).reduce((acc: FlattenedObject, key: string) => {
-    const newKey = parentKey ? `${parentKey}.${key}` : key
-
-    if (typeof obj[key] === "object" && obj[key] !== null) {
-      Object.assign(acc, flattenObject(obj[key], newKey))
-    } else {
-      acc[newKey] = obj[key]
-    }
-
-    return acc
-  }, {})
-}
-
-// Function to extract unique fields from an array of objects
-export const extractFields = (data: any[]): string[] => {
-  const flattenedData: FlattenedObject[] = data.map((item) => flattenObject(item))
-
-  const allFields: string[] = flattenedData.reduce(
-    (acc: string[], item: FlattenedObject) => {
-      Object.keys(item).forEach((key) => {
-        if (!acc.includes(key)) {
-          acc.push(key)
-        }
-      })
-      return acc
-    },
-    []
-  )
-
-  return allFields
+// Helper function to get nested value based on the parsed subString
+const getNestedValue = (item: any, field: Field): any => {
+  return resolveFieldValue(item, field)
 }
 
 // Function to convert JSON data to CSV format
-export const json2csv = (data: any[], headers: Header[]): string => {
-  // Filter headers based on the presence of data
-  const includedHeaders: Header[] = headers.filter((header) =>
-    data.some((item) => {
-      const value = header.key
-        .split(".")
-        .reduce(
-          (obj, key) => (obj && obj[key] !== undefined ? obj[key] : undefined),
-          item
-        )
-      return value !== undefined
+export const json2csv = (data: any[], headers: Field[]): string => {
+  // Generate CSV header from subString field
+  const csvHeader = headers
+    .flatMap((header) => {
+      const headerText = capital(get(_)(header.value, { values: { n: 1 } }))
+      if (header.value === "related_unit") {
+        // Create two columns for related_unit :puke:
+        return [`${headerText} 1`, `${headerText} 2`]
+      }
+      // Create two columns for validity from/to
+      else if (header.value === "validity") {
+        return [`${capital(get(_)("from"))}`, `${capital(get(_)("to"))}`]
+      }
+      return headerText
     })
-  )
+    .join(",")
 
-  // Generate CSV content
-  const csvContent: string = [
-    includedHeaders.map((header) => header.label).join(","),
-    ...data.map((item) => {
-      const rowValues: string[] = includedHeaders.map((header) => {
-        const value = header.key
-          .split(".")
-          .reduce(
-            (obj, key) => (obj && obj[key] !== undefined ? obj[key] : undefined),
-            item
-          )
-        return JSON.stringify(value)
+  // Generate CSV rows
+  const csvRows = data.map((item) => {
+    return headers
+      .flatMap((header) => {
+        const values = getNestedValue(item, header)
+        if (header.value === "related_unit") {
+          // Handle related_unit case with two columns :puke:
+          return values.map((value: string[]) => (value ? value : ""))
+        } else if (header.value === "validity") {
+          // TODO: Should we format the date?
+          return values.map((value: string[]) => (value ? value : ""))
+        } else {
+          // Return single value for non-array cases
+          return JSON.stringify(values ? values : "")
+        }
       })
-      return rowValues.join(",")
-    }),
-  ].join("\n")
+      .join(",") // Join values for each row
+  })
 
-  return csvContent
+  return [csvHeader, ...csvRows].join("\n")
 }
 
 // Function to handle the download action
 export const downloadHandler = (
   event: MouseEvent,
   data: any[],
-  allPossibleHeaders: Header[]
+  headers: Field[],
+  filename: string
 ) => {
   event.preventDefault()
 
-  const currentDataHeaders: Header[] = allPossibleHeaders.map((definedHeader) => {
-    // Check if definedHeader.key is present in the data
-    const matchedHeader = extractFields(data).includes(definedHeader.key)
-      ? definedHeader
-      : null
-    return matchedHeader || { key: definedHeader.key, label: definedHeader.key }
-  })
-
   // Generate CSV and trigger download
-  const csvData: string = json2csv(data, currentDataHeaders)
+  const csvData: string = json2csv(data, headers)
   const blob: Blob = new Blob([csvData], { type: "text/csv" })
   const link: HTMLAnchorElement = document.createElement("a")
   link.href = URL.createObjectURL(blob)
-  link.download = "insights.csv"
+  link.download = filename ? `${filename}.csv` : "insights.csv"
   link.click()
 }
