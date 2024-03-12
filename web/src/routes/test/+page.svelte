@@ -1,16 +1,15 @@
 <script lang="ts">
-  import { graphQLClient } from "$lib/util/http"
-  import { gql } from "graphql-request"
   import { query } from "gql-query-builder"
 
-  const isTrue = true
-  const vali = isTrue
+  let state = { employee: { validity: true } }
+
+  $: vali = state.employee.validity
     ? `validity {
           from
         }`
     : ``
 
-  const myQuery = query(
+  $: myQuery = query(
     {
       operation: "org_units",
       variables: {
@@ -24,8 +23,11 @@
     null,
     { operationName: "GetOrgUnits" }
   )
-  console.log(myQuery)
+
+  $: console.log(state, vali, myQuery)
 </script>
+
+<input type="checkbox" bind:checked={state.employee.validity} />
 
 <div class="px-12 pt-6">
   <h1 class="mb-4">Test</h1>
