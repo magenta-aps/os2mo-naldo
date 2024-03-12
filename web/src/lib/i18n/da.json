@@ -130,7 +130,8 @@
 	"rolebinding": "{n, plural, =0 {rollebindingen} one {rollebinding} other {rollebindinger}}",
 	"role_type": "rolletype",
 	"save": "gem",
-	"search": {
+	"search": "søg",
+	"search_for": {
 		"person": "Søg efter person",
 		"organisation": "Søg efter organisation",
 		"address": "Søg efter adresse"

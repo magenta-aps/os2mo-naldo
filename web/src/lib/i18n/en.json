@@ -128,7 +128,8 @@
 	"rolebinding": "{n, plural, =0 {the rolebinding} one {rolebinding} other {rolebindings}}",
 	"role_type": "role type",
 	"save": "save",
-	"search": {
+	"search": "search",
+	"search_for": {
 		"person": "Search for person",
 		"organisation": "Search for organisation",
 		"address": "Search for address"

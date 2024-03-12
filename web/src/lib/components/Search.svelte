@@ -299,8 +299,8 @@
       bind:value
       hideEmptyState={true}
       placeholder={type === "employee"
-        ? capital($_("search.person"))
-        : capital($_("search.organisation"))}
+        ? capital($_("search_for.person"))
+        : capital($_("search_for.organisation"))}
       clearFilterTextOnBlur={false}
       on:change
       on:clear
