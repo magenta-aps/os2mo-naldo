@@ -11,6 +11,8 @@ import {
   addSeconds,
   differenceInCalendarDays,
 } from "date-fns"
+import { _ } from "svelte-i18n"
+import { capital } from "$lib/util/translationUtils"
 import { get } from "svelte/store"
 
 export const getUuidFromHash = (hash: string) => {
@@ -241,4 +243,16 @@ export const findClosestValidity = (validities: any, date: string) => {
   }
 
   return closestValidity
+}
+
+type Item = any
+
+// `get(_)` for translations since `$_` is a store and doesn't work in .ts files
+export const sortItemsBy = (items: Item[], sortBy: string) => {
+  return items
+    .map((item) => ({
+      ...item,
+      [sortBy]: capital(get(_)(item[sortBy], { values: { n: item.n } })),
+    }))
+    .sort((a, b) => (a[sortBy] > b[sortBy] ? 1 : -1))
 }
