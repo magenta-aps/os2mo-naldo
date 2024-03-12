@@ -4,10 +4,15 @@
   import DetailTable from "$lib/components/shared/detail_table.svelte"
   import { tenses } from "$lib/stores/tenses"
   import type { ComponentType, SvelteComponent } from "svelte"
+  import { MOConfig } from "$lib/stores/config"
 
   export let headers: Header[]
   export let table: ComponentType<SvelteComponent>
   export let onlyPresent = false
+
+  if ($MOConfig && $MOConfig.confdb_show_level === "false") {
+    headers = headers.filter((header) => header.title !== capital($_("org_unit_level")))
+  }
 </script>
 
 <DetailTable {headers}>

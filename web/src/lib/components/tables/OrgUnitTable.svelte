@@ -14,6 +14,7 @@
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
+  import { MOConfig } from "$lib/stores/config"
 
   type OrgUnits = OrgUnitQuery["org_units"]["objects"][0]["objects"]
   let data: OrgUnits
@@ -89,11 +90,13 @@
       <td class="p-4"
         >{org_unit.unit_type ? org_unit.unit_type.name : capital($_("not_set"))}</td
       >
-      <td class="p-4"
-        >{org_unit.org_unit_level
-          ? org_unit.org_unit_level.name
-          : capital($_("not_set"))}</td
-      >
+      {#if $MOConfig && $MOConfig.confdb_show_level === "true"}
+        <td class="p-4"
+          >{org_unit.org_unit_level
+            ? org_unit.org_unit_level.name
+            : capital($_("not_set"))}</td
+        >
+      {/if}
       {#if org_unit.parent}
         <a href="{base}/organisation/{org_unit.parent.uuid}">
           <td class="p-4">{org_unit.parent.name}</td>
