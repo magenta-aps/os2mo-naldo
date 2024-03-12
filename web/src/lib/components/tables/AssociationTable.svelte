@@ -15,6 +15,7 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
+  import { MOConfig } from "$lib/stores/config"
 
   type Associations = AssociationsQuery["associations"]["objects"][0]["objects"]
   let data: Associations
@@ -112,7 +113,9 @@
         </a>
       {/if}
       <td class="p-4">{association.association_type?.name}</td>
-      <td class="p-4">{association.primary ? association.primary?.name : ""}</td>
+      {#if $MOConfig && $MOConfig.confdb_show_primary_association === "true"}
+        <td class="p-4">{association.primary ? association.primary?.name : ""}</td>
+      {/if}
       <ValidityTableCell validity={association.validity} />
       <td>
         <a
