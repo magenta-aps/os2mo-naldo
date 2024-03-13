@@ -25,6 +25,7 @@
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
   import TextArea from "$lib/components/forms/shared/textArea.svelte"
+  import { MOConfig } from "$lib/stores/config"
 
   let toDate: string
   const fromDate = field("from", "", [required()])
@@ -172,6 +173,8 @@
   {@const note = notes[notes.length - 1].note}
   {@const classes = data.classes.objects}
   {@const itSystems = data.itsystems.objects}
+  {@const disableForm =
+    $MOConfig?.confdb_it_system_entry_edit_fields_disabled === "true" ? true : false}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -186,6 +189,7 @@
             min={validities.from}
             max={toDate ? toDate : validities.to}
             required={true}
+            disabled={disableForm}
           />
           <DateInput
             bind:value={toDate}
@@ -194,6 +198,7 @@
             id="to"
             min={$fromDate.value}
             max={validities.to}
+            disabled={disableForm}
           />
         </div>
         <div class="flex flex-row gap-6">
@@ -206,6 +211,7 @@
             errors={$itSystem.errors}
             iterable={getITSystemNames(itSystems)}
             required={true}
+            disabled={disableForm}
           />
           <Input
             title={capital($_("account_name"))}
@@ -215,6 +221,7 @@
             bind:value={$accountName.value}
             errors={$accountName.errors}
             required={true}
+            disabled={disableForm}
           />
         </div>
         <div class="flex">
@@ -223,6 +230,7 @@
             id="primary"
             startValue={itUser.primary?.uuid}
             value={getClassUuidByUserKey(classes, "primary")}
+            disabled={disableForm}
           />
         </div>
         <input
@@ -231,12 +239,18 @@
           id="non-primary"
           value={getClassUuidByUserKey(classes, "non-primary")}
         />
-        <TextArea title={capital($_("notes"))} id="notes" startValue={note} />
+        <TextArea
+          title={capital($_("notes"))}
+          id="notes"
+          startValue={note}
+          disabled={disableForm}
+        />
       </div>
     </div>
     <div class="flex py-6 gap-4">
       <button
         type="submit"
+        disabled={disableForm}
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
         >{capital(
           $_("edit_item", {
