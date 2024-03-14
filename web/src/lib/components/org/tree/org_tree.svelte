@@ -80,7 +80,14 @@
             validities {
               name
               uuid
-              children(filter: { hierarchy: { uuids: $orgUnitHierarchies } }) {
+              children(
+                filter: {
+                  subtree: {
+                    from_date: $fromDate
+                    hierarchy: { uuids: $orgUnitHierarchies }
+                  }
+                }
+              ) {
                 name
                 uuid
               }

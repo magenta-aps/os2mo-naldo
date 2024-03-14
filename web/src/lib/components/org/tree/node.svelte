@@ -44,12 +44,28 @@
       $fromDate: DateTime
       $orgUnitHierarchies: [UUID!]
     ) {
-      org_units(filter: { uuids: $uuid, from_date: $fromDate }) {
+      org_units(filter: { uuids: $uuid }) {
         objects {
           objects {
-            children(filter: { hierarchy: { uuids: $orgUnitHierarchies } }) {
+            name
+            uuid
+            org_unit_hierarchy_model {
               name
               uuid
+            }
+            children(
+              filter: {
+                subtree: {
+                  from_date: $fromDate
+                  hierarchy: { uuids: $orgUnitHierarchies }
+                }
+              }
+            ) {
+              name
+              uuid
+              org_unit_hierarchy_model {
+                name
+              }
             }
           }
         }
@@ -155,6 +171,12 @@
 
 {#if open}
   {#each children.sort( (a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1) ) as child}
-    <svelte:self {...child} {breadcrumbs} {fromDate} indent={indent + 24} />
+    <svelte:self
+      {...child}
+      {orgUnitHierarchyUuid}
+      {breadcrumbs}
+      {fromDate}
+      indent={indent + 24}
+    />
   {/each}
 {/if}
