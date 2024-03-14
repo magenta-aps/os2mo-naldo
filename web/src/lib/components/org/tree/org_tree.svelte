@@ -12,6 +12,9 @@
   import {
     OrgUnitsWithChildrenDocument,
     OrgUnitHierarchiesDocument,
+    type OrgUnitsWithChildrenQuery,
+    type OrgUnitsWithFilteredChildrenQuery,
+    OrgUnitsWithFilteredChildrenDocument,
   } from "./query.generated"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import Select from "$lib/components/forms/shared/select.svelte"
@@ -45,19 +48,13 @@
   const fetchOrgTree = async (
     fromDate: string,
     childUuid?: string | null,
-    orgUnitHierachyUuid?: string | null
+    orgUnitHierarchyUuid?: string | null
   ) => {
     gql`
-      query OrgUnitsWithChildren($fromDate: DateTime, $orgUnitHierarchies: [UUID!]) {
-        org_units(
-          filter: {
-            parents: null
-            from_date: $fromDate
-            hierarchies: $orgUnitHierarchies
-          }
-        ) {
+      query OrgUnitsWithChildren($fromDate: DateTime) {
+        org_units(filter: { parents: null, subtree: { from_date: $fromDate } }) {
           objects {
-            objects {
+            validities {
               name
               uuid
               children {
@@ -68,13 +65,44 @@
           }
         }
       }
+
+      query OrgUnitsWithFilteredChildren(
+        $fromDate: DateTime
+        $orgUnitHierarchies: [UUID!]
+      ) {
+        org_units(
+          filter: {
+            parents: null
+            subtree: { from_date: $fromDate, hierarchy: { uuids: $orgUnitHierarchies } }
+          }
+        ) {
+          objects {
+            validities {
+              name
+              uuid
+              children(filter: { hierarchy: { uuids: $orgUnitHierarchies } }) {
+                name
+                uuid
+              }
+            }
+          }
+        }
+      }
     `
 
     // Breadcrumbs
-    const res = await graphQLClient().request(OrgUnitsWithChildrenDocument, {
-      fromDate: fromDate,
-      orgUnitHierarchies: orgUnitHierachyUuid,
-    })
+    let res: OrgUnitsWithChildrenQuery | OrgUnitsWithFilteredChildrenQuery
+
+    if (orgUnitHierarchyUuid) {
+      res = await graphQLClient().request(OrgUnitsWithFilteredChildrenDocument, {
+        fromDate: fromDate,
+        orgUnitHierarchies: orgUnitHierarchyUuid,
+      })
+    } else {
+      res = await graphQLClient().request(OrgUnitsWithChildrenDocument, {
+        fromDate: fromDate,
+      })
+    }
 
     const orgTree = []
     const uuid = childUuid ? childUuid : $page.params.uuid
@@ -88,9 +116,10 @@
 
     for (let org of res.org_units.objects) {
       orgTree.push({
-        uuid: org.objects[0].uuid,
-        name: org.objects[0].name,
-        children: org.objects[0].children,
+        uuid: org.validities[0].uuid,
+        name: org.validities[0].name,
+        children: org.validities[0].children,
+        orgUnitHierarchyUuid: orgUnitHierarchyUuid,
         breadcrumbs: breadcrumbs,
         fromDate: fromDate,
       })
@@ -118,7 +147,14 @@
       id="org-unit-hierarchy"
       bind:value={orgUnitHierachy}
       startValue={brutto}
-      iterable={getClassesByFacetUserKey(facets, "org_unit_hierarchy")}
+      iterable={[
+        {
+          name: "Bruttoorganisation",
+          uuid: null,
+          user_key: "Bruttoorganisation",
+        },
+        ...[getClassesByFacetUserKey(facets, "org_unit_hierarchy")].flat(),
+      ]}
       on:change={() =>
         (refreshableOrgTree = fetchOrgTree($date, null, orgUnitHierachy?.uuid))}
     />
