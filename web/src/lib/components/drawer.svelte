@@ -53,7 +53,7 @@
     style="width: {isLargeScreen ? `${$drawerWidth}px` : '100%'}"
   >
     <label for="drawer" class="drawer-overlay" />
-    <ul class="bg-base-100">
+    <ul class="bg-base-100 h-screen">
       <div>
         <DrawerContent />
       </div>
