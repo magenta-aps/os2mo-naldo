@@ -5,7 +5,12 @@
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { onMount } from "svelte"
-  import { OrgUnitChildrenDocument } from "./query.generated"
+  import {
+    OrgUnitChildrenDocument,
+    OrgUnitFilteredChildrenDocument,
+    type OrgUnitChildrenQuery,
+    type OrgUnitFilteredChildrenQuery,
+  } from "./query.generated"
   import Icon from "@iconify/svelte"
   import keyboardArrowDownRounded from "@iconify/icons-material-symbols/keyboard-arrow-down-rounded"
 
@@ -16,6 +21,7 @@
   export let breadcrumbs: string[] = []
   export let open = false
   export let fromDate: string
+  export let orgUnitHierarchyUuid: string | undefined | null
 
   let loading = false
 
@@ -32,13 +38,56 @@
         }
       }
     }
+
+    query OrgUnitFilteredChildren(
+      $uuid: [UUID!]
+      $fromDate: DateTime
+      $orgUnitHierarchies: [UUID!]
+    ) {
+      org_units(filter: { uuids: $uuid }) {
+        objects {
+          objects {
+            name
+            uuid
+            org_unit_hierarchy_model {
+              name
+              uuid
+            }
+            children(
+              filter: {
+                subtree: {
+                  from_date: $fromDate
+                  hierarchy: { uuids: $orgUnitHierarchies }
+                }
+              }
+            ) {
+              name
+              uuid
+              org_unit_hierarchy_model {
+                name
+              }
+            }
+          }
+        }
+      }
+    }
   `
 
   const fetchChildren = async (uuid: string) => {
-    const res = await graphQLClient().request(OrgUnitChildrenDocument, {
-      uuid: uuid,
-      fromDate: fromDate,
-    })
+    let res: OrgUnitChildrenQuery | OrgUnitFilteredChildrenQuery
+
+    if (orgUnitHierarchyUuid) {
+      res = await graphQLClient().request(OrgUnitFilteredChildrenDocument, {
+        uuid: uuid,
+        fromDate: fromDate,
+        orgUnitHierarchies: orgUnitHierarchyUuid,
+      })
+    } else {
+      res = await graphQLClient().request(OrgUnitChildrenDocument, {
+        uuid: uuid,
+        fromDate: fromDate,
+      })
+    }
 
     return res.org_units?.objects[0].objects[0].children
   }
@@ -122,6 +171,12 @@
 
 {#if open}
   {#each children.sort( (a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1) ) as child}
-    <svelte:self {...child} {breadcrumbs} {fromDate} indent={indent + 24} />
+    <svelte:self
+      {...child}
+      {orgUnitHierarchyUuid}
+      {breadcrumbs}
+      {fromDate}
+      indent={indent + 24}
+    />
   {/each}
 {/if}
