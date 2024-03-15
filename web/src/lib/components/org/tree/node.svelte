@@ -30,6 +30,7 @@
       org_units(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
           objects {
+            uuid
             children {
               name
               uuid
@@ -47,7 +48,6 @@
       org_units(filter: { uuids: $uuid }) {
         objects {
           objects {
-            name
             uuid
             children(
               filter: {
@@ -66,7 +66,7 @@
     }
   `
 
-  const fetchChildren = async (uuid: string) => {
+  const fetchChildren = async (uuid: string[]) => {
     let res: OrgUnitChildrenQuery | OrgUnitFilteredChildrenQuery
 
     if (orgUnitHierarchyUuid) {
@@ -82,22 +82,26 @@
       })
     }
 
-    return res.org_units?.objects[0].objects[0].children
+    return res.org_units.objects
   }
 
   const toggleOpen = async () => {
     if (!open) {
       loading = true
 
-      // Filter children that need to fetch children
+      // Check if the children are cached
       const childrenToFetch = children.filter((child) => !child.children)
-      // Fetch children concurrently
-      const fetchPromises = childrenToFetch.map((child) => fetchChildren(child.uuid))
-      // Wait for all fetches to complete
-      const fetchedChildren = await Promise.all(fetchPromises)
-      // Assign fetched children to their corresponding parent
-      for (let child of childrenToFetch) {
-        child.children = fetchedChildren.shift()
+
+      // Skip if cached
+      if (childrenToFetch.length) {
+        const fetchedChildren = await fetchChildren(
+          childrenToFetch.map((child) => child.uuid)
+        )
+
+        // Adds the next layer of children
+        for (const child of children) {
+          child.children = fetchedChildren.shift()?.objects[0].children
+        }
       }
 
       loading = false
