@@ -120,8 +120,6 @@
   {@const validities = getMinMaxValidities(
     data.associations.objects[0].validities[0].org_unit
   )}
-  {console.log(validities)}
-  {console.log(associationValidities)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
