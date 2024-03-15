@@ -52,7 +52,7 @@
   ) => {
     gql`
       query OrgUnitsWithChildren($fromDate: DateTime) {
-        org_units(filter: { parents: null, subtree: { from_date: $fromDate } }) {
+        org_units(filter: { parents: null, from_date: $fromDate }) {
           objects {
             validities {
               name
@@ -147,7 +147,12 @@
   }
 </script>
 
-{#await graphQLClient().request(OrgUnitHierarchiesDocument) then data}
+{#await graphQLClient().request(OrgUnitHierarchiesDocument)}
+  <div role="status" class="max-w-sm animate-pulse">
+    <div class="h-10 bg-base-100 rounded dark:bg-accent max-w-4 mb-2.5" />
+    <span class="sr-only">{capital($_("loading"))}...</span>
+  </div>
+{:then data}
   {#if data.facets.objects.length && data.facets.objects[0].objects[0].classes.length}
     {@const facets = data.facets.objects}
     <Select
@@ -155,11 +160,7 @@
       bind:value={orgUnitHierachy}
       startValue={brutto}
       iterable={[
-        {
-          name: "Bruttoorganisation",
-          uuid: null,
-          user_key: "Bruttoorganisation",
-        },
+        brutto,
         ...[getClassesByFacetUserKey(facets, "org_unit_hierarchy")].flat(),
       ]}
       on:change={() =>

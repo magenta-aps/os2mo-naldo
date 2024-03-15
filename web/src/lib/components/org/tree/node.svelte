@@ -49,10 +49,6 @@
           objects {
             name
             uuid
-            org_unit_hierarchy_model {
-              name
-              uuid
-            }
             children(
               filter: {
                 subtree: {
@@ -63,9 +59,6 @@
             ) {
               name
               uuid
-              org_unit_hierarchy_model {
-                name
-              }
             }
           }
         }
