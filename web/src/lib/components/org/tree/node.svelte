@@ -88,11 +88,18 @@
   const toggleOpen = async () => {
     if (!open) {
       loading = true
-      for (let child of children) {
-        if (!child.children) {
-          child.children = await fetchChildren(child.uuid)
-        }
+
+      // Filter children that need to fetch children
+      const childrenToFetch = children.filter((child) => !child.children)
+      // Fetch children concurrently
+      const fetchPromises = childrenToFetch.map((child) => fetchChildren(child.uuid))
+      // Wait for all fetches to complete
+      const fetchedChildren = await Promise.all(fetchPromises)
+      // Assign fetched children to their corresponding parent
+      for (let child of childrenToFetch) {
+        child.children = fetchedChildren.shift()
       }
+
       loading = false
     }
     open = !open
