@@ -29,7 +29,7 @@
     query OrgUnitChildren($uuid: [UUID!], $fromDate: DateTime) {
       org_units(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          objects {
+          validities {
             uuid
             children {
               name
@@ -47,7 +47,7 @@
     ) {
       org_units(filter: { uuids: $uuid }) {
         objects {
-          objects {
+          validities {
             uuid
             children(
               filter: {
@@ -100,7 +100,7 @@
 
         // Adds the next layer of children
         for (const child of children) {
-          child.children = fetchedChildren.shift()?.objects[0].children
+          child.children = fetchedChildren.shift()?.validities[0].children
         }
       }
 

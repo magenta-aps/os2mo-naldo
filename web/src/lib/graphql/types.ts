@@ -2313,6 +2313,7 @@ export type EmployeeLeavesArgs = {
 export type EmployeeManager_RolesArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<EmployeesBoundManagerFilter>;
+  inherit?: Scalars['Boolean']['input'];
   limit?: InputMaybe<Scalars['int']['input']>;
 };
 
@@ -2665,6 +2666,7 @@ export type EmployeesBoundLeaveFilter = {
 export type EmployeesBoundManagerFilter = {
   employee?: InputMaybe<EmployeeFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  inherit?: InputMaybe<Scalars['Boolean']['input']>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   registration?: InputMaybe<ManagerRegistrationFilter>;
@@ -5974,6 +5976,11 @@ export type ManagerFilter = {
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
+   * wat doink
+   *
+   */
+  inherit?: InputMaybe<Scalars['Boolean']['input']>;
+  /**
    * Organisation Unit filter limiting which entries are returned.
    *
    */
@@ -8950,6 +8957,7 @@ export type QueryLeavesArgs = {
 export type QueryManagersArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ManagerFilter>;
+  inherit?: Scalars['Boolean']['input'];
   limit?: InputMaybe<Scalars['int']['input']>;
 };
 
