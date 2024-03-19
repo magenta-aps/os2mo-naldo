@@ -6,14 +6,14 @@ export type LeaveQueryVariables = Types.Exact<{
 }>;
 
 
-export type LeaveQuery = { __typename?: 'Query', leaves: { __typename?: 'LeaveResponsePaged', objects: Array<{ __typename?: 'LeaveResponse', validities: Array<{ __typename?: 'Leave', validity: { __typename?: 'Validity', from: any, to?: any | null }, person: Array<{ __typename?: 'Employee', validity: { __typename?: 'OpenValidity', from?: any | null, to?: any | null } }> }> }> } };
+export type LeaveQuery = { leaves: { objects: Array<{ validities: Array<{ validity: { from: any, to?: any | null }, person: Array<{ validity: { from?: any | null, to?: any | null } }> }> }> } };
 
 export type TerminateLeaveMutationVariables = Types.Exact<{
   input: Types.LeaveTerminateInput;
 }>;
 
 
-export type TerminateLeaveMutation = { __typename?: 'Mutation', leave_terminate: { __typename?: 'LeaveResponse', objects: Array<{ __typename?: 'Leave', person: Array<{ __typename?: 'Employee', name: string }> }> } };
+export type TerminateLeaveMutation = { leave_terminate: { objects: Array<{ person: Array<{ name: string }> }> } };
 
 
 export const LeaveDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Leave"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"uuid"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"leaves"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"uuids"},"value":{"kind":"Variable","name":{"kind":"Name","value":"uuid"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"from_date"},"value":{"kind":"NullValue"}},{"kind":"ObjectField","name":{"kind":"Name","value":"to_date"},"value":{"kind":"NullValue"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}}]}},{"kind":"Field","name":{"kind":"Name","value":"person"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"from_date"},"value":{"kind":"NullValue"}},{"kind":"ObjectField","name":{"kind":"Name","value":"to_date"},"value":{"kind":"NullValue"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<LeaveQuery, LeaveQueryVariables>;

@@ -6,14 +6,14 @@ export type EngagementQueryVariables = Types.Exact<{
 }>;
 
 
-export type EngagementQuery = { __typename?: 'Query', engagements: { __typename?: 'EngagementResponsePaged', objects: Array<{ __typename?: 'EngagementResponse', validities: Array<{ __typename?: 'Engagement', validity: { __typename?: 'Validity', from: any, to?: any | null }, person: Array<{ __typename?: 'Employee', validity: { __typename?: 'OpenValidity', from?: any | null, to?: any | null } }> }> }> } };
+export type EngagementQuery = { engagements: { objects: Array<{ validities: Array<{ validity: { from: any, to?: any | null }, person: Array<{ validity: { from?: any | null, to?: any | null } }> }> }> } };
 
 export type TerminateEngagementMutationVariables = Types.Exact<{
   input: Types.EngagementTerminateInput;
 }>;
 
 
-export type TerminateEngagementMutation = { __typename?: 'Mutation', engagement_terminate: { __typename?: 'EngagementResponse', objects: Array<{ __typename?: 'Engagement', uuid: any, employee: Array<{ __typename?: 'Employee', name: string }> }> } };
+export type TerminateEngagementMutation = { engagement_terminate: { objects: Array<{ uuid: any, employee: Array<{ name: string }> }> } };
 
 
 export const EngagementDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Engagement"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"uuid"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"engagements"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"uuids"},"value":{"kind":"Variable","name":{"kind":"Name","value":"uuid"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"from_date"},"value":{"kind":"NullValue"}},{"kind":"ObjectField","name":{"kind":"Name","value":"to_date"},"value":{"kind":"NullValue"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}}]}},{"kind":"Field","name":{"kind":"Name","value":"person"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"from_date"},"value":{"kind":"NullValue"}},{"kind":"ObjectField","name":{"kind":"Name","value":"to_date"},"value":{"kind":"NullValue"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<EngagementQuery, EngagementQueryVariables>;

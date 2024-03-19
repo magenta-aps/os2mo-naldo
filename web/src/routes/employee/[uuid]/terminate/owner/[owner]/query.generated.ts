@@ -6,14 +6,14 @@ export type OwnerQueryVariables = Types.Exact<{
 }>;
 
 
-export type OwnerQuery = { __typename?: 'Query', owners: { __typename?: 'OwnerResponsePaged', objects: Array<{ __typename?: 'OwnerResponse', validities: Array<{ __typename?: 'Owner', validity: { __typename?: 'Validity', from: any, to?: any | null }, person?: Array<{ __typename?: 'Employee', validity: { __typename?: 'OpenValidity', from?: any | null, to?: any | null } }> | null }> }> } };
+export type OwnerQuery = { owners: { objects: Array<{ validities: Array<{ validity: { from: any, to?: any | null }, person?: Array<{ validity: { from?: any | null, to?: any | null } }> | null }> }> } };
 
 export type TerminateOwnerMutationVariables = Types.Exact<{
   input: Types.OwnerTerminateInput;
 }>;
 
 
-export type TerminateOwnerMutation = { __typename?: 'Mutation', owner_terminate: { __typename?: 'OwnerResponse', objects: Array<{ __typename?: 'Owner', person?: Array<{ __typename?: 'Employee', name: string }> | null }> } };
+export type TerminateOwnerMutation = { owner_terminate: { objects: Array<{ person?: Array<{ name: string }> | null }> } };
 
 
 export const OwnerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Owner"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"uuid"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"owners"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"uuids"},"value":{"kind":"Variable","name":{"kind":"Name","value":"uuid"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"from_date"},"value":{"kind":"NullValue"}},{"kind":"ObjectField","name":{"kind":"Name","value":"to_date"},"value":{"kind":"NullValue"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}}]}},{"kind":"Field","name":{"kind":"Name","value":"person"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"from_date"},"value":{"kind":"NullValue"}},{"kind":"ObjectField","name":{"kind":"Name","value":"to_date"},"value":{"kind":"NullValue"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<OwnerQuery, OwnerQueryVariables>;

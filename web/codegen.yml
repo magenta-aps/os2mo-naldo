@@ -17,3 +17,4 @@ generates:
       - typed-document-node
     config:
       useTypeImports: true
+      skipTypename: true

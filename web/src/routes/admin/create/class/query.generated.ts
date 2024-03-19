@@ -6,14 +6,14 @@ export type FacetQueryVariables = Types.Exact<{
 }>;
 
 
-export type FacetQuery = { __typename?: 'Query', facets: { __typename?: 'FacetResponsePaged', objects: Array<{ __typename?: 'FacetResponse', objects: Array<{ __typename?: 'Facet', uuid: any, user_key: string, validity: { __typename?: 'OpenValidity', from?: any | null, to?: any | null } }> }> } };
+export type FacetQuery = { facets: { objects: Array<{ objects: Array<{ uuid: any, user_key: string, validity: { from?: any | null, to?: any | null } }> }> } };
 
 export type CreateClassMutationVariables = Types.Exact<{
   input: Types.ClassCreateInput;
 }>;
 
 
-export type CreateClassMutation = { __typename?: 'Mutation', class_create: { __typename?: 'ClassResponse', objects: Array<{ __typename?: 'Class', name: string, uuid: any }> } };
+export type CreateClassMutation = { class_create: { objects: Array<{ name: string, uuid: any }> } };
 
 
 export const FacetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Facet"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"fromDate"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"facets"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"from_date"},"value":{"kind":"Variable","name":{"kind":"Name","value":"fromDate"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"uuid"}},{"kind":"Field","name":{"kind":"Name","value":"user_key"}},{"kind":"Field","name":{"kind":"Name","value":"validity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<FacetQuery, FacetQueryVariables>;

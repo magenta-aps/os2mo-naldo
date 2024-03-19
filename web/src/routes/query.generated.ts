@@ -4,12 +4,12 @@ import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-
 export type GetConfigQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type GetConfigQuery = { __typename?: 'Query', configuration: { __typename?: 'ConfigurationPaged', objects: Array<{ __typename?: 'Configuration', key: string, jsonified_value: string }> } };
+export type GetConfigQuery = { configuration: { objects: Array<{ key: string, jsonified_value: string }> } };
 
 export type VersionQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type VersionQuery = { __typename?: 'Query', version: { __typename?: 'Version', mo_version?: string | null } };
+export type VersionQuery = { version: { mo_version?: string | null } };
 
 
 export const GetConfigDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetConfig"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"configuration"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"key"}},{"kind":"Field","name":{"kind":"Name","value":"jsonified_value"}}]}}]}}]}}]} as unknown as DocumentNode<GetConfigQuery, GetConfigQueryVariables>;
