@@ -27,12 +27,12 @@
 
   gql`
     query OrgUnitChildren($uuid: [UUID!], $fromDate: DateTime) {
-      org_units(filter: { uuids: $uuid, from_date: $fromDate }) {
+      org_units(filter: { parents: $uuid, from_date: $fromDate }) {
         objects {
           validities {
+            name
             uuid
-            children {
-              name
+            children(limit: 1) {
               uuid
             }
           }
@@ -45,9 +45,10 @@
       $fromDate: DateTime
       $orgUnitHierarchies: [UUID!]
     ) {
-      org_units(filter: { uuids: $uuid }) {
+      org_units(filter: { parents: $uuid, from_date: $fromDate }) {
         objects {
           validities {
+            name
             uuid
             children(
               filter: {
@@ -57,7 +58,6 @@
                 }
               }
             ) {
-              name
               uuid
             }
           }
@@ -66,7 +66,7 @@
     }
   `
 
-  const fetchChildren = async (uuid: string[]) => {
+  const fetchChildren = async (uuid: string) => {
     let res: OrgUnitChildrenQuery | OrgUnitFilteredChildrenQuery
 
     if (orgUnitHierarchyUuid) {
@@ -89,19 +89,12 @@
     if (!open) {
       loading = true
 
-      // Check if the children are cached
-      const childrenToFetch = children.filter((child) => !child.children)
+      // Check if we already did this (re-opening the org)
+      if (!children.some((child) => "children" in child)) {
+        const res = await fetchChildren(uuid)
 
-      // Skip if cached
-      if (childrenToFetch.length) {
-        const fetchedChildren = await fetchChildren(
-          childrenToFetch.map((child) => child.uuid)
-        )
-
-        // Adds the next layer of children
-        for (const child of children) {
-          child.children = fetchedChildren.shift()?.validities[0].children
-        }
+        // Overwrite with the new layer of children
+        children = res.map((child) => child.validities[0])
       }
 
       loading = false
