@@ -4,7 +4,7 @@ import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-
 export type GetClassesQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type GetClassesQuery = { __typename?: 'Query', facets: { __typename?: 'FacetResponsePaged', objects: Array<{ __typename?: 'FacetResponse', objects: Array<{ __typename?: 'Facet', uuid: any, user_key: string, classes: Array<{ __typename?: 'Class', uuid: any, user_key: string, name: string }> }> }> } };
+export type GetClassesQuery = { facets: { objects: Array<{ objects: Array<{ uuid: any, user_key: string, classes: Array<{ uuid: any, user_key: string, name: string }> }> }> } };
 
 export type GetEngagementsQueryVariables = Types.Exact<{
   limit?: Types.InputMaybe<Types.Scalars['int']['input']>;
@@ -15,7 +15,7 @@ export type GetEngagementsQueryVariables = Types.Exact<{
 }>;
 
 
-export type GetEngagementsQuery = { __typename?: 'Query', engagements: { __typename?: 'EngagementResponsePaged', objects: Array<{ __typename?: 'EngagementResponse', current?: { __typename?: 'Engagement', person: Array<{ __typename?: 'Employee', name: string }>, primary?: { __typename?: 'Class', name: string } | null, job_function: { __typename?: 'Class', name: string }, org_unit: Array<{ __typename?: 'OrganisationUnit', name: string, managers: Array<{ __typename?: 'Manager', person?: Array<{ __typename?: 'Employee', name: string }> | null }> }>, validity: { __typename?: 'Validity', from: any, to?: any | null } } | null }> } };
+export type GetEngagementsQuery = { engagements: { objects: Array<{ current?: { person: Array<{ name: string }>, primary?: { name: string } | null, job_function: { name: string }, org_unit: Array<{ name: string, managers: Array<{ person?: Array<{ name: string }> | null }> }>, validity: { from: any, to?: any | null } } | null }> } };
 
 
 export const GetClassesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetClasses"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"facets"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"user_keys"},"value":{"kind":"StringValue","value":"engagement_job_function","block":false}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"uuid"}},{"kind":"Field","name":{"kind":"Name","value":"user_key"}},{"kind":"Field","name":{"kind":"Name","value":"classes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"uuid"}},{"kind":"Field","name":{"kind":"Name","value":"user_key"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetClassesQuery, GetClassesQueryVariables>;

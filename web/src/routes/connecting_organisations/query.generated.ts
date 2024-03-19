@@ -7,21 +7,21 @@ export type RelatedUnitsQueryVariables = Types.Exact<{
 }>;
 
 
-export type RelatedUnitsQuery = { __typename?: 'Query', related_units: { __typename?: 'RelatedUnitResponsePaged', objects: Array<{ __typename?: 'RelatedUnitResponse', objects: Array<{ __typename?: 'RelatedUnit', org_units: Array<{ __typename?: 'OrganisationUnit', name: string, uuid: any }>, validity: { __typename?: 'Validity', from: any, to?: any | null } }> }> } };
+export type RelatedUnitsQuery = { related_units: { objects: Array<{ objects: Array<{ org_units: Array<{ name: string, uuid: any }>, validity: { from: any, to?: any | null } }> }> } };
 
 export type RelatedUnitsOrgTreeQueryVariables = Types.Exact<{
   from_date: Types.Scalars['DateTime']['input'];
 }>;
 
 
-export type RelatedUnitsOrgTreeQuery = { __typename?: 'Query', org_units: { __typename?: 'OrganisationUnitResponsePaged', objects: Array<{ __typename?: 'OrganisationUnitResponse', uuid: any, objects: Array<{ __typename?: 'OrganisationUnit', name: string, uuid: any, parent?: { __typename?: 'OrganisationUnit', name: string, uuid: any } | null }> }> } };
+export type RelatedUnitsOrgTreeQuery = { org_units: { objects: Array<{ uuid: any, objects: Array<{ name: string, uuid: any, parent?: { name: string, uuid: any } | null }> }> } };
 
 export type UpdateRelatedUnitsMutationVariables = Types.Exact<{
   input: Types.RelatedUnitsUpdateInput;
 }>;
 
 
-export type UpdateRelatedUnitsMutation = { __typename?: 'Mutation', related_units_update: { __typename?: 'RelatedUnitResponse', uuid: any } };
+export type UpdateRelatedUnitsMutation = { related_units_update: { uuid: any } };
 
 
 export const RelatedUnitsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"RelatedUnits"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"org_unit"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"fromDate"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"related_units"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"org_units"},"value":{"kind":"Variable","name":{"kind":"Name","value":"org_unit"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"from_date"},"value":{"kind":"Variable","name":{"kind":"Name","value":"fromDate"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"org_units"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"uuid"}}]}},{"kind":"Field","name":{"kind":"Name","value":"validity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<RelatedUnitsQuery, RelatedUnitsQueryVariables>;

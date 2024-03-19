@@ -6,14 +6,14 @@ export type AddressQueryVariables = Types.Exact<{
 }>;
 
 
-export type AddressQuery = { __typename?: 'Query', addresses: { __typename?: 'AddressResponsePaged', objects: Array<{ __typename?: 'AddressResponse', validities: Array<{ __typename?: 'Address', validity: { __typename?: 'Validity', from: any, to?: any | null }, org_unit?: Array<{ __typename?: 'OrganisationUnit', validity: { __typename?: 'Validity', from: any, to?: any | null } }> | null }> }> } };
+export type AddressQuery = { addresses: { objects: Array<{ validities: Array<{ validity: { from: any, to?: any | null }, org_unit?: Array<{ validity: { from: any, to?: any | null } }> | null }> }> } };
 
 export type TerminateAddressMutationVariables = Types.Exact<{
   input: Types.AddressTerminateInput;
 }>;
 
 
-export type TerminateAddressMutation = { __typename?: 'Mutation', address_terminate: { __typename?: 'AddressResponse', uuid: any, objects: Array<{ __typename?: 'Address', org_unit?: Array<{ __typename?: 'OrganisationUnit', name: string }> | null }> } };
+export type TerminateAddressMutation = { address_terminate: { uuid: any, objects: Array<{ org_unit?: Array<{ name: string }> | null }> } };
 
 
 export const AddressDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Address"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"uuid"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addresses"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"uuids"},"value":{"kind":"Variable","name":{"kind":"Name","value":"uuid"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"from_date"},"value":{"kind":"NullValue"}},{"kind":"ObjectField","name":{"kind":"Name","value":"to_date"},"value":{"kind":"NullValue"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}}]}},{"kind":"Field","name":{"kind":"Name","value":"org_unit"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"from_date"},"value":{"kind":"NullValue"}},{"kind":"ObjectField","name":{"kind":"Name","value":"to_date"},"value":{"kind":"NullValue"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<AddressQuery, AddressQueryVariables>;

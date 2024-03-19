@@ -6,14 +6,14 @@ export type ManagerQueryVariables = Types.Exact<{
 }>;
 
 
-export type ManagerQuery = { __typename?: 'Query', managers: { __typename?: 'ManagerResponsePaged', objects: Array<{ __typename?: 'ManagerResponse', validities: Array<{ __typename?: 'Manager', validity: { __typename?: 'Validity', from: any, to?: any | null }, person?: Array<{ __typename?: 'Employee', validity: { __typename?: 'OpenValidity', from?: any | null, to?: any | null } }> | null }> }> } };
+export type ManagerQuery = { managers: { objects: Array<{ validities: Array<{ validity: { from: any, to?: any | null }, person?: Array<{ validity: { from?: any | null, to?: any | null } }> | null }> }> } };
 
 export type TerminateManagerMutationVariables = Types.Exact<{
   input: Types.ManagerTerminateInput;
 }>;
 
 
-export type TerminateManagerMutation = { __typename?: 'Mutation', manager_terminate: { __typename?: 'ManagerResponse', objects: Array<{ __typename?: 'Manager', uuid: any, person?: Array<{ __typename?: 'Employee', name: string }> | null }> } };
+export type TerminateManagerMutation = { manager_terminate: { objects: Array<{ uuid: any, person?: Array<{ name: string }> | null }> } };
 
 
 export const ManagerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Manager"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"uuid"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"managers"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"uuids"},"value":{"kind":"Variable","name":{"kind":"Name","value":"uuid"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"from_date"},"value":{"kind":"NullValue"}},{"kind":"ObjectField","name":{"kind":"Name","value":"to_date"},"value":{"kind":"NullValue"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}}]}},{"kind":"Field","name":{"kind":"Name","value":"person"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"from_date"},"value":{"kind":"NullValue"}},{"kind":"ObjectField","name":{"kind":"Name","value":"to_date"},"value":{"kind":"NullValue"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<ManagerQuery, ManagerQueryVariables>;

@@ -7,7 +7,7 @@ export type OrgUnitChildrenQueryVariables = Types.Exact<{
 }>;
 
 
-export type OrgUnitChildrenQuery = { __typename?: 'Query', org_units: { __typename?: 'OrganisationUnitResponsePaged', objects: Array<{ __typename?: 'OrganisationUnitResponse', validities: Array<{ __typename?: 'OrganisationUnit', uuid: any, children: Array<{ __typename?: 'OrganisationUnit', name: string, uuid: any }> }> }> } };
+export type OrgUnitChildrenQuery = { org_units: { objects: Array<{ validities: Array<{ uuid: any, children: Array<{ name: string, uuid: any }> }> }> } };
 
 export type OrgUnitFilteredChildrenQueryVariables = Types.Exact<{
   uuid?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -16,19 +16,19 @@ export type OrgUnitFilteredChildrenQueryVariables = Types.Exact<{
 }>;
 
 
-export type OrgUnitFilteredChildrenQuery = { __typename?: 'Query', org_units: { __typename?: 'OrganisationUnitResponsePaged', objects: Array<{ __typename?: 'OrganisationUnitResponse', validities: Array<{ __typename?: 'OrganisationUnit', uuid: any, children: Array<{ __typename?: 'OrganisationUnit', name: string, uuid: any }> }> }> } };
+export type OrgUnitFilteredChildrenQuery = { org_units: { objects: Array<{ validities: Array<{ uuid: any, children: Array<{ name: string, uuid: any }> }> }> } };
 
 export type OrgUnitHierarchiesQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type OrgUnitHierarchiesQuery = { __typename?: 'Query', facets: { __typename?: 'FacetResponsePaged', objects: Array<{ __typename?: 'FacetResponse', objects: Array<{ __typename?: 'Facet', user_key: string, uuid: any, classes: Array<{ __typename?: 'Class', name: string, user_key: string, uuid: any }> }> }> } };
+export type OrgUnitHierarchiesQuery = { facets: { objects: Array<{ objects: Array<{ user_key: string, uuid: any, classes: Array<{ name: string, user_key: string, uuid: any }> }> }> } };
 
 export type OrgUnitsWithChildrenQueryVariables = Types.Exact<{
   fromDate?: Types.InputMaybe<Types.Scalars['DateTime']['input']>;
 }>;
 
 
-export type OrgUnitsWithChildrenQuery = { __typename?: 'Query', org_units: { __typename?: 'OrganisationUnitResponsePaged', objects: Array<{ __typename?: 'OrganisationUnitResponse', validities: Array<{ __typename?: 'OrganisationUnit', name: string, uuid: any, children: Array<{ __typename?: 'OrganisationUnit', name: string, uuid: any }> }> }> } };
+export type OrgUnitsWithChildrenQuery = { org_units: { objects: Array<{ validities: Array<{ name: string, uuid: any, children: Array<{ name: string, uuid: any }> }> }> } };
 
 export type OrgUnitsWithFilteredChildrenQueryVariables = Types.Exact<{
   fromDate?: Types.InputMaybe<Types.Scalars['DateTime']['input']>;
@@ -36,7 +36,7 @@ export type OrgUnitsWithFilteredChildrenQueryVariables = Types.Exact<{
 }>;
 
 
-export type OrgUnitsWithFilteredChildrenQuery = { __typename?: 'Query', org_units: { __typename?: 'OrganisationUnitResponsePaged', objects: Array<{ __typename?: 'OrganisationUnitResponse', validities: Array<{ __typename?: 'OrganisationUnit', name: string, uuid: any, children: Array<{ __typename?: 'OrganisationUnit', name: string, uuid: any }> }> }> } };
+export type OrgUnitsWithFilteredChildrenQuery = { org_units: { objects: Array<{ validities: Array<{ name: string, uuid: any, children: Array<{ name: string, uuid: any }> }> }> } };
 
 
 export const OrgUnitChildrenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"OrgUnitChildren"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"uuid"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"fromDate"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"org_units"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"uuids"},"value":{"kind":"Variable","name":{"kind":"Name","value":"uuid"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"from_date"},"value":{"kind":"Variable","name":{"kind":"Name","value":"fromDate"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"uuid"}},{"kind":"Field","name":{"kind":"Name","value":"children"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"uuid"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<OrgUnitChildrenQuery, OrgUnitChildrenQueryVariables>;

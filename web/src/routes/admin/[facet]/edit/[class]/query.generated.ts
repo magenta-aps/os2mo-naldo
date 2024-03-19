@@ -7,14 +7,14 @@ export type ClassQueryVariables = Types.Exact<{
 }>;
 
 
-export type ClassQuery = { __typename?: 'Query', classes: { __typename?: 'ClassResponsePaged', objects: Array<{ __typename?: 'ClassResponse', objects: Array<{ __typename?: 'Class', uuid: any, user_key: string, name: string, facet_uuid: any, validity: { __typename?: 'OpenValidity', from?: any | null, to?: any | null } }> }> } };
+export type ClassQuery = { classes: { objects: Array<{ objects: Array<{ uuid: any, user_key: string, name: string, facet_uuid: any, validity: { from?: any | null, to?: any | null } }> }> } };
 
 export type UpdateClassMutationVariables = Types.Exact<{
   input: Types.ClassUpdateInput;
 }>;
 
 
-export type UpdateClassMutation = { __typename?: 'Mutation', class_update: { __typename?: 'ClassResponse', objects: Array<{ __typename?: 'Class', name: string, uuid: any }> } };
+export type UpdateClassMutation = { class_update: { objects: Array<{ name: string, uuid: any }> } };
 
 
 export const ClassDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Class"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"uuid"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"fromDate"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"classes"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"uuids"},"value":{"kind":"Variable","name":{"kind":"Name","value":"uuid"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"from_date"},"value":{"kind":"Variable","name":{"kind":"Name","value":"fromDate"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"uuid"}},{"kind":"Field","name":{"kind":"Name","value":"user_key"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"facet_uuid"}},{"kind":"Field","name":{"kind":"Name","value":"validity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<ClassQuery, ClassQueryVariables>;

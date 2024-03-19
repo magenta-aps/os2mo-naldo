@@ -9,7 +9,7 @@ export type AddressQueryVariables = Types.Exact<{
 }>;
 
 
-export type AddressQuery = { __typename?: 'Query', addresses: { __typename?: 'AddressResponsePaged', objects: Array<{ __typename?: 'AddressResponse', objects: Array<{ __typename?: 'Address', name?: string | null, uuid: any, address_type: { __typename?: 'Class', name: string }, visibility?: { __typename?: 'Class', name: string } | null, validity: { __typename?: 'Validity', from: any, to?: any | null } }> }> } };
+export type AddressQuery = { addresses: { objects: Array<{ objects: Array<{ name?: string | null, uuid: any, address_type: { name: string }, visibility?: { name: string } | null, validity: { from: any, to?: any | null } }> }> } };
 
 export type AssociationsQueryVariables = Types.Exact<{
   employee?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -19,7 +19,7 @@ export type AssociationsQueryVariables = Types.Exact<{
 }>;
 
 
-export type AssociationsQuery = { __typename?: 'Query', associations: { __typename?: 'AssociationResponsePaged', objects: Array<{ __typename?: 'AssociationResponse', objects: Array<{ __typename?: 'Association', uuid: any, org_unit: Array<{ __typename?: 'OrganisationUnit', name: string, uuid: any }>, employee: Array<{ __typename?: 'Employee', name: string, uuid: any }>, association_type?: { __typename?: 'Class', name: string } | null, primary?: { __typename?: 'Class', name: string } | null, validity: { __typename?: 'Validity', from: any, to?: any | null } }> }> } };
+export type AssociationsQuery = { associations: { objects: Array<{ objects: Array<{ uuid: any, org_unit: Array<{ name: string, uuid: any }>, employee: Array<{ name: string, uuid: any }>, association_type?: { name: string } | null, primary?: { name: string } | null, validity: { from: any, to?: any | null } }> }> } };
 
 export type ClassQueryVariables = Types.Exact<{
   facet_user_key?: Types.InputMaybe<Array<Types.Scalars['String']['input']> | Types.Scalars['String']['input']>;
@@ -28,7 +28,7 @@ export type ClassQueryVariables = Types.Exact<{
 }>;
 
 
-export type ClassQuery = { __typename?: 'Query', classes: { __typename?: 'ClassResponsePaged', objects: Array<{ __typename?: 'ClassResponse', objects: Array<{ __typename?: 'Class', name: string, user_key: string, uuid: any, facet_uuid: any, validity: { __typename?: 'OpenValidity', from?: any | null, to?: any | null } }> }> } };
+export type ClassQuery = { classes: { objects: Array<{ objects: Array<{ name: string, user_key: string, uuid: any, facet_uuid: any, validity: { from?: any | null, to?: any | null } }> }> } };
 
 export type EmployeeQueryVariables = Types.Exact<{
   uuid?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -37,7 +37,7 @@ export type EmployeeQueryVariables = Types.Exact<{
 }>;
 
 
-export type EmployeeQuery = { __typename?: 'Query', employees: { __typename?: 'EmployeeResponsePaged', objects: Array<{ __typename?: 'EmployeeResponse', objects: Array<{ __typename?: 'Employee', name: string, uuid: any, nickname: string, validity: { __typename?: 'OpenValidity', from?: any | null, to?: any | null } }> }> } };
+export type EmployeeQuery = { employees: { objects: Array<{ objects: Array<{ name: string, uuid: any, nickname: string, validity: { from?: any | null, to?: any | null } }> }> } };
 
 export type EngagementsQueryVariables = Types.Exact<{
   employee?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -47,7 +47,7 @@ export type EngagementsQueryVariables = Types.Exact<{
 }>;
 
 
-export type EngagementsQuery = { __typename?: 'Query', engagements: { __typename?: 'EngagementResponsePaged', objects: Array<{ __typename?: 'EngagementResponse', objects: Array<{ __typename?: 'Engagement', uuid: any, employee: Array<{ __typename?: 'Employee', uuid: any, name: string }>, job_function: { __typename?: 'Class', name: string }, engagement_type: { __typename?: 'Class', name: string }, org_unit: Array<{ __typename?: 'OrganisationUnit', name: string, uuid: any }>, validity: { __typename?: 'Validity', from: any, to?: any | null }, primary?: { __typename?: 'Class', name: string } | null }> }> } };
+export type EngagementsQuery = { engagements: { objects: Array<{ objects: Array<{ uuid: any, employee: Array<{ uuid: any, name: string }>, job_function: { name: string }, engagement_type: { name: string }, org_unit: Array<{ name: string, uuid: any }>, validity: { from: any, to?: any | null }, primary?: { name: string } | null }> }> } };
 
 export type ItAssociationsQueryVariables = Types.Exact<{
   employee?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -56,7 +56,7 @@ export type ItAssociationsQueryVariables = Types.Exact<{
 }>;
 
 
-export type ItAssociationsQuery = { __typename?: 'Query', associations: { __typename?: 'AssociationResponsePaged', objects: Array<{ __typename?: 'AssociationResponse', objects: Array<{ __typename?: 'Association', uuid: any, org_unit: Array<{ __typename?: 'OrganisationUnit', name: string, uuid: any }>, job_function?: { __typename?: 'Class', name: string } | null, primary?: { __typename?: 'Class', name: string } | null, it_user: Array<{ __typename?: 'ITUser', user_key: string, itsystem: { __typename?: 'ITSystem', name: string } }>, validity: { __typename?: 'Validity', from: any, to?: any | null } }> }> } };
+export type ItAssociationsQuery = { associations: { objects: Array<{ objects: Array<{ uuid: any, org_unit: Array<{ name: string, uuid: any }>, job_function?: { name: string } | null, primary?: { name: string } | null, it_user: Array<{ user_key: string, itsystem: { name: string } }>, validity: { from: any, to?: any | null } }> }> } };
 
 export type ItUsersQueryVariables = Types.Exact<{
   employee?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -66,7 +66,7 @@ export type ItUsersQueryVariables = Types.Exact<{
 }>;
 
 
-export type ItUsersQuery = { __typename?: 'Query', itusers: { __typename?: 'ITUserResponsePaged', objects: Array<{ __typename?: 'ITUserResponse', objects: Array<{ __typename?: 'ITUser', user_key: string, uuid: any, itsystem: { __typename?: 'ITSystem', name: string }, validity: { __typename?: 'Validity', from: any, to?: any | null }, primary?: { __typename?: 'Class', uuid: any, name: string } | null }> }> } };
+export type ItUsersQuery = { itusers: { objects: Array<{ objects: Array<{ user_key: string, uuid: any, itsystem: { name: string }, validity: { from: any, to?: any | null }, primary?: { uuid: any, name: string } | null }> }> } };
 
 export type GetEngagementsQueryVariables = Types.Exact<{
   limit?: Types.InputMaybe<Types.Scalars['int']['input']>;
@@ -77,7 +77,7 @@ export type GetEngagementsQueryVariables = Types.Exact<{
 }>;
 
 
-export type GetEngagementsQuery = { __typename?: 'Query', engagements: { __typename?: 'EngagementResponsePaged', objects: Array<{ __typename?: 'EngagementResponse', current?: { __typename?: 'Engagement', person: Array<{ __typename?: 'Employee', name: string }>, primary?: { __typename?: 'Class', name: string } | null, job_function: { __typename?: 'Class', name: string }, org_unit: Array<{ __typename?: 'OrganisationUnit', name: string, managers: Array<{ __typename?: 'Manager', person?: Array<{ __typename?: 'Employee', name: string }> | null }> }>, validity: { __typename?: 'Validity', from: any, to?: any | null } } | null }> } };
+export type GetEngagementsQuery = { engagements: { objects: Array<{ current?: { person: Array<{ name: string }>, primary?: { name: string } | null, job_function: { name: string }, org_unit: Array<{ name: string, managers: Array<{ person?: Array<{ name: string }> | null }> }>, validity: { from: any, to?: any | null } } | null }> } };
 
 export type KleQueryVariables = Types.Exact<{
   org_unit?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -86,7 +86,7 @@ export type KleQueryVariables = Types.Exact<{
 }>;
 
 
-export type KleQuery = { __typename?: 'Query', kles: { __typename?: 'KLEResponsePaged', objects: Array<{ __typename?: 'KLEResponse', objects: Array<{ __typename?: 'KLE', uuid: any, kle_number: { __typename?: 'Class', name: string }, kle_aspects: Array<{ __typename?: 'Class', name: string }>, validity: { __typename?: 'Validity', from: any, to?: any | null } }> }> } };
+export type KleQuery = { kles: { objects: Array<{ objects: Array<{ uuid: any, kle_number: { name: string }, kle_aspects: Array<{ name: string }>, validity: { from: any, to?: any | null } }> }> } };
 
 export type EmployeeLeavesQueryVariables = Types.Exact<{
   employee_uuid?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -95,7 +95,7 @@ export type EmployeeLeavesQueryVariables = Types.Exact<{
 }>;
 
 
-export type EmployeeLeavesQuery = { __typename?: 'Query', leaves: { __typename?: 'LeaveResponsePaged', objects: Array<{ __typename?: 'LeaveResponse', objects: Array<{ __typename?: 'Leave', uuid: any, validity: { __typename?: 'Validity', from: any, to?: any | null }, leave_type: { __typename?: 'Class', name: string }, engagement: { __typename?: 'Engagement', org_unit: Array<{ __typename?: 'OrganisationUnit', name: string }>, job_function: { __typename?: 'Class', name: string } } }> }> } };
+export type EmployeeLeavesQuery = { leaves: { objects: Array<{ objects: Array<{ uuid: any, validity: { from: any, to?: any | null }, leave_type: { name: string }, engagement: { org_unit: Array<{ name: string }>, job_function: { name: string } } }> }> } };
 
 export type ManagersQueryVariables = Types.Exact<{
   employee?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -105,7 +105,7 @@ export type ManagersQueryVariables = Types.Exact<{
 }>;
 
 
-export type ManagersQuery = { __typename?: 'Query', managers: { __typename?: 'ManagerResponsePaged', objects: Array<{ __typename?: 'ManagerResponse', objects: Array<{ __typename?: 'Manager', uuid: any, employee?: Array<{ __typename?: 'Employee', uuid: any, name: string }> | null, org_unit: Array<{ __typename?: 'OrganisationUnit', name: string, uuid: any }>, manager_level: { __typename?: 'Class', name: string }, manager_type: { __typename?: 'Class', name: string }, responsibilities: Array<{ __typename?: 'Class', name: string }>, validity: { __typename?: 'Validity', from: any, to?: any | null } }> }> } };
+export type ManagersQuery = { managers: { objects: Array<{ objects: Array<{ uuid: any, employee?: Array<{ uuid: any, name: string }> | null, org_unit: Array<{ name: string, uuid: any }>, manager_level: { name: string }, manager_type: { name: string }, responsibilities: Array<{ name: string }>, validity: { from: any, to?: any | null } }> }> } };
 
 export type OrgUnitQueryVariables = Types.Exact<{
   uuid?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -114,7 +114,7 @@ export type OrgUnitQueryVariables = Types.Exact<{
 }>;
 
 
-export type OrgUnitQuery = { __typename?: 'Query', org_units: { __typename?: 'OrganisationUnitResponsePaged', objects: Array<{ __typename?: 'OrganisationUnitResponse', objects: Array<{ __typename?: 'OrganisationUnit', name: string, uuid: any, unit_type?: { __typename?: 'Class', name: string } | null, org_unit_level?: { __typename?: 'Class', name: string } | null, parent?: { __typename?: 'OrganisationUnit', name: string, uuid: any, parent?: { __typename?: 'OrganisationUnit', name: string } | null } | null, validity: { __typename?: 'Validity', from: any, to?: any | null } }> }> } };
+export type OrgUnitQuery = { org_units: { objects: Array<{ objects: Array<{ name: string, uuid: any, unit_type?: { name: string } | null, org_unit_level?: { name: string } | null, parent?: { name: string, uuid: any, parent?: { name: string } | null } | null, validity: { from: any, to?: any | null } }> }> } };
 
 export type EmployeeAndOrgOwnerQueryVariables = Types.Exact<{
   employee_uuid?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -124,7 +124,7 @@ export type EmployeeAndOrgOwnerQueryVariables = Types.Exact<{
 }>;
 
 
-export type EmployeeAndOrgOwnerQuery = { __typename?: 'Query', owners: { __typename?: 'OwnerResponsePaged', objects: Array<{ __typename?: 'OwnerResponse', objects: Array<{ __typename?: 'Owner', uuid: any, validity: { __typename?: 'Validity', from: any, to?: any | null }, person?: Array<{ __typename?: 'Employee', name: string, uuid: any }> | null, org_unit?: Array<{ __typename?: 'OrganisationUnit', name: string, uuid: any }> | null, owner?: Array<{ __typename?: 'Employee', name: string, uuid: any }> | null }> }> } };
+export type EmployeeAndOrgOwnerQuery = { owners: { objects: Array<{ objects: Array<{ uuid: any, validity: { from: any, to?: any | null }, person?: Array<{ name: string, uuid: any }> | null, org_unit?: Array<{ name: string, uuid: any }> | null, owner?: Array<{ name: string, uuid: any }> | null }> }> } };
 
 export type RelatedUnitsQueryVariables = Types.Exact<{
   org_unit?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -132,7 +132,7 @@ export type RelatedUnitsQueryVariables = Types.Exact<{
 }>;
 
 
-export type RelatedUnitsQuery = { __typename?: 'Query', related_units: { __typename?: 'RelatedUnitResponsePaged', objects: Array<{ __typename?: 'RelatedUnitResponse', objects: Array<{ __typename?: 'RelatedUnit', org_units: Array<{ __typename?: 'OrganisationUnit', name: string, uuid: any }>, validity: { __typename?: 'Validity', from: any, to?: any | null } }> }> } };
+export type RelatedUnitsQuery = { related_units: { objects: Array<{ objects: Array<{ org_units: Array<{ name: string, uuid: any }>, validity: { from: any, to?: any | null } }> }> } };
 
 export type EmployeeAndOrgRolesQueryVariables = Types.Exact<{
   employee_uuid?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -142,7 +142,7 @@ export type EmployeeAndOrgRolesQueryVariables = Types.Exact<{
 }>;
 
 
-export type EmployeeAndOrgRolesQuery = { __typename?: 'Query', roles: { __typename?: 'RoleResponsePaged', objects: Array<{ __typename?: 'RoleResponse', objects: Array<{ __typename?: 'Role', uuid: any, role_type: { __typename?: 'Class', name: string }, validity: { __typename?: 'Validity', from: any, to?: any | null }, employee: Array<{ __typename?: 'Employee', name: string, uuid: any }>, org_unit: Array<{ __typename?: 'OrganisationUnit', name: string, uuid: any }> }> }> } };
+export type EmployeeAndOrgRolesQuery = { roles: { objects: Array<{ objects: Array<{ uuid: any, role_type: { name: string }, validity: { from: any, to?: any | null }, employee: Array<{ name: string, uuid: any }>, org_unit: Array<{ name: string, uuid: any }> }> }> } };
 
 
 export const AddressDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Address"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"org_unit"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"employee"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"fromDate"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"toDate"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addresses"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"org_units"},"value":{"kind":"Variable","name":{"kind":"Name","value":"org_unit"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"employees"},"value":{"kind":"Variable","name":{"kind":"Name","value":"employee"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"from_date"},"value":{"kind":"Variable","name":{"kind":"Name","value":"fromDate"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"to_date"},"value":{"kind":"Variable","name":{"kind":"Name","value":"toDate"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"uuid"}},{"kind":"Field","name":{"kind":"Name","value":"address_type"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"visibility"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"validity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<AddressQuery, AddressQueryVariables>;

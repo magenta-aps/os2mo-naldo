@@ -6,14 +6,14 @@ export type ItUserQueryVariables = Types.Exact<{
 }>;
 
 
-export type ItUserQuery = { __typename?: 'Query', itusers: { __typename?: 'ITUserResponsePaged', objects: Array<{ __typename?: 'ITUserResponse', validities: Array<{ __typename?: 'ITUser', validity: { __typename?: 'Validity', from: any, to?: any | null }, person?: Array<{ __typename?: 'Employee', validity: { __typename?: 'OpenValidity', from?: any | null, to?: any | null } }> | null }> }> } };
+export type ItUserQuery = { itusers: { objects: Array<{ validities: Array<{ validity: { from: any, to?: any | null }, person?: Array<{ validity: { from?: any | null, to?: any | null } }> | null }> }> } };
 
 export type TerminateItUserMutationVariables = Types.Exact<{
   input: Types.ItUserTerminateInput;
 }>;
 
 
-export type TerminateItUserMutation = { __typename?: 'Mutation', ituser_terminate: { __typename?: 'ITUserResponse', objects: Array<{ __typename?: 'ITUser', uuid: any, person?: Array<{ __typename?: 'Employee', name: string }> | null }> } };
+export type TerminateItUserMutation = { ituser_terminate: { objects: Array<{ uuid: any, person?: Array<{ name: string }> | null }> } };
 
 
 export const ItUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ITUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"uuid"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"itusers"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"uuids"},"value":{"kind":"Variable","name":{"kind":"Name","value":"uuid"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"from_date"},"value":{"kind":"NullValue"}},{"kind":"ObjectField","name":{"kind":"Name","value":"to_date"},"value":{"kind":"NullValue"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}}]}},{"kind":"Field","name":{"kind":"Name","value":"person"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"from_date"},"value":{"kind":"NullValue"}},{"kind":"ObjectField","name":{"kind":"Name","value":"to_date"},"value":{"kind":"NullValue"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<ItUserQuery, ItUserQueryVariables>;

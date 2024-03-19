@@ -4,14 +4,14 @@ import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-
 export type GetSpConfigQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type GetSpConfigQuery = { __typename?: 'Query', configuration: { __typename?: 'ConfigurationPaged', objects: Array<{ __typename?: 'Configuration', jsonified_value: string, key: string }> } };
+export type GetSpConfigQuery = { configuration: { objects: Array<{ jsonified_value: string, key: string }> } };
 
 export type CreateEmployeeMutationVariables = Types.Exact<{
   input: Types.EmployeeCreateInput;
 }>;
 
 
-export type CreateEmployeeMutation = { __typename?: 'Mutation', employee_create: { __typename?: 'EmployeeResponse', objects: Array<{ __typename?: 'Employee', name: string, uuid: any }> } };
+export type CreateEmployeeMutation = { employee_create: { objects: Array<{ name: string, uuid: any }> } };
 
 
 export const GetSpConfigDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetSPConfig"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"configuration"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"identifiers"},"value":{"kind":"StringValue","value":"enable_sp","block":false}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"jsonified_value"}},{"kind":"Field","name":{"kind":"Name","value":"key"}}]}}]}}]}}]} as unknown as DocumentNode<GetSpConfigQuery, GetSpConfigQueryVariables>;
