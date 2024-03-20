@@ -35,6 +35,7 @@
 	"for": "for",
 	"future": "fremtid",
 	"givenname": "{n, plural, one {fornavn} other {fornavn(e)}}",
+	"inherited_manager": "nedarvet leder fra {org_unit}",
 	"insight": "indsigt",
 	"it_system": "IT-system",
 	"itassociation": "{n, plural, =0 {IT-tilknytningen} one {IT-tilknytning} other {IT-tilknytninger}}",

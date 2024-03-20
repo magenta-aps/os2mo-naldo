@@ -35,6 +35,7 @@
 	"for": "for",
 	"future": "future",
 	"givenname": "{n, plural, one {first name} other {first name(s)}}",
+	"inherited_manager": "inherited manager from {org_unit}",
 	"insight": "insight",
 	"it_system": "IT system",
 	"itassociation": "{n, plural, =0 {the IT affiliation} one {IT affiliation} other {IT affiliations}}",
