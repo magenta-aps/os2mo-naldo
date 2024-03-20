@@ -6,7 +6,12 @@
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
-  import { ManagersDocument, type ManagersQuery } from "./query.generated"
+  import {
+    OrgUnitManagersDocument,
+    EmployeeManagersDocument,
+    type OrgUnitManagersQuery,
+    type EmployeeManagersQuery,
+  } from "./query.generated"
   import { date } from "$lib/stores/date"
   import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
   import { sortData } from "$lib/util/sorting"
@@ -15,55 +20,97 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
+  import { MOConfig } from "$lib/stores/config"
 
-  type Managers = ManagersQuery["managers"]["objects"][0]["objects"]
-  let data: Managers
+  let inheritManager: boolean | undefined
+
+  if ($MOConfig && $MOConfig.confdb_inherit_manager === "false") {
+    inheritManager = false
+  }
 
   export let tense: Tense
 
   const uuid = $page.params.uuid
   const isOrg = $page.route.id?.startsWith("/organisation")
-  const employee = isOrg ? null : uuid
-  const org_unit = isOrg ? uuid : null
+
+  type Managers =
+    | EmployeeManagersQuery["employees"]["objects"][0]["validities"]
+    | OrgUnitManagersQuery["org_units"]["objects"][0]["validities"]
+  let data: Managers
+
+  // TODO: When/If GraphQL support searching for `inherited managers` on top-level `managers`, revert to this commit
 
   gql`
-    query Managers(
-      $employee: [UUID!]
-      $org_unit: [UUID!]
+    query OrgUnitManagers(
+      $uuids: [UUID!]
       $fromDate: DateTime
       $toDate: DateTime
+      $inherit: Boolean = true
     ) {
-      managers(
-        filter: {
-          employees: $employee
-          org_units: $org_unit
-          from_date: $fromDate
-          to_date: $toDate
-        }
-      ) {
+      org_units(filter: { uuids: $uuids }) {
         objects {
-          objects {
-            uuid
-            employee {
+          validities {
+            managers(
+              filter: { from_date: $fromDate, to_date: $toDate }
+              inherit: $inherit
+            ) {
               uuid
-              name
+              person {
+                name
+                uuid
+              }
+              org_unit {
+                name
+                uuid
+              }
+              manager_level {
+                name
+              }
+              manager_type {
+                name
+              }
+              responsibilities {
+                name
+              }
+              validity {
+                from
+                to
+              }
             }
-            org_unit {
-              name
+          }
+        }
+      }
+    }
+
+    query EmployeeManagers($fromDate: DateTime, $toDate: DateTime, $uuids: [UUID!]) {
+      employees(filter: { uuids: $uuids }) {
+        objects {
+          validities {
+            managers: manager_roles(
+              filter: { from_date: $fromDate, to_date: $toDate }
+            ) {
               uuid
-            }
-            manager_level {
-              name
-            }
-            manager_type {
-              name
-            }
-            responsibilities {
-              name
-            }
-            validity {
-              from
-              to
+              person {
+                name
+                uuid
+              }
+              org_unit {
+                name
+                uuid
+              }
+              manager_level {
+                name
+              }
+              manager_type {
+                name
+              }
+              responsibilities {
+                name
+              }
+              validity {
+                from
+                to
+              }
             }
           }
         }
@@ -78,22 +125,39 @@
   }
 
   onMount(async () => {
-    const res = await graphQLClient().request(ManagersDocument, {
-      org_unit: org_unit,
-      employee: employee,
-      ...tenseToValidity(tense, $date),
-    })
     const managers: Managers = []
 
-    // Filters and flattens the data
-    for (const outer of res.managers.objects) {
-      // TODO: Remove when GraphQL is able to do this for us
-      const filtered = outer.objects.filter((obj) => {
-        return tenseFilter(obj, tense)
+    if (isOrg) {
+      const res = await graphQLClient().request(OrgUnitManagersDocument, {
+        uuids: uuid,
+        inherit: inheritManager,
+        ...tenseToValidity(tense, $date),
       })
-      managers.push(...filtered)
+
+      // Filters and flattens the data
+      for (const outer of res.org_units.objects) {
+        // TODO: Remove when GraphQL is able to do this for us
+        const filtered = outer.validities.filter((obj) => {
+          return tenseFilter(obj.managers[0], tense)
+        })
+        managers.push(...filtered)
+      }
+      data = managers
+    } else {
+      const res = await graphQLClient().request(EmployeeManagersDocument, {
+        uuids: uuid,
+        ...tenseToValidity(tense, $date),
+      })
+      // Filters and flattens the data
+      for (const outer of res.employees.objects) {
+        // TODO: Remove when GraphQL is able to do this for us
+        const filtered = outer.validities.filter((obj) => {
+          return tenseFilter(obj.managers[0], tense)
+        })
+        managers.push(...filtered)
+      }
+      data = managers
     }
-    data = managers
   })
 </script>
 
@@ -102,36 +166,41 @@
     <td class="p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
-  {#each data as manager}
+  {#each data[0].managers as orgOrEmployee}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
       {#if isOrg}
-        <a href="{base}/employee/{manager.employee ? manager.employee[0].uuid : ''}">
-          <td class="p-4">{manager.employee ? manager.employee[0].name : ""}</td>
+        <a
+          href="{base}/employee/{orgOrEmployee.person
+            ? orgOrEmployee.person[0].uuid
+            : ''}"
+        >
+          <td class="p-4">{orgOrEmployee.person ? orgOrEmployee.person[0].name : ""}</td
+          >
         </a>
       {:else}
-        <a href="{base}/organisation/{manager.org_unit[0].uuid}">
+        <a href="{base}/organisation/{orgOrEmployee.org_unit[0].uuid}">
           <td class="p-4">
-            {manager.org_unit[0].name}
+            {orgOrEmployee.org_unit[0].name}
           </td>
         </a>
       {/if}
       <td class="p-4">
         <ul>
-          {#each manager.responsibilities as responsibility}
+          {#each orgOrEmployee.responsibilities as responsibility}
             <li>
               • {responsibility.name}
             </li>
           {/each}
         </ul>
       </td>
-      <td class="p-4">{manager.manager_type.name}</td>
-      <td class="p-4">{manager.manager_level.name}</td>
-      <ValidityTableCell validity={manager.validity} />
+      <td class="p-4">{orgOrEmployee.manager_type.name}</td>
+      <td class="p-4">{orgOrEmployee.manager_level.name}</td>
+      <ValidityTableCell validity={orgOrEmployee.validity} />
       <td>
         <a
           href="{base}/{$page.route.id?.split(
             '/'
-          )[1]}/{uuid}/edit/manager/{manager.uuid}"
+          )[1]}/{uuid}/edit/manager/{orgOrEmployee.uuid}"
         >
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>
@@ -140,7 +209,7 @@
         <a
           href="{base}/{$page.route.id?.split(
             '/'
-          )[1]}/{uuid}/terminate/manager/{manager.uuid}"
+          )[1]}/{uuid}/terminate/manager/{orgOrEmployee.uuid}"
         >
           <Icon icon={cancelOutlineRounded} width="25" height="25" />
         </a>
