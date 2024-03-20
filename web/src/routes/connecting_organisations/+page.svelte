@@ -44,14 +44,13 @@
       }
     }
 
-    query RelatedUnitsOrgTree($from_date: DateTime!) {
-      org_units(filter: { from_date: $from_date }) {
+    query RelatedUnitsOrgTree($fromDate: DateTime!) {
+      org_units(filter: { parents: null, from_date: $fromDate }) {
         objects {
-          uuid
-          objects {
+          validities {
             name
             uuid
-            parent {
+            children {
               name
               uuid
             }
@@ -67,49 +66,22 @@
     }
   `
 
-  const fetchOrgTree = async () => {
-    const data = await graphQLClient().request(RelatedUnitsOrgTreeDocument, {
-      from_date: $date,
+  const fetchOrgTree = async (fromDate: string) => {
+    const res = await graphQLClient().request(RelatedUnitsOrgTreeDocument, {
+      fromDate: $date,
     })
-    if (data.org_units) {
-      const orgUnitList: any[] = []
-      for (let org of data.org_units.objects) {
-        orgUnitList.push({
-          uuid: org.uuid,
-          parentUuid: org.objects[0].parent?.uuid,
-          name: org.objects[0].name,
-        })
-      }
-      orgTree = convertListToTree(orgUnitList)
+
+    for (let org of res.org_units.objects) {
+      orgTree.push({
+        uuid: org.validities[0].uuid,
+        name: org.validities[0].name,
+        children: org.validities[0].children,
+        fromDate: fromDate,
+      })
     }
-  }
-
-  const convertListToTree = (orgUnitList: any[]) => {
-    // Converts a flat list of org units to a tree of org units. This ensures that the organisation and its structure only need to be fetched once
-    // Each node in the org unit tree gets a "children" attribute containing its children.
-    // Source: https://stackoverflow.com/a/40732240
-
-    const dataTree: any[] = [] // Variable holding the resulting tree
-    const hashTable = Object.create(null) // Temporary holding place used in the main loop
-
-    // Sort org_units
-    orgUnitList.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))
-
-    // Add an empty list called "children" to each org unit in the flat list
-    orgUnitList.forEach(
-      (orgUnit) => (hashTable[orgUnit.uuid] = { ...orgUnit, children: [] })
+    return orgTree.sort((a, b) =>
+      a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1
     )
-    // Convert flat list to tree
-    orgUnitList.forEach((orgUnit) => {
-      if (orgUnit.parentUuid) {
-        // Add (another) child to the parent org unit
-        hashTable[orgUnit.parentUuid].children.push(hashTable[orgUnit.uuid])
-      } else {
-        // Add (another) root node to the top of the tree
-        dataTree.push(hashTable[orgUnit.uuid])
-      }
-    })
-    return dataTree
   }
 
   const fetchRelatedUnits = async (originUuid: string) => {
@@ -162,7 +134,7 @@
 
   const fetchAll = async () => {
     await graphQLClient().request(RelatedUnitsDocument, { fromDate: $date })
-    await fetchOrgTree()
+    await fetchOrgTree($date)
   }
 
   const updateSelectedDestinationUuids = () => {
