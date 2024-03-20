@@ -174,8 +174,19 @@
             ? orgOrEmployee.person[0].uuid
             : ''}"
         >
-          <td class="p-4">{orgOrEmployee.person ? orgOrEmployee.person[0].name : ""}</td
-          >
+          <td class="p-4">
+            {orgOrEmployee.person ? orgOrEmployee.person[0].name : ""}
+            <!-- Add (*) if manager-object is inherited -->
+            {#if orgOrEmployee.org_unit[0].uuid !== $page.params.uuid}
+              <span
+                title={capital(
+                  $_("inherited_manager", {
+                    values: { org_unit: orgOrEmployee.org_unit[0].name },
+                  })
+                )}>(*)</span
+              >
+            {/if}
+          </td>
         </a>
       {:else}
         <a href="{base}/organisation/{orgOrEmployee.org_unit[0].uuid}">
