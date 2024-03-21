@@ -57,8 +57,7 @@
             validities {
               name
               uuid
-              children {
-                name
+              children(limit: 1) {
                 uuid
               }
             }
@@ -81,6 +80,7 @@
               name
               uuid
               children(
+                limit: 1
                 filter: {
                   subtree: {
                     from_date: $fromDate
@@ -88,7 +88,6 @@
                   }
                 }
               ) {
-                name
                 uuid
               }
             }
