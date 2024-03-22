@@ -20,7 +20,6 @@
   import AssociationTable from "$lib/components/tables/AssociationTable.svelte"
   import EmployeeTable from "$lib/components/tables/EmployeeTable.svelte"
   import ItAssociationTable from "$lib/components/tables/ITAssociationTable.svelte"
-  import RoleTable from "$lib/components/tables/RoleTable.svelte"
   import ManagerTable from "$lib/components/tables/ManagerTable.svelte"
   import LeaveTable from "$lib/components/tables/LeaveTable.svelte"
   import OwnerTable from "$lib/components/tables/OwnerTable.svelte"
@@ -34,7 +33,6 @@
     { label: "address", value: "address", n: 2 },
     { label: "association", value: "association", n: 2 },
     { label: "itassociation", value: "itassociation", n: 2 },
-    { label: "role", value: "role", n: 2 },
     { label: "ituser", value: "ituser", n: 2 },
     { label: "leave", value: "leave", n: 2 },
     { label: "manager", value: "manager", n: 2 },
@@ -193,20 +191,6 @@
           { title: capital($_("it_system")), sortPath: "it_user[0].itsystem.name" },
           { title: capital($_("account_name")), sortPath: "it_user[0].user_key" },
           { title: capital($_("primary")) },
-          { title: capital($_("date.date")), sortPath: "validity.from" },
-          { title: "" },
-          { title: "" },
-        ]}
-      />
-    {:else if activeItem === EmployeeTab.ROLE}
-      <TableTensesWrapper
-        table={RoleTable}
-        headers={[
-          {
-            title: capital($_("unit", { values: { n: 1 } })),
-            sortPath: "org_unit[0].name",
-          },
-          { title: capital($_("role_type")), sortPath: "role_type.name" },
           { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
