@@ -129,7 +129,8 @@
     {:else}
       <div on:change={handleRadioChange} class="ml-2">
         <RadioButton
-          groupName="originUuid"
+          name="originUuid"
+          noPadding={true}
           id={uuid}
           title={name}
           value={uuid}

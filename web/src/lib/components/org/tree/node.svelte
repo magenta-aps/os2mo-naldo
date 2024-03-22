@@ -21,7 +21,7 @@
   export let breadcrumbs: string[] = []
   export let open = false
   export let fromDate: string
-  export let orgUnitHierarchyUuid: string | undefined | null
+  export let orgUnitHierarchyUuid: string | undefined | null = undefined
 
   let loading = false
 

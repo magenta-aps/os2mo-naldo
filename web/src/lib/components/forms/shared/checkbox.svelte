@@ -2,6 +2,7 @@
   import { _ } from "svelte-i18n"
   export let title: string | undefined = undefined
   export let id: string
+  export let name: string = id
   export let value: string
   export let startValue: string | undefined = undefined
   export let extra_classes = ""
@@ -18,7 +19,7 @@
     <input
       type="checkbox"
       {id}
-      name={id}
+      {name}
       {value}
       checked={startValue === value}
       class="checkbox checkbox-primary {extra_classes} rounded normal-case font-normal text-base text-base-100"
