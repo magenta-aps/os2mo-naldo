@@ -109,7 +109,7 @@
           activeItem === OrgTab.ORG_UNIT
             ? `organisation/create#uuid=${$page.params.uuid}`
             : activeItem === OrgTab.RELATED_UNIT
-            ? "connecting_organisations"
+            ? "connections"
             : `organisation/${$page.params.uuid}/create/${activeItem}`
         }`}
       >
