@@ -15,52 +15,51 @@
   import {
     OrgUnitsWithChildrenDocument,
     UpdateRelatedUnitsDocument,
-    type OrgUnitsWithChildrenQuery,
+    RelatedUnitsDocument,
   } from "./query.generated"
 
-  // First load from index
-  const fetchOrgTree = async (fromDate: string, childUuid?: string | null) => {
-    gql`
-      query OrgUnitsWithChildren($fromDate: DateTime) {
-        org_units(filter: { parents: null, from_date: $fromDate }) {
-          objects {
-            validities {
+  let selectedOriginOrg: string | null = null
+  let selectedDestinationOrgs: string[] = []
+
+  gql`
+    query OrgUnitsWithChildren($fromDate: DateTime) {
+      org_units(filter: { parents: null, from_date: $fromDate }) {
+        objects {
+          validities {
+            name
+            uuid
+            children(limit: 1) {
+              uuid
+            }
+          }
+        }
+      }
+    }
+
+    query RelatedUnits($org_unit: [UUID!], $fromDate: DateTime) {
+      related_units(filter: { org_unit: { uuids: $org_unit }, from_date: $fromDate }) {
+        objects {
+          validities {
+            org_units {
               name
               uuid
-              children(limit: 1) {
-                uuid
-              }
+            }
+            validity {
+              from
+              to
             }
           }
         }
       }
+    }
 
-      query RelatedUnits($org_unit: [UUID!], $fromDate: DateTime) {
-        related_units(
-          filter: { org_unit: { uuids: $org_unit }, from_date: $fromDate }
-        ) {
-          objects {
-            validities {
-              org_units {
-                name
-                uuid
-              }
-              validity {
-                from
-                to
-              }
-            }
-          }
-        }
+    mutation UpdateRelatedUnits($input: RelatedUnitsUpdateInput!) {
+      related_units_update(input: $input) {
+        uuid
       }
-
-      mutation UpdateRelatedUnits($input: RelatedUnitsUpdateInput!) {
-        related_units_update(input: $input) {
-          uuid
-        }
-      }
-    `
-
+    }
+  `
+  const fetchOrgTree = async (fromDate: string, childUuid?: string | null) => {
     const res = await graphQLClient().request(OrgUnitsWithChildrenDocument, {
       fromDate: fromDate,
     })
@@ -76,7 +75,7 @@
         fromDate: fromDate,
       })
     }
-    return orgTree
+    return orgTree.sort((a, b) => (a.name > b.name ? 1 : a.name < b.name ? -1 : 0))
   }
 
   let refreshableOrgTree = fetchOrgTree($date, null)
@@ -98,6 +97,39 @@
         }
       }
     }
+  const updateDestinationUuids = async (fromDate: string, originUuid: string) => {
+    const res = await graphQLClient().request(RelatedUnitsDocument, {
+      fromDate: fromDate,
+      org_unit: originUuid,
+    })
+    const newDestinations = res.related_units.objects.flatMap((related) => {
+      const related_unit = related.validities[0]
+      return selectedOriginOrg === related_unit.org_units[0].uuid
+        ? related_unit.org_units[1].uuid
+        : related_unit.org_units[0].uuid
+    })
+    selectedDestinationOrgs = [...newDestinations]
+    return selectedDestinationOrgs
+    // TODO: Når denne skifter, skal der laves ny query og ticke checkboxes?
+  }
+
+  const handleRadioChange = (event: Event) => {
+    const target = event.target as HTMLInputElement
+    selectedOriginOrg = target.id
+    updateDestinationUuids($date, selectedOriginOrg)
+  }
+
+  // Maybe this is useless
+  const handleCheckboxChange = (event: Event) => {
+    const target = event.target as HTMLInputElement
+    if (target.checked) {
+      selectedDestinationOrgs = [...selectedDestinationOrgs, target.id]
+    } else {
+      selectedDestinationOrgs = selectedDestinationOrgs.filter(
+        (org) => org !== target.id
+      )
+    }
+  }
 </script>
 
 <title>{$_("navigation.connecting_organisations")} | OS2mo</title>
@@ -119,14 +151,18 @@
             <ul class="menu pt-6 px-4 overflow-y-auto bg-base-100 text-base-content">
               {#each orgTree as child}
                 <!-- bind value -->
-                <Node {...child} type="radio" />
+                <div on:change={handleRadioChange} class="ml-2">
+                  <Node {...child} type="radio" {selectedOriginOrg} />
+                </div>
               {/each}
             </ul>
           </div>
           <div class="w-1/2">
             <ul class="menu pt-6 px-4 overflow-y-auto bg-base-100 text-base-content">
               {#each orgTree as child}
-                <Node {...child} type="checkbox" />
+                <div on:change={handleCheckboxChange} class="ml-2">
+                  <Node {...child} type="checkbox" {selectedDestinationOrgs} />
+                </div>
               {/each}
             </ul>
           </div>

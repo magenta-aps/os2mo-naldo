@@ -54,12 +54,19 @@
 
   const hasMatchingDescendant = (node: any) => {
     // Checks for children, and if there are children, checks recursively for match.
+    console.log(node)
     if (node.children) {
+      console.log(node.children)
+
       for (let child of node.children) {
+        console.log(child)
+
         if (
           selectedDestinationsOrgs.some((dest) => dest.uuid === child.uuid) ||
           hasMatchingDescendant(child)
         ) {
+          console.log("Is true")
+
           return true
         }
       }
