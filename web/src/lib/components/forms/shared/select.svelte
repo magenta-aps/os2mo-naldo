@@ -20,6 +20,7 @@
   export let isClearable: boolean | undefined = false
   export let extra_classes = ""
   export let errors: string[] = []
+  export let searchable: boolean = false
 
   $: if (value?.name) {
     name = value?.name
@@ -62,7 +63,7 @@
       clearable={isClearable}
       {placeholder}
       items={iterable}
-      searchable={false}
+      {searchable}
       clearFilterTextOnBlur={false}
       bind:value
       on:change
