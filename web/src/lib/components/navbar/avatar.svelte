@@ -9,7 +9,7 @@
       return `${capital($_("loading"))}...`
     }
     if (keycloak && keycloak.idTokenParsed) {
-      return keycloak.idTokenParsed.name
+      return keycloak.idTokenParsed.preferred_username
     }
     return "No Auth"
   }
