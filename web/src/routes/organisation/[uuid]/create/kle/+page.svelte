@@ -160,6 +160,7 @@
           id="kle-number"
           bind:name={$kleNumber.value}
           errors={$kleNumber.errors}
+          searchable={true}
           iterable={getClassesByFacetUserKey(facets, "kle_number")}
           required={true}
         />

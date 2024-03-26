@@ -3,6 +3,10 @@
   import { capital } from "$lib/util/translationUtils"
   import SvelteSelect from "svelte-select"
 
+  // TODO: Maybe clean up these "hacks", e.g.
+  //   $: if (value?.name) {
+  //      name = value?.name
+  //   }
   type Value = {
     uuid: string | null
     name: string
@@ -11,7 +15,15 @@
   export let title: string | undefined = undefined
   export let id: string
   export let name: string | undefined = undefined
-  export let iterable: any[] | undefined = undefined
+  export let iterable: Value[] | undefined = undefined
+  // Do this to support built-in search with `searchable`
+  if (iterable) {
+    iterable = iterable.map((object) => ({
+      ...object,
+      label: object.name,
+      value: object.uuid,
+    }))
+  }
   export let required = false
   export let placeholder: string = ""
   export let disabled = false
@@ -20,6 +32,7 @@
   export let isClearable: boolean | undefined = false
   export let extra_classes = ""
   export let errors: string[] = []
+  export let searchable: boolean = false
 
   $: if (value?.name) {
     name = value?.name
@@ -62,7 +75,7 @@
       clearable={isClearable}
       {placeholder}
       items={iterable}
-      searchable={false}
+      {searchable}
       clearFilterTextOnBlur={false}
       bind:value
       on:change
