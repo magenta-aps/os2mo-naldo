@@ -3,6 +3,7 @@
   import { capital } from "$lib/util/translationUtils"
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
+  import { env } from "$env/dynamic/public"
   import { isAdmin } from "$lib/stores/auth"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
   import Avatar from "$lib/components/navbar/avatar.svelte"
@@ -105,7 +106,7 @@
       >
         <Icon class="cursor-pointer" icon={filePresentRounded} width="25" height="25" />
       </a>
-      {#if $isAdmin}
+      {#if env.PUBLIC_SHOW_ADMIN_PANEL && $isAdmin}
         <a class="text-base-100" href="{base}/admin"
           ><Icon icon={adminPanelSettingsOutlineRounded} width="25" height="25" /></a
         >
