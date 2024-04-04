@@ -6,7 +6,7 @@
   import { env } from "$env/dynamic/public"
   import { isAdmin } from "$lib/stores/auth"
   import DateInput from "$lib/components/forms/shared/date_input.svelte"
-  import Avatar from "$lib/components/navbar/avatar.svelte"
+  import User from "$lib/components/navbar/user.svelte"
   import Search from "$lib/components/search.svelte"
   import Icon from "@iconify/svelte"
   import personOutlineRounded from "@iconify/icons-material-symbols/person-outline-rounded"
@@ -32,13 +32,8 @@
       $date = selectedDate
     }, 500)
   }
-
-  function changeLanguage(event: any) {
-    locale.set(event.currentTarget.value)
-  }
 </script>
 
-<!-- TODO: think about UX on navbar -->
 <div class="navbar bg-secondary shadow-xl">
   <div class="navbar-start text-base-100">
     <label for="drawer" class="btn btn-square btn-ghost lg:hidden">
@@ -48,13 +43,27 @@
     <a class="btn btn-ghost normal-case text-xl hover:no-underline" href="{base}/"
       >OS2mo</a
     >
-    {#if $MOConfig && JSON.parse($MOConfig.navlinks).length}
-      {@const links = JSON.parse($MOConfig.navlinks)}
-      <ul class="menu menu-horizontal px-1">
-        <li>
-          <details>
-            <summary class="flex">{capital($_("link", { values: { n: 2 } }))}</summary>
-            <ul class="dropdown-content p-2 menu z-[1] rounded w-max">
+    <ul class="menu menu-horizontal px-1">
+      <li>
+        <details>
+          <summary class="flex font-bold"
+            >{capital($_("link", { values: { n: 2 } }))}</summary
+          >
+          <ul class="dropdown-content p-2 menu z-[1] rounded w-max">
+            <li>
+              <a class="w-100 text-secondary hover:no-underline" href="{base}/reports"
+                >{capital($_("report", { values: { n: 2 } }))}</a
+              >
+            </li>
+            {#if env.PUBLIC_SHOW_ADMIN_PANEL && $isAdmin}
+              <li>
+                <a class="w-100 text-secondary hover:no-underline" href="{base}/admin"
+                  >{capital($_("admin_panel"))}</a
+                >
+              </li>
+            {/if}
+            {#if $MOConfig && JSON.parse($MOConfig.navlinks).length}
+              {@const links = JSON.parse($MOConfig.navlinks)}
               {#each links as link}
                 <li>
                   <a class="w-100 text-secondary hover:no-underline" href={link.href}
@@ -62,11 +71,11 @@
                   >
                 </li>
               {/each}
-            </ul>
-          </details>
-        </li>
-      </ul>
-    {/if}
+            {/if}
+          </ul>
+        </details>
+      </li>
+    </ul>
   </div>
 
   <div class="navbar-center">
@@ -98,45 +107,6 @@
   </div>
 
   <div class="navbar-end flex">
-    <div class="flex gap-1 pr-4">
-      <a
-        class="text-base-100"
-        href="{base}/reports"
-        title={capital($_("report", { values: { n: 2 } }))}
-      >
-        <Icon class="cursor-pointer" icon={filePresentRounded} width="25" height="25" />
-      </a>
-      {#if env.PUBLIC_SHOW_ADMIN_PANEL && $isAdmin}
-        <a class="text-base-100" href="{base}/admin"
-          ><Icon icon={adminPanelSettingsOutlineRounded} width="25" height="25" /></a
-        >
-      {/if}
-    </div>
-    <div class="join gap-2 pr-4">
-      <input
-        type="radio"
-        id="lang-en"
-        name="lang"
-        value="en"
-        class="join-item hidden"
-        on:change={changeLanguage}
-      />
-      <label for="lang-en">
-        <Icon class="cursor-pointer" icon={circleFlagsGb} width="25" height="25" />
-      </label>
-      <input
-        type="radio"
-        id="lang-da"
-        name="lang"
-        value="da"
-        class="join-item hidden"
-        on:change={changeLanguage}
-      />
-      <label for="lang-da">
-        <Icon class="cursor-pointer" icon={circleFlagsDa} width="25" height="25" />
-      </label>
-    </div>
-
-    <Avatar />
+    <User />
   </div>
 </div>
