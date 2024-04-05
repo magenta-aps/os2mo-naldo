@@ -2,7 +2,7 @@
   import { _ } from "svelte-i18n"
   import "$lib/global.css"
   import SuccessAlert from "$lib/components/alerts/success.svelte"
-  import Navbar from "$lib/components/navbar.svelte"
+  import Navbar from "$lib/components/Navbar.svelte"
   import { onMount } from "svelte"
   import { initKeycloak } from "$lib/util/keycloak"
   import Favicon from "$lib/assets/favicon.png"
