@@ -1,9 +1,9 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
-  import DateInput from "$lib/components/forms/shared/date_input.svelte"
-  import Error from "$lib/components/alerts/error.svelte"
-  import Input from "$lib/components/forms/shared/input.svelte"
+  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
+  import Error from "$lib/components/alerts/Error.svelte"
+  import Input from "$lib/components/forms/shared/Input.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { date } from "$lib/stores/date"
@@ -16,7 +16,7 @@
   import { page } from "$app/stores"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
-  import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string

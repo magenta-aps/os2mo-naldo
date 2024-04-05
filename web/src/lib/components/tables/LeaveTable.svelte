@@ -4,7 +4,7 @@
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { EmployeeLeavesDocument, type EmployeeLeavesQuery } from "./query.generated"
-  import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
+  import ValidityTableCell from "$lib/components/shared/ValidityTableCell.svelte"
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
   import { tenseFilter, tenseToValidity } from "$lib/util/helpers"

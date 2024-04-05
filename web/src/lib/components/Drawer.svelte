@@ -2,7 +2,7 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import { isAuth } from "$lib/stores/auth"
-  import DrawerContent from "$lib/components/drawer_content.svelte"
+  import DrawerContent from "$lib/components/DrawerContent.svelte"
   import { defaultDrawerWidth, drawerWidth } from "$lib/stores/drawer_width"
   import { onMount } from "svelte"
   import Icon from "@iconify/svelte"

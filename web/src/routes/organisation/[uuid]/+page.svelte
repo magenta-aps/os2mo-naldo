@@ -2,9 +2,9 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import { page } from "$app/stores"
-  import HeadTitle from "$lib/components/shared/head_title.svelte"
-  import CopyToClipboard from "$lib/components/copy_to_clipboard.svelte"
-  import TenseTabs from "$lib/components/shared/tense_tabs.svelte"
+  import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
+  import CopyToClipboard from "$lib/components/Clipboard.svelte"
+  import TenseTabs from "$lib/components/shared/TenseTabs.svelte"
   import { OrgTab, activeOrgTab } from "$lib/stores/tab"
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
@@ -23,8 +23,8 @@
   import KleTable from "$lib/components/tables/KLETable.svelte"
   import OwnerTable from "$lib/components/tables/OwnerTable.svelte"
   import RelatedUnitsTable from "$lib/components/tables/RelatedUnitsTable.svelte"
-  import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
-  import Tabs from "$lib/components/shared/tabs.svelte"
+  import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
+  import Tabs from "$lib/components/shared/Tabs.svelte"
   import { MOConfig } from "$lib/stores/config"
 
   // Tabs

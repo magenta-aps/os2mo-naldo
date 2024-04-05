@@ -1,8 +1,8 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
-  import Error from "$lib/components/alerts/error.svelte"
-  import Select from "$lib/components/forms/shared/select.svelte"
+  import Error from "$lib/components/alerts/Error.svelte"
+  import Select from "$lib/components/forms/shared/Select.svelte"
   import { enhance } from "$app/forms"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
@@ -11,18 +11,18 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import Search from "$lib/components/search.svelte"
+  import Search from "$lib/components/Search.svelte"
   import {
     getEngagementTitlesAndUuid,
     getUuidFromHash,
     type EngagementTitleAndUuid,
   } from "$lib/util/helpers"
   import { onMount } from "svelte"
-  import DateInput from "$lib/components/forms/shared/date_input.svelte"
+  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
-  import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
-  import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
+  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
 
   let selectedOrgUnit: {
     uuid: string

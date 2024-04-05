@@ -1,7 +1,7 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
-  import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
+  import ValidityTableCell from "$lib/components/shared/ValidityTableCell.svelte"
   import { base } from "$app/paths"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"

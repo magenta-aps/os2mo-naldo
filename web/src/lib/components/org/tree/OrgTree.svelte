@@ -4,7 +4,7 @@
   import { page } from "$app/stores"
   import { graphQLClient } from "$lib/util/http"
   import { fetchParentTree } from "$lib/util/parent_tree.js"
-  import Node from "$lib/components/org/tree/node.svelte"
+  import Node from "$lib/components/org/tree/Node.svelte"
   import { success } from "$lib/stores/alert"
   import { date } from "$lib/stores/date"
   import { globalNavigation } from "$lib/stores/navigation"
@@ -17,7 +17,7 @@
     OrgUnitsWithFilteredChildrenDocument,
   } from "./query.generated"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
-  import Select from "$lib/components/forms/shared/select.svelte"
+  import Select from "$lib/components/forms/shared/Select.svelte"
 
   const brutto = {
     uuid: null,
