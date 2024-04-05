@@ -154,14 +154,16 @@
 {:then data}
   {#if data.facets.objects.length && data.facets.objects[0].objects[0].classes.length}
     {@const facets = data.facets.objects}
+    <!-- Do this to avoid flat returning undefined in iterable, since `iterable: Value` -->
+    {@const hierarchies = getClassesByFacetUserKey(
+      facets,
+      "org_unit_hierarchy"
+    )?.flat()}
     <Select
       id="org-unit-hierarchy"
       bind:value={orgUnitHierachy}
       startValue={brutto}
-      iterable={[
-        brutto,
-        ...[getClassesByFacetUserKey(facets, "org_unit_hierarchy")].flat(),
-      ]}
+      iterable={[brutto, ...(hierarchies ? hierarchies : [])]}
       on:change={() =>
         (refreshableOrgTree = fetchOrgTree($date, null, orgUnitHierachy?.uuid))}
     />
