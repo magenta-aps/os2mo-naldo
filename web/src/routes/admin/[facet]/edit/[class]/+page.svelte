@@ -1,9 +1,9 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
-  import DateInput from "$lib/components/forms/shared/date_input.svelte"
-  import Error from "$lib/components/alerts/error.svelte"
-  import Select from "$lib/components/forms/shared/select.svelte"
+  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
+  import Error from "$lib/components/alerts/Error.svelte"
+  import Select from "$lib/components/forms/shared/Select.svelte"
   import { enhance } from "$app/forms"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
@@ -12,7 +12,7 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import Input from "$lib/components/forms/shared/input.svelte"
+  import Input from "$lib/components/forms/shared/Input.svelte"
   import type { SubmitFunction } from "./$types"
   import { UpdateClassDocument, ClassDocument } from "./query.generated"
   import { form, field } from "svelte-forms"
@@ -90,7 +90,7 @@
       $_("edit_item", {
         values: { item: $_("job_function", { values: { n: 1 } }) },
       })
-    )}} | OS2mo</title
+    )} | OS2mo</title
   >
 
   <div class="flex align-center px-6 pt-6 pb-4">
@@ -99,7 +99,7 @@
         $_("edit_item", {
           values: { item: $_("job_function", { values: { n: 1 } }) },
         })
-      )}}
+      )}
     </h3>
   </div>
 
@@ -162,7 +162,7 @@
           $_("edit_item", {
             values: { item: $_("job_function", { values: { n: 1 } }) },
           })
-        )}}</button
+        )}</button
       >
       <button
         type="button"

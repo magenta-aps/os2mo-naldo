@@ -1,7 +1,7 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
-  import Error from "$lib/components/alerts/error.svelte"
+  import Error from "$lib/components/alerts/Error.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "../connecting_organisations/$types"
   import { goto } from "$app/navigation"

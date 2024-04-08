@@ -2,8 +2,8 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import { createEventDispatcher } from "svelte"
-  import Checkbox from "$lib/components/forms/shared/checkbox.svelte"
-  import RadioButton from "$lib/components/forms/shared/radio_button.svelte"
+  import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
+  import RadioButton from "$lib/components/forms/shared/RadioButton.svelte"
   import Icon from "@iconify/svelte"
   import keyboardArrowDownRounded from "@iconify/icons-material-symbols/keyboard-arrow-down-rounded"
 

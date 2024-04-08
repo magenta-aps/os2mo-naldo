@@ -1,8 +1,8 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
-  import DateInput from "$lib/components/forms/shared/date_input.svelte"
-  import Error from "$lib/components/alerts/error.svelte"
+  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
+  import Error from "$lib/components/alerts/Error.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { success, error } from "$lib/stores/alert"
@@ -10,14 +10,14 @@
   import { UpdateOrgUnitDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { date } from "$lib/stores/date"
-  import Search from "$lib/components/search.svelte"
+  import Search from "$lib/components/Search.svelte"
   import { page } from "$app/stores"
   import { OrgUnitDocument } from "./query.generated"
-  import Input from "$lib/components/forms/shared/input.svelte"
+  import Input from "$lib/components/forms/shared/Input.svelte"
   import { getUuidFromHash } from "$lib/util/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
-  import Breadcrumbs from "$lib/components/org/breadcrumbs.svelte"
+  import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
 
   let toDate: string
   let selectedOrgUnit: {

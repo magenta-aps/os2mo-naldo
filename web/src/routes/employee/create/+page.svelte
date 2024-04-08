@@ -1,8 +1,8 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
-  import Error from "$lib/components/alerts/error.svelte"
-  import Input from "$lib/components/forms/shared/input.svelte"
+  import Error from "$lib/components/alerts/Error.svelte"
+  import Input from "$lib/components/forms/shared/Input.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { success, error } from "$lib/stores/alert"

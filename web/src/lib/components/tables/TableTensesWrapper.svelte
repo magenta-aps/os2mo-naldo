@@ -1,7 +1,7 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
-  import DetailTable from "$lib/components/shared/detail_table.svelte"
+  import DetailTable from "$lib/components/shared/DetailTable.svelte"
   import { tenses } from "$lib/stores/tenses"
   import type { ComponentType, SvelteComponent } from "svelte"
   import { MOConfig } from "$lib/stores/config"

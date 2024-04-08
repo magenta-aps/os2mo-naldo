@@ -4,18 +4,18 @@
   import { gql } from "graphql-request"
   import { graphQLClient } from "$lib/util/http"
   import { date } from "$lib/stores/date"
-  import HeadTitle from "$lib/components/shared/head_title.svelte"
-  import DetailTable from "$lib/components/shared/detail_table.svelte"
+  import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
+  import DetailTable from "$lib/components/shared/DetailTable.svelte"
   import InsightTable from "$lib/components/tables/InsightTable.svelte"
-  import Input from "$lib/components/forms/shared/input.svelte"
-  import Select from "$lib/components/forms/shared/select.svelte"
+  import Input from "$lib/components/forms/shared/Input.svelte"
+  import Select from "$lib/components/forms/shared/Select.svelte"
   import {
     GetClassesDocument,
     GetEngagementsDocument,
     type GetEngagementsQuery,
   } from "./query.generated"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
-  import Search from "$lib/components/search.svelte"
+  import Search from "$lib/components/Search.svelte"
   import { engagements } from "$lib/stores/csv"
   import { downloadHandler } from "$lib/util/csv"
   import { onMount } from "svelte"

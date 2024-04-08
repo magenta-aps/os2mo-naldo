@@ -1,9 +1,9 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
-  import DateInput from "$lib/components/forms/shared/date_input.svelte"
-  import Error from "$lib/components/alerts/error.svelte"
-  import Select from "$lib/components/forms/shared/select.svelte"
+  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
+  import Error from "$lib/components/alerts/Error.svelte"
+  import Select from "$lib/components/forms/shared/Select.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { goto } from "$app/navigation"
@@ -16,10 +16,10 @@
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import { CreateLeaveDocument, LeaveAndEmployeeDocument } from "./query.generated"
   import { getEngagementTitlesAndUuid } from "$lib/util/helpers"
-  import Search from "$lib/components/search.svelte"
+  import Search from "$lib/components/Search.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
-  import Skeleton from "$lib/components/forms/shared/skeleton.svelte"
+  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string

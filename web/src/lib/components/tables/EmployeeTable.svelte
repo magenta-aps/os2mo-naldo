@@ -5,7 +5,7 @@
   import { gql } from "graphql-request"
   import { date } from "$lib/stores/date"
   import { EmployeeDocument, type EmployeeQuery } from "./query.generated"
-  import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
+  import ValidityTableCell from "$lib/components/shared/ValidityTableCell.svelte"
   import { base } from "$app/paths"
   import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
   import { sortDirection, sortKey } from "$lib/stores/sorting"

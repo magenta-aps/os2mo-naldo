@@ -4,7 +4,7 @@
   import SvelteSelect from "svelte-select"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
-  import SearchItem from "./search_item.svelte"
+  import SearchItem from "./SearchItem.svelte"
   import { date } from "$lib/stores/date"
   import { globalNavigation } from "$lib/stores/navigation"
   import { gql } from "graphql-request"

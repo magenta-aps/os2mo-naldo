@@ -2,10 +2,10 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import { base } from "$app/paths"
-  import TenseTabs from "$lib/components/shared/tense_tabs.svelte"
+  import TenseTabs from "$lib/components/shared/TenseTabs.svelte"
   import ClassTable from "$lib/components/tables/ClassTable.svelte"
   import TableTensesWrapper from "$lib/components/tables/TableTensesWrapper.svelte"
-  import DetailTable from "$lib/components/shared/detail_table.svelte"
+  import DetailTable from "$lib/components/shared/DetailTable.svelte"
 </script>
 
 <!-- TODO: admin HeadTitle -->

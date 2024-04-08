@@ -2,7 +2,7 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import { gql } from "graphql-request"
-  import ValidityTableCell from "$lib/components/shared/validity_table_cell.svelte"
+  import ValidityTableCell from "$lib/components/shared/ValidityTableCell.svelte"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { sortData } from "$lib/util/sorting"
   import { onMount } from "svelte"
