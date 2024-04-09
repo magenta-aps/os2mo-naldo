@@ -57,9 +57,7 @@
             validities {
               name
               uuid
-              children(limit: 1) {
-                uuid
-              }
+              child_count(filter: { from_date: $fromDate })
             }
           }
         }
@@ -79,17 +77,14 @@
             validities {
               name
               uuid
-              children(
-                limit: 1
+              child_count(
                 filter: {
                   subtree: {
                     from_date: $fromDate
                     hierarchy: { uuids: $orgUnitHierarchies }
                   }
                 }
-              ) {
-                uuid
-              }
+              )
             }
           }
         }
@@ -122,9 +117,7 @@
 
     for (let org of res.org_units.objects) {
       orgTree.push({
-        uuid: org.validities[0].uuid,
-        name: org.validities[0].name,
-        children: org.validities[0].children,
+        ...org.validities[0],
         orgUnitHierarchyUuid: orgUnitHierarchyUuid,
         breadcrumbs: breadcrumbs,
         fromDate: fromDate,
@@ -148,7 +141,7 @@
 
 {#await graphQLClient().request(OrgUnitHierarchiesDocument)}
   <div role="status" class="max-w-sm animate-pulse">
-    <div class="h-10 bg-base-100 rounded dark:bg-accent max-w-4 mb-2.5" />
+    <div class="mb-2.5 h-10 rounded bg-base-100 max-w-4 dark:bg-accent" />
     <span class="sr-only">{capital($_("loading"))}...</span>
   </div>
 {:then data}
@@ -171,7 +164,7 @@
   {#key refreshableOrgTree}
     {#await refreshableOrgTree}
       <div role="status" class="max-w-sm animate-pulse">
-        <div class="h-10 bg-base-100 rounded dark:bg-accent max-w-4 mb-2.5" />
+        <div class="mb-2.5 h-10 rounded bg-base-100 max-w-4 dark:bg-accent" />
         <span class="sr-only">{capital($_("loading"))}...</span>
       </div>
     {:then orgTree}
