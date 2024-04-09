@@ -9,12 +9,14 @@
 	"authenticating": "autentificering",
 	"cancel": "annullér",
 	"copied": "kopieret",
-	"connection_text": "angiv hvilke eneheder der skal sammenkobles med",
 	"connect_with": "sammenkobles med:",
+	"connection_success": "relaterede enheder er blevet redigeret for organisationsenheden",
+	"connection_text": "angiv hvilke eneheder der skal sammenkobles med",
 	"copy": "kopiér",
 	"cpr_number": "CPR nummer",
 	"create_item": "opret {item}",
 	"date": {
+		"change": "dato for ændring",
 		"date": "dato",
 		"start_date": "startdato",
 		"end_date": "slutdato",
@@ -66,7 +68,7 @@
 		"rename_unit": "Omdøb enhed",
 		"move_unit": "Flyt enhed",
 		"terminate_unit": "Afslut enhed",
-		"connecting_organisations": "Organisationssammenkobling"
+		"connections": "Organisationssammenkobling"
 	},
 	"new": "ny",
 	"new2": "nyt",

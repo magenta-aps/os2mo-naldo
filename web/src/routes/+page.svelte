@@ -80,8 +80,8 @@
             >
           </li>
           <li>
-            <a href="{base}/connecting_organisations" class="hover:no-underline">
-              {$_("navigation.connecting_organisations")}</a
+            <a href="{base}/connections" class="hover:no-underline">
+              {$_("navigation.connections")}</a
             >
           </li>
         </ul>

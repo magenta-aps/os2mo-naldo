@@ -8,13 +8,15 @@
 	"association_type": "affiliation leave",
 	"authenticating": "authenticating",
 	"cancel": "cancel",
-	"connection_text": "specify which units to connect to",
 	"connect_with": "is connected to:",
+	"connection_success": "related units have been updated for the organisation unit",
+	"connection_text": "specify which units to connect to",
 	"copied": "copied",
 	"copy": "copy",
 	"cpr_number": "CPR number",
 	"create_item": "create {item}",
 	"date": {
+		"change": "date of change",
 		"date": "date",
 		"start_date": "start date",
 		"end_date": "end date",
@@ -66,7 +68,7 @@
 		"rename_unit": "Rename unit",
 		"move_unit": "Move unit",
 		"terminate_unit": "Terminate unit",
-		"connecting_organisations": "Connecting organisations"
+		"connections": "Connecting organisations"
 	},
 	"new": "new",
 	"new2": "new",
