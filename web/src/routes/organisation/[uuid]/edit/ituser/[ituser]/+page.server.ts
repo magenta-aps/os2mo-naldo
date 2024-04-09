@@ -1,5 +1,5 @@
-import type { Actions, RequestEvent } from "@sveltejs/kit"
 import type { ItUserUpdateInput } from "$lib/graphql/types"
+import type { Actions, RequestEvent } from "@sveltejs/kit"
 
 export const actions: Actions = {
   default: async ({ request, params }: RequestEvent): Promise<ItUserUpdateInput> => {

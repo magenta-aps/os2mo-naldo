@@ -1,10 +1,10 @@
-import type { OpenValidity, Validity } from "$lib/graphql/types"
 import { env } from "$env/dynamic/public"
+import type { OpenValidity, Validity } from "$lib/graphql/types"
 import { date } from "$lib/stores/date"
-import { get } from "svelte/store"
-import { parseISO, isValid, min, max, format } from "date-fns"
 import type { Facet } from "$lib/util/get_classes"
 import { keycloak } from "$lib/util/keycloak"
+import { format, isValid, parseISO } from "date-fns"
+import { get } from "svelte/store"
 
 export const getUuidFromHash = (hash: string) => {
   let uuidFromHash = hash.split("&").find((e) => e.startsWith("#uuid="))

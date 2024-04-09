@@ -1,6 +1,6 @@
-import type { Actions, RequestEvent } from "@sveltejs/kit"
 import type { KleCreateInput } from "$lib/graphql/types"
 import type { UnpackedClass } from "$lib/util/helpers"
+import type { Actions, RequestEvent } from "@sveltejs/kit"
 
 export const actions: Actions = {
   default: async ({ request, params }: RequestEvent): Promise<KleCreateInput> => {

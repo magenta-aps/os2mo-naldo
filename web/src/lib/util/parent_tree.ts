@@ -1,6 +1,6 @@
 import { graphQLClient } from "$lib/util/http"
-import { GetParentDocument } from "./query.generated"
 import { gql } from "graphql-request"
+import { GetParentDocument } from "./query.generated"
 
 gql`
   query GetParent($uuid: [UUID!], $fromDate: DateTime) {
