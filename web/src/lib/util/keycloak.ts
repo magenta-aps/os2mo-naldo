@@ -1,6 +1,6 @@
-import Keycloak from "keycloak-js"
-import { isAuth, isAdmin } from "$lib/stores/auth"
 import { env } from "$env/dynamic/public"
+import { isAdmin, isAuth } from "$lib/stores/auth"
+import Keycloak from "keycloak-js"
 
 const instance = `${env.PUBLIC_BASE_URL}/service/keycloak.json`
 
