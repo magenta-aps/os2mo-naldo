@@ -16,6 +16,7 @@
 
   export let name = ""
   export let children: any[] = []
+  export let child_count: number
   export let indent = 8
   export let uuid = ""
   export let breadcrumbs: string[] = []
@@ -32,9 +33,7 @@
           validities {
             name
             uuid
-            children(limit: 1) {
-              uuid
-            }
+            child_count(filter: { from_date: $fromDate })
           }
         }
       }
@@ -50,16 +49,14 @@
           validities {
             name
             uuid
-            children(
+            child_count(
               filter: {
                 subtree: {
                   from_date: $fromDate
                   hierarchy: { uuids: $orgUnitHierarchies }
                 }
               }
-            ) {
-              uuid
-            }
+            )
           }
         }
       }
@@ -131,7 +128,7 @@
 </script>
 
 <a
-  class="m-0 p-0 block w-full h-full hover:no-underline"
+  class="block p-0 m-0 w-full h-full hover:no-underline"
   href={`${base}/organisation/${uuid}`}
 >
   <li
@@ -145,8 +142,8 @@
       id={$page.params.uuid === uuid ? "active" : ""}
     >
       {#if loading}
-        <div class="loading loading-spinner h-5 w-5" />
-      {:else if children.length}
+        <div class="w-5 h-5 loading loading-spinner" />
+      {:else if child_count}
         {#if open}
           <button on:click|preventDefault={toggleOpen}>
             <Icon icon={keyboardArrowDownRounded} width="20" height="20" rotate={0} />
@@ -157,9 +154,9 @@
           </button>
         {/if}
       {:else}
-        <div class="h-5 w-5" />
+        <div class="w-5 h-5" />
       {/if}
-      <p class="text-secondary break-words">
+      <p class="break-words text-secondary">
         {name}
       </p>
     </div>

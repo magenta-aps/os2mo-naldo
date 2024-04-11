@@ -31,10 +31,7 @@
           validities {
             name
             uuid
-            children(limit: 1) {
-              uuid
-              name
-            }
+            child_count(filter: { from_date: $fromDate })
           }
         }
       }
@@ -77,10 +74,8 @@
 
     for (let org of res.org_units.objects) {
       orgTree.push({
-        uuid: org.validities[0].uuid,
-        name: org.validities[0].name,
+        ...org.validities[0],
         breadcrumbs: breadcrumbs,
-        children: org.validities[0].children,
         fromDate: fromDate,
       })
     }

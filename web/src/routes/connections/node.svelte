@@ -25,7 +25,7 @@
   export let breadcrumbs: string[][] = []
   export let selectedOriginOrg: string | null = null
   export let selectedDestinationOrgs: string[] = []
-  export let parentUuid: string = ""
+  export let child_count: number
 
   let loading = false
 
@@ -36,10 +36,7 @@
           validities {
             name
             uuid
-            children {
-              name
-              uuid
-            }
+            child_count(filter: { from_date: $fromDate })
           }
         }
       }
@@ -110,7 +107,7 @@
   <div class="flex pl-2 text-secondary">
     {#if loading}
       <div class="w-5 h-5 loading loading-spinner" />
-    {:else if children.length}
+    {:else if child_count}
       {#if open}
         <button class="text-secondary" on:click|preventDefault={toggleOpen}>
           <Icon icon={keyboardArrowDownRounded} width="20" height="20" rotate={0} />
@@ -143,7 +140,6 @@
   {#each children.sort( (a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1) ) as child}
     <svelte:self
       {...child}
-      parentUuid={uuid}
       {selectedDestinationOrgs}
       {selectedOriginOrg}
       {breadcrumbs}
