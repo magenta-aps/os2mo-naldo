@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital, upperCase } from "$lib/util/translationUtils"
   import { page } from "$app/stores"
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
   import CopyToClipboard from "$lib/components/Clipboard.svelte"
@@ -151,6 +151,10 @@
         table={EngagementTable}
         headers={[
           { title: capital($_("name")), sortPath: "employee[0].name" },
+          {
+            title: upperCase($_("user_key")),
+            sortPath: "user_key",
+          },
           {
             title: capital($_("job_function", { values: { n: 1 } })),
             sortPath: "job_function.name",

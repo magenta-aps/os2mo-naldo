@@ -110,7 +110,7 @@
 	"to": "til",
 	"unit": "{n, plural, =0 {enheden} one {enhed} other {enheder}}",
 	"unit_number": "enhedsnummer",
-	"user_key": "userkey",
+	"user_key": "id",
 	"validation": {
 		"is_required": "{field} er obligatorisk",
 		"is_invalid": "{field} er ugyldigt",

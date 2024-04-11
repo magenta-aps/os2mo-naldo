@@ -112,7 +112,7 @@
 	"to": "to",
 	"unit": "{n, plural, =0 {the unit} one {unit} other {units}}",
 	"unit_number": "unit number",
-	"user_key": "userkey",
+	"user_key": "id",
 	"validation": {
 		"is_required": "{field} is required",
 		"is_invalid": "{field} is invalid",

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital, upperCase } from "$lib/util/translationUtils"
   import { base } from "$app/paths"
   import TenseTabs from "$lib/components/shared/TenseTabs.svelte"
   import ClassTable from "$lib/components/tables/ClassTable.svelte"
@@ -31,7 +31,7 @@
   <DetailTable
     headers={[
       { title: capital($_("name")), sortPath: "name" },
-      { title: capital($_("user_key")), sortPath: "user_key" },
+      { title: upperCase($_("user_key")), sortPath: "user_key" },
       { title: capital($_("date.date")), sortPath: "validity.from" },
       { title: "" },
     ]}

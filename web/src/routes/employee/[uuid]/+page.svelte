@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital, upperCase } from "$lib/util/translationUtils"
   import Tabs from "$lib/components/shared/Tabs.svelte"
   import { EmployeeTab, activeEmployeeTab } from "$lib/stores/tab"
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
@@ -136,6 +136,10 @@
           {
             title: capital($_("unit", { values: { n: 1 } })),
             sortPath: "org_unit[0].name",
+          },
+          {
+            title: upperCase($_("user_key")),
+            sortPath: "user_key",
           },
           {
             title: capital($_("job_function", { values: { n: 1 } })),

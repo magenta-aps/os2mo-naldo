@@ -45,6 +45,7 @@
         objects {
           objects {
             uuid
+            user_key
             employee {
               uuid
               name
@@ -118,6 +119,7 @@
           <td class="p-4">{engagement.org_unit[0].name}</td>
         </a>
       {/if}
+      <td class="p-4">{engagement.user_key}</td>
       <td class="p-4">{engagement.job_function.name}</td>
       <td class="p-4">{engagement.engagement_type.name}</td>
       {#if $MOConfig && $MOConfig.confdb_show_primary_engagement === "true"}
