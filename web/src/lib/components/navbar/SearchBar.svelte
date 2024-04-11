@@ -23,14 +23,24 @@
 </script>
 
 <div class="flex gap-2 items-center justify-center">
-  <div class="text-base-100">
+  <button
+    on:click={() => {
+      orgChecked = false
+    }}
+    class="text-base-100"
+  >
     <Icon icon={personOutlineRounded} width="25" height="25" />
-  </div>
+  </button>
   <input type="checkbox" class="toggle" bind:checked={orgChecked} />
 
-  <div class="text-base-100 pr-2">
+  <button
+    on:click={() => {
+      orgChecked = true
+    }}
+    class="text-base-100 pr-2"
+  >
     <Icon icon={homeWorkOutlineRounded} width="25" height="25" />
-  </div>
+  </button>
   <div class="w-96 flex items-center justify-center">
     {#if orgChecked}
       <Search action="goto" type={"org-unit"} />
