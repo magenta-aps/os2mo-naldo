@@ -37,6 +37,7 @@
       associations(
         filter: {
           employees: $employee
+          it_association: false
           org_units: $org_unit
           from_date: $fromDate
           to_date: $toDate
