@@ -11,15 +11,20 @@
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { sortData } from "$lib/util/sorting"
   import { onMount } from "svelte"
+  import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
 
   type RelatedUnits = RelatedUnitsQuery["related_units"]["objects"][0]["objects"]
   let data: RelatedUnits
 
+  export let tense: Tense
+
   const uuid = $page.params.uuid
 
   gql`
-    query RelatedUnits($org_unit: [UUID!], $fromDate: DateTime) {
-      related_units(filter: { org_units: $org_unit, from_date: $fromDate }) {
+    query RelatedUnits($org_unit: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+      related_units(
+        filter: { org_units: $org_unit, from_date: $fromDate, to_date: $toDate }
+      ) {
         objects {
           objects {
             org_units {
@@ -46,18 +51,18 @@
     const res = await graphQLClient().request(RelatedUnitsDocument, {
       org_unit: uuid,
       fromDate: $date,
+      ...tenseToValidity(tense, $date),
     })
-    const engagements: RelatedUnits = []
+    const relatedUnits: RelatedUnits = []
 
-    // Filters and flattens the data
     for (const outer of res.related_units.objects) {
       // TODO: Remove when GraphQL is able to do this for us
       const filtered = outer.objects.filter((obj) => {
-        return obj
+        return tenseFilter(obj, tense)
       })
-      engagements.push(...filtered)
+      relatedUnits.push(...filtered)
     }
-    data = engagements
+    data = relatedUnits
   })
 </script>
 
