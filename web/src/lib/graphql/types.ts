@@ -6306,6 +6306,25 @@ export type Mutation = {
   class_update: ClassResponse;
   /** Creates an employee. */
   employee_create: EmployeeResponse;
+  /**
+   * Deletes an employee.
+   * **Warning**:
+   * This mutator does bitemporal deletion, **not** temporal termination.
+   * Do **not** use this mutator **unless** you **fully understand** its implications.
+   *
+   * Bitemporal deletion and temporal termination are **very** different operations and should **not** be confused.
+   * If you do not know which of the operations you need, you most likely need temporal termination.
+   *
+   * Bitemporal deletion works on the bitemporal time-axis, and should **only** be used by clients that **fully understand** the underlying bitemporal model, including how a bitemporal delete affects the registration history.
+   *
+   * After this call the deleted entity will no longer show up in **any** temporal listing.
+   *
+   * Note:
+   * It is currently the callers responsibility to ensure that references are dealt with before doing bitemporal deletions.
+   * Failure to do so **will** leave dangling references breaking temporal foreign-keys, and potentially breaking invariants in the data.
+   *
+   */
+  employee_delete: EmployeeResponse;
   /** Refresh employees. */
   employee_refresh: UuidPaged;
   /** Terminates an employee. */
@@ -6552,6 +6571,7 @@ export type MutationAddress_DeleteArgs = {
  */
 export type MutationAddress_RefreshArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<AddressFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
@@ -6603,6 +6623,7 @@ export type MutationAssociation_CreateArgs = {
  */
 export type MutationAssociation_RefreshArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<AssociationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
@@ -6666,6 +6687,7 @@ export type MutationClass_DeleteArgs = {
  */
 export type MutationClass_RefreshArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<ClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
@@ -6715,8 +6737,21 @@ export type MutationEmployee_CreateArgs = {
  * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
  *
  */
+export type MutationEmployee_DeleteArgs = {
+  uuid: Scalars['UUID']['input'];
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationEmployee_RefreshArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<EmployeeFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
@@ -6780,6 +6815,7 @@ export type MutationEngagement_DeleteArgs = {
  */
 export type MutationEngagement_RefreshArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<EngagementFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
@@ -6843,6 +6879,7 @@ export type MutationFacet_DeleteArgs = {
  */
 export type MutationFacet_RefreshArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<FacetFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
@@ -6942,6 +6979,7 @@ export type MutationItsystem_DeleteArgs = {
  */
 export type MutationItsystem_RefreshArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<ItSystemFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
@@ -7005,6 +7043,7 @@ export type MutationItuser_DeleteArgs = {
  */
 export type MutationItuser_RefreshArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<ItUserFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
@@ -7056,6 +7095,7 @@ export type MutationKle_CreateArgs = {
  */
 export type MutationKle_RefreshArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<KleFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
@@ -7107,6 +7147,7 @@ export type MutationLeave_CreateArgs = {
  */
 export type MutationLeave_RefreshArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<LeaveFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
@@ -7158,6 +7199,7 @@ export type MutationManager_CreateArgs = {
  */
 export type MutationManager_RefreshArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<ManagerFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
@@ -7221,6 +7263,7 @@ export type MutationOrg_Unit_CreateArgs = {
  */
 export type MutationOrg_Unit_RefreshArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<OrganisationUnitFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
@@ -7272,6 +7315,7 @@ export type MutationOwner_CreateArgs = {
  */
 export type MutationOwner_RefreshArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<OwnerFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
@@ -7311,6 +7355,7 @@ export type MutationOwner_UpdateArgs = {
  */
 export type MutationRelated_Unit_RefreshArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<RelatedUnitFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
@@ -7350,6 +7395,7 @@ export type MutationRole_CreateArgs = {
  */
 export type MutationRole_RefreshArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<RoleFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
@@ -7985,23 +8031,14 @@ export type OrganisationUnitUnit_TypeArgs = {
 };
 
 export type OrganisationUnitCreateInput = {
-  /** Org-unit name. */
   name: Scalars['String']['input'];
-  /** UUID of the unit hierarchy. */
   org_unit_hierarchy?: InputMaybe<Scalars['UUID']['input']>;
-  /** UUID of unit level. */
   org_unit_level?: InputMaybe<Scalars['UUID']['input']>;
-  /** UUID of the type. */
   org_unit_type: Scalars['UUID']['input'];
-  /** UUID of the related parent. */
   parent?: InputMaybe<Scalars['UUID']['input']>;
-  /** UUID of time planning. */
   time_planning?: InputMaybe<Scalars['UUID']['input']>;
-  /** Extra info or uuid. */
   user_key?: InputMaybe<Scalars['String']['input']>;
-  /** UUID to be created. Will be autogenerated if not specified. */
   uuid?: InputMaybe<Scalars['UUID']['input']>;
-  /** Validity range for the org-unit. */
   validity: RaValidityInput;
 };
 
@@ -8295,23 +8332,14 @@ export type OrganisationUnitTerminateInput = {
 };
 
 export type OrganisationUnitUpdateInput = {
-  /** Name of the organisation unit to be updated. */
   name?: InputMaybe<Scalars['String']['input']>;
-  /** UUID of organisation units hierarchy to be updated. */
   org_unit_hierarchy?: InputMaybe<Scalars['UUID']['input']>;
-  /** UUID of the organisation units level to be updated. */
   org_unit_level?: InputMaybe<Scalars['UUID']['input']>;
-  /** UUID of the organisation units type to be updated. */
   org_unit_type?: InputMaybe<Scalars['UUID']['input']>;
-  /** UUID of the organisation units related parent to be updated. */
   parent?: InputMaybe<Scalars['UUID']['input']>;
-  /** UUID of organisation units time planning to be updated. */
   time_planning?: InputMaybe<Scalars['UUID']['input']>;
-  /** Extra info or uuid. */
   user_key?: InputMaybe<Scalars['String']['input']>;
-  /** UUID of the organisation unit to be updated. */
   uuid: Scalars['UUID']['input'];
-  /** Validity range for the organisation unit to be updated. */
   validity: RaValidityInput;
 };
 
