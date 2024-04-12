@@ -47,11 +47,13 @@
         <br />
         <div class="inline-block text-primary text-sm">
           {#if address.resolve.__typename === "DARAddress"}
-            {address.resolve.name}
+            {address.address_type.name}: {address.resolve.name}
           {:else if address.resolve.__typename === "DefaultAddress"}
-            {address.resolve.value}
+            {address.address_type.name}: {address.resolve.value}
           {:else if address.resolve.__typename === "MultifieldAddress"}
-            {address.resolve.value + " " + address.resolve.value2}
+            {address.address_type.name}: {address.resolve.value +
+              " " +
+              address.resolve.value2}
           {/if}
         </div>
       {/each}

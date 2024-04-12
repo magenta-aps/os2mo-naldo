@@ -81,6 +81,9 @@
             name
             uuid
             addresses {
+              address_type {
+                name
+              }
               resolve {
                 ... on DefaultAddress {
                   __typename
@@ -109,6 +112,9 @@
             name
             uuid
             addresses {
+              address_type {
+                name
+              }
               resolve {
                 ... on DefaultAddress {
                   __typename
