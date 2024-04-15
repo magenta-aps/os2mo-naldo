@@ -22,6 +22,8 @@
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getMinMaxValidities } from "$lib/util/helpers"
+  import { MOConfig } from "$lib/stores/config"
+  import { env } from "$env/dynamic/public"
 
   let toDate: string
   let parent: {
@@ -32,12 +34,23 @@
   const fromDate = field("from", "", [required()])
   const name = field("name", "", [required()])
   const orgUnitType = field("org_unit_type", "", [required()])
-  const orgUnitLevel = field("org_unit_level", "", [required()])
-  const svelteForm = form(fromDate, name, orgUnitType, orgUnitLevel)
+  const timePlanning = field("time_planning", "", [required()])
+  let svelteForm = form(fromDate, name, orgUnitType)
+
+  // This is needed, since `timePlanning` is required, but only used by some.
+  if (
+    $MOConfig &&
+    $MOConfig.confdb_show_time_planning === "true" &&
+    env.PUBLIC_OPTIONAL_TIME_PLANNING !== "true"
+  ) {
+    svelteForm = form(fromDate, name, orgUnitType, timePlanning)
+  }
 
   gql`
     query GetOrgUnitAndFacets($uuid: [UUID!], $fromDate: DateTime) {
-      facets(filter: { user_keys: ["org_unit_level", "org_unit_type"] }) {
+      facets(
+        filter: { user_keys: ["org_unit_level", "org_unit_type", "time_planning"] }
+      ) {
         objects {
           objects {
             uuid
@@ -62,6 +75,11 @@
                 from
                 to
               }
+            }
+            time_planning {
+              name
+              uuid
+              user_key
             }
             unit_type {
               uuid
@@ -154,6 +172,7 @@
         <Skeleton />
         <Skeleton />
         <Skeleton />
+        <Skeleton />
         <div class="flex flex-row gap-6">
           <Skeleton extra_classes="basis-1/2" />
           <Skeleton extra_classes="basis-1/2" />
@@ -217,20 +236,30 @@
           startValue={orgUnit.name}
           required={true}
         />
-
-        <div class="flex flex-row gap-6">
+        {#if $MOConfig && $MOConfig.confdb_show_time_planning === "true"}
           <Select
-            title={capital($_("org_unit_level"))}
-            id="org-level"
-            bind:name={$orgUnitLevel.value}
-            errors={$orgUnitLevel.errors}
-            startValue={orgUnit.org_unit_level ? orgUnit.org_unit_level : undefined}
-            on:clear={() => ($orgUnitLevel.value = "")}
-            extra_classes="basis-1/2"
-            iterable={getClassesByFacetUserKey(facets, "org_unit_level")}
+            title={capital($_("time_planning"))}
+            id="time-planning"
+            bind:name={$timePlanning.value}
+            errors={$timePlanning.errors}
+            startValue={orgUnit.time_planning ? orgUnit.time_planning : undefined}
+            iterable={getClassesByFacetUserKey(facets, "time_planning")}
             isClearable={true}
-            required={true}
+            required={env.PUBLIC_OPTIONAL_TIME_PLANNING !== "true"}
+            on:clear={() => ($timePlanning.value = "")}
           />
+        {/if}
+        <div class="flex flex-row gap-6">
+          {#if $MOConfig && $MOConfig.confdb_show_level === "true"}
+            <Select
+              title={capital($_("org_unit_level"))}
+              id="org-level"
+              startValue={orgUnit.org_unit_level ? orgUnit.org_unit_level : undefined}
+              extra_classes="basis-1/2"
+              iterable={getClassesByFacetUserKey(facets, "org_unit_level")}
+              isClearable={true}
+            />
+          {/if}
           <Select
             title={capital($_("org_unit_type"))}
             id="org-type"

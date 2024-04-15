@@ -129,6 +129,7 @@
           { title: capital($_("org_unit_type")), sortPath: "unit_type.name" },
           { title: capital($_("org_unit_level")), sortPath: "org_unit_level.name" },
           { title: capital($_("parent")) },
+          { title: capital($_("time_planning")), sortPath: "time_planning.name" },
           { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
         ]}
