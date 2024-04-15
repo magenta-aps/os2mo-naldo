@@ -227,7 +227,6 @@
     {:else if activeItem === OrgTab.RELATED_UNIT}
       <TableTensesWrapper
         table={RelatedUnitsTable}
-        onlyPresent={true}
         headers={[
           { title: capital($_("related_unit", { values: { n: 1 } })) },
           { title: capital($_("date.date")), sortPath: "validity.from" },
