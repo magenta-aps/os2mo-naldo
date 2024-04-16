@@ -43,6 +43,9 @@
                 name
               }
             }
+            time_planning {
+              name
+            }
             validity {
               from
               to
@@ -107,6 +110,13 @@
             $_("no_item", { values: { item: $_("parent", { values: { n: 1 } }) } })
           )}</td
         >
+      {/if}
+      {#if $MOConfig && $MOConfig.confdb_show_time_planning === "true"}
+        <td class="p-4">
+          {org_unit.time_planning
+            ? org_unit.time_planning.name
+            : capital($_("not_set"))}
+        </td>
       {/if}
       <ValidityTableCell validity={org_unit.validity} />
       <td>

@@ -14,6 +14,9 @@
   if ($MOConfig && $MOConfig.confdb_show_level === "false") {
     headers = headers.filter((header) => header.title !== capital($_("org_unit_level")))
   }
+  if ($MOConfig && $MOConfig.confdb_show_time_planning === "false") {
+    headers = headers.filter((header) => header.title !== capital($_("time_planning")))
+  }
 
   if (
     $MOConfig &&
