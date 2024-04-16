@@ -2430,10 +2430,10 @@ d@1, d@^1.0.1:
     es5-ext "^0.10.50"
     type "^1.0.1"
 
-daisyui@^4.4.24:
-  version "4.4.24"
-  resolved "https://registry.npmjs.org/daisyui/-/daisyui-4.4.24.tgz"
-  integrity sha512-u/B3484J08V7N0rIYymnC+SyxOjlYQL+2vyhHWV+/KC+VaUcbEF2Z3H06eCPgdTiZ0J+ml44aH7wBhIymPFQ+g==
+daisyui@^4.10.2:
+  version "4.10.2"
+  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-4.10.2.tgz#c0e072b94ccaa0326d1fdec26e8dc163ac070561"
+  integrity sha512-eCWS1W/JPyxW9IvlgW5m0R6rp9ZhRsBTW37rvEUthckkjsV04u8XipV519OoccSA46ixhSJa3q7XLI1WUFtRCA==
   dependencies:
     css-selector-tokenizer "^0.8"
     culori "^3"
