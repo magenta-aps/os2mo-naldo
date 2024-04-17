@@ -10,6 +10,8 @@ export const actions: Actions = {
     const associationType = data.get("association-type")
     const employeeUuid = data.get("employee-uuid")
     const primary = data.get("primary")
+    const substitute = data.get("substitute")
+    const tradeUnion = data.get("trade-union")
     const startDate = data.get("from")
     const endDate = data.get("to")
 
@@ -19,6 +21,8 @@ export const actions: Actions = {
       ...(associationType && { association_type: associationType }),
       ...(employeeUuid && { employee: employeeUuid }),
       ...(primary && { primary: primary }),
+      ...(substitute && { substitute: substitute }),
+      ...(tradeUnion && { trade_union: tradeUnion }),
     }
   },
 }

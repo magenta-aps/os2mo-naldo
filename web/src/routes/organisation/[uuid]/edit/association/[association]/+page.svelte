@@ -23,15 +23,52 @@
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getMinMaxValidities } from "$lib/util/helpers"
+  import { MOConfig } from "$lib/stores/config"
+  import SelectGroup from "$lib/components/forms/shared/SelectGroup.svelte"
 
   let toDate: string
+
+  let associationType: { name: string; user_key: string; uuid: string }
+  $: associationTypeUuid = associationType?.uuid
+
   const fromDate = field("from", "", [required()])
   const employee = field("employee", "", [required()])
-  const associationType = field("association_type", "", [required()])
-  const svelteForm = form(fromDate, employee, associationType)
+  const associationTypeField = field("association_type", "", [required()])
+  let substitute = field("substitute", "")
+  let svelteForm = form(fromDate, employee, associationTypeField, substitute)
+
+  let getDynamicFacet: boolean = false
+  let dynamicFacetUuid: string | undefined
+
+  // Maybe we need to JSON.parse our config, so we avoid doing it here?
+  if ($MOConfig && JSON.parse($MOConfig.confdb_association_dynamic_facets)) {
+    getDynamicFacet = true
+    dynamicFacetUuid = JSON.parse($MOConfig.confdb_association_dynamic_facets)
+  }
+
+  const isSubstituteNeeded = (associationTypeUuid: string) => {
+    // Check if the selected associationType needs a substitute, if true, make the field required and update the form validation
+    if (
+      $MOConfig &&
+      JSON.parse($MOConfig.confdb_substitute_roles).includes(associationTypeUuid)
+    ) {
+      substitute = field("substitute", "", [required()])
+      svelteForm = form(fromDate, employee, associationTypeField, substitute)
+      return true
+    } else {
+      substitute = field("substitute", "")
+      svelteForm = form(fromDate, employee, associationTypeField, substitute)
+      return false
+    }
+  }
 
   gql`
-    query AssociationAndFacet($uuid: [UUID!], $fromDate: DateTime) {
+    query AssociationAndFacet(
+      $uuid: [UUID!]
+      $fromDate: DateTime
+      $getDynamicFacet: Boolean!
+      $dynamicFacetUuid: [UUID!]
+    ) {
       facets(filter: { user_keys: ["association_type", "primary_type"] }) {
         objects {
           objects {
@@ -63,6 +100,15 @@
               user_key
               name
             }
+            substitute {
+              name
+              uuid
+            }
+            trade_union {
+              uuid
+              user_key
+              name
+            }
             validity {
               from
               to
@@ -72,6 +118,27 @@
                 from
                 to
               }
+            }
+          }
+        }
+      }
+      ...MedOrg
+    }
+
+    fragment MedOrg on Query {
+      classes(filter: { facet: { uuids: $dynamicFacetUuid } })
+        @include(if: $getDynamicFacet) {
+        objects {
+          objects {
+            top_level_facet {
+              uuid
+              user_key
+            }
+            name
+            children {
+              name
+              user_key
+              uuid
             }
           }
         }
@@ -121,7 +188,7 @@
     }
 </script>
 
-{#await graphQLClient().request( AssociationAndFacetDocument, { uuid: $page.params.association, fromDate: $date } )}
+{#await graphQLClient().request( AssociationAndFacetDocument, { uuid: $page.params.association, fromDate: $date, getDynamicFacet: getDynamicFacet, dynamicFacetUuid: dynamicFacetUuid } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -143,6 +210,7 @@
   {@const validities = getMinMaxValidities(
     data.associations.objects[0].validities[0].org_unit
   )}
+  {@const topLevelFacets = data.classes?.objects}
 
   <title
     >{capital(
@@ -189,12 +257,15 @@
             max={validities.to}
           />
         </div>
+        <!-- TODO: make optional when GraphQL agrees -->
         <Search
           type="employee"
-          startValue={{
-            uuid: association.person[0].uuid,
-            name: association.person[0].name,
-          }}
+          startValue={association.person[0]
+            ? {
+                uuid: association.person[0].uuid,
+                name: association.person[0].name,
+              }
+            : undefined}
           bind:name={$employee.value}
           errors={$employee.errors}
           on:clear={() => ($employee.value = "")}
@@ -207,8 +278,9 @@
             startValue={association.association_type
               ? association.association_type
               : undefined}
-            bind:name={$associationType.value}
-            errors={$associationType.errors}
+            bind:name={$associationTypeField.value}
+            bind:value={associationType}
+            errors={$associationTypeField.errors}
             iterable={getClassesByFacetUserKey(facets, "association_type")}
             extra_classes="basis-1/2"
             required={true}
@@ -222,6 +294,32 @@
             isClearable={true}
           />
         </div>
+        {#if associationType}
+          {#if isSubstituteNeeded(associationTypeUuid)}
+            <Search
+              id="substitute"
+              title={capital($_("substitute"))}
+              startValue={association.substitute[0]
+                ? {
+                    uuid: association.substitute[0].uuid,
+                    name: association.substitute[0].name,
+                  }
+                : undefined}
+              bind:name={$substitute.value}
+              errors={$substitute.errors}
+              type="employee"
+              required={true}
+            />
+          {/if}
+        {/if}
+        {#if $MOConfig && JSON.parse($MOConfig.confdb_association_dynamic_facets)}
+          <SelectGroup
+            id="trade-union"
+            title={$_("trade_union")}
+            iterable={topLevelFacets}
+            startValue={association.trade_union ? association.trade_union : undefined}
+          />
+        {/if}
       </div>
     </div>
     <div class="flex py-6 gap-4">

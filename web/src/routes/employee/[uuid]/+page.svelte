@@ -175,6 +175,8 @@
             sortPath: "org_unit[0].name",
           },
           { title: capital($_("association_type")), sortPath: "association_type.name" },
+          { title: capital($_("substitute")), sortPath: "substitute[0].name" },
+          { title: capital($_("trade_union")) },
           { title: capital($_("primary")) },
           { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
