@@ -18,6 +18,7 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
 
+  let toDate: string
   const fromDate = field("from", "", [required()])
   const svelteForm = form(fromDate)
 
@@ -150,9 +151,16 @@
           startValue={$date}
           bind:value={$fromDate.value}
           errors={$fromDate.errors}
-          title={capital($_("date.change"))}
+          title={capital($_("date.from"))}
+          max={toDate ? toDate : undefined}
           id="from"
           required={true}
+        />
+        <DateInput
+          bind:value={toDate}
+          title={capital($_("date.end_date"))}
+          id="to"
+          min={$fromDate.value ? $fromDate.value : undefined}
         />
         <div class="basis-1/2" />
       </div>

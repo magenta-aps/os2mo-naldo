@@ -8,11 +8,12 @@ export const actions: Actions = {
     const originUuid = data.get("origin")
     const destinationUuids = data.getAll("destination")
     const startDate = data.get("from")
+    const endDate = data.get("to")
 
     return {
       origin: originUuid,
       destination: destinationUuids,
-      validity: { from: startDate },
+      validity: { from: startDate, ...(endDate && { to: endDate }) },
     }
   },
 }
