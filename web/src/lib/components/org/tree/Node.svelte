@@ -44,7 +44,13 @@
       $fromDate: DateTime
       $orgUnitHierarchies: [UUID!]
     ) {
-      org_units(filter: { parents: $uuid, from_date: $fromDate }) {
+      org_units(
+        filter: {
+          parents: $uuid,
+          from_date: $fromDate,
+          hierarchy: { uuids: $orgUnitHierarchies }
+        }
+      ) {
         objects {
           validities {
             name
