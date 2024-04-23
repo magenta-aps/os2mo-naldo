@@ -2,7 +2,9 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import { page } from "$app/stores"
-  import { fetchGraph } from "$lib/util/http"
+  import { graphQLClient } from "$lib/util/http"
+  import { gql } from "graphql-request"
+  import { EmployeeDocument, OrgUnitDocument } from "./query.generated"
 
   enum Title {
     ORGANISATION = "organisation",
@@ -13,38 +15,37 @@
   type TitleType = `${Title}`
   export let type: TitleType
 
-  const fetchTitleName = async (uuid: string): Promise<String> => {
-    let query: string
+  gql`
+    query OrgUnit($uuid: [UUID!]) {
+      org_units(filter: { uuids: $uuid }) {
+        objects {
+          validities {
+            name
+          }
+        }
+      }
+    }
 
-    // TODO: FIX THIS!!!!!!!!!!!
+    query Employee($uuid: [UUID!]) {
+      employees(filter: { uuids: $uuid }) {
+        objects {
+          validities {
+            name
+          }
+        }
+      }
+    }
+  `
+
+  const fetchTitleName = async (uuid: string): Promise<String> => {
     switch (type) {
       case Title.ORGANISATION:
-        query = `{
-          org_units(filter: { uuids: "${uuid}" }) {
-            objects {
-              objects {
-                name
-              }
-            }
-          }
-        }`
-        return fetchGraph(query)
-          .then((res) => res.json())
-          .then((json) => json.data.org_units.objects[0].objects[0].name)
-      // TODO: FIX THIS!!!!!!!!!!!
+        return (await graphQLClient().request(OrgUnitDocument, { uuid: uuid }))
+          .org_units.objects[0].validities[0].name
+
       case Title.EMPLOYEE:
-        query = `{
-          employees(filter: { uuids: "${uuid}" }) {
-            objects {
-              objects {
-                name
-              }
-            }
-          }
-        }`
-        return fetchGraph(query)
-          .then((res) => res.json())
-          .then((json) => json.data.employees.objects[0].objects[0].name)
+        return (await graphQLClient().request(EmployeeDocument, { uuid: uuid }))
+          .employees.objects[0].validities[0].name
 
       case Title.INSIGHT:
         return capital($_("insight"))
@@ -60,5 +61,7 @@
     <title>... | OS2mo</title>
   {:then value}
     <title>{value} | OS2mo</title>
+  {:catch}
+    <title>OS2mo</title>
   {/await}
 </svelte:head>

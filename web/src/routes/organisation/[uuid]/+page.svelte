@@ -8,10 +8,9 @@
   import { OrgTab, activeOrgTab } from "$lib/stores/tab"
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
-  import { env } from "$env/dynamic/public"
   import { gql } from "graphql-request"
   import { graphQLClient } from "$lib/util/http"
-  import { OrgUnitDocument } from "./query.generated"
+  import { OrgUnitDocument, type OrgUnitQuery } from "./query.generated"
   import { onMount } from "svelte"
   import TableTensesWrapper from "$lib/components/tables/TableTensesWrapper.svelte"
   import EngagementTable from "$lib/components/tables/EngagementTable.svelte"
@@ -26,6 +25,7 @@
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Tabs from "$lib/components/shared/Tabs.svelte"
   import { MOConfig } from "$lib/stores/config"
+  import { tenseFilter } from "$lib/util/helpers"
 
   // Tabs
   let items = [
@@ -44,20 +44,55 @@
   let activeItem = $activeOrgTab
   const tabChange = (e: CustomEvent) => ($activeOrgTab = activeItem = e.detail)
 
+  // TODO: Switch to validities
   gql`
-    query OrgUnit($uuid: [UUID!], $fromDate: DateTime) {
-      org_units(filter: { uuids: $uuid, from_date: $fromDate }) {
+    query OrgUnit($uuid: [UUID!]) {
+      org_units(filter: { uuids: $uuid, from_date: null, to_date: null }) {
         objects {
           objects {
             name
             user_key
             uuid
+            validity {
+              from
+              to
+            }
           }
         }
       }
     }
   `
-  onMount(() => {
+
+  const fetchRelevantOrg = async (uuid: string, globalDate: string) => {
+    const res = await graphQLClient().request(OrgUnitDocument, {
+      uuid: uuid,
+    })
+
+    let orgUnits: OrgUnitQuery["org_units"]["objects"]["0"]["objects"] = []
+
+    for (const outer of res.org_units.objects) {
+      // Look for present
+      orgUnits = outer.objects.filter((obj) => {
+        const fromDate = obj.validity.from.split("T")[0]
+        const toDate = obj.validity.to?.split("T")[0]
+        return globalDate >= fromDate && (!toDate || globalDate <= toDate)
+      })
+      if (orgUnits.length > 0) break
+
+      // Look for past
+      orgUnits = outer.objects.filter((obj) => {
+        return tenseFilter(obj, "past")
+      })
+      if (orgUnits.length) break
+
+      // Look for future
+      orgUnits = outer.objects.filter((obj) => {
+        return tenseFilter(obj, "future")
+      })
+    }
+    return orgUnits[0]
+  }
+  onMount(async () => {
     // Will show up as #Tab&MaybeOtherStuff&Ect...
     // In dev SvelteKit will add things like &state=<uuid>
     if ($page.url.hash) {
@@ -79,12 +114,11 @@
 <HeadTitle type="organisation" />
 
 <div class="px-12 pt-6">
-  {#await graphQLClient().request( OrgUnitDocument, { uuid: uuidFromUrl, fromDate: $date } )}
+  {#await fetchRelevantOrg(uuidFromUrl, $date)}
     <p>Loader organisation...</p>
-  {:then data}
-    {@const orgUnit = data.org_units.objects[0].objects[0]}
-    <!-- Find activeItem in `items` -->
-    <!-- Fallback "" is just to make TypeScript happy - shouldn't ever happen -->
+  {:then orgUnit}
+    <!-- Find activeItem in `items`
+    Fallback "" is just to make TypeScript happy - shouldn't ever happen -->
     {@const item = items.find((item) => item.value === activeItem)?.label || ""}
 
     <div>
@@ -97,7 +131,6 @@
       <h1 class="pb-4">{orgUnit.name}</h1>
       <CopyToClipboard uuid={orgUnit.uuid} name={orgUnit.name} />
     </div>
-
     <Tabs {activeItem} {items} on:tabChange={tabChange} />
 
     <div class="flex justify-between">
@@ -120,7 +153,8 @@
         )}
       </a>
     </div>
-
+  {/await}
+  {#key $date + uuidFromUrl}
     {#if activeItem === OrgTab.ORG_UNIT}
       <TableTensesWrapper
         table={OrgUnitTable}
@@ -234,5 +268,5 @@
         ]}
       />
     {/if}
-  {/await}
+  {/key}
 </div>
