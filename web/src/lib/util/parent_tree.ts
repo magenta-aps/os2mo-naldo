@@ -6,7 +6,7 @@ gql`
   query GetParent($uuid: [UUID!], $fromDate: DateTime) {
     org_units(filter: { uuids: $uuid, from_date: $fromDate }) {
       objects {
-        objects {
+        validities {
           parent {
             name
             uuid
@@ -23,7 +23,10 @@ const fetchParent = async (uuid: string, fromDate: string) => {
     fromDate: fromDate,
   })
 
-  return res.org_units.objects[0].objects[0].parent
+  // Empty objects can happen when there's no present org after changing the global time
+  return res.org_units.objects.length
+    ? res.org_units.objects[0].validities[0].parent
+    : null
 }
 
 export const fetchParentTree = async (
