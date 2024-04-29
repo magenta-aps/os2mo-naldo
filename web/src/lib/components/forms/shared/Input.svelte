@@ -14,7 +14,7 @@
   export let disabled = false
   export let pattern: string | undefined = undefined
   export let extra_classes = ""
-  export let readonly = false
+  export let readonly: boolean = false
   export let errors: string[] = []
 
   const typeAction = (node: any) => {
