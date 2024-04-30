@@ -24,7 +24,7 @@
   import { getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string
-  let addressType: { name: string; user_key: string; uuid: string }
+  let addressType: { name: string; user_key: string; uuid: string; scope: string }
   $: addressTypeUuid = addressType?.uuid
 
   // update the field depending on address-type
@@ -44,6 +44,7 @@
               uuid
               user_key
               name
+              scope
             }
           }
         }
@@ -203,7 +204,7 @@
         </div>
         <!-- FIXME: Translate address_types -->
         {#if addressType}
-          {#if addressType.name === Addresses.POSTADRESSE}
+          {#if addressType.scope === "DAR"}
             <DarSearch
               title={addressType.name}
               id="value"

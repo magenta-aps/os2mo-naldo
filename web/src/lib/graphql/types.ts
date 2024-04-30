@@ -603,10 +603,81 @@ export type AddressResponse = {
  * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
  *
  */
+export type AddressResponseCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type AddressResponseObjectsArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
 export type AddressResponseRegistrationsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type AddressResponseValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /** Result page in cursor-based pagination. */
@@ -1203,10 +1274,81 @@ export type AssociationResponse = {
  * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
  *
  */
+export type AssociationResponseCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type AssociationResponseObjectsArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
 export type AssociationResponseRegistrationsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type AssociationResponseValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /** Result page in cursor-based pagination. */
@@ -1954,10 +2096,81 @@ export type ClassResponse = {
  * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
  *
  */
+export type ClassResponseCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type ClassResponseObjectsArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
 export type ClassResponseRegistrationsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type ClassResponseValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /** Result page in cursor-based pagination. */
@@ -2537,10 +2750,81 @@ export type EmployeeResponse = {
  * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
  *
  */
+export type EmployeeResponseCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type EmployeeResponseObjectsArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
 export type EmployeeResponseRegistrationsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type EmployeeResponseValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /** Result page in cursor-based pagination. */
@@ -3248,10 +3532,81 @@ export type EngagementResponse = {
  * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
  *
  */
+export type EngagementResponseCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type EngagementResponseObjectsArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
 export type EngagementResponseRegistrationsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type EngagementResponseValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /** Result page in cursor-based pagination. */
@@ -3722,10 +4077,81 @@ export type FacetResponse = {
  * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
  *
  */
+export type FacetResponseCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type FacetResponseObjectsArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
 export type FacetResponseRegistrationsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type FacetResponseValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /** Result page in cursor-based pagination. */
@@ -4251,10 +4677,81 @@ export type ItSystemResponse = {
  * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
  *
  */
+export type ItSystemResponseCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type ItSystemResponseObjectsArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
 export type ItSystemResponseRegistrationsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type ItSystemResponseValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /** Result page in cursor-based pagination. */
@@ -4785,10 +5282,81 @@ export type ItUserResponse = {
  * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
  *
  */
+export type ItUserResponseCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type ItUserResponseObjectsArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
 export type ItUserResponseRegistrationsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type ItUserResponseValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /** Result page in cursor-based pagination. */
@@ -5280,10 +5848,81 @@ export type KleResponse = {
  * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
  *
  */
+export type KleResponseCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type KleResponseObjectsArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
 export type KleResponseRegistrationsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type KleResponseValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /** Result page in cursor-based pagination. */
@@ -5695,10 +6334,81 @@ export type LeaveResponse = {
  * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
  *
  */
+export type LeaveResponseCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type LeaveResponseObjectsArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
 export type LeaveResponseRegistrationsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type LeaveResponseValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /** Result page in cursor-based pagination. */
@@ -6166,10 +6876,81 @@ export type ManagerResponse = {
  * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
  *
  */
+export type ManagerResponseCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type ManagerResponseObjectsArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
 export type ManagerResponseRegistrationsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type ManagerResponseValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /** Result page in cursor-based pagination. */
@@ -8044,6 +8825,13 @@ export type OrganisationUnitCreateInput = {
 
 /** Organisation unit filter. */
 export type OrganisationUnitFilter = {
+  /**
+   * Filter organisation units to only include matches pointed to by engagements.
+   *
+   * Can be used to find organisation units for certain engagements.
+   *
+   */
+  engagement?: InputMaybe<EngagementFilter>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -8296,10 +9084,81 @@ export type OrganisationUnitResponse = {
  * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
  *
  */
+export type OrganisationUnitResponseCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type OrganisationUnitResponseObjectsArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
 export type OrganisationUnitResponseRegistrationsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type OrganisationUnitResponseValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /** Result page in cursor-based pagination. */
@@ -8681,10 +9540,81 @@ export type OwnerResponse = {
  * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
  *
  */
+export type OwnerResponseCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type OwnerResponseObjectsArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
 export type OwnerResponseRegistrationsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type OwnerResponseValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /** Result page in cursor-based pagination. */
@@ -8777,6 +9707,7 @@ export type ParentsBoundFacetFilter = {
 };
 
 export type ParentsBoundOrganisationUnitFilter = {
+  engagement?: InputMaybe<EngagementFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
   hierarchy?: InputMaybe<ClassFilter>;
@@ -9404,10 +10335,81 @@ export type RelatedUnitResponse = {
  * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
  *
  */
+export type RelatedUnitResponseCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type RelatedUnitResponseObjectsArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
 export type RelatedUnitResponseRegistrationsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type RelatedUnitResponseValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /** Result page in cursor-based pagination. */
@@ -9782,10 +10784,81 @@ export type RoleResponse = {
  * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
  *
  */
+export type RoleResponseCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type RoleResponseObjectsArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
 export type RoleResponseRegistrationsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ModelsUuidsBoundRegistrationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * Top-level container for (bi)-temporal and actual state data access.
+ *
+ * Contains a UUID uniquely denoting the bitemporal object.
+ *
+ * Contains three different object temporality axis:
+ *
+ * | entrypoint      | temporal axis | validity time | assertion time |
+ * |-----------------|---------------|---------------|----------------|
+ * | `current`       | actual state  | current       | current        |
+ * | `objects`       | temporal      | varying       | current        |
+ * | `registrations` | bitemporal    | varying       | varying        |
+ *
+ * The argument for having three different entrypoints into the data is limiting complexity according to use-case.
+ *
+ * That is, if a certain integration or UI only needs, say, actual state data, the complexities of the bitemporal data modelling is unwanted complexity, and as such, better left out.
+ *
+ */
+export type RoleResponseValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /** Result page in cursor-based pagination. */
@@ -9928,6 +11001,7 @@ export type UuidsBoundLeaveFilter = {
 };
 
 export type UuidsBoundOrganisationUnitFilter = {
+  engagement?: InputMaybe<EngagementFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
   hierarchy?: InputMaybe<ClassFilter>;
