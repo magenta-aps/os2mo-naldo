@@ -119,28 +119,51 @@
             bind:cprNumber={$cprNumber.value}
             errors={$cprNumber.errors}
           />
-          <div class="flex flex-row gap-6">
-            <Input
-              title={capital($_("givenname", { values: { n: 2 } }))}
-              id="first-name"
-              bind:value={seperatedFirstName}
-              bind:cprName={$firstName.value}
-              errors={$firstName.errors}
-              extra_classes="basis-1/2"
-              required={true}
-              readonly
-            />
-            <Input
-              title={capital($_("surname"))}
-              id="last-name"
-              bind:value={seperatedLastName}
-              bind:cprName={$lastName.value}
-              errors={$lastName.errors}
-              extra_classes="basis-1/2"
-              required={true}
-              readonly
-            />
-          </div>
+          <!-- If we get a response with empty name property, it means that a fictional CPR-number has been entered. -->
+          <!-- Therefore we allow typing a name, rather than making the input read-only. -->
+          {#if person && person.name === ""}
+            <div class="flex flex-row gap-6">
+              <Input
+                title={capital($_("givenname", { values: { n: 2 } }))}
+                id="first-name"
+                bind:cprName={$firstName.value}
+                errors={$firstName.errors}
+                extra_classes="basis-1/2"
+                required={true}
+              />
+              <Input
+                title={capital($_("surname"))}
+                id="last-name"
+                bind:cprName={$lastName.value}
+                errors={$lastName.errors}
+                extra_classes="basis-1/2"
+                required={true}
+              />
+            </div>
+          {:else}
+            <div class="flex flex-row gap-6">
+              <Input
+                title={capital($_("givenname", { values: { n: 2 } }))}
+                id="first-name"
+                bind:value={seperatedFirstName}
+                bind:cprName={$firstName.value}
+                errors={$firstName.errors}
+                extra_classes="basis-1/2"
+                required={true}
+                readonly
+              />
+              <Input
+                title={capital($_("surname"))}
+                id="last-name"
+                bind:value={seperatedLastName}
+                bind:cprName={$lastName.value}
+                errors={$lastName.errors}
+                extra_classes="basis-1/2"
+                required={true}
+                readonly
+              />
+            </div>
+          {/if}
         {:else}
           <Input
             title={capital($_("cpr_number"))}
