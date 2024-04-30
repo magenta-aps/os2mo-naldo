@@ -24,7 +24,7 @@
   import { getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string
-  let addressType: { name: string; user_key: string; uuid: string }
+  let addressType: { name: string; user_key: string; uuid: string; scope: string }
   $: addressTypeUuid = addressType?.uuid
 
   // update the field depending on address-type
@@ -44,6 +44,7 @@
               name
               uuid
               user_key
+              scope
             }
           }
         }
@@ -259,9 +260,7 @@
           <input hidden name="address-type-uuid" bind:value={addressTypeUuid} />
         </div>
         {#if addressType}
-          {#if [Addresses.HENVENDELSESSTED, Addresses.POSTADRESSE, Addresses.RETURADRESSE]
-            .map(String)
-            .includes(addressType.name)}
+          {#if addressType.scope === "DAR"}
             <DarSearch
               title={addressType.name}
               startValue={{
