@@ -17,6 +17,12 @@
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import { MOConfig } from "$lib/stores/config"
 
+  let inheritManager: boolean | undefined
+
+  if ($MOConfig && $MOConfig.confdb_inherit_manager === "false") {
+    inheritManager = false
+  }
+
   type Engagements = EngagementsQuery["engagements"]["objects"][0]["objects"]
   let data: Engagements
 
@@ -33,6 +39,7 @@
       $org_unit: [UUID!]
       $fromDate: DateTime
       $toDate: DateTime
+      $inherit: Boolean = true
     ) {
       engagements(
         filter: {
@@ -59,6 +66,15 @@
             org_unit {
               name
               uuid
+              managers(inherit: $inherit) {
+                person {
+                  name
+                  uuid
+                }
+                org_unit {
+                  name
+                }
+              }
             }
             validity {
               from
@@ -83,6 +99,7 @@
     const res = await graphQLClient().request(EngagementsDocument, {
       org_unit: org_unit,
       employee: employee,
+      inherit: inheritManager,
       ...tenseToValidity(tense, $date),
     })
     const engagements: Engagements = []
@@ -122,6 +139,41 @@
       <td class="p-4">{engagement.user_key}</td>
       <td class="p-4">{engagement.job_function.name}</td>
       <td class="p-4">{engagement.engagement_type.name}</td>
+      {#if !isOrg}
+        <td class="p-4">
+          <!-- If there's more than 1 manager, create a list -->
+          <!-- Extra if/else logic implemented, so we can add <a>-tags to the managers -->
+          {#if engagement.org_unit[0].managers.length > 1}
+            <ul>
+              {#each engagement.org_unit[0].managers as manager}
+                <li>
+                  {#if manager.person}
+                    <a href="{base}/employee/{manager.person?.[0].uuid}">
+                      • {manager.person?.[0].name}
+                    </a>
+                  {:else}
+                    • {capital($_("vacant"))}
+                  {/if}
+                </li>
+              {/each}
+            </ul>
+            <!-- If there's only 1 manager and it's not vacant -->
+          {:else if engagement.org_unit[0].managers[0] && engagement.org_unit[0].managers[0].person?.[0]}
+            <a
+              href="{base}/employee/{engagement.org_unit[0].managers[0].person[0].uuid}"
+            >
+              {engagement.org_unit[0].managers[0].person[0].name}
+            </a>
+            <!-- 1 vacant manager -->
+          {:else if engagement.org_unit[0].managers[0]}
+            {capital($_("vacant"))}
+          {:else}
+            {capital(
+              $_("no_item", { values: { item: $_("manager", { values: { n: 1 } }) } })
+            )}
+          {/if}
+        </td>
+      {/if}
       {#if $MOConfig && $MOConfig.confdb_show_primary_engagement === "true"}
         <td class="p-4">{engagement.primary ? engagement.primary.name : ""}</td>
       {/if}
