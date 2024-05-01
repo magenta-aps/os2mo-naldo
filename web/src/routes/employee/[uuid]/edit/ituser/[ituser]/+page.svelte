@@ -27,6 +27,7 @@
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
   import { getMinMaxValidities } from "$lib/util/helpers"
   import { MOConfig } from "$lib/stores/config"
+  import { env } from "$env/dynamic/public"
 
   let toDate: string
 
@@ -40,6 +41,7 @@
       $uuid: [UUID!]
       $fromDate: DateTime
       $employeeUuid: [UUID!]
+      $primaryClass: String!
     ) {
       itusers(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
@@ -79,7 +81,7 @@
           }
         }
       }
-      classes(filter: { user_keys: ["primary", "non-primary"] }) {
+      classes(filter: { user_keys: [$primaryClass, "non-primary"] }) {
         objects {
           objects {
             uuid
@@ -152,7 +154,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ItUserItSystemsAndPrimaryDocument, { uuid: $page.params.ituser, fromDate: $date, employeeUuid: $page.params.uuid } )}
+{#await graphQLClient().request( ItUserItSystemsAndPrimaryDocument, { uuid: $page.params.ituser, fromDate: $date, employeeUuid: $page.params.uuid, primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary" } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -236,7 +238,10 @@
             title={capital($_("primary"))}
             id="primary"
             startValue={itUser.primary_uuid}
-            value={getClassUuidByUserKey(classes, "primary")}
+            value={getClassUuidByUserKey(
+              classes,
+              env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary"
+            )}
             disabled={disableForm}
           />
         </div>
