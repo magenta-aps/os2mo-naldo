@@ -26,6 +26,7 @@
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
   import { getMinMaxValidities } from "$lib/util/helpers"
+  import { env } from "$env/dynamic/public"
 
   let toDate: string
 
@@ -35,7 +36,7 @@
   const svelteForm = form(fromDate, itSystem, accountName)
 
   gql`
-    query ItSystemsClassAndEmployee($uuid: [UUID!]) {
+    query ItSystemsClassAndEmployee($uuid: [UUID!], $primaryClass: String!) {
       itsystems {
         objects {
           objects {
@@ -44,7 +45,7 @@
           }
         }
       }
-      classes(filter: { user_keys: ["primary", "non-primary"] }) {
+      classes(filter: { user_keys: [$primaryClass, "non-primary"] }) {
         objects {
           objects {
             uuid
@@ -128,7 +129,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ItSystemsClassAndEmployeeDocument, { uuid: $page.params.uuid } )}
+{#await graphQLClient().request( ItSystemsClassAndEmployeeDocument, { uuid: $page.params.uuid, primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary" } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -196,7 +197,10 @@
           <Checkbox
             title={capital($_("primary"))}
             id="primary"
-            value={getClassUuidByUserKey(classes, "primary")}
+            value={getClassUuidByUserKey(
+              classes,
+              env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary"
+            )}
           />
         </div>
         <input
