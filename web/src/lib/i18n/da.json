@@ -37,6 +37,7 @@
 	"for": "for",
 	"future": "fremtid",
 	"givenname": "{n, plural, one {fornavn} other {fornavn(e)}}",
+	"id": "id",
 	"inherited_manager": "nedarvet leder fra {org_unit}",
 	"insight": "indsigt",
 	"it_system": "IT-system",
@@ -110,7 +111,7 @@
 	"to": "til",
 	"unit": "{n, plural, =0 {enheden} one {enhed} other {enheder}}",
 	"unit_number": "enhedsnummer",
-	"user_key": "id",
+	"user_key": "brugervendtnøgle",
 	"validation": {
 		"is_required": "{field} er obligatorisk",
 		"is_invalid": "{field} er ugyldigt",

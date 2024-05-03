@@ -55,6 +55,7 @@
             uuid
             value
             name
+            user_key
             address_type {
               name
               uuid
@@ -259,6 +260,11 @@
           />
           <input hidden name="address-type-uuid" bind:value={addressTypeUuid} />
         </div>
+        <Input
+          startValue={address.user_key !== address.value ? address.user_key : undefined}
+          title={capital($_("user_key"))}
+          id="user-key"
+        />
         {#if addressType}
           {#if addressType.scope === "DAR"}
             <DarSearch

@@ -6,6 +6,7 @@ export const actions: Actions = {
     const data = await request.formData()
     const addressType = data.get("address-type-uuid")
     const visibility = data.get("visibility")
+    const userKey = data.get("user-key") as string
     const value = data.get("value") as string
     const startDate = data.get("from")
     const endDate = data.get("to")
@@ -13,6 +14,7 @@ export const actions: Actions = {
     return {
       person: params.uuid,
       address_type: addressType,
+      ...(userKey && { user_key: userKey }),
       value: value,
       ...(visibility && { visibility: visibility }),
       validity: { from: startDate, ...(endDate && { to: endDate }) },

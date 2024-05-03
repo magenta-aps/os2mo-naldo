@@ -202,6 +202,7 @@
           />
           <input hidden name="address-type-uuid" bind:value={addressTypeUuid} />
         </div>
+        <Input title={capital($_("user_key"))} id="user-key" />
         <!-- FIXME: Translate address_types -->
         {#if addressType}
           {#if addressType.scope === "DAR"}

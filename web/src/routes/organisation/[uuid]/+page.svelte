@@ -173,6 +173,7 @@
         table={AddressTable}
         headers={[
           { title: capital($_("address_type")), sortPath: "address_type.name" },
+          { title: capital($_("user_key")) },
           { title: capital($_("address", { values: { n: 1 } })), sortPath: "name" },
           // TODO: Make it possible to sort optional fields maybe? visibility and primary for example
           { title: capital($_("visibility")) },
@@ -187,7 +188,7 @@
         headers={[
           { title: capital($_("name")), sortPath: "employee[0].name" },
           {
-            title: upperCase($_("user_key")),
+            title: upperCase($_("id")),
             sortPath: "user_key",
           },
           {
