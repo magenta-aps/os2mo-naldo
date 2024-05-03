@@ -232,6 +232,7 @@
           />
           <input hidden name="address-type-uuid" bind:value={addressTypeUuid} />
         </div>
+        <Input title={capital($_("user_key"))} id="user-key" />
         {#if addressType}
           {#if addressType.scope === "DAR"}
             <DarSearch

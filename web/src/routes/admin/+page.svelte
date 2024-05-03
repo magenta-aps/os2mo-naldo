@@ -31,7 +31,7 @@
   <DetailTable
     headers={[
       { title: capital($_("name")), sortPath: "name" },
-      { title: upperCase($_("user_key")), sortPath: "user_key" },
+      { title: upperCase($_("id")), sortPath: "user_key" },
       { title: capital($_("date.date")), sortPath: "validity.from" },
       { title: "" },
     ]}

@@ -45,6 +45,8 @@
           objects {
             name
             uuid
+            user_key
+            value
             address_type {
               name
             }
@@ -98,6 +100,7 @@
       p-4 leading-5 border-t border-slate-300 text-secondary"
     >
       <td class="p-4">{address.address_type.name}</td>
+      <td class="p-4">{address.user_key !== address.value ? address.user_key : ""}</td>
       <td class="p-4">{address.name}</td>
       <td class="p-4"
         >{address.visibility ? address.visibility.name : capital($_("not_set"))}</td

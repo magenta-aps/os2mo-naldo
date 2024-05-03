@@ -57,6 +57,8 @@
         objects {
           validities {
             uuid
+            user_key
+            value
             address_type {
               uuid
               user_key
@@ -235,6 +237,11 @@
           />
           <input hidden name="address-type-uuid" bind:value={addressTypeUuid} />
         </div>
+        <Input
+          startValue={address.user_key !== address.value ? address.user_key : undefined}
+          title={capital($_("user_key"))}
+          id="user-key"
+        />
         <!-- FIXME: Translate address_types -->
         {#if addressType}
           {#if addressType.scope === "DAR"}
