@@ -24,6 +24,7 @@
 		"start": "start",
 		"end": "slut"
 	},
+	"description": "beskrivelse",
 	"edit_item": "redigér {item}",
 	"employee": "{n, plural, =0 {medarbejderen} one {medarbejder} other {medarbejdere}}",
 	"empty_breadcrumbs": "placeres i roden",
@@ -111,7 +112,6 @@
 	"to": "til",
 	"unit": "{n, plural, =0 {enheden} one {enhed} other {enheder}}",
 	"unit_number": "enhedsnummer",
-	"user_key": "brugervendtnøgle",
 	"validation": {
 		"is_required": "{field} er obligatorisk",
 		"is_invalid": "{field} er ugyldigt",

@@ -24,6 +24,7 @@
 		"start": "start",
 		"end": "end"
 	},
+	"description": "description",
 	"edit_item": "edit {item}",
 	"employee": "{n, plural, =0 {the employee} one {employee} other {employees}}",
 	"empty_breadcrumbs": "will be placed in the root",
@@ -113,7 +114,6 @@
 	"to": "to",
 	"unit": "{n, plural, =0 {the unit} one {unit} other {units}}",
 	"unit_number": "unit number",
-	"user_key": "user key",
 	"validation": {
 		"is_required": "{field} is required",
 		"is_invalid": "{field} is invalid",

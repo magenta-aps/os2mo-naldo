@@ -262,7 +262,7 @@
         </div>
         <Input
           startValue={address.user_key !== address.value ? address.user_key : undefined}
-          title={capital($_("user_key"))}
+          title={capital($_("description"))}
           id="user-key"
         />
         {#if addressType}
