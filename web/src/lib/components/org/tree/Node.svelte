@@ -46,9 +46,9 @@
     ) {
       org_units(
         filter: {
-          parents: $uuid,
-          from_date: $fromDate,
-          hierarchy: { uuids: $orgUnitHierarchies }
+          parents: $uuid
+          from_date: $fromDate
+          subtree: { from_date: $fromDate, hierarchy: { uuids: $orgUnitHierarchies } }
         }
       ) {
         objects {
