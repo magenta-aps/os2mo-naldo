@@ -13,7 +13,7 @@
   export let title: string | undefined = undefined
   export let id: string
   export let name: string | undefined = undefined
-  export let iterable: any[]
+  export let iterable: any[] | undefined
   export let required = false
   export let placeholder: string = ""
   export let disabled = false
@@ -35,18 +35,20 @@
   }
 
   // Flattening data
-  const flatData = iterable
-    .flatMap((group) => {
-      return group.objects.flatMap((parent: Class) => {
-        const groupName = parent.name
-        return parent.children.map((child) => ({
-          group: groupName,
-          label: child.name,
-          uuid: child.uuid,
-        }))
+  if (iterable) {
+    iterable = iterable
+      .flatMap((group) => {
+        return group.objects.flatMap((parent: Class) => {
+          const groupName = parent.name
+          return parent.children.map((child) => ({
+            group: groupName,
+            label: child.name,
+            uuid: child.uuid,
+          }))
+        })
       })
-    })
-    .sort((a, b) => (a.label > b.label ? 1 : -1))
+      .sort((a, b) => (a.label > b.label ? 1 : -1))
+  }
 
   const groupBy = (item: any) => item.group
 </script>
@@ -80,7 +82,7 @@
       clearable={isClearable}
       {placeholder}
       groupHeaderSelectable={false}
-      items={flatData}
+      items={iterable}
       {groupBy}
       searchable={false}
       bind:value

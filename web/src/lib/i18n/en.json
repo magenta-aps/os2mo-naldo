@@ -5,7 +5,7 @@
 	"admin_panel": "administrator panel",
 	"and": "and",
 	"association": "{n, plural, =0 {the affiliation} one {affiliation} other {affiliations}}",
-	"association_type": "affiliation leave",
+	"association_type": "affiliation type",
 	"authenticating": "authenticating",
 	"cancel": "cancel",
 	"connect_with": "is connected to:",
@@ -103,6 +103,7 @@
 		"address": "Search for address"
 	},
 	"specify": "specify",
+	"substitute": "substitute",
 	"success_create": "{item} {name, select, undefined {} other {for {name}}} has been created.",
 	"success_edit": "{item} {name, select, undefined {} other {for {name}}} has been edited.",
 	"success_move": "{item} {name, select, undefined {} other {for {name}}} has been moved.",
@@ -112,6 +113,7 @@
 	"terminate_item": "terminate {item}",
 	"time_planning": "time planning",
 	"to": "to",
+	"trade_union": "Confederation / Trade Union",
 	"unit": "{n, plural, =0 {the unit} one {unit} other {units}}",
 	"unit_number": "unit number",
 	"validation": {

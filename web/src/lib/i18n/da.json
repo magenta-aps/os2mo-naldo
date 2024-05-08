@@ -103,6 +103,7 @@
 		"address": "Søg efter adresse"
 	},
 	"specify": "angiv",
+	"substitute": "stedfortræder",
 	"success_create": "{item} {for} er blevet oprettet.",
 	"success_edit": "{item} {for} er blevet redigeret.",
 	"success_terminate": "{item} {for} er blevet afsluttet.",
@@ -110,6 +111,7 @@
 	"terminate_item": "afslut {item}",
 	"time_planning": "tidsregistrering",
 	"to": "til",
+	"trade_union": "Hovedorganisation / Faglig organisation",
 	"unit": "{n, plural, =0 {enheden} one {enhed} other {enheder}}",
 	"unit_number": "enhedsnummer",
 	"validation": {

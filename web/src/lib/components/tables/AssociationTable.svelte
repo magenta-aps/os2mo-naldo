@@ -57,6 +57,12 @@
             association_type {
               name
             }
+            trade_union {
+              name
+            }
+            substitute {
+              name
+            }
             primary {
               name
             }
@@ -105,15 +111,29 @@
     <!-- some py-4 others p-4 -->
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       {#if isOrg}
-        <a href="{base}/employee/{association.employee[0].uuid}">
-          <td class="p-4">{association.employee[0].name}</td>
-        </a>
+        {#if association.employee[0]}
+          <a href="{base}/employee/{association.employee[0].uuid}">
+            <td class="p-4">{association.employee[0].name}</td>
+          </a>
+        {:else}
+          <td class="p-4" />
+        {/if}
       {:else}
         <a href="{base}/organisation/{association.org_unit[0].uuid}">
-          <td class="p-4">{association.org_unit[0].name}</td>
+          <td class="p-4"
+            >{association.org_unit[0] ? association.org_unit[0].name : ""}</td
+          >
         </a>
       {/if}
       <td class="p-4">{association.association_type?.name}</td>
+      <td class="p-4"
+        >{association.substitute[0] ? association.substitute[0].name : ""}</td
+      >
+      {#if $MOConfig && JSON.parse($MOConfig.confdb_association_dynamic_facets)}
+        <td class="p-4"
+          >{association.trade_union ? association.trade_union?.name : ""}</td
+        >
+      {/if}
       {#if $MOConfig && $MOConfig.confdb_show_primary_association === "true"}
         <td class="p-4">{association.primary ? association.primary?.name : ""}</td>
       {/if}

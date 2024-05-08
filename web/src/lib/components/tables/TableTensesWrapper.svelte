@@ -11,6 +11,7 @@
   export let headers: Header[]
   export let table: ComponentType<SvelteComponent>
 
+  // Filter out all the tabs that are dependent on environment variables
   if ($MOConfig && $MOConfig.confdb_show_level === "false") {
     headers = headers.filter((header) => header.title !== capital($_("org_unit_level")))
   }
@@ -31,6 +32,13 @@
     table == AssociationTable
   ) {
     headers = headers.filter((header) => header.title !== capital($_("primary")))
+  }
+  if (
+    $MOConfig &&
+    !JSON.parse($MOConfig.confdb_association_dynamic_facets) &&
+    table == AssociationTable
+  ) {
+    headers = headers.filter((header) => header.title !== capital($_("trade_union")))
   }
 </script>
 
