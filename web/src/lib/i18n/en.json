@@ -116,6 +116,7 @@
 	"trade_union": "Confederation / Trade Union",
 	"unit": "{n, plural, =0 {the unit} one {unit} other {units}}",
 	"unit_number": "unit number",
+	"vacant": "vacant",
 	"validation": {
 		"is_required": "{field} is required",
 		"is_invalid": "{field} is invalid",

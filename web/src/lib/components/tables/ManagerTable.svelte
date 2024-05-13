@@ -177,6 +177,7 @@
           <td class="p-4">
             {orgOrEmployee.person ? orgOrEmployee.person[0].name : ""}
             <!-- Add (*) if manager-object is inherited -->
+            <!-- TODO: Fix this, so vacant managers doesn't get (*) as a link -->
             {#if orgOrEmployee.org_unit[0].uuid !== $page.params.uuid}
               <span
                 title={capital(
