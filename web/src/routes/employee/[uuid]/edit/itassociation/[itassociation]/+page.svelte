@@ -271,7 +271,7 @@
         <Breadcrumbs orgUnit={selectedOrgUnit} />
         <div class="flex flex-row gap-6">
           <Select
-            title={capital($_("ituser"))}
+            title={capital($_("ituser", { values: { n: 1 } }))}
             id="it-user-uuid"
             startValue={itUserStartValue[0]}
             bind:name={$itUser.value}

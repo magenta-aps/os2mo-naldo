@@ -14,6 +14,7 @@ services:
       PUBLIC_OPTIONAL_TIME_PLANNING: "false"
       # user_key of primary class ("primary" is used, if not set) 
       # PUBLIC_PRIMARY_CLASS_USER_KEY: "primary"
+      PUBLIC_SHOW_ROLEBINDINGS: "true"
     ports:
       - 4173:3000 # prod - node
     restart: on-failure
@@ -31,6 +32,7 @@ services:
       PUBLIC_OPTIONAL_TIME_PLANNING: "false"
       # user_key of primary class ("primary" is used, if not set) 
       # PUBLIC_PRIMARY_CLASS_USER_KEY: "primary"
+      PUBLIC_SHOW_ROLEBINDINGS: "true"
     ports:
       - 5173:5173 # dev
       - 24678:24678 # hot module reloading

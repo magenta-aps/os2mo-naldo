@@ -26,6 +26,20 @@ export const tenseToValidity = (
   }
 }
 
+export const filterTenseToValidity = (
+  tense: Tense,
+  date: string
+): { from_date: string | null; to_date: string | null } | {} => {
+  switch (tense) {
+    case "past":
+      return { from_date: null, to_date: date }
+    case "present":
+      return { from_date: date }
+    case "future":
+      return { from_date: date, to_date: null }
+  }
+}
+
 export const tenseFilter = (
   obj: { validity: Validity | OpenValidity },
   tense: Tense
@@ -44,13 +58,17 @@ export const tenseFilter = (
 type ITUserITSystemName = {
   uuid: string
   user_key: string
-  itsystem: { name: string }
+  itsystem: {
+    name: string
+    uuid?: string
+  }
 }
 
 export const getITUserITSystemName = (itusers: ITUserITSystemName[]) => {
   return itusers.map((ituser) => ({
     uuid: ituser.uuid,
     name: `${ituser.itsystem.name}, ${ituser.user_key}`,
+    itsystem: { uuid: ituser.itsystem.uuid },
   }))
 }
 

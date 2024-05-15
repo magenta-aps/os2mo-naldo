@@ -96,6 +96,7 @@
 	"rename": "rename",
 	"report": "{n, plural, one {report} other {reports}}",
 	"role": "{n, plural, =0 {the role} one {role} other {roles}}",
+	"rolebinding": "{n, plural, =0 {the rolebinding} one {rolebinding} other {rolebindings}}",
 	"role_type": "role type",
 	"save": "save",
 	"search": {

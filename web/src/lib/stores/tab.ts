@@ -9,6 +9,7 @@ export enum OrgTab {
   MANAGER = "manager",
   KLE = "kle",
   OWNER = "owner",
+  ROLEBINDING = "rolebinding",
   RELATED_UNIT = "related_unit",
 }
 
@@ -24,6 +25,7 @@ export enum EmployeeTab {
   LEAVE = "leave",
   MANAGER = "manager",
   OWNER = "owner",
+  ROLEBINDING = "rolebinding",
 }
 
 export const activeEmployeeTab = writable(EmployeeTab.EMPLOYEE)
