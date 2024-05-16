@@ -40,6 +40,7 @@
 	"givenname": "{n, plural, one {first name} other {first name(s)}}",
 	"id": "id",
 	"inherited_manager": "inherited manager from {org_unit}",
+	"inherited_owner": "inherited owner from {org_unit}",
 	"insight": "insight",
 	"it_system": "IT system",
 	"itassociation": "{n, plural, =0 {the IT affiliation} one {IT affiliation} other {IT affiliations}}",

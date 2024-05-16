@@ -113,6 +113,11 @@ export type Address = {
    */
   href?: Maybe<Scalars['String']['output']>;
   /**
+   * Connected IT-user.
+   *
+   */
+  ituser: Array<ItUser>;
+  /**
    * Human readable name of the address.
    *
    * Name is *usually* equal to `value`, but may differ if `value` is not human readable.
@@ -278,6 +283,17 @@ export type AddressEngagementArgs = {
  * Address information for either an employee or organisational unit
  *
  */
+export type AddressItuserArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<UuidsBoundItUserFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * Address information for either an employee or organisational unit
+ *
+ */
 export type AddressOrg_UnitArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<UuidsBoundOrganisationUnitFilter>;
@@ -316,6 +332,8 @@ export type AddressCreateInput = {
   employee?: InputMaybe<Scalars['UUID']['input']>;
   /** UUID for the related engagement. */
   engagement?: InputMaybe<Scalars['UUID']['input']>;
+  /** UUID for the related ituser. */
+  ituser?: InputMaybe<Scalars['UUID']['input']>;
   /** UUID for the related org unit. */
   org_unit?: InputMaybe<Scalars['UUID']['input']>;
   /** UUID for the related person. */
@@ -415,6 +433,8 @@ export type AddressFilter = {
   engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /** ITUser filter limiting which entries are returned. */
+  ituser?: InputMaybe<ItUserFilter>;
   /**
    * Organisation Unit filter limiting which entries are returned.
    *
@@ -719,6 +739,8 @@ export type AddressUpdateInput = {
   employee?: InputMaybe<Scalars['UUID']['input']>;
   /** UUID for the related engagement. */
   engagement?: InputMaybe<Scalars['UUID']['input']>;
+  /** UUID for the related ituser. */
+  ituser?: InputMaybe<Scalars['UUID']['input']>;
   /** UUID for the related org unit. */
   org_unit?: InputMaybe<Scalars['UUID']['input']>;
   /** UUID for the related person. */
@@ -2900,6 +2922,7 @@ export type EmployeesBoundAddressFilter = {
   engagement?: InputMaybe<EngagementFilter>;
   engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  ituser?: InputMaybe<ItUserFilter>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   registration?: InputMaybe<AddressRegistrationFilter>;
@@ -3041,7 +3064,8 @@ export type Engagement = {
   /**
    * Whether this engagement is the primary engagement.
    *
-   * Checks if the `primary` field contains either a class with user-key: `"primary"` or `"explicitly-primary"`.
+   * Checks this engagements against the users other engagements. The engagement with the highest scope in the associated primary class
+   * is marked as primary. Only one engagement can be primary.
    *
    */
   is_primary: Scalars['Boolean']['output'];
@@ -4806,6 +4830,16 @@ export type ItSystemUpdateInput = {
 export type ItUser = {
   __typename?: 'ITUser';
   /**
+   * Addresses connected with the IT-user.
+   *
+   * Commonly contain addresses such as:
+   * * Email
+   * * AD GUID
+   * * FK-org UUID
+   *
+   */
+  addresses: Array<Address>;
+  /**
    * Employee using the IT account.
    *
    * Note:
@@ -4947,6 +4981,20 @@ export type ItUser = {
   uuid: Scalars['UUID']['output'];
   /** Validity of the IT user object. */
   validity: Validity;
+};
+
+
+/**
+ * User information related to IT systems.
+ *
+ * This is commonly used to map out IT accounts or IT service accounts.
+ * It is however also used to hold IT system specific identifiers for correlation purposes.
+ *
+ */
+export type ItUserAddressesArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<ItuserBoundAddressFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
 };
 
 
@@ -5427,6 +5475,23 @@ export type ItUserUpdateInput = {
   uuid: Scalars['UUID']['input'];
   /** Validity of the created IT user object. */
   validity: RaValidityInput;
+};
+
+export type ItuserBoundAddressFilter = {
+  address_type?: InputMaybe<ClassFilter>;
+  address_type_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  address_types?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  employee?: InputMaybe<EmployeeFilter>;
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  engagement?: InputMaybe<EngagementFilter>;
+  engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  registration?: InputMaybe<AddressRegistrationFilter>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 export type ItuserBoundRoleBindingFilter = {
@@ -8268,6 +8333,7 @@ export type OrgUnitsboundaddressfilter = {
   engagement?: InputMaybe<EngagementFilter>;
   engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  ituser?: InputMaybe<ItUserFilter>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   registration?: InputMaybe<AddressRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
@@ -8330,17 +8396,6 @@ export type OrgUnitsboundleavefilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   registration?: InputMaybe<LeaveRegistrationFilter>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
-};
-
-export type OrgUnitsboundownerfilter = {
-  employee?: InputMaybe<EmployeeFilter>;
-  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
-  org_unit?: InputMaybe<OrganisationUnitFilter>;
-  owner?: InputMaybe<EmployeeFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -8598,8 +8653,10 @@ export type OrganisationUnit = {
    */
   org_unit_level_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
+   * Owner roles for the organisation unit.
    *
-   * Owners of the organisation unit.
+   * May be empty in which case owners are usually inherited from parents.
+   * See the `inherit`-flag for details.
    *
    */
   owners: Array<Owner>;
@@ -8777,9 +8834,8 @@ export type OrganisationUnitOrg_Unit_LevelArgs = {
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitOwnersArgs = {
-  cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  filter?: InputMaybe<OrgUnitsboundownerfilter>;
-  limit?: InputMaybe<Scalars['int']['input']>;
+  filter?: InputMaybe<OwnerFilter>;
+  inherit?: Scalars['Boolean']['input'];
 };
 
 
