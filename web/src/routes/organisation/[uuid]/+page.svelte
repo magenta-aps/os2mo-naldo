@@ -256,7 +256,7 @@
       <TableTensesWrapper
         table={OwnerTable}
         headers={[
-          { title: capital($_("name")), sortPath: "person[0].name" },
+          { title: capital($_("name")), sortPath: "owner[0].name" },
           { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
           { title: "" },

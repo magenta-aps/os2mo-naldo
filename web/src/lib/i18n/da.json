@@ -40,6 +40,7 @@
 	"givenname": "{n, plural, one {fornavn} other {fornavn(e)}}",
 	"id": "id",
 	"inherited_manager": "nedarvet leder fra {org_unit}",
+	"inherited_owner": "nedarvet ejer fra {org_unit}",
 	"insight": "indsigt",
 	"it_system": "IT-system",
 	"itassociation": "{n, plural, =0 {IT-tilknytningen} one {IT-tilknytning} other {IT-tilknytninger}}",

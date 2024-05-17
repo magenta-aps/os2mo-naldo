@@ -7,8 +7,10 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import {
-    EmployeeAndOrgOwnerDocument,
-    type EmployeeAndOrgOwnerQuery,
+    EmployeeOwnerDocument,
+    OrgUnitOwnerDocument,
+    type EmployeeOwnerQuery,
+    type OrgUnitOwnerQuery,
   } from "./query.generated"
   import { date } from "$lib/stores/date"
   import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
@@ -19,33 +21,24 @@
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
 
-  type Owner = EmployeeAndOrgOwnerQuery["owners"]["objects"][0]["objects"]
-  let data: Owner
+  type Owners =
+    | EmployeeOwnerQuery["owners"]["objects"][0]["validities"]
+    | OrgUnitOwnerQuery["org_units"]["objects"][0]["validities"][0]["owners"]
+
+  let data: Owners
 
   export let tense: Tense
 
   const uuid = $page.params.uuid
   const isOrg = $page.route.id?.startsWith("/organisation")
-  const employee = isOrg ? null : uuid
-  const org_unit = isOrg ? uuid : null
 
   gql`
-    query EmployeeAndOrgOwner(
-      $employee_uuid: [UUID!]
-      $org_uuid: [UUID!]
-      $fromDate: DateTime
-      $toDate: DateTime
-    ) {
+    query EmployeeOwner($uuids: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
       owners(
-        filter: {
-          employees: $employee_uuid
-          org_units: $org_uuid
-          from_date: $fromDate
-          to_date: $toDate
-        }
+        filter: { employee: { uuids: $uuids }, from_date: $fromDate, to_date: $toDate }
       ) {
         objects {
-          objects {
+          validities {
             uuid
             validity {
               from
@@ -67,6 +60,34 @@
         }
       }
     }
+
+    query OrgUnitOwner($uuids: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+      org_units(filter: { uuids: $uuids }) {
+        objects {
+          validities {
+            owners(filter: { from_date: $fromDate, to_date: $toDate }, inherit: true) {
+              uuid
+              validity {
+                from
+                to
+              }
+              person {
+                name
+                uuid
+              }
+              org_unit {
+                name
+                uuid
+              }
+              owner {
+                name
+                uuid
+              }
+            }
+          }
+        }
+      }
+    }
   `
 
   $: {
@@ -76,23 +97,38 @@
   }
 
   onMount(async () => {
-    const res = await graphQLClient().request(EmployeeAndOrgOwnerDocument, {
-      org_uuid: org_unit,
-      employee_uuid: employee,
-      ...tenseToValidity(tense, $date),
-    })
+    const owners: Owners = []
 
-    const owners: Owner = []
-
-    // Filters and flattens the data
-    for (const outer of res.owners.objects) {
-      // TODO: Remove when GraphQL is able to do this for us
-      const filtered = outer.objects.filter((obj) => {
-        return tenseFilter(obj, tense)
+    if (isOrg) {
+      const res = await graphQLClient().request(OrgUnitOwnerDocument, {
+        uuids: uuid,
+        ...tenseToValidity(tense, $date),
       })
-      owners.push(...filtered)
+
+      // Filters and flattens the data
+      for (const outer of res.org_units.objects) {
+        // TODO: Remove when GraphQL is able to do this for us
+        const filtered = outer.validities[0].owners.filter((obj) => {
+          return tenseFilter(obj, tense)
+        })
+        owners.push(...filtered)
+      }
+      data = owners
+    } else {
+      const res = await graphQLClient().request(EmployeeOwnerDocument, {
+        uuids: uuid,
+        ...tenseToValidity(tense, $date),
+      })
+      // Filters and flattens the data
+      for (const outer of res.owners.objects) {
+        // TODO: Remove when GraphQL is able to do this for us
+        const filtered = outer.validities.filter((obj) => {
+          return tenseFilter(obj, tense)
+        })
+        owners.push(...filtered)
+      }
+      data = owners
     }
-    data = owners
   })
 </script>
 
@@ -104,7 +140,20 @@
   {#each data as ownerObj}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <a href="{base}/employee/{ownerObj.owner ? ownerObj.owner[0].uuid : ''}">
-        <td class="p-4">{ownerObj.owner ? ownerObj.owner[0].name : ""}</td>
+        <td class="p-4"
+          >{ownerObj.owner ? ownerObj.owner[0].name : ""}
+          <!-- Add (*) if manager-object is inherited -->
+          <!-- TODO: Fix this, so vacant managers doesn't get (*) as a link -->
+          {#if isOrg && ownerObj.org_unit?.[0].uuid !== $page.params.uuid}
+            <span
+              title={capital(
+                $_("inherited_manager", {
+                  values: { org_unit: ownerObj.org_unit?.[0].name },
+                })
+              )}>(*)</span
+            >
+          {/if}</td
+        >
       </a>
       <ValidityTableCell validity={ownerObj.validity} />
       <td>
