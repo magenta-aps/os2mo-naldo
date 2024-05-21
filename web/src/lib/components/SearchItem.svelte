@@ -2,19 +2,20 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import type {
-    LazySearchQuery,
+    LazyEmployeeSearchQuery,
+    LazyOrgUnitSearchQuery,
     SearchEmployeeQuery,
     SearchOrgUnitQuery,
   } from "./query.generated"
 
-  type Employee = SearchEmployeeQuery["employees"]["objects"][0]["objects"][0]
-  type OrgUnit = SearchOrgUnitQuery["org_units"]["objects"][0]["objects"][0]
+  type Employee = SearchEmployeeQuery["employees"]["objects"][0]["validities"][0]
+  type OrgUnit = SearchOrgUnitQuery["org_units"]["objects"][0]["validities"][0]
   type LazyEmployee = NonNullable<
-    LazySearchQuery["employees"]
-  >["objects"][0]["objects"][0]
+    LazyEmployeeSearchQuery["employees"]
+  >["objects"][0]["validities"][0]
   type LazyOrgUnit = NonNullable<
-    LazySearchQuery["org_units"]
-  >["objects"][0]["objects"][0]
+    LazyOrgUnitSearchQuery["org_units"]
+  >["objects"][0]["validities"][0]
 
   type SearchItem = Employee | OrgUnit | LazyEmployee | LazyOrgUnit
 
@@ -40,7 +41,7 @@
       {#if isLazyOrg(item) && item.parent}
         <br />
         <div class="inline-block text-primary text-sm">
-          Overenhed: {item.parent.name}
+          {capital($_("parent"))}: {item.parent.name}
         </div>
       {/if}
       {#each item.addresses as address}
