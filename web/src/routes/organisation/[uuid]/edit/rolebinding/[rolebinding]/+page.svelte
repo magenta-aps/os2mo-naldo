@@ -162,7 +162,7 @@
     const res = await graphQLClient().request(GetItSystemRolesDocument, {
       itSystemUuid: itSystemUuid,
     })
-    itSystemRoles = res.classes?.objects[0]?.objects
+    itSystemRoles = res.classes?.objects.map((cls) => cls.objects[0])
   }
 
   $: if (itUser?.itsystem?.uuid) {
