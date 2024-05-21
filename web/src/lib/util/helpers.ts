@@ -3,7 +3,14 @@ import type { OpenValidity, Validity } from "$lib/graphql/types"
 import { date } from "$lib/stores/date"
 import type { Facet } from "$lib/util/get_classes"
 import { keycloak } from "$lib/util/keycloak"
-import { format, isValid, parseISO, formatISO, addSeconds } from "date-fns"
+import {
+  format,
+  isValid,
+  parseISO,
+  formatISO,
+  addSeconds,
+  differenceInCalendarDays,
+} from "date-fns"
 import { get } from "svelte/store"
 
 export const getUuidFromHash = (hash: string) => {
@@ -202,4 +209,36 @@ export const formatQueryDates = (validity: Validity | OpenValidity): string => {
   }
 
   return `?${formattedFrom || formattedTo}`
+}
+
+// Setting `validities: any` to avoid having to create the types in `Search.svelte` by hand
+export const findClosestValidity = (validities: any, date: string) => {
+  let closestValidity = null
+  let closestDistance = Infinity // Initialize to a very large number
+  const filterDate = parseISO(date)
+
+  for (const object of validities) {
+    const fromDate = parseISO(object.validity.from)
+    const toDate = object.validity.to ? parseISO(object.validity.to) : null
+
+    // Check if the validity is active on input `date`
+    if (fromDate <= filterDate && (!toDate || toDate >= filterDate)) {
+      return object
+    }
+
+    // Calculate the distance input `date`
+    const fromDistance = Math.abs(differenceInCalendarDays(fromDate, filterDate))
+    const toDistance = toDate
+      ? Math.abs(differenceInCalendarDays(toDate, filterDate))
+      : Infinity
+    const minDistance = Math.min(fromDistance, toDistance) // Find the minimum distance
+
+    // Update the closest validity if this one is closer
+    if (minDistance < closestDistance) {
+      closestDistance = minDistance
+      closestValidity = object
+    }
+  }
+
+  return closestValidity
 }

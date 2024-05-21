@@ -9,27 +9,36 @@
   import { updateGlobalNavigation } from "$lib/stores/navigation"
   import { gql } from "graphql-request"
   import { graphQLClient } from "$lib/util/http"
+  import { findClosestValidity } from "$lib/util/helpers"
   import {
     SearchEmployeeDocument,
     SearchOrgUnitDocument,
     type SearchEmployeeQuery,
     type SearchOrgUnitQuery,
-    LazySearchDocument,
-    type LazySearchQuery,
+    LazyEmployeeSearchDocument,
+    type LazyEmployeeSearchQuery,
+    LazyOrgUnitSearchDocument,
+    type LazyOrgUnitSearchQuery,
   } from "./query.generated"
+  import { env } from "$env/dynamic/public"
 
-  type Employees = SearchEmployeeQuery["employees"]["objects"][0]["objects"]
-  type OrgUnits = SearchOrgUnitQuery["org_units"]["objects"][0]["objects"]
+  type Employees = SearchEmployeeQuery["employees"]["objects"][0]["validities"]
+  type OrgUnits = SearchOrgUnitQuery["org_units"]["objects"][0]["validities"]
   type LazyEmployees = NonNullable<
-    LazySearchQuery["employees"]
-  >["objects"][0]["objects"]
-  type LazyOrgUnits = NonNullable<LazySearchQuery["org_units"]>["objects"][0]["objects"]
+    LazyEmployeeSearchQuery["employees"]
+  >["objects"][0]["validities"]
+  type LazyOrgUnits = NonNullable<
+    LazyOrgUnitSearchQuery["org_units"]
+  >["objects"][0]["validities"]
 
   type SearchItems = Employees | OrgUnits | LazyEmployees | LazyOrgUnits
   type SearchItem = SearchItems[0]
 
-  export let startValue: SearchItem | undefined = undefined
-  export let value: SearchItem | undefined = startValue || undefined
+  // { name: string; uuid: string } allows us to use `<Search>` in forms, without using validity, since it's not needed.
+  export let startValue: SearchItem | { name: string; uuid: string } | undefined =
+    undefined
+  export let value: SearchItem | { name: string; uuid: string } | undefined =
+    startValue || undefined
   export let name: string | undefined = undefined
   export let type: "employee" | "org-unit"
   export let action: "select" | "goto" = "select" // Redirect for navigation, select for forms
@@ -49,66 +58,40 @@
   let items: SearchItems
 
   gql`
-    query SearchEmployee($fromDate: DateTime, $queryString: String!) {
-      employees(filter: { from_date: $fromDate, query: $queryString }) {
+    query SearchEmployee($filter: EmployeeFilter!) {
+      employees(filter: $filter) {
         objects {
-          objects {
+          validities {
             uuid
             name
-          }
-        }
-      }
-    }
-    query SearchOrgUnit($fromDate: DateTime, $queryString: String!) {
-      org_units(filter: { from_date: $fromDate, query: $queryString }) {
-        objects {
-          objects {
-            uuid
-            name
+            validity {
+              from
+              to
+            }
           }
         }
       }
     }
 
-    query LazySearch($uuids: [UUID!], $isEmployeeRoute: Boolean!) {
-      ...employee_or_org
-    }
-
-    fragment employee_or_org on Query {
-      employees(filter: { uuids: $uuids }) @include(if: $isEmployeeRoute) {
+    query SearchOrgUnit($filter: OrganisationUnitFilter!) {
+      org_units(filter: $filter) {
         objects {
-          objects {
-            name
+          validities {
             uuid
-            addresses {
-              address_type {
-                name
-              }
-              resolve {
-                ... on DefaultAddress {
-                  __typename
-                  value
-                }
-                ... on DARAddress {
-                  __typename
-                  name
-                }
-                ... on MultifieldAddress {
-                  __typename
-                  value
-                  value2
-                }
-              }
-            }
-            itusers {
-              user_key
+            name
+            validity {
+              from
+              to
             }
           }
         }
       }
-      org_units(filter: { uuids: $uuids }) @skip(if: $isEmployeeRoute) {
+    }
+
+    query LazyOrgUnitSearch($orgUnitFilter: OrganisationUnitFilter!) {
+      org_units(filter: $orgUnitFilter) {
         objects {
-          objects {
+          validities {
             name
             uuid
             addresses {
@@ -134,6 +117,48 @@
             parent {
               name
             }
+            validity {
+              from
+              to
+            }
+          }
+        }
+      }
+    }
+
+    query LazyEmployeeSearch($employeeFilter: EmployeeFilter!) {
+      employees(filter: $employeeFilter) {
+        objects {
+          validities {
+            name
+            uuid
+            addresses {
+              address_type {
+                name
+              }
+              resolve {
+                ... on DefaultAddress {
+                  __typename
+                  value
+                }
+                ... on DARAddress {
+                  __typename
+                  name
+                }
+                ... on MultifieldAddress {
+                  __typename
+                  value
+                  value2
+                }
+              }
+            }
+            itusers {
+              user_key
+            }
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -145,45 +170,88 @@
     if (filterText.length < 3) return []
 
     loading = true
-    let res: SearchEmployeeQuery | SearchOrgUnitQuery | LazySearchQuery
+    let res:
+      | SearchEmployeeQuery
+      | SearchOrgUnitQuery
+      | LazyEmployeeSearchQuery
+      | LazyOrgUnitSearchQuery
 
     switch (type) {
       case "employee":
+        let employeeFilter
+        // Check if FF is true, else search "normally"
+        if (env.PUBLIC_SEARCH_INFINITY === "true" && action === "goto") {
+          employeeFilter = { from_date: null, to_date: null, query: filterText }
+        } else {
+          employeeFilter = { from_date: $date, query: filterText }
+        }
         res = await graphQLClient().request(SearchEmployeeDocument, {
-          fromDate: $date,
-          queryString: filterText,
+          filter: employeeFilter,
         })
-        items = res.employees.objects
-          .map((item) => item.objects[0])
+
+        items = items = res.employees.objects
+          .map((item) => findClosestValidity(item.validities, $date))
           .sort((a, b) => (a.name > b.name ? 1 : -1))
 
+        let lazyEmployeeFilter
+        if (env.PUBLIC_SEARCH_INFINITY === "true" && action === "goto") {
+          lazyEmployeeFilter = {
+            from_date: null,
+            to_date: null,
+            uuids: items.map((e) => e.uuid),
+          }
+        } else {
+          lazyEmployeeFilter = { from_date: $date, uuids: items.map((e) => e.uuid) }
+        }
+
+        res = await graphQLClient().request(LazyEmployeeSearchDocument, {
+          employeeFilter: lazyEmployeeFilter,
+        })
+
+        if (res.employees) {
+          items = items = res.employees.objects
+            .map((item) => findClosestValidity(item.validities, $date))
+            .sort((a, b) => (a.name > b.name ? 1 : -1))
+        }
         break
 
       case "org-unit":
+        let orgUnitFilter
+        // Check if FF is true, else search "normally"
+        if (env.PUBLIC_SEARCH_INFINITY === "true" && action === "goto") {
+          orgUnitFilter = { from_date: null, to_date: null, query: filterText }
+        } else {
+          orgUnitFilter = { from_date: $date, query: filterText }
+        }
         res = await graphQLClient().request(SearchOrgUnitDocument, {
-          fromDate: $date,
-          queryString: filterText,
+          filter: orgUnitFilter,
         })
-        items = res.org_units.objects
-          .map((item) => item.objects[0])
+
+        items = items = res.org_units.objects
+          .map((item) => findClosestValidity(item.validities, $date))
           .sort((a, b) => (a.name > b.name ? 1 : -1))
 
+        let lazyOrgFilter
+        if (env.PUBLIC_SEARCH_INFINITY === "true" && action === "goto") {
+          lazyOrgFilter = {
+            from_date: null,
+            to_date: null,
+            uuids: items.map((e) => e.uuid),
+          }
+        } else {
+          lazyOrgFilter = { from_date: $date, uuids: items.map((e) => e.uuid) }
+        }
+
+        res = await graphQLClient().request(LazyOrgUnitSearchDocument, {
+          orgUnitFilter: lazyOrgFilter,
+        })
+
+        if (res.org_units) {
+          items = items = res.org_units.objects
+            .map((item) => findClosestValidity(item.validities, $date))
+            .sort((a, b) => (a.name > b.name ? 1 : -1))
+        }
         break
-    }
-
-    res = await graphQLClient().request(LazySearchDocument, {
-      uuids: items.map((e) => e.uuid),
-      isEmployeeRoute: type === "employee",
-    })
-
-    if (res.employees) {
-      items = res.employees.objects
-        .map((item) => item.objects[0])
-        .sort((a, b) => (a.name > b.name ? 1 : -1))
-    } else if (res.org_units) {
-      items = res.org_units.objects
-        .map((item) => item.objects[0])
-        .sort((a, b) => (a.name > b.name ? 1 : -1))
     }
 
     loading = false
