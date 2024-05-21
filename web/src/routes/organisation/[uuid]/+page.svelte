@@ -21,6 +21,7 @@
   import OrgUnitTable from "$lib/components/tables/OrgUnitTable.svelte"
   import KleTable from "$lib/components/tables/KLETable.svelte"
   import OwnerTable from "$lib/components/tables/OwnerTable.svelte"
+  import RoleBindingTable from "$lib/components/tables/RoleBindingTable.svelte"
   import RelatedUnitsTable from "$lib/components/tables/RelatedUnitsTable.svelte"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Tabs from "$lib/components/shared/Tabs.svelte"
@@ -34,6 +35,7 @@
     { label: "engagement", value: "engagement", n: 2 },
     { label: "association", value: "association", n: 2 },
     { label: "ituser", value: "ituser", n: 2 },
+    { label: "rolebinding", value: "rolebinding", n: 2 },
     { label: "kle", value: "kle", n: 2 },
     { label: "manager", value: "manager", n: 2 },
     { label: "owner", value: "owner", n: 2 },
@@ -223,6 +225,27 @@
           { title: capital($_("it_system")), sortPath: "itsystem.name" },
           { title: capital($_("account_name")), sortPath: "user_key" },
           { title: capital($_("primary")) },
+          { title: capital($_("date.date")), sortPath: "validity.from" },
+          { title: "" },
+          { title: "" },
+        ]}
+      />
+    {:else if activeItem === OrgTab.ROLEBINDING}
+      <TableTensesWrapper
+        table={RoleBindingTable}
+        headers={[
+          {
+            title: capital($_("ituser", { values: { n: 1 } })),
+            sortPath: "ituser[0].user_key",
+          },
+          {
+            title: capital($_("itsystem", { values: { n: 1 } })),
+            sortPath: "ituser[0].itsystem.name",
+          },
+          {
+            title: capital($_("role", { values: { n: 1 } })),
+            sortPath: "role[0].name",
+          },
           { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
           { title: "" },

@@ -44,7 +44,7 @@
 	"insight": "indsigt",
 	"it_system": "IT-system",
 	"itassociation": "{n, plural, =0 {IT-tilknytningen} one {IT-tilknytning} other {IT-tilknytninger}}",
-	"ituser": "IT-bruger",
+	"ituser": "{n, plural, =0 {IT brugeren} one {IT bruger} other {IT brugere}}",
 	"job_function": "{n, plural, =0 {stillingsbetegnelsen} one {stillingsbetegnelse} other {stillingsbetegnelser}}",
 	"job_function_bvn": "brugervendt stillingsbetegnelse",
 	"kle": "KLE-opmærkning",
@@ -96,6 +96,7 @@
 	"rename": "omdøb",
 	"report": "{n, plural, one {rapport} other {rapporter}}",
 	"role": "{n, plural, =0 {rollen} one {rolle} other {roller}}",
+	"rolebinding": "{n, plural, =0 {rollebindingen} one {rollebinding} other {rollebindinger}}",
 	"role_type": "rolletype",
 	"save": "gem",
 	"search": {
