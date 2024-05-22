@@ -112,8 +112,8 @@
                 $_("success_create", {
                   values: {
                     item: $_("rolebinding", { values: { n: 0 } }),
-                    name: mutation.rolebinding_create.objects[0].ituser[0].org_unit?.[0]
-                      .name,
+                    name: mutation.rolebinding_create.objects[0]?.ituser?.[0]
+                      .org_unit?.[0].name,
                   },
                 })
               ),

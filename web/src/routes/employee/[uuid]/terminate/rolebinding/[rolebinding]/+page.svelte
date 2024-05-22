@@ -72,7 +72,7 @@
                 $_("success_terminate", {
                   values: {
                     item: $_("rolebinding", { values: { n: 0 } }),
-                    name: mutation.rolebinding_terminate.objects[0].ituser[0]
+                    name: mutation.rolebinding_terminate.objects[0]?.ituser?.[0]
                       .person?.[0].name,
                   },
                 })
