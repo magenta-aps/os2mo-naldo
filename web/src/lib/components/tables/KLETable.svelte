@@ -15,6 +15,7 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
+  import { formatQueryDates } from "$lib/util/helpers"
 
   type KLEs = KleQuery["kles"]["objects"][0]["objects"]
   let data: KLEs
@@ -89,7 +90,10 @@
       <td class="p-4">{kle.kle_number.name}</td>
       <ValidityTableCell validity={kle.validity} />
       <td>
-        <a href="{base}/organisation/{$page.params.uuid}/edit/kle/{kle.uuid}">
+        <a
+          href="{base}/organisation/{$page.params
+            .uuid}/edit/kle/{kle.uuid}{formatQueryDates(kle.validity)}"
+        >
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>
       </td>

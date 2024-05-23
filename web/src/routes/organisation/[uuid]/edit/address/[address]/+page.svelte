@@ -34,7 +34,7 @@
   $: svelteForm = form(fromDate, addressTypeField, addressField)
 
   gql`
-    query AddressAndFacets($uuid: [UUID!], $fromDate: DateTime) {
+    query AddressAndFacets($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
       facets(filter: { user_keys: ["org_unit_address_type", "visibility"] }) {
         objects {
           objects {
@@ -49,7 +49,7 @@
           }
         }
       }
-      addresses(filter: { uuids: $uuid, from_date: $fromDate }) {
+      addresses(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
           validities {
             uuid
@@ -192,7 +192,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( AddressAndFacetsDocument, { uuid: $page.params.address, fromDate: $date } )}
+{#await graphQLClient().request( AddressAndFacetsDocument, { uuid: $page.params.address, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to") } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">

@@ -47,6 +47,7 @@
       $uuid: [UUID!]
       $employeeUuid: [UUID!]
       $fromDate: DateTime
+      $toDate: DateTime
     ) {
       facets(
         filter: { user_keys: ["manager_type", "manager_level", "responsibility"] }
@@ -63,7 +64,7 @@
           }
         }
       }
-      managers(filter: { uuids: $uuid, from_date: $fromDate }) {
+      managers(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
           validities {
             uuid
@@ -170,7 +171,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ManagerAndFacetsDocument, { uuid: $page.params.manager, employeeUuid: $page.params.uuid, fromDate: $date } )}
+{#await graphQLClient().request( ManagerAndFacetsDocument, { uuid: $page.params.manager, employeeUuid: $page.params.uuid, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to") } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">

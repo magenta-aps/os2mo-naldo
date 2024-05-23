@@ -15,6 +15,7 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
+  import { formatQueryDates } from "$lib/util/helpers"
 
   export let tense: Tense
 
@@ -97,7 +98,11 @@
       </td>
       <ValidityTableCell validity={leave.validity} />
       <td>
-        <a aria-disabled href="{base}/employee/{uuid}/edit/leave/{leave.uuid}">
+        <a
+          href="{base}/employee/{uuid}/edit/leave/{leave.uuid}{formatQueryDates(
+            leave.validity
+          )}"
+        >
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>
       </td>

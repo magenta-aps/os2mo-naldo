@@ -27,10 +27,10 @@
   const svelteForm = form(fromDate, firstName, lastName)
 
   gql`
-    query Employee($uuid: [UUID!]) {
+    query Employee($uuid: [UUID!], $fromDate: DateTime) {
       employees(filter: { uuids: $uuid, from_date: null, to_date: null }) {
         objects {
-          current {
+          current(at: $fromDate) {
             given_name
             surname
             nickname_givenname
@@ -111,7 +111,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request(EmployeeDocument, { uuid: $page.params.uuid })}
+{#await graphQLClient().request( EmployeeDocument, { uuid: $page.params.uuid, fromDate: $page.url.searchParams.get("from") } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">

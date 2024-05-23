@@ -20,6 +20,7 @@
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import type { RoleBindingFilter } from "$lib/graphql/types"
+  import { formatQueryDates } from "$lib/util/helpers"
 
   type Rolebinding = RolebindingsQuery["rolebindings"]["objects"][0]["objects"]
   let data: Rolebinding
@@ -99,7 +100,9 @@
         <a
           href="{base}/{$page.route.id?.split(
             '/'
-          )[1]}/{uuid}/edit/rolebinding/{rolebindingObj.uuid}"
+          )[1]}/{uuid}/edit/rolebinding/{rolebindingObj.uuid}{formatQueryDates(
+            rolebindingObj.validity
+          )}"
         >
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>

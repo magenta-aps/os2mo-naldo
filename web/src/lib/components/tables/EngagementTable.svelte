@@ -15,6 +15,7 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
+  import { formatQueryDates } from "$lib/util/helpers"
   import { MOConfig } from "$lib/stores/config"
 
   let inheritManager: boolean | undefined
@@ -182,7 +183,9 @@
         <a
           href="{base}/{$page.route.id?.split(
             '/'
-          )[1]}/{uuid}/edit/engagement/{engagement.uuid}"
+          )[1]}/{uuid}/edit/engagement/{engagement.uuid}{formatQueryDates(
+            engagement.validity
+          )}"
         >
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>
