@@ -3,7 +3,7 @@ import type { OpenValidity, Validity } from "$lib/graphql/types"
 import { date } from "$lib/stores/date"
 import type { Facet } from "$lib/util/get_classes"
 import { keycloak } from "$lib/util/keycloak"
-import { format, isValid, parseISO } from "date-fns"
+import { format, isValid, parseISO, formatISO, addSeconds } from "date-fns"
 import { get } from "svelte/store"
 
 export const getUuidFromHash = (hash: string) => {
@@ -178,11 +178,20 @@ export const getMinMaxValidities = (
 
 export const formatQueryDates = (validity: Validity | OpenValidity): string => {
   const from = parseISO(validity.from)
-  const to = parseISO(validity.to)
+  let to = parseISO(validity.to)
+
+  // TODO: Workaround for sus backend behaviour (https://redmine.magenta.dk/issues/61001)
+  if (to.getTime() === from.getTime()) {
+    to = addSeconds(to, 1)
+  }
 
   // If date is not valid, set to null (we never return null, it's just to make it clearer than an empty string)
-  const formattedFrom = isValid(from) ? `from=${format(from, "yyyy-MM-dd")}` : null
-  const formattedTo = isValid(to) ? `to=${format(to, "yyyy-MM-dd")}` : null
+  const formattedFrom = isValid(from)
+    ? `from=${encodeURIComponent(formatISO(from, { representation: "complete" }))}`
+    : null
+  const formattedTo = isValid(to)
+    ? `to=${encodeURIComponent(formatISO(to, { representation: "complete" }))}`
+    : null
 
   if (!formattedFrom && !formattedTo) {
     return ""
