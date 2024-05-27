@@ -20,6 +20,7 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
+  import { formatQueryDates } from "$lib/util/helpers"
   import { MOConfig } from "$lib/stores/config"
 
   let inheritManager: boolean | undefined
@@ -34,8 +35,8 @@
   const isOrg = $page.route.id?.startsWith("/organisation")
 
   type Managers =
-    | EmployeeManagersQuery["employees"]["objects"][0]["validities"]
-    | OrgUnitManagersQuery["org_units"]["objects"][0]["validities"]
+    | EmployeeManagersQuery["employees"]["objects"][0]["validities"][0]["managers"]
+    | OrgUnitManagersQuery["org_units"]["objects"][0]["validities"][0]["managers"]
   let data: Managers
 
   // TODO: When/If GraphQL support searching for `inherited managers` on top-level `managers`, revert to this commit
@@ -135,10 +136,10 @@
       })
 
       // Filters and flattens the data
-      for (const outer of res.org_units.objects) {
+      for (const outer of res.org_units.objects[0].validities) {
         // TODO: Remove when GraphQL is able to do this for us
-        const filtered = outer.validities.filter((obj) => {
-          return tenseFilter(obj.managers[0], tense)
+        const filtered = outer.managers.filter((obj) => {
+          return tenseFilter(obj, tense)
         })
         managers.push(...filtered)
       }
@@ -149,10 +150,10 @@
         ...tenseToValidity(tense, $date),
       })
       // Filters and flattens the data
-      for (const outer of res.employees.objects) {
+      for (const outer of res.employees.objects[0].validities) {
         // TODO: Remove when GraphQL is able to do this for us
-        const filtered = outer.validities.filter((obj) => {
-          return tenseFilter(obj.managers[0], tense)
+        const filtered = outer.managers.filter((obj) => {
+          return tenseFilter(obj, tense)
         })
         managers.push(...filtered)
       }
@@ -166,7 +167,7 @@
     <td class="p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
-  {#each data[0].managers as orgOrEmployee}
+  {#each data as orgOrEmployee}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
       {#if isOrg}
         <a
@@ -212,7 +213,9 @@
         <a
           href="{base}/{$page.route.id?.split(
             '/'
-          )[1]}/{uuid}/edit/manager/{orgOrEmployee.uuid}"
+          )[1]}/{uuid}/edit/manager/{orgOrEmployee.uuid}{formatQueryDates(
+            orgOrEmployee.validity
+          )}"
         >
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>

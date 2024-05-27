@@ -26,8 +26,13 @@
   const svelteForm = form(fromDate)
 
   gql`
-    query Owner($uuid: [UUID!], $employeeUuid: [UUID!], $fromDate: DateTime) {
-      owners(filter: { uuids: $uuid, from_date: $fromDate }) {
+    query Owner(
+      $uuid: [UUID!]
+      $employeeUuid: [UUID!]
+      $fromDate: DateTime
+      $toDate: DateTime
+    ) {
+      owners(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
           validities {
             owner {
@@ -114,7 +119,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( OwnerDocument, { uuid: $page.params.owner, employeeUuid: $page.params.uuid, fromDate: $date } )}
+{#await graphQLClient().request( OwnerDocument, { uuid: $page.params.owner, employeeUuid: $page.params.uuid, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to") } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">

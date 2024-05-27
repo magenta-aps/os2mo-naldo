@@ -20,6 +20,7 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
+  import { formatQueryDates } from "$lib/util/helpers"
 
   type Owners =
     | EmployeeOwnerQuery["owners"]["objects"][0]["validities"]
@@ -160,7 +161,7 @@
         <a
           href="{base}/{$page.route.id?.split(
             '/'
-          )[1]}/{uuid}/edit/owner/{ownerObj.uuid}"
+          )[1]}/{uuid}/edit/owner/{ownerObj.uuid}{formatQueryDates(ownerObj.validity)}"
         >
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>

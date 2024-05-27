@@ -15,6 +15,7 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
+  import { formatQueryDates } from "$lib/util/helpers"
 
   type ITUsers = ItUsersQuery["itusers"]["objects"][0]["objects"]
   let data: ITUsers
@@ -104,7 +105,9 @@
       <ValidityTableCell validity={ituser.validity} />
       <td>
         <a
-          href="{base}/{$page.route.id?.split('/')[1]}/{uuid}/edit/ituser/{ituser.uuid}"
+          href="{base}/{$page.route.id?.split(
+            '/'
+          )[1]}/{uuid}/edit/ituser/{ituser.uuid}{formatQueryDates(ituser.validity)}"
         >
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>

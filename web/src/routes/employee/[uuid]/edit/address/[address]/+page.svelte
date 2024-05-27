@@ -37,6 +37,7 @@
     query AddressAndFacets(
       $uuid: [UUID!]
       $fromDate: DateTime
+      $toDate: DateTime
       $employee_uuid: [UUID!]
     ) {
       facets(filter: { user_keys: ["employee_address_type", "visibility"] }) {
@@ -53,7 +54,7 @@
           }
         }
       }
-      addresses(filter: { uuids: $uuid, from_date: $fromDate }) {
+      addresses(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
           validities {
             uuid
@@ -171,7 +172,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( AddressAndFacetsDocument, { uuid: $page.params.address, fromDate: $date, employee_uuid: $page.params.uuid } )}
+{#await graphQLClient().request( AddressAndFacetsDocument, { uuid: $page.params.address, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), employee_uuid: $page.params.uuid } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">

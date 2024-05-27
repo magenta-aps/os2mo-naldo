@@ -175,3 +175,22 @@ export const getMinMaxValidities = (
     to: maxDate ? format(maxDate, "yyyy-MM-dd") : undefined,
   }
 }
+
+export const formatQueryDates = (validity: Validity | OpenValidity): string => {
+  const from = parseISO(validity.from)
+  const to = parseISO(validity.to)
+
+  // If date is not valid, set to null (we never return null, it's just to make it clearer than an empty string)
+  const formattedFrom = isValid(from) ? `from=${format(from, "yyyy-MM-dd")}` : null
+  const formattedTo = isValid(to) ? `to=${format(to, "yyyy-MM-dd")}` : null
+
+  if (!formattedFrom && !formattedTo) {
+    return ""
+  }
+
+  if (formattedFrom && formattedTo) {
+    return `?${formattedFrom}&${formattedTo}`
+  }
+
+  return `?${formattedFrom || formattedTo}`
+}

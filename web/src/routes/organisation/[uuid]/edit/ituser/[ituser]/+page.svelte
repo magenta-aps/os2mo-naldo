@@ -38,9 +38,10 @@
     query ITUserItSystemsOrgAndPrimary(
       $uuid: [UUID!]
       $fromDate: DateTime
+      $toDate: DateTime
       $primaryClass: String!
     ) {
-      itusers(filter: { uuids: $uuid, from_date: $fromDate }) {
+      itusers(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
           validities {
             user_key
@@ -150,7 +151,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ItUserItSystemsOrgAndPrimaryDocument, { uuid: $page.params.ituser, fromDate: $date, primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary" } )}
+{#await graphQLClient().request( ItUserItSystemsOrgAndPrimaryDocument, { uuid: $page.params.ituser, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary" } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">

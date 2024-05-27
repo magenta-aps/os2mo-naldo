@@ -47,6 +47,7 @@
       $uuid: [UUID!]
       $employeeUuid: [UUID!]
       $fromDate: DateTime
+      $toDate: DateTime
     ) {
       facets(filter: { user_keys: "engagement_job_function" }) {
         objects {
@@ -71,7 +72,12 @@
         }
       }
       associations(
-        filter: { uuids: $uuid, from_date: $fromDate, it_association: true }
+        filter: {
+          uuids: $uuid
+          from_date: $fromDate
+          to_date: $toDate
+          it_association: true
+        }
       ) {
         objects {
           validities {
@@ -195,7 +201,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ItAssociationAndFacetsDocument, { uuid: $page.params.itassociation, employeeUuid: $page.params.uuid, fromDate: $date } )}
+{#await graphQLClient().request( ItAssociationAndFacetsDocument, { uuid: $page.params.itassociation, employeeUuid: $page.params.uuid, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to") } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
