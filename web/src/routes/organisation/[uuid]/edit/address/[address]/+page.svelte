@@ -245,7 +245,6 @@
             startValue={address.visibility ? address.visibility : undefined}
             iterable={getClassesByFacetUserKey(facets, "visibility")}
             extra_classes="basis-1/2"
-            isClearable={true}
           />
           <Select
             title={capital($_("address_type"))}
