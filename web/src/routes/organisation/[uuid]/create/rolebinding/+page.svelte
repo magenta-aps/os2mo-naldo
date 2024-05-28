@@ -131,7 +131,9 @@
     const res = await graphQLClient().request(GetItSystemRolesDocument, {
       itSystemUuid: itSystemUuid,
     })
-    itSystemRoles = res.classes?.objects.map((cls) => cls.objects[0])
+    itSystemRoles = res.classes?.objects
+      .map((cls) => cls.objects[0])
+      .sort((a, b) => (a.name > b.name ? 1 : -1))
   }
 </script>
 
