@@ -82,11 +82,11 @@
       on:clear
     >
       <div slot="item" let:item class="cursor-pointer">
-        {item.name}
+        {capital($_(item.name.toLowerCase()))}
       </div>
 
       <div slot="selection" let:selection class="cursor-pointer">
-        {selection.name}
+        {capital($_(selection.name.toLowerCase()))}
       </div>
     </SvelteSelect>
   </div>

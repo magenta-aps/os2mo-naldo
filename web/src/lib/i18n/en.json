@@ -1,4 +1,9 @@
 {
+	"ansat": "employed",
+	"linjeorganisation": "super cool name",
+
+
+
 	"account_name": "account name",
 	"address": "{n, plural, =0 {the address} one {address} other {addresses}}",
 	"address_type": "address type",
