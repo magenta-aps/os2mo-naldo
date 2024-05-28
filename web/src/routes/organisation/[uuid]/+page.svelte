@@ -225,6 +225,7 @@
           { title: capital($_("it_system")), sortPath: "itsystem.name" },
           { title: capital($_("account_name")), sortPath: "user_key" },
           { title: capital($_("primary")) },
+          { title: "rolle" },
           { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
           { title: "" },

@@ -49,6 +49,16 @@
             itsystem {
               name
             }
+            rolebindings {
+              uuid
+              role {
+                name
+              }
+              validity {
+                from
+                to
+              }
+            }
             validity {
               from
               to
@@ -102,6 +112,7 @@
       <td class="p-4">{ituser.itsystem.name}</td>
       <td class="p-4">{ituser.user_key}</td>
       <td class="p-4">{ituser.primary ? ituser.primary.name : ""}</td>
+      <td class="p-4" />
       <ValidityTableCell validity={ituser.validity} />
       <td>
         <a
@@ -122,6 +133,35 @@
         </a>
       </td>
     </tr>
+    {#each ituser.rolebindings as rolebinding}
+      <tr class="leading-4 border-t border-slate-300 text-secondary">
+        <td class="p-4" />
+        <td class="p-4" />
+        <td class="p-4" />
+        <td class="p-4"> {rolebinding.role[0].name} </td>
+        <ValidityTableCell validity={rolebinding.validity} />
+        <td>
+          <a
+            href="{base}/{$page.route.id?.split(
+              '/'
+            )[1]}/{uuid}/edit/rolebinding/{rolebinding.uuid}{formatQueryDates(
+              rolebinding.validity
+            )}"
+          >
+            <Icon icon={editSquareOutlineRounded} width="25" height="25" />
+          </a>
+        </td>
+        <td>
+          <a
+            href="{base}/{$page.route.id?.split(
+              '/'
+            )[1]}/{uuid}/terminate/rolebinding/{rolebinding.uuid}"
+          >
+            <Icon icon={cancelOutlineRounded} width="25" height="25" />
+          </a>
+        </td>
+      </tr>
+    {/each}
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
       <!-- TODO: Add translated "No IT users in <tense>"-message" -->
