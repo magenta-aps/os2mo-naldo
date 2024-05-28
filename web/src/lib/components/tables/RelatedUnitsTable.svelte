@@ -74,15 +74,17 @@
 {:else}
   {#each data as related_unit}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-      {#if related_unit.org_units[0].uuid == $page.params.uuid}
-        <a href="{base}/organisation/{related_unit.org_units[1].uuid}">
-          <td class="p-4">{related_unit.org_units[1].name}</td>
-        </a>
-      {:else}
-        <a href="{base}/organisation/{related_unit.org_units[0].uuid}">
-          <td class="p-4">{related_unit.org_units[0].name}</td>
-        </a>
-      {/if}
+      <td class="p-4">
+        {#if related_unit.org_units[0].uuid == $page.params.uuid}
+          <a href="{base}/organisation/{related_unit.org_units[1].uuid}">
+            {related_unit.org_units[1].name}
+          </a>
+        {:else}
+          <a href="{base}/organisation/{related_unit.org_units[0].uuid}">
+            {related_unit.org_units[0].name}
+          </a>
+        {/if}
+      </td>
       <ValidityTableCell validity={related_unit.validity} />
     </tr>
   {:else}

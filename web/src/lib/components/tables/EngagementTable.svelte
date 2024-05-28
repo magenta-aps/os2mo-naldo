@@ -17,6 +17,7 @@
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import { formatQueryDates } from "$lib/util/helpers"
   import { MOConfig } from "$lib/stores/config"
+  import { globalNavigation } from "$lib/stores/navigation"
 
   let inheritManager: boolean | undefined
 
@@ -123,20 +124,21 @@
   </tr>
 {:else}
   {#each data as engagement, i}
-    <!-- TODO: If no engagements "No past engagements found"-ish -->
     <tr
       class="{i % 2 === 0 ? '' : 'bg-slate-100'} 
       py-4 leading-5 border-t border-slate-300 text-secondary"
     >
-      {#if isOrg}
-        <a href="{base}/employee/{engagement.employee[0].uuid}">
-          <td class="p-4">{engagement.employee[0].name}</td>
-        </a>
-      {:else}
-        <a href="{base}/organisation/{engagement.org_unit[0].uuid}">
-          <td class="p-4">{engagement.org_unit[0].name}</td>
-        </a>
-      {/if}
+      <td class="p-4">
+        {#if isOrg}
+          <a href="{base}/employee/{engagement.employee[0].uuid}"
+            >{engagement.employee[0].name}</a
+          >
+        {:else}
+          <a href="{base}/organisation/{engagement.org_unit[0].uuid}"
+            >{engagement.org_unit[0].name}</a
+          >
+        {/if}
+      </td>
       <td class="p-4">{engagement.user_key}</td>
       <td class="p-4">{engagement.job_function.name}</td>
       <td class="p-4">{engagement.engagement_type.name}</td>
@@ -202,7 +204,6 @@
     </tr>
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
-      <!-- TODO: Add translated "No engagements in <tense>"-message" -->
       <td class="p-4"
         >{capital(
           $_("no_item", { values: { item: $_("engagement", { values: { n: 2 } }) } })

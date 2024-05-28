@@ -109,23 +109,18 @@
   </tr>
 {:else}
   {#each data as association}
-    <!-- some py-4 others p-4 -->
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-      {#if isOrg}
-        {#if association.employee[0]}
+      <td class="p-4">
+        {#if isOrg}
           <a href="{base}/employee/{association.employee[0].uuid}">
-            <td class="p-4">{association.employee[0].name}</td>
+            {association.employee[0].name}
           </a>
         {:else}
-          <td class="p-4" />
-        {/if}
-      {:else}
-        <a href="{base}/organisation/{association.org_unit[0].uuid}">
-          <td class="p-4"
-            >{association.org_unit[0] ? association.org_unit[0].name : ""}</td
+          <a href="{base}/organisation/{association.org_unit[0].uuid}">
+            {association.org_unit[0].name}</a
           >
-        </a>
-      {/if}
+        {/if}
+      </td>
       <td class="p-4">{association.association_type?.name}</td>
       <td class="p-4"
         >{association.substitute[0] ? association.substitute[0].name : ""}</td

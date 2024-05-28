@@ -95,9 +95,11 @@
 {:else}
   {#each data as itassociation}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-      <a href="{base}/organisation/{itassociation.org_unit[0].uuid}">
-        <td class="p-4">{itassociation.org_unit[0].name}</td>
-      </a>
+      <td class="p-4">
+        <a href="{base}/organisation/{itassociation.org_unit[0].uuid}">
+          {itassociation.org_unit[0].name}
+        </a>
+      </td>
       <td class="p-4">{itassociation.job_function?.name}</td>
       <td class="p-4">{itassociation.it_user[0].itsystem.name}</td>
       <td class="p-4">{itassociation.it_user[0].user_key}</td>

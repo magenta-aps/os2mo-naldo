@@ -140,22 +140,25 @@
 {:else}
   {#each data as ownerObj}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-      <a href="{base}/employee/{ownerObj.owner ? ownerObj.owner[0].uuid : ''}">
-        <td class="p-4"
-          >{ownerObj.owner ? ownerObj.owner[0].name : ""}
-          <!-- Add (*) if manager-object is inherited -->
-          <!-- TODO: Fix this, so vacant managers doesn't get (*) as a link -->
-          {#if isOrg && ownerObj.org_unit?.[0].uuid !== $page.params.uuid}
-            <span
-              title={capital(
-                $_("inherited_manager", {
-                  values: { org_unit: ownerObj.org_unit?.[0].name },
-                })
-              )}>(*)</span
-            >
-          {/if}</td
-        >
-      </a>
+      <td class="p-4">
+        {#if ownerObj.owner}
+          <a href="{base}/employee/{ownerObj.owner[0].uuid}">
+            {ownerObj.owner[0].name}
+          </a>
+        {:else}
+          {capital($_("vacant"))}
+        {/if}
+        <!-- Add (*) if owner-object is inherited -->
+        {#if isOrg && ownerObj.org_unit?.[0].uuid !== $page.params.uuid}
+          <span
+            title={capital(
+              $_("inherited_owner", {
+                values: { org_unit: ownerObj.org_unit?.[0].name },
+              })
+            )}>(*)</span
+          >
+        {/if}
+      </td>
       <ValidityTableCell validity={ownerObj.validity} />
       <td>
         <a

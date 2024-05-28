@@ -101,17 +101,17 @@
             : capital($_("not_set"))}</td
         >
       {/if}
-      {#if org_unit.parent}
-        <a href="{base}/organisation/{org_unit.parent.uuid}">
-          <td class="p-4">{org_unit.parent.name}</td>
-        </a>
-      {:else}
-        <td class="p-4"
-          >{capital(
+      <td class="p-4">
+        {#if org_unit.parent}
+          <a href="{base}/organisation/{org_unit.parent.uuid}">
+            {org_unit.parent.name}
+          </a>
+        {:else}
+          {capital(
             $_("no_item", { values: { item: $_("parent", { values: { n: 1 } }) } })
-          )}</td
-        >
-      {/if}
+          )}
+        {/if}
+      </td>
       {#if $MOConfig && $MOConfig.confdb_show_time_planning === "true"}
         <td class="p-4">
           {org_unit.time_planning
