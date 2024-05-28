@@ -92,9 +92,7 @@
         {leave.leave_type.name}
       </td>
       <td class="p-4">
-        {#if leave.engagement}
-          {leave.engagement.job_function.name}, {leave.engagement.org_unit[0].name}
-        {/if}
+        {leave.engagement.job_function.name}, {leave.engagement.org_unit[0].name}
       </td>
       <ValidityTableCell validity={leave.validity} />
       <td>
@@ -110,6 +108,14 @@
         <a href="{base}/employee/{uuid}/terminate/leave/{leave.uuid}">
           <Icon icon={cancelOutlineRounded} width="25" height="25" />
         </a></td
+      >
+    </tr>
+  {:else}
+    <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
+      <td class="p-4"
+        >{capital(
+          $_("no_item", { values: { item: $_("leave", { values: { n: 2 } }) } })
+        )}</td
       >
     </tr>
   {/each}

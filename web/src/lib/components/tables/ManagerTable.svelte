@@ -169,34 +169,31 @@
 {:else}
   {#each data as orgOrEmployee}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
-      {#if isOrg}
-        <a
-          href="{base}/employee/{orgOrEmployee.person
-            ? orgOrEmployee.person[0].uuid
-            : ''}"
-        >
-          <td class="p-4">
-            {orgOrEmployee.person ? orgOrEmployee.person[0].name : ""}
-            <!-- Add (*) if manager-object is inherited -->
-            <!-- TODO: Fix this, so vacant managers doesn't get (*) as a link -->
-            {#if orgOrEmployee.org_unit[0].uuid !== $page.params.uuid}
-              <span
-                title={capital(
-                  $_("inherited_manager", {
-                    values: { org_unit: orgOrEmployee.org_unit[0].name },
-                  })
-                )}>(*)</span
-              >
-            {/if}
-          </td>
-        </a>
-      {:else}
-        <a href="{base}/organisation/{orgOrEmployee.org_unit[0].uuid}">
-          <td class="p-4">
+      <td class="p-4">
+        {#if isOrg}
+          {#if orgOrEmployee.person}
+            <a href="{base}/employee/{orgOrEmployee.person[0].uuid}">
+              {orgOrEmployee.person[0].name}
+            </a>
+          {:else}
+            {capital($_("vacant"))}
+          {/if}
+          <!-- Add (*) if manager-object is inherited -->
+          {#if orgOrEmployee.org_unit[0].uuid !== $page.params.uuid}
+            <span
+              title={capital(
+                $_("inherited_manager", {
+                  values: { org_unit: orgOrEmployee.org_unit[0].name },
+                })
+              )}>(*)</span
+            >
+          {/if}
+        {:else}
+          <a href="{base}/organisation/{orgOrEmployee.org_unit[0].uuid}">
             {orgOrEmployee.org_unit[0].name}
-          </td>
-        </a>
-      {/if}
+          </a>
+        {/if}
+      </td>
       <td class="p-4">
         <ul>
           {#each orgOrEmployee.responsibilities as responsibility}
