@@ -15,10 +15,14 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
+  import keyboardArrowUpRounded from "@iconify/icons-material-symbols/keyboard-arrow-up-rounded"
+  import keyboardArrowDownRounded from "@iconify/icons-material-symbols/keyboard-arrow-down-rounded"
   import { formatQueryDates } from "$lib/util/helpers"
+  import { slide } from "svelte/transition"
 
   type ITUsers = ItUsersQuery["itusers"]["objects"][0]["objects"]
   let data: ITUsers
+  let expanded: Boolean[]
 
   export let tense: Tense
 
@@ -96,7 +100,12 @@
       itUsers.push(...filtered)
     }
     data = itUsers
+    expanded = new Array(data.length).fill(false) // state array to track expanded rows
   })
+
+  const toggleExpanded = (index: number) => {
+    expanded[index] = !expanded[index]
+  }
 </script>
 
 {#if !data}
@@ -109,10 +118,23 @@
       class="{i % 2 === 0 ? '' : 'bg-slate-100'} 
       p-4 leading-5 border-t border-slate-300 text-secondary"
     >
+      {#if ituser.rolebindings.length}
+        <td class="p-4">
+          <button on:click={() => toggleExpanded(i)}>
+            <Icon
+              icon={expanded[i] ? keyboardArrowUpRounded : keyboardArrowDownRounded}
+              width="25"
+              height="25"
+            />
+          </button>
+        </td>
+      {:else}
+        <td class="p-4" />
+      {/if}
       <td class="p-4">{ituser.itsystem.name}</td>
       <td class="p-4">{ituser.user_key}</td>
       <td class="p-4">{ituser.primary ? ituser.primary.name : ""}</td>
-      <td class="p-4" />
+      <td class="p-4">-</td>
       <ValidityTableCell validity={ituser.validity} />
       <td>
         <a
@@ -133,35 +155,42 @@
         </a>
       </td>
     </tr>
-    {#each ituser.rolebindings as rolebinding}
-      <tr class="leading-4 border-t border-slate-300 text-secondary">
-        <td class="p-4" />
-        <td class="p-4" />
-        <td class="p-4" />
-        <td class="p-4"> {rolebinding.role[0].name} </td>
-        <ValidityTableCell validity={rolebinding.validity} />
-        <td>
-          <a
-            href="{base}/{$page.route.id?.split(
-              '/'
-            )[1]}/{uuid}/edit/rolebinding/{rolebinding.uuid}{formatQueryDates(
-              rolebinding.validity
-            )}"
-          >
-            <Icon icon={editSquareOutlineRounded} width="25" height="25" />
-          </a>
-        </td>
-        <td>
-          <a
-            href="{base}/{$page.route.id?.split(
-              '/'
-            )[1]}/{uuid}/terminate/rolebinding/{rolebinding.uuid}"
-          >
-            <Icon icon={cancelOutlineRounded} width="25" height="25" />
-          </a>
-        </td>
-      </tr>
-    {/each}
+    {#if expanded[i]}
+      {#each ituser.rolebindings as rolebinding}
+        <tr
+          class="{i % 2 === 0
+            ? ''
+            : 'bg-slate-100'} leading-3 border-t border-slate-300 text-secondary text-xs"
+        >
+          <td class="p-4" />
+          <td class="p-4">-</td>
+          <td class="p-4">-</td>
+          <td class="p-4">-</td>
+          <td class="p-4"> {rolebinding.role[0].name} </td>
+          <ValidityTableCell validity={rolebinding.validity} />
+          <td>
+            <a
+              href="{base}/{$page.route.id?.split(
+                '/'
+              )[1]}/{uuid}/edit/rolebinding/{rolebinding.uuid}{formatQueryDates(
+                rolebinding.validity
+              )}"
+            >
+              <Icon icon={editSquareOutlineRounded} width="25" height="25" />
+            </a>
+          </td>
+          <td>
+            <a
+              href="{base}/{$page.route.id?.split(
+                '/'
+              )[1]}/{uuid}/terminate/rolebinding/{rolebinding.uuid}"
+            >
+              <Icon icon={cancelOutlineRounded} width="25" height="25" />
+            </a>
+          </td>
+        </tr>
+      {/each}
+    {/if}
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
       <!-- TODO: Add translated "No IT users in <tense>"-message" -->
