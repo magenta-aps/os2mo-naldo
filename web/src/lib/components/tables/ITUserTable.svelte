@@ -18,11 +18,9 @@
   import keyboardArrowUpRounded from "@iconify/icons-material-symbols/keyboard-arrow-up-rounded"
   import keyboardArrowDownRounded from "@iconify/icons-material-symbols/keyboard-arrow-down-rounded"
   import { formatQueryDates } from "$lib/util/helpers"
-  import { slide } from "svelte/transition"
 
   type ITUsers = ItUsersQuery["itusers"]["objects"][0]["objects"]
   let data: ITUsers
-  let expanded: Boolean[]
 
   export let tense: Tense
 
@@ -100,11 +98,13 @@
       itUsers.push(...filtered)
     }
     data = itUsers
-    expanded = new Array(data.length).fill(false) // state array to track expanded rows
   })
 
-  const toggleExpanded = (index: number) => {
-    expanded[index] = !expanded[index]
+  let expanded = new Map()
+  const toggleExpanded = (uuid: string) => {
+    expanded.set(uuid, !expanded.get(uuid))
+    // This line ensures reactivity
+    expanded = new Map(expanded)
   }
 </script>
 
@@ -116,22 +116,29 @@
   {#each data as ituser, i}
     <tr
       class="{i % 2 === 0 ? '' : 'bg-slate-100'} 
-      p-4 leading-5 border-t border-slate-300 text-secondary"
+      p-4 leading-5 border-t border-slate-300 text-secondary {ituser.rolebindings.length
+        ? 'cursor-pointer'
+        : ''}"
+      on:click={() => {
+        if (ituser.rolebindings.length) {
+          toggleExpanded(ituser.uuid)
+        }
+      }}
     >
-      {#if ituser.rolebindings.length}
-        <td class="p-4">
-          <button on:click={() => toggleExpanded(i)}>
+      <td class="p-4"
+        >{ituser.itsystem.name}
+        {#if ituser.rolebindings.length}
+          <button class="align-middle">
             <Icon
-              icon={expanded[i] ? keyboardArrowUpRounded : keyboardArrowDownRounded}
+              icon={expanded.get(ituser.uuid)
+                ? keyboardArrowUpRounded
+                : keyboardArrowDownRounded}
               width="25"
               height="25"
             />
           </button>
-        </td>
-      {:else}
-        <td class="p-4" />
-      {/if}
-      <td class="p-4">{ituser.itsystem.name}</td>
+        {/if}</td
+      >
       <td class="p-4">{ituser.user_key}</td>
       <td class="p-4">{ituser.primary ? ituser.primary.name : ""}</td>
       <td class="p-4">-</td>
@@ -155,14 +162,13 @@
         </a>
       </td>
     </tr>
-    {#if expanded[i]}
+    {#if expanded.get(ituser.uuid)}
       {#each ituser.rolebindings as rolebinding}
         <tr
           class="{i % 2 === 0
             ? ''
             : 'bg-slate-100'} leading-3 border-t border-slate-300 text-secondary text-xs"
         >
-          <td class="p-4" />
           <td class="p-4">-</td>
           <td class="p-4">-</td>
           <td class="p-4">-</td>

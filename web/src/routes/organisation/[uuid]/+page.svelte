@@ -222,7 +222,6 @@
       <TableTensesWrapper
         table={ItUserTable}
         headers={[
-          { title: "" },
           { title: capital($_("it_system")), sortPath: "itsystem.name" },
           { title: capital($_("account_name")), sortPath: "user_key" },
           { title: capital($_("primary")) },
