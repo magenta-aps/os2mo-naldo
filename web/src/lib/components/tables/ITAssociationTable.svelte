@@ -16,6 +16,7 @@
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import { formatQueryDates } from "$lib/util/helpers"
+  import { updateGlobalNavigation } from "$lib/stores/navigation"
 
   export let tense: Tense
 
@@ -96,7 +97,10 @@
   {#each data as itassociation}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4">
-        <a href="{base}/organisation/{itassociation.org_unit[0].uuid}">
+        <a
+          href="{base}/organisation/{itassociation.org_unit[0].uuid}"
+          on:click={() => updateGlobalNavigation(itassociation.org_unit[0].uuid)}
+        >
           {itassociation.org_unit[0].name}
         </a>
       </td>

@@ -22,6 +22,7 @@
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import { formatQueryDates } from "$lib/util/helpers"
   import { MOConfig } from "$lib/stores/config"
+  import { updateGlobalNavigation } from "$lib/stores/navigation"
 
   let inheritManager: boolean | undefined
 
@@ -189,7 +190,10 @@
             >
           {/if}
         {:else}
-          <a href="{base}/organisation/{orgOrEmployee.org_unit[0].uuid}">
+          <a
+            href="{base}/organisation/{orgOrEmployee.org_unit[0].uuid}"
+            on:click={() => updateGlobalNavigation(orgOrEmployee.org_unit[0].uuid)}
+          >
             {orgOrEmployee.org_unit[0].name}
           </a>
         {/if}
