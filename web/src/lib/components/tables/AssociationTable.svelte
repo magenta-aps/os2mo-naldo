@@ -17,6 +17,7 @@
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import { formatQueryDates } from "$lib/util/helpers"
   import { MOConfig } from "$lib/stores/config"
+  import { updateGlobalNavigation } from "$lib/stores/navigation"
 
   type Associations = AssociationsQuery["associations"]["objects"][0]["objects"]
   let data: Associations
@@ -116,7 +117,10 @@
             {association.employee[0].name}
           </a>
         {:else}
-          <a href="{base}/organisation/{association.org_unit[0].uuid}">
+          <a
+            href="{base}/organisation/{association.org_unit[0].uuid}"
+            on:click={() => updateGlobalNavigation(association.org_unit[0].uuid)}
+          >
             {association.org_unit[0].name}</a
           >
         {/if}

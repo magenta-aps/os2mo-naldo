@@ -6,7 +6,7 @@
   import { base } from "$app/paths"
   import SearchItem from "./SearchItem.svelte"
   import { date } from "$lib/stores/date"
-  import { globalNavigation } from "$lib/stores/navigation"
+  import { updateGlobalNavigation } from "$lib/stores/navigation"
   import { gql } from "graphql-request"
   import { graphQLClient } from "$lib/util/http"
   import {
@@ -241,7 +241,7 @@
             `${base}/${type === "employee" ? "employee" : "organisation"}/${value.uuid}`
           )
           if (type === "org-unit") {
-            $globalNavigation.uuid = value.uuid
+            updateGlobalNavigation(value.uuid)
           }
           // Removes lingering/distracting value from staying after being redirected
           value = undefined
