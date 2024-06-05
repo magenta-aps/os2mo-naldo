@@ -50,11 +50,10 @@
         }
       }
     }
-    mutation UpdateEmployee($input: EmployeeUpdateInput!) {
+    mutation UpdateEmployee($input: EmployeeUpdateInput!, $date: DateTime!) {
       employee_update(input: $input) {
-        objects {
+        current(at: $date) {
           name
-          uuid
         }
       }
     }
@@ -70,17 +69,18 @@
           try {
             const mutation = await graphQLClient().request(UpdateEmployeeDocument, {
               input: result.data,
+              date: result.data.validity.from,
             })
             $success = {
               message: capital(
-                $_("success_edit", {
+                $_("success_edit_item", {
                   values: {
                     item: $_("employee", { values: { n: 0 } }),
-                    name: undefined,
+                    name: mutation.employee_update.current?.name,
                   },
                 })
               ),
-              uuid: mutation.employee_update.objects[0].uuid,
+              uuid: $page.params.uuid,
               type: "employee",
             }
           } catch (err) {

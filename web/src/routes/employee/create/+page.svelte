@@ -41,7 +41,7 @@
 
     mutation CreateEmployee($input: EmployeeCreateInput!) {
       employee_create(input: $input) {
-        objects {
+        current {
           name
           uuid
         }
@@ -64,14 +64,11 @@
               message: capital(
                 $_("success_create", {
                   values: {
-                    item: $_("employee", { values: { n: 0 } }),
-                    name: mutation.employee_create.objects[0]?.name,
+                    name: mutation.employee_create.current?.name,
                   },
                 })
               ),
-              uuid: mutation.employee_create.objects.length
-                ? mutation.employee_create.objects[0].uuid
-                : null,
+              uuid: mutation.employee_create.current?.uuid,
               type: "employee",
             }
           } catch (err) {

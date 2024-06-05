@@ -43,12 +43,14 @@
       }
     }
 
-    mutation TerminateITAssociation($input: ITAssociationTerminateInput!) {
+    mutation TerminateITAssociation(
+      $input: ITAssociationTerminateInput!
+      $date: DateTime!
+    ) {
       itassociation_terminate(input: $input) {
-        objects {
-          employee {
+        current(at: $date) {
+          person {
             name
-            uuid
           }
         }
       }
@@ -66,15 +68,15 @@
               TerminateItAssociationDocument,
               {
                 input: result.data,
+                date: result.data.to,
               }
             )
             $success = {
               message: capital(
-                $_("success_terminate", {
+                $_("success_terminate_item", {
                   values: {
                     item: $_("itassociation", { values: { n: 0 } }),
-                    name: mutation.itassociation_terminate.objects[0]?.employee?.[0]
-                      .name,
+                    name: mutation.itassociation_terminate.current?.person?.[0].name,
                   },
                 })
               ),

@@ -85,9 +85,9 @@
       }
     }
 
-    mutation CreateOrgUnit($input: OrganisationUnitCreateInput!) {
+    mutation CreateOrgUnit($input: OrganisationUnitCreateInput!, $date: DateTime!) {
       org_unit_create(input: $input) {
-        objects {
+        current(at: $date) {
           uuid
           name
         }
@@ -105,22 +105,17 @@
           try {
             const mutation = await graphQLClient().request(CreateOrgUnitDocument, {
               input: result.data,
+              date: result.data.validity.from,
             })
             $success = {
               message: capital(
                 $_("success_create", {
                   values: {
-                    item: $_("org_unit", { values: { n: 0 } }),
-                    name: undefined,
+                    name: mutation.org_unit_create.current?.name,
                   },
                 })
               ),
-              // TODO: Fix `parent` redirect, when `/organisation` is not a thing anymore
-              uuid: mutation.org_unit_create.objects[0]?.uuid
-                ? mutation.org_unit_create.objects[0].uuid
-                : parent
-                ? parent.uuid
-                : "",
+              uuid: mutation.org_unit_create.current?.uuid,
               type: "organisation",
             }
           } catch (err) {

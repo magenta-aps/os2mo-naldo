@@ -40,10 +40,9 @@
       }
     }
 
-    mutation TerminateManager($input: ManagerTerminateInput!) {
+    mutation TerminateManager($input: ManagerTerminateInput!, $date: DateTime!) {
       manager_terminate(input: $input) {
-        objects {
-          uuid
+        current(at: $date) {
           person {
             name
           }
@@ -61,14 +60,15 @@
           try {
             const mutation = await graphQLClient().request(TerminateManagerDocument, {
               input: result.data,
+              date: result.data.to,
             })
 
             $success = {
               message: capital(
-                $_("success_terminate", {
+                $_("success_terminate_item", {
                   values: {
                     item: $_("manager", { values: { n: 0 } }),
-                    name: mutation.manager_terminate.objects[0]?.person?.[0].name,
+                    name: mutation.manager_terminate.current?.person?.[0].name,
                   },
                 })
               ),

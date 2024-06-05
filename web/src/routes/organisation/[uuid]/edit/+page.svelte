@@ -99,12 +99,12 @@
         }
       }
     }
-  `
 
-  gql`
-    mutation UpdateOrgUnit($input: OrganisationUnitUpdateInput!) {
+    mutation UpdateOrgUnit($input: OrganisationUnitUpdateInput!, $date: DateTime!) {
       org_unit_update(input: $input) {
-        uuid
+        current(at: $date) {
+          name
+        }
       }
     }
   `
@@ -119,14 +119,14 @@
           try {
             const mutation = await graphQLClient().request(UpdateOrgUnitDocument, {
               input: result.data,
+              date: result.data.validity.from,
             })
 
             $success = {
               message: capital(
                 $_("success_edit", {
                   values: {
-                    item: $_("org_unit", { values: { n: 0 } }),
-                    name: undefined,
+                    name: mutation.org_unit_update.current?.name,
                   },
                 })
               ),

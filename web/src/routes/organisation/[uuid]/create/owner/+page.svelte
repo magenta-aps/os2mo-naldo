@@ -38,9 +38,9 @@
       }
     }
 
-    mutation CreateOwner($input: OwnerCreateInput!) {
+    mutation CreateOwner($input: OwnerCreateInput!, $date: DateTime!) {
       owner_create(input: $input) {
-        objects {
+        current(at: $date) {
           org_unit {
             name
           }
@@ -58,13 +58,14 @@
           try {
             const mutation = await graphQLClient().request(CreateOwnerDocument, {
               input: result.data,
+              date: result.data.validity.from,
             })
             $success = {
               message: capital(
-                $_("success_create", {
+                $_("success_create_item", {
                   values: {
                     item: $_("owner", { values: { n: 0 } }),
-                    name: mutation.owner_create.objects[0]?.org_unit?.[0].name,
+                    name: mutation.owner_create.current?.org_unit?.[0].name,
                   },
                 })
               ),

@@ -40,10 +40,9 @@
       }
     }
 
-    mutation TerminateITUser($input: ITUserTerminateInput!) {
+    mutation TerminateITUser($input: ITUserTerminateInput!, $date: DateTime!) {
       ituser_terminate(input: $input) {
-        objects {
-          uuid
+        current(at: $date) {
           person {
             name
           }
@@ -61,14 +60,15 @@
           try {
             const mutation = await graphQLClient().request(TerminateItUserDocument, {
               input: result.data,
+              date: result.data.to,
             })
 
             $success = {
               message: capital(
-                $_("success_terminate", {
+                $_("success_terminate_item", {
                   values: {
                     item: $_("ituser", { values: { n: 0 } }),
-                    name: mutation.ituser_terminate.objects[0]?.person?.[0].name,
+                    name: mutation.ituser_terminate.current?.person?.[0].name,
                   },
                 })
               ),

@@ -116,9 +116,9 @@
       }
     }
 
-    mutation UpdateRoleBinding($input: RoleBindingUpdateInput!) {
+    mutation UpdateRoleBinding($input: RoleBindingUpdateInput!, $date: DateTime!) {
       rolebinding_update(input: $input) {
-        objects {
+        current(at: $date) {
           ituser {
             org_unit {
               name
@@ -138,13 +138,14 @@
           try {
             const mutation = await graphQLClient().request(UpdateRoleBindingDocument, {
               input: result.data,
+              date: result.data.validity.from,
             })
             $success = {
               message: capital(
-                $_("success_edit", {
+                $_("success_edit_item", {
                   values: {
                     item: $_("rolebinding", { values: { n: 0 } }),
-                    name: mutation.rolebinding_update.objects[0].ituser[0].org_unit?.[0]
+                    name: mutation.rolebinding_update.current?.ituser[0].org_unit?.[0]
                       .name,
                   },
                 })

@@ -57,9 +57,12 @@
       }
     }
 
-    mutation TerminateOrgUnit($input: OrganisationUnitTerminateInput!) {
+    mutation TerminateOrgUnit(
+      $input: OrganisationUnitTerminateInput!
+      $date: DateTime!
+    ) {
       org_unit_terminate(input: $input) {
-        objects {
+        current(at: $date) {
           uuid
           name
         }
@@ -76,20 +79,18 @@
           try {
             const mutation = await graphQLClient().request(TerminateOrgUnitDocument, {
               input: result.data,
+              date: result.data.to,
             })
 
             $success = {
               message: capital(
                 $_("success_terminate", {
                   values: {
-                    item: $_("org_unit", { values: { n: 0 } }),
-                    name: undefined,
+                    name: mutation.org_unit_terminate.current?.name,
                   },
                 })
               ),
-              uuid: mutation.org_unit_terminate.objects[0]?.uuid
-                ? mutation.org_unit_terminate.objects[0].uuid
-                : "",
+              uuid: mutation.org_unit_terminate.current?.uuid,
               type: "organisation",
             }
           } catch (err) {
