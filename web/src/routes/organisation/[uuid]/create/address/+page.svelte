@@ -61,10 +61,10 @@
       }
     }
 
-    mutation CreateAddress($input: AddressCreateInput!) {
+    mutation CreateAddress($input: AddressCreateInput!, $date: DateTime!) {
       address_create(input: $input) {
         uuid
-        objects {
+        current(at: $date) {
           org_unit {
             name
           }
@@ -130,13 +130,14 @@
           try {
             const mutation = await graphQLClient().request(CreateAddressDocument, {
               input: result.data,
+              date: result.data.validity.from,
             })
             $success = {
               message: capital(
-                $_("success_create", {
+                $_("success_create_item", {
                   values: {
                     item: $_("address", { values: { n: 0 } }),
-                    name: mutation.address_create.objects[0]?.org_unit?.[0].name,
+                    name: mutation.address_create.current?.org_unit?.[0].name,
                   },
                 })
               ),

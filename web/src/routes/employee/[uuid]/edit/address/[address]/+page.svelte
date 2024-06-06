@@ -91,11 +91,10 @@
       }
     }
 
-    mutation UpdateAddress($input: AddressUpdateInput!) {
+    mutation UpdateAddress($input: AddressUpdateInput!, $date: DateTime!) {
       address_update(input: $input) {
-        objects {
-          uuid
-          employee {
+        current(at: $date) {
+          person {
             name
           }
         }
@@ -131,13 +130,14 @@
           try {
             const mutation = await graphQLClient().request(UpdateAddressDocument, {
               input: result.data,
+              date: result.data.validity.from,
             })
             $success = {
               message: capital(
-                $_("success_edit", {
+                $_("success_edit_item", {
                   values: {
                     item: $_("address", { values: { n: 0 } }),
-                    name: mutation.address_update.objects[0]?.employee?.[0].name,
+                    name: mutation.address_update.current?.person?.[0].name,
                   },
                 })
               ),

@@ -46,7 +46,7 @@
 
     mutation TerminateEmployee($input: EmployeeTerminateInput!) {
       employee_terminate(input: $input) {
-        objects {
+        current {
           uuid
           name
         }
@@ -67,14 +67,13 @@
 
             $success = {
               message: capital(
-                $_("success_terminate", {
+                $_("success_terminate_employee", {
                   values: {
-                    item: $_("employee", { values: { n: 0 } }),
-                    name: undefined,
+                    name: mutation.employee_terminate.current?.name,
                   },
                 })
               ),
-              uuid: mutation.employee_terminate.objects[0].uuid,
+              uuid: mutation.employee_terminate.current?.uuid,
               type: "employee",
             }
           } catch (err) {

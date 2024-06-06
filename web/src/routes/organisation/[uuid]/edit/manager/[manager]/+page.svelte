@@ -97,10 +97,9 @@
       }
     }
 
-    mutation UpdateManager($input: ManagerUpdateInput!) {
+    mutation UpdateManager($input: ManagerUpdateInput!, $date: DateTime!) {
       manager_update(input: $input) {
-        uuid
-        objects {
+        current(at: $date) {
           person {
             name
           }
@@ -118,13 +117,14 @@
           try {
             const mutation = await graphQLClient().request(UpdateManagerDocument, {
               input: result.data,
+              date: result.data.validity.from,
             })
             $success = {
               message: capital(
-                $_("success_edit", {
+                $_("success_edit_item", {
                   values: {
                     item: $_("manager", { values: { n: 0 } }),
-                    name: mutation.manager_update.objects[0]?.person?.[0].name,
+                    name: mutation.manager_update.current?.person?.[0].name,
                   },
                 })
               ),

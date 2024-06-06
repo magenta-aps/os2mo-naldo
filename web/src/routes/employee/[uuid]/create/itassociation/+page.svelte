@@ -88,10 +88,10 @@
       }
     }
 
-    mutation CreateITAssociation($input: ITAssociationCreateInput!) {
+    mutation CreateITAssociation($input: ITAssociationCreateInput!, $date: DateTime!) {
       itassociation_create(input: $input) {
-        objects {
-          employee {
+        current(at: $date) {
+          person {
             name
           }
         }
@@ -111,14 +111,15 @@
               CreateItAssociationDocument,
               {
                 input: result.data,
+                date: result.data.validity.from,
               }
             )
             $success = {
               message: capital(
-                $_("success_create", {
+                $_("success_create_item", {
                   values: {
                     item: $_("itassociation", { values: { n: 0 } }),
-                    name: mutation.itassociation_create.objects[0]?.employee?.[0].name,
+                    name: mutation.itassociation_create.current?.person?.[0].name,
                   },
                 })
               ),

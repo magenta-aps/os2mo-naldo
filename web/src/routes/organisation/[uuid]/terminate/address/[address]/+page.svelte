@@ -40,10 +40,9 @@
       }
     }
 
-    mutation TerminateAddress($input: AddressTerminateInput!) {
+    mutation TerminateAddress($input: AddressTerminateInput!, $date: DateTime!) {
       address_terminate(input: $input) {
-        uuid
-        objects {
+        current(at: $date) {
           org_unit {
             name
           }
@@ -61,14 +60,15 @@
           try {
             const mutation = await graphQLClient().request(TerminateAddressDocument, {
               input: result.data,
+              date: result.data.to,
             })
 
             $success = {
               message: capital(
-                $_("success_terminate", {
+                $_("success_terminate_item", {
                   values: {
                     item: $_("address", { values: { n: 0 } }),
-                    name: mutation.address_terminate.objects[0]?.org_unit?.[0].name,
+                    name: mutation.address_terminate.current?.org_unit?.[0].name,
                   },
                 })
               ),

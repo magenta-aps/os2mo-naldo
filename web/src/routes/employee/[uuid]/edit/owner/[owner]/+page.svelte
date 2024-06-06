@@ -58,9 +58,9 @@
       }
     }
 
-    mutation UpdateOwner($input: OwnerUpdateInput!) {
+    mutation UpdateOwner($input: OwnerUpdateInput!, $date: DateTime!) {
       owner_update(input: $input) {
-        objects {
+        current(at: $date) {
           person {
             name
           }
@@ -78,13 +78,14 @@
           try {
             const mutation = await graphQLClient().request(UpdateOwnerDocument, {
               input: result.data,
+              date: result.data.validity.from,
             })
             $success = {
               message: capital(
-                $_("success_edit", {
+                $_("success_edit_item", {
                   values: {
                     item: $_("owner", { values: { n: 0 } }),
-                    name: mutation.owner_update.objects[0]?.person?.[0].name,
+                    name: mutation.owner_update.current?.person?.[0].name,
                   },
                 })
               ),

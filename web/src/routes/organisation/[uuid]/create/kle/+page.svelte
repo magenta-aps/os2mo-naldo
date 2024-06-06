@@ -54,10 +54,9 @@
       }
     }
 
-    mutation CreateKLE($input: KLECreateInput!) {
+    mutation CreateKLE($input: KLECreateInput!, $date: DateTime!) {
       kle_create(input: $input) {
-        uuid
-        objects {
+        current(at: $date) {
           org_unit {
             name
           }
@@ -75,13 +74,14 @@
           try {
             const mutation = await graphQLClient().request(CreateKleDocument, {
               input: result.data,
+              date: result.data.validity.from,
             })
             $success = {
               message: capital(
-                $_("success_create", {
+                $_("success_create_item", {
                   values: {
                     item: $_("kle", { values: { n: 0 } }),
-                    name: mutation.kle_create.objects[0]?.org_unit?.[0].name,
+                    name: mutation.kle_create.current?.org_unit?.[0].name,
                   },
                 })
               ),

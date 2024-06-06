@@ -88,10 +88,9 @@
       }
     }
 
-    mutation UpdateITUser($input: ITUserUpdateInput!) {
+    mutation UpdateITUser($input: ITUserUpdateInput!, $date: DateTime!) {
       ituser_update(input: $input) {
-        uuid
-        objects {
+        current(at: $date) {
           person {
             name
           }
@@ -109,14 +108,15 @@
           try {
             const mutation = await graphQLClient().request(UpdateItUserDocument, {
               input: result.data,
+              date: result.data.validity.from,
             })
 
             $success = {
               message: capital(
-                $_("success_edit", {
+                $_("success_edit_item", {
                   values: {
                     item: $_("ituser", { values: { n: 0 } }),
-                    name: mutation.ituser_update.objects[0]?.person?.[0].name,
+                    name: mutation.ituser_update.current?.person?.[0].name,
                   },
                 })
               ),

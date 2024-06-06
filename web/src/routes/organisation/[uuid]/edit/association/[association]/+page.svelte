@@ -146,10 +146,9 @@
       }
     }
 
-    mutation UpdateAssociation($input: AssociationUpdateInput!) {
+    mutation UpdateAssociation($input: AssociationUpdateInput!, $date: DateTime!) {
       association_update(input: $input) {
-        objects {
-          uuid
+        current(at: $date) {
           person {
             name
           }
@@ -168,13 +167,14 @@
           try {
             const mutation = await graphQLClient().request(UpdateAssociationDocument, {
               input: result.data,
+              date: result.data.validity.from,
             })
             $success = {
               message: capital(
-                $_("success_edit", {
+                $_("success_edit_item", {
                   values: {
                     item: $_("association", { values: { n: 0 } }),
-                    name: mutation.association_update.objects[0]?.person?.[0].name,
+                    name: mutation.association_update.current?.person?.[0].name,
                   },
                 })
               ),

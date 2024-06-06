@@ -84,9 +84,9 @@
       }
     }
 
-    mutation CreateRoleBinding($input: RoleBindingCreateInput!) {
+    mutation CreateRoleBinding($input: RoleBindingCreateInput!, $date: DateTime!) {
       rolebinding_create(input: $input) {
-        objects {
+        current(at: $date) {
           ituser {
             org_unit {
               name
@@ -106,14 +106,15 @@
           try {
             const mutation = await graphQLClient().request(CreateRoleBindingDocument, {
               input: result.data,
+              date: result.data.validity.from,
             })
             $success = {
               message: capital(
-                $_("success_create", {
+                $_("success_create_item", {
                   values: {
                     item: $_("rolebinding", { values: { n: 0 } }),
-                    name: mutation.rolebinding_create.objects[0]?.ituser?.[0]
-                      .org_unit?.[0].name,
+                    name: mutation.rolebinding_create.current?.ituser?.[0].org_unit?.[0]
+                      .name,
                   },
                 })
               ),

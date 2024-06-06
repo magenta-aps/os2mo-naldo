@@ -40,11 +40,10 @@
       }
     }
 
-    mutation TerminateEngagement($input: EngagementTerminateInput!) {
+    mutation TerminateEngagement($input: EngagementTerminateInput!, $date: DateTime!) {
       engagement_terminate(input: $input) {
-        objects {
-          uuid
-          employee {
+        current(at: $date) {
+          person {
             name
           }
         }
@@ -63,15 +62,16 @@
               TerminateEngagementDocument,
               {
                 input: result.data,
+                date: result.data.to,
               }
             )
 
             $success = {
               message: capital(
-                $_("success_terminate", {
+                $_("success_terminate_item", {
                   values: {
                     item: $_("engagement", { values: { n: 0 } }),
-                    name: mutation.engagement_terminate.objects[0]?.employee?.[0].name,
+                    name: mutation.engagement_terminate.current?.person?.[0].name,
                   },
                 })
               ),

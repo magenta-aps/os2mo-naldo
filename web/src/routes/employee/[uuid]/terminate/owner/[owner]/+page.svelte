@@ -40,9 +40,9 @@
       }
     }
 
-    mutation TerminateOwner($input: OwnerTerminateInput!) {
+    mutation TerminateOwner($input: OwnerTerminateInput!, $date: DateTime!) {
       owner_terminate(input: $input) {
-        objects {
+        current(at: $date) {
           person {
             name
           }
@@ -60,14 +60,15 @@
           try {
             const mutation = await graphQLClient().request(TerminateOwnerDocument, {
               input: result.data,
+              date: result.data.to,
             })
 
             $success = {
               message: capital(
-                $_("success_terminate", {
+                $_("success_terminate_item", {
                   values: {
                     item: $_("owner", { values: { n: 0 } }),
-                    name: mutation.owner_terminate.objects[0]?.person?.[0].name,
+                    name: mutation.owner_terminate.current?.person?.[0].name,
                   },
                 })
               ),

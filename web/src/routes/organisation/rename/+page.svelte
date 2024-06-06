@@ -35,17 +35,17 @@
     query OrgUnit($uuid: [UUID!], $fromDate: DateTime) {
       org_units(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          objects {
+          validities {
             name
             uuid
           }
         }
       }
     }
-    mutation UpdateOrgUnit($input: OrganisationUnitUpdateInput!) {
+    mutation UpdateOrgUnit($input: OrganisationUnitUpdateInput!, $date: DateTime!) {
       org_unit_update(input: $input) {
-        uuid
-        objects {
+        current(at: $date) {
+          uuid
           name
         }
       }
@@ -62,6 +62,7 @@
           try {
             const mutation = await graphQLClient().request(UpdateOrgUnitDocument, {
               input: result.data,
+              date: result.data.validity.from,
             })
 
             $success = {
@@ -69,12 +70,11 @@
               message: capital(
                 $_("success_rename", {
                   values: {
-                    item: $_("org_unit", { values: { n: 0 } }),
-                    name: undefined,
+                    name: mutation.org_unit_update.current?.name,
                   },
                 })
               ),
-              uuid: mutation.org_unit_update.uuid,
+              uuid: mutation.org_unit_update.current?.uuid,
               type: "organisation",
             }
           } catch (err) {
@@ -126,7 +126,7 @@
             placeholder="{$_('loading')} {$_('organisation')}..."
           />
         {:then data}
-          {@const orgUnitUuidFromHash = data.org_units.objects[0].objects[0]}
+          {@const orgUnitUuidFromHash = data.org_units.objects[0].validities[0]}
           <Search
             title="{capital($_('specify'))} {$_('unit', { values: { n: 1 } })}"
             type="org-unit"

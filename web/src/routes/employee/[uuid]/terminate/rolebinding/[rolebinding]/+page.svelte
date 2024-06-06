@@ -40,9 +40,12 @@
       }
     }
 
-    mutation TerminateRolebinding($input: RoleBindingTerminateInput!) {
+    mutation TerminateRolebinding(
+      $input: RoleBindingTerminateInput!
+      $date: DateTime!
+    ) {
       rolebinding_terminate(input: $input) {
-        objects {
+        current(at: $date) {
           ituser {
             person {
               name
@@ -64,15 +67,16 @@
               TerminateRolebindingDocument,
               {
                 input: result.data,
+                date: result.data.to,
               }
             )
 
             $success = {
               message: capital(
-                $_("success_terminate", {
+                $_("success_terminate_item", {
                   values: {
                     item: $_("rolebinding", { values: { n: 0 } }),
-                    name: mutation.rolebinding_terminate.objects[0]?.ituser?.[0]
+                    name: mutation.rolebinding_terminate.current?.ituser?.[0]
                       .person?.[0].name,
                   },
                 })

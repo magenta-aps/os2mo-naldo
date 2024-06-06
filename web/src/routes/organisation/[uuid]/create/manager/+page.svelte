@@ -58,9 +58,9 @@
       }
     }
 
-    mutation CreateManager($input: ManagerCreateInput!) {
+    mutation CreateManager($input: ManagerCreateInput!, $date: DateTime!) {
       manager_create(input: $input) {
-        objects {
+        current(at: $date) {
           person {
             name
           }
@@ -78,13 +78,14 @@
           try {
             const mutation = await graphQLClient().request(CreateManagerDocument, {
               input: result.data,
+              date: result.data.validity.from,
             })
             $success = {
               message: capital(
-                $_("success_create", {
+                $_("success_create_item", {
                   values: {
                     item: $_("manager", { values: { n: 0 } }),
-                    name: mutation.manager_create.objects[0]?.person?.[0].name,
+                    name: mutation.manager_create.current?.person?.[0].name,
                   },
                 })
               ),

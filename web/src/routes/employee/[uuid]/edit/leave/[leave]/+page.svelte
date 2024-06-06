@@ -105,13 +105,10 @@
       }
     }
 
-    mutation UpdateLeave($input: LeaveUpdateInput!) {
+    mutation UpdateLeave($input: LeaveUpdateInput!, $date: DateTime!) {
       leave_update(input: $input) {
-        objects {
+        current(at: $date) {
           person {
-            name
-          }
-          leave_type {
             name
           }
         }
@@ -129,13 +126,14 @@
           try {
             const mutation = await graphQLClient().request(UpdateLeaveDocument, {
               input: result.data,
+              date: result.data.validity.from,
             })
             $success = {
               message: capital(
-                $_("success_edit", {
+                $_("success_edit_item", {
                   values: {
                     item: $_("leave", { values: { n: 0 } }),
-                    name: mutation.leave_update.objects[0]?.person?.[0].name,
+                    name: mutation.leave_update.current?.person?.[0].name,
                   },
                 })
               ),

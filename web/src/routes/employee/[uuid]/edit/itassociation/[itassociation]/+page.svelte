@@ -135,11 +135,10 @@
       }
     }
 
-    mutation UpdateITAssociation($input: ITAssociationUpdateInput!) {
+    mutation UpdateITAssociation($input: ITAssociationUpdateInput!, $date: DateTime!) {
       itassociation_update(input: $input) {
-        objects {
-          uuid
-          employee {
+        current(at: $date) {
+          person {
             name
           }
         }
@@ -159,14 +158,15 @@
               UpdateItAssociationDocument,
               {
                 input: result.data,
+                date: result.data.validity.from,
               }
             )
             $success = {
               message: capital(
-                $_("success_edit", {
+                $_("success_edit_item", {
                   values: {
                     item: $_("itassociation", { values: { n: 0 } }),
-                    name: mutation.itassociation_update.objects[0]?.employee?.[0].name,
+                    name: mutation.itassociation_update.current?.person?.[0].name,
                   },
                 })
               ),

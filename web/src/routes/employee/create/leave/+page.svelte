@@ -103,9 +103,9 @@
       }
     }
 
-    mutation CreateLeave($input: LeaveCreateInput!) {
+    mutation CreateLeave($input: LeaveCreateInput!, $date: DateTime!) {
       leave_create(input: $input) {
-        objects {
+        current(at: $date) {
           person {
             name
             uuid
@@ -125,17 +125,18 @@
           try {
             const mutation = await graphQLClient().request(CreateLeaveDocument, {
               input: result.data,
+              date: result.data.validity.from,
             })
             $success = {
               message: capital(
-                $_("success_create", {
+                $_("success_create_item", {
                   values: {
                     item: $_("leave", { values: { n: 0 } }),
-                    name: mutation.leave_create.objects[0]?.person?.[0].name,
+                    name: mutation.leave_create.current?.person?.[0].name,
                   },
                 })
               ),
-              uuid: mutation.leave_create.objects[0].person[0].uuid,
+              uuid: mutation.leave_create.current?.person?.[0].uuid,
               type: "employee",
             }
           } catch (err) {

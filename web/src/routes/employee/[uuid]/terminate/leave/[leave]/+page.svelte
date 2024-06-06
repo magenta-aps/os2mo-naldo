@@ -39,9 +39,9 @@
         }
       }
     }
-    mutation TerminateLeave($input: LeaveTerminateInput!) {
+    mutation TerminateLeave($input: LeaveTerminateInput!, $date: DateTime!) {
       leave_terminate(input: $input) {
-        objects {
+        current(at: $date) {
           person {
             name
           }
@@ -60,13 +60,14 @@
           try {
             const mutation = await graphQLClient().request(TerminateLeaveDocument, {
               input: result.data,
+              date: result.data.to,
             })
             $success = {
               message: capital(
-                $_("success_terminate", {
+                $_("success_terminate_item", {
                   values: {
                     item: $_("leave", { values: { n: 0 } }),
-                    name: mutation.leave_terminate.objects[0]?.person?.[0].name,
+                    name: mutation.leave_terminate.current?.person?.[0].name,
                   },
                 })
               ),
