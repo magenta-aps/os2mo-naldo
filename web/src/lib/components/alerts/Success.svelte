@@ -45,14 +45,14 @@
           href={`/${$success.type}/${$success.uuid}`}
           class="shadow-lg alert alert-success"
         >
-          <div>
+          <div class="flex gap-1">
             <Icon icon={checkCircleOutlineRounded} width="20" height="20" />
             <span>{$success.message}</span>
           </div>
         </a>
       {:else}
         <a href="/" class="shadow-lg alert alert-success">
-          <div>
+          <div class="flex gap-1">
             <Icon icon={checkCircleOutlineRounded} width="20" height="20" />
             <span>{$success.message}</span>
           </div>
@@ -60,7 +60,7 @@
       {/if}
     {:else}
       <div class="shadow-lg alert alert-success">
-        <div>
+        <div class="flex gap-1">
           <Icon icon={checkCircleOutlineRounded} width="20" height="20" />
           <span>{$success.message}</span>
         </div>
