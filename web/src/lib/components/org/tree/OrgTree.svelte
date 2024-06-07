@@ -134,7 +134,7 @@
   }
 
   // Triggered when using the global navigation to find an organisation
-  $: if ($globalNavigation) {
+  $: if ($globalNavigation || $date) {
     refreshableOrgTree = fetchOrgTree($date, $globalNavigation)
   }
 </script>
