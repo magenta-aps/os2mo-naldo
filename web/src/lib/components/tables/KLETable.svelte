@@ -73,12 +73,12 @@
 
 {#if !data}
   <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-    <td class="p-4">{capital($_("loading"))}</td>
+    <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
   {#each data as kle}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-      <td class="p-4">
+      <td class="text-sm p-4">
         <ul>
           {#each kle.kle_aspects as aspect}
             <li>
@@ -87,7 +87,7 @@
           {/each}
         </ul>
       </td>
-      <td class="p-4">{kle.kle_number.name}</td>
+      <td class="text-sm p-4">{kle.kle_number.name}</td>
       <ValidityTableCell validity={kle.validity} />
       <td>
         <a
@@ -105,7 +105,7 @@
     </tr>
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
-      <td class="p-4"
+      <td class="text-sm p-4"
         >{capital(
           $_("no_item", { values: { item: $_("kle", { values: { n: 2 } }) } })
         )}</td

@@ -68,15 +68,15 @@
 
 {#if !data}
   <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-    <td class="p-4">{capital($_("loading"))}</td>
+    <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
   {#each data as employee}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-      <td class="p-4">
+      <td class="text-sm p-4">
         {employee.name}
       </td>
-      <td class="p-4">{employee.nickname}</td>
+      <td class="text-sm p-4">{employee.nickname}</td>
       <ValidityTableCell validity={employee.validity} />
       <td>
         <a href="{base}/employee/{uuid}/edit{formatQueryDates(employee.validity)}">
@@ -87,7 +87,7 @@
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
       <!-- TODO: Add translated "No <type> in <tense>"-message" -->
-      <td class="p-4"
+      <td class="text-sm p-4"
         >{capital(
           $_("no_item", { values: { item: $_("employee", { values: { n: 2 } }) } })
         )}</td

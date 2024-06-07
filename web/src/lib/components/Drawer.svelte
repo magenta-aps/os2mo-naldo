@@ -50,7 +50,7 @@
   </div>
   <div
     class="drawer-side fixed lg:h-[calc(100vh-4rem)] overflow-x-hidden"
-    style="width: {isLargeScreen ? `${$drawerWidth}px` : '100%'}"
+    style="width: {isLargeScreen ? `${$drawerWidth}px` : 'w-full'}"
   >
     <label for="drawer" class="drawer-overlay" />
     <ul class="bg-base-100 h-screen lg:h-fit">

@@ -82,7 +82,7 @@
   </tr>
 {:else if !data}
   <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-    <td class="p-4">{capital($_("loading"))}</td>
+    <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
   {#each data as cls, i}
@@ -90,8 +90,8 @@
       class="{i % 2 === 0 ? '' : 'bg-slate-100'} 
         p-4 leading-5 border-t border-slate-300 text-secondary"
     >
-      <td class="p-4">{cls.name}</td>
-      <td class="p-4">{cls.user_key}</td>
+      <td class="text-sm p-4">{cls.name}</td>
+      <td class="text-sm p-4">{cls.user_key}</td>
       <ValidityTableCell validity={cls.validity} />
       <td>
         <a
@@ -105,7 +105,7 @@
     </tr>
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
-      <td class="p-4"
+      <td class="text-sm p-4"
         >{capital(
           $_("no_item", { values: { item: $_("class", { values: { n: 2 } }) } })
         )}</td

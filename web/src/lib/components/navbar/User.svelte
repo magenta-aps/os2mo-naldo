@@ -37,7 +37,7 @@
   </div>
   <ul
     tabindex="-1"
-    class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
+    class="menu menu-compact shadow dropdown-content mt-3 p-2 bg-base-100 rounded w-52"
   >
     <li>
       <div

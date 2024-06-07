@@ -141,7 +141,7 @@
     {capital($_("loading"))}
   {:then data}
     {@const facets = data.facets.objects}
-    <div class="collapse bg-slate-100 rounded shadow-sm my-4">
+    <div class="collapse bg-slate-100 rounded my-4">
       <input type="checkbox" />
       <div class="collapse-title">
         <h3>Filter</h3>

@@ -165,12 +165,12 @@
 
 {#if !data}
   <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-    <td class="p-4">{capital($_("loading"))}</td>
+    <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
   {#each data as orgOrEmployee}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
-      <td class="p-4">
+      <td class="text-sm p-4">
         {#if isOrg}
           {#if orgOrEmployee.person}
             <a href="{base}/employee/{orgOrEmployee.person[0].uuid}">
@@ -198,7 +198,7 @@
           </a>
         {/if}
       </td>
-      <td class="p-4">
+      <td class="text-sm p-4">
         <ul>
           {#each orgOrEmployee.responsibilities as responsibility}
             <li>
@@ -207,8 +207,8 @@
           {/each}
         </ul>
       </td>
-      <td class="p-4">{orgOrEmployee.manager_type.name}</td>
-      <td class="p-4">{orgOrEmployee.manager_level.name}</td>
+      <td class="text-sm p-4">{orgOrEmployee.manager_type.name}</td>
+      <td class="text-sm p-4">{orgOrEmployee.manager_level.name}</td>
       <ValidityTableCell validity={orgOrEmployee.validity} />
       <td>
         <a
@@ -234,7 +234,7 @@
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
       <!-- TODO: Add translated "No <type> in <tense>"-message" -->
-      <td class="p-4"
+      <td class="text-sm p-4"
         >{capital(
           $_("no_item", { values: { item: $_("manager", { values: { n: 2 } }) } })
         )}</td

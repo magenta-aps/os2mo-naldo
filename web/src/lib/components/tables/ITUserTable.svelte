@@ -92,7 +92,7 @@
 
 {#if !data}
   <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-    <td class="p-4">{capital($_("loading"))}</td>
+    <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
   {#each data as ituser, i}

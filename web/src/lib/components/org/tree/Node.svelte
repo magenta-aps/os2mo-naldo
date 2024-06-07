@@ -162,7 +162,7 @@
       {:else}
         <div class="w-5 h-5" />
       {/if}
-      <p class="break-words text-secondary">
+      <p class="text-sm text-secondary break-words">
         {name}
       </p>
     </div>

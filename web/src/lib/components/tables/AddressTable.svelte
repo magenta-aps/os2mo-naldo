@@ -92,7 +92,7 @@
 
 {#if !data}
   <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-    <td class="p-4">{capital($_("loading"))}</td>
+    <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
   {#each data as address, i}
@@ -100,10 +100,12 @@
       class="{i % 2 === 0 ? '' : 'bg-slate-100'} 
       p-4 leading-5 border-t border-slate-300 text-secondary"
     >
-      <td class="p-4">{address.address_type.name}</td>
-      <td class="p-4">{address.user_key !== address.value ? address.user_key : ""}</td>
-      <td class="p-4">{address.name}</td>
-      <td class="p-4"
+      <td class="text-sm p-4">{address.address_type.name}</td>
+      <td class="text-sm p-4"
+        >{address.user_key !== address.value ? address.user_key : ""}</td
+      >
+      <td class="text-sm p-4">{address.name}</td>
+      <td class="text-sm p-4"
         >{address.visibility ? address.visibility.name : capital($_("not_set"))}</td
       >
       <ValidityTableCell validity={address.validity} />
@@ -130,7 +132,7 @@
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
       <!-- TODO: Add translated "No <type> in <tense>"-message" -->
-      <td class="p-4"
+      <td class="text-sm p-4"
         >{capital(
           $_("no_item", { values: { item: $_("address", { values: { n: 2 } }) } })
         )}</td
