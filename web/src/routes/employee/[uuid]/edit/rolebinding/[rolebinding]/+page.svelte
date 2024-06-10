@@ -241,7 +241,7 @@
           <Select
             title={capital($_("ituser", { values: { n: 1 } }))}
             id="it-user-uuid"
-            startValue={itUserStartValue[0]}
+            startValue={itUserStartValue?.[0]}
             bind:value={itUser}
             bind:name={$itUserField.value}
             errors={$itUserField.errors}

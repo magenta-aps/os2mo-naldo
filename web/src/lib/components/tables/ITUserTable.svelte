@@ -17,9 +17,11 @@
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import keyboardArrowUpRounded from "@iconify/icons-material-symbols/keyboard-arrow-up-rounded"
   import keyboardArrowDownRounded from "@iconify/icons-material-symbols/keyboard-arrow-down-rounded"
+  import addCircleOutLineRounded from "@iconify/icons-material-symbols/add-circle-outline-rounded"
+
   import { formatQueryDates } from "$lib/util/helpers"
 
-  type ITUsers = ItUsersQuery["itusers"]["objects"][0]["objects"]
+  type ITUsers = ItUsersQuery["itusers"]["objects"][0]["validities"]
   let data: ITUsers
 
   export let tense: Tense
@@ -45,11 +47,12 @@
         }
       ) {
         objects {
-          objects {
+          validities {
             user_key
             uuid
             itsystem {
               name
+              uuid
             }
             rolebindings {
               uuid
@@ -92,7 +95,7 @@
     // Filters and flattens the data
     for (const outer of res.itusers.objects) {
       // TODO: Remove when GraphQL is able to do this for us
-      const filtered = outer.objects.filter((obj) => {
+      const filtered = outer.validities.filter((obj) => {
         return tenseFilter(obj, tense)
       })
       itUsers.push(...filtered)
@@ -141,7 +144,17 @@
       >
       <td class="p-4">{ituser.user_key}</td>
       <td class="p-4">{ituser.primary ? ituser.primary.name : ""}</td>
-      <td class="p-4">-</td>
+      <td class="p-4">
+        <a
+          href="{base}/{$page.route.id?.split(
+            '/'
+          )[1]}/{uuid}/create/rolebinding/{ituser.uuid}{formatQueryDates(
+            ituser.validity
+          )}&itsystem={ituser.itsystem.uuid}"
+        >
+          <Icon icon={addCircleOutLineRounded} width="25" height="25" />
+        </a>
+      </td>
       <ValidityTableCell validity={ituser.validity} />
       <td>
         <a
@@ -199,7 +212,6 @@
     {/if}
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
-      <!-- TODO: Add translated "No IT users in <tense>"-message" -->
       <td class="p-4"
         >{capital(
           $_("no_item", { values: { item: $_("ituser", { values: { n: 2 } }) } })

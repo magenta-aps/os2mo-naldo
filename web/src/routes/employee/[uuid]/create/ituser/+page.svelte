@@ -14,13 +14,15 @@
   import {
     ItSystemsClassAndEmployeeDocument,
     CreateItUserDocument,
+    CreateItUserAndRolebindingDocument,
+    GetItSystemRolesDocument,
   } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
   import { getClassUuidByUserKey } from "$lib/util/get_classes"
-  import { getITSystemNames } from "$lib/util/helpers"
+  import { getITSystemNames, type UnpackedClass } from "$lib/util/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
@@ -29,11 +31,24 @@
   import { env } from "$env/dynamic/public"
 
   let toDate: string
+  let rolebindingFromDate: string
+  let rolebindingToDate: string
 
   const fromDate = field("from", "", [required()])
-  const itSystem = field("it_system", "", [required()])
+  const itSystemField = field("it_system", "", [required()])
   const accountName = field("accountName", "", [required()])
-  const svelteForm = form(fromDate, itSystem, accountName)
+  const svelteForm = form(fromDate, itSystemField, accountName)
+
+  let role: {
+    uuid: string
+    name: string
+  }
+
+  let itSystem: {
+    uuid: string
+    name: string
+  }
+  let itSystemRoles: UnpackedClass | undefined
 
   gql`
     query ItSystemsClassAndEmployee($uuid: [UUID!], $primaryClass: String!) {
@@ -64,10 +79,44 @@
         }
       }
     }
+    query GetITSystemRoles($itSystemUuid: [UUID!]) {
+      classes(
+        filter: { facet: { user_keys: "role" }, it_system: { uuids: $itSystemUuid } }
+      ) {
+        objects {
+          objects {
+            uuid
+            user_key
+            name
+          }
+        }
+      }
+    }
 
-    mutation CreateItUser($input: ITUserCreateInput!, $date: DateTime!) {
-      ituser_create(input: $input) {
+    mutation CreateItUserAndRolebinding(
+      $itUserInput: ITUserCreateInput!
+      $rolebindingInput: RoleBindingCreateInput!
+      $date: DateTime!
+    ) {
+      ituser_create(input: $itUserInput) {
         current(at: $date) {
+          uuid
+          person {
+            name
+          }
+          itsystem {
+            name
+          }
+        }
+      }
+      rolebinding_create(input: $rolebindingInput) {
+        uuid
+      }
+    }
+    mutation CreateItUser($itUserInput: ITUserCreateInput!, $date: DateTime!) {
+      ituser_create(input: $itUserInput) {
+        current(at: $date) {
+          uuid
           person {
             name
           }
@@ -78,36 +127,76 @@
       }
     }
   `
+
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
       // Await the validation, before we continue
+
       await svelteForm.validate()
       if ($svelteForm.valid) {
         if (result.type === "success" && result.data) {
-          try {
-            const mutation = await graphQLClient().request(CreateItUserDocument, {
-              input: result.data,
-              date: result.data.validity.from,
-            })
-            $success = {
-              message: capital(
-                $_("success_create_item", {
-                  values: {
-                    item: $_("ituser", { values: { n: 0 } }),
-                    name: mutation.ituser_create.current?.person?.[0].name,
-                  },
-                })
-              ),
-              uuid: $page.params.uuid,
-              type: "employee",
+          const itUserInput = result.data.itUserInput
+          const rolebindingInput = result.data.rolebindingInput
+          if (role && rolebindingInput) {
+            try {
+              const mutation = await graphQLClient().request(
+                CreateItUserAndRolebindingDocument,
+                {
+                  itUserInput: itUserInput,
+                  rolebindingInput: rolebindingInput,
+                  date: itUserInput.validity.from,
+                }
+              )
+              $success = {
+                message: capital(
+                  $_("success_create_item", {
+                    values: {
+                      item: $_("ituser", { values: { n: 0 } }),
+                      name: mutation.ituser_create.current?.person?.[0].name,
+                    },
+                  })
+                ),
+                uuid: $page.params.uuid,
+                type: "employee",
+              }
+            } catch (err) {
+              $error = { message: err }
             }
-          } catch (err) {
-            $error = { message: err }
+          } else {
+            try {
+              const mutation = await graphQLClient().request(CreateItUserDocument, {
+                itUserInput: itUserInput,
+                date: itUserInput.validity.from,
+              })
+              $success = {
+                message: capital(
+                  $_("success_create_item", {
+                    values: {
+                      item: $_("ituser", { values: { n: 0 } }),
+                      name: mutation.ituser_create.current?.person?.[0].name,
+                    },
+                  })
+                ),
+                uuid: $page.params.uuid,
+                type: "employee",
+              }
+            } catch (err) {
+              $error = { message: err }
+            }
           }
         }
       }
     }
+
+  const fetchItSystemRoles = async (itSystemUuid: string | undefined | null) => {
+    const res = await graphQLClient().request(GetItSystemRolesDocument, {
+      itSystemUuid: itSystemUuid,
+    })
+    itSystemRoles = res.classes?.objects
+      .map((cls) => cls.objects[0])
+      .sort((a, b) => (a.name > b.name ? 1 : -1))
+  }
 </script>
 
 <title
@@ -179,8 +268,12 @@
           <Select
             title={capital($_("it_system"))}
             id="it-system"
-            bind:name={$itSystem.value}
-            errors={$itSystem.errors}
+            bind:name={$itSystemField.value}
+            bind:value={itSystem}
+            errors={$itSystemField.errors}
+            on:change={() => {
+              fetchItSystemRoles(itSystem.uuid)
+            }}
             iterable={getITSystemNames(itSystems)}
             extra_classes="basis-1/2"
             required={true}
@@ -211,6 +304,44 @@
           value={getClassUuidByUserKey(classes, "non-primary")}
         />
         <TextArea title={capital($_("notes"))} id="notes" />
+        <div class="divider p-0 m-0 mb-4 w-full" />
+        <h4>{capital($_("rolebinding", { values: { n: 1 } }))}</h4>
+        <div class="flex flex-row gap-6">
+          <DateInput
+            startValue={$date}
+            bind:value={rolebindingFromDate}
+            errors={$fromDate.errors}
+            title={capital($_("date.start_date"))}
+            id="rolebinding-from"
+            min={$fromDate.value ? $fromDate.value : validities.from}
+            max={rolebindingToDate ? rolebindingToDate : toDate}
+          />
+          <DateInput
+            bind:value={toDate}
+            title={capital($_("date.end_date"))}
+            id="rolebinding-to"
+            min={$fromDate.value ? $fromDate.value : rolebindingFromDate}
+            max={toDate ? toDate : validities.to}
+          />
+        </div>
+        {#if itSystemRoles && itSystemRoles.length}
+          {#key itSystemRoles}
+            <Select
+              title={capital($_("role", { values: { n: 1 } }))}
+              bind:value={role}
+              id="it-system-role-uuid"
+              iterable={itSystemRoles}
+              extra_classes="basis-1/2"
+            />
+          {/key}
+        {:else}
+          <Select
+            title={capital($_("role", { values: { n: 1 } }))}
+            id="it-system-role-uuid"
+            extra_classes="basis-1/2"
+            disabled
+          />
+        {/if}
       </div>
     </div>
     <div class="flex py-6 gap-4">

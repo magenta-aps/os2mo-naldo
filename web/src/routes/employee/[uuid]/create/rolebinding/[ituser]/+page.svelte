@@ -12,43 +12,34 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import type { UnpackedClass } from "$lib/util/helpers"
   import type { SubmitFunction } from "./$types"
-  import {
-    CreateRoleBindingDocument,
-    ItUserAndFacetDocument,
-    GetItSystemRolesDocument,
-  } from "./query.generated"
+  import { CreateRoleBindingDocument, ItUserAndFacetDocument } from "./query.generated"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getITUserITSystemName, getMinMaxValidities } from "$lib/util/helpers"
-
-  let itUser: {
-    uuid: string | null
-    name: string
-    user_key: string | null
-    itsystem: {
-      uuid: string | null
-      name: string
-    }
-  }
+  import { getClassesByFacetUserKey } from "$lib/util/get_classes"
 
   let toDate: string
 
   const fromDate = field("from", "", [required()])
-  const itUserField = field("it_user", "", [required()])
   const role = field("role", "", [required()])
-  const svelteForm = form(fromDate, itUserField, role)
-
-  let itSystemRoles: UnpackedClass | undefined
+  const svelteForm = form(fromDate, role)
 
   gql`
-    query ITUserAndFacet($uuid: [UUID!]) {
+    query ITUserAndFacet(
+      $uuid: [UUID!]
+      $itUserUuid: [UUID!]
+      $itSystemUuid: [UUID!]
+      $fromDate: DateTime
+      $toDate: DateTime
+    ) {
       employees(filter: { uuids: $uuid, from_date: null, to_date: null }) {
         objects {
           current {
-            itusers {
+            itusers(
+              filter: { uuids: $itUserUuid, from_date: $fromDate, to_date: $toDate }
+            ) {
               itsystem {
                 name
                 user_key
@@ -56,6 +47,10 @@
               }
               uuid
               user_key
+              validity {
+                from
+                to
+              }
             }
           }
           validities {
@@ -66,16 +61,17 @@
           }
         }
       }
-    }
-    query GetITSystemRoles($itSystemUuid: [UUID!]) {
-      classes(
-        filter: { facet: { user_keys: "role" }, it_system: { uuids: $itSystemUuid } }
-      ) {
+
+      facets(filter: { user_keys: "role" }) {
         objects {
           objects {
             uuid
             user_key
-            name
+            classes(filter: { it_system: { uuids: $itSystemUuid } }) {
+              uuid
+              user_key
+              name
+            }
           }
         }
       }
@@ -93,6 +89,8 @@
       }
     }
   `
+  console.log($page.url.searchParams.get("from"))
+
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
@@ -124,15 +122,6 @@
         }
       }
     }
-
-  const fetchItSystemRoles = async (itSystemUuid: string | undefined | null) => {
-    const res = await graphQLClient().request(GetItSystemRolesDocument, {
-      itSystemUuid: itSystemUuid,
-    })
-    itSystemRoles = res.classes?.objects
-      .map((cls) => cls.objects[0])
-      .sort((a, b) => (a.name > b.name ? 1 : -1))
-  }
 </script>
 
 <title
@@ -155,7 +144,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request(ItUserAndFacetDocument, { uuid: $page.params.uuid })}
+{#await graphQLClient().request( ItUserAndFacetDocument, { uuid: $page.params.uuid, itUserUuid: $page.params.ituser, itSystemUuid: $page.url.searchParams.get("itsystem"), fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to") } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -171,8 +160,9 @@
     </div>
   </div>
 {:then data}
-  {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
-  {@const itusers = data.employees.objects[0].current?.itusers}
+  {@const validities = getMinMaxValidities(data.employees.objects[0].current?.itusers)}
+  {@const itUser = getITUserITSystemName(data.employees.objects[0].current?.itusers)}
+  {@const itSystemRoles = getClassesByFacetUserKey(data.facets.objects, "role")}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -201,29 +191,21 @@
           <Select
             title={capital($_("ituser", { values: { n: 1 } }))}
             id="it-user-uuid"
-            bind:value={itUser}
-            bind:name={$itUserField.value}
-            errors={$itUserField.errors}
-            iterable={getITUserITSystemName(itusers ? itusers : [])}
-            on:change={() => {
-              fetchItSystemRoles(itUser.itsystem.uuid)
-              $role.value = ""
-            }}
+            startValue={itUser?.[0]}
             required={true}
+            disabled
             extra_classes="basis-1/2"
           />
           {#if itSystemRoles && itSystemRoles.length}
-            {#key itSystemRoles}
-              <Select
-                title={capital($_("role", { values: { n: 1 } }))}
-                id="it-system-role-uuid"
-                bind:name={$role.value}
-                errors={$role.errors}
-                iterable={itSystemRoles}
-                extra_classes="basis-1/2"
-                required
-              />
-            {/key}
+            <Select
+              title={capital($_("role", { values: { n: 1 } }))}
+              id="it-system-role-uuid"
+              bind:name={$role.value}
+              errors={$role.errors}
+              iterable={itSystemRoles}
+              extra_classes="basis-1/2"
+              required
+            />
           {:else}
             <Select
               title={capital($_("role", { values: { n: 1 } }))}
