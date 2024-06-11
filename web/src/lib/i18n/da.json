@@ -44,7 +44,7 @@
 	"insight": "indsigt",
 	"it_system": "IT-system",
 	"itassociation": "{n, plural, =0 {IT-tilknytningen} one {IT-tilknytning} other {IT-tilknytninger}}",
-	"ituser": "{n, plural, =0 {IT brugeren} one {IT bruger} other {IT brugere}}",
+	"ituser": "{n, plural, =0 {IT-brugeren} one {IT-bruger} other {IT-brugere}}",
 	"job_function": "{n, plural, =0 {stillingsbetegnelsen} one {stillingsbetegnelse} other {stillingsbetegnelser}}",
 	"job_function_bvn": "brugervendt stillingsbetegnelse",
 	"kle": "KLE-opmærkning",
