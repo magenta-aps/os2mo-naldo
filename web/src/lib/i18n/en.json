@@ -44,7 +44,7 @@
 	"insight": "insight",
 	"it_system": "IT system",
 	"itassociation": "{n, plural, =0 {the IT affiliation} one {IT affiliation} other {IT affiliations}}",
-	"ituser": "{n, plural, =0 {the IT user} one {IT user} other {IT users}}",
+	"ituser": "{n, plural, =0 {the IT-user} one {IT-user} other {IT-users}}",
 	"job_function": "{n, plural, =0 {the job title} one {job title} other {job titles}}",
 	"job_function_bvn": "user-facing job title",
 	"kle": "{n, plural, =0 {the KLE-tagging} one {KLE-tagging} other {KLE-taggings}}",
