@@ -1,5 +1,18 @@
+import { _ } from "svelte-i18n"
+import { capital } from "$lib/util/translationUtils"
+import { get } from "svelte/store"
+
 export type Facet = {
   objects: {
+    uuid: any
+    user_key: string
+    classes?: { name: string; uuid: any; user_key: string }[]
+  }[]
+}
+
+// This should replace the `Facet`-type at some point
+export type FacetValidities = {
+  validities: {
     uuid: any
     user_key: string
     classes?: { name: string; uuid: any; user_key: string }[]
@@ -12,6 +25,16 @@ export const getClassesByFacetUserKey = (facets: Facet[], user_key: string) => {
     throw new Error("user_key did not match any of the given facets")
   }
   return foundFacet.objects[0].classes?.sort((a, b) => (a.name > b.name ? 1 : -1))
+}
+
+// `get(_)` for translations since `$_` is a store and doesn't work in .ts files
+export const sortFacets = (facets: FacetValidities[]) => {
+  return facets
+    .map((e) => ({
+      name: capital(get(_)("facets." + e.validities[0].user_key)),
+      uuid: e.validities[0].uuid,
+    }))
+    .sort((a, b) => (a.name > b.name ? 1 : -1))
 }
 
 type Class = {
@@ -31,12 +54,11 @@ export const getClassUuidByUserKey = (classes: Class[], user_key: string) => {
   return foundClass.objects[0].uuid
 }
 
-// Temporary function to just get specific facet
-// Should be removed when it's possible to create classes for all facets
-export const getSpecificFacet = (facets: Facet[], user_key: string) => {
-  const foundFacet = facets.find((facet) => facet.objects[0].user_key === user_key)
+// Used to getting startvalue of facet select
+export const getSpecificFacet = (facets: FacetValidities[], uuid: string) => {
+  const foundFacet = facets.find((facet) => facet.validities[0].uuid === uuid)
   return {
-    uuid: foundFacet?.objects[0].uuid,
-    name: foundFacet?.objects[0].user_key || "",
+    uuid: foundFacet?.validities[0].uuid,
+    name: foundFacet?.validities[0].user_key || "",
   }
 }

@@ -58,7 +58,7 @@ export const tenseFilter = (
     case "present":
       return true
     case "future":
-      return globalDate < obj.validity.from.split("T")[0]
+      return globalDate < obj.validity.from?.split("T")[0]
   }
 }
 

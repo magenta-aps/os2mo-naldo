@@ -11,6 +11,9 @@
   export let headers: Header[]
   export let table: ComponentType<SvelteComponent>
 
+  // Specific for admin interface
+  export let facetUuid: string | undefined = undefined
+
   // Filter out all the tabs that are dependent on environment variables
   if ($MOConfig && $MOConfig.confdb_show_level === "false") {
     headers = headers.filter((header) => header.title !== capital($_("org_unit_level")))
@@ -49,7 +52,7 @@
         >{capital($_("future"))}</th
       >
     </tr>
-    <svelte:component this={table} tense="future" />
+    <svelte:component this={table} tense="future" {facetUuid} />
   {/if}
   {#if $tenses.present}
     <tr>
@@ -57,7 +60,7 @@
         >{capital($_("present"))}</th
       ></tr
     >
-    <svelte:component this={table} tense="present" />
+    <svelte:component this={table} tense="present" {facetUuid} />
   {/if}
   {#if $tenses.past}
     <tr>
@@ -65,6 +68,6 @@
         >{capital($_("past"))}</th
       >
     </tr>
-    <svelte:component this={table} tense="past" />
+    <svelte:component this={table} tense="past" {facetUuid} />
   {/if}
 </DetailTable>
