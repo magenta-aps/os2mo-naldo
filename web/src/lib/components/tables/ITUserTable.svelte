@@ -15,10 +15,6 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
-  import keyboardArrowUpRounded from "@iconify/icons-material-symbols/keyboard-arrow-up-rounded"
-  import keyboardArrowDownRounded from "@iconify/icons-material-symbols/keyboard-arrow-down-rounded"
-  import addCircleOutLineRounded from "@iconify/icons-material-symbols/add-circle-outline-rounded"
-
   import { formatQueryDates } from "$lib/util/helpers"
 
   type ITUsers = ItUsersQuery["itusers"]["objects"][0]["validities"]
@@ -53,16 +49,6 @@
             itsystem {
               name
               uuid
-            }
-            rolebindings {
-              uuid
-              role {
-                name
-              }
-              validity {
-                from
-                to
-              }
             }
             validity {
               from
@@ -102,13 +88,6 @@
     }
     data = itUsers
   })
-
-  let expanded = new Map()
-  const toggleExpanded = (uuid: string) => {
-    expanded.set(uuid, !expanded.get(uuid))
-    // This line ensures reactivity
-    expanded = new Map(expanded)
-  }
 </script>
 
 {#if !data}
@@ -119,42 +98,11 @@
   {#each data as ituser, i}
     <tr
       class="{i % 2 === 0 ? '' : 'bg-slate-100'} 
-      p-4 leading-5 border-t border-slate-300 text-secondary {ituser.rolebindings.length
-        ? 'cursor-pointer'
-        : ''}"
-      on:click={() => {
-        if (ituser.rolebindings.length) {
-          toggleExpanded(ituser.uuid)
-        }
-      }}
+      p-4 leading-5 border-t border-slate-300 text-secondary"
     >
-      <td class="p-4"
-        >{ituser.itsystem.name}
-        {#if ituser.rolebindings.length}
-          <button class="align-middle">
-            <Icon
-              icon={expanded.get(ituser.uuid)
-                ? keyboardArrowUpRounded
-                : keyboardArrowDownRounded}
-              width="25"
-              height="25"
-            />
-          </button>
-        {/if}</td
-      >
+      <td class="p-4">{ituser.itsystem.name} </td>
       <td class="p-4">{ituser.user_key}</td>
       <td class="p-4">{ituser.primary ? ituser.primary.name : ""}</td>
-      <td class="p-4">
-        <a
-          href="{base}/{$page.route.id?.split(
-            '/'
-          )[1]}/{uuid}/create/rolebinding/{ituser.uuid}{formatQueryDates(
-            ituser.validity
-          )}&itsystem={ituser.itsystem.uuid}"
-        >
-          <Icon icon={addCircleOutLineRounded} width="25" height="25" />
-        </a>
-      </td>
       <ValidityTableCell validity={ituser.validity} />
       <td>
         <a
@@ -175,41 +123,6 @@
         </a>
       </td>
     </tr>
-    {#if expanded.get(ituser.uuid)}
-      {#each ituser.rolebindings as rolebinding}
-        <tr
-          class="{i % 2 === 0
-            ? ''
-            : 'bg-slate-100'} leading-3 border-t border-slate-300 text-secondary text-xs"
-        >
-          <td class="p-4">-</td>
-          <td class="p-4">-</td>
-          <td class="p-4">-</td>
-          <td class="p-4"> {rolebinding.role[0].name} </td>
-          <ValidityTableCell validity={rolebinding.validity} />
-          <td>
-            <a
-              href="{base}/{$page.route.id?.split(
-                '/'
-              )[1]}/{uuid}/edit/rolebinding/{rolebinding.uuid}{formatQueryDates(
-                rolebinding.validity
-              )}"
-            >
-              <Icon icon={editSquareOutlineRounded} width="25" height="25" />
-            </a>
-          </td>
-          <td>
-            <a
-              href="{base}/{$page.route.id?.split(
-                '/'
-              )[1]}/{uuid}/terminate/rolebinding/{rolebinding.uuid}"
-            >
-              <Icon icon={cancelOutlineRounded} width="25" height="25" />
-            </a>
-          </td>
-        </tr>
-      {/each}
-    {/if}
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="p-4"

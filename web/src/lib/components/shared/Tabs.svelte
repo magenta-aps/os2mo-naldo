@@ -8,6 +8,7 @@
 
   export let items: { label: string; value: string; n: number }[]
   export let activeItem: string
+  export let extra_classes: string = ""
 
   let dispatch = createEventDispatcher()
 
@@ -23,7 +24,7 @@
   }
 </script>
 
-<div class="tabs tabs-bordered">
+<div class="tabs tabs-bordered {extra_classes}">
   {#each items as item}
     <a
       href="#{item.value}"

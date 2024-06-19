@@ -29,3 +29,10 @@ export enum EmployeeTab {
 }
 
 export const activeEmployeeTab = writable(EmployeeTab.EMPLOYEE)
+
+export enum ItTab {
+  IT = "ituser",
+  ROLEBINDING = "rolebinding",
+}
+
+export const activeItTab = writable(ItTab.IT)
