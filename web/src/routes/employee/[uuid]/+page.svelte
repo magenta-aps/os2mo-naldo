@@ -3,6 +3,7 @@
   import { capital, upperCase } from "$lib/util/translationUtils"
   import Tabs from "$lib/components/shared/Tabs.svelte"
   import { EmployeeTab, activeEmployeeTab } from "$lib/stores/tab"
+  import CopyToClipboard from "$lib/components/Clipboard.svelte"
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
   import { page } from "$app/stores"
   import { gql } from "graphql-request"
@@ -51,6 +52,7 @@
       employees(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
           objects {
+            uuid
             name
             cpr_number
           }
@@ -98,6 +100,7 @@
             ? `(${employee.cpr_number.slice(0, 6)}-${employee.cpr_number.slice(-4)})`
             : ""}
         </span>
+        <CopyToClipboard uuid={employee.uuid} name={employee.name} />
       {/if}
     </h1>
 
