@@ -14,7 +14,7 @@
   import { onMount } from "svelte"
   import TableTensesWrapper from "$lib/components/tables/TableTensesWrapper.svelte"
   import EngagementTable from "$lib/components/tables/EngagementTable.svelte"
-  import ItUserTable from "$lib/components/tables/ITUserTable.svelte"
+  import OrgItUserTable from "$lib/components/tables/OrgITUserTable.svelte"
   import AddressTable from "$lib/components/tables/AddressTable.svelte"
   import AssociationTable from "$lib/components/tables/AssociationTable.svelte"
   import ManagerTable from "$lib/components/tables/ManagerTable.svelte"
@@ -255,7 +255,7 @@
       />
       {#if itActiveItem === ItTab.IT}
         <TableTensesWrapper
-          table={ItUserTable}
+          table={OrgItUserTable}
           headers={[
             { title: capital($_("it_system")), sortPath: "itsystem.name" },
             { title: capital($_("account_name")), sortPath: "user_key" },
