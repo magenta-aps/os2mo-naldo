@@ -12,7 +12,6 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import type { UnpackedClass } from "$lib/util/helpers"
   import type { SubmitFunction } from "./$types"
   import {
     CreateRoleBindingDocument,
@@ -22,26 +21,27 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getITUserITSystemName, getMinMaxValidities } from "$lib/util/helpers"
-
-  let itUser: {
-    uuid: string | null
-    name: string
-    user_key: string | null
-    itsystem: {
-      uuid: string | null
-      name: string
-    }
-  }
+  import {
+    getITUserITSystemName,
+    getMinMaxValidities,
+    type UnpackedClass,
+  } from "$lib/util/helpers"
+  import { getClassesByFacetUserKey } from "$lib/util/get_classes"
 
   let toDate: string
 
-  const fromDate = field("from", "", [required()])
-  const itUserField = field("it_user", "", [required()])
-  const role = field("role", "", [required()])
-  const svelteForm = form(fromDate, itUserField, role)
-
+  let itUser: {
+    uuid: string
+    name: string
+    itsystem: {
+      uuid: string
+    }
+  }
   let itSystemRoles: UnpackedClass | undefined
+
+  const fromDate = field("from", "", [required()])
+  const roleField = field("role", "", [required()])
+  const svelteForm = form(fromDate, roleField)
 
   gql`
     query ITUserAndFacet($uuid: [UUID!]) {
@@ -56,6 +56,10 @@
               }
               uuid
               user_key
+              validity {
+                from
+                to
+              }
             }
           }
           validities {
@@ -67,6 +71,7 @@
         }
       }
     }
+
     query GetITSystemRoles($itSystemUuid: [UUID!]) {
       classes(
         filter: { facet: { user_keys: "role" }, it_system: { uuids: $itSystemUuid } }
@@ -93,6 +98,7 @@
       }
     }
   `
+
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
@@ -171,8 +177,8 @@
     </div>
   </div>
 {:then data}
-  {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
-  {@const itusers = data.employees.objects[0].current?.itusers}
+  {@const validities = getMinMaxValidities(data.employees.objects[0].current?.itusers)}
+  {@const itUsers = getITUserITSystemName(data.employees.objects[0].current?.itusers)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -202,34 +208,29 @@
             title={capital($_("ituser", { values: { n: 1 } }))}
             id="it-user-uuid"
             bind:value={itUser}
-            bind:name={$itUserField.value}
-            errors={$itUserField.errors}
-            iterable={getITUserITSystemName(itusers ? itusers : [])}
+            iterable={itUsers}
             on:change={() => {
               fetchItSystemRoles(itUser.itsystem.uuid)
-              $role.value = ""
             }}
             required={true}
             extra_classes="basis-1/2"
           />
           {#if itSystemRoles && itSystemRoles.length}
-            {#key itSystemRoles}
-              <Select
-                title={capital($_("role", { values: { n: 1 } }))}
-                id="it-system-role-uuid"
-                bind:name={$role.value}
-                errors={$role.errors}
-                iterable={itSystemRoles}
-                extra_classes="basis-1/2"
-                required
-              />
-            {/key}
+            <Select
+              title={capital($_("role", { values: { n: 1 } }))}
+              id="role-uuid"
+              bind:name={$roleField.value}
+              errors={$roleField.errors}
+              iterable={itSystemRoles}
+              extra_classes="basis-1/2"
+              required
+            />
           {:else}
             <Select
               title={capital($_("role", { values: { n: 1 } }))}
-              id="it-system-role-uuid"
-              bind:name={$role.value}
-              errors={$role.errors}
+              id="role-uuid"
+              bind:name={$roleField.value}
+              errors={$roleField.errors}
               extra_classes="basis-1/2"
               required
               disabled

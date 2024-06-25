@@ -2,8 +2,8 @@
   import { _ } from "svelte-i18n"
   import { capital, upperCase } from "$lib/util/translationUtils"
   import Tabs from "$lib/components/shared/Tabs.svelte"
-  import { EmployeeTab, activeEmployeeTab } from "$lib/stores/tab"
   import CopyToClipboard from "$lib/components/Clipboard.svelte"
+  import { EmployeeTab, ItTab, activeEmployeeTab, activeItTab } from "$lib/stores/tab"
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
   import { page } from "$app/stores"
   import { gql } from "graphql-request"
@@ -36,16 +36,27 @@
     { label: "association", value: "association", n: 2 },
     { label: "itassociation", value: "itassociation", n: 2 },
     { label: "ituser", value: "ituser", n: 2 },
-    { label: "rolebinding", value: "rolebinding", n: 2 },
     { label: "leave", value: "leave", n: 2 },
     { label: "manager", value: "manager", n: 2 },
     { label: "owner", value: "owner", n: 2 },
   ]
 
+  let itItems = [
+    { label: "ituser", value: "ituser", n: 2 },
+    { label: "rolebinding", value: "rolebinding", n: 2 },
+  ]
+
   let uuidFromUrl = $page.params.uuid
 
   let activeItem = $activeEmployeeTab
-  const tabChange = (e: CustomEvent) => ($activeEmployeeTab = activeItem = e.detail)
+  const tabChange = (e: CustomEvent) => {
+    $activeEmployeeTab = activeItem = e.detail
+  }
+
+  let itActiveItem = $activeItTab
+  const itTabChange = (e: CustomEvent) => {
+    $activeItTab = itActiveItem = e.detail
+  }
 
   gql`
     query Employee($uuid: [UUID!], $fromDate: DateTime) {
@@ -67,8 +78,15 @@
     if ($page.url.hash) {
       const firstHash = $page.url.hash.slice(1).split("&")[0]
       if (Object.values(EmployeeTab).some((v) => v === firstHash)) {
-        // Safe to assume the hash is an EmployeeTab
-        $activeEmployeeTab = activeItem = firstHash as EmployeeTab
+        if (firstHash === ItTab.ROLEBINDING) {
+          // Since rolebinding is not an EmployeeTab, we need to make sure we go to EmployeeTab.IT
+          // and also change activeItTab to rolebinding/it
+          $activeEmployeeTab = activeItem = EmployeeTab.IT as EmployeeTab
+          $activeItTab = itActiveItem = firstHash as ItTab
+        } else {
+          // Safe to assume the hash is an EmployeeTab
+          $activeEmployeeTab = activeItem = firstHash as EmployeeTab
+        }
       }
     }
   })
@@ -108,20 +126,33 @@
 
     <div class="flex justify-between">
       <TenseTabs />
-      <a
-        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5 hover:no-underline"
-        href={`${base}/employee/${
-          activeItem === EmployeeTab.EMPLOYEE
-            ? "create"
-            : `${$page.params.uuid}/create/${activeItem}`
-        }`}
-      >
-        {capital(
-          $_("create_item", {
-            values: { item: $_(item, { values: { n: 1 } }) },
-          })
-        )}
-      </a>
+      {#if activeItem === EmployeeTab.IT}
+        <a
+          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5 hover:no-underline"
+          href={`${base}/employee/${$page.params.uuid}/create/${itActiveItem}`}
+        >
+          {capital(
+            $_("create_item", {
+              values: { item: $_(itActiveItem, { values: { n: 1 } }) },
+            })
+          )}
+        </a>
+      {:else}
+        <a
+          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5 hover:no-underline"
+          href={`${base}/employee/${
+            activeItem === EmployeeTab.EMPLOYEE
+              ? "create"
+              : `${$page.params.uuid}/create/${activeItem}`
+          }`}
+        >
+          {capital(
+            $_("create_item", {
+              values: { item: $_(activeItem, { values: { n: 1 } }) },
+            })
+          )}
+        </a>
+      {/if}
     </div>
 
     {#if activeItem === EmployeeTab.EMPLOYEE}
@@ -212,39 +243,46 @@
         ]}
       />
     {:else if activeItem === EmployeeTab.IT}
-      <TableTensesWrapper
-        table={ItUserTable}
-        headers={[
-          { title: capital($_("it_system")), sortPath: "itsystem.name" },
-          { title: capital($_("account_name")), sortPath: "user_key" },
-          { title: capital($_("primary")) },
-          { title: capital($_("role", { values: { n: 1 } })) },
-          { title: capital($_("date.date")), sortPath: "validity.from" },
-          { title: "" },
-          { title: "" },
-        ]}
+      <Tabs
+        activeItem={itActiveItem}
+        items={itItems}
+        on:tabChange={itTabChange}
+        extra_classes="mb-2"
       />
-    {:else if activeItem === EmployeeTab.ROLEBINDING}
-      <TableTensesWrapper
-        table={RoleBindingTable}
-        headers={[
-          {
-            title: capital($_("ituser", { values: { n: 1 } })),
-            sortPath: "ituser[0].user_key",
-          },
-          {
-            title: capital($_("itsystem", { values: { n: 1 } })),
-            sortPath: "ituser[0].itsystem.name",
-          },
-          {
-            title: capital($_("role", { values: { n: 1 } })),
-            sortPath: "role[0].name",
-          },
-          { title: capital($_("date.date")), sortPath: "validity.from" },
-          { title: "" },
-          { title: "" },
-        ]}
-      />
+      {#if itActiveItem === ItTab.IT}
+        <TableTensesWrapper
+          table={ItUserTable}
+          headers={[
+            { title: capital($_("it_system")), sortPath: "itsystem.name" },
+            { title: capital($_("account_name")), sortPath: "user_key" },
+            { title: capital($_("primary")) },
+            { title: capital($_("date.date")), sortPath: "validity.from" },
+            { title: "" },
+            { title: "" },
+          ]}
+        />
+      {:else if itActiveItem === ItTab.ROLEBINDING}
+        <TableTensesWrapper
+          table={RoleBindingTable}
+          headers={[
+            {
+              title: capital($_("ituser", { values: { n: 1 } })),
+              sortPath: "ituser[0].user_key",
+            },
+            {
+              title: capital($_("itsystem", { values: { n: 1 } })),
+              sortPath: "ituser[0].itsystem.name",
+            },
+            {
+              title: capital($_("role", { values: { n: 1 } })),
+              sortPath: "role[0].name",
+            },
+            { title: capital($_("date.date")), sortPath: "validity.from" },
+            { title: "" },
+            { title: "" },
+          ]}
+        />
+      {/if}
     {:else if activeItem === EmployeeTab.LEAVE}
       <TableTensesWrapper
         table={LeaveTable}

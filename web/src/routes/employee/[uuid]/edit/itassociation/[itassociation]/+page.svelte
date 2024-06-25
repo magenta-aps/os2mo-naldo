@@ -279,7 +279,7 @@
           <Select
             title={capital($_("ituser", { values: { n: 1 } }))}
             id="it-user-uuid"
-            startValue={itUserStartValue[0]}
+            startValue={itUserStartValue?.[0]}
             bind:name={$itUser.value}
             errors={$itUser.errors}
             iterable={getITUserITSystemName(itusers)}

@@ -5,7 +5,7 @@
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
   import CopyToClipboard from "$lib/components/Clipboard.svelte"
   import TenseTabs from "$lib/components/shared/TenseTabs.svelte"
-  import { OrgTab, activeOrgTab } from "$lib/stores/tab"
+  import { ItTab, OrgTab, activeItTab, activeOrgTab } from "$lib/stores/tab"
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
   import { gql } from "graphql-request"
@@ -35,16 +35,25 @@
     { label: "engagement", value: "engagement", n: 2 },
     { label: "association", value: "association", n: 2 },
     { label: "ituser", value: "ituser", n: 2 },
-    { label: "rolebinding", value: "rolebinding", n: 2 },
     { label: "kle", value: "kle", n: 2 },
     { label: "manager", value: "manager", n: 2 },
     { label: "owner", value: "owner", n: 2 },
     { label: "related_unit", value: "related_unit", n: 2 },
   ]
 
+  let itItems = [
+    { label: "ituser", value: "ituser", n: 2 },
+    { label: "rolebinding", value: "rolebinding", n: 2 },
+  ]
+
   let uuidFromUrl = $page.params.uuid
   let activeItem = $activeOrgTab
   const tabChange = (e: CustomEvent) => ($activeOrgTab = activeItem = e.detail)
+
+  let itActiveItem = $activeItTab
+  const itTabChange = (e: CustomEvent) => {
+    $activeItTab = itActiveItem = e.detail
+  }
 
   // TODO: Switch to validities
   gql`
@@ -101,8 +110,15 @@
       // The replace is to solve encoding issues with the 'æ' in KLE-opmærkninger
       const firstHash = $page.url.hash.slice(1).split("&")[0].replace("%C3%A6", "æ")
       if (Object.values(OrgTab).some((v) => v === firstHash)) {
-        // Safe to assume the hash is an OrgTab
-        $activeOrgTab = activeItem = firstHash as OrgTab
+        if (firstHash === ItTab.ROLEBINDING) {
+          // Since rolebinding is not an EmployeeTab, we need to make sure we go to EmployeeTab.IT
+          // and also change activeItTab to rolebinding/it
+          $activeOrgTab = activeItem = OrgTab.IT as OrgTab
+          $activeItTab = itActiveItem = firstHash as ItTab
+        } else {
+          // Safe to assume the hash is an OrgTab
+          $activeOrgTab = activeItem = firstHash as OrgTab
+        }
       }
     }
   })
@@ -137,23 +153,36 @@
 
     <div class="flex justify-between">
       <TenseTabs />
-      <!-- Links are different on `org_unit` and `related`-tabs -->
-      <a
-        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5 hover:no-underline"
-        href={`${base}/${
-          activeItem === OrgTab.ORG_UNIT
-            ? `organisation/create#uuid=${$page.params.uuid}`
-            : activeItem === OrgTab.RELATED_UNIT
-            ? "connections"
-            : `organisation/${$page.params.uuid}/create/${activeItem}`
-        }`}
-      >
-        {capital(
-          $_("create_item", {
-            values: { item: $_(item, { values: { n: 1 } }) },
-          })
-        )}
-      </a>
+      {#if activeItem === OrgTab.IT}
+        <a
+          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5 hover:no-underline"
+          href={`${base}/organisation/${$page.params.uuid}/create/${itActiveItem}`}
+        >
+          {capital(
+            $_("create_item", {
+              values: { item: $_(itActiveItem, { values: { n: 1 } }) },
+            })
+          )}
+        </a>
+      {:else}
+        <!-- Links are different on `org_unit` and `related`-tabs -->
+        <a
+          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5 hover:no-underline"
+          href={`${base}/${
+            activeItem === OrgTab.ORG_UNIT
+              ? `organisation/create#uuid=${$page.params.uuid}`
+              : activeItem === OrgTab.RELATED_UNIT
+              ? "connections"
+              : `organisation/${$page.params.uuid}/create/${activeItem}`
+          }`}
+        >
+          {capital(
+            $_("create_item", {
+              values: { item: $_(activeItem, { values: { n: 1 } }) },
+            })
+          )}
+        </a>
+      {/if}
     </div>
   {/await}
   {#key $date + uuidFromUrl}
@@ -219,39 +248,46 @@
         ]}
       />
     {:else if activeItem === OrgTab.IT}
-      <TableTensesWrapper
-        table={ItUserTable}
-        headers={[
-          { title: capital($_("it_system")), sortPath: "itsystem.name" },
-          { title: capital($_("account_name")), sortPath: "user_key" },
-          { title: capital($_("primary")) },
-          { title: capital($_("role", { values: { n: 1 } })) },
-          { title: capital($_("date.date")), sortPath: "validity.from" },
-          { title: "" },
-          { title: "" },
-        ]}
+      <Tabs
+        activeItem={itActiveItem}
+        items={itItems}
+        on:tabChange={itTabChange}
+        extra_classes="mb-2"
       />
-    {:else if activeItem === OrgTab.ROLEBINDING}
-      <TableTensesWrapper
-        table={RoleBindingTable}
-        headers={[
-          {
-            title: capital($_("ituser", { values: { n: 1 } })),
-            sortPath: "ituser[0].user_key",
-          },
-          {
-            title: capital($_("itsystem", { values: { n: 1 } })),
-            sortPath: "ituser[0].itsystem.name",
-          },
-          {
-            title: capital($_("role", { values: { n: 1 } })),
-            sortPath: "role[0].name",
-          },
-          { title: capital($_("date.date")), sortPath: "validity.from" },
-          { title: "" },
-          { title: "" },
-        ]}
-      />
+      {#if itActiveItem === ItTab.IT}
+        <TableTensesWrapper
+          table={ItUserTable}
+          headers={[
+            { title: capital($_("it_system")), sortPath: "itsystem.name" },
+            { title: capital($_("account_name")), sortPath: "user_key" },
+            { title: capital($_("primary")) },
+            { title: capital($_("date.date")), sortPath: "validity.from" },
+            { title: "" },
+            { title: "" },
+          ]}
+        />
+      {:else if itActiveItem === ItTab.ROLEBINDING}
+        <TableTensesWrapper
+          table={RoleBindingTable}
+          headers={[
+            {
+              title: capital($_("ituser", { values: { n: 1 } })),
+              sortPath: "ituser[0].user_key",
+            },
+            {
+              title: capital($_("itsystem", { values: { n: 1 } })),
+              sortPath: "ituser[0].itsystem.name",
+            },
+            {
+              title: capital($_("role", { values: { n: 1 } })),
+              sortPath: "role[0].name",
+            },
+            { title: capital($_("date.date")), sortPath: "validity.from" },
+            { title: "" },
+            { title: "" },
+          ]}
+        />
+      {/if}
     {:else if activeItem === OrgTab.MANAGER}
       <TableTensesWrapper
         table={ManagerTable}

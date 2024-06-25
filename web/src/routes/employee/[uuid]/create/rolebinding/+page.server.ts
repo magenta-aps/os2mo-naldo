@@ -8,7 +8,7 @@ export const actions: Actions = {
   }: RequestEvent): Promise<RoleBindingCreateInput> => {
     const data = await request.formData()
     const ituserUuid = data.get("it-user-uuid")
-    const roleUuid = data.get("it-system-role-uuid")
+    const roleUuid = data.get("role-uuid")
     const startDate = data.get("from")
     const endDate = data.get("to")
 
