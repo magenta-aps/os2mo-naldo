@@ -8,7 +8,7 @@
   import menuRounded from "@iconify/icons-material-symbols/menu-rounded"
 </script>
 
-<div class="navbar bg-secondary shadow-xl">
+<div class="navbar bg-secondary">
   <div class="navbar-start text-base-100">
     <label for="drawer" class="btn btn-square btn-ghost lg:hidden">
       <Icon icon={menuRounded} width="25" height="25" />

@@ -83,15 +83,15 @@
 
 {#if !data}
   <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-    <td class="p-4">{capital($_("loading"))}</td>
+    <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
   {#each data as leave}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-      <td class="p-4">
+      <td class="text-sm p-4">
         {leave.leave_type.name}
       </td>
-      <td class="p-4">
+      <td class="text-sm p-4">
         {leave.engagement.job_function.name}, {leave.engagement.org_unit[0].name}
       </td>
       <ValidityTableCell validity={leave.validity} />
@@ -112,7 +112,7 @@
     </tr>
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
-      <td class="p-4"
+      <td class="text-sm p-4"
         >{capital(
           $_("no_item", { values: { item: $_("leave", { values: { n: 2 } }) } })
         )}</td

@@ -139,18 +139,17 @@
     Fallback "" is just to make TypeScript happy - shouldn't ever happen -->
     {@const item = items.find((item) => item.value === activeItem)?.label || ""}
 
-    <div>
-      {#if $MOConfig && $MOConfig.confdb_show_user_key === "true"}
-        {capital($_("unit_number"))}: {orgUnit.user_key}
-      {/if}
-      <Breadcrumbs {orgUnit} link={true} />
-    </div>
     <div class="flex gap-5">
       <h1 class="pb-4">{orgUnit.name}</h1>
       <CopyToClipboard uuid={orgUnit.uuid} name={orgUnit.name} />
     </div>
+    <div class="pb-4">
+      <Breadcrumbs {orgUnit} link={true} />
+      {#if $MOConfig && $MOConfig.confdb_show_user_key === "true"}
+        <p class="text-sm">{capital($_("unit_number"))}: {orgUnit.user_key}</p>
+      {/if}
+    </div>
     <Tabs {activeItem} {items} on:tabChange={tabChange} />
-
     <div class="flex justify-between">
       <TenseTabs />
       {#if activeItem === OrgTab.IT}

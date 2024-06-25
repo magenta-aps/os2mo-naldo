@@ -10,11 +10,15 @@
   export let link: boolean = false
 </script>
 
+<!-- Since link is only used at Organisation pages, which is where we need no padding -->
+<!-- I used the conditional for padding - even though it's not directly connected. -->
 {#if orgUnit}
   {#await fetchParentTree(orgUnit.uuid, $date)}
-    <div class="text-secondary pb-4">{capital($_("loading"))}...</div>
+    <div class="text-secondary {link ? 'pb-0' : 'pb-4'}">
+      {capital($_("loading"))}...
+    </div>
   {:then parents}
-    <div class=" breadcrumbs text-secondary pb-4 pt-0">
+    <div class="breadcrumbs text-secondary pt-0 {link ? 'pb-0' : 'pb-4'}">
       <ul>
         {#each parents.reverse() as parent}
           <li>
@@ -34,5 +38,5 @@
     </div>
   {/await}
 {:else if !orgUnit && emptyMessage}
-  <div class="text-secondary pb-4">{emptyMessage}</div>
+  <div class="text-secondary {link ? 'pb-0' : 'pb-4'}">{emptyMessage}</div>
 {/if}

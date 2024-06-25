@@ -11,7 +11,7 @@
   export let validity: Validity
 </script>
 
-<td class="whitespace-nowrap px-4 py-2">
+<td class="text-sm px-4 py-2 whitespace-nowrap">
   <div>
     <span class="text-slate-600 font-normal inline-block min-w-[2.5rem]"
       >{capital($_("date.start"))}</span

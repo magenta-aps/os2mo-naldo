@@ -106,12 +106,12 @@
 
 {#if !data}
   <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-    <td class="p-4">{capital($_("loading"))}</td>
+    <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
   {#each data as association}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-      <td class="p-4">
+      <td class="text-sm p-4">
         {#if isOrg}
           <a href="{base}/employee/{association.employee[0].uuid}">
             {association.employee[0].name}
@@ -125,17 +125,19 @@
           >
         {/if}
       </td>
-      <td class="p-4">{association.association_type?.name}</td>
-      <td class="p-4"
+      <td class="text-sm p-4">{association.association_type?.name}</td>
+      <td class="text-sm p-4"
         >{association.substitute[0] ? association.substitute[0].name : ""}</td
       >
       {#if $MOConfig && JSON.parse($MOConfig.confdb_association_dynamic_facets)}
-        <td class="p-4"
+        <td class="text-sm p-4"
           >{association.trade_union ? association.trade_union?.name : ""}</td
         >
       {/if}
       {#if $MOConfig && $MOConfig.confdb_show_primary_association === "true"}
-        <td class="p-4">{association.primary ? association.primary?.name : ""}</td>
+        <td class="text-sm p-4"
+          >{association.primary ? association.primary?.name : ""}</td
+        >
       {/if}
       <ValidityTableCell validity={association.validity} />
       <td>
@@ -162,7 +164,7 @@
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
       <!-- TODO: Add translated "No associations in <tense>"-message" -->
-      <td class="p-4"
+      <td class="text-sm p-4"
         >{capital(
           $_("no_item", { values: { item: $_("association", { values: { n: 2 } }) } })
         )}</td

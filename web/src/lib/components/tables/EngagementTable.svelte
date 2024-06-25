@@ -120,7 +120,7 @@
 
 {#if !data}
   <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-    <td class="p-4">{capital($_("loading"))}</td>
+    <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
   {#each data as engagement, i}
@@ -128,7 +128,7 @@
       class="{i % 2 === 0 ? '' : 'bg-slate-100'} 
       py-4 leading-5 border-t border-slate-300 text-secondary"
     >
-      <td class="p-4">
+      <td class="text-sm p-4">
         {#if isOrg}
           <a href="{base}/employee/{engagement.employee[0].uuid}"
             >{engagement.employee[0].name}</a
@@ -141,11 +141,11 @@
           >
         {/if}
       </td>
-      <td class="p-4">{engagement.user_key}</td>
-      <td class="p-4">{engagement.job_function.name}</td>
-      <td class="p-4">{engagement.engagement_type.name}</td>
+      <td class="text-sm p-4">{engagement.user_key}</td>
+      <td class="text-sm p-4">{engagement.job_function.name}</td>
+      <td class="text-sm p-4">{engagement.engagement_type.name}</td>
       {#if !isOrg}
-        <td class="p-4">
+        <td class="text-sm p-4">
           <!-- If there's more than 1 manager, create a list -->
           <!-- Extra if/else logic implemented, so we can add <a>-tags to the managers -->
           {#if engagement.org_unit[0].managers.length > 1}
@@ -180,7 +180,7 @@
         </td>
       {/if}
       {#if $MOConfig && $MOConfig.confdb_show_primary_engagement === "true"}
-        <td class="p-4">{engagement.primary ? engagement.primary.name : ""}</td>
+        <td class="text-sm p-4">{engagement.primary ? engagement.primary.name : ""}</td>
       {/if}
       <ValidityTableCell validity={engagement.validity} />
       <td>
@@ -206,7 +206,7 @@
     </tr>
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
-      <td class="p-4"
+      <td class="text-sm p-4"
         >{capital(
           $_("no_item", { values: { item: $_("engagement", { values: { n: 2 } }) } })
         )}</td

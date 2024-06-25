@@ -68,7 +68,7 @@
 
 {#if !$engagements}
   <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-    <td class="p-4">{capital($_("loading"))}</td>
+    <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
   {#each $engagements as engagement, i}
@@ -78,16 +78,16 @@
           class="{i % 2 === 0 ? '' : 'bg-slate-100'} 
       py-4 leading-5 border-t border-slate-300 text-secondary"
         >
-          <td class="p-4">
+          <td class="text-sm p-4">
             {engagement.person[0].name}
           </td>
-          <td class="p-4">
+          <td class="text-sm p-4">
             {engagement.job_function.name}
           </td>
-          <td class="p-4">
+          <td class="text-sm p-4">
             {engagement.org_unit[0].name}
           </td>
-          <td class="p-4">
+          <td class="text-sm p-4">
             {#if engagement.org_unit[0].managers.length}
               {#each engagement.org_unit[0].managers as manager}
                 <p>
@@ -103,7 +103,7 @@
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
       <!-- TODO: Add translated "No <type> in <tense>"-message" -->
-      <td class="p-4"
+      <td class="text-sm p-4"
         >{capital(
           $_("no_item", { values: { item: $_("employee", { values: { n: 2 } }) } })
         )}</td

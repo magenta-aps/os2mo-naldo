@@ -22,6 +22,7 @@
   }
 </script>
 
+<!-- Toggle -->
 <div class="flex gap-2 items-center justify-center">
   <button
     on:click={() => {
@@ -41,6 +42,8 @@
   >
     <Icon icon={homeWorkOutlineRounded} width="25" height="25" />
   </button>
+
+  <!-- Search -->
   <div class="w-96 flex items-center justify-center">
     {#if orgChecked}
       <Search action="goto" type={"org-unit"} />
@@ -48,6 +51,8 @@
       <Search action="goto" type={"employee"} />
     {/if}
   </div>
+
+  <!-- Datepicker -->
   <div>
     <DateInput
       bind:value={selectedDate}

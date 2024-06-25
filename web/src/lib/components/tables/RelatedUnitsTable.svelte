@@ -69,12 +69,12 @@
 <!-- TODO: We can't sort on name, since we don't know if we use [0] or [1] -->
 {#if !data}
   <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-    <td class="p-4">{capital($_("loading"))}</td>
+    <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
   {#each data as related_unit}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-      <td class="p-4">
+      <td class="text-sm p-4">
         {#if related_unit.org_units[0].uuid == $page.params.uuid}
           <a href="{base}/organisation/{related_unit.org_units[1].uuid}">
             {related_unit.org_units[1].name}
@@ -89,7 +89,7 @@
     </tr>
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
-      <td class="p-4"
+      <td class="text-sm p-4"
         >{capital(
           $_("no_item", { values: { item: $_("related_unit", { values: { n: 2 } }) } })
         )}</td

@@ -91,12 +91,12 @@
 
 {#if !data}
   <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-    <td class="p-4">{capital($_("loading"))}</td>
+    <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
   {#each data as itassociation}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-      <td class="p-4">
+      <td class="text-sm p-4">
         <a
           href="{base}/organisation/{itassociation.org_unit[0].uuid}"
           on:click={() => updateGlobalNavigation(itassociation.org_unit[0].uuid)}
@@ -104,10 +104,12 @@
           {itassociation.org_unit[0].name}
         </a>
       </td>
-      <td class="p-4">{itassociation.job_function?.name}</td>
-      <td class="p-4">{itassociation.it_user[0].itsystem.name}</td>
-      <td class="p-4">{itassociation.it_user[0].user_key}</td>
-      <td class="p-4">{itassociation.primary ? itassociation.primary?.name : ""}</td>
+      <td class="text-sm p-4">{itassociation.job_function?.name}</td>
+      <td class="text-sm p-4">{itassociation.it_user[0].itsystem.name}</td>
+      <td class="text-sm p-4">{itassociation.it_user[0].user_key}</td>
+      <td class="text-sm p-4"
+        >{itassociation.primary ? itassociation.primary?.name : ""}</td
+      >
       <ValidityTableCell validity={itassociation.validity} />
       <td>
         <a
@@ -127,7 +129,7 @@
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
       <!-- TODO: Add translated "No <type> in <tense>"-message" -->
-      <td class="p-4"
+      <td class="text-sm p-4"
         >{capital(
           $_("no_item", { values: { item: $_("itassociation", { values: { n: 2 } }) } })
         )}</td

@@ -24,7 +24,7 @@
   }
 </script>
 
-<div class="tabs tabs-bordered {extra_classes}">
+<div class="tabs tabs-bordered whitespace-nowrap {extra_classes}">
   {#each items as item}
     <a
       href="#{item.value}"

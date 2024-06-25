@@ -85,23 +85,23 @@
 
 {#if !data}
   <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-    <td class="p-4">{capital($_("loading"))}</td>
+    <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
   {#each data as org_unit}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-      <td class="p-4">{org_unit.name}</td>
-      <td class="p-4"
+      <td class="text-sm p-4">{org_unit.name}</td>
+      <td class="text-sm p-4"
         >{org_unit.unit_type ? org_unit.unit_type.name : capital($_("not_set"))}</td
       >
       {#if $MOConfig && $MOConfig.confdb_show_level === "true"}
-        <td class="p-4"
+        <td class="text-sm p-4"
           >{org_unit.org_unit_level
             ? org_unit.org_unit_level.name
             : capital($_("not_set"))}</td
         >
       {/if}
-      <td class="p-4">
+      <td class="text-sm p-4">
         {#if org_unit.parent}
           <a href="{base}/organisation/{org_unit.parent.uuid}">
             {org_unit.parent.name}
@@ -113,7 +113,7 @@
         {/if}
       </td>
       {#if $MOConfig && $MOConfig.confdb_show_time_planning === "true"}
-        <td class="p-4">
+        <td class="text-sm p-4">
           {org_unit.time_planning
             ? org_unit.time_planning.name
             : capital($_("not_set"))}
@@ -133,7 +133,7 @@
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
       <!-- TODO: Add translated "No <type> in <tense>"-message" -->
-      <td class="p-4"
+      <td class="text-sm p-4"
         >{capital(
           $_("no_item", { values: { item: $_("org_unit", { values: { n: 2 } }) } })
         )}</td
