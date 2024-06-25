@@ -5,37 +5,100 @@
   import TenseTabs from "$lib/components/shared/TenseTabs.svelte"
   import ClassTable from "$lib/components/tables/ClassTable.svelte"
   import TableTensesWrapper from "$lib/components/tables/TableTensesWrapper.svelte"
+  import Select from "$lib/components/forms/shared/Select.svelte"
   import DetailTable from "$lib/components/shared/DetailTable.svelte"
+  import { GetFacetsDocument } from "./query.generated"
+  import { gql } from "graphql-request"
+  import { graphQLClient } from "$lib/util/http"
+  import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
+  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
+  import { sortFacets } from "$lib/util/get_classes"
+  import { date } from "$lib/stores/date"
+
+  let facet: { name: string; uuid: string }
+  let facetUuid: string
+
+  gql`
+    query GetFacets($fromDate: DateTime!) {
+      facets(filter: { from_date: $fromDate }) {
+        objects {
+          validities {
+            uuid
+            user_key
+          }
+        }
+      }
+    }
+  `
+
+  const updateFacet = () => {
+    facetUuid = facet.uuid
+  }
 </script>
 
-<!-- TODO: admin HeadTitle -->
-<!-- <HeadTitle type="admin" /> -->
+<HeadTitle type="admin" />
 
 <div class="px-12 pt-6">
-  <h1 class="mb-4">{capital($_("job_function", { values: { n: 2 } }))}</h1>
+  <h1 class="mb-4">{capital($_("admin_panel"))}</h1>
 
-  <div class="flex justify-end">
-    <a
-      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
-      href={`${base}/admin/create/class`}
-    >
-      {capital(
-        $_("create_item", {
-          values: { item: $_("job_function", { values: { n: 1 } }) },
-        })
-      )}
-    </a>
-  </div>
-  <!-- If tenses are added to admin-page, refer to following MR for easy revert -->
-  <!-- https://git.magenta.dk/rammearkitektur/os2mo-naldo/-/merge_requests/539 -->
-  <DetailTable
-    headers={[
-      { title: capital($_("name")), sortPath: "name" },
-      { title: upperCase($_("id")), sortPath: "user_key" },
-      { title: capital($_("date.date")), sortPath: "validity.from" },
-      { title: "" },
-    ]}
-  >
-    <svelte:component this={ClassTable} tense="present" />
-  </DetailTable>
+  {#await graphQLClient().request(GetFacetsDocument, { fromDate: $date })}
+    <div class="flex flex-row gap-6">
+      <Skeleton extra_classes="basis-1/2" />
+    </div>
+  {:then data}
+    {@const facets = data.facets.objects}
+    <div class="flex flex-row gap-6">
+      <Select
+        title={capital($_("facet", { values: { n: 1 } }))}
+        id="facet-uuid"
+        bind:value={facet}
+        iterable={sortFacets(facets)}
+        on:change={() => {
+          updateFacet()
+        }}
+        placeholder={capital(
+          $_("select_item", {
+            values: { item: $_("facet", { values: { n: 1 } }) },
+          })
+        )}
+        extra_classes="basis-1/4"
+      />
+    </div>
+    <div class="flex justify-between">
+      <TenseTabs />
+      {#if facetUuid}
+        <a
+          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
+          href="{base}/admin/facet/{facetUuid}/create/class"
+        >
+          {capital(
+            $_("create_item", {
+              values: { item: $_(facet.name, { values: { n: 1 } }) },
+            })
+          )}
+        </a>
+      {:else}
+        <a
+          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
+          href="{base}/admin/facet/create/class"
+        >
+          {capital(
+            $_("create_item", {
+              values: { item: $_("class", { values: { n: 1 } }) },
+            })
+          )}
+        </a>
+      {/if}
+    </div>
+    <TableTensesWrapper
+      table={ClassTable}
+      headers={[
+        { title: capital($_("name")), sortPath: "name" },
+        { title: capital($_("user_key")), sortPath: "user_key" },
+        { title: capital($_("date.date")), sortPath: "validity.from" },
+        { title: "" },
+      ]}
+      {facetUuid}
+    />
+  {/await}
 </div>

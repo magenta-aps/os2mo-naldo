@@ -12,6 +12,7 @@
   import { onMount } from "svelte"
   import { sortKey, sortDirection } from "$lib/stores/sorting"
   import { sortData } from "$lib/util/sorting"
+  import Select from "$lib/components/forms/shared/Select.svelte"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
 
@@ -19,13 +20,12 @@
   let data: Classes
 
   export let tense: Tense
+  export let facetUuid: string
 
   gql`
-    query Class($facet_user_key: [String!], $fromDate: DateTime, $toDate: DateTime) {
+    query Class($facetUuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
       classes(
-        filter: {
-          facet: { user_keys: $facet_user_key, from_date: $fromDate, to_date: $toDate }
-        }
+        filter: { facet: { uuids: $facetUuid }, from_date: $fromDate, to_date: $toDate }
       ) {
         objects {
           objects {
@@ -49,10 +49,9 @@
     }
   }
 
-  onMount(async () => {
+  const getClasses = async (facetUuid: string) => {
     const res = await graphQLClient().request(ClassDocument, {
-      // TODO: When more classes are added to the admin site, change this to be dynamic
-      facet_user_key: "engagement_job_function",
+      facetUuid: facetUuid,
       ...tenseToValidity(tense, $date),
     })
     const classes: Classes = []
@@ -66,10 +65,22 @@
       classes.push(...filtered)
     }
     data = classes
-  })
+  }
+
+  $: if (facetUuid) {
+    getClasses(facetUuid)
+  }
 </script>
 
-{#if !data}
+{#if !data && !facetUuid}
+  <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+    <td class="p-4"
+      >{capital(
+        $_("no_item", { values: { item: $_("facet", { values: { n: 2 } }) } })
+      )}</td
+    >
+  </tr>
+{:else if !data}
   <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
     <td class="p-4">{capital($_("loading"))}</td>
   </tr>
@@ -84,7 +95,9 @@
       <ValidityTableCell validity={cls.validity} />
       <td>
         <a
-          href="{base}/{$page.route.id?.split('/')[1]}/{cls.facet_uuid}/edit/{cls.uuid}"
+          href="{base}/{$page.route.id?.split(
+            '/'
+          )[1]}/facet/{cls.facet_uuid}/edit/class/{cls.uuid}"
         >
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>
@@ -92,10 +105,9 @@
     </tr>
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
-      <!-- TODO: Add translated "No <type> in <tense>"-message" -->
       <td class="p-4"
         >{capital(
-          $_("no_item", { values: { item: $_("job_function", { values: { n: 2 } }) } })
+          $_("no_item", { values: { item: $_("class", { values: { n: 2 } }) } })
         )}</td
       >
     </tr>

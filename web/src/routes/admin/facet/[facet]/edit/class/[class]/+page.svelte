@@ -3,7 +3,6 @@
   import { capital } from "$lib/util/translationUtils"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
-  import Select from "$lib/components/forms/shared/Select.svelte"
   import { enhance } from "$app/forms"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
@@ -17,11 +16,12 @@
   import { UpdateClassDocument, ClassDocument } from "./query.generated"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
+  import { getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string
 
   const fromDate = field("from", "", [required()])
-  // const userKey = field("user_key", "", [required()])
+  const userKey = field("user_key", "", [required()])
   const name = field("name", "", [required()])
   const svelteForm = form(fromDate, name)
 
@@ -29,11 +29,17 @@
     query Class($uuid: [UUID!], $fromDate: DateTime) {
       classes(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
-          objects {
+          validities {
             uuid
             user_key
             name
-            facet_uuid
+            facet(filter: { from_date: null, to_date: null }) {
+              uuid
+              validity {
+                from
+                to
+              }
+            }
             validity {
               from
               to
@@ -43,11 +49,10 @@
       }
     }
 
-    mutation UpdateClass($input: ClassUpdateInput!) {
+    mutation UpdateClass($input: ClassUpdateInput!, $date: DateTime!) {
       class_update(input: $input) {
-        objects {
+        current(at: $date) {
           name
-          uuid
         }
       }
     }
@@ -62,13 +67,16 @@
           try {
             const mutation = await graphQLClient().request(UpdateClassDocument, {
               input: result.data,
+              date: result.data.validity.from,
             })
             $success = {
-              message: `Stillingsbetegnelse ${
-                mutation.class_update.objects[0]?.name
-                  ? `${mutation.class_update.objects[0].name}`
-                  : ""
-              } er redigeret fra d. ${$fromDate.value}`,
+              message: capital(
+                $_("success_edit", {
+                  values: {
+                    name: mutation.class_update.current?.name,
+                  },
+                })
+              ),
               type: "admin",
             }
           } catch (err) {
@@ -79,31 +87,32 @@
     }
 </script>
 
+<title
+  >{capital(
+    $_("edit_item", {
+      values: { item: $_("class", { values: { n: 1 } }) },
+    })
+  )} | OS2mo</title
+>
+
+<div class="flex align-center px-6 pt-6 pb-4">
+  <h3 class="flex-1">
+    {capital(
+      $_("edit_item", {
+        values: { item: $_("class", { values: { n: 1 } }) },
+      })
+    )}
+  </h3>
+</div>
+
+<div class="divider p-0 m-0 mb-4 w-full" />
+
 {#await graphQLClient().request( ClassDocument, { uuid: $page.params.class, fromDate: $date } )}
   <!-- TODO: Should have a skeleton for the loading stage -->
   {capital($_("loading"))}
 {:then data}
-  {@const cls = data.classes.objects[0].objects[0]}
-
-  <title
-    >{capital(
-      $_("edit_item", {
-        values: { item: $_("job_function", { values: { n: 1 } }) },
-      })
-    )} | OS2mo</title
-  >
-
-  <div class="flex align-center px-6 pt-6 pb-4">
-    <h3 class="flex-1">
-      {capital(
-        $_("edit_item", {
-          values: { item: $_("job_function", { values: { n: 1 } }) },
-        })
-      )}
-    </h3>
-  </div>
-
-  <div class="divider p-0 m-0 mb-4 w-full" />
+  {@const cls = data.classes.objects[0].validities[0]}
+  {@const validities = getMinMaxValidities(data.classes.objects[0].validities)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -115,43 +124,41 @@
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={undefined}
-            max={toDate ? toDate : undefined}
+            min={validities.from}
+            max={toDate ? toDate : validities.to}
             required={true}
           />
-          <!-- FIXME: (don't know which prefix to use) -->
-          <!-- Commented out for now, but will probably be needed at some point: -->
-          <!-- https://redmine.magenta.dk/issues/58396 -->
-          <!-- <DateInput
+          <DateInput
             bind:value={toDate}
+            startValue={cls.validity.to ? cls.validity.to.split("T")[0] : null}
             title={capital($_("date.end_date"))}
             id="to"
-            startValue={cls.validity.to ? cls.validity.to.split("T")[0] : null}
-            min={$fromDate.value ? $fromDate.value : undefined}
-            max={undefined}
-          /> -->
+            min={$fromDate.value ? $fromDate.value : validities.from}
+            max={validities.to}
+          />
         </div>
-        <!-- <div class="flex flex-row gap-6"> -->
-        <Input
-          title={capital($_("name"))}
-          id="name"
-          bind:value={$name.value}
-          startValue={cls.name}
-          errors={$name.errors}
-          required={true}
-        />
-        <!-- TODO: user_key removed for now - should probably be a possibility in the future -->
-        <!-- <Input
+        <div class="flex flex-row gap-6">
+          <Input
+            title={capital($_("name"))}
+            id="name"
+            bind:value={$name.value}
+            startValue={cls.name}
+            errors={$name.errors}
+            extra_classes="basis-1/2"
+            required={true}
+          />
+          <Input
             title="User key"
             id="user-key"
-            extra_classes="basis-1/2"
             bind:value={$userKey.value}
             startValue={cls.user_key}
             errors={$userKey.errors}
+            extra_classes="basis-1/2"
             required={true}
-          /> -->
-        <!-- </div> -->
-        <input type="hidden" id="facet-uuid" name="facet-uuid" value={cls.facet_uuid} />
+          />
+        </div>
+        <!-- This field should not be needed on update -->
+        <input type="hidden" id="facet-uuid" name="facet-uuid" value={cls.facet.uuid} />
       </div>
     </div>
     <div class="flex py-6 gap-4">
@@ -160,7 +167,7 @@
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
         >{capital(
           $_("edit_item", {
-            values: { item: $_("job_function", { values: { n: 1 } }) },
+            values: { item: $_("class", { values: { n: 1 } }) },
           })
         )}</button
       >

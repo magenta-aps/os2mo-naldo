@@ -10,6 +10,7 @@
     ORGANISATION = "organisation",
     EMPLOYEE = "employee",
     INSIGHT = "insight",
+    ADMIN = "admin",
   }
 
   type TitleType = `${Title}`
@@ -49,6 +50,9 @@
 
       case Title.INSIGHT:
         return capital($_("insight"))
+
+      case Title.ADMIN:
+        return capital($_("admin_panel"))
 
       default:
         throw TypeError("Wrong or no title type used")
