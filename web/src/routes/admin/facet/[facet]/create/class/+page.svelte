@@ -18,21 +18,18 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import { getMinMaxValidities } from "$lib/util/helpers"
-  import { sortFacets } from "$lib/util/get_classes"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getSpecificFacet } from "$lib/util/get_classes"
 
   let toDate: string
 
   const fromDate = field("from", "", [required()])
   const name = field("name", "", [required()])
-  // const userKey = field("user_key", "", [required()])
-  const facetField = field("facet", "", [required()])
-  const svelteForm = form(fromDate, name)
+  const userKey = field("user_key", "", [required()])
+  const svelteForm = form(fromDate, name, userKey)
 
   gql`
-    query Facet($fromDate: DateTime!) {
-      facets(filter: { from_date: $fromDate }) {
+    query Facet($uuid: [UUID!], $fromDate: DateTime!) {
+      facets(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
           validities {
             uuid
@@ -105,7 +102,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request(FacetDocument, { fromDate: $date })}
+{#await graphQLClient().request( FacetDocument, { uuid: $page.params.facet, fromDate: $date } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -121,7 +118,7 @@
     </div>
   </div>
 {:then data}
-  {@const facets = data.facets.objects}
+  {@const facet = data.facets.objects[0].validities[0]}
   {@const validities = getMinMaxValidities(null)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
@@ -146,17 +143,17 @@
             max={validities.to}
           />
         </div>
+        <Select
+          title={capital($_("facet", { values: { n: 1 } }))}
+          id="facet"
+          value={{
+            uuid: facet.uuid,
+            name: capital($_("facets.name." + facet.user_key)),
+          }}
+          required={true}
+          disabled
+        />
         <div class="flex flex-row gap-6">
-          <Select
-            title="Facet"
-            id="facet"
-            bind:name={$facetField.value}
-            errors={$facetField.errors}
-            startValue={getSpecificFacet(facets, $page.params.facet)}
-            iterable={sortFacets(facets)}
-            extra_classes="basis-1/2"
-            required={true}
-          />
           <Input
             title={capital($_("name"))}
             id="name"
@@ -165,16 +162,15 @@
             extra_classes="basis-1/2"
             required={true}
           />
-        </div>
-        <!-- TODO: user_key removed for now - should probably be a possibility in the future -->
-        <!-- <Input
-            title="User key"
+          <Input
+            title={capital($_("user_key"))}
             id="user-key"
-            extra_classes="basis-1/2"
             bind:value={$userKey.value}
             errors={$userKey.errors}
-          /> -->
-        <!-- </div> -->
+            extra_classes="basis-1/2"
+            required={true}
+          />
+        </div>
       </div>
     </div>
     <div class="flex py-6 gap-4">
