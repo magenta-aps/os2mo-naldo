@@ -6,13 +6,14 @@ export const actions: Actions = {
     const data = await request.formData()
     const facet = data.get("facet")
     const name = data.get("name") as string
+    const userKey = data.get("user-key") as string
     const startDate = data.get("from")
     const endDate = data.get("to")
 
     return {
       facet_uuid: facet,
       name: name,
-      user_key: name,
+      user_key: userKey,
       validity: { from: startDate, ...(endDate && { to: endDate }) },
     }
   },

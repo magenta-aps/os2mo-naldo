@@ -5,14 +5,12 @@
   import { base } from "$app/paths"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
-  import { tenseToValidity, tenseFilter } from "$lib/util/helpers"
+  import { tenseToValidity, tenseFilter, formatQueryDates } from "$lib/util/helpers"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { ClassDocument, type ClassQuery } from "./query.generated"
-  import { onMount } from "svelte"
   import { sortKey, sortDirection } from "$lib/stores/sorting"
   import { sortData } from "$lib/util/sorting"
-  import Select from "$lib/components/forms/shared/Select.svelte"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
 
@@ -76,7 +74,7 @@
   <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
     <td class="p-4"
       >{capital(
-        $_("no_item", { values: { item: $_("facet", { values: { n: 2 } }) } })
+        $_("no_item", { values: { item: $_("class", { values: { n: 2 } }) } })
       )}</td
     >
   </tr>
@@ -97,7 +95,9 @@
         <a
           href="{base}/{$page.route.id?.split(
             '/'
-          )[1]}/facet/{cls.facet_uuid}/edit/class/{cls.uuid}"
+          )[1]}/facet/{cls.facet_uuid}/edit/class/{cls.uuid}{formatQueryDates(
+            cls.validity
+          )}"
         >
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>

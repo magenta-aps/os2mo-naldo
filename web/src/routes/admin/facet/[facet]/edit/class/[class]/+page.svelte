@@ -26,8 +26,8 @@
   const svelteForm = form(fromDate, name)
 
   gql`
-    query Class($uuid: [UUID!], $fromDate: DateTime) {
-      classes(filter: { uuids: $uuid, from_date: $fromDate }) {
+    query Class($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+      classes(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
           validities {
             uuid
@@ -107,7 +107,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ClassDocument, { uuid: $page.params.class, fromDate: $date } )}
+{#await graphQLClient().request( ClassDocument, { uuid: $page.params.class, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to") } )}
   <!-- TODO: Should have a skeleton for the loading stage -->
   {capital($_("loading"))}
 {:then data}
@@ -148,7 +148,7 @@
             required={true}
           />
           <Input
-            title="User key"
+            title={capital($_("user_key"))}
             id="user-key"
             bind:value={$userKey.value}
             startValue={cls.user_key}
@@ -157,8 +157,6 @@
             required={true}
           />
         </div>
-        <!-- This field should not be needed on update -->
-        <input type="hidden" id="facet-uuid" name="facet-uuid" value={cls.facet.uuid} />
       </div>
     </div>
     <div class="flex py-6 gap-4">
