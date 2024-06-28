@@ -6,7 +6,7 @@
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
-  import { EmployeeItUsersDocument, type EmployeeItUsersQuery } from "./query.generated"
+  import { OrgUnitItUsersDocument, type OrgUnitItUsersQuery } from "./query.generated"
   import { date } from "$lib/stores/date"
   import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
   import { sortData } from "$lib/util/sorting"
@@ -17,7 +17,9 @@
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import { formatQueryDates } from "$lib/util/helpers"
 
-  type ITUsers = EmployeeItUsersQuery["itusers"]["objects"][0]["validities"]
+  type ITUsers =
+    | OrgUnitItUsersQuery["byEngagement"]["objects"][0]["validities"]
+    | OrgUnitItUsersQuery["byOrgUnit"]["objects"][0]["validities"]
   let data: ITUsers
 
   export let tense: Tense
@@ -25,10 +27,36 @@
   const uuid = $page.params.uuid
 
   gql`
-    query EmployeeITUsers($employee: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
-      itusers(
+    query OrgUnitITUsers($orgUnit: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+      byEngagement: itusers(
         filter: {
-          employee: { uuids: $employee }
+          engagement: { org_unit: { uuids: $orgUnit } }
+          from_date: $fromDate
+          to_date: $toDate
+        }
+      ) {
+        objects {
+          validities {
+            user_key
+            uuid
+            itsystem {
+              name
+              uuid
+            }
+            validity {
+              from
+              to
+            }
+            primary {
+              uuid
+              name
+            }
+          }
+        }
+      }
+      byOrgUnit: itusers(
+        filter: {
+          org_unit: { uuids: $orgUnit }
           from_date: $fromDate
           to_date: $toDate
         }
@@ -62,14 +90,16 @@
   }
 
   onMount(async () => {
-    const res = await graphQLClient().request(EmployeeItUsersDocument, {
-      employee: uuid,
+    const res = await graphQLClient().request(OrgUnitItUsersDocument, {
+      orgUnit: uuid,
       ...tenseToValidity(tense, $date),
     })
     const itUsers: ITUsers = []
 
+    const combinedItUsers = [...res.byEngagement.objects, ...res.byOrgUnit.objects]
+
     // Filters and flattens the data
-    for (const outer of res.itusers.objects) {
+    for (const outer of combinedItUsers) {
       // TODO: Remove when GraphQL is able to do this for us
       const filtered = outer.validities.filter((obj) => {
         return tenseFilter(obj, tense)
@@ -88,7 +118,7 @@
   {#each data as ituser, i}
     <tr
       class="{i % 2 === 0 ? '' : 'bg-slate-100'} 
-      p-4 leading-5 border-t border-slate-300 text-secondary"
+        p-4 leading-5 border-t border-slate-300 text-secondary"
     >
       <td class="p-4">{ituser.itsystem.name} </td>
       <td class="p-4">{ituser.user_key}</td>
