@@ -19,11 +19,11 @@
     filter: string
     value: string
     n: number
-    fields?: Field[]
+    fields: Field[]
   }
 
   let mainQuery: MainQuery
-  let fields: Field[] = []
+  let chosenFields: Field[] = []
   // Can this be anything else than any??
   let data: any
 
@@ -32,7 +32,7 @@
     {
       operation: "org_units",
       filter: "OrganisationUnitFilter",
-      value: "unit",
+      value: $_("unit"),
       n: 1,
       fields: [
         { value: "name", subString: "name" },
@@ -78,13 +78,14 @@
             type: mainQuery.filter,
           },
         },
-        fields: [{ objects: [{ validities: fields.map((field) => field.subString) }] }],
+        fields: [
+          // Somehow do `current(at: $date)`
+          { objects: [{ current: chosenFields.map((field) => field.subString) }] },
+        ],
       },
       null,
       { operationName: `get_${mainQuery.operation}` }
     )
-    console.log(myQuery)
-
     await getData(myQuery)
   }
 
@@ -98,8 +99,18 @@
     )
 
     data = res
+
+    const results = []
+    for (const outer of data[mainQuery.operation].objects) {
+      results.push(outer.current)
+    }
+    data = results
   }
 </script>
+
+<div class="px-12 pt-6">
+  <h1 class="mb-4">Insights</h1>
+</div>
 
 <div class="flex flex-row gap-6">
   <NoValueSelect
@@ -114,16 +125,8 @@
     title={capital($_("lol"))}
     id="lol"
     iterable={mainQuery ? mainQuery.fields : undefined}
-    bind:value={fields}
+    bind:value={chosenFields}
     extra_classes="basis-1/3"
-  />
-  <NoValueSelect
-    title={capital($_("lol"))}
-    id="lol"
-    iterable={sortItemsBy(items, "value")}
-    bind:value={mainQuery}
-    extra_classes="basis-1/3"
-    isClearable={true}
   />
 </div>
 <button
@@ -131,11 +134,7 @@
   disabled={!mainQuery}
   on:click={async () => updateQuery()}>{capital($_("search"))}</button
 >
-<div class="px-12 pt-6">
-  <h1 class="mb-4">Test</h1>
-</div>
-{#if !data}
-  ingenting
-{:else}
-  <InsightsTable {data} tense="present" {mainQuery} />
-{/if}
+
+{#key data}
+  <InsightsTable {data} headers={chosenFields} />
+{/key}

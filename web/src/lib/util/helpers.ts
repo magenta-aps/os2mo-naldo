@@ -53,7 +53,6 @@ export const tenseFilter = (
   obj: { validity: Validity | OpenValidity },
   tense: Tense
 ) => {
-  console.log(obj)
   const globalDate = get(date)
   switch (tense) {
     case "past":
