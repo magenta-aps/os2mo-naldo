@@ -19,7 +19,7 @@
             >{capital($_("report", { values: { n: 2 } }))}</a
           >
         </li>
-        {#if env.PUBLIC_SHOW_ADMIN_PANEL === "true" && $isAdmin}
+        {#if env.PUBLIC_SHOW_ADMIN_PANEL !== "false" && $isAdmin}
           <li>
             <a class="w-100 text-secondary hover:no-underline" href="{base}/admin"
               >{capital($_("admin_panel"))}</a
