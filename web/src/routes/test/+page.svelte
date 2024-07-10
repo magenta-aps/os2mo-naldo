@@ -7,6 +7,7 @@
   import { graphQLClient } from "$lib/util/http"
   import InsightsSelectMultiple from "$lib/components/insights/InsightsSelectMultiple.svelte"
   import InsightsTable from "$lib/components/tables/InsightsTable.svelte"
+  import Search from "$lib/components/Search.svelte"
 
   // Types
   interface Field {
@@ -24,6 +25,7 @@
 
   let mainQuery: MainQuery
   let chosenFields: Field[] = []
+  let orgUnit: { name: string; uuid: string }
   // Can this be anything else than any??
   let data: any
 
@@ -32,7 +34,7 @@
     {
       operation: "org_units",
       filter: "OrganisationUnitFilter",
-      value: $_("unit"),
+      value: "unit",
       n: 1,
       fields: [
         { value: "name", subString: "name" },
@@ -41,40 +43,122 @@
         { value: "validity", subString: "validity {from to}" },
       ],
     },
-    { operation: "addresses", filter: "AddressFilter", value: "address", n: 2 },
-    { operation: "engagements", filter: "EngagementFilter", value: "engagement", n: 2 },
+    {
+      operation: "addresses",
+      filter: "AddressFilter",
+      value: "address",
+      n: 2,
+      fields: [
+        { value: "address_type", subString: "address_type {name}" },
+        { value: "address", subString: "name" },
+        { value: "visibility", subString: "visibility {name}" },
+        { value: "validity", subString: "validity {from to}" },
+      ],
+    },
+    {
+      operation: "engagements",
+      filter: "EngagementFilter",
+      value: "engagement",
+      n: 2,
+      fields: [
+        { value: "name", subString: "person {name}" },
+        { value: "job_function", subString: "job_function {name}" },
+        { value: "engagement_type", subString: "engagement_type {name}" },
+        { value: "primary", subString: "primary {name}" },
+        { value: "validity", subString: "validity {from to}" },
+      ],
+    },
     {
       operation: "associations",
       filter: "AssociationFilter",
       value: "association",
       n: 2,
+      fields: [
+        { value: "name", subString: "person {name}" },
+        { value: "association_type", subString: "association_type {name}" },
+        { value: "substitute", subString: "substitute {name}" },
+        { value: "trade_union", subString: "trade_union {name}" },
+        { value: "validity", subString: "validity {from to}" },
+      ],
     },
-    { operation: "itusers", filter: "ITUserFilter", value: "ituser", n: 2 },
+    {
+      operation: "itusers",
+      filter: "ITUserFilter",
+      value: "ituser",
+      n: 2,
+      fields: [
+        { value: "it_system", subString: "itsystem {name}" },
+        { value: "account_name", subString: "user_key" },
+        { value: "primary", subString: "primary {name}" },
+        { value: "validity", subString: "validity {from to}" },
+      ],
+    },
+    // HERTIL
     {
       operation: "rolebindings",
       filter: "RoleBindingFilter",
       value: "rolebinding",
       n: 2,
+      fields: [
+        { value: "ituser", subString: "ituser {name}" },
+        { value: "it_system", subString: "itsystem {name}" },
+        { value: "role", subString: "role {name}" },
+        { value: "validity", subString: "validity {from to}" },
+      ],
     },
     { operation: "kles", filter: "KLEFilter", value: "kle", n: 2 },
-    { operation: "managers", filter: "ManagerFilter", value: "manager", n: 2 },
-    { operation: "owners", filter: "OwnerFilter", value: "owner", n: 2 },
+    {
+      operation: "managers",
+      filter: "ManagerFilter",
+      value: "manager",
+      n: 2,
+      fields: [
+        { value: "name", subString: "person {name}" },
+        { value: "manager_responsibility", subString: "responsibilities {name}" },
+        { value: "manager_type", subString: "manager_type {name}" },
+        { value: "manager_level", subString: "manager_level {name}" },
+        { value: "validity", subString: "validity {from to}" },
+      ],
+    },
+    {
+      operation: "owners",
+      filter: "OwnerFilter",
+      value: "owner",
+      n: 2,
+      fields: [
+        { value: "name", subString: "person {name}" },
+        { value: "validity", subString: "validity {from to}" },
+      ],
+    },
     {
       operation: "related_units",
       filter: "RelatedUnitFilter",
       value: "related_unit",
       n: 2,
+      fields: [
+        { value: "related_unit", subString: "person {name}" },
+        { value: "validity", subString: "validity {from to}" },
+      ],
     },
   ]
 
   const updateQuery = async () => {
     if (!mainQuery) return
+    let filterValue
+    if (mainQuery.operation === "org_units") {
+      filterValue = { uuids: orgUnit.uuid }
+    } else if (mainQuery.operation === "itusers") {
+      // Need to do 2 queries somehow, otherwise we don't get the actual itusers of the unit.
+      filterValue = { engagement: { org_unit: { uuids: orgUnit.uuid } } }
+    } else {
+      filterValue = { org_unit: { uuids: orgUnit.uuid } }
+    }
     const myQuery = query(
       {
         operation: mainQuery.operation,
         variables: {
           filter: {
-            value: { uuids: "f06ee470-9f17-566f-acbe-e938112d46d9" },
+            value: filterValue,
             type: mainQuery.filter,
           },
         },
@@ -113,14 +197,16 @@
 </div>
 
 <div class="flex flex-row gap-6">
+  <!-- Sort items -->
   <NoValueSelect
     title={capital($_("lol"))}
     id="lol"
-    iterable={sortItemsBy(items, "value")}
+    iterable={items}
     bind:value={mainQuery}
     extra_classes="basis-1/3"
     isClearable={true}
   />
+  <!-- Sort items -->
   <InsightsSelectMultiple
     title={capital($_("lol"))}
     id="lol"
@@ -128,6 +214,7 @@
     bind:value={chosenFields}
     extra_classes="basis-1/3"
   />
+  <Search type="org-unit" bind:value={orgUnit} required={true} />
 </div>
 <button
   class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"

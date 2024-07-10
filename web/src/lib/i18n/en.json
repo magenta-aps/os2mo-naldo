@@ -162,6 +162,7 @@
 		"is_invalid": "{field} is invalid",
 		"is_wrong_format": "{field} is wrong format"
 	},
+	"validity": "validity",
 	"visibility": "visibility",
 	"welcome_message": "Welcome to GIR"
 }

@@ -164,6 +164,7 @@
 		"is_invalid": "{field} er ugyldigt",
 		"is_wrong_format": "{field} er forkert format"
 	},
+	"validity": "gyldighed",
 	"visibility": "synlighed",
 	"welcome_message": "Velkommen til MO"
 }

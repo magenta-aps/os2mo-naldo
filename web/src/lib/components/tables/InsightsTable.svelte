@@ -1,20 +1,9 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
-  import { graphQLClient } from "$lib/util/http"
-  import { gql } from "graphql-request"
-  import { date } from "$lib/stores/date"
-  import { EmployeeDocument, type EmployeeQuery } from "./query.generated"
   import ValidityTableCell from "$lib/components/shared/ValidityTableCell.svelte"
-  import { base } from "$app/paths"
-  import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
-  import { sortData } from "$lib/util/sorting"
-  import { onMount } from "svelte"
-  import { page } from "$app/stores"
   import Icon from "@iconify/svelte"
-  import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
-  import { formatQueryDates } from "$lib/util/helpers"
 
   export let data: any
   export let headers
@@ -85,16 +74,31 @@
           <td class="p-4">Intet valgt</td>
         </tr>
       {:else}
+        {console.log(data)}
         {#each data as searchObject}
           <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
             {#each headers as header, i}
-              {#if header.value === "name"}
+              <!-- Handle when we're looking for the name of the object e.g. org_unit -->
+              {#if header.subString === "name"}
                 <td class="p-4">
                   {searchObject.name}
+                </td>
+                <!-- Handle when "name" is the name of a person -->
+              {:else if header.value === "substitute"}
+                <td class="p-4">
+                  {searchObject.substitute[0]?.name
+                    ? searchObject.substitute[0]?.name
+                    : ""}
+                </td>
+                <!-- Handle when "name" is the name of a person -->
+              {:else if header.value === "name" && header.subString !== "name"}
+                <td class="p-4">
+                  {searchObject.person[0].name}
                 </td>
               {:else if header.value === "validity"}
                 <ValidityTableCell validity={searchObject.validity} />
               {:else}
+                <!-- Handle name of classes e.g. `visibility {name}` -->
                 <td class="p-4">
                   {searchObject[headers[i].value]?.name
                     ? searchObject[headers[i].value].name
