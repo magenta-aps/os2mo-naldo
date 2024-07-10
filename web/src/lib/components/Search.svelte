@@ -64,6 +64,7 @@
           validities {
             uuid
             name
+            cpr_number
             validity {
               from
               to
@@ -132,6 +133,7 @@
           validities {
             name
             uuid
+            cpr_number
             addresses {
               address_type {
                 name
@@ -317,7 +319,7 @@
       }}
     >
       <div slot="item" let:item>
-        <SearchItem {item} />
+        <SearchItem {item} {type} />
       </div>
 
       <div slot="selection" let:selection>
