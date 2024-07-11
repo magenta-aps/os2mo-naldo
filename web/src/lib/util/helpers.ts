@@ -256,3 +256,42 @@ export const sortItemsBy = (items: Item[], sortBy: string) => {
     }))
     .sort((a, b) => (a[sortBy] > b[sortBy] ? 1 : -1))
 }
+
+// Insights
+export type Field = {
+  value: string
+  subString: string
+}
+
+export type MainQuery = {
+  operation: string
+  filter: string
+  value: string
+  n: number
+  fields: Field[]
+}
+
+export const resolveFieldValue = (searchObject: any, header: Field) => {
+  if (header.subString === "name") {
+    return searchObject.name
+  }
+  if (header.value === "name" && header.subString !== "name" && searchObject.person) {
+    return searchObject.person[0]?.name ?? ""
+  }
+  if (header.value === "name" && header.subString !== "name" && searchObject.owner) {
+    return searchObject.owner[0]?.name ?? ""
+  }
+  if (header.value === "substitute" && searchObject.substitute) {
+    return searchObject.substitute[0]?.name ?? ""
+  }
+  if (header.value === "account_name" && searchObject.user_key) {
+    return searchObject.user_key ?? ""
+  }
+  if (header.value === "ituser" && searchObject.ituser) {
+    return searchObject.ituser[0].user_key ?? ""
+  }
+  if (header.value === "validity") {
+    return null // Special handling for validity
+  }
+  return searchObject[header.value]?.name ?? ""
+}

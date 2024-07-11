@@ -8,20 +8,8 @@
   import InsightsSelectMultiple from "$lib/components/insights/InsightsSelectMultiple.svelte"
   import InsightsTable from "$lib/components/tables/InsightsTable.svelte"
   import Search from "$lib/components/Search.svelte"
-
-  // Types
-  interface Field {
-    value: string
-    subString: string
-  }
-
-  interface MainQuery {
-    operation: string
-    filter: string
-    value: string
-    n: number
-    fields: Field[]
-  }
+  import { type Field, type MainQuery } from "$lib/util/helpers"
+  import { downloadHandler } from "$lib/util/newCsv"
 
   let mainQuery: MainQuery
   let chosenFields: Field[] = []
@@ -87,21 +75,20 @@
       value: "ituser",
       n: 2,
       fields: [
-        { value: "it_system", subString: "itsystem {name}" },
+        { value: "itsystem", subString: "itsystem {name}" },
         { value: "account_name", subString: "user_key" },
         { value: "primary", subString: "primary {name}" },
         { value: "validity", subString: "validity {from to}" },
       ],
     },
-    // HERTIL
     {
       operation: "rolebindings",
       filter: "RoleBindingFilter",
       value: "rolebinding",
       n: 2,
       fields: [
-        { value: "ituser", subString: "ituser {name}" },
-        { value: "it_system", subString: "itsystem {name}" },
+        { value: "ituser", subString: "ituser {user_key}" },
+        // { value: "it_system", subString: "itsystem {name}" },
         { value: "role", subString: "role {name}" },
         { value: "validity", subString: "validity {from to}" },
       ],
@@ -126,17 +113,18 @@
       value: "owner",
       n: 2,
       fields: [
-        { value: "name", subString: "person {name}" },
+        { value: "name", subString: "owner {name}" },
         { value: "validity", subString: "validity {from to}" },
       ],
     },
+    // Send UUID to check which unit to show
     {
       operation: "related_units",
       filter: "RelatedUnitFilter",
       value: "related_unit",
       n: 2,
       fields: [
-        { value: "related_unit", subString: "person {name}" },
+        { value: "related_unit", subString: "org_units {name}" },
         { value: "validity", subString: "validity {from to}" },
       ],
     },
@@ -225,3 +213,9 @@
 {#key data}
   <InsightsTable {data} headers={chosenFields} />
 {/key}
+
+<button
+  class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+  disabled={!data}
+  on:click={(event) => downloadHandler(event, data, chosenFields)}>Download CSV</button
+>

@@ -4,9 +4,10 @@
   import ValidityTableCell from "$lib/components/shared/ValidityTableCell.svelte"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import Icon from "@iconify/svelte"
+  import { resolveFieldValue, type Field } from "$lib/util/helpers"
 
   export let data: any
-  export let headers
+  export let headers: Field[]
 
   // $: {
   //   if (data) {
@@ -31,39 +32,9 @@
       <thead class="text-left">
         {#each headers as header}
           <th
-            on:click={() => {
-              sortTable(header.sortPath || "")
-            }}
-            class="{header.sortPath ? 'cursor-pointer' : ''} 
-                px-4 py-3 font-bold leading-4 tracking-wider text-left text-secondary border-slate-300 bg-slate-300"
+            class="px-4 py-3 font-bold leading-4 tracking-wider text-left text-secondary border-slate-300 bg-slate-300"
           >
-            <div class="flex items-center">
-              {$_(header.value)}
-              {#if header.sortPath}
-                <div class="flex flex-col items-center justify-center pl-1">
-                  <Icon
-                    icon={keyboardArrowUpRounded}
-                    width="16"
-                    height="16"
-                    class="relative top-1 {$sortKey === header.sortPath &&
-                    $sortDirection === -1
-                      ? 'opacity-100'
-                      : 'opacity-30'}
-                    "
-                  />
-                  <Icon
-                    icon={keyboardArrowDownRounded}
-                    width="16"
-                    height="16"
-                    class="relative bottom-1 {$sortKey === header.sortPath &&
-                    $sortDirection === 1
-                      ? 'opacity-100'
-                      : 'opacity-30'}
-                    "
-                  />
-                </div>
-              {/if}
-            </div>
+            <div class="flex items-center">{$_(header.value)}</div>
           </th>
         {/each}
       </thead>
@@ -73,36 +44,26 @@
         <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
           <td class="p-4">Intet valgt</td>
         </tr>
-      {:else}
+      {:else if data && headers}
         {console.log(data)}
         {#each data as searchObject}
           <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+            <!-- This check is needed since, if fields are cleared (after making a query), it will break with -->
+            <!-- Error: {#each} only works with iterable values. -->
             {#each headers as header, i}
-              <!-- Handle when we're looking for the name of the object e.g. org_unit -->
-              {#if header.subString === "name"}
-                <td class="p-4">
-                  {searchObject.name}
-                </td>
-                <!-- Handle when "name" is the name of a person -->
-              {:else if header.value === "substitute"}
-                <td class="p-4">
-                  {searchObject.substitute[0]?.name
-                    ? searchObject.substitute[0]?.name
-                    : ""}
-                </td>
-                <!-- Handle when "name" is the name of a person -->
-              {:else if header.value === "name" && header.subString !== "name"}
-                <td class="p-4">
-                  {searchObject.person[0].name}
-                </td>
-              {:else if header.value === "validity"}
+              {#if header.value === "validity" && searchObject.validity}
                 <ValidityTableCell validity={searchObject.validity} />
+              {:else if header.value === "manager_responsibility"}
+                <ul>
+                  {#each searchObject.responsibilities as responsibility}
+                    <li>
+                      • {responsibility.name}
+                    </li>
+                  {/each}
+                </ul>
               {:else}
-                <!-- Handle name of classes e.g. `visibility {name}` -->
                 <td class="p-4">
-                  {searchObject[headers[i].value]?.name
-                    ? searchObject[headers[i].value].name
-                    : ""}
+                  {resolveFieldValue(searchObject, header)}
                 </td>
               {/if}
             {/each}
@@ -113,7 +74,7 @@
             <td class="p-4"
               >{capital(
                 $_("no_item", {
-                  values: { item: $_("employee", { values: { n: 2 } }) },
+                  values: { item: $_("data", { values: { n: 2 } }) },
                 })
               )}</td
             >
