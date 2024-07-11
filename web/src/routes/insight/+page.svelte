@@ -1,194 +1,224 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
-  import { gql } from "graphql-request"
+  import { query } from "gql-query-builder"
+  import InsightsSelect from "$lib/components/insights/InsightsSelect.svelte"
+  import { sortItemsBy } from "$lib/util/helpers"
   import { graphQLClient } from "$lib/util/http"
-  import { date } from "$lib/stores/date"
-  import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
-  import DetailTable from "$lib/components/shared/DetailTable.svelte"
-  import InsightTable from "$lib/components/tables/InsightTable.svelte"
-  import Input from "$lib/components/forms/shared/Input.svelte"
-  import Select from "$lib/components/forms/shared/Select.svelte"
-  import {
-    GetClassesDocument,
-    GetEngagementsDocument,
-    type GetEngagementsQuery,
-  } from "./query.generated"
-  import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import InsightsSelectMultiple from "$lib/components/insights/InsightsSelectMultiple.svelte"
+  import InsightsTable from "$lib/components/tables/InsightsTable.svelte"
   import Search from "$lib/components/Search.svelte"
-  import { engagements } from "$lib/stores/csv"
+  import { type Field, type MainQuery } from "$lib/util/helpers"
   import { downloadHandler } from "$lib/util/csv"
-  import { onMount } from "svelte"
-  import { debounce } from "$lib/util/helpers"
+  import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
 
-  type Engagements = GetEngagementsQuery["engagements"]["objects"][0]["current"][]
+  let mainQuery: MainQuery
+  let chosenFields: Field[] = []
+  let orgUnit: { name: string; uuid: string }
+  // Can this be anything else than any??
+  let data: any
 
-  let name: string,
-    jobFunction: { uuid: string; name: string; user_key?: string | null },
-    jobFunctionUuid: string,
-    orgUnit: { uuid: string; name: string; user_key?: string | null },
-    orgUnitUuid: string
-
-  const filterEngagements = async (
-    name: string | undefined | null,
-    jobFunctionUuid: string | undefined | null,
-    orgUnitUuid: string | undefined | null
-  ): Promise<Engagements> => {
-    const res = await graphQLClient().request(GetEngagementsDocument, {
-      queryString: name,
-      jobFunction: jobFunctionUuid,
-      orgUnit: orgUnitUuid,
-      fromDate: $date,
-    })
-    const filteredEngagements: Engagements = []
-
-    // Filters and flattens the data
-    for (const outer of res.engagements.objects) {
-      filteredEngagements.push(outer.current)
-    }
-
-    return ($engagements = filteredEngagements)
-  }
-
-  $: {
-    jobFunctionUuid = jobFunction?.uuid
-    orgUnitUuid = orgUnit?.uuid
-  }
-
-  gql`
-    query GetClasses {
-      facets(filter: { user_keys: "engagement_job_function" }) {
-        objects {
-          objects {
-            uuid
-            user_key
-            classes {
-              uuid
-              user_key
-              name
-            }
-          }
-        }
-      }
-    }
-
-    query GetEngagements(
-      $limit: int = 10
-      $queryString: String
-      $orgUnit: [UUID!]
-      $jobFunction: [UUID!]
-      $fromDate: DateTime
-    ) {
-      engagements(
-        limit: $limit
-        filter: {
-          employee: { query: $queryString }
-          org_unit: { uuids: $orgUnit }
-          job_function: { uuids: $jobFunction }
-          from_date: $fromDate
-        }
-      ) {
-        objects {
-          current {
-            person {
-              name
-            }
-            primary {
-              name
-            }
-            job_function {
-              name
-            }
-            org_unit {
-              name
-              managers {
-                person {
-                  name
-                }
-              }
-            }
-            validity {
-              from
-              to
-            }
-          }
-        }
-      }
-    }
-  `
-
-  const allPossibleHeaders = [
-    { key: "person.0.name", label: "Person Name" },
-    { key: "primary.name", label: "Primary" },
-    { key: "job_function.name", label: "Job Function Name" },
-    { key: "org_unit.0.name", label: "Organization Unit Name" },
-    { key: "org_unit.0.managers.0.person.0.name", label: "Manager Name" },
-    { key: "validity.from", label: "Validity From" },
-    { key: "validity.to", label: "Validity To" },
+  // Predefined mainqueries with their possible fields etc.
+  let items = [
+    {
+      operation: "org_units",
+      filter: "OrganisationUnitFilter",
+      value: "unit",
+      n: 1,
+      fields: [
+        { value: "name", subString: "name" },
+        { value: "parent", subString: "parent {name}" },
+        { value: "org_unit_level", subString: "org_unit_level {name}" },
+        { value: "validity", subString: "validity {from to}" },
+      ],
+    },
+    {
+      operation: "addresses",
+      filter: "AddressFilter",
+      value: "address",
+      n: 2,
+      fields: [
+        { value: "address_type", subString: "address_type {name}" },
+        { value: "address", subString: "name" },
+        { value: "visibility", subString: "visibility {name}" },
+        { value: "validity", subString: "validity {from to}" },
+      ],
+    },
+    {
+      operation: "engagements",
+      filter: "EngagementFilter",
+      value: "engagement",
+      n: 2,
+      fields: [
+        { value: "name", subString: "person {name}" },
+        { value: "job_function", subString: "job_function {name}" },
+        { value: "engagement_type", subString: "engagement_type {name}" },
+        { value: "primary", subString: "primary {name}" },
+        { value: "validity", subString: "validity {from to}" },
+      ],
+    },
+    {
+      operation: "associations",
+      filter: "AssociationFilter",
+      value: "association",
+      n: 2,
+      fields: [
+        { value: "name", subString: "person {name}" },
+        { value: "association_type", subString: "association_type {name}" },
+        { value: "substitute", subString: "substitute {name}" },
+        { value: "trade_union", subString: "trade_union {name}" },
+        { value: "validity", subString: "validity {from to}" },
+      ],
+    },
+    {
+      operation: "itusers",
+      filter: "ITUserFilter",
+      value: "ituser",
+      n: 2,
+      fields: [
+        { value: "itsystem", subString: "itsystem {name}" },
+        { value: "account_name", subString: "user_key" },
+        { value: "primary", subString: "primary {name}" },
+        { value: "validity", subString: "validity {from to}" },
+      ],
+    },
+    {
+      operation: "rolebindings",
+      filter: "RoleBindingFilter",
+      value: "rolebinding",
+      n: 2,
+      fields: [
+        { value: "ituser", subString: "ituser {user_key}" },
+        // { value: "it_system", subString: "itsystem {name}" },
+        { value: "role", subString: "role {name}" },
+        { value: "validity", subString: "validity {from to}" },
+      ],
+    },
+    { operation: "kles", filter: "KLEFilter", value: "kle", n: 2 },
+    {
+      operation: "managers",
+      filter: "ManagerFilter",
+      value: "manager",
+      n: 2,
+      fields: [
+        { value: "name", subString: "person {name}" },
+        { value: "manager_responsibility", subString: "responsibilities {name}" },
+        { value: "manager_type", subString: "manager_type {name}" },
+        { value: "manager_level", subString: "manager_level {name}" },
+        { value: "validity", subString: "validity {from to}" },
+      ],
+    },
+    {
+      operation: "owners",
+      filter: "OwnerFilter",
+      value: "owner",
+      n: 2,
+      fields: [
+        { value: "name", subString: "owner {name}" },
+        { value: "validity", subString: "validity {from to}" },
+      ],
+    },
+    // Send UUID to check which unit to show
+    {
+      operation: "related_units",
+      filter: "RelatedUnitFilter",
+      value: "related_unit",
+      n: 2,
+      fields: [
+        { value: "related_unit", subString: "org_units {name}" },
+        { value: "validity", subString: "validity {from to}" },
+      ],
+    },
   ]
 
-  onMount(async () => {
-    $engagements = await filterEngagements(name, jobFunctionUuid, orgUnitUuid)
-  })
+  const updateQuery = async () => {
+    if (!mainQuery) return
+    let filterValue
+    if (mainQuery.operation === "org_units") {
+      filterValue = { uuids: orgUnit.uuid }
+    } else if (mainQuery.operation === "itusers") {
+      // Need to do 2 queries somehow, otherwise we don't get the actual itusers of the unit.
+      filterValue = { engagement: { org_unit: { uuids: orgUnit.uuid } } }
+    } else {
+      filterValue = { org_unit: { uuids: orgUnit.uuid } }
+    }
+    const myQuery = query(
+      {
+        operation: mainQuery.operation,
+        variables: {
+          filter: {
+            value: filterValue,
+            type: mainQuery.filter,
+          },
+        },
+        fields: [
+          // Somehow do `current(at: $date)`
+          { objects: [{ current: chosenFields.map((field) => field.subString) }] },
+        ],
+      },
+      null,
+      { operationName: `get_${mainQuery.operation}` }
+    )
+    await getData(myQuery)
+  }
+
+  const getData = async (generatedQuery: {
+    query: string
+    variables: { filter: object }
+  }) => {
+    const res = await graphQLClient().request(
+      generatedQuery.query,
+      generatedQuery.variables
+    )
+
+    data = res
+
+    const results = []
+    for (const outer of data[mainQuery.operation].objects) {
+      results.push(outer.current)
+    }
+    data = results
+  }
 </script>
 
 <HeadTitle type="insight" />
 
-<div class="px-12 pt-6 mb-5">
-  <h1 class="mb-4">Insight</h1>
-  {#await graphQLClient().request(GetClassesDocument)}
-    <!-- TODO: Should have a skeleton for the loading stage -->
-    {capital($_("loading"))}
-  {:then data}
-    {@const facets = data.facets.objects}
-    <div class="collapse bg-slate-100 rounded my-4">
-      <input type="checkbox" />
-      <div class="collapse-title">
-        <h3>Filter</h3>
-      </div>
-      <div class="collapse-content">
-        <div class="grid grid-cols-4 gap-4">
-          <Input title={capital($_("name"))} id="filter-name" bind:value={name} />
-          <Select
-            title={capital($_("job_function", { values: { n: 1 } }))}
-            id="filter-job-function"
-            bind:value={jobFunction}
-            iterable={getClassesByFacetUserKey(facets, "engagement_job_function")}
-          />
-          <!-- TODO: Allow searching for multiple units -->
-          <!-- TODO: Allow searching for children of x -->
-          <Search
-            type="org-unit"
-            title={capital($_("unit", { values: { n: 1 } }))}
-            id="filter-org-unit"
-            bind:value={orgUnit}
-          />
-        </div>
-        <button
-          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-          on:click={async () =>
-            await debounce(filterEngagements, name, jobFunctionUuid, orgUnitUuid)}
-          >Søg</button
-        >
-      </div>
-    </div>
-
-    <DetailTable
-      headers={[
-        { title: "Navn", sortPath: "person[0].name" },
-        { title: "Stillingsbetegnelse" },
-        { title: "Enhed" },
-        { title: "Leder" },
-        { title: "Dato" },
-      ]}
-    >
-      <svelte:component this={InsightTable} {name} {jobFunctionUuid} {orgUnitUuid} />
-    </DetailTable>
-    <button
-      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-      disabled={!$engagements.length}
-      on:click={(event) => downloadHandler(event, $engagements, allPossibleHeaders)}
-      >Download CSV</button
-    >
-  {/await}
+<div class="px-12 pt-6">
+  <h1 class="mb-4">Insights</h1>
 </div>
+
+<div class="flex flex-row gap-6">
+  <!-- Sort items -->
+  <InsightsSelect
+    title={capital($_("lol"))}
+    id="lol"
+    iterable={items}
+    bind:value={mainQuery}
+    extra_classes="basis-1/3"
+    isClearable={true}
+  />
+  <!-- Sort items -->
+  <InsightsSelectMultiple
+    title={capital($_("lol"))}
+    id="lol"
+    iterable={mainQuery ? mainQuery.fields : undefined}
+    bind:value={chosenFields}
+    extra_classes="basis-1/3"
+  />
+  <Search type="org-unit" bind:value={orgUnit} required={true} />
+</div>
+<button
+  class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+  disabled={!mainQuery}
+  on:click={async () => updateQuery()}>{capital($_("search"))}</button
+>
+
+{#key data}
+  <InsightsTable {data} headers={chosenFields} />
+{/key}
+
+<button
+  class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+  disabled={!data}
+  on:click={(event) => downloadHandler(event, data, chosenFields)}>Download CSV</button
+>
