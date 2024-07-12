@@ -53,6 +53,9 @@
                     </li>
                   {/each}
                 </ul>
+              {:else if header.value === "related_unit"}
+                <td class="p-4">{searchObject.org_units[0].name}</td>
+                <td class="p-4">{searchObject.org_units[1].name}</td>
               {:else}
                 <td class="p-4">
                   {resolveFieldValue(searchObject, header)}

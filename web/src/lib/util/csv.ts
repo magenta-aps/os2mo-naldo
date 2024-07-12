@@ -1,7 +1,7 @@
 import { _ } from "svelte-i18n"
 import { capital } from "$lib/util/translationUtils"
 import { get } from "svelte/store"
-import { type Field } from "$lib/util/helpers"
+import type { Field } from "$lib/util/helpers"
 
 // Helper function to parse the nested structure from subString
 const parseSubString = (subString: string): string[] => {

@@ -9,7 +9,7 @@
   import InsightsSelectMultiple from "$lib/components/insights/InsightsSelectMultiple.svelte"
   import InsightsTable from "$lib/components/tables/InsightsTable.svelte"
   import Search from "$lib/components/Search.svelte"
-  import { type Field, type MainQuery } from "$lib/util/helpers"
+  import type { Field, MainQuery } from "$lib/util/helpers"
   import { downloadHandler } from "$lib/util/csv"
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
 
@@ -96,7 +96,7 @@
         { value: "validity", subString: "validity {from to}" },
       ],
     },
-    { operation: "kles", filter: "KLEFilter", value: "kle", n: 2 },
+    // { operation: "kles", filter: "KLEFilter", value: "kle", n: 2 },
     {
       operation: "managers",
       filter: "ManagerFilter",
@@ -120,7 +120,7 @@
         { value: "validity", subString: "validity {from to}" },
       ],
     },
-    // Send UUID to check which unit to show
+    // Somehow make the 1 field actually return 2 related_unit fields, so we can see the pairing.
     {
       operation: "related_units",
       filter: "RelatedUnitFilter",
