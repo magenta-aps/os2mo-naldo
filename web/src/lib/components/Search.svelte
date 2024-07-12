@@ -45,6 +45,7 @@
   export let title: string = `${type === "employee" ? "Person" : "Organisation"}`
   export let id = `${type}-uuid`
   export let required = false
+  export let extra_classes = ""
   export let disabled = false
   export let errors: string[] = []
 
@@ -265,7 +266,7 @@
   }
 </script>
 
-<div class="w-full {action === 'select' ? 'pb-3' : ''}">
+<div class="w-full {extra_classes} {action === 'select' ? 'pb-3' : ''}">
   <div class={action === "select" ? "pb-1" : ""}>
     {#if action === "select"}
       <label for="autocomplete" class="text-sm text-secondary pb-1">

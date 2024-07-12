@@ -3,7 +3,8 @@
   import { capital } from "$lib/util/translationUtils"
   import { query } from "gql-query-builder"
   import InsightsSelect from "$lib/components/insights/InsightsSelect.svelte"
-  import { sortItemsBy } from "$lib/util/helpers"
+  import Input from "$lib/components/forms/shared/Input.svelte"
+  import { debounce, sortItemsBy } from "$lib/util/helpers"
   import { graphQLClient } from "$lib/util/http"
   import InsightsSelectMultiple from "$lib/components/insights/InsightsSelectMultiple.svelte"
   import InsightsTable from "$lib/components/tables/InsightsTable.svelte"
@@ -17,6 +18,7 @@
   let orgUnit: { name: string; uuid: string }
   // Can this be anything else than any??
   let data: any
+  let filename: string
 
   // Predefined mainqueries with their possible fields etc.
   let items = [
@@ -186,39 +188,50 @@
 <div class="px-12 pt-6">
   <h1 class="mb-4">Insights</h1>
 </div>
+<div class="px-12 pt-6">
+  <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded p-6 mb-4">
+    <!-- Sort items -->
+    <div class="flex flex-row gap-6">
+      <InsightsSelect
+        title={capital($_("main_query"))}
+        id="main-query"
+        iterable={items}
+        bind:value={mainQuery}
+        extra_classes="basis-1/2"
+        isClearable={true}
+      />
+      <Search type="org-unit" bind:value={orgUnit} extra_classes="basis-1/2" />
+    </div>
+    <InsightsSelectMultiple
+      title={capital($_("fields"))}
+      id="fields"
+      iterable={mainQuery ? mainQuery.fields : undefined}
+      bind:value={chosenFields}
+      extra_classes="basis-1/3"
+    />
+    <!-- Added debounce to avoid spamming queries -->
+    <button
+      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+      disabled={!mainQuery}
+      on:click={async () => debounce(updateQuery)}>{capital($_("search"))}</button
+    >
+    <div class="divider p-0 m-0 my-2 w-full" />
+    <Input
+      title={capital($_("filename"))}
+      id="filename"
+      bind:value={filename}
+      extra_classes="basis-1/2"
+    />
 
-<div class="flex flex-row gap-6">
-  <!-- Sort items -->
-  <InsightsSelect
-    title={capital($_("lol"))}
-    id="lol"
-    iterable={items}
-    bind:value={mainQuery}
-    extra_classes="basis-1/3"
-    isClearable={true}
-  />
-  <!-- Sort items -->
-  <InsightsSelectMultiple
-    title={capital($_("lol"))}
-    id="lol"
-    iterable={mainQuery ? mainQuery.fields : undefined}
-    bind:value={chosenFields}
-    extra_classes="basis-1/3"
-  />
-  <Search type="org-unit" bind:value={orgUnit} required={true} />
+    <button
+      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+      disabled={!data}
+      on:click={(event) => downloadHandler(event, data, chosenFields, filename)}
+      >Download</button
+    >
+  </div>
+
+  {#key data}
+    <InsightsTable {data} headers={chosenFields} />
+  {/key}
 </div>
-<button
-  class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-  disabled={!mainQuery}
-  on:click={async () => updateQuery()}>{capital($_("search"))}</button
->
-
-{#key data}
-  <InsightsTable {data} headers={chosenFields} />
-{/key}
-
-<button
-  class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-  disabled={!data}
-  on:click={(event) => downloadHandler(event, data, chosenFields)}>Download CSV</button
->

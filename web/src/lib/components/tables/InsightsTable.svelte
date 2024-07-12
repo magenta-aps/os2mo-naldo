@@ -2,47 +2,39 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import ValidityTableCell from "$lib/components/shared/ValidityTableCell.svelte"
-  import { sortDirection, sortKey } from "$lib/stores/sorting"
-  import Icon from "@iconify/svelte"
   import { resolveFieldValue, type Field } from "$lib/util/helpers"
 
   export let data: any
   export let headers: Field[]
-
-  // $: {
-  //   if (data) {
-  //     const results = []
-
-  //     for (const outer of data[mainQuery.operation].objects) {
-  //       // TODO: Remove when GraphQL is able to do this for us
-  //       const filtered = outer.validities.filter((obj) => {
-  //         return tenseFilter(obj, tense)
-  //       })
-  //       results.push(...filtered)
-  //     }
-
-  //     data = results
-  //   }
-  // }
 </script>
 
 <div class="overflow-x-auto rounded border mb-8">
   <table class="border-slate-300 w-full">
-    {#if headers}
+    {#if headers && headers.length}
       <thead class="text-left">
         {#each headers as header}
           <th
             class="px-4 py-3 font-bold leading-4 tracking-wider text-left text-secondary border-slate-300 bg-slate-300"
           >
-            <div class="flex items-center">{$_(header.value)}</div>
+            <div class="flex items-center">
+              {capital($_(header.value, { values: { n: 1 } }))}
+            </div>
           </th>
         {/each}
+      </thead>
+    {:else}
+      <thead class="text-left">
+        <th
+          class="px-4 py-3 font-bold leading-4 tracking-wider text-left text-secondary border-slate-300 bg-slate-300"
+        >
+          <div class="flex items-center">{capital($_("choose_header"))}</div>
+        </th>
       </thead>
     {/if}
     <tbody class="border-slate-300 min-h-64 text-slate-600">
       {#if !data}
         <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-          <td class="p-4">Intet valgt</td>
+          <td class="p-4">...</td>
         </tr>
       {:else if data && headers}
         {console.log(data)}
@@ -70,7 +62,6 @@
           </tr>
         {:else}
           <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
-            <!-- TODO: Add translated "No <type> in <tense>"-message" -->
             <td class="p-4"
               >{capital(
                 $_("no_item", {

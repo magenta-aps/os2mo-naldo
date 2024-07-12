@@ -133,7 +133,7 @@ export const debounce = async (
   const now = Date.now()
 
   return new Promise<void>((resolve) => {
-    if (!lastCalledAt || now - lastCalledAt >= 500) {
+    if (!lastCalledAt || now - lastCalledAt >= 1000) {
       lastCalledAt = now
       resolve(func(...args))
     }

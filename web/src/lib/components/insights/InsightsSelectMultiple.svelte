@@ -65,11 +65,11 @@
       }}
     >
       <div slot="item" let:item class="cursor-pointer">
-        {capital($_(item.value))}
+        {capital($_(item.value, { values: { n: item.n } }))}
       </div>
 
       <div slot="selection" let:selection class="cursor-pointer">
-        {capital($_(selection.value))}
+        {capital($_(selection.value, { values: { n: selection.n } }))}
       </div>
     </SvelteSelect>
   </div>
