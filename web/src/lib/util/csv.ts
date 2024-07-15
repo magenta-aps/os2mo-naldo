@@ -3,6 +3,8 @@ import { capital } from "$lib/util/translationUtils"
 import { get } from "svelte/store"
 import type { Field } from "$lib/util/helpers"
 
+// TODO: Find better way to support `related_unit`..
+
 // Helper function to parse the nested structure from subString
 const parseSubString = (subString: string): string[] => {
   // Convert subString to a path-like structure, e.g., "parent {name}"
@@ -15,6 +17,12 @@ const parseSubString = (subString: string): string[] => {
 // Helper function to get nested value based on the parsed subString
 const getNestedValue = (item: any, field: Field): any => {
   const keys = parseSubString(field.subString)
+
+  if (field.value === "related_unit") {
+    // :puke:
+    return [item.org_units[0].name, item.org_units[1].name]
+  }
+
   return keys.reduce((acc, key) => {
     if (acc && typeof acc === "object" && acc[key] !== undefined && acc[key] !== null) {
       return acc[key]
@@ -27,16 +35,30 @@ const getNestedValue = (item: any, field: Field): any => {
 export const json2csv = (data: any[], headers: Field[]): string => {
   // Generate CSV header from subString field
   const csvHeader = headers
-    .map((header) => capital(get(_)(header.value, { values: { n: 1 } })))
+    .flatMap((header) => {
+      const headerText = capital(get(_)(header.value, { values: { n: 1 } }))
+      if (header.value === "related_unit") {
+        // Create two columns for related_unit :puke:
+        return [`${headerText} 1`, `${headerText} 2`]
+      }
+      return headerText
+    })
     .join(",")
 
   // Generate CSV rows
   const csvRows = data.map((item) => {
-    const rowValues = headers.map((header) => {
-      const value = getNestedValue(item, header)
-      return JSON.stringify(value !== undefined ? value : "")
-    })
-    return rowValues.join(",")
+    return headers
+      .flatMap((header) => {
+        const values = getNestedValue(item, header)
+        if (header.value === "related_unit") {
+          // Handle related_unit case with two columns :puke:
+          return values.map((value: string[]) => (value !== undefined ? value : ""))
+        } else {
+          // Return single value for non-array cases
+          return JSON.stringify(values !== undefined ? values : "")
+        }
+      })
+      .join(",") // Join values for each row
   })
 
   return [csvHeader, ...csvRows].join("\n")

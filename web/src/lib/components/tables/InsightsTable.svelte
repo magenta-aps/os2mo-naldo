@@ -6,6 +6,7 @@
 
   export let data: any
   export let headers: Field[]
+  export let unit: { name: string; uuid: string }
 </script>
 
 <div class="overflow-x-auto rounded border mb-8">
@@ -13,6 +14,15 @@
     {#if headers && headers.length}
       <thead class="text-left">
         {#each headers as header}
+          {#if header.value === "related_unit"}
+            <th
+              class="px-4 py-3 font-bold leading-4 tracking-wider text-left text-secondary border-slate-300 bg-slate-300"
+            >
+              <div class="flex items-center">
+                {capital($_(header.value, { values: { n: 1 } }))}
+              </div>
+            </th>
+          {/if}
           <th
             class="px-4 py-3 font-bold leading-4 tracking-wider text-left text-secondary border-slate-300 bg-slate-300"
           >
@@ -54,8 +64,8 @@
                   {/each}
                 </ul>
               {:else if header.value === "related_unit"}
-                <td class="p-4">{searchObject.org_units[0].name}</td>
                 <td class="p-4">{searchObject.org_units[1].name}</td>
+                <td class="p-4">{searchObject.org_units[0].name}</td>
               {:else}
                 <td class="p-4">
                   {resolveFieldValue(searchObject, header)}
