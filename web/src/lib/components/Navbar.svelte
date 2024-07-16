@@ -20,7 +20,7 @@
     <NavLinks />
   </div>
 
-  <div class="navbar-end flex">
+  <div class="navbar-end flex gap-10">
     <SearchBar />
     <User />
   </div>

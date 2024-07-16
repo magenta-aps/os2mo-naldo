@@ -12,6 +12,7 @@
   import { form, field } from "svelte-forms"
   import { required, pattern } from "svelte-forms/validators"
   import CprLookup from "$lib/components/CPRLookup.svelte"
+  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
 
   let person: CprLookupResponse
   let nicknameFirstName: string
@@ -101,8 +102,21 @@
 
 <form method="post" class="mx-6" use:enhance={handler}>
   {#await graphQLClient().request(GetSpConfigDocument)}
-    <!-- TODO: Should have a skeleton for the loading stage -->
-    {capital($_("loading"))}
+    <div class="mx-6">
+      <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+        <div class="p-8">
+          <Skeleton />
+          <div class="flex flex-row gap-6">
+            <Skeleton extra_classes="basis-1/2" />
+            <Skeleton extra_classes="basis-1/2" />
+          </div>
+          <div class="flex flex-row gap-6">
+            <Skeleton extra_classes="basis-1/2" />
+            <Skeleton extra_classes="basis-1/2" />
+          </div>
+        </div>
+      </div>
+    </div>
   {:then data}
     {@const SpEnabled = data.configuration.objects[0].jsonified_value === "true"}
 
