@@ -1,37 +1,22 @@
 import { _ } from "svelte-i18n"
 import { capital } from "$lib/util/translationUtils"
 import { get } from "svelte/store"
-import type { Field } from "$lib/util/helpers"
+import { resolveFieldValue, type Field } from "$lib/util/helpers"
 
 // TODO: Find better way to support `related_unit`..
 
 // Helper function to parse the nested structure from subString
-const parseSubString = (subString: string): string[] => {
-  // Convert subString to a path-like structure, e.g., "parent {name}"
-  return subString
-    .replace(/\{|\}/g, "") // Remove braces
-    .split(/\s+/) // Split by spaces
-    .filter((part) => part.length > 0) // Remove empty parts
-}
+// const parseSubString = (subString: string): string[] => {
+//   // Convert subString to a path-like structure, e.g., "parent {name}"
+//   return subString
+//     .replace(/\{|\}/g, "") // Remove braces
+//     .split(/\s+/) // Split by spaces
+//     .filter((part) => part.length > 0) // Remove empty parts
+// }
 
 // Helper function to get nested value based on the parsed subString
 const getNestedValue = (item: any, field: Field): any => {
-  const keys = parseSubString(field.subString)
-
-  if (field.value === "related_unit") {
-    // :puke:
-    return [item.org_units[0].name, item.org_units[1].name]
-  } else if (field.value === "validity") {
-    // :puke:
-    return [item.validity.from, item.validity.to]
-  }
-
-  return keys.reduce((acc, key) => {
-    if (acc && typeof acc === "object" && acc[key] !== undefined && acc[key] !== null) {
-      return acc[key]
-    }
-    return null
-  }, item)
+  return resolveFieldValue(item, field)
 }
 
 // Function to convert JSON data to CSV format
@@ -57,13 +42,13 @@ export const json2csv = (data: any[], headers: Field[]): string => {
         const values = getNestedValue(item, header)
         if (header.value === "related_unit") {
           // Handle related_unit case with two columns :puke:
-          return values.map((value: string[]) => (value ? value : null))
+          return values.map((value: string[]) => (value ? value : ""))
         } else if (header.value === "validity") {
           // TODO: Should we format the date?
-          return values.map((value: string[]) => (value ? value : null))
+          return values.map((value: string[]) => (value ? value : ""))
         } else {
           // Return single value for non-array cases
-          return JSON.stringify(values ? values : null)
+          return JSON.stringify(values ? values : "")
         }
       })
       .join(",") // Join values for each row
@@ -88,4 +73,6 @@ export const downloadHandler = (
   link.href = URL.createObjectURL(blob)
   link.download = filename ? `${filename}.csv` : "insights.csv"
   link.click()
+  // FIX MANAGER
+  // LAV CLEAR
 }

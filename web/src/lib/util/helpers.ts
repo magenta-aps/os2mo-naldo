@@ -291,7 +291,18 @@ export const resolveFieldValue = (searchObject: any, header: Field) => {
     return searchObject.ituser[0].user_key ?? ""
   }
   if (header.value === "validity") {
-    return null // Special handling for validity
+    return [searchObject.validity.from ?? "", searchObject.validity.to ?? ""]
+  }
+  if (header.value === "related_unit") {
+    return [
+      searchObject.org_units[0]?.name ?? "",
+      searchObject.org_units[1]?.name ?? "",
+    ]
+  }
+  if (header.value === "manager_responsibility") {
+    return searchObject.responsibilities
+      .map((responsibility: { name: string }) => responsibility.name)
+      .join(", ")
   }
   return searchObject[header.value]?.name ?? ""
 }
