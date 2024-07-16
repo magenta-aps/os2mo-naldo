@@ -5,15 +5,6 @@ import { resolveFieldValue, type Field } from "$lib/util/helpers"
 
 // TODO: Find better way to support `related_unit`..
 
-// Helper function to parse the nested structure from subString
-// const parseSubString = (subString: string): string[] => {
-//   // Convert subString to a path-like structure, e.g., "parent {name}"
-//   return subString
-//     .replace(/\{|\}/g, "") // Remove braces
-//     .split(/\s+/) // Split by spaces
-//     .filter((part) => part.length > 0) // Remove empty parts
-// }
-
 // Helper function to get nested value based on the parsed subString
 const getNestedValue = (item: any, field: Field): any => {
   return resolveFieldValue(item, field)
@@ -28,7 +19,9 @@ export const json2csv = (data: any[], headers: Field[]): string => {
       if (header.value === "related_unit") {
         // Create two columns for related_unit :puke:
         return [`${headerText} 1`, `${headerText} 2`]
-      } else if (header.value === "validity") {
+      }
+      // Create two columns for validity from/to
+      else if (header.value === "validity") {
         return [`${capital(get(_)("from"))}`, `${capital(get(_)("to"))}`]
       }
       return headerText
@@ -73,6 +66,4 @@ export const downloadHandler = (
   link.href = URL.createObjectURL(blob)
   link.download = filename ? `${filename}.csv` : "insights.csv"
   link.click()
-  // FIX MANAGER
-  // LAV CLEAR
 }

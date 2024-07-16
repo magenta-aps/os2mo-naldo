@@ -181,6 +181,16 @@
     }
     data = results
   }
+
+  const clearFilter = () => {
+    // dno hvordan det er fedest..
+    // Kunne være dope hvis vi kunne kalde `clear` på InsightsSelect, så vi kan resette den.
+    // Tænker det er bedre end at tillade den at være null/undefined
+    // Ellers er det ret lige til at resette de andre:
+    // data = null
+    // chosenFields = []
+    // orgUnit = { name: "", uuid: "" }
+  }
 </script>
 
 <HeadTitle type="insight" />
@@ -200,16 +210,7 @@
         extra_classes="basis-1/2"
         isClearable={true}
       />
-      <!-- remove startvalue, it's just for testing -->
-      <Search
-        type="org-unit"
-        bind:value={orgUnit}
-        startValue={{
-          name: "Kolding Kommune",
-          uuid: "f06ee470-9f17-566f-acbe-e938112d46d9",
-        }}
-        extra_classes="basis-1/2"
-      />
+      <Search type="org-unit" bind:value={orgUnit} extra_classes="basis-1/2" />
     </div>
     <InsightsSelectMultiple
       title={capital($_("fields"))}
@@ -231,12 +232,15 @@
       bind:value={filename}
       extra_classes="basis-1/2"
     />
-
     <button
       class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
       disabled={!data}
       on:click={(event) => downloadHandler(event, data, chosenFields, filename)}
       >Download</button
+    >
+    <button
+      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+      on:click={() => clearFilter()}>Ryd</button
     >
   </div>
 
