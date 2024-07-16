@@ -21,6 +21,9 @@ const getNestedValue = (item: any, field: Field): any => {
   if (field.value === "related_unit") {
     // :puke:
     return [item.org_units[0].name, item.org_units[1].name]
+  } else if (field.value === "validity") {
+    // :puke:
+    return [item.validity.from, item.validity.to]
   }
 
   return keys.reduce((acc, key) => {
@@ -40,6 +43,8 @@ export const json2csv = (data: any[], headers: Field[]): string => {
       if (header.value === "related_unit") {
         // Create two columns for related_unit :puke:
         return [`${headerText} 1`, `${headerText} 2`]
+      } else if (header.value === "validity") {
+        return [`${capital(get(_)("from"))}`, `${capital(get(_)("to"))}`]
       }
       return headerText
     })
@@ -52,10 +57,13 @@ export const json2csv = (data: any[], headers: Field[]): string => {
         const values = getNestedValue(item, header)
         if (header.value === "related_unit") {
           // Handle related_unit case with two columns :puke:
-          return values.map((value: string[]) => (value !== undefined ? value : ""))
+          return values.map((value: string[]) => (value ? value : null))
+        } else if (header.value === "validity") {
+          // TODO: Should we format the date?
+          return values.map((value: string[]) => (value ? value : null))
         } else {
           // Return single value for non-array cases
-          return JSON.stringify(values !== undefined ? values : "")
+          return JSON.stringify(values ? values : null)
         }
       })
       .join(",") // Join values for each row

@@ -1,12 +1,11 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
-  import ValidityTableCell from "$lib/components/shared/ValidityTableCell.svelte"
   import { resolveFieldValue, type Field } from "$lib/util/helpers"
+  import { formatDate } from "$lib/util/date"
 
   export let data: any
   export let headers: Field[]
-  export let unit: { name: string; uuid: string }
 </script>
 
 <div class="overflow-x-auto rounded border mb-8">
@@ -14,6 +13,7 @@
     {#if headers && headers.length}
       <thead class="text-left">
         {#each headers as header}
+          <!-- Add column to show both org_units in the relation -->
           {#if header.value === "related_unit"}
             <th
               class="px-4 py-3 font-bold leading-4 tracking-wider text-left text-secondary border-slate-300 bg-slate-300"
@@ -22,14 +22,38 @@
                 {capital($_(header.value, { values: { n: 1 } }))}
               </div>
             </th>
+            <th
+              class="px-4 py-3 font-bold leading-4 tracking-wider text-left text-secondary border-slate-300 bg-slate-300"
+            >
+              <div class="flex items-center">
+                {capital($_(header.value, { values: { n: 1 } }))}
+              </div>
+            </th>
+            <!-- Add column to seperate validity from/to -->
+          {:else if header.value === "validity"}
+            <th
+              class="px-4 py-3 font-bold leading-4 tracking-wider text-left text-secondary border-slate-300 bg-slate-300"
+            >
+              <div class="flex items-center">
+                {capital($_("from"))}
+              </div>
+            </th>
+            <th
+              class="px-4 py-3 font-bold leading-4 tracking-wider text-left text-secondary border-slate-300 bg-slate-300"
+            >
+              <div class="flex items-center">
+                {capital($_("to"))}
+              </div>
+            </th>
+          {:else}
+            <th
+              class="px-4 py-3 font-bold leading-4 tracking-wider text-left text-secondary border-slate-300 bg-slate-300"
+            >
+              <div class="flex items-center">
+                {capital($_(header.value, { values: { n: 1 } }))}
+              </div>
+            </th>
           {/if}
-          <th
-            class="px-4 py-3 font-bold leading-4 tracking-wider text-left text-secondary border-slate-300 bg-slate-300"
-          >
-            <div class="flex items-center">
-              {capital($_(header.value, { values: { n: 1 } }))}
-            </div>
-          </th>
         {/each}
       </thead>
     {:else}
@@ -52,9 +76,18 @@
           <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
             <!-- This check is needed since, if fields are cleared (after making a query), it will break with -->
             <!-- Error: {#each} only works with iterable values. -->
-            {#each headers as header, i}
+            {#each headers as header}
               {#if header.value === "validity" && searchObject.validity}
-                <ValidityTableCell validity={searchObject.validity} />
+                <td class="p-4"
+                  >{searchObject.validity.from
+                    ? formatDate(searchObject.validity.from)
+                    : null}</td
+                >
+                <td class="p-4"
+                  >{searchObject.validity.to
+                    ? formatDate(searchObject.validity.to)
+                    : null}</td
+                >
               {:else if header.value === "manager_responsibility"}
                 <ul>
                   {#each searchObject.responsibilities as responsibility}

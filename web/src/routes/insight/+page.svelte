@@ -4,7 +4,7 @@
   import { query } from "gql-query-builder"
   import InsightsSelect from "$lib/components/insights/InsightsSelect.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
-  import { debounce, sortItemsBy } from "$lib/util/helpers"
+  import { debounce } from "$lib/util/helpers"
   import { graphQLClient } from "$lib/util/http"
   import InsightsSelectMultiple from "$lib/components/insights/InsightsSelectMultiple.svelte"
   import InsightsTable from "$lib/components/tables/InsightsTable.svelte"
@@ -241,6 +241,6 @@
   </div>
 
   {#key data}
-    <InsightsTable {data} headers={chosenFields} unit={orgUnit} />
+    <InsightsTable {data} headers={chosenFields} />
   {/key}
 </div>
