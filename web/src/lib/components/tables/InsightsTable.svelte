@@ -81,20 +81,23 @@
                 <td class="p-4"
                   >{searchObject.validity.from
                     ? formatDate(searchObject.validity.from)
-                    : null}</td
+                    : ""}</td
                 >
                 <td class="p-4"
                   >{searchObject.validity.to
                     ? formatDate(searchObject.validity.to)
-                    : null}</td
+                    : ""}</td
                 >
               {:else if header.value === "manager_responsibility"}
+                <!-- TODO: Maybe add indication of 'inherited' -->
                 <ul>
-                  {#each searchObject.responsibilities as responsibility}
-                    <li>
-                      • {responsibility.name}
-                    </li>
-                  {/each}
+                  {#if searchObject.responsibilities}
+                    {#each searchObject.responsibilities as responsibility}
+                      <li>
+                        • {responsibility.name}
+                      </li>
+                    {/each}
+                  {/if}
                 </ul>
               {:else if header.value === "related_unit"}
                 <td class="p-4">{searchObject.org_units[1].name}</td>

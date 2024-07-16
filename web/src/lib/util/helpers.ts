@@ -274,35 +274,38 @@ export type MainQuery = {
 export const resolveFieldValue = (searchObject: any, header: Field) => {
   if (header.subString === "name") {
     return searchObject.name
-  }
-  if (header.value === "name" && header.subString !== "name" && searchObject.person) {
+  } else if (
+    header.value === "name" &&
+    header.subString !== "name" &&
+    searchObject.person
+  ) {
     return searchObject.person[0]?.name ?? ""
-  }
-  if (header.value === "name" && header.subString !== "name" && searchObject.owner) {
+  } else if (
+    header.value === "name" &&
+    header.subString !== "name" &&
+    searchObject.owner
+  ) {
     return searchObject.owner[0]?.name ?? ""
-  }
-  if (header.value === "substitute" && searchObject.substitute) {
-    return searchObject.substitute[0]?.name ?? ""
-  }
-  if (header.value === "account_name" && searchObject.user_key) {
-    return searchObject.user_key ?? ""
-  }
-  if (header.value === "ituser" && searchObject.ituser) {
-    return searchObject.ituser[0].user_key ?? ""
-  }
-  if (header.value === "validity") {
+  } else if (header.value === "validity") {
     return [searchObject.validity.from ?? "", searchObject.validity.to ?? ""]
-  }
-  if (header.value === "related_unit") {
+  } else if (header.value === "substitute" && searchObject.substitute) {
+    return searchObject.substitute[0]?.name ?? ""
+  } else if (header.value === "account_name" && searchObject.user_key) {
+    return searchObject.user_key ?? ""
+  } else if (header.value === "ituser" && searchObject.ituser) {
+    return searchObject.ituser[0].user_key ?? ""
+  } else if (header.value === "role" && searchObject.role) {
+    return searchObject.role[0].name ?? ""
+  } else if (header.value === "related_unit") {
     return [
       searchObject.org_units[0]?.name ?? "",
       searchObject.org_units[1]?.name ?? "",
     ]
-  }
-  if (header.value === "manager_responsibility") {
+  } else if (header.value === "manager_responsibility") {
     return searchObject.responsibilities
       .map((responsibility: { name: string }) => responsibility.name)
       .join(", ")
+  } else {
+    return searchObject[header.value]?.name ?? ""
   }
-  return searchObject[header.value]?.name ?? ""
 }
