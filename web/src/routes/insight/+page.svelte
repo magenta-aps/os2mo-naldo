@@ -6,6 +6,7 @@
   import Input from "$lib/components/forms/shared/Input.svelte"
   import { debounce } from "$lib/util/helpers"
   import { graphQLClient } from "$lib/util/http"
+  import { date } from "$lib/stores/date"
   import InsightsSelectMultiple from "$lib/components/insights/InsightsSelectMultiple.svelte"
   import InsightsTable from "$lib/components/tables/InsightsTable.svelte"
   import Search from "$lib/components/Search.svelte"
@@ -144,7 +145,7 @@
     } else {
       filterValue = { org_unit: { uuids: orgUnit.uuid } }
     }
-    const myQuery = query(
+    const gqlQuery = query([
       {
         operation: mainQuery.operation,
         variables: {
@@ -154,14 +155,19 @@
           },
         },
         fields: [
-          // Somehow do `current(at: $date)`
-          { objects: [{ current: chosenFields.map((field) => field.subString) }] },
+          {
+            objects: [
+              {
+                operation: "current",
+                variables: { date: { name: "at", value: $date, type: "DateTime" } },
+                fields: chosenFields.map((field) => field.subString),
+              },
+            ],
+          },
         ],
       },
-      null,
-      { operationName: `get_${mainQuery.operation}` }
-    )
-    await getData(myQuery)
+    ])
+    await getData(gqlQuery)
   }
 
   const getData = async (generatedQuery: {

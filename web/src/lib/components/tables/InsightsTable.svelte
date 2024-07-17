@@ -77,35 +77,37 @@
             <!-- This check is needed since, if fields are cleared (after making a query), it will break with -->
             <!-- Error: {#each} only works with iterable values. -->
             {#each headers as header}
-              {#if header.value === "validity" && searchObject.validity}
-                <td class="p-4"
-                  >{searchObject.validity.from
-                    ? formatDate(searchObject.validity.from)
-                    : ""}</td
-                >
-                <td class="p-4"
-                  >{searchObject.validity.to
-                    ? formatDate(searchObject.validity.to)
-                    : ""}</td
-                >
-              {:else if header.value === "manager_responsibility"}
-                <!-- TODO: Maybe add indication of 'inherited' -->
-                <ul>
-                  {#if searchObject.responsibilities}
-                    {#each searchObject.responsibilities as responsibility}
-                      <li>
-                        • {responsibility.name}
-                      </li>
-                    {/each}
-                  {/if}
-                </ul>
-              {:else if header.value === "related_unit"}
-                <td class="p-4">{searchObject.org_units[1].name}</td>
-                <td class="p-4">{searchObject.org_units[0].name}</td>
-              {:else}
-                <td class="p-4">
-                  {resolveFieldValue(searchObject, header)}
-                </td>
+              {#if searchObject}
+                {#if header.value === "validity" && searchObject.validity}
+                  <td class="p-4"
+                    >{searchObject.validity.from
+                      ? formatDate(searchObject.validity.from)
+                      : ""}</td
+                  >
+                  <td class="p-4"
+                    >{searchObject.validity.to
+                      ? formatDate(searchObject.validity.to)
+                      : ""}</td
+                  >
+                {:else if header.value === "manager_responsibility"}
+                  <!-- TODO: Maybe add indication of 'inherited' -->
+                  <ul>
+                    {#if searchObject.responsibilities}
+                      {#each searchObject.responsibilities as responsibility}
+                        <li>
+                          • {responsibility.name}
+                        </li>
+                      {/each}
+                    {/if}
+                  </ul>
+                {:else if header.value === "related_unit"}
+                  <td class="p-4">{searchObject.org_units[1].name}</td>
+                  <td class="p-4">{searchObject.org_units[0].name}</td>
+                {:else}
+                  <td class="p-4">
+                    {resolveFieldValue(searchObject, header)}
+                  </td>
+                {/if}
               {/if}
             {/each}
           </tr>

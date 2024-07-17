@@ -272,6 +272,9 @@ export type MainQuery = {
 }
 
 export const resolveFieldValue = (searchObject: any, header: Field) => {
+  if (!searchObject) {
+    return
+  }
   if (header.subString === "name") {
     return searchObject.name
   } else if (
@@ -287,7 +290,7 @@ export const resolveFieldValue = (searchObject: any, header: Field) => {
   ) {
     return searchObject.owner[0]?.name ?? ""
   } else if (header.value === "validity") {
-    return [searchObject.validity.from ?? "", searchObject.validity.to ?? ""]
+    return [searchObject.validity?.from ?? "", searchObject.validity?.to ?? ""]
   } else if (header.value === "substitute" && searchObject.substitute) {
     return searchObject.substitute[0]?.name ?? ""
   } else if (header.value === "account_name" && searchObject.user_key) {
