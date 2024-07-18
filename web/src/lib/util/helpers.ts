@@ -11,6 +11,8 @@ import {
   addSeconds,
   differenceInCalendarDays,
 } from "date-fns"
+import { _ } from "svelte-i18n"
+import { capital } from "$lib/util/translationUtils"
 import { get } from "svelte/store"
 
 export const getUuidFromHash = (hash: string) => {
@@ -131,7 +133,7 @@ export const debounce = async (
   const now = Date.now()
 
   return new Promise<void>((resolve) => {
-    if (!lastCalledAt || now - lastCalledAt >= 500) {
+    if (!lastCalledAt || now - lastCalledAt >= 1000) {
       lastCalledAt = now
       resolve(func(...args))
     }
@@ -241,4 +243,72 @@ export const findClosestValidity = (validities: any, date: string) => {
   }
 
   return closestValidity
+}
+
+type Item = any
+
+// `get(_)` for translations since `$_` is a store and doesn't work in .ts files
+export const sortItemsBy = (items: Item[], sortBy: string) => {
+  return items
+    .map((item) => ({
+      ...item,
+      [sortBy]: capital(get(_)(item[sortBy], { values: { n: item.n } })),
+    }))
+    .sort((a, b) => (a[sortBy] > b[sortBy] ? 1 : -1))
+}
+
+// Insights
+export type Field = {
+  value: string
+  subString: string
+}
+
+export type MainQuery = {
+  operation: string
+  filter: string
+  value: string
+  n: number
+  fields: Field[]
+}
+
+export const resolveFieldValue = (searchObject: any, header: Field) => {
+  if (!searchObject) {
+    return
+  }
+  if (header.subString === "name") {
+    return searchObject.name
+  } else if (
+    header.value === "name" &&
+    header.subString !== "name" &&
+    searchObject.person
+  ) {
+    return searchObject.person[0]?.name ?? ""
+  } else if (
+    header.value === "name" &&
+    header.subString !== "name" &&
+    searchObject.owner
+  ) {
+    return searchObject.owner[0]?.name ?? ""
+  } else if (header.value === "validity") {
+    return [searchObject.validity?.from ?? "", searchObject.validity?.to ?? ""]
+  } else if (header.value === "substitute" && searchObject.substitute) {
+    return searchObject.substitute[0]?.name ?? ""
+  } else if (header.value === "account_name" && searchObject.user_key) {
+    return searchObject.user_key ?? ""
+  } else if (header.value === "ituser" && searchObject.ituser) {
+    return searchObject.ituser[0].user_key ?? ""
+  } else if (header.value === "role" && searchObject.role) {
+    return searchObject.role[0].name ?? ""
+  } else if (header.value === "related_unit") {
+    return [
+      searchObject.org_units[0]?.name ?? "",
+      searchObject.org_units[1]?.name ?? "",
+    ]
+  } else if (header.value === "manager_responsibility") {
+    return searchObject.responsibilities
+      .map((responsibility: { name: string }) => responsibility.name)
+      .join(", ")
+  } else {
+    return searchObject[header.value]?.name ?? ""
+  }
 }
