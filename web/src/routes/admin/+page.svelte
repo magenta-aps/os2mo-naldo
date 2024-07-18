@@ -6,16 +6,14 @@
   import ClassTable from "$lib/components/tables/ClassTable.svelte"
   import TableTensesWrapper from "$lib/components/tables/TableTensesWrapper.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
-  import DetailTable from "$lib/components/shared/DetailTable.svelte"
   import { GetFacetsDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { graphQLClient } from "$lib/util/http"
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { sortFacets } from "$lib/util/get_classes"
   import { date } from "$lib/stores/date"
 
-  let facet: { name: string; uuid: string }
+  let facet: { name: string; uuid: string; user_key: string }
   let facetUuid: string
 
   gql`
@@ -52,7 +50,13 @@
         title={capital($_("facet", { values: { n: 1 } }))}
         id="facet-uuid"
         bind:value={facet}
-        iterable={sortFacets(facets)}
+        iterable={facets
+          .map((e) => ({
+            name: capital($_("facets.name." + e.validities[0].user_key)),
+            user_key: e.validities[0].user_key,
+            uuid: e.validities[0].uuid,
+          }))
+          .sort((a, b) => (a.name > b.name ? 1 : -1))}
         on:change={() => {
           updateFacet()
         }}
@@ -64,6 +68,9 @@
         extra_classes="basis-1/4"
       />
     </div>
+    {#if facetUuid}
+      <p>{$_("facets.description." + facet.user_key)}</p>
+    {/if}
     <div class="flex justify-between">
       <TenseTabs />
       {#if facetUuid}

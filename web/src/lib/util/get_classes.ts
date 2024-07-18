@@ -31,7 +31,7 @@ export const getClassesByFacetUserKey = (facets: Facet[], user_key: string) => {
 export const sortFacets = (facets: FacetValidities[]) => {
   return facets
     .map((e) => ({
-      name: capital(get(_)("facets." + e.validities[0].user_key)),
+      name: capital(get(_)("facets.name." + e.validities[0].user_key)),
       uuid: e.validities[0].uuid,
     }))
     .sort((a, b) => (a.name > b.name ? 1 : -1))
@@ -52,13 +52,4 @@ export const getClassUuidByUserKey = (classes: Class[], user_key: string) => {
     throw new Error("user_key did not match any of the given classes")
   }
   return foundClass.objects[0].uuid
-}
-
-// Used to getting startvalue of facet select
-export const getSpecificFacet = (facets: FacetValidities[], uuid: string) => {
-  const foundFacet = facets.find((facet) => facet.validities[0].uuid === uuid)
-  return {
-    uuid: foundFacet?.validities[0].uuid,
-    name: foundFacet?.validities[0].user_key || "",
-  }
 }
