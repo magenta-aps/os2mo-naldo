@@ -14,7 +14,7 @@
   import { downloadHandler } from "$lib/util/csv"
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
 
-  let mainQuery: MainQuery
+  let mainQuery: MainQuery | undefined
   let chosenFields: Field[] = []
   let orgUnit: { name: string; uuid: string }
   // Can this be anything else than any??
@@ -175,6 +175,8 @@
     query: string
     variables: { filter: object }
   }) => {
+    // KOMMENTAR OM AT VI SÆTTER TIL UDNEFINED
+    if (!mainQuery) return
     const res = await graphQLClient().request(
       generatedQuery.query,
       generatedQuery.variables
@@ -190,13 +192,10 @@
   }
 
   const clearFilter = () => {
-    // dno hvordan det er fedest..
-    // Kunne være dope hvis vi kunne kalde `clear` på InsightsSelect, så vi kan resette den.
-    // Tænker det er bedre end at tillade den at være null/undefined
-    // Ellers er det ret lige til at resette de andre:
-    // data = null
-    // chosenFields = []
-    // orgUnit = { name: "", uuid: "" }
+    mainQuery = undefined
+    data = null
+    chosenFields = []
+    orgUnit = { name: "", uuid: "" }
   }
 </script>
 
