@@ -3,8 +3,6 @@ import { capital } from "$lib/util/translationUtils"
 import { get } from "svelte/store"
 import { resolveFieldValue, type Field } from "$lib/util/helpers"
 
-// TODO: Find better way to support `related_unit`..
-
 // Helper function to get nested value based on the parsed subString
 const getNestedValue = (item: any, field: Field): any => {
   return resolveFieldValue(item, field)

@@ -15,7 +15,6 @@
   export let extra_classes = ""
   export let multiple = true
   export let value: Fields[] | undefined
-  // TODO: Types needs to be fixed OVERALL
   export let errors: string[] = []
 
   const itemId = "value" // Used by the component to differentiate between items

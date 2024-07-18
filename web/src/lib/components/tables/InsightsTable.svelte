@@ -71,7 +71,6 @@
           <td class="p-4">...</td>
         </tr>
       {:else if data && headers}
-        {console.log(data)}
         {#each data as searchObject}
           <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
             <!-- This check is needed since, if fields are cleared (after making a query), it will break with -->

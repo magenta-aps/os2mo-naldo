@@ -14,7 +14,7 @@
   export let disabled = false
   export let startValue: Operation | undefined = undefined
   export let value: Operation | undefined = startValue || undefined
-  export let isClearable: boolean | undefined = false
+  export let isClearable: boolean = false
   export let extra_classes = ""
   export let errors: string[] = []
   export let searchable: boolean = false

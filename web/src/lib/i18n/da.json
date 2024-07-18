@@ -27,6 +27,7 @@
 		"start": "start",
 		"end": "slut"
 	},
+	"default_filename": "Defaulter til 'insights'",
 	"description": "beskrivelse",
 	"download_as_csv": "download som csv",
 	"edit_item": "redigér {item}",
