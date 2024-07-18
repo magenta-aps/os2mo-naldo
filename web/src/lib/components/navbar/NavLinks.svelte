@@ -7,11 +7,11 @@
   import { MOConfig } from "$lib/stores/config"
 </script>
 
-<ul class="menu menu-horizontal px-1">
+<ul class="menu menu-horizontal px-1 hidden lg:flex">
   <li>
     <details>
       <summary class="flex font-bold"
-        >{capital($_("link", { values: { n: 2 } }))}</summary
+        >{capital($_("resources", { values: { n: 2 } }))}</summary
       >
       <ul class="dropdown-content p-2 menu z-[1] rounded w-max">
         <li>

@@ -26,7 +26,7 @@
   }
 </script>
 
-<div class="dropdown dropdown-end z-10">
+<div class="dropdown dropdown-end z-10 hidden lg:inline-block">
   <div tabindex="-1" class="btn btn-ghost flex">
     <div class="join gap-2">
       <p class="invisible lg:visible text-base-100 self-center">{fullName()}</p>

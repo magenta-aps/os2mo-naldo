@@ -20,11 +20,8 @@
     <NavLinks />
   </div>
 
-  <div class="navbar-center">
-    <SearchBar />
-  </div>
-
   <div class="navbar-end flex">
+    <SearchBar />
     <User />
   </div>
 </div>
