@@ -10,6 +10,7 @@
 	"cancel": "annullér",
 	"choose_header": "vælg **headers**",
 	"class": "{n, plural, =0 {klassen} one {klasse} other {klasser}}",
+	"clear": "ryd",
 	"connect_with": "sammenkobles med:",
 	"connection_success": "relaterede enheder er blevet redigeret for organisationsenheden",
 	"connection_text": "angiv hvilke eneheder der skal sammenkobles med",
@@ -27,6 +28,7 @@
 		"end": "slut"
 	},
 	"description": "beskrivelse",
+	"download_as_csv": "download som csv",
 	"edit_item": "redigér {item}",
 	"employee": "{n, plural, =0 {medarbejderen} one {medarbejder} other {medarbejdere}}",
 	"empty_breadcrumbs": "placeres i roden",

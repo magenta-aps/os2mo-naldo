@@ -10,6 +10,7 @@
 	"cancel": "cancel",
 	"choose_header": "choose headers",
 	"class": "{n, plural, =0 {the class} one {class} other {classes}}",
+	"clear": "clear",
 	"connect_with": "is connected to:",
 	"connection_success": "related units have been updated for the organisation unit",
 	"connection_text": "specify which units to connect to",
@@ -27,6 +28,7 @@
 		"end": "end"
 	},
 	"description": "description",
+	"download_as_csv": "download as csv",
 	"edit_item": "edit {item}",
 	"employee": "{n, plural, =0 {the employee} one {employee} other {employees}}",
 	"empty_breadcrumbs": "will be placed in the root",

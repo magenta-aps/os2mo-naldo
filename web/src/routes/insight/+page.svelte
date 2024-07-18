@@ -22,6 +22,7 @@
   let filename: string
 
   // Predefined mainqueries with their possible fields etc.
+  // TODO: Should probably be moved to seperate file
   let items = [
     {
       operation: "org_units",
@@ -140,7 +141,7 @@
     if (mainQuery.operation === "org_units") {
       filterValue = { uuids: orgUnit.uuid }
     } else if (mainQuery.operation === "itusers") {
-      // Need to do 2 queries somehow, otherwise we don't get the actual itusers of the unit.
+      // TODO: Need to do 2 queries somehow, otherwise we don't get the actual itusers of the unit.
       filterValue = { engagement: { org_unit: { uuids: orgUnit.uuid } } }
     } else {
       filterValue = { org_unit: { uuids: orgUnit.uuid } }
@@ -232,21 +233,16 @@
       on:click={async () => debounce(updateQuery)}>{capital($_("search"))}</button
     >
     <div class="divider p-0 m-0 my-2 w-full" />
-    <Input
-      title={capital($_("filename"))}
-      id="filename"
-      bind:value={filename}
-      extra_classes="basis-1/2"
-    />
+    <Input title={capital($_("filename"))} id="filename" bind:value={filename} />
     <button
       class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
       disabled={!data}
       on:click={(event) => downloadHandler(event, data, chosenFields, filename)}
-      >Download</button
+      >{capital($_("download_as_csv"))}</button
     >
     <button
       class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-      on:click={() => clearFilter()}>Ryd</button
+      on:click={() => clearFilter()}>{capital($_("clear"))}</button
     >
   </div>
 
