@@ -44,7 +44,7 @@
   </button>
 
   <!-- Search -->
-  <div class="w-60 lg:w-96 flex items-center justify-center">
+  <div class="w-60 xl:w-96 flex items-center justify-center">
     {#if orgChecked}
       <Search action="goto" type={"org-unit"} />
     {:else}

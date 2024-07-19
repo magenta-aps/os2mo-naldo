@@ -30,23 +30,27 @@
   <title>OS2mo</title>
 </svelte:head>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 px-4 lg:px-12 pt-10 gap-4 lg:gap-20">
+<div class="grid grid-cols-1 xl:grid-cols-3 px-4 xl:px-12 pt-10 gap-4 xl:gap-20">
   <!-- Main Content with Welcome Message and Image -->
-  <div class="lg:col-span-2 flex flex-col">
+  <div class="xl:col-span-2 flex flex-col">
     <h1 class="mb-2 text-primary text-center">
       {$_("welcome_message")}
     </h1>
     <h3 class="mb-4 text-secondary text-center font-bold">
       {$_("mo")}
     </h3>
-    <img class="w-9/12 mx-auto" src={indexPageImage} alt={$_("welcome_message")} />
+    <img
+      class="w-7/12 xl:w-9/12 mx-auto"
+      src={indexPageImage}
+      alt={$_("welcome_message")}
+    />
   </div>
 
   <!-- Quick Actions Card -->
-  <div class="card bg-primary rounded">
+  <div class="w-4/5 mx-auto card bg-primary rounded">
     <div class="card-body">
       <h2 class="font-bold text-white pb-4">{$_("quick_actions")}</h2>
-      <div class="grid grid-cols-2 lg:grid-cols-1">
+      <div class="grid grid-cols-2 xl:grid-cols-1">
         <div>
           <h3 class="text-lg text-white">
             {capital($_("employee", { values: { n: 1 } }))}
@@ -145,11 +149,11 @@
   </div>
 
   <!-- Version Information -->
-  <div class="lg:col-span-2 lg:col-start-1 mt-4 lg:mt-0">
+  <div class="xl:col-span-2 xl:col-start-1 mt-4 xl:mt-0">
     {#await graphQLClient().request(VersionDocument)}
       <div class="text-center p-5">Henter version</div>
     {:then data}
-      <div class="text-center p-5">
+      <div class="lg:text-center p-5">
         <p>OS2mo version: {data.version.mo_version}</p>
         <p>OS2mo-frontend version: {env.PUBLIC_COMMIT_TAG}</p>
       </div>
