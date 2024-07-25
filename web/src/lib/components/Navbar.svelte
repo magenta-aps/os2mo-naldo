@@ -10,7 +10,7 @@
 
 <div class="navbar bg-secondary">
   <div class="navbar-start text-base-100">
-    <label for="drawer" class="btn btn-square btn-ghost lg:hidden">
+    <label for="drawer" class="btn btn-square btn-ghost xl:hidden">
       <Icon icon={menuRounded} width="25" height="25" />
     </label>
 
@@ -20,11 +20,8 @@
     <NavLinks />
   </div>
 
-  <div class="navbar-center">
-    <SearchBar />
-  </div>
-
   <div class="navbar-end flex">
+    <SearchBar />
     <User />
   </div>
 </div>

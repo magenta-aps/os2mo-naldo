@@ -27,12 +27,12 @@
   })
 
   // Keeps track of when the screen goes between mobile and desktop view
-  $: isLargeScreen = screenSize >= 1024
+  $: isLargeScreen = screenSize >= 1280
 </script>
 
 <svelte:window bind:innerWidth={screenSize} />
 
-<div class="drawer lg:drawer-open">
+<div class="drawer xl:drawer-open">
   <input id="drawer" type="checkbox" class="drawer-toggle" />
   <label for="drawer" class="drawer-overlay cursor-pointer" aria-hidden="true" />
 
@@ -49,11 +49,11 @@
     {/if}
   </div>
   <div
-    class="drawer-side fixed lg:h-[calc(100vh-4rem)] overflow-x-hidden"
+    class="drawer-side fixed h-screen xl:h-[calc(100vh-4rem)] overflow-x-hidden"
     style="width: {isLargeScreen ? `${$drawerWidth}px` : 'w-full'}"
   >
     <label for="drawer" class="drawer-overlay" />
-    <ul class="bg-base-100 h-screen lg:h-fit">
+    <ul class="bg-base-100 w-1/2 xl:w-full h-screen xl:h-fit">
       <div>
         <DrawerContent />
       </div>

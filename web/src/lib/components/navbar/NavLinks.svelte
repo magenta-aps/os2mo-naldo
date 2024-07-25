@@ -7,7 +7,7 @@
   import { MOConfig } from "$lib/stores/config"
 </script>
 
-<ul class="menu menu-horizontal px-1">
+<ul class="menu menu-horizontal px-1 hidden xl:flex">
   <li>
     <details>
       <summary class="flex font-bold"
