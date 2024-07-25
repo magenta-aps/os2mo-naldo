@@ -58,7 +58,7 @@
           <ul class="menu px-0">
             <li>
               <a
-                href="{base}/organisation/create"
+                href="{base}/employee/create"
                 class="text-white hover:no-underline flex items-center gap-2"
               >
                 <Icon icon={personAddOutlineRounded} width="20" height="20" />
@@ -151,7 +151,9 @@
   <!-- Version Information -->
   <div class="xl:col-span-2 xl:col-start-1 mt-4 xl:mt-0">
     {#await graphQLClient().request(VersionDocument)}
-      <div class="text-center p-5">Henter version</div>
+      <div class="lg:text-center p-5">
+        <p>Henter version</p>
+      </div>
     {:then data}
       <div class="lg:text-center p-5">
         <p>OS2mo version: {data.version.mo_version}</p>

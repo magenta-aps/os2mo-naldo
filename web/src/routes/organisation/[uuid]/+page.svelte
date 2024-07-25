@@ -55,12 +55,11 @@
     $activeItTab = itActiveItem = e.detail
   }
 
-  // TODO: Switch to validities
   gql`
     query OrgUnit($uuid: [UUID!]) {
       org_units(filter: { uuids: $uuid, from_date: null, to_date: null }) {
         objects {
-          objects {
+          validities {
             name
             user_key
             uuid
@@ -79,11 +78,11 @@
       uuid: uuid,
     })
 
-    let orgUnits: OrgUnitQuery["org_units"]["objects"]["0"]["objects"] = []
+    let orgUnits: OrgUnitQuery["org_units"]["objects"][0]["validities"] = []
 
     for (const outer of res.org_units.objects) {
       // Look for present
-      orgUnits = outer.objects.filter((obj) => {
+      orgUnits = outer.validities.filter((obj) => {
         const fromDate = obj.validity.from.split("T")[0]
         const toDate = obj.validity.to?.split("T")[0]
         return globalDate >= fromDate && (!toDate || globalDate <= toDate)
@@ -91,13 +90,13 @@
       if (orgUnits.length > 0) break
 
       // Look for past
-      orgUnits = outer.objects.filter((obj) => {
+      orgUnits = outer.validities.filter((obj) => {
         return tenseFilter(obj, "past")
       })
       if (orgUnits.length) break
 
       // Look for future
-      orgUnits = outer.objects.filter((obj) => {
+      orgUnits = outer.validities.filter((obj) => {
         return tenseFilter(obj, "future")
       })
     }

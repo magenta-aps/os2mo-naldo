@@ -233,7 +233,6 @@
     </tr>
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
-      <!-- TODO: Add translated "No <type> in <tense>"-message" -->
       <td class="text-sm p-4"
         >{capital(
           $_("no_item", { values: { item: $_("manager", { values: { n: 2 } }) } })
