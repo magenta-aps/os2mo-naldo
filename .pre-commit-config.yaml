@@ -10,7 +10,7 @@ repos:
           - prettier@2.8.8
           - prettier-plugin-svelte@2.10.1
           - prettier-plugin-organize-imports@3.2.4
-          - svelte
+          - svelte@4.2.8
 
   - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
     rev: v9.1.0
