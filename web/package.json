@@ -55,7 +55,7 @@
     "svelte-forms": "^2.3.1",
     "svelte-i18n": "^4.0.0",
     "svelte-select": "^5.8.3",
-    "svelte2tsx": "^0.7.13",
+    "svelte2tsx": "^0.7.14",
     "uuid": "^10.0.0"
   }
 }
