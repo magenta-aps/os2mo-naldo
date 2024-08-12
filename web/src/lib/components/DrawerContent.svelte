@@ -37,7 +37,7 @@
   <div class="flex justify-between pt-6 px-5 xl:hidden">
     <h3 class="font-bold text-primary pb-4">OS2mo</h3>
     <label class="xl:hidden" for="drawer">
-      <Icon icon={closeRounded} class="text-primary" />
+      <Icon icon={closeRounded} class="text-primary cursor-pointer" />
     </label>
   </div>
 
