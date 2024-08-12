@@ -95,6 +95,20 @@ export const getEngagementTitlesAndUuid = (engagements: EngagementTitleAndUuid[]
   }))
 }
 
+export type KleNumberTitleAndUuid = {
+  uuid: string
+  name: string
+  user_key: string
+}
+
+export const getKleNumberTitleAndUuid = (kles: KleNumberTitleAndUuid[]) => {
+  const KleNumbers = kles.map((kle) => ({
+    uuid: kle.uuid,
+    name: `${kle.user_key} - ${kle.name}`,
+  }))
+  return KleNumbers.sort((a, b) => (a.name > b.name ? 1 : -1))
+}
+
 type ITSystem = {
   objects: {
     uuid: string

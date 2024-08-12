@@ -304,7 +304,7 @@
         table={KleTable}
         headers={[
           { title: capital($_("kle_aspect")), sortPath: "kle_aspects[0].name" },
-          { title: capital($_("kle_number")), sortPath: "kle_number.name" },
+          { title: capital($_("kle_number")), sortPath: "kle_number.user_key" },
           { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
