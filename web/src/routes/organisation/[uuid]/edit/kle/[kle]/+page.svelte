@@ -19,7 +19,7 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getMinMaxValidities } from "$lib/util/helpers"
+  import { getKleNumberTitleAndUuid, getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string
   const fromDate = field("from", "", [required()])
@@ -151,6 +151,7 @@
 {:then data}
   {@const kle = data.kles.objects[0].validities[0]}
   {@const facets = data.facets.objects}
+  {@const kleNumbers = getClassesByFacetUserKey(facets, "kle_number")}
   {@const validities = getMinMaxValidities(data.kles.objects[0].validities[0].org_unit)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
@@ -183,7 +184,7 @@
           bind:name={$kleNumber.value}
           errors={$kleNumber.errors}
           searchable={true}
-          iterable={getClassesByFacetUserKey(facets, "kle_number")}
+          iterable={getKleNumberTitleAndUuid(kleNumbers ? kleNumbers : [])}
           required={true}
         />
         <SelectMultiple

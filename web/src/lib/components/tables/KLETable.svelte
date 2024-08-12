@@ -32,6 +32,7 @@
             uuid
             kle_number {
               name
+              user_key
             }
             kle_aspects {
               name
@@ -87,7 +88,9 @@
           {/each}
         </ul>
       </td>
-      <td class="text-sm p-4">{kle.kle_number.name}</td>
+      <td class="text-sm p-4"
+        >{`${kle.kle_number.user_key} - ${kle.kle_number.name}`}</td
+      >
       <ValidityTableCell validity={kle.validity} />
       <td>
         <a
