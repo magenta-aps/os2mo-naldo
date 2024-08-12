@@ -95,11 +95,13 @@
     <!-- TODO: Sort items -->
     <div class="flex flex-row gap-6">
       <InsightsSelect
-        title={capital($_("main_query"))}
+        title={capital($_("subject"))}
         id="main-query"
         iterable={mainQueries}
         bind:value={mainQuery}
         extra_classes="basis-1/2"
+        on:change={() => (chosenFields = mainQuery ? mainQuery.fields : [])}
+        on:clear={() => (chosenFields = [])}
         isClearable={true}
         required={true}
       />
