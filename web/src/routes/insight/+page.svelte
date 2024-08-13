@@ -32,6 +32,7 @@
     } else {
       filterValue = { org_unit: { uuids: orgUnit?.uuid } }
     }
+    filterValue = { ...filterValue, from_date: null, to_date: null }
     const gqlQuery = query([
       {
         operation: mainQuery.operation,
