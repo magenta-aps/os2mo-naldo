@@ -52,7 +52,7 @@
         return capital($_("insight"))
 
       case Title.ADMIN:
-        return capital($_("admin_panel"))
+        return capital($_("classifications"))
 
       default:
         throw TypeError("Wrong or no title type used")

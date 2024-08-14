@@ -37,7 +37,7 @@
 <HeadTitle type="admin" />
 
 <div class="px-12 pt-6">
-  <h1 class="mb-4">{capital($_("admin_panel"))}</h1>
+  <h1 class="mb-4">{capital($_("classifications"))}</h1>
 
   {#await graphQLClient().request(GetFacetsDocument, { fromDate: $date })}
     <div class="flex flex-row gap-6">
