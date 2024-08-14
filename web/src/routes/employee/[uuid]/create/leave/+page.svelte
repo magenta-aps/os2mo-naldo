@@ -30,13 +30,13 @@
   const svelteForm = form(fromDate, leaveType, engagement)
 
   gql`
-    query LeaveAndEmployee($uuid: [UUID!]) {
+    query LeaveAndEmployee($uuid: [UUID!], $currentDate: DateTime!) {
       facets(filter: { user_keys: ["leave_type"] }) {
         objects {
-          objects {
+          validities {
             uuid
             user_key
-            classes {
+            classes(filter: { from_date: $currentDate }) {
               uuid
               user_key
               name
@@ -136,7 +136,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request(LeaveAndEmployeeDocument, { uuid: $page.params.uuid })}
+{#await graphQLClient().request( LeaveAndEmployeeDocument, { uuid: $page.params.uuid, currentDate: $date } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">

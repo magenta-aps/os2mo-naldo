@@ -48,15 +48,19 @@
   const urlHashOrgUnitUuid = getUuidFromHash($page.url.hash)
   const includeOrgUnit = urlHashOrgUnitUuid ? true : false
   gql`
-    query GetOrgUnitAndFacets($uuid: [UUID!], $includeOrgUnit: Boolean!) {
+    query GetOrgUnitAndFacets(
+      $uuid: [UUID!]
+      $includeOrgUnit: Boolean!
+      $currentDate: DateTime!
+    ) {
       facets(
         filter: { user_keys: ["org_unit_level", "org_unit_type", "time_planning"] }
       ) {
         objects {
-          objects {
+          validities {
             uuid
             user_key
-            classes {
+            classes(filter: { from_date: $currentDate }) {
               name
               uuid
               user_key
@@ -148,7 +152,7 @@
 
 <!-- LOOKATME: FIXME: SOMETHING: Form here or inside await? -->
 <form method="post" class="mx-6" use:enhance={handler}>
-  {#await graphQLClient().request( GetOrgUnitAndFacetsDocument, { uuid: urlHashOrgUnitUuid, includeOrgUnit: includeOrgUnit } )}
+  {#await graphQLClient().request( GetOrgUnitAndFacetsDocument, { uuid: urlHashOrgUnitUuid, includeOrgUnit: includeOrgUnit, currentDate: $date } )}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
