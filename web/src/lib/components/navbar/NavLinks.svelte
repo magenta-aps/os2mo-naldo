@@ -20,6 +20,7 @@
           >
         </li>
         {#if $isAdmin}
+          <!-- TODO: Create real featureflag that locks the page, and doesn't just remove the link -->
           {#if env.PUBLIC_SHOW_ADMIN_PANEL !== "false"}
             <li>
               <a class="w-100 text-secondary hover:no-underline" href="{base}/admin"
@@ -27,11 +28,14 @@
               >
             </li>
           {/if}
-          <li>
-            <a class="w-100 text-secondary hover:no-underline" href="{base}/insight"
-              >{capital($_("insights"))}</a
-            >
-          </li>
+          <!-- TODO: Create real featureflag that locks the page, and doesn't just remove the link -->
+          {#if env.PUBLIC_SHOW_INSIGHTS !== "false"}
+            <li>
+              <a class="w-100 text-secondary hover:no-underline" href="{base}/insight"
+                >{capital($_("insights"))}</a
+              >
+            </li>
+          {/if}
         {/if}
         {#if $MOConfig && JSON.parse($MOConfig.navlinks).length}
           {@const links = JSON.parse($MOConfig.navlinks)}
