@@ -108,6 +108,7 @@
       />
       <Search
         type="org-unit"
+        title={capital($_("org_unit", { values: { n: 1 } }))}
         bind:value={orgUnit}
         extra_classes="basis-1/2"
         required={true}
