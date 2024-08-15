@@ -2,6 +2,7 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
+  import Select from "$lib/components/forms/shared/Select.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import { enhance } from "$app/forms"
   import { goto } from "$app/navigation"
@@ -17,13 +18,15 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import { getMinMaxValidities } from "$lib/util/helpers"
+  import { facetStore } from "$lib/stores/facetStore"
 
   let toDate: string
+  let chosenFacet: { name: string; uuid: string; user_key?: string }
 
   const fromDate = field("from", "", [required()])
   const userKey = field("user_key", "", [required()])
   const name = field("name", "", [required()])
-  const svelteForm = form(fromDate, name)
+  const svelteForm = form(fromDate, userKey, name)
 
   gql`
     query Class($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
@@ -35,10 +38,7 @@
             name
             facet(filter: { from_date: null, to_date: null }) {
               uuid
-              validity {
-                from
-                to
-              }
+              user_key
             }
             validity {
               from
@@ -79,6 +79,8 @@
               ),
               type: "admin",
             }
+            // Set facet, so when we redirect to `/admin`, the facet is selected
+            facetStore.set(chosenFacet)
           } catch (err) {
             $error = { message: err }
           }
@@ -112,6 +114,7 @@
   {capital($_("loading"))}
 {:then data}
   {@const cls = data.classes.objects[0].validities[0]}
+  {@const facet = data.classes.objects[0].validities[0].facet}
   {@const validities = getMinMaxValidities(data.classes.objects[0].validities)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
@@ -137,6 +140,17 @@
             max={validities.to}
           />
         </div>
+        <Select
+          title={capital($_("facet", { values: { n: 1 } }))}
+          id="facet"
+          bind:value={chosenFacet}
+          startValue={{
+            uuid: facet.uuid,
+            name: capital($_("facets.name." + facet.user_key)),
+          }}
+          required={true}
+          disabled
+        />
         <div class="flex flex-row gap-6">
           <Input
             title={capital($_("name"))}

@@ -12,8 +12,10 @@
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { date } from "$lib/stores/date"
+  import { facetStore } from "$lib/stores/facetStore"
+  import { onMount } from "svelte"
 
-  let facet: { name: string; uuid: string; user_key: string }
+  let facet: { name: string; uuid: string; user_key?: string }
   let facetUuid: string
 
   gql`
@@ -32,6 +34,15 @@
   const updateFacet = () => {
     facetUuid = facet.uuid
   }
+  onMount(async () => {
+    if ($facetStore.uuid) {
+      facet = {
+        name: $facetStore.name,
+        uuid: $facetStore.uuid,
+      }
+      facetUuid = $facetStore.uuid
+    }
+  })
 </script>
 
 <HeadTitle type="admin" />
