@@ -175,6 +175,7 @@
 	},
 	"select_item": "select {item}",
 	"specify": "specify",
+	"subject": "subject",
 	"substitute": "substitute",
 	"success_create": "{name} has been created",
 	"success_create_class": "the class {name} has been created.",

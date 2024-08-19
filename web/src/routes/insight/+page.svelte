@@ -32,6 +32,7 @@
     } else {
       filterValue = { org_unit: { uuids: orgUnit?.uuid } }
     }
+    filterValue = { ...filterValue, from_date: null, to_date: null }
     const gqlQuery = query([
       {
         operation: mainQuery.operation,
@@ -95,16 +96,19 @@
     <!-- TODO: Sort items -->
     <div class="flex flex-row gap-6">
       <InsightsSelect
-        title={capital($_("main_query"))}
+        title={capital($_("subject"))}
         id="main-query"
         iterable={mainQueries}
         bind:value={mainQuery}
         extra_classes="basis-1/2"
+        on:change={() => (chosenFields = mainQuery ? mainQuery.fields : [])}
+        on:clear={() => (chosenFields = [])}
         isClearable={true}
         required={true}
       />
       <Search
         type="org-unit"
+        title={capital($_("org_unit", { values: { n: 1 } }))}
         bind:value={orgUnit}
         extra_classes="basis-1/2"
         required={true}
