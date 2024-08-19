@@ -10,6 +10,7 @@
 	"choose_header": "choose headers",
 	"class": "{n, plural, =0 {the class} one {class} other {classes}}",
 	"classifications": "classifications",
+	"classifications_text": "Translate this.",
 	"clear": "clear",
 	"connect_with": "is connected to:",
 	"connection_success": "related units have been updated for the organisation unit",

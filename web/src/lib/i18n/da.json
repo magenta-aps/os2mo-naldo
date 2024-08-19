@@ -10,6 +10,7 @@
 	"choose_header": "vælg felter",
 	"class": "{n, plural, =0 {klassen} one {klasse} other {klasser}}",
 	"classifications": "klassifikationer",
+	"classifications_text": "Her kan du oprette og ændre i alle MOs klasser. Under hver facet (Engagementstype, Enhedstype, m.fl.), kan du ændre navnet på eksisterende klasser og oprette nye klasser. Bemærk, at alle nye klasser bliver oprettet som fritekstfelter. Hvis der er behov for validering på felterne, skal der anmodes herom. Bemærk også, at nyoprettede klasser ikke nødvendigvis vil blive håndteret i integrationer til andre systemer, med mindre der bliver anmodet herom: support@magenta.dk. Bemærk endelig, at det ikke er muligt at slette klasser, fordi det fx kan resultere, at en række ansatte pludselig mister deres stillingsbetegnelse eller telefonnummer.",
 	"clear": "ryd",
 	"connect_with": "sammenkobles med:",
 	"connection_success": "relaterede enheder er blevet redigeret for organisationsenheden",
