@@ -169,6 +169,7 @@
           />
           <Input
             title={capital($_("user_key"))}
+            info={$_("user_key_tooltip")}
             id="user-key"
             bind:value={$userKey.value}
             errors={$userKey.errors}

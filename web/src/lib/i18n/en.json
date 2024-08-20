@@ -197,6 +197,7 @@
 	"unit": "{n, plural, =0 {the unit} one {unit} other {units}}",
 	"unit_number": "unit number",
 	"user_key": "user key",
+	"user_key_tooltip": "The user-key is a user-facing identification of the object. It is currently mandatory and can simply be identical to the name.",
 	"vacant": "vacant",
 	"validation": {
 		"is_invalid": "{field} is invalid",

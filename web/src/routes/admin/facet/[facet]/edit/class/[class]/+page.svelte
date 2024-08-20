@@ -163,6 +163,7 @@
           />
           <Input
             title={capital($_("user_key"))}
+            info={$_("user_key_tooltip")}
             id="user-key"
             bind:value={$userKey.value}
             startValue={cls.user_key}

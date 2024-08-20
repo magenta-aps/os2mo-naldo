@@ -196,6 +196,7 @@
 	"unit": "{n, plural, =0 {enheden} one {enhed} other {enheder}}",
 	"unit_number": "enhedsnummer",
 	"user_key": "brugervendt nøgle (bvn)",
+	"user_key_tooltip": "Den Brugervendte Nøgle er en brugervendt identifiaktion af objektet. Er pt. obligatorisk og kan blot være identisk med navn.",
 	"vacant": "vakant",
 	"validation": {
 		"is_invalid": "{field} er ugyldigt",

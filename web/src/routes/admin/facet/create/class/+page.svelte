@@ -165,6 +165,7 @@
         <div class="flex flex-row gap-6">
           <Input
             title={capital($_("name"))}
+            info={$_("user_key_tooltip")}
             id="name"
             bind:value={$name.value}
             errors={$name.errors}
