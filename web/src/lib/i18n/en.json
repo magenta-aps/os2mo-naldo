@@ -10,7 +10,7 @@
 	"choose_header": "choose headers",
 	"class": "{n, plural, =0 {the class} one {class} other {classes}}",
 	"classifications": "classifications",
-	"classifications_text": "Translate this.",
+	"classifications_text": "Here, you can create and modify all MO classes. Under each facet (Engagement Type, Unit Type, etc.), you can change the name of existing classes and create new ones. Note that all new classes are created as free text fields. If validation of the fields is required, a request must be made. Also note that newly created classes will not necessarily be handled in integrations with other systems unless a request is made: support@magenta.dk. Finally, note that it is not possible to delete classes, as this could, for example, result in a number of employees suddenly losing their job titles or phone numbers.",
 	"clear": "clear",
 	"connect_with": "is connected to:",
 	"connection_success": "related units have been updated for the organisation unit",
