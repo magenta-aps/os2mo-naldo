@@ -1,28 +1,16 @@
 export const mainQueries = [
-  {
-    operation: "org_units",
-    filter: "OrganisationUnitFilter",
-    value: "unit",
-    n: 1,
-    fields: [
-      { value: "name", subString: "name" },
-      { value: "parent", subString: "parent {name}" },
-      { value: "org_unit_level", subString: "org_unit_level {name}" },
-      { value: "validity", subString: "validity {from to}" },
-    ],
-  },
-  {
-    operation: "addresses",
-    filter: "AddressFilter",
-    value: "address",
-    n: 2,
-    fields: [
-      { value: "address_type", subString: "address_type {name}" },
-      { value: "address", subString: "name" },
-      { value: "visibility", subString: "visibility {name}" },
-      { value: "validity", subString: "validity {from to}" },
-    ],
-  },
+  // {
+  //   operation: "addresses",
+  //   filter: "AddressFilter",
+  //   value: "address",
+  //   n: 2,
+  //   fields: [
+  //     { value: "address_type", subString: "address_type {name}" },
+  //     { value: "address", subString: "name" },
+  //     { value: "visibility", subString: "visibility {name}" },
+  //     { value: "validity", subString: "validity {from to}" },
+  //   ],
+  // },
   {
     operation: "engagements",
     filter: "EngagementFilter",
@@ -34,6 +22,16 @@ export const mainQueries = [
       { value: "engagement_type", subString: "engagement_type {name}" },
       { value: "primary", subString: "primary {name}" },
       { value: "validity", subString: "validity {from to}" },
+      {
+        value: "email",
+        subString:
+          'person { email: addresses(filter: { address_type: { scope: "EMAIL" } }) {name}}',
+      },
+      {
+        value: "phone",
+        subString:
+          'person { phone: addresses(filter: { address_type: { scope: "PHONE" } }) {name}}',
+      },
     ],
   },
   {

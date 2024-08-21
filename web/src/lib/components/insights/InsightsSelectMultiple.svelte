@@ -7,7 +7,7 @@
 
   export let title: string | undefined = undefined
   export let id: string
-  export let iterable: Fields[] | undefined = undefined
+  export let iterable: Fields[] | [] | undefined = undefined
   export let name: string[] | undefined | null = undefined
   export let required = false
   export let placeholder: string = ""
@@ -59,6 +59,7 @@
       clearFilterTextOnBlur={false}
       bind:value
       on:change
+      on:input
       on:clear={() => {
         name = undefined
       }}

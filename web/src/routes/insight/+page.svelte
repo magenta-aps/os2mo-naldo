@@ -3,6 +3,7 @@
   import { capital } from "$lib/util/translationUtils"
   import { query } from "gql-query-builder"
   import InsightsSelect from "$lib/components/insights/InsightsSelect.svelte"
+  import Selects from "$lib/components/insights/Selects.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import { debounce } from "$lib/util/helpers"
   import { graphQLClient } from "$lib/util/http"
@@ -10,36 +11,56 @@
   import InsightsSelectMultiple from "$lib/components/insights/InsightsSelectMultiple.svelte"
   import InsightsTable from "$lib/components/tables/InsightsTable.svelte"
   import Search from "$lib/components/Search.svelte"
-  import type { Field, MainQuery } from "$lib/util/helpers"
+  import type { Field, MainQuery, SelectedQuery } from "$lib/util/helpers"
   import { downloadHandler } from "$lib/util/csv"
+  import Icon from "@iconify/svelte"
+  import removeRounded from "@iconify/icons-material-symbols/remove-rounded"
+  import addRounded from "@iconify/icons-material-symbols/add-rounded"
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
   import { mainQueries } from "./mainQueries"
 
-  let mainQuery: MainQuery | undefined
-  let chosenFields: Field[] = []
   let orgUnit: { name: string; uuid: string } | undefined
   let data: any
   let filename: string
 
+  let selectedQueries: SelectedQuery[] = [
+    {
+      mainQuery: undefined,
+      chosenFields: [],
+    },
+  ]
+
+  orgUnit = {
+    name: "Kolding Kommune",
+    uuid: "f06ee470-9f17-566f-acbe-e938112d46d9",
+  }
+
+  // Function to add a new select
+  const addNewSelect = () => {
+    selectedQueries = [
+      ...selectedQueries,
+      {
+        mainQuery: undefined,
+        chosenFields: [],
+      },
+    ]
+  }
+
+  // Function to remove a select based on index
+  const removeSelect = (index: number) => {
+    selectedQueries = selectedQueries.filter((_, i) => i !== index)
+  }
+
   const updateQuery = async () => {
-    if (!mainQuery) return
-    let filterValue
-    if (mainQuery.operation === "org_units") {
-      filterValue = { uuids: orgUnit?.uuid }
-    } else if (mainQuery.operation === "itusers") {
-      // TODO: Need to do 2 queries somehow, otherwise we don't get the actual itusers of the unit.
-      filterValue = { engagement: { org_unit: { uuids: orgUnit?.uuid } } }
-    } else {
-      filterValue = { org_unit: { uuids: orgUnit?.uuid } }
-    }
-    filterValue = { ...filterValue, from_date: null, to_date: null }
+    if (!selectedQueries) return
+    let filterValue = { uuids: orgUnit?.uuid, from_date: null, to_date: null }
     const gqlQuery = query([
       {
-        operation: mainQuery.operation,
+        operation: "org_units",
         variables: {
           filter: {
             value: filterValue,
-            type: mainQuery.filter,
+            type: "OrganisationUnitFilter",
           },
         },
         fields: [
@@ -48,7 +69,10 @@
               {
                 operation: "current",
                 variables: { date: { name: "at", value: $date, type: "DateTime" } },
-                fields: chosenFields.map((field) => field.subString),
+                fields: selectedQueries.map((query) => ({
+                  [query.mainQuery ? query.mainQuery.operation : ""]:
+                    query.chosenFields.map((field) => field.subString),
+                })),
               },
             ],
           },
@@ -63,7 +87,7 @@
     variables: { filter: object }
   }) => {
     // This will never happen, but is needed to satisfy TypeScript as mainQuery in theory can be `undefined`
-    if (!mainQuery) return
+    // if (!mainQuery) return
     const res = await graphQLClient().request(
       generatedQuery.query,
       generatedQuery.variables
@@ -72,16 +96,14 @@
     data = res
 
     const results = []
-    for (const outer of data[mainQuery.operation].objects) {
+    for (const outer of data.org_units.objects) {
       results.push(outer.current)
     }
     data = results
   }
 
   const clearFilter = () => {
-    mainQuery = undefined
     data = null
-    chosenFields = []
     orgUnit = undefined
   }
 </script>
@@ -93,38 +115,37 @@
 </div>
 <div class="px-12 pt-6">
   <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded p-6 mb-4">
-    <!-- TODO: Sort items -->
-    <div class="flex flex-row gap-6">
-      <InsightsSelect
-        title={capital($_("subject"))}
-        id="main-query"
-        iterable={mainQueries}
-        bind:value={mainQuery}
-        extra_classes="basis-1/2"
-        on:change={() => (chosenFields = mainQuery ? mainQuery.fields : [])}
-        on:clear={() => (chosenFields = [])}
-        isClearable={true}
-        required={true}
-      />
+    <div>
+      <!-- TODO: Sort items -->
       <Search
         type="org-unit"
         title={capital($_("org_unit", { values: { n: 1 } }))}
         bind:value={orgUnit}
-        extra_classes="basis-1/2"
         required={true}
       />
+      {#each selectedQueries as querySet, index}
+        <Selects {mainQueries} {querySet} {index} bind:data={selectedQueries} />
+        <button
+          class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100"
+          on:click={() => removeSelect(index)}
+          ><Icon icon={removeRounded} width="20" height="20" /></button
+        >
+        {#if index === selectedQueries.length - 1}
+          <button
+            class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100 mb-4"
+            on:click={() => addNewSelect()}
+            ><Icon icon={addRounded} width="20" height="20" /></button
+          >
+        {:else}
+          <div class="divider p-0 m-0 my-2 w-full" />
+        {/if}
+      {/each}
     </div>
-    <InsightsSelectMultiple
-      title={capital($_("fields"))}
-      id="fields"
-      iterable={mainQuery ? mainQuery.fields : undefined}
-      bind:value={chosenFields}
-      required={true}
-    />
     <!-- Added debounce to avoid spamming queries -->
     <button
       class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-      disabled={!mainQuery || !orgUnit || !chosenFields.length}
+      disabled={selectedQueries[selectedQueries.length - 1].mainQuery === undefined ||
+        selectedQueries[selectedQueries.length - 1].mainQuery === null}
       on:click={async () => debounce(updateQuery)}>{capital($_("search"))}</button
     >
     <button
@@ -141,12 +162,12 @@
     <button
       class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
       disabled={!data}
-      on:click={(event) => downloadHandler(event, data, chosenFields, filename)}
+      on:click={(event) => downloadHandler(event, data, selectedQueries, filename)}
       >{capital($_("download_as_csv"))}</button
     >
   </div>
 
   {#key data}
-    <InsightsTable {data} headers={chosenFields} />
+    <InsightsTable {data} headers={selectedQueries} />
   {/key}
 </div>
