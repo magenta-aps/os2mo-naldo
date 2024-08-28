@@ -25,7 +25,7 @@
   export let breadcrumbs: string[][] = []
   export let selectedOriginOrg: string | null = null
   export let selectedDestinationOrgs: string[] = []
-  export let child_count: number
+  export let has_children: boolean
 
   let loading = false
 
@@ -36,7 +36,7 @@
           validities {
             name
             uuid
-            child_count(filter: { from_date: $fromDate })
+            has_children(filter: { from_date: $fromDate })
           }
         }
       }
@@ -107,7 +107,7 @@
   <div class="flex pl-2 text-secondary">
     {#if loading}
       <div class="w-5 h-5 loading loading-spinner" />
-    {:else if child_count}
+    {:else if has_children}
       {#if open}
         <button class="text-secondary" on:click|preventDefault={toggleOpen}>
           <Icon icon={keyboardArrowDownRounded} width="20" height="20" rotate={0} />
