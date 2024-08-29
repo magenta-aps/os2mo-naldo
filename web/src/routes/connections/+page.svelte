@@ -31,7 +31,7 @@
           validities {
             name
             uuid
-            child_count(filter: { from_date: $fromDate })
+            has_children(filter: { from_date: $fromDate })
           }
         }
       }

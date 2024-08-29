@@ -16,7 +16,7 @@
 
   export let name = ""
   export let children: any[] = []
-  export let child_count: number
+  export let has_children: boolean
   export let indent = 8
   export let uuid = ""
   export let breadcrumbs: string[] = []
@@ -33,7 +33,7 @@
           validities {
             name
             uuid
-            child_count(filter: { from_date: $fromDate })
+            has_children(filter: { from_date: $fromDate })
           }
         }
       }
@@ -55,7 +55,7 @@
           validities {
             name
             uuid
-            child_count(
+            has_children(
               filter: {
                 subtree: {
                   from_date: $fromDate
@@ -149,7 +149,7 @@
     >
       {#if loading}
         <div class="w-5 h-5 loading loading-spinner" />
-      {:else if child_count}
+      {:else if has_children}
         {#if open}
           <button on:click|preventDefault={toggleOpen}>
             <Icon icon={keyboardArrowDownRounded} width="20" height="20" rotate={0} />

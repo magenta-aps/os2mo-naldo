@@ -8571,6 +8571,14 @@ export type OrganisationUnit = {
    */
   engagements: Array<Engagement>;
   /**
+   * TODO.
+   *
+   * The result of collecting organisational units by following `parent` until `parent` becomes `null`.
+   * I.e. the list of all ancestors on the way to the organisation tree root.
+   *
+   */
+  has_children: Scalars['Boolean']['output'];
+  /**
    * IT (service) accounts.
    *
    * May be an empty list if the organistion unit does not have any IT (service) accounts whatsoever.
@@ -8793,6 +8801,12 @@ export type OrganisationUnitEngagementsArgs = {
 
 
 /** Organisation unit within the organisation tree */
+export type OrganisationUnitHas_ChildrenArgs = {
+  filter?: InputMaybe<ParentsBoundOrganisationUnitFilter>;
+};
+
+
+/** Organisation unit within the organisation tree */
 export type OrganisationUnitItusersArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<OrgUnitsboundituserfilter>;
@@ -8945,6 +8959,21 @@ export type OrganisationUnitFilter = {
    *
    */
   hierarchy?: InputMaybe<ClassFilter>;
+  /**
+   * Name filter finding exact matches by name.
+   *
+   * | `names`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  names?: InputMaybe<Array<Scalars['String']['input']>>;
   /**
    * Parent filter limiting which entries are returned.
    *
@@ -9777,6 +9806,7 @@ export type ParentsBoundOrganisationUnitFilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
   hierarchy?: InputMaybe<ClassFilter>;
+  names?: InputMaybe<Array<Scalars['String']['input']>>;
   parent?: InputMaybe<OrganisationUnitFilter>;
   query?: InputMaybe<Scalars['String']['input']>;
   registration?: InputMaybe<OrganisationUnitRegistrationFilter>;
@@ -11013,6 +11043,7 @@ export type UuidsBoundOrganisationUnitFilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
   hierarchy?: InputMaybe<ClassFilter>;
+  names?: InputMaybe<Array<Scalars['String']['input']>>;
   parent?: InputMaybe<OrganisationUnitFilter>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
   query?: InputMaybe<Scalars['String']['input']>;
