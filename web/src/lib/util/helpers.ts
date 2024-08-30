@@ -303,9 +303,9 @@ export const resolveFieldValue = (searchObject: any, header: Field) => {
   ) {
     return searchObject.person[0]?.name ?? ""
   } else if (header.value === "email" || header.value === "phone") {
-    if (searchObject.person[0][header.value]) {
+    if (searchObject.person && searchObject.person[0][header.value]) {
       return (
-        searchObject.person?.[0]?.[header.value]
+        searchObject.person[0][header.value]
           .map((address: { name: string }) => address.name)
           .join(", ") ?? ""
       )

@@ -69,10 +69,21 @@
               {
                 operation: "current",
                 variables: { date: { name: "at", value: $date, type: "DateTime" } },
-                fields: selectedQueries.map((query) => ({
-                  [query.mainQuery ? query.mainQuery.operation : ""]:
-                    query.chosenFields.map((field) => field.subString),
-                })),
+                fields: selectedQueries
+                  .map((query) => {
+                    // If mainQuery.operation is not org_units, we insert the operation e.g. `engagements {...}`
+                    if (query.mainQuery && query.mainQuery.operation !== "org_units") {
+                      return {
+                        [query.mainQuery.operation]: query.chosenFields.map(
+                          (field) => field.subString
+                        ),
+                      }
+                      // If operation === org_units, we just add the fields directly - if !mainQuery -> skip
+                    } else {
+                      return query.chosenFields.map((field) => field.subString ?? "")
+                    }
+                  })
+                  .flat(),
               },
             ],
           },

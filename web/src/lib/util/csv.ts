@@ -27,40 +27,52 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
     csvHeader = csvHeader.concat(currentHeader)
   })
 
+  let orgUnitData: string[] = new Array(csvHeader.length).fill("")
+
   // Prepare rows with empty cells where needed
   selectedQueries.forEach((selectedQuery, queryIndex) => {
     const { chosenFields, mainQuery } = selectedQuery
     const startOffset = columnOffsets[queryIndex]
 
-    const itemsArray = data[0][mainQuery.operation]
+    if (mainQuery?.operation === "org_units") {
+      const unitData = data[0] // Assuming "org_units" data is at the top level
 
-    itemsArray.forEach((item: any) => {
-      const row: string[] = new Array(csvHeader.length).fill("")
-
-      chosenFields.forEach((header, fieldIndex) => {
-        const fieldValue = resolveFieldValue(item, header)
-        let values: string[] = []
-
-        if (header.value === "related_unit") {
-          // TODO: Fix  this
-        } else if (header.value === "validity") {
-          // Handle validity, which has `from` and `to` values
-          const fromValue = item.validity?.from || ""
-          const toValue = item.validity?.to || ""
-          values = [fromValue, toValue]
-        } else {
-          // Handle general case
-          values = fieldValue ? [JSON.stringify(fieldValue)] : [""]
-        }
-
-        // // Insert values into the row array at the correct positions
-        // values.forEach((value, valueIndex) => {
-        //   row[startOffset + fieldIndex + valueIndex] = value
-        // })
+      chosenFields.forEach((field: Field, index) => {
+        const fieldValue = resolveFieldValue(unitData, field)
+        orgUnitData[startOffset + index] = fieldValue ? JSON.stringify(fieldValue) : ""
       })
+    }
 
-      csvRows.push(row.join(","))
-    })
+    if (mainQuery && mainQuery?.operation !== "org_units") {
+      const itemsArray = data[0][mainQuery.operation]
+      itemsArray.forEach((item: any) => {
+        const row: string[] = [...orgUnitData]
+        chosenFields.forEach((header, fieldIndex) => {
+          const fieldValue = resolveFieldValue(item, header)
+          // Move this
+          let values: string[] = []
+
+          if (header.value === "related_unit") {
+            // TODO: Fix  this
+          } else if (header.value === "validity") {
+            // Handle validity, which has `from` and `to` values
+            const fromValue = item.validity?.from || ""
+            const toValue = item.validity?.to || ""
+            values = [fromValue, toValue]
+          } else {
+            // Handle general case
+            values = fieldValue ? [JSON.stringify(fieldValue)] : [""]
+          }
+
+          // // Insert values into the row array at the correct positions
+          values.forEach((value, valueIndex) => {
+            row[startOffset + fieldIndex + valueIndex] = value
+          })
+        })
+
+        csvRows.push(row.join(","))
+      })
+    }
   })
 
   // Combine header and rows

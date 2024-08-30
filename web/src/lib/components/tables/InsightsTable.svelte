@@ -72,7 +72,6 @@
         </tr>
       {:else if data && headers}
         {#each data as mainQuery}
-          {console.log(mainQuery)}
           <!-- Loop over each key in mainQuery -->
           {#each Object.keys(mainQuery) as key}
             {#if Array.isArray(mainQuery[key])}
@@ -82,6 +81,7 @@
                   {#each headers as selectedQuery}
                     {#each selectedQuery.chosenFields as chosenField}
                       {#if searchObject}
+                        <!-- Check if the field is validity and render the validity dates -->
                         {#if chosenField.value === "validity" && searchObject.validity}
                           <td class="p-4">
                             {searchObject.validity.from
@@ -93,6 +93,7 @@
                               ? formatDate(searchObject.validity.to)
                               : ""}
                           </td>
+                          <!-- Render manager responsibility if exists -->
                         {:else if chosenField.value === "manager_responsibility"}
                           <ul>
                             {#if searchObject.responsibilities}
@@ -101,6 +102,7 @@
                               {/each}
                             {/if}
                           </ul>
+                          <!-- Render related unit names -->
                         {:else if chosenField.value === "related_unit"}
                           {#if searchObject.org_units && searchObject.org_units.length >= 2}
                             <td class="p-4">{searchObject.org_units[1].name}</td>
@@ -108,6 +110,7 @@
                           {:else}
                             <td class="p-4">N/A</td>
                           {/if}
+                          <!-- Default rendering logic for other fields -->
                         {:else}
                           <td class="p-4">
                             {resolveFieldValue(searchObject, chosenField)}
@@ -118,6 +121,31 @@
                   {/each}
                 </tr>
               {/each}
+              <!-- Special case: If the key is not an array, it handles the org_unit data structure -->
+            {:else if mainQuery}
+              <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+                {#each headers as selectedQuery}
+                  {#each selectedQuery.chosenFields as chosenField}
+                    <!-- Render each field for the single mainQuery object -->
+                    {#if chosenField.value === "validity" && mainQuery.validity}
+                      <td class="p-4">
+                        {mainQuery.validity.from
+                          ? formatDate(mainQuery.validity.from)
+                          : "N/A"}
+                      </td>
+                      <td class="p-4">
+                        {mainQuery.validity.to
+                          ? formatDate(mainQuery.validity.to)
+                          : "N/A"}
+                      </td>
+                    {:else}
+                      <td class="p-4">
+                        {resolveFieldValue(mainQuery, chosenField)}
+                      </td>
+                    {/if}
+                  {/each}
+                {/each}
+              </tr>
             {/if}
           {/each}
         {/each}
