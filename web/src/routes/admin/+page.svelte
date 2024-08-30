@@ -12,8 +12,12 @@
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { date } from "$lib/stores/date"
+  import { facetStore } from "$lib/stores/facetStore"
+  import { onMount } from "svelte"
+  import Icon from "@iconify/svelte"
+  import infoOutlineRounded from "@iconify/icons-material-symbols/info-outline-rounded"
 
-  let facet: { name: string; uuid: string; user_key: string }
+  let facet: { name: string; uuid: string; user_key?: string }
   let facetUuid: string
 
   gql`
@@ -32,12 +36,26 @@
   const updateFacet = () => {
     facetUuid = facet.uuid
   }
+  onMount(async () => {
+    if ($facetStore.uuid) {
+      facet = {
+        name: $facetStore.name,
+        uuid: $facetStore.uuid,
+      }
+      facetUuid = $facetStore.uuid
+    }
+  })
 </script>
 
 <HeadTitle type="admin" />
 
 <div class="px-12 pt-6">
-  <h1 class="mb-4">{capital($_("admin_panel"))}</h1>
+  <h1 class="mb-4">
+    {capital($_("classifications"))}
+    <div class="tooltip tooltip-bottom" data-tip={$_("classifications_text")}>
+      <Icon class="align-middle" icon={infoOutlineRounded} width="25" height="25" />
+    </div>
+  </h1>
 
   {#await graphQLClient().request(GetFacetsDocument, { fromDate: $date })}
     <div class="flex flex-row gap-6">

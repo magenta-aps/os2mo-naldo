@@ -75,13 +75,14 @@
       $toDate: DateTime
       $getDynamicFacet: Boolean!
       $dynamicFacetUuid: [UUID!]
+      $currentDate: DateTime!
     ) {
       facets(filter: { user_keys: ["association_type", "primary_type"] }) {
         objects {
-          objects {
+          validities {
             uuid
             user_key
-            classes {
+            classes(filter: { from_date: $currentDate }) {
               uuid
               user_key
               name
@@ -227,7 +228,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( AssociationAndFacetsDocument, { uuid: $page.params.association, employeeUuid: $page.params.uuid, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), getDynamicFacet: getDynamicFacet, dynamicFacetUuid: dynamicFacetUuid } )}
+{#await graphQLClient().request( AssociationAndFacetsDocument, { uuid: $page.params.association, employeeUuid: $page.params.uuid, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), getDynamicFacet: getDynamicFacet, dynamicFacetUuid: dynamicFacetUuid, currentDate: $date } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">

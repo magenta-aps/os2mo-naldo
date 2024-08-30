@@ -17,9 +17,11 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import { getMinMaxValidities } from "$lib/util/helpers"
+  import { facetStore } from "$lib/stores/facetStore"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
 
   let toDate: string
+  let facet: { name: string; uuid: string; user_key?: string }
 
   const fromDate = field("from", "", [required()])
   const name = field("name", "", [required()])
@@ -74,6 +76,8 @@
               ),
               type: "admin",
             }
+            // Set facet, so when we redirect to `/admin`, the facet is selected
+            facetStore.set(facet)
           } catch (err) {
             $error = { message: err }
           }
@@ -147,6 +151,7 @@
           title={capital($_("facet", { values: { n: 1 } }))}
           id="facet"
           bind:name={$facetField.value}
+          bind:value={facet}
           errors={$facetField.errors}
           iterable={facets
             .map((e) => ({
@@ -160,6 +165,7 @@
         <div class="flex flex-row gap-6">
           <Input
             title={capital($_("name"))}
+            info={$_("user_key_tooltip")}
             id="name"
             bind:value={$name.value}
             errors={$name.errors}

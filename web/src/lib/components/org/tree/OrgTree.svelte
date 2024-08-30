@@ -27,13 +27,13 @@
   let orgUnitHierachy = brutto
 
   gql`
-    query OrgUnitHierarchies {
+    query OrgUnitHierarchies($currentDate: DateTime!) {
       facets(filter: { user_keys: "org_unit_hierarchy" }) {
         objects {
-          objects {
+          validities {
             user_key
             uuid
-            classes {
+            classes(filter: { from_date: $currentDate }) {
               name
               user_key
               uuid
@@ -139,13 +139,13 @@
   }
 </script>
 
-{#await graphQLClient().request(OrgUnitHierarchiesDocument)}
+{#await graphQLClient().request(OrgUnitHierarchiesDocument, { currentDate: $date })}
   <div role="status" class="max-w-sm animate-pulse">
     <div class="mb-2.5 h-10 rounded bg-base-100 max-w-4 dark:bg-accent" />
     <span class="sr-only">{capital($_("loading"))}...</span>
   </div>
 {:then data}
-  {#if data.facets.objects.length && data.facets.objects[0].objects[0].classes.length}
+  {#if data.facets.objects.length && data.facets.objects[0].validities[0].classes.length}
     {@const facets = data.facets.objects}
     <!-- Do this to avoid flat returning undefined in iterable, since `iterable: Value` -->
     {@const hierarchies = getClassesByFacetUserKey(

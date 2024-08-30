@@ -44,6 +44,7 @@
       $employeeUuid: [UUID!]
       $fromDate: DateTime
       $toDate: DateTime
+      $currentDate: DateTime
     ) {
       facets(
         filter: {
@@ -51,10 +52,10 @@
         }
       ) {
         objects {
-          objects {
+          validities {
             uuid
             user_key
-            classes {
+            classes(filter: { from_date: $currentDate }) {
               name
               uuid
               user_key
@@ -169,7 +170,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( EngagementAndFacetDocument, { uuid: $page.params.engagement, employeeUuid: $page.params.uuid, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to") } )}
+{#await graphQLClient().request( EngagementAndFacetDocument, { uuid: $page.params.engagement, employeeUuid: $page.params.uuid, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), currentDate: $date } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">

@@ -43,13 +43,17 @@
   }
   let engagements: EngagementTitleAndUuid[] | undefined
   gql`
-    query LeaveTypeAndEmployee($uuid: [UUID!], $includeEmployee: Boolean!) {
+    query LeaveTypeAndEmployee(
+      $uuid: [UUID!]
+      $includeEmployee: Boolean!
+      $currentDate: DateTime
+    ) {
       facets(filter: { user_keys: ["leave_type"] }) {
         objects {
-          objects {
+          validities {
             uuid
             user_key
-            classes {
+            classes(filter: { from_date: $currentDate }) {
               uuid
               user_key
               name
@@ -184,7 +188,7 @@
 
 <!-- LOOKATME: FIXME: SOMETHING: Form here or inside await? -->
 <form method="post" class="mx-6" use:enhance={handler}>
-  {#await graphQLClient().request( LeaveTypeAndEmployeeDocument, { uuid: urlHashEmployeeUuid, includeEmployee: includeEmployee } )}
+  {#await graphQLClient().request( LeaveTypeAndEmployeeDocument, { uuid: urlHashEmployeeUuid, includeEmployee: includeEmployee, currentDate: $date } )}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">

@@ -43,13 +43,13 @@
   const svelteForm = form(fromDate, itUser, jobFunction, orgUnit)
 
   gql`
-    query FacetClassesAndEmployee($uuid: [UUID!]) {
+    query FacetClassesAndEmployee($uuid: [UUID!], $currentDate: DateTime!) {
       facets(filter: { user_keys: "engagement_job_function" }) {
         objects {
-          objects {
+          validities {
             uuid
             user_key
-            classes {
+            classes(filter: { from_date: $currentDate }) {
               user_key
               name
               uuid
@@ -57,9 +57,11 @@
           }
         }
       }
-      classes(filter: { user_keys: ["primary", "non-primary"] }) {
+      classes(
+        filter: { user_keys: ["primary", "non-primary"], from_date: $currentDate }
+      ) {
         objects {
-          objects {
+          validities {
             uuid
             user_key
           }
@@ -154,7 +156,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( FacetClassesAndEmployeeDocument, { uuid: $page.params.uuid } )}
+{#await graphQLClient().request( FacetClassesAndEmployeeDocument, { uuid: $page.params.uuid, currentDate: $date } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
