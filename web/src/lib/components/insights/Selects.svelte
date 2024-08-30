@@ -10,12 +10,11 @@
   export let index: number
   export let data: SelectedQuery[]
 
-  let myValue: Field[] = querySet.chosenFields || []
+  let chosenFields: Field[] = querySet.chosenFields || []
 
   const updateValue = () => {
-    data[index] = { mainQuery: querySet.mainQuery, chosenFields: myValue }
+    data[index] = { mainQuery: querySet.mainQuery, chosenFields: chosenFields }
   }
-  // $: data[index] = { mainQuery: querySet.mainQuery, chosenFields: myValue }
 </script>
 
 <InsightsSelect
@@ -25,7 +24,7 @@
   bind:value={querySet.mainQuery}
   on:change={() => {
     querySet.chosenFields = querySet.mainQuery ? querySet.mainQuery.fields : []
-    myValue = querySet.mainQuery ? querySet.mainQuery.fields : []
+    chosenFields = querySet.mainQuery ? querySet.mainQuery.fields : []
     updateValue()
   }}
   isClearable={true}
@@ -36,7 +35,7 @@
   title={capital($_("fields"))}
   id={`fields-${index}`}
   iterable={querySet.mainQuery ? querySet.mainQuery.fields : undefined}
-  bind:value={myValue}
+  bind:value={chosenFields}
   on:input={() => {
     updateValue()
   }}

@@ -35,7 +35,7 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
     const startOffset = columnOffsets[queryIndex]
 
     if (mainQuery?.operation === "org_units") {
-      const unitData = data[0] // Assuming "org_units" data is at the top level
+      const unitData = data[0]
 
       chosenFields.forEach((field: Field, index) => {
         const fieldValue = resolveFieldValue(unitData, field)
@@ -49,7 +49,6 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
         const row: string[] = [...orgUnitData]
         chosenFields.forEach((header, fieldIndex) => {
           const fieldValue = resolveFieldValue(item, header)
-          // Move this
           let values: string[] = []
 
           if (header.value === "related_unit") {

@@ -30,12 +30,6 @@
     },
   ]
 
-  orgUnit = {
-    name: "Kolding Kommune",
-    uuid: "f06ee470-9f17-566f-acbe-e938112d46d9",
-  }
-
-  // Function to add a new select
   const addNewSelect = () => {
     selectedQueries = [
       ...selectedQueries,
@@ -46,7 +40,6 @@
     ]
   }
 
-  // Function to remove a select based on index
   const removeSelect = (index: number) => {
     selectedQueries = selectedQueries.filter((_, i) => i !== index)
   }
@@ -97,8 +90,7 @@
     query: string
     variables: { filter: object }
   }) => {
-    // This will never happen, but is needed to satisfy TypeScript as mainQuery in theory can be `undefined`
-    // if (!mainQuery) return
+    if (!selectedQueries || !generatedQuery) return
     const res = await graphQLClient().request(
       generatedQuery.query,
       generatedQuery.variables
@@ -116,6 +108,14 @@
   const clearFilter = () => {
     data = null
     orgUnit = undefined
+    // TODO: selectedQueries are cleared, but the data is `Selects` are not updated,
+    // so the multiSelect will still have the fields selected
+    selectedQueries = [
+      {
+        mainQuery: undefined,
+        chosenFields: [],
+      },
+    ]
   }
 </script>
 
