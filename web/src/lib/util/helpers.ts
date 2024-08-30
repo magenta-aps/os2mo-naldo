@@ -318,6 +318,8 @@ export const resolveFieldValue = (searchObject: any, header: Field) => {
     searchObject.owner
   ) {
     return searchObject.owner[0]?.name ?? ""
+  } else if (header.value === "type") {
+    return searchObject.__typename
   } else if (header.value === "validity") {
     return [searchObject.validity?.from ?? "", searchObject.validity?.to ?? ""]
   } else if (header.value === "substitute" && searchObject.substitute) {
