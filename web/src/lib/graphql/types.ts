@@ -8553,7 +8553,8 @@ export type OrganisationUnit = {
   /**
    * Children count of the organisation unit.
    * @deprecated Will be removed in a future version of GraphQL.
-   * Count the elements returned by `children {{uuid}}` instead.
+   * Consider if `has_children` can answer your query. Otherwise, count
+   * the elements returned by `children {{uuid}}`.
    *
    */
   child_count: Scalars['Int']['output'];
@@ -8570,13 +8571,7 @@ export type OrganisationUnit = {
    *
    */
   engagements: Array<Engagement>;
-  /**
-   * TODO.
-   *
-   * The result of collecting organisational units by following `parent` until `parent` becomes `null`.
-   * I.e. the list of all ancestors on the way to the organisation tree root.
-   *
-   */
+  /** Returns whether the organisation unit has children. */
   has_children: Scalars['Boolean']['output'];
   /**
    * IT (service) accounts.

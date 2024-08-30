@@ -33,7 +33,11 @@
   const svelteForm = form(fromDate, itSystem, accountName)
 
   gql`
-    query ItSystemsClassAndOrg($uuid: [UUID!], $primaryClass: String!) {
+    query ItSystemsClassAndOrg(
+      $uuid: [UUID!]
+      $primaryClass: String!
+      $currentDate: DateTime!
+    ) {
       itsystems {
         objects {
           objects {
@@ -42,9 +46,11 @@
           }
         }
       }
-      classes(filter: { user_keys: [$primaryClass, "non-primary"] }) {
+      classes(
+        filter: { user_keys: [$primaryClass, "non-primary"], from_date: $currentDate }
+      ) {
         objects {
-          objects {
+          validities {
             uuid
             user_key
           }
@@ -123,7 +129,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ItSystemsClassAndOrgDocument, { uuid: $page.params.uuid, primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary" } )}
+{#await graphQLClient().request( ItSystemsClassAndOrgDocument, { uuid: $page.params.uuid, primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary", currentDate: $date } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">

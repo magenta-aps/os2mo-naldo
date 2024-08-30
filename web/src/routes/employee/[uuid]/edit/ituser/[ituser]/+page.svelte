@@ -43,6 +43,7 @@
       $toDate: DateTime
       $employeeUuid: [UUID!]
       $primaryClass: String!
+      $currentDate: DateTime!
     ) {
       itusers(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
@@ -82,9 +83,11 @@
           }
         }
       }
-      classes(filter: { user_keys: [$primaryClass, "non-primary"] }) {
+      classes(
+        filter: { user_keys: [$primaryClass, "non-primary"], from_date: $currentDate }
+      ) {
         objects {
-          objects {
+          validities {
             uuid
             user_key
           }
@@ -155,7 +158,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ItUserItSystemsAndPrimaryDocument, { uuid: $page.params.ituser, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), employeeUuid: $page.params.uuid, primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary" } )}
+{#await graphQLClient().request( ItUserItSystemsAndPrimaryDocument, { uuid: $page.params.ituser, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), employeeUuid: $page.params.uuid, primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary", currentDate: $date } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">

@@ -1,5 +1,8 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import Icon from "@iconify/svelte"
+  import infoOutlineRounded from "@iconify/icons-material-symbols/info-outline-rounded"
+
   export let title: string | undefined = undefined
   export let size: string = "sm"
   export let id: string
@@ -16,6 +19,7 @@
   export let extra_classes = ""
   export let readonly: boolean = false
   export let errors: string[] = []
+  export let info: string | undefined = undefined
 
   const typeAction = (node: any) => {
     node.type = type
@@ -33,6 +37,11 @@
       <label for={id} class="text-sm pb-1">
         {title ? title : ""}
         {required ? "*" : ""}
+        {#if info}
+          <div class="tooltip tooltip-bottom" data-tip={info}>
+            <Icon icon={infoOutlineRounded} width="15" height="15" />
+          </div>
+        {/if}
       </label>
     {/if}
     <input
