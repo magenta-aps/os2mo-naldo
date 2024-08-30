@@ -121,12 +121,11 @@
                   {/each}
                 </tr>
               {/each}
-              <!-- Special case: If the key is not an array, it handles the org_unit data structure -->
-            {:else if mainQuery}
+              <!-- TODO: Special case: If the key is not an array, it handles the org_unit data structure -->
+              <!-- {:else if mainQuery}
               <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
                 {#each headers as selectedQuery}
                   {#each selectedQuery.chosenFields as chosenField}
-                    <!-- Render each field for the single mainQuery object -->
                     {#if chosenField.value === "validity" && mainQuery.validity}
                       <td class="p-4">
                         {mainQuery.validity.from
@@ -145,7 +144,7 @@
                     {/if}
                   {/each}
                 {/each}
-              </tr>
+              </tr> -->
             {/if}
           {/each}
         {/each}

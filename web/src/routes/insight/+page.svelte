@@ -178,7 +178,7 @@
     >
   </div>
 
-  {#key data}
+  <!-- {#key data}
     <InsightsTable {data} headers={selectedQueries} />
-  {/key}
+  {/key} -->
 </div>
