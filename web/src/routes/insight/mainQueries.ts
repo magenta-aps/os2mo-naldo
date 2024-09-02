@@ -123,7 +123,7 @@ export const mainQueries = [
     fields: [
       { value: "type", subString: "__typename" },
       { value: "related_unit", subString: "org_units {name}" },
-      { value: "validity", subString: "validity {from to}" },
+      // { value: "validity", subString: "validity {from to}" },
     ],
   },
 ]

@@ -52,7 +52,8 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
           let values: string[] = []
 
           if (header.value === "related_unit") {
-            // TODO: Fix  this
+            // Handle related units, which as `unit 1` and `unit 2`
+            values = [item.org_units[0].name || "", item.org_units[1].name]
           } else if (header.value === "validity") {
             // Handle validity, which has `from` and `to` values
             const fromValue = item.validity?.from || ""
@@ -63,7 +64,7 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
             values = fieldValue ? [JSON.stringify(fieldValue)] : [""]
           }
 
-          // // Insert values into the row array at the correct positions
+          // Insert values into the row array at the correct positions
           values.forEach((value, valueIndex) => {
             row[startOffset + fieldIndex + valueIndex] = value
           })

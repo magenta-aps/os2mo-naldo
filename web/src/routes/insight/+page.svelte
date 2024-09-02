@@ -156,7 +156,8 @@
     <button
       class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
       disabled={selectedQueries[selectedQueries.length - 1].mainQuery === undefined ||
-        selectedQueries[selectedQueries.length - 1].mainQuery === null}
+        selectedQueries[selectedQueries.length - 1].mainQuery === null ||
+        !orgUnit}
       on:click={async () => debounce(updateQuery)}>{capital($_("search"))}</button
     >
     <button
