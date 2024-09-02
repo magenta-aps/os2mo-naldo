@@ -20,7 +20,12 @@
 <InsightsSelect
   title={capital($_("subject"))}
   id={`main-query-${index}`}
-  iterable={mainQueries}
+  iterable={mainQueries.sort((a, b) =>
+    $_(a.value, { values: { n: a.n } }).toLowerCase() >
+    $_(b.value, { values: { n: b.n } }).toLowerCase()
+      ? 1
+      : -1
+  )}
   bind:value={querySet.mainQuery}
   on:change={() => {
     querySet.chosenFields = querySet.mainQuery ? querySet.mainQuery.fields : []
@@ -34,7 +39,11 @@
 <InsightsSelectMultiple
   title={capital($_("fields"))}
   id={`fields-${index}`}
-  iterable={querySet.mainQuery ? querySet.mainQuery.fields : undefined}
+  iterable={querySet.mainQuery
+    ? querySet.mainQuery.fields.sort((a, b) =>
+        $_(a.value).toLowerCase() > $_(b.value).toLowerCase() ? 1 : -1
+      )
+    : undefined}
   bind:value={chosenFields}
   on:input={() => {
     updateValue()
