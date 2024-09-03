@@ -285,24 +285,41 @@ export type MainQuery = {
   fields: Field[]
 }
 
+export type SelectedQuery = {
+  mainQuery?: MainQuery
+  chosenFields: Field[]
+}
+
 export const resolveFieldValue = (searchObject: any, header: Field) => {
   if (!searchObject) {
     return
   }
   if (header.subString === "name") {
-    return searchObject.name
+    return searchObject.name ?? ""
   } else if (
     header.value === "name" &&
     header.subString !== "name" &&
     searchObject.person
   ) {
     return searchObject.person[0]?.name ?? ""
+  } else if (header.value === "email" || header.value === "phone") {
+    if (searchObject.person && searchObject.person[0][header.value]) {
+      return (
+        searchObject.person[0][header.value]
+          .map((address: { name: string }) => address.name)
+          .join(", ") ?? ""
+      )
+    } else {
+      return ""
+    }
   } else if (
     header.value === "name" &&
     header.subString !== "name" &&
     searchObject.owner
   ) {
     return searchObject.owner[0]?.name ?? ""
+  } else if (header.value === "type") {
+    return searchObject.__typename
   } else if (header.value === "validity") {
     return [searchObject.validity?.from ?? "", searchObject.validity?.to ?? ""]
   } else if (header.value === "substitute" && searchObject.substitute) {
