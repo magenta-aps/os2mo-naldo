@@ -192,7 +192,7 @@
           />
           <DateInput
             bind:value={toDate}
-            title={capital($_("date.start_date"))}
+            title={capital($_("date.end_date"))}
             id="to"
             min={$fromDate.value}
             max={validities.to}
