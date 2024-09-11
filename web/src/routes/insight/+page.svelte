@@ -19,6 +19,7 @@
   let orgUnit: { name: string; uuid: string } | undefined
   let data: any
   let filename: string
+  let loading = false
 
   let selectedQueries: SelectedQuery[] = [
     {
@@ -38,11 +39,13 @@
   }
 
   const removeSelect = (index: number) => {
+    // FIX: This doesn't work correctly
     selectedQueries = selectedQueries.filter((_, i) => i !== index)
   }
 
   const updateQuery = async () => {
     if (!selectedQueries) return
+    loading = true
     let filterValue = { uuids: orgUnit?.uuid, from_date: null, to_date: null }
     const gqlQuery = query([
       {
@@ -80,7 +83,8 @@
         ],
       },
     ])
-    await getData(gqlQuery)
+    data = await getData(gqlQuery)
+    loading = false
   }
 
   const getData = async (generatedQuery: {
@@ -88,18 +92,16 @@
     variables: { filter: object }
   }) => {
     if (!selectedQueries || !generatedQuery) return
-    const res = await graphQLClient().request(
+    const res: any = await graphQLClient().request(
       generatedQuery.query,
       generatedQuery.variables
     )
 
-    data = res
-
     const results = []
-    for (const outer of data.org_units.objects) {
+    for (const outer of res.org_units.objects) {
       results.push(outer.current)
     }
-    data = results
+    return results
   }
 
   const clearFilter = () => {
@@ -124,7 +126,6 @@
 <div class="px-12 pt-6">
   <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded p-6 mb-4">
     <div>
-      <!-- TODO: Sort items -->
       <Search
         type="org-unit"
         title={capital($_("org_unit", { values: { n: 1 } }))}
@@ -170,9 +171,10 @@
     />
     <button
       class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-      disabled={!data}
+      disabled={!data || loading}
       on:click={(event) => downloadHandler(event, data, selectedQueries, filename)}
-      >{capital($_("download_as_csv"))}</button
+      >{capital($_("download_as_csv"))}
+      {#if loading}<span class="loading loading-spinner" />{/if}</button
     >
   </div>
 
