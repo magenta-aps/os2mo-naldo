@@ -82,6 +82,7 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
     const startOffset = columnOffsets[queryIndex]
 
     if (mainQuery && mainQuery.operation !== "org_units") {
+      // TODO: Make 'subject' first in row (after org_unit)
       const itemsArray = data[0][mainQuery.operation]
       itemsArray.forEach((item: any) => {
         const row: string[] = [...orgUnitData] // Start each row with orgUnitData
