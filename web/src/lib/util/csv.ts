@@ -22,9 +22,7 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
     // Calculate headers and offsets for org_units data
     const orgUnitHeader = chosenFields.flatMap((header) => {
       const headerText = capital(get(_)(header.value, { values: { n: 1 } }))
-      if (header.value === "related_unit") {
-        return [`${headerText} 1`, `${headerText} 2`]
-      } else if (header.value === "validity") {
+      if (header.value === "validity") {
         return [`${capital(get(_)("from"))}`, `${capital(get(_)("to"))}`]
       }
       return headerText
@@ -37,6 +35,7 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
 
     // Populate orgUnitData with values
     orgUnitData = new Array(csvHeader.length).fill("")
+    let currentOffset = orgUnitsOffset
     chosenFields.forEach((field: Field, index) => {
       let values: string[] = []
       const fieldValue = resolveFieldValue(unitData, field)
@@ -50,8 +49,9 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
       }
 
       // Insert values into the orgUnitData array
-      values.forEach((value, valueIndex) => {
-        orgUnitData[orgUnitsOffset + index + valueIndex] = value
+      values.forEach((value) => {
+        orgUnitData[currentOffset] = value
+        currentOffset++
       })
     })
   }
