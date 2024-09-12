@@ -9,7 +9,7 @@
   enum Title {
     ORGANISATION = "organisation",
     EMPLOYEE = "employee",
-    INSIGHT = "insight",
+    INSIGHTS = "insights",
     ADMIN = "admin",
   }
 
@@ -48,8 +48,8 @@
         return (await graphQLClient().request(EmployeeDocument, { uuid: uuid }))
           .employees.objects[0].validities[0].name
 
-      case Title.INSIGHT:
-        return capital($_("insight"))
+      case Title.INSIGHTS:
+        return capital($_("insights"))
 
       case Title.ADMIN:
         return capital($_("classifications"))

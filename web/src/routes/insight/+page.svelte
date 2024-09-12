@@ -118,10 +118,10 @@
   }
 </script>
 
-<HeadTitle type="insight" />
+<HeadTitle type="insights" />
 
 <div class="px-12 pt-6">
-  <h1 class="mb-4">Insights</h1>
+  <h1 class="mb-4">{capital($_("insights"))}</h1>
 </div>
 <div class="px-12 pt-6">
   <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded p-6 mb-4">
@@ -134,11 +134,13 @@
       />
       {#each selectedQueries as querySet, index}
         <Selects {mainQueries} {querySet} {index} bind:data={selectedQueries} />
-        <button
-          class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100"
-          on:click={() => removeSelect(index)}
-          ><Icon icon={removeRounded} width="20" height="20" /></button
-        >
+        {#if selectedQueries.length > 1}
+          <button
+            class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100"
+            on:click={() => removeSelect(index)}
+            ><Icon icon={removeRounded} width="20" height="20" /></button
+          >
+        {/if}
         {#if index === selectedQueries.length - 1}
           <button
             class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100 mb-4"
@@ -153,7 +155,7 @@
     <!-- Added debounce to avoid spamming queries -->
     <button
       class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-      disabled={selectedQueries[selectedQueries.length - 1].mainQuery === undefined ||
+      disabled={selectedQueries[selectedQueries?.length - 1]?.mainQuery === undefined ||
         selectedQueries[selectedQueries.length - 1].mainQuery === null ||
         !orgUnit}
       on:click={async () => debounce(updateQuery)}>{capital($_("search"))}</button
