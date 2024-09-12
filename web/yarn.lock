@@ -4343,10 +4343,10 @@ svelte-select@^5.8.3:
   dependencies:
     svelte-floating-ui "1.5.8"
 
-svelte2tsx@^0.7.13:
-  version "0.7.13"
-  resolved "https://registry.yarnpkg.com/svelte2tsx/-/svelte2tsx-0.7.13.tgz#d9f19277dd9f74b5894c77ddebcf09ed67c9f5e9"
-  integrity sha512-aObZ93/kGAiLXA/I/kP+x9FriZM+GboB/ReOIGmLNbVGEd2xC+aTCppm3mk1cc9I/z60VQf7b2QDxC3jOXu3yw==
+svelte2tsx@^0.7.19:
+  version "0.7.19"
+  resolved "https://registry.yarnpkg.com/svelte2tsx/-/svelte2tsx-0.7.19.tgz#135117dce47bcb295d376873532ee2c00222deb5"
+  integrity sha512-PME/9mILn9wOihtk2dxu9tmf2+B9X6oWuqYPJRKSjqU4wq3Pc6+fOuYV7T3H+QF5afmA1oDobfXC6dzmK9NAVw==
   dependencies:
     dedent-js "^1.0.1"
     pascal-case "^3.1.1"
