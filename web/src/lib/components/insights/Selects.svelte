@@ -32,6 +32,9 @@
     chosenFields = querySet.mainQuery ? querySet.mainQuery.fields : []
     updateValue()
   }}
+  on:clear={() => {
+    chosenFields = []
+  }}
   isClearable={true}
   required={true}
 />
