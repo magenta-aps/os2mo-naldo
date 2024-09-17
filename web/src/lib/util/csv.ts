@@ -14,17 +14,16 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
     (query) => query.mainQuery?.operation !== "org_units"
   )
 
-  // Create org_unit data if present. This is needed since we want the data to be in every row
-  // and on top of that, we want it to be at the start of every row.
-  let orgUnitData: string[] = []
+  // First, handle the org_unit headers and data
+  let orgUnitDataTemplate: string[] = []
   const orgUnitsQuery = selectedQueries.find(
     (query) => query.mainQuery?.operation === "org_units"
   )
+
   if (orgUnitsQuery) {
     const { chosenFields } = orgUnitsQuery
-    const unitData = data[0]
 
-    // Calculate headers and offsets for org_units data
+    // Create headers for org_units
     const orgUnitHeader = chosenFields.flatMap((header) => {
       const headerText = capital(get(_)(header.value, { values: { n: 1 } }))
       if (header.value === "validity") {
@@ -33,43 +32,18 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
       return headerText
     })
 
-    // Set column offset for org_units
-    const orgUnitsOffset = csvHeader.length
-    columnOffsets[selectedQueries.indexOf(orgUnitsQuery)] = orgUnitsOffset
+    // Add org_unit headers at the start
     csvHeader = csvHeader.concat(orgUnitHeader)
 
-    // Populate orgUnitData with values
-    orgUnitData = new Array(csvHeader.length).fill("")
-    let currentOffset = orgUnitsOffset
-    chosenFields.forEach((field: Field, index) => {
-      let values: string[] = []
-      const fieldValue = resolveFieldValue(unitData, field)
-
-      if (field.value === "validity") {
-        // Handle validity field
-        values = [unitData.validity?.from || "", unitData.validity?.to || ""]
-      } else {
-        // Handle general case
-        values = fieldValue ? [JSON.stringify(fieldValue)] : [""]
-      }
-
-      // Insert values into the orgUnitData array
-      values.forEach((value) => {
-        orgUnitData[currentOffset] = value
-        currentOffset++
-      })
-    })
-
-    // If only `org_units` is present in the query, push it to the row.
-    // This is done, since if we have other queries, we want the orgUnitData to on every row, and not by itself.
-    if (!hasOtherQueries) {
-      csvRows.push(orgUnitData.join(","))
-    }
+    // Create a template for orgUnitData rows, initialized with empty strings
+    orgUnitDataTemplate = new Array(orgUnitHeader.length).fill("")
   }
 
-  // Process the rest of the queries and calculate headers
+  // Then, handle the rest of the selected queries and calculate headers
   selectedQueries.forEach((selectedQuery, index) => {
     const { chosenFields, mainQuery } = selectedQuery
+
+    // Skip org_units because it's already handled
     if (mainQuery?.operation !== "org_units") {
       const currentHeader = chosenFields.flatMap((header) => {
         const headerText = capital(get(_)(header.value, { values: { n: 1 } }))
@@ -87,47 +61,83 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
     }
   })
 
-  // Prepare rows for other queries
-  selectedQueries.forEach((selectedQuery, queryIndex) => {
-    const { chosenFields, mainQuery } = selectedQuery
-    const startOffset = columnOffsets[queryIndex]
+  // Now, process each org unit
+  data.forEach((orgUnit) => {
+    let orgUnitData: string[] = [...orgUnitDataTemplate] // Start with empty orgUnitData
 
-    if (mainQuery && mainQuery.operation !== "org_units") {
-      // TODO: Make 'subject' first in row (after org_unit)
-      data.forEach((datalol: any) => {
-        const itemsArray = datalol[mainQuery.operation]
-        itemsArray.forEach((item: any) => {
-          const row: string[] = [...orgUnitData] // Start each row with orgUnitData
+    // If org_units query exists, fill in the orgUnitData
+    if (orgUnitsQuery) {
+      const { chosenFields } = orgUnitsQuery
 
-          let currentOffset = startOffset
-          chosenFields.forEach((header) => {
-            const fieldValue = resolveFieldValue(item, header)
-            let values: string[] = []
+      let currentOffset = 0 // Start of org unit fields in the row
 
-            if (header.value === "related_unit") {
-              // Handle related units
-              values = [item.org_units[0]?.name || "", item.org_units[1]?.name || ""]
-            } else if (header.value === "validity") {
-              // Handle validity field
-              const fromValue = item.validity?.from || ""
-              const toValue = item.validity?.to || ""
-              values = [fromValue, toValue]
-            } else {
-              // Handle general case
-              values = fieldValue ? [JSON.stringify(fieldValue)] : [""]
-            }
+      chosenFields.forEach((field: Field) => {
+        let values: string[] = []
+        const fieldValue = resolveFieldValue(orgUnit, field)
 
-            // Insert values into the row array at the correct positions
-            values.forEach((value) => {
-              row[currentOffset] = value
-              currentOffset++
-            })
-          })
+        if (field.value === "validity") {
+          // Handle validity field
+          values = [orgUnit.validity?.from || "", orgUnit.validity?.to || ""]
+        } else {
+          // Handle general case
+          values = fieldValue ? [JSON.stringify(fieldValue)] : [""]
+        }
 
-          csvRows.push(row.join(","))
+        // Insert values into the orgUnitData array
+        values.forEach((value) => {
+          orgUnitData[currentOffset] = value
+          currentOffset++
         })
       })
+      // If only `org_units` is present in the query, push it to the row.
+      // This is done, since if we have other queries, we want the orgUnitData to on every row, and not by itself.
+      if (!hasOtherQueries) {
+        csvRows.push(orgUnitData.join(","))
+      }
     }
+
+    // Process the rest of the queries and create rows
+    selectedQueries.forEach((selectedQuery, queryIndex) => {
+      const { chosenFields, mainQuery } = selectedQuery
+      const startOffset = columnOffsets[queryIndex]
+
+      if (mainQuery && mainQuery.operation !== "org_units") {
+        const itemsArray = orgUnit[mainQuery.operation]
+
+        if (itemsArray && Array.isArray(itemsArray)) {
+          itemsArray.forEach((item: any) => {
+            const row: string[] = [...orgUnitData] // Start each row with orgUnitData
+
+            let currentOffset = startOffset
+            chosenFields.forEach((header) => {
+              const fieldValue = resolveFieldValue(item, header)
+              let values: string[] = []
+
+              if (header.value === "related_unit") {
+                // Handle related units
+                values = [item.org_units[0]?.name || "", item.org_units[1]?.name || ""]
+              } else if (header.value === "validity") {
+                // Handle validity field
+                const fromValue = item.validity?.from || ""
+                const toValue = item.validity?.to || ""
+                values = [fromValue, toValue]
+              } else {
+                // Handle general case
+                values = fieldValue ? [JSON.stringify(fieldValue)] : [""]
+              }
+
+              // Insert values into the row array at the correct positions
+              values.forEach((value) => {
+                row[currentOffset] = value
+                currentOffset++
+              })
+            })
+
+            csvRows.push(row.join(","))
+          })
+        }
+      }
+    })
   })
 
   // Combine header and rows
@@ -149,7 +159,7 @@ export const downloadHandler = (
   const csvData: string = json2csv(data, selectedQueries)
   const blob: Blob = new Blob([csvData], { type: "text/csv" })
   const link: HTMLAnchorElement = document.createElement("a")
-  // link.href = URL.createObjectURL(blob)
-  // link.download = filename ? `${filename}.csv` : "insights.csv"
-  // link.click()
+  link.href = URL.createObjectURL(blob)
+  link.download = filename ? `${filename}.csv` : "insights.csv"
+  link.click()
 }

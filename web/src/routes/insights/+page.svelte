@@ -49,7 +49,7 @@
     if (!selectedQueries) return
     loading = true
     let filterValue = {
-      goodname: { uuids: orgUnit?.uuid, from_date: null, to_date: null },
+      ancestor: { uuids: orgUnit?.uuid, from_date: null, to_date: null },
     }
     const gqlQuery = query([
       {
