@@ -2,6 +2,8 @@
   import { _ } from "svelte-i18n"
   import { capital, upperCase } from "$lib/util/translationUtils"
   import { page } from "$app/stores"
+  import Icon from "@iconify/svelte"
+  import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
   import CopyToClipboard from "$lib/components/Clipboard.svelte"
   import TenseTabs from "$lib/components/shared/TenseTabs.svelte"
@@ -151,36 +153,44 @@
     <Tabs {activeItem} {items} on:tabChange={tabChange} />
     <div class="flex justify-between">
       <TenseTabs />
-      {#if activeItem === OrgTab.IT}
+      <div class="flex gap-2">
         <a
-          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5 hover:no-underline"
-          href={`${base}/organisation/${$page.params.uuid}/create/${itActiveItem}`}
+          class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base text-base-100 px-1 my-5 hover:no-underline"
+          href={`${base}/auditlog/${$page.params.uuid}`}
         >
-          {capital(
-            $_("create_item", {
-              values: { item: $_(itActiveItem, { values: { n: 1 } }) },
-            })
-          )}
+          <Icon icon={historyRounded} width="25" height="25" />
         </a>
-      {:else}
-        <!-- Links are different on `org_unit` and `related`-tabs -->
-        <a
-          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5 hover:no-underline"
-          href={`${base}/${
-            activeItem === OrgTab.ORG_UNIT
-              ? `organisation/create#uuid=${$page.params.uuid}`
-              : activeItem === OrgTab.RELATED_UNIT
-              ? "connections"
-              : `organisation/${$page.params.uuid}/create/${activeItem}`
-          }`}
-        >
-          {capital(
-            $_("create_item", {
-              values: { item: $_(activeItem, { values: { n: 1 } }) },
-            })
-          )}
-        </a>
-      {/if}
+        {#if activeItem === OrgTab.IT}
+          <a
+            class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5 hover:no-underline"
+            href={`${base}/organisation/${$page.params.uuid}/create/${itActiveItem}`}
+          >
+            {capital(
+              $_("create_item", {
+                values: { item: $_(itActiveItem, { values: { n: 1 } }) },
+              })
+            )}
+          </a>
+        {:else}
+          <!-- Links are different on `org_unit` and `related`-tabs -->
+          <a
+            class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5 hover:no-underline"
+            href={`${base}/${
+              activeItem === OrgTab.ORG_UNIT
+                ? `organisation/create#uuid=${$page.params.uuid}`
+                : activeItem === OrgTab.RELATED_UNIT
+                ? "connections"
+                : `organisation/${$page.params.uuid}/create/${activeItem}`
+            }`}
+          >
+            {capital(
+              $_("create_item", {
+                values: { item: $_(activeItem, { values: { n: 1 } }) },
+              })
+            )}
+          </a>
+        {/if}
+      </div>
     </div>
   {/await}
   {#key $date + uuidFromUrl}

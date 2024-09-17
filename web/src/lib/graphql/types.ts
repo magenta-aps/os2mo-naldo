@@ -2569,6 +2569,7 @@ export type EmployeeLeavesArgs = {
 export type EmployeeManager_RolesArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<EmployeesBoundManagerFilter>;
+  inherit?: Scalars['Boolean']['input'];
   limit?: InputMaybe<Scalars['int']['input']>;
 };
 
@@ -4877,6 +4878,8 @@ export type ItUser = {
    *
    */
   engagement_uuid?: Maybe<Scalars['UUID']['output']>;
+  /** ID of the user account in the external system. */
+  external_id?: Maybe<Scalars['String']['output']>;
   /**
    * ITSystem this account is for.
    *
@@ -5099,6 +5102,8 @@ export type ItUserRolebindingsArgs = {
 export type ItUserCreateInput = {
   /** Reference to the engagement of the IT user (if any). */
   engagement?: InputMaybe<Scalars['UUID']['input']>;
+  /** ID of the user account in the external system. */
+  external_id?: InputMaybe<Scalars['String']['input']>;
   /** Reference to the IT system for the IT user. */
   itsystem: Scalars['UUID']['input'];
   /** Note associated with the creation of this IT user. */
@@ -5465,6 +5470,8 @@ export type ItUserTerminateInput = {
 export type ItUserUpdateInput = {
   /** Reference to the engagement of the IT user (if any). */
   engagement?: InputMaybe<Scalars['UUID']['input']>;
+  /** ID of the user account in the external system. */
+  external_id?: InputMaybe<Scalars['String']['input']>;
   /** Reference to the IT system for the IT user. */
   itsystem?: InputMaybe<Scalars['UUID']['input']>;
   /** Note associated with the update of this IT user. */
@@ -8408,6 +8415,18 @@ export type OrgUnitsboundleavefilter = {
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
+export type OrgUnitsboundmanagerfilter = {
+  employee?: InputMaybe<EmployeeFilter>;
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
+  registration?: InputMaybe<ManagerRegistrationFilter>;
+  responsibility?: InputMaybe<ClassFilter>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
 export type OrgUnitsboundrelatedunitfilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
@@ -8550,13 +8569,7 @@ export type OrganisationUnit = {
    *
    */
   associations_validity: Array<Association>;
-  /**
-   * Children count of the organisation unit.
-   * @deprecated Will be removed in a future version of GraphQL.
-   * Consider if `has_children` can answer your query. Otherwise, count
-   * the elements returned by `children {{uuid}}`.
-   *
-   */
+  /** Children count of the organisation unit. For performance, consider if `has_children` can answer your query instead. */
   child_count: Scalars['Int']['output'];
   /**
    * The immediate descendants in the organisation tree
@@ -8773,9 +8786,7 @@ export type OrganisationUnitAssociationsArgs = {
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitChild_CountArgs = {
-  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ParentsBoundOrganisationUnitFilter>;
-  limit?: InputMaybe<Scalars['int']['input']>;
 };
 
 
@@ -8827,8 +8838,10 @@ export type OrganisationUnitLeavesArgs = {
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitManagersArgs = {
-  filter?: InputMaybe<ManagerFilter>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<OrgUnitsboundmanagerfilter>;
   inherit?: Scalars['Boolean']['input'];
+  limit?: InputMaybe<Scalars['int']['input']>;
 };
 
 
@@ -10000,6 +10013,7 @@ export type QueryLeavesArgs = {
 export type QueryManagersArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ManagerFilter>;
+  inherit?: Scalars['Boolean']['input'];
   limit?: InputMaybe<Scalars['int']['input']>;
 };
 
