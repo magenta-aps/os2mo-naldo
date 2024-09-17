@@ -94,36 +94,38 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
 
     if (mainQuery && mainQuery.operation !== "org_units") {
       // TODO: Make 'subject' first in row (after org_unit)
-      const itemsArray = data[0][mainQuery.operation]
-      itemsArray.forEach((item: any) => {
-        const row: string[] = [...orgUnitData] // Start each row with orgUnitData
+      data.forEach((datalol: any) => {
+        const itemsArray = datalol[mainQuery.operation]
+        itemsArray.forEach((item: any) => {
+          const row: string[] = [...orgUnitData] // Start each row with orgUnitData
 
-        let currentOffset = startOffset
-        chosenFields.forEach((header) => {
-          const fieldValue = resolveFieldValue(item, header)
-          let values: string[] = []
+          let currentOffset = startOffset
+          chosenFields.forEach((header) => {
+            const fieldValue = resolveFieldValue(item, header)
+            let values: string[] = []
 
-          if (header.value === "related_unit") {
-            // Handle related units
-            values = [item.org_units[0]?.name || "", item.org_units[1]?.name || ""]
-          } else if (header.value === "validity") {
-            // Handle validity field
-            const fromValue = item.validity?.from || ""
-            const toValue = item.validity?.to || ""
-            values = [fromValue, toValue]
-          } else {
-            // Handle general case
-            values = fieldValue ? [JSON.stringify(fieldValue)] : [""]
-          }
+            if (header.value === "related_unit") {
+              // Handle related units
+              values = [item.org_units[0]?.name || "", item.org_units[1]?.name || ""]
+            } else if (header.value === "validity") {
+              // Handle validity field
+              const fromValue = item.validity?.from || ""
+              const toValue = item.validity?.to || ""
+              values = [fromValue, toValue]
+            } else {
+              // Handle general case
+              values = fieldValue ? [JSON.stringify(fieldValue)] : [""]
+            }
 
-          // Insert values into the row array at the correct positions
-          values.forEach((value) => {
-            row[currentOffset] = value
-            currentOffset++
+            // Insert values into the row array at the correct positions
+            values.forEach((value) => {
+              row[currentOffset] = value
+              currentOffset++
+            })
           })
-        })
 
-        csvRows.push(row.join(","))
+          csvRows.push(row.join(","))
+        })
       })
     }
   })
@@ -147,7 +149,7 @@ export const downloadHandler = (
   const csvData: string = json2csv(data, selectedQueries)
   const blob: Blob = new Blob([csvData], { type: "text/csv" })
   const link: HTMLAnchorElement = document.createElement("a")
-  link.href = URL.createObjectURL(blob)
-  link.download = filename ? `${filename}.csv` : "insights.csv"
-  link.click()
+  // link.href = URL.createObjectURL(blob)
+  // link.download = filename ? `${filename}.csv` : "insights.csv"
+  // link.click()
 }
