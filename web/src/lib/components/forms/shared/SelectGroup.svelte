@@ -38,14 +38,16 @@
   if (iterable) {
     iterable = iterable
       .flatMap((group) => {
-        return group.objects.flatMap((parent: Class) => {
+        if (group.current) {
+          const parent = group.current
           const groupName = parent.name
-          return parent.children.map((child) => ({
+          return parent.children.map((child: Class) => ({
             group: groupName,
             label: child.name,
             uuid: child.uuid,
           }))
-        })
+        }
+        return [] // If `current` is null or undefined, return an empty array
       })
       .sort((a, b) => (a.label > b.label ? 1 : -1))
   }
