@@ -106,7 +106,7 @@
       classes(filter: { facet: { uuids: $dynamicFacetUuid } })
         @include(if: $getDynamicFacet) {
         objects {
-          objects {
+          current(at: $currentDate) {
             top_level_facet {
               uuid
               user_key

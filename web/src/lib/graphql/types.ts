@@ -8899,6 +8899,33 @@ export type OrganisationUnitCreateInput = {
 /** Organisation unit filter. */
 export type OrganisationUnitFilter = {
   /**
+   * Find organisation units which match the given filter, or which are organisationally placed under those units.
+   *
+   * Returns all matches along with their descendants (every node is its own ancestor as per [CLRS] 12.2-6).
+   *
+   * For example, given the following tree:
+   * ```
+   * A
+   * ├── B
+   * │   ├── C
+   * │   │   └── D
+   * │   └── E
+   * └── F
+   * ```
+   * the `ancestor` filter behaves according to the following table:
+   *
+   * | Filter | Returned    |
+   * |--------|-------------|
+   * |      A | A B C D E F |
+   * |      B | B C D E     |
+   * |      C | C D         |
+   * |      D | D           |
+   * |      E | E           |
+   * |      F | F           |
+   *
+   */
+  ancestor?: InputMaybe<OrganisationUnitFilter>;
+  /**
    * Filter organisation units to only include matches pointed to by engagements.
    *
    * Can be used to find organisation units for certain engagements.
@@ -9014,6 +9041,26 @@ export type OrganisationUnitFilter = {
    * Filter organisation units, returning all matches along with their ancestors.
    *
    * Can be used to find organisation units together with the context of their organisational placement.
+   *
+   * For example, given the following tree:
+   * ```
+   * A
+   * ├── B
+   * │   ├── C
+   * │   │   └── D
+   * │   └── E
+   * └── F
+   * ```
+   * the `subtree` filter behaves according to the following table:
+   *
+   * | Filter | Returned    |
+   * |--------|-------------|
+   * |      A | A           |
+   * |      B | A B         |
+   * |      C | A B C       |
+   * |      D | A B C D     |
+   * |      E | A B E       |
+   * |      F | A F         |
    *
    */
   subtree?: InputMaybe<OrganisationUnitFilter>;
@@ -9802,6 +9849,7 @@ export type ParentsBoundFacetFilter = {
 };
 
 export type ParentsBoundOrganisationUnitFilter = {
+  ancestor?: InputMaybe<OrganisationUnitFilter>;
   engagement?: InputMaybe<EngagementFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   goodname?: InputMaybe<OrganisationUnitFilter>;
@@ -11040,6 +11088,7 @@ export type UuidsBoundLeaveFilter = {
 };
 
 export type UuidsBoundOrganisationUnitFilter = {
+  ancestor?: InputMaybe<OrganisationUnitFilter>;
   engagement?: InputMaybe<EngagementFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   goodname?: InputMaybe<OrganisationUnitFilter>;
