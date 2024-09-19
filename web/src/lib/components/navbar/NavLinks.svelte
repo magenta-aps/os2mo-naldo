@@ -31,7 +31,7 @@
           <!-- TODO: Create real featureflag that locks the page, and doesn't just remove the link -->
           {#if env.PUBLIC_SHOW_INSIGHTS !== "false"}
             <li>
-              <a class="w-100 text-secondary hover:no-underline" href="{base}/insight"
+              <a class="w-100 text-secondary hover:no-underline" href="{base}/insights"
                 >{capital($_("insights"))}</a
               >
             </li>

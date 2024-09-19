@@ -2,16 +2,13 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import { query } from "gql-query-builder"
-  import InsightsSelect from "$lib/components/insights/InsightsSelect.svelte"
   import Selects from "$lib/components/insights/Selects.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import { debounce } from "$lib/util/helpers"
   import { graphQLClient } from "$lib/util/http"
   import { date } from "$lib/stores/date"
-  import InsightsSelectMultiple from "$lib/components/insights/InsightsSelectMultiple.svelte"
-  import InsightsTable from "$lib/components/tables/InsightsTable.svelte"
   import Search from "$lib/components/Search.svelte"
-  import type { Field, MainQuery, SelectedQuery } from "$lib/util/helpers"
+  import type { SelectedQuery } from "$lib/util/helpers"
   import { downloadHandler } from "$lib/util/csv"
   import Icon from "@iconify/svelte"
   import removeRounded from "@iconify/icons-material-symbols/remove-rounded"
@@ -22,6 +19,9 @@
   let orgUnit: { name: string; uuid: string } | undefined
   let data: any
   let filename: string
+  let loading = false
+  // Random variable, is only used to trigger updates in `Selects`
+  let removed = 0
 
   let selectedQueries: SelectedQuery[] = [
     {
@@ -42,10 +42,12 @@
 
   const removeSelect = (index: number) => {
     selectedQueries = selectedQueries.filter((_, i) => i !== index)
+    removed++
   }
 
   const updateQuery = async () => {
     if (!selectedQueries) return
+    loading = true
     let filterValue = { uuids: orgUnit?.uuid, from_date: null, to_date: null }
     const gqlQuery = query([
       {
@@ -83,7 +85,8 @@
         ],
       },
     ])
-    await getData(gqlQuery)
+    data = await getData(gqlQuery)
+    loading = false
   }
 
   const getData = async (generatedQuery: {
@@ -91,75 +94,68 @@
     variables: { filter: object }
   }) => {
     if (!selectedQueries || !generatedQuery) return
-    const res = await graphQLClient().request(
+    const res: any = await graphQLClient().request(
       generatedQuery.query,
       generatedQuery.variables
     )
 
-    data = res
-
     const results = []
-    for (const outer of data.org_units.objects) {
+    for (const outer of res.org_units.objects) {
       results.push(outer.current)
     }
-    data = results
+    return results
   }
 
   const clearFilter = () => {
     data = null
     orgUnit = undefined
-    // TODO: selectedQueries are cleared, but the data is `Selects` are not updated,
-    // so the multiSelect will still have the fields selected
     selectedQueries = [
       {
         mainQuery: undefined,
         chosenFields: [],
       },
     ]
+    removed++
   }
 </script>
 
-<HeadTitle type="insight" />
+<HeadTitle type="insights" />
 
 <div class="px-12 pt-6">
-  <h1 class="mb-4">Insights</h1>
+  <h1 class="mb-4">{capital($_("insights"))}</h1>
 </div>
 <div class="px-12 pt-6">
   <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded p-6 mb-4">
     <div>
-      <!-- TODO: Sort items -->
       <Search
         type="org-unit"
         title={capital($_("org_unit", { values: { n: 1 } }))}
         bind:value={orgUnit}
         required={true}
       />
-      {#each selectedQueries as querySet, index}
-        <Selects {mainQueries} {querySet} {index} bind:data={selectedQueries} />
-        <button
-          class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100"
-          on:click={() => removeSelect(index)}
-          ><Icon icon={removeRounded} width="20" height="20" /></button
-        >
-        {#if index === selectedQueries.length - 1}
-          <button
-            class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100 mb-4"
-            on:click={() => addNewSelect()}
-            ><Icon icon={addRounded} width="20" height="20" /></button
-          >
-        {:else}
-          <div class="divider p-0 m-0 my-2 w-full" />
-        {/if}
-      {/each}
+
+      {#key removed}
+        {#each selectedQueries as querySet, index}
+          <Selects {mainQueries} {querySet} {index} bind:data={selectedQueries} />
+          {#if selectedQueries.length > 1}
+            <button
+              class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100"
+              on:click={() => removeSelect(index)}
+              ><Icon icon={removeRounded} width="20" height="20" /></button
+            >
+          {/if}
+          {#if index === selectedQueries.length - 1}
+            <button
+              class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100 mb-4"
+              on:click={() => addNewSelect()}
+              ><Icon icon={addRounded} width="20" height="20" /></button
+            >
+          {:else}
+            <div class="divider p-0 m-0 my-2 w-full" />
+          {/if}
+        {/each}
+      {/key}
     </div>
-    <!-- Added debounce to avoid spamming queries -->
-    <button
-      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-      disabled={selectedQueries[selectedQueries.length - 1].mainQuery === undefined ||
-        selectedQueries[selectedQueries.length - 1].mainQuery === null ||
-        !orgUnit}
-      on:click={async () => debounce(updateQuery)}>{capital($_("search"))}</button
-    >
     <button
       class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
       on:click={() => clearFilter()}>{capital($_("clear"))}</button
@@ -173,9 +169,18 @@
     />
     <button
       class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-      disabled={!data}
-      on:click={(event) => downloadHandler(event, data, selectedQueries, filename)}
-      >{capital($_("download_as_csv"))}</button
+      disabled={selectedQueries.some(
+        (selectedQuery) =>
+          selectedQuery.mainQuery === null || selectedQuery.mainQuery === undefined
+      ) ||
+        selectedQueries[selectedQueries.length - 1].mainQuery === null ||
+        !orgUnit}
+      on:click={async (event) => {
+        await debounce(updateQuery)
+        downloadHandler(event, data, selectedQueries, filename)
+      }}
+      >{capital($_("download_as_csv"))}
+      {#if loading}<span class="loading loading-spinner" />{/if}</button
     >
   </div>
 

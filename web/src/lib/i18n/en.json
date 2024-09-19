@@ -106,7 +106,7 @@
 	"id": "id",
 	"inherited_manager": "inherited manager from {org_unit}",
 	"inherited_owner": "inherited owner from {org_unit}",
-	"insight": "insight",
+	"insights": "insights",
 	"it_system": "IT system",
 	"itsystem": "IT system",
 	"itassociation": "{n, plural, =0 {the IT affiliation} one {IT affiliation} other {IT affiliations}}",

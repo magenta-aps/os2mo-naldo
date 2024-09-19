@@ -29,8 +29,7 @@ export const mainQueries = [
     value: "engagement",
     n: 2,
     fields: [
-      { value: "type", subString: "__typename" },
-      { value: "type", subString: "__typename" },
+      { value: "subject", subString: "__typename" },
       { value: "name", subString: "person {name}" },
       { value: "job_function", subString: "job_function {name}" },
       { value: "engagement_type", subString: "engagement_type {name}" },
@@ -54,7 +53,7 @@ export const mainQueries = [
     value: "association",
     n: 2,
     fields: [
-      { value: "type", subString: "__typename" },
+      { value: "subject", subString: "__typename" },
       { value: "name", subString: "person {name}" },
       { value: "association_type", subString: "association_type {name}" },
       { value: "substitute", subString: "substitute {name}" },
@@ -68,7 +67,7 @@ export const mainQueries = [
     value: "ituser",
     n: 2,
     fields: [
-      { value: "type", subString: "__typename" },
+      { value: "subject", subString: "__typename" },
       { value: "itsystem", subString: "itsystem {name}" },
       { value: "account_name", subString: "user_key" },
       { value: "primary", subString: "primary {name}" },
@@ -81,7 +80,7 @@ export const mainQueries = [
     value: "rolebinding",
     n: 2,
     fields: [
-      { value: "type", subString: "__typename" },
+      { value: "subject", subString: "__typename" },
       { value: "ituser", subString: "ituser {user_key}" },
       // { value: "it_system", subString: "itsystem {name}" },
       { value: "role", subString: "role {name}" },
@@ -96,7 +95,7 @@ export const mainQueries = [
     value: "manager",
     n: 2,
     fields: [
-      { value: "type", subString: "__typename" },
+      { value: "subject", subString: "__typename" },
       { value: "name", subString: "person {name}" },
       { value: "manager_responsibility", subString: "responsibilities {name}" },
       { value: "manager_type", subString: "manager_type {name}" },
@@ -110,7 +109,7 @@ export const mainQueries = [
     value: "owner",
     n: 2,
     fields: [
-      { value: "type", subString: "__typename" },
+      { value: "subject", subString: "__typename" },
       { value: "name", subString: "owner {name}" },
       { value: "validity", subString: "validity {from to}" },
     ],
@@ -121,7 +120,7 @@ export const mainQueries = [
     value: "related_unit",
     n: 2,
     fields: [
-      { value: "type", subString: "__typename" },
+      { value: "subject", subString: "__typename" },
       { value: "related_unit", subString: "org_units {name}" },
       // { value: "validity", subString: "validity {from to}" },
     ],
