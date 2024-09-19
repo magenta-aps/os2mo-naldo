@@ -20,6 +20,7 @@
   let data: any
   let filename: string
   let loading = false
+  // Random variable, is only used to trigger updates in `Selects`
   let removed = 0
 
   let selectedQueries: SelectedQuery[] = [
@@ -40,11 +41,8 @@
   }
 
   const removeSelect = (index: number) => {
-    // FIX: This doesn't work correctly
-    console.log("før", selectedQueries)
     selectedQueries = selectedQueries.filter((_, i) => i !== index)
     removed++
-    console.log("efter", selectedQueries)
   }
 
   const updateQuery = async () => {
@@ -111,14 +109,13 @@
   const clearFilter = () => {
     data = null
     orgUnit = undefined
-    // TODO: selectedQueries are cleared, but the data is `Selects` are not updated,
-    // so the multiSelect will still have the fields selected
     selectedQueries = [
       {
         mainQuery: undefined,
         chosenFields: [],
       },
     ]
+    removed++
   }
 </script>
 
@@ -159,17 +156,6 @@
         {/each}
       {/key}
     </div>
-    <!-- Added debounce to avoid spamming queries -->
-    <button
-      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-      disabled={selectedQueries.some(
-        (selectedQuery) =>
-          selectedQuery.mainQuery === null || selectedQuery.mainQuery === undefined
-      ) ||
-        selectedQueries[selectedQueries.length - 1].mainQuery === null ||
-        !orgUnit}
-      on:click={async () => debounce(updateQuery)}>{capital($_("search"))}</button
-    >
     <button
       class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
       on:click={() => clearFilter()}>{capital($_("clear"))}</button
@@ -183,8 +169,16 @@
     />
     <button
       class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-      disabled={!data || loading}
-      on:click={(event) => downloadHandler(event, data, selectedQueries, filename)}
+      disabled={selectedQueries.some(
+        (selectedQuery) =>
+          selectedQuery.mainQuery === null || selectedQuery.mainQuery === undefined
+      ) ||
+        selectedQueries[selectedQueries.length - 1].mainQuery === null ||
+        !orgUnit}
+      on:click={async (event) => {
+        await debounce(updateQuery)
+        downloadHandler(event, data, selectedQueries, filename)
+      }}
       >{capital($_("download_as_csv"))}
       {#if loading}<span class="loading loading-spinner" />{/if}</button
     >
