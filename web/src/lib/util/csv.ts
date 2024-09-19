@@ -9,6 +9,11 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
   let csvRows: string[] = []
   let columnOffsets: number[] = [] // Keeps track of column start positions for each query
 
+  // Check if `org_units` is the only subject
+  const hasOtherQueries = selectedQueries.some(
+    (query) => query.mainQuery?.operation !== "org_units"
+  )
+
   // Create org_unit data if present. This is needed since we want the data to be in every row
   // and on top of that, we want it to be at the start of every row.
   let orgUnitData: string[] = []
@@ -54,6 +59,12 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
         currentOffset++
       })
     })
+
+    // If only `org_units` is present in the query, push it to the row.
+    // This is done, since if we have other queries, we want the orgUnitData to on every row, and not by itself.
+    if (!hasOtherQueries) {
+      csvRows.push(orgUnitData.join(","))
+    }
   }
 
   // Process the rest of the queries and calculate headers
