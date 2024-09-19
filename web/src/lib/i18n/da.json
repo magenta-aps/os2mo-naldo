@@ -106,7 +106,7 @@
 	"id": "id",
 	"inherited_manager": "nedarvet leder fra {org_unit}",
 	"inherited_owner": "nedarvet ejer fra {org_unit}",
-	"insight": "indsigt",
+	"insights": "indsigt",
 	"it_system": "IT-system",
 	"itsystem": "IT-system",
 	"itassociation": "{n, plural, =0 {IT-tilknytningen} one {IT-tilknytning} other {IT-tilknytninger}}",

@@ -9,53 +9,105 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
   let csvRows: string[] = []
   let columnOffsets: number[] = [] // Keeps track of column start positions for each query
 
-  // Calculate the number of columns for each query and where each starts
-  selectedQueries.forEach((selectedQuery, index) => {
-    const { chosenFields } = selectedQuery
-    const currentHeader = chosenFields.flatMap((header) => {
+  // Check if `org_units` is the only subject
+  const hasOtherQueries = selectedQueries.some(
+    (query) => query.mainQuery?.operation !== "org_units"
+  )
+
+  // Create org_unit data if present. This is needed since we want the data to be in every row
+  // and on top of that, we want it to be at the start of every row.
+  let orgUnitData: string[] = []
+  const orgUnitsQuery = selectedQueries.find(
+    (query) => query.mainQuery?.operation === "org_units"
+  )
+  if (orgUnitsQuery) {
+    const { chosenFields } = orgUnitsQuery
+    const unitData = data[0]
+
+    // Calculate headers and offsets for org_units data
+    const orgUnitHeader = chosenFields.flatMap((header) => {
       const headerText = capital(get(_)(header.value, { values: { n: 1 } }))
-      if (header.value === "related_unit") {
-        return [`${headerText} 1`, `${headerText} 2`]
-      } else if (header.value === "validity") {
+      if (header.value === "validity") {
         return [`${capital(get(_)("from"))}`, `${capital(get(_)("to"))}`]
       }
       return headerText
     })
 
-    // Set column offset for this query
-    columnOffsets[index] = csvHeader.length
-    csvHeader = csvHeader.concat(currentHeader)
+    // Set column offset for org_units
+    const orgUnitsOffset = csvHeader.length
+    columnOffsets[selectedQueries.indexOf(orgUnitsQuery)] = orgUnitsOffset
+    csvHeader = csvHeader.concat(orgUnitHeader)
+
+    // Populate orgUnitData with values
+    orgUnitData = new Array(csvHeader.length).fill("")
+    let currentOffset = orgUnitsOffset
+    chosenFields.forEach((field: Field, index) => {
+      let values: string[] = []
+      const fieldValue = resolveFieldValue(unitData, field)
+
+      if (field.value === "validity") {
+        // Handle validity field
+        values = [unitData.validity?.from || "", unitData.validity?.to || ""]
+      } else {
+        // Handle general case
+        values = fieldValue ? [JSON.stringify(fieldValue)] : [""]
+      }
+
+      // Insert values into the orgUnitData array
+      values.forEach((value) => {
+        orgUnitData[currentOffset] = value
+        currentOffset++
+      })
+    })
+
+    // If only `org_units` is present in the query, push it to the row.
+    // This is done, since if we have other queries, we want the orgUnitData to on every row, and not by itself.
+    if (!hasOtherQueries) {
+      csvRows.push(orgUnitData.join(","))
+    }
+  }
+
+  // Process the rest of the queries and calculate headers
+  selectedQueries.forEach((selectedQuery, index) => {
+    const { chosenFields, mainQuery } = selectedQuery
+    if (mainQuery?.operation !== "org_units") {
+      const currentHeader = chosenFields.flatMap((header) => {
+        const headerText = capital(get(_)(header.value, { values: { n: 1 } }))
+        if (header.value === "related_unit") {
+          return [`${headerText} 1`, `${headerText} 2`]
+        } else if (header.value === "validity") {
+          return [`${capital(get(_)("from"))}`, `${capital(get(_)("to"))}`]
+        }
+        return headerText
+      })
+
+      // Set column offset for this query
+      columnOffsets[index] = csvHeader.length
+      csvHeader = csvHeader.concat(currentHeader)
+    }
   })
 
-  let orgUnitData: string[] = new Array(csvHeader.length).fill("")
-
-  // Prepare rows with empty cells where needed
+  // Prepare rows for other queries
   selectedQueries.forEach((selectedQuery, queryIndex) => {
     const { chosenFields, mainQuery } = selectedQuery
     const startOffset = columnOffsets[queryIndex]
 
-    if (mainQuery?.operation === "org_units") {
-      const unitData = data[0]
-
-      chosenFields.forEach((field: Field, index) => {
-        const fieldValue = resolveFieldValue(unitData, field)
-        orgUnitData[startOffset + index] = fieldValue ? JSON.stringify(fieldValue) : ""
-      })
-    }
-
-    if (mainQuery && mainQuery?.operation !== "org_units") {
+    if (mainQuery && mainQuery.operation !== "org_units") {
+      // TODO: Make 'subject' first in row (after org_unit)
       const itemsArray = data[0][mainQuery.operation]
       itemsArray.forEach((item: any) => {
-        const row: string[] = [...orgUnitData]
-        chosenFields.forEach((header, fieldIndex) => {
+        const row: string[] = [...orgUnitData] // Start each row with orgUnitData
+
+        let currentOffset = startOffset
+        chosenFields.forEach((header) => {
           const fieldValue = resolveFieldValue(item, header)
           let values: string[] = []
 
           if (header.value === "related_unit") {
-            // Handle related units, which as `unit 1` and `unit 2`
-            values = [item.org_units[0].name || "", item.org_units[1].name]
+            // Handle related units
+            values = [item.org_units[0]?.name || "", item.org_units[1]?.name || ""]
           } else if (header.value === "validity") {
-            // Handle validity, which has `from` and `to` values
+            // Handle validity field
             const fromValue = item.validity?.from || ""
             const toValue = item.validity?.to || ""
             values = [fromValue, toValue]
@@ -65,8 +117,9 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
           }
 
           // Insert values into the row array at the correct positions
-          values.forEach((value, valueIndex) => {
-            row[startOffset + fieldIndex + valueIndex] = value
+          values.forEach((value) => {
+            row[currentOffset] = value
+            currentOffset++
           })
         })
 
