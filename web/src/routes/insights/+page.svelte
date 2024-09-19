@@ -20,6 +20,7 @@
   let data: any
   let filename: string
   let loading = false
+  let removed = 0
 
   let selectedQueries: SelectedQuery[] = [
     {
@@ -40,7 +41,10 @@
 
   const removeSelect = (index: number) => {
     // FIX: This doesn't work correctly
+    console.log("før", selectedQueries)
     selectedQueries = selectedQueries.filter((_, i) => i !== index)
+    removed++
+    console.log("efter", selectedQueries)
   }
 
   const updateQuery = async () => {
@@ -132,25 +136,28 @@
         bind:value={orgUnit}
         required={true}
       />
-      {#each selectedQueries as querySet, index}
-        <Selects {mainQueries} {querySet} {index} bind:data={selectedQueries} />
-        {#if selectedQueries.length > 1}
-          <button
-            class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100"
-            on:click={() => removeSelect(index)}
-            ><Icon icon={removeRounded} width="20" height="20" /></button
-          >
-        {/if}
-        {#if index === selectedQueries.length - 1}
-          <button
-            class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100 mb-4"
-            on:click={() => addNewSelect()}
-            ><Icon icon={addRounded} width="20" height="20" /></button
-          >
-        {:else}
-          <div class="divider p-0 m-0 my-2 w-full" />
-        {/if}
-      {/each}
+
+      {#key removed}
+        {#each selectedQueries as querySet, index}
+          <Selects {mainQueries} {querySet} {index} bind:data={selectedQueries} />
+          {#if selectedQueries.length > 1}
+            <button
+              class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100"
+              on:click={() => removeSelect(index)}
+              ><Icon icon={removeRounded} width="20" height="20" /></button
+            >
+          {/if}
+          {#if index === selectedQueries.length - 1}
+            <button
+              class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100 mb-4"
+              on:click={() => addNewSelect()}
+              ><Icon icon={addRounded} width="20" height="20" /></button
+            >
+          {:else}
+            <div class="divider p-0 m-0 my-2 w-full" />
+          {/if}
+        {/each}
+      {/key}
     </div>
     <!-- Added debounce to avoid spamming queries -->
     <button
