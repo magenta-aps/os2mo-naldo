@@ -48,7 +48,9 @@
   const updateQuery = async () => {
     if (!selectedQueries) return
     loading = true
-    let filterValue = { uuids: orgUnit?.uuid, from_date: null, to_date: null }
+    let filterValue = {
+      ancestor: { uuids: orgUnit?.uuid, from_date: null, to_date: null },
+    }
     const gqlQuery = query([
       {
         operation: "org_units",
