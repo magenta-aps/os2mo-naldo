@@ -15,14 +15,10 @@ ENV PUBLIC_COMMIT_TAG=${COMMIT_TAG:-HEAD}
 # --- DEV ---
 FROM base as dev
 
-ENV NODE_ENV=development
-
 CMD yarn dev --host
 
 # --- PROD ---
 FROM base as prod
-
-ENV NODE_ENV=production
 
 RUN yarn build
 
