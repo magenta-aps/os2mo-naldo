@@ -1,19 +1,18 @@
 <script lang="ts">
+  import { engagementInfo } from "$lib/stores/engagementInfoStore"
   import { step } from "$lib/stores/stepStore"
-  import Step1 from "$lib/components/brugeropret/step1.svelte"
-  import Step2 from "$lib/components/brugeropret/step2.svelte"
+  import EmployeeStep from "$lib/components/brugeropret/employeeStep.svelte"
+  import EngagementStep from "$lib/components/brugeropret/engagementStep.svelte"
 
   $: {
-    console.log($step)
+    console.log($engagementInfo)
   }
 </script>
 
 {#if $step === 1}
-  <Step1 />
+  <EmployeeStep />
 {:else if $step === 2}
-  <Step2 />
-{:else}
-  LOL
+  <EngagementStep />
 {/if}
 
 <!-- https://github.com/mdeme01/svelte-multi-step-form/blob/main/src/lib/components/personal-info.svelte -->
