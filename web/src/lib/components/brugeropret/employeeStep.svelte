@@ -24,26 +24,33 @@
   // TODO: Add error-handling
 </script>
 
+<div class="flex align-center px-6 pt-6 pb-4">
+  <h3 class="flex-1">
+    {capital(
+      $_("create_item", {
+        values: { item: $_("employee", { values: { n: 1 } }) },
+      })
+    )}
+  </h3>
+</div>
+
 <form on:submit|preventDefault={() => step.updateStep("inc")} class="mx-6">
   {#await graphQLClient().request(GetSpConfigDocument)}
-    <div class="mx-6">
-      <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
-        <div class="p-8">
-          <Skeleton />
-          <div class="flex flex-row gap-6">
-            <Skeleton extra_classes="basis-1/2" />
-            <Skeleton extra_classes="basis-1/2" />
-          </div>
-          <div class="flex flex-row gap-6">
-            <Skeleton extra_classes="basis-1/2" />
-            <Skeleton extra_classes="basis-1/2" />
-          </div>
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+      <div class="p-8">
+        <Skeleton />
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
         </div>
       </div>
     </div>
   {:then data}
     {@const SpEnabled = data.configuration.objects[0].jsonified_value === "true"}
-
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <!-- TODO: Support SP, like in `employee -> create` -->

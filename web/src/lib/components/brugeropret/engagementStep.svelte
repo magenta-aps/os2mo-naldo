@@ -64,7 +64,7 @@
   {:then data}
     {@const facets = data.facets.objects}
 
-    <form method="post" class="mx-6">
+    <form on:submit|preventDefault={() => step.updateStep("inc")} class="mx-6">
       <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
         <div class="p-8">
           <div class="flex flex-row gap-6">
