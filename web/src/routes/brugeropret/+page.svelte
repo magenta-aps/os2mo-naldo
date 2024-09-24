@@ -3,6 +3,7 @@
   import { step } from "$lib/stores/stepStore"
   import EmployeeStep from "$lib/components/brugeropret/employeeStep.svelte"
   import EngagementStep from "$lib/components/brugeropret/engagementStep.svelte"
+  import ItUserStep from "$lib/components/brugeropret/ituserStep.svelte"
 
   $: {
     console.log($engagementInfo)
@@ -13,6 +14,8 @@
   <EmployeeStep />
 {:else if $step === 2}
   <EngagementStep />
+{:else if $step === 3}
+  <ItUserStep />
 {/if}
 
 <!-- https://github.com/mdeme01/svelte-multi-step-form/blob/main/src/lib/components/personal-info.svelte -->
