@@ -110,17 +110,19 @@ export const getKleNumberTitleAndUuid = (kles: KleNumberTitleAndUuid[]) => {
 }
 
 type ITSystem = {
-  objects: {
+  current?: {
     uuid: string
     name: string
-  }[]
+  } | null
 }
 
 export const getITSystemNames = (itsystems: ITSystem[]) => {
-  const ITSystems = itsystems.map((itsystem) => ({
-    uuid: itsystem.objects[0].uuid,
-    name: itsystem.objects[0].name,
-  }))
+  const ITSystems = itsystems
+    .filter((itsystem) => itsystem.current && itsystem.current !== null)
+    .map((itsystem) => ({
+      uuid: itsystem.current!.uuid,
+      name: itsystem.current!.name,
+    }))
   return ITSystems.sort((a, b) => (a.name > b.name ? 1 : -1))
 }
 
