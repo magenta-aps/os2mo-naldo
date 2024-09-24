@@ -77,7 +77,7 @@
       }
       itsystems {
         objects {
-          objects {
+          current(at: $currentDate) {
             name
             uuid
           }
