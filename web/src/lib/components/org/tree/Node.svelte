@@ -48,7 +48,10 @@
         filter: {
           parents: $uuid
           from_date: $fromDate
-          subtree: { from_date: $fromDate, hierarchy: { uuids: $orgUnitHierarchies } }
+          descendant: {
+            from_date: $fromDate
+            hierarchy: { uuids: $orgUnitHierarchies }
+          }
         }
       ) {
         objects {
@@ -57,7 +60,7 @@
             uuid
             has_children(
               filter: {
-                subtree: {
+                descendant: {
                   from_date: $fromDate
                   hierarchy: { uuids: $orgUnitHierarchies }
                 }

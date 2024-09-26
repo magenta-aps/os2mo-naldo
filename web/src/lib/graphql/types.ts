@@ -8899,11 +8899,11 @@ export type OrganisationUnitCreateInput = {
 /** Organisation unit filter. */
 export type OrganisationUnitFilter = {
   /**
-   * Find organisation units which match the given filter, or which are organisationally placed under those units.
+   * Select organisation units which have an ancestor matching the given filter.
    *
-   * Returns all matches along with their descendants (every node is its own ancestor as per [CLRS] 12.2-6).
+   * Note that every node is its own ancestor as per [CLRS] 12.2-6.
    *
-   * For example, given the following tree:
+   * Given the following tree:
    * ```
    * A
    * ├── B
@@ -8925,6 +8925,33 @@ export type OrganisationUnitFilter = {
    *
    */
   ancestor?: InputMaybe<OrganisationUnitFilter>;
+  /**
+   * Select organisation units which have a descendant matching the given filter.
+   *
+   * Note that every node is its own descendant as per [CLRS] 12.2-6.
+   *
+   * Given the following tree:
+   * ```
+   * A
+   * ├── B
+   * │   ├── C
+   * │   │   └── D
+   * │   └── E
+   * └── F
+   * ```
+   * the `descendant` filter behaves according to the following table:
+   *
+   * | Filter | Returned    |
+   * |--------|-------------|
+   * |      A | A           |
+   * |      B | A B         |
+   * |      C | A B C       |
+   * |      D | A B C D     |
+   * |      E | A B E       |
+   * |      F | A F         |
+   *
+   */
+  descendant?: InputMaybe<OrganisationUnitFilter>;
   /**
    * Filter organisation units to only include matches pointed to by engagements.
    *
@@ -8995,7 +9022,7 @@ export type OrganisationUnitFilter = {
    */
   names?: InputMaybe<Array<Scalars['String']['input']>>;
   /**
-   * Parent filter limiting which entries are returned.
+   * Select organisation units whose parent matches the given filter.
    *
    * Set to `None` to find root units.
    *
@@ -9030,32 +9057,7 @@ export type OrganisationUnitFilter = {
    *
    */
   registration?: InputMaybe<OrganisationUnitRegistrationFilter>;
-  /**
-   * Filter organisation units, returning all matches along with their ancestors.
-   *
-   * Can be used to find organisation units together with the context of their organisational placement.
-   *
-   * For example, given the following tree:
-   * ```
-   * A
-   * ├── B
-   * │   ├── C
-   * │   │   └── D
-   * │   └── E
-   * └── F
-   * ```
-   * the `subtree` filter behaves according to the following table:
-   *
-   * | Filter | Returned    |
-   * |--------|-------------|
-   * |      A | A           |
-   * |      B | A B         |
-   * |      C | A B C       |
-   * |      D | A B C D     |
-   * |      E | A B E       |
-   * |      F | A F         |
-   *
-   */
+  /** @deprecated Renamed to 'descendant' */
   subtree?: InputMaybe<OrganisationUnitFilter>;
   /** Limit the elements returned by their ending validity. */
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
@@ -9843,6 +9845,7 @@ export type ParentsBoundFacetFilter = {
 
 export type ParentsBoundOrganisationUnitFilter = {
   ancestor?: InputMaybe<OrganisationUnitFilter>;
+  descendant?: InputMaybe<OrganisationUnitFilter>;
   engagement?: InputMaybe<EngagementFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -11081,6 +11084,7 @@ export type UuidsBoundLeaveFilter = {
 
 export type UuidsBoundOrganisationUnitFilter = {
   ancestor?: InputMaybe<OrganisationUnitFilter>;
+  descendant?: InputMaybe<OrganisationUnitFilter>;
   engagement?: InputMaybe<EngagementFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
