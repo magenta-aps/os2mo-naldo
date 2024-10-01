@@ -5,7 +5,7 @@ type EngagementInfo = {
   person: string
   fromDate: string
   toDate: string
-  orgUnit: { uuid: string; name: string }
+  orgUnit: { uuid: string; name: string } | undefined
   userkey: string
   jobFunction: { uuid: string; name: string; userkey: string }
   engagementType: { uuid: string; name: string; userkey: string }
@@ -16,7 +16,7 @@ const defaultValue: EngagementInfo = {
   person: "", // Somehow get employeeInfoStore.uuid
   fromDate: "",
   toDate: "",
-  orgUnit: { uuid: "", name: "" },
+  orgUnit: undefined,
   userkey: "",
   jobFunction: { uuid: "", name: "", userkey: "" },
   engagementType: { uuid: "", name: "", userkey: "" },

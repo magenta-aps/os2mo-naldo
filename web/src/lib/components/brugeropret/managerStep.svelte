@@ -49,8 +49,8 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request(ManagerFacetsDocument, { currentDate: $date })}
-  <div class="mx-6">
+<form on:submit|preventDefault={() => step.updateStep("inc")} class="mx-6">
+  {#await graphQLClient().request(ManagerFacetsDocument, { currentDate: $date })}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
@@ -65,11 +65,9 @@
         <Skeleton />
       </div>
     </div>
-  </div>
-{:then data}
-  {@const facets = data.facets.objects}
+  {:then data}
+    {@const facets = data.facets.objects}
 
-  <form on:submit|preventDefault={() => step.updateStep("inc")} class="form-step">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
@@ -138,5 +136,5 @@
       </button>
     </div>
     <Error />
-  </form>
-{/await}
+  {/await}
+</form>
