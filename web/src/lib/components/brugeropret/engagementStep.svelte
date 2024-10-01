@@ -8,17 +8,16 @@
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
   import { graphQLClient } from "$lib/util/http"
-  import { FacetsDocument } from "./query.generated"
+  import { EngagementFacetsDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import Search from "$lib/components/Search.svelte"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getMinMaxValidities } from "$lib/util/helpers"
 
   gql`
-    query Facets($currentDate: DateTime!) {
+    query EngagementFacets($currentDate: DateTime!) {
       facets(
         filter: {
           user_keys: ["engagement_type", "engagement_job_function", "primary_type"]
@@ -40,8 +39,20 @@
   `
 </script>
 
+<div class="flex align-center px-6 pt-6 pb-4">
+  <h3 class="flex-1">
+    {capital(
+      $_("create_item", {
+        values: { item: $_("engagement", { values: { n: 1 } }) },
+      })
+    )}
+  </h3>
+</div>
+
+<div class="divider p-0 m-0 mb-4 w-full" />
+
 <form on:submit|preventDefault={() => step.updateStep("inc")} class="form-step">
-  {#await graphQLClient().request(FacetsDocument, { currentDate: $date })}
+  {#await graphQLClient().request(EngagementFacetsDocument, { currentDate: $date })}
     <div class="mx-6">
       <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
         <div class="p-8">
