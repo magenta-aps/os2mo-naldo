@@ -5,6 +5,7 @@
   import EngagementStep from "$lib/components/brugeropret/engagementStep.svelte"
   import ItUserStep from "$lib/components/brugeropret/ituserStep.svelte"
   import ManagerStep from "$lib/components/brugeropret/managerStep.svelte"
+  import AddressStep from "$lib/components/brugeropret/addressStep.svelte"
 
   $: {
     console.log($engagementInfo)
@@ -19,6 +20,8 @@
   <ItUserStep />
 {:else if $step === 4}
   <ManagerStep />
+{:else if $step === 5}
+  <AddressStep />
 {/if}
 
 <!-- https://github.com/mdeme01/svelte-multi-step-form/blob/main/src/lib/components/personal-info.svelte -->
