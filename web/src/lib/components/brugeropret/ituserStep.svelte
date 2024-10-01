@@ -7,10 +7,6 @@
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
   import { step } from "$lib/stores/stepStore"
-  import { enhance } from "$app/forms"
-  import { goto } from "$app/navigation"
-  import { base } from "$app/paths"
-  import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
   import { ItSystemsAndPrimaryDocument } from "./query.generated"
   import { gql } from "graphql-request"
@@ -19,11 +15,8 @@
   import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
   import { getClassUuidByUserKey } from "$lib/util/get_classes"
   import { getITSystemNames, type UnpackedClass } from "$lib/util/helpers"
-  import { form, field } from "svelte-forms"
-  import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
-  import { getMinMaxValidities } from "$lib/util/helpers"
   import { env } from "$env/dynamic/public"
 
   gql`
@@ -66,14 +59,6 @@
     }
   `
 </script>
-
-<title
-  >{capital(
-    $_("create_item", {
-      values: { item: $_("ituser", { values: { n: 1 } }) },
-    })
-  )} | OS2mo</title
->
 
 <div class="flex align-center px-6 pt-6 pb-4">
   <h3 class="flex-1">

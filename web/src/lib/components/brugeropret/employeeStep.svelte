@@ -34,6 +34,8 @@
   </h3>
 </div>
 
+<div class="divider p-0 m-0 mb-4 w-full" />
+
 <form on:submit|preventDefault={() => step.updateStep("inc")} class="mx-6">
   {#await graphQLClient().request(GetSpConfigDocument)}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">

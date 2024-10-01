@@ -2961,6 +2961,7 @@ export type EmployeesBoundEngagementFilter = {
 export type EmployeesBoundItUserFilter = {
   employee?: InputMaybe<EmployeeFilter>;
   engagement?: InputMaybe<EngagementFilter>;
+  external_ids?: InputMaybe<Array<Scalars['String']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   itsystem?: InputMaybe<ItSystemFilter>;
   itsystem_uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -5149,6 +5150,21 @@ export type ItUserFilter = {
    *
    */
   engagement?: InputMaybe<EngagementFilter>;
+  /**
+   * Only return IT users with this `external_id` filter limiting which entries are returned.
+   *
+   * | `external_id`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  external_ids?: InputMaybe<Array<Scalars['String']['input']>>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -8384,6 +8400,7 @@ export type OrgUnitsboundituserfilter = {
   employee?: InputMaybe<EmployeeFilter>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   engagement?: InputMaybe<EngagementFilter>;
+  external_ids?: InputMaybe<Array<Scalars['String']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   itsystem?: InputMaybe<ItSystemFilter>;
   itsystem_uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -11061,6 +11078,7 @@ export type UuidsBoundItUserFilter = {
   employee?: InputMaybe<EmployeeFilter>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   engagement?: InputMaybe<EngagementFilter>;
+  external_ids?: InputMaybe<Array<Scalars['String']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   itsystem?: InputMaybe<ItSystemFilter>;
   itsystem_uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
