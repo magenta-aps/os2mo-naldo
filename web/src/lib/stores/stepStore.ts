@@ -11,13 +11,15 @@ const createStepStore = () => {
 
   const { subscribe, update, set } = writable<number>(initialStep)
 
-  const updateStep = (action: "inc" | "dec" | "res") =>
+  const updateStep = (action: "inc" | "dec" | "res" | number) =>
     update((step) => {
       const newStep =
         action === "inc" && step < 5
           ? step + 1
           : action === "dec" && step > 1
           ? step - 1
+          : typeof action === "number"
+          ? (step = action)
           : 1
       if (browser) localStorage.setItem("step", JSON.stringify(newStep))
       return newStep

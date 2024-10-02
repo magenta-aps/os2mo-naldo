@@ -24,19 +24,7 @@
   // TODO: Add error-handling
 </script>
 
-<div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">
-    {capital(
-      $_("create_item", {
-        values: { item: $_("employee", { values: { n: 1 } }) },
-      })
-    )}
-  </h3>
-</div>
-
-<div class="divider p-0 m-0 mb-4 w-full" />
-
-<form on:submit|preventDefault={() => step.updateStep("inc")} class="mx-6">
+<form on:submit|preventDefault={() => step.updateStep("inc")}>
   {#await graphQLClient().request(GetSpConfigDocument)}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -52,6 +40,7 @@
       </div>
     </div>
   {:then data}
+    <!-- LAV VALIDATION -->
     {@const SpEnabled = data.configuration.objects[0].jsonified_value === "true"}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
