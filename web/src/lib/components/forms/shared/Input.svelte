@@ -26,9 +26,7 @@
   }
 
   // This is only for the name inputs in create employee
-  $: if (value) {
-    cprName = value
-  }
+  $: cprName = value
 </script>
 
 <div class="form-control pb-3 {extra_classes}">
