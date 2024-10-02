@@ -4,20 +4,22 @@ import { v4 as uuidv4 } from "uuid"
 
 type EmployeeInfo = {
   uuid: string
-  cprNumber: string
+  cprNumber: { name: string; cpr_no: string }
   firstName: string
   lastName: string
   nicknameFirstname: string
   nicknameLastname: string
+  validated: boolean
 }
 
 const defaultValue: EmployeeInfo = {
   uuid: uuidv4(),
-  cprNumber: "",
+  cprNumber: { name: "", cpr_no: "" },
   firstName: "",
   lastName: "",
   nicknameFirstname: "",
   nicknameLastname: "",
+  validated: false,
 }
 
 const createEmployeeInfoStore = () => {
@@ -28,11 +30,18 @@ const createEmployeeInfoStore = () => {
     initialValue = storedEmployeeInfo ? JSON.parse(storedEmployeeInfo) : defaultValue
   }
 
-  const { subscribe, set } = writable<EmployeeInfo>(initialValue)
+  const { subscribe, update, set } = writable<EmployeeInfo>(initialValue)
 
   const reset = () => {
     if (browser) localStorage.removeItem("employee-info")
     set(defaultValue)
+  }
+
+  const isValid = (valid: boolean) => {
+    update((employeeStore) => {
+      employeeStore.validated = valid
+      return employeeStore
+    })
   }
 
   subscribe((value) => {
@@ -43,6 +52,7 @@ const createEmployeeInfoStore = () => {
     subscribe,
     set,
     reset,
+    isValid,
   }
 }
 
