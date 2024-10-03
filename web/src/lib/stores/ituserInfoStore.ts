@@ -9,6 +9,7 @@ type ItUserInfo = {
   userkey: string
   ituserType: { uuid: string; name: string; userkey: string }
   primary: string
+  validated: boolean
 }
 
 const defaultValue: ItUserInfo = {
@@ -19,6 +20,7 @@ const defaultValue: ItUserInfo = {
   userkey: "",
   ituserType: { uuid: "", name: "", userkey: "" },
   primary: "",
+  validated: false,
 }
 
 const createItUserInfoStore = () => {
@@ -29,11 +31,18 @@ const createItUserInfoStore = () => {
     initialValue = storedItUserInfo ? JSON.parse(storedItUserInfo) : defaultValue
   }
 
-  const { subscribe, set } = writable<ItUserInfo>(initialValue)
+  const { subscribe, update, set } = writable<ItUserInfo>(initialValue)
 
   const reset = () => {
     if (browser) localStorage.removeItem("ituser-info")
     set(defaultValue)
+  }
+
+  const isValid = (valid: boolean) => {
+    update((ituserStore) => {
+      ituserStore.validated = valid
+      return ituserStore
+    })
   }
 
   subscribe((value) => {
@@ -44,6 +53,7 @@ const createItUserInfoStore = () => {
     subscribe,
     set,
     reset,
+    isValid,
   }
 }
 

@@ -4,6 +4,7 @@
   export let id: string
   export let name = id
   export let value: string | number | undefined
+  export let validationValue: string | number | undefined = undefined
   export let startValue: string | number | undefined = undefined
   value = startValue ? startValue : value
   export let required = false
@@ -14,6 +15,10 @@
   // We changed from `pb-4` to having `pb-3` and `pb-1`, which messed with the navbar DateInput.
   // This is a workaround.
   export let noPadding: Boolean = false
+
+  $: {
+    validationValue = value
+  }
 </script>
 
 <div class="form-control basis-1/2 {noPadding ? '' : 'pb-3'}">

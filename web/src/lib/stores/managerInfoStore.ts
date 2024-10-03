@@ -9,6 +9,7 @@ type ManagerInfo = {
   managerType: { uuid: string; name: string; userkey: string }
   managerLevel: { uuid: string; name: string; userkey: string }
   responsibilities: { uuid: string; name: string; userkey: string }[] | undefined
+  validated: boolean
 }
 
 const defaultValue: ManagerInfo = {
@@ -19,6 +20,7 @@ const defaultValue: ManagerInfo = {
   managerType: { uuid: "", name: "", userkey: "" },
   managerLevel: { uuid: "", name: "", userkey: "" },
   responsibilities: undefined,
+  validated: false,
 }
 
 const createManagerInfoStore = () => {
@@ -29,11 +31,18 @@ const createManagerInfoStore = () => {
     initialValue = storedManagerInfo ? JSON.parse(storedManagerInfo) : defaultValue
   }
 
-  const { subscribe, set } = writable<ManagerInfo>(initialValue)
+  const { subscribe, update, set } = writable<ManagerInfo>(initialValue)
 
   const reset = () => {
     if (browser) localStorage.removeItem("manager-info")
     set(defaultValue)
+  }
+
+  const isValid = (valid: boolean) => {
+    update((managerStore) => {
+      managerStore.validated = valid
+      return managerStore
+    })
   }
 
   subscribe((value) => {
@@ -44,6 +53,7 @@ const createManagerInfoStore = () => {
     subscribe,
     set,
     reset,
+    isValid,
   }
 }
 

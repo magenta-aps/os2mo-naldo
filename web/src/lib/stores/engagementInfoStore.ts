@@ -10,6 +10,7 @@ type EngagementInfo = {
   jobFunction: { uuid: string; name: string; userkey: string }
   engagementType: { uuid: string; name: string; userkey: string }
   primary: string
+  validated: boolean
 }
 
 const defaultValue: EngagementInfo = {
@@ -21,6 +22,7 @@ const defaultValue: EngagementInfo = {
   jobFunction: { uuid: "", name: "", userkey: "" },
   engagementType: { uuid: "", name: "", userkey: "" },
   primary: "",
+  validated: false,
 }
 
 const createEngagementInfoStore = () => {
@@ -33,11 +35,18 @@ const createEngagementInfoStore = () => {
       : defaultValue
   }
 
-  const { subscribe, set } = writable<EngagementInfo>(initialValue)
+  const { subscribe, update, set } = writable<EngagementInfo>(initialValue)
 
   const reset = () => {
     if (browser) localStorage.removeItem("engagement-info")
     set(defaultValue)
+  }
+
+  const isValid = (valid: boolean) => {
+    update((engagementStore) => {
+      engagementStore.validated = valid
+      return engagementStore
+    })
   }
 
   subscribe((value) => {
@@ -48,6 +57,7 @@ const createEngagementInfoStore = () => {
     subscribe,
     set,
     reset,
+    isValid,
   }
 }
 
