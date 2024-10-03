@@ -12,6 +12,8 @@
   import { gql } from "graphql-request"
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
   import Search from "$lib/components/Search.svelte"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
@@ -37,9 +39,25 @@
       }
     }
   `
+
+  const fromDate = field("from", "", [required()])
+  const orgUnit = field("org_unit", "", [required()])
+  const jobFunction = field("job_function", "", [required()])
+  const engagementType = field("engagement_type", "", [required()])
+  const svelteForm = form(fromDate, orgUnit, jobFunction, engagementType)
+
+  const validateForm = async () => {
+    await svelteForm.validate()
+    if ($svelteForm.valid) {
+      engagementInfo.isValid(true)
+      step.updateStep("inc")
+    } else {
+      engagementInfo.isValid(false)
+    }
+  }
 </script>
 
-<form on:submit|preventDefault={() => step.updateStep("inc")}>
+<form on:submit|preventDefault={async () => await validateForm()}>
   {#await graphQLClient().request(EngagementFacetsDocument, { currentDate: $date })}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -68,6 +86,8 @@
           <DateInput
             startValue={$date}
             bind:value={$engagementInfo.fromDate}
+            bind:validationValue={$fromDate.value}
+            errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
             required={true}
@@ -80,8 +100,10 @@
         </div>
         <Search
           type="org-unit"
-          on:clear={() => ($engagementInfo.orgUnit = { uuid: "", name: "" })}
           bind:value={$engagementInfo.orgUnit}
+          on:clear={() => ($orgUnit.value = "")}
+          bind:name={$orgUnit.value}
+          errors={$orgUnit.errors}
           required={true}
         />
         <Breadcrumbs orgUnit={$engagementInfo.orgUnit} />
@@ -91,6 +113,8 @@
             title={capital($_("job_function", { values: { n: 1 } }))}
             id="job-function"
             bind:value={$engagementInfo.jobFunction}
+            bind:name={$jobFunction.value}
+            errors={$jobFunction.errors}
             iterable={getClassesByFacetUserKey(facets, "engagement_job_function")}
             required={true}
             extra_classes="basis-1/2"
@@ -101,6 +125,8 @@
             title={capital($_("engagement_type"))}
             id="engagement-type"
             bind:value={$engagementInfo.engagementType}
+            bind:name={$engagementType.value}
+            errors={$engagementType.errors}
             iterable={getClassesByFacetUserKey(facets, "engagement_type")}
             required={true}
             extra_classes="basis-1/2"

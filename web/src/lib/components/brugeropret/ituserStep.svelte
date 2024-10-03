@@ -15,6 +15,8 @@
   import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
   import { getClassUuidByUserKey } from "$lib/util/get_classes"
   import { getITSystemNames, type UnpackedClass } from "$lib/util/helpers"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
   import { env } from "$env/dynamic/public"
@@ -58,9 +60,24 @@
       }
     }
   `
+
+  const fromDate = field("from", "", [required()])
+  const itSystemField = field("it_system", "", [required()])
+  const accountName = field("accountName", "", [required()])
+  const svelteForm = form(fromDate, itSystemField, accountName)
+
+  const validateForm = async () => {
+    await svelteForm.validate()
+    if ($svelteForm.valid) {
+      ituserInfo.isValid(true)
+      step.updateStep("inc")
+    } else {
+      ituserInfo.isValid(false)
+    }
+  }
 </script>
 
-<form on:submit|preventDefault={() => step.updateStep("inc")}>
+<form on:submit|preventDefault={async () => await validateForm()}>
   {#await graphQLClient().request( ItSystemsAndPrimaryDocument, { uuid: $page.params.uuid, primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary", currentDate: $date } )}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -85,6 +102,8 @@
           <DateInput
             startValue={$date}
             bind:value={$ituserInfo.fromDate}
+            bind:validationValue={$fromDate.value}
+            errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
             required={true}
@@ -100,12 +119,16 @@
             title={capital($_("it_system"))}
             id="it-system"
             bind:value={$ituserInfo.itSystem}
+            bind:name={$itSystemField.value}
+            errors={$itSystemField.errors}
             iterable={getITSystemNames(itSystems)}
             extra_classes="basis-1/2"
             required={true}
           />
           <Input
             bind:value={$ituserInfo.userkey}
+            bind:cprName={$accountName.value}
+            errors={$accountName.errors}
             extra_classes="basis-1/2"
             title={capital($_("account_name"))}
             id="account-name"

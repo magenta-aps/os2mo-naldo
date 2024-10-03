@@ -6,8 +6,9 @@
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import { form, field } from "svelte-forms"
-  import { required, pattern, min } from "svelte-forms/validators"
+  import { required, pattern } from "svelte-forms/validators"
   import CprLookup from "$lib/components/CPRLookup.svelte"
+  import CPRInput from "$lib/components/brugeropret/CPRInput.svelte"
   import { graphQLClient } from "$lib/util/http"
   import { GetSpConfigDocument } from "./query.generated"
   import { gql } from "graphql-request"
@@ -50,7 +51,7 @@
     }
   }
 
-  // TODO: Add error-handling
+  // TODO: FIX inputs - not working perfectly.
 </script>
 
 <form on:submit|preventDefault={async () => await validateForm()}>
@@ -132,16 +133,17 @@
         {:else}
           <!-- FIXME: Doesn't work correctly -->
           <!-- Hard to support both SP and no SP in a smart way, when we need to store the data -->
-          <Input
+          <CPRInput
             title={capital($_("cpr_number"))}
             id="cpr-number"
-            bind:cprName={$cprNumber.value}
+            bind:value={$employeeInfo.cprNumber}
+            bind:cprNumber={$cprNumber.value}
             errors={$cprNumber.errors}
             required={true}
           />
           <div class="flex flex-row gap-6">
             <Input
-              title={capital($_("givenname", { values: { n: 2 } }))}
+              title={capital($_("givennameasd", { values: { n: 2 } }))}
               id="first-name"
               bind:value={$employeeInfo.firstName}
               bind:cprName={$firstName.value}

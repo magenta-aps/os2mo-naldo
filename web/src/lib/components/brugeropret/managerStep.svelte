@@ -11,6 +11,8 @@
   import { ManagerFacetsDocument } from "./query.generated"
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import { form, field } from "svelte-forms"
+  import { required } from "svelte-forms/validators"
   import Search from "$lib/components/Search.svelte"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
@@ -35,9 +37,32 @@
       }
     }
   `
+
+  const fromDate = field("from", "", [required()])
+  const orgUnit = field("org_unit", "", [required()])
+  const managerType = field("manager_type", "", [required()])
+  const managerLevel = field("manager_level", "", [required()])
+  const responsibilities = field("responsibilities", undefined, [required()])
+  const svelteForm = form(
+    fromDate,
+    orgUnit,
+    managerType,
+    managerLevel,
+    responsibilities
+  )
+
+  const validateForm = async () => {
+    await svelteForm.validate()
+    if ($svelteForm.valid) {
+      managerInfo.isValid(true)
+      step.updateStep("inc")
+    } else {
+      managerInfo.isValid(false)
+    }
+  }
 </script>
 
-<form on:submit|preventDefault={() => step.updateStep("inc")}>
+<form on:submit|preventDefault={async () => await validateForm()}>
   {#await graphQLClient().request(ManagerFacetsDocument, { currentDate: $date })}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -62,6 +87,8 @@
           <DateInput
             startValue={$date}
             bind:value={$managerInfo.fromDate}
+            bind:validationValue={$fromDate.value}
+            errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
             required={true}
@@ -75,7 +102,9 @@
         <Search
           type="org-unit"
           bind:value={$managerInfo.orgUnit}
-          on:clear={() => ($managerInfo.orgUnit = { uuid: "", name: "" })}
+          on:clear={() => ($orgUnit.value = "")}
+          bind:name={$orgUnit.value}
+          errors={$orgUnit.errors}
           required={true}
         />
         <Breadcrumbs orgUnit={$managerInfo.orgUnit} />
@@ -84,6 +113,8 @@
             title={capital($_("manager_type"))}
             id="manager-type"
             bind:value={$managerInfo.managerType}
+            bind:name={$managerType.value}
+            errors={$managerType.errors}
             iterable={getClassesByFacetUserKey(facets, "manager_type")}
             extra_classes="basis-1/2"
             required={true}
@@ -92,6 +123,8 @@
             title={capital($_("manager_level"))}
             id="manager-level"
             bind:value={$managerInfo.managerLevel}
+            bind:name={$managerLevel.value}
+            errors={$managerLevel.errors}
             iterable={getClassesByFacetUserKey(facets, "manager_level")}
             extra_classes="basis-1/2"
             required={true}
@@ -99,8 +132,9 @@
         </div>
         <SelectMultiple
           bind:value={$managerInfo.responsibilities}
-          on:clear={() =>
-            ($managerInfo.responsibilities = [{ uuid: "", name: "", userkey: "" }])}
+          bind:name={$responsibilities.value}
+          errors={$responsibilities.errors}
+          on:clear={() => ($responsibilities.value = undefined)}
           title={capital($_("manager_responsibility"))}
           id="responsibility"
           iterable={getClassesByFacetUserKey(facets, "responsibility")}
