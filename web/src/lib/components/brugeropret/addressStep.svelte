@@ -37,12 +37,16 @@
     }
   `
 
+  const fromDate = field("from", "", [required()])
+  const addressTypeField = field("address_type", "", [required()])
   let addressField = field("", "")
-  $: svelteForm = form(addressField)
+  $: svelteForm = form(fromDate, addressTypeField, addressField)
 
-  $: addressTypeUuid = $addressInfo.addressType?.uuid
+  // Reactive statement for $addressInfo.addressType?.name, since calling the store, will override it
+  // and therefore rerun the switch-statement and empty the list of errors.
+  $: addressTypeName = $addressInfo.addressType?.name
 
-  $: switch ($addressInfo.addressType?.name) {
+  $: switch (addressTypeName) {
     case Addresses.EMAIL:
       addressField = field(Addresses.EMAIL, "", [required(), email()])
       break
@@ -59,9 +63,19 @@
     default:
       break
   }
+
+  const validateForm = async () => {
+    await svelteForm.validate()
+    if ($svelteForm.valid) {
+      addressInfo.isValid(true)
+      step.updateStep("inc")
+    } else {
+      addressInfo.isValid(false)
+    }
+  }
 </script>
 
-<form on:submit|preventDefault={() => step.updateStep("inc")}>
+<form on:submit|preventDefault={async () => await validateForm()}>
   {#await graphQLClient().request(AddressFacetsDocument, { currentDate: $date })}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -84,6 +98,8 @@
           <DateInput
             startValue={$date}
             bind:value={$addressInfo.fromDate}
+            bind:validationValue={$fromDate.value}
+            errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
             required={true}
@@ -107,11 +123,12 @@
             title={capital($_("address_type"))}
             id="address-type"
             bind:value={$addressInfo.addressType}
+            bind:name={$addressTypeField.value}
+            errors={$addressTypeField.errors}
             iterable={getClassesByFacetUserKey(facets, "employee_address_type")}
             extra_classes="basis-1/2"
             required={true}
           />
-          <input hidden name="address-type-uuid" bind:value={addressTypeUuid} />
         </div>
         <Input title={capital($_("description"))} id="user-key" />
         <!-- FIXME: Translate address_types -->
@@ -121,7 +138,8 @@
               title={$addressInfo.addressType.name}
               id="value"
               bind:darName={$addressInfo.addressValue}
-              bind:errors={$addressField.errors}
+              bind:validationValue={$addressField.value}
+              errors={$addressField.errors}
               required={true}
             />
           {:else}
@@ -129,7 +147,8 @@
               title={$addressInfo.addressType.name}
               id="value"
               bind:value={$addressInfo.addressValue}
-              bind:errors={$addressField.errors}
+              bind:cprName={$addressField.value}
+              errors={$addressField.errors}
               required={true}
             />
           {/if}
