@@ -6,14 +6,20 @@
   import { MOConfig } from "$lib/stores/config"
   import { OrgTab, EmployeeTab } from "$lib/stores/tab"
   import { env } from "$env/dynamic/public"
+  import { employeeInfo } from "$lib/stores/employeeInfoStore"
+  import { engagementInfo } from "$lib/stores/engagementInfoStore"
+  import { ituserInfo } from "$lib/stores/ituserInfoStore"
+  import { managerInfo } from "$lib/stores/managerInfoStore"
+  import { addressInfo } from "$lib/stores/addressInfoStore"
 
-  // Change these
-  let items = [
-    { name: "Opret medarbejder", count: 1 },
-    { name: "Opret engagement", count: 2 },
-    { name: "Opret IT-bruger", count: 3 },
-    { name: "Opret manager", count: 4 },
-    { name: "Opret adresse", count: 5 },
+  // IDK about this
+  $: items = [
+    { name: "Opret medarbejder", count: 1, valid: $employeeInfo.validated },
+    { name: "Opret engagement", count: 2, valid: $engagementInfo.validated },
+    { name: "Opret IT-bruger", count: 3, valid: $ituserInfo.validated },
+    { name: "Opret manager", count: 4, valid: $managerInfo.validated },
+    { name: "Opret adresse", count: 5, valid: $addressInfo.validated },
+    { name: "Opsummering", count: 6, valid: false },
   ]
 </script>
 
@@ -25,6 +31,7 @@
         {item.count === $step ? 'tab-active text-primary' : 'text-secondary'}"
       on:click={() => step.updateStep(item.count)}
     >
+      {item.valid ? "✓" : ""}
       {`${item.count}. ${capital($_(item.name))}`}
     </button>
   {/each}

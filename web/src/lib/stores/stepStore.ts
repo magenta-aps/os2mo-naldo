@@ -14,7 +14,7 @@ const createStepStore = () => {
   const updateStep = (action: "inc" | "dec" | "res" | number) =>
     update((step) => {
       const newStep =
-        action === "inc" && step < 5
+        action === "inc" && step < 6
           ? step + 1
           : action === "dec" && step > 1
           ? step - 1
