@@ -8,6 +8,7 @@
   import ManagerStep from "$lib/components/brugeropret/managerStep.svelte"
   import AddressStep from "$lib/components/brugeropret/addressStep.svelte"
   import Stepper from "$lib/components/brugeropret/Stepper.svelte"
+  import SummaryStep from "$lib/components/brugeropret/SummaryStep.svelte"
 </script>
 
 <div class="flex align-center px-6 pt-6 pb-4">
@@ -32,6 +33,8 @@
       <ManagerStep />
     {:else if $step === 5}
       <AddressStep />
+    {:else if $step === 6}
+      <SummaryStep />
     {/if}
   </div>
 </div>

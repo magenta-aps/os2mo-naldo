@@ -130,9 +130,13 @@
             required={true}
           />
         </div>
-        <Input title={capital($_("description"))} id="user-key" />
+        <Input
+          title={capital($_("description"))}
+          id="user-key"
+          bind:value={$addressInfo.userkey}
+        />
         <!-- FIXME: Translate address_types -->
-        {#if $addressInfo.addressType}
+        {#if $addressInfo.addressType.scope}
           {#if $addressInfo.addressType.scope === "DAR"}
             <DarSearch
               title={$addressInfo.addressType.name}
