@@ -27,9 +27,6 @@
 
   // This is only for the name inputs in create employee
   $: cprName = value
-  $: {
-    console.log(errors)
-  }
 </script>
 
 <div class="form-control pb-3 {extra_classes}">

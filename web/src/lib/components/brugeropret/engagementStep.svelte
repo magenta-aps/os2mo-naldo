@@ -154,6 +154,13 @@
       >
         {capital($_("back"))}
       </button>
+      <button
+        type="button"
+        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+        on:click={() => step.updateStep("inc")}
+      >
+        {capital($_("skip"))}
+      </button>
     </div>
     <Error />
   {/await}
