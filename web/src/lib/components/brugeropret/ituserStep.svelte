@@ -151,7 +151,11 @@
           id="non-primary"
           value={getClassUuidByUserKey(classes, "non-primary")}
         />
-        <TextArea title={capital($_("notes"))} id="notes" />
+        <TextArea
+          title={capital($_("notes"))}
+          id="notes"
+          bind:value={$ituserInfo.notes}
+        />
         <!-- <div class="divider p-0 m-0 mb-4 w-full" />
         <h4>{capital($_("rolebinding", { values: { n: 1 } }))}</h4>
         <div class="flex flex-row gap-6">
