@@ -9,6 +9,7 @@
   export let value: DarAddressResponse | undefined = startValue || undefined
   export let title: string
   export let darName: string | undefined | null = undefined
+  export let validationValue: string | undefined | null = undefined
   export let id = `value`
   export let required = true
   export let disabled = false
@@ -17,6 +18,7 @@
   // :(
   $: if (value?.tekst) {
     darName = value.tekst
+    validationValue = value.tekst
   }
 
   const itemId = "tekst" // Used by the component to differentiate between items
