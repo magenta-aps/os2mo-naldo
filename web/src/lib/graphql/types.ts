@@ -7173,6 +7173,8 @@ export type Mutation = {
   address_terminate: AddressResponse;
   /** Updates an address. */
   address_update: AddressResponse;
+  /** Creates a list of address. */
+  addresses_create: Array<AddressResponse>;
   /** Creates an association. */
   association_create: AssociationResponse;
   /** Refresh associations. */
@@ -7262,6 +7264,8 @@ export type Mutation = {
   engagement_terminate: EngagementResponse;
   /** Updates an engagement. */
   engagement_update: EngagementResponse;
+  /** Creates a list of engagements. */
+  engagements_create: Array<EngagementResponse>;
   /** Creates a facet. */
   facet_create: FacetResponse;
   /**
@@ -7349,6 +7353,8 @@ export type Mutation = {
   ituser_terminate: ItUserResponse;
   /** Updates an IT-User. */
   ituser_update: ItUserResponse;
+  /** Creates a list of itusers. */
+  itusers_create: Array<ItUserResponse>;
   /** Creates a KLE annotation. */
   kle_create: KleResponse;
   /** Refresh KLEs. */
@@ -7373,6 +7379,8 @@ export type Mutation = {
   manager_terminate: ManagerResponse;
   /** Updates a manager relation. */
   manager_update: ManagerResponse;
+  /** Creates a list of managers. */
+  managers_create: Array<ManagerResponse>;
   /**
    * Creates the root-organisation.
    * @deprecated The root organisation concept will be removed in a future version of OS2mo.
@@ -7503,6 +7511,18 @@ export type MutationAddress_TerminateArgs = {
  */
 export type MutationAddress_UpdateArgs = {
   input: AddressUpdateInput;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationAddresses_CreateArgs = {
+  input: Array<AddressCreateInput>;
 };
 
 
@@ -7757,6 +7777,18 @@ export type MutationEngagement_UpdateArgs = {
  * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
  *
  */
+export type MutationEngagements_CreateArgs = {
+  input: Array<EngagementCreateInput>;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationFacet_CreateArgs = {
   input: FacetCreateInput;
 };
@@ -7985,6 +8017,18 @@ export type MutationItuser_UpdateArgs = {
  * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
  *
  */
+export type MutationItusers_CreateArgs = {
+  input: Array<ItUserCreateInput>;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationKle_CreateArgs = {
   input: KleCreateInput;
 };
@@ -8131,6 +8175,18 @@ export type MutationManager_TerminateArgs = {
  */
 export type MutationManager_UpdateArgs = {
   input: ManagerUpdateInput;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationManagers_CreateArgs = {
+  input: Array<ManagerCreateInput>;
 };
 
 
