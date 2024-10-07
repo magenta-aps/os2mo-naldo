@@ -9,20 +9,34 @@
   Cpr?
   <dl class="grid gap-1">
     <div class="grid grid-cols-2">
+      <dt>{capital($_("cpr_number"))}:</dt>
+      {#if $employeeInfo.validated === true}
+        <dd>{$employeeInfo.cprNumber.cpr_no.trim().slice(0, 6)}</dd>
+      {/if}
+    </div>
+    <div class="grid grid-cols-2">
       <dt>{capital($_("givenname", { values: { n: 2 } }))}:</dt>
-      <dd>{$employeeInfo.firstName}</dd>
+      {#if $employeeInfo.validated === true}
+        <dd>{$employeeInfo.firstName}</dd>
+      {/if}
     </div>
     <div class="grid grid-cols-2">
       <dt>{capital($_("surname", { values: { n: 2 } }))}:</dt>
-      <dd>{$employeeInfo.lastName}</dd>
+      {#if $employeeInfo.validated === true}
+        <dd>{$employeeInfo.lastName}</dd>
+      {/if}
     </div>
     <div class="grid grid-cols-2">
       <dt>{capital($_("nickname_givenname", { values: { n: 2 } }))}:</dt>
-      <dd>{$employeeInfo.nicknameFirstname}</dd>
+      {#if $employeeInfo.validated === true}
+        <dd>{$employeeInfo.nicknameFirstname}</dd>
+      {/if}
     </div>
     <div class="grid grid-cols-2">
       <dt>{capital($_("nickname_surname", { values: { n: 2 } }))}:</dt>
-      <dd>{$employeeInfo.nicknameLastname}</dd>
+      {#if $employeeInfo.validated === true}
+        <dd>{$employeeInfo.nicknameLastname}</dd>
+      {/if}
     </div>
   </dl>
 </div>
