@@ -30,7 +30,6 @@
     <div class="grid grid-cols-2">
       <dt>{capital($_($addressInfo.addressType.name))}:</dt>
       <dd>{$addressInfo.addressValue}</dd>
-      {console.log($addressInfo.addressValue)}
     </div>
   </dl>
 </div>
