@@ -9,27 +9,39 @@
   <dl class="grid gap-1">
     <div class="grid grid-cols-2">
       <dt>{capital($_("date.start_date"))}:</dt>
-      <dd>{$addressInfo.fromDate}</dd>
+      {#if $addressInfo.validated === true}
+        <dd>{$addressInfo.fromDate}</dd>
+      {/if}
     </div>
     <div class="grid grid-cols-2">
       <dt>{capital($_("date.end_date"))}:</dt>
-      <dd>{$addressInfo.toDate}</dd>
+      {#if $addressInfo.validated === true}
+        <dd>{$addressInfo.toDate}</dd>
+      {/if}
     </div>
     <div class="grid grid-cols-2">
       <dt>{capital($_("visibility"))}:</dt>
-      <dd>{$addressInfo.visibility?.name ? $addressInfo.visibility.name : ""}</dd>
+      {#if $addressInfo.validated === true}
+        <dd>{$addressInfo.visibility?.name ? $addressInfo.visibility.name : ""}</dd>
+      {/if}
     </div>
     <div class="grid grid-cols-2">
       <dt>{capital($_("description"))}:</dt>
-      <dd>{$addressInfo.userkey ? $addressInfo.userkey : ""}</dd>
+      {#if $addressInfo.validated === true}
+        <dd>{$addressInfo.userkey ? $addressInfo.userkey : ""}</dd>
+      {/if}
     </div>
     <div class="grid grid-cols-2">
       <dt>{capital($_("address_type"))}:</dt>
-      <dd>{$addressInfo.addressType.name ? $addressInfo.addressType.name : ""}</dd>
+      {#if $addressInfo.validated === true}
+        <dd>{$addressInfo.addressType.name ? $addressInfo.addressType.name : ""}</dd>
+      {/if}
     </div>
     <div class="grid grid-cols-2">
       <dt>{capital($_($addressInfo.addressType.name))}:</dt>
-      <dd>{$addressInfo.addressValue}</dd>
+      {#if $addressInfo.validated === true}
+        <dd>{$addressInfo.addressValue}</dd>
+      {/if}
     </div>
   </dl>
 </div>
