@@ -6,10 +6,9 @@ type AddressInfo = {
   fromDate: string
   toDate: string
   visibility: { uuid: string; name: string; userkey: string } | undefined
-  addressType:
-    | { uuid: string; name: string; userkey: string; scope: string }
-    | undefined
+  addressType: { uuid: string; name: string; userkey: string; scope: string }
   addressValue: string
+  userkey: string
   validated: boolean
 }
 
@@ -18,8 +17,9 @@ const defaultValue: AddressInfo = {
   fromDate: "",
   toDate: "",
   visibility: undefined,
-  addressType: undefined,
+  addressType: { uuid: "", name: "", userkey: "", scope: "" },
   addressValue: "",
+  userkey: "",
   validated: false,
 }
 

@@ -7,7 +7,7 @@ type ItUserInfo = {
   toDate: string
   itSystem: { uuid: string; name: string }
   userkey: string
-  ituserType: { uuid: string; name: string; userkey: string }
+  notes: string
   primary: string
   validated: boolean
 }
@@ -18,7 +18,7 @@ const defaultValue: ItUserInfo = {
   toDate: "",
   itSystem: { uuid: "", name: "" },
   userkey: "",
-  ituserType: { uuid: "", name: "", userkey: "" },
+  notes: "",
   primary: "",
   validated: false,
 }
