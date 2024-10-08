@@ -2,13 +2,13 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import { step } from "$lib/stores/stepStore"
-  import EmployeeStep from "$lib/components/brugeropret/employeeStep.svelte"
-  import EngagementStep from "$lib/components/brugeropret/engagementStep.svelte"
-  import ItUserStep from "$lib/components/brugeropret/ituserStep.svelte"
-  import ManagerStep from "$lib/components/brugeropret/managerStep.svelte"
-  import AddressStep from "$lib/components/brugeropret/addressStep.svelte"
-  import Stepper from "$lib/components/brugeropret/Stepper.svelte"
-  import SummaryStep from "$lib/components/brugeropret/SummaryStep.svelte"
+  import EmployeeStep from "$lib/components/userflow/EmployeeStep.svelte"
+  import EngagementStep from "$lib/components/userflow/EngagementStep.svelte"
+  import ItUserStep from "$lib/components/userflow/ItuserStep.svelte"
+  import ManagerStep from "$lib/components/userflow/ManagerStep.svelte"
+  import AddressStep from "$lib/components/userflow/AddressStep.svelte"
+  import Stepper from "$lib/components/userflow/Stepper.svelte"
+  import SummaryStep from "$lib/components/userflow/SummaryStep.svelte"
 </script>
 
 <div class="flex align-center px-6 pt-6 pb-4">
