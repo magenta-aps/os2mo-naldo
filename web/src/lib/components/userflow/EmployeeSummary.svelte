@@ -6,7 +6,6 @@
 
 <div>
   <h2 class="pb-2">{capital($_("employee", { values: { n: 1 } }))}</h2>
-  Cpr?
   <dl class="grid gap-1">
     <div class="grid grid-cols-2">
       <dt>{capital($_("cpr_number"))}:</dt>

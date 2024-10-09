@@ -143,6 +143,11 @@
     <ItUserSummary />
     <ManagerSummary />
     <AddressSummary />
-    <button on:click={submitData} class="btn btn-primary">Submit</button>
+    <button
+      on:click={submitData}
+      disabled={!$employeeInfo.validated}
+      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+      >Submit</button
+    >
   </div>
 </div>
