@@ -10,12 +10,42 @@
 
   // IDK about this
   $: items = [
-    { name: "Opret medarbejder*", count: 1, valid: $employeeInfo.validated },
-    { name: "Opret engagement", count: 2, valid: $engagementInfo.validated },
-    { name: "Opret IT-bruger", count: 3, valid: $ituserInfo.validated },
-    { name: "Opret manager", count: 4, valid: $managerInfo.validated },
-    { name: "Opret adresse", count: 5, valid: $addressInfo.validated },
-    { name: "Opsummering", count: 6, valid: false },
+    {
+      name: `${capital(
+        $_("create_item", { values: { item: $_("employee", { values: { n: 1 } }) } })
+      )}*`,
+      count: 1,
+      valid: $employeeInfo.validated,
+    },
+    {
+      name: `${capital(
+        $_("create_item", { values: { item: $_("engagement", { values: { n: 1 } }) } })
+      )}`,
+      count: 2,
+      valid: $engagementInfo.validated,
+    },
+    {
+      name: `${capital(
+        $_("create_item", { values: { item: $_("ituser", { values: { n: 1 } }) } })
+      )}`,
+      count: 3,
+      valid: $ituserInfo.validated,
+    },
+    {
+      name: `${capital(
+        $_("create_item", { values: { item: $_("manager", { values: { n: 1 } }) } })
+      )}`,
+      count: 4,
+      valid: $managerInfo.validated,
+    },
+    {
+      name: `${capital(
+        $_("create_item", { values: { item: $_("address", { values: { n: 1 } }) } })
+      )}`,
+      count: 5,
+      valid: $addressInfo.validated,
+    },
+    { name: `${capital($_("summary"))}`, count: 6, valid: false },
   ]
 </script>
 
