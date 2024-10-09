@@ -10,7 +10,7 @@
 
   // IDK about this
   $: items = [
-    { name: "Opret medarbejder", count: 1, valid: $employeeInfo.validated },
+    { name: "Opret medarbejder*", count: 1, valid: $employeeInfo.validated },
     { name: "Opret engagement", count: 2, valid: $engagementInfo.validated },
     { name: "Opret IT-bruger", count: 3, valid: $ituserInfo.validated },
     { name: "Opret manager", count: 4, valid: $managerInfo.validated },
@@ -25,7 +25,13 @@
       data-sveltekit-replacestate
       class="tab text-base hover:no-underline
         {item.count === $step ? 'tab-active text-primary' : 'text-secondary'}"
-      on:click={() => step.updateStep(item.count)}
+      on:click={() => {
+        if (item.count === 1) {
+          step.updateStep(item.count)
+        } else if ($employeeInfo.validated === true) {
+          step.updateStep(item.count)
+        }
+      }}
     >
       {item.valid ? "✓" : ""}
       {`${item.count}. ${capital($_(item.name))}`}

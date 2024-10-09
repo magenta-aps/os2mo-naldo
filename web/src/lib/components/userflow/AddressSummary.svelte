@@ -38,8 +38,8 @@
       {/if}
     </div>
     <div class="grid grid-cols-2">
-      <dt>{capital($_($addressInfo.addressType.name))}:</dt>
       {#if $addressInfo.validated === true}
+        <dt>{capital($_($addressInfo.addressType.name))}:</dt>
         <dd>{$addressInfo.addressValue}</dd>
       {/if}
     </div>
