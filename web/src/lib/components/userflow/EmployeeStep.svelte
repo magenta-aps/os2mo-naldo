@@ -26,17 +26,19 @@
   `
 
   $: {
-    $employeeInfo.firstName = $employeeInfo.cprNumber?.name
-      ?.split(" ")
-      .slice(0, -1)
-      .join(" ")
-    $employeeInfo.lastName = $employeeInfo.cprNumber?.name
-      ?.split(" ")
-      .slice(-1)
-      .join(" ")
+    const name = $employeeInfo.cprNumber?.name
+    // :peepocry:
+
+    if (name && name.trim() !== "") {
+      $employeeInfo.firstName = name.split(" ").slice(0, -1).join(" ")
+      $employeeInfo.lastName = name.split(" ").slice(-1).join(" ")
+    }
   }
 
-  const cprNumber = field("cpr_number", "", [required(), pattern(/^\d{6}\d{4}$/)])
+  const cprNumber = field("cpr_number", undefined, [
+    required(),
+    pattern(/^\d{6}\d{4}$/),
+  ])
   const firstName = field("first_name", "", [required()])
   const lastName = field("last_name", "", [required()])
   const svelteForm = form(cprNumber, firstName, lastName)

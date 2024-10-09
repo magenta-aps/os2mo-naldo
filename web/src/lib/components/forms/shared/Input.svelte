@@ -25,6 +25,9 @@
     node.type = type
   }
 
+  $: console.log(value)
+  $: console.log(cprName)
+
   // This is only for the name inputs in create employee
   $: cprName = value
 </script>
