@@ -1,5 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import Icon from "@iconify/svelte"
   import infoOutlineRounded from "@iconify/icons-material-symbols/info-outline-rounded"
 
@@ -10,7 +11,6 @@
   export let value: CprLookupResponse | undefined | null = undefined
   export let cprNumber: string | number | null | undefined = undefined
   export let required = false
-  export let placeholder: string | undefined = undefined
   export let type = "text"
   export let disabled = false
   export let pattern: string | undefined = undefined
@@ -47,8 +47,8 @@
       {pattern}
       {id}
       {name}
-      {placeholder}
-      bind:value
+      placeholder={capital($_("enter_cpr"))}
+      bind:value={cprNumber}
       type="text"
       class="input input-bordered input-{size} rounded text-base font-normal w-full focus:outline-0
         {errors.length ? 'input-error' : 'focus:input-primary'}"
