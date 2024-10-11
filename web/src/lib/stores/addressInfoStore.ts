@@ -7,7 +7,9 @@ type AddressInfo = {
   toDate: string
   visibility: { uuid: string; name: string; userkey: string } | undefined
   addressType: { uuid: string; name: string; userkey: string; scope: string }
-  addressValue: string
+  // adressValue should handle DAR addresses better - right now it's just a string meaning value or ID.
+  // ID is useless when showing in Summary, since it's a UUID.
+  addressValue: { name?: string; value: string } | string
   userkey: string
   validated: boolean
 }
@@ -18,7 +20,7 @@ const defaultValue: AddressInfo = {
   toDate: "",
   visibility: undefined,
   addressType: { uuid: "", name: "", userkey: "", scope: "" },
-  addressValue: "",
+  addressValue: { name: undefined, value: "" },
   userkey: "",
   validated: false,
 }

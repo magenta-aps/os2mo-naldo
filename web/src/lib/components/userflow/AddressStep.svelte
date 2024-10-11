@@ -13,6 +13,7 @@
   import { date } from "$lib/stores/date"
   import { form, field } from "svelte-forms"
   import { required, email, pattern } from "svelte-forms/validators"
+  import AddressInput from "$lib/components/userflow/AddressInput.svelte"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import DarSearch from "$lib/components/DARSearch.svelte"
   import { Addresses } from "$lib/util/addresses"
@@ -125,6 +126,7 @@
             bind:value={$addressInfo.addressType}
             bind:name={$addressTypeField.value}
             errors={$addressTypeField.errors}
+            on:change={() => ($addressInfo.addressValue = "")}
             iterable={getClassesByFacetUserKey(facets, "employee_address_type")}
             extra_classes="basis-1/2"
             required={true}
@@ -141,17 +143,24 @@
             <DarSearch
               title={$addressInfo.addressType.name}
               id="value"
-              bind:darName={$addressInfo.addressValue}
-              bind:validationValue={$addressField.value}
+              startValue={typeof $addressInfo.addressValue === "object"
+                ? {
+                    tekst: $addressInfo.addressValue.name,
+                    adresse: { id: $addressInfo.addressValue.value },
+                    adgangsadresse: { id: $addressInfo.addressValue.value },
+                  }
+                : undefined}
+              bind:darValue={$addressInfo.addressValue}
+              bind:darName={$addressField.value}
               errors={$addressField.errors}
               required={true}
             />
           {:else}
-            <Input
+            <AddressInput
               title={$addressInfo.addressType.name}
               id="value"
               bind:value={$addressInfo.addressValue}
-              bind:cprName={$addressField.value}
+              bind:validationField={$addressField.value}
               errors={$addressField.errors}
               required={true}
             />

@@ -71,6 +71,7 @@
           org_unit: $engagementInfo.orgUnit?.uuid,
           engagement_type: $engagementInfo.engagementType.uuid,
           job_function: $engagementInfo.jobFunction.uuid,
+          primary: $engagementInfo.primary.uuid,
           validity: {
             from: $engagementInfo.fromDate,
             to: $engagementInfo.toDate ? $engagementInfo.toDate : null,
@@ -109,7 +110,10 @@
       ? {
           person: $employeeInfo.uuid,
           address_type: $addressInfo.addressType.uuid,
-          value: $addressInfo.addressValue,
+          value:
+            typeof $addressInfo.addressValue === "object"
+              ? $addressInfo.addressValue?.value
+              : $addressInfo.addressValue,
           user_key: $addressInfo.userkey,
           visibility: $addressInfo.visibility?.uuid,
           validity: {

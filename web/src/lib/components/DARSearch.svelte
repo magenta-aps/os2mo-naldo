@@ -3,26 +3,31 @@
   import { capital } from "$lib/util/translationUtils"
   import { env } from "$env/dynamic/public"
   import SvelteSelect from "svelte-select"
-  import DarItem from "./DARItem.svelte"
+  import DarItem from "$lib/components/DARItem.svelte"
 
   export let startValue: DarAddressResponse | undefined = undefined
   export let value: DarAddressResponse | undefined = startValue || undefined
   export let title: string
   export let darName: string | undefined | null = undefined
-  export let validationValue: string | undefined | null = undefined
+  export let darValue: { name?: string; value: string } | string = {
+    name: undefined,
+    value: "",
+  }
   export let id = `value`
   export let required = true
   export let disabled = false
   export let errors: string[] = []
 
-  // :(
-  $: if (value?.tekst) {
-    darName = value.tekst
-    validationValue = value.tekst
-  }
-
   const itemId = "tekst" // Used by the component to differentiate between items
   const url = env.PUBLIC_DAR_ACCESS_ADDRESSES ? "adgangsadresser" : "adresser"
+
+  $: if (value?.tekst) {
+    darName = value.tekst
+    darValue = {
+      name: value.tekst,
+      value: value.adgangsadresse?.id ? value.adgangsadresse.id : value.adresse.id,
+    }
+  }
 
   const fetchDAR = async (filterText: string) => {
     if (!filterText.length) return []
@@ -101,9 +106,9 @@
 </div>
 
 {#if value}
-  {#if env.PUBLIC_DAR_ACCESS_ADDRESSES}
+  {#if env.PUBLIC_DAR_ACCESS_ADDRESSES && "adgangsadresse" in value}
     <input hidden name={id} bind:value={value.adgangsadresse.id} />
-  {:else}
+  {:else if "adresse" in value}
     <input hidden name={id} bind:value={value.adresse.id} />
   {/if}
 {/if}
