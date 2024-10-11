@@ -55,6 +55,10 @@
       engagementInfo.isValid(false)
     }
   }
+
+  $: {
+    console.log($engagementInfo.primary)
+  }
 </script>
 
 <form on:submit|preventDefault={async () => await validateForm()}>
@@ -134,6 +138,7 @@
           <Select
             title={capital($_("primary"))}
             id="primary"
+            bind:value={$engagementInfo.primary}
             iterable={getClassesByFacetUserKey(facets, "primary_type")}
             extra_classes="basis-1/2"
             isClearable={true}

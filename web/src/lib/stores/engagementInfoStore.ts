@@ -9,7 +9,7 @@ type EngagementInfo = {
   userkey: string
   jobFunction: { uuid: string; name: string; userkey: string }
   engagementType: { uuid: string; name: string; userkey: string }
-  primary: string
+  primary: { uuid: string; name: string; userkey: string }
   validated: boolean
 }
 
@@ -21,7 +21,7 @@ const defaultValue: EngagementInfo = {
   userkey: "",
   jobFunction: { uuid: "", name: "", userkey: "" },
   engagementType: { uuid: "", name: "", userkey: "" },
-  primary: "",
+  primary: { uuid: "", name: "", userkey: "" },
   validated: false,
 }
 

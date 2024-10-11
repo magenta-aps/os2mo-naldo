@@ -46,7 +46,7 @@
     <div class="grid grid-cols-2">
       <dt>{capital($_("primary", { values: { n: 1 } }))}:</dt>
       {#if $engagementInfo.validated === true}
-        <dd>{$engagementInfo.primary ? $engagementInfo.primary : ""}</dd>
+        <dd>{$engagementInfo.primary ? $engagementInfo.primary.name : ""}</dd>
       {/if}
     </div>
   </dl>
