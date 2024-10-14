@@ -138,6 +138,7 @@
           bind:value={$addressInfo.userkey}
         />
         <!-- FIXME: Translate address_types -->
+        <!-- FIXME: When value is empty, this doesn't show placeholder -->
         {#if $addressInfo.addressType.scope}
           {#if $addressInfo.addressType.scope === "DAR"}
             <DarSearch

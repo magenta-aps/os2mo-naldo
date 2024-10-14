@@ -20,7 +20,7 @@ const defaultValue: AddressInfo = {
   toDate: "",
   visibility: undefined,
   addressType: { uuid: "", name: "", userkey: "", scope: "" },
-  addressValue: { name: undefined, value: "" },
+  addressValue: { name: "", value: "" },
   userkey: "",
   validated: false,
 }

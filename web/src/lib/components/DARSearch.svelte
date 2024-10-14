@@ -27,6 +27,8 @@
       name: value.tekst,
       value: value.adgangsadresse?.id ? value.adgangsadresse.id : value.adresse.id,
     }
+  } else {
+    value = undefined
   }
 
   const fetchDAR = async (filterText: string) => {
