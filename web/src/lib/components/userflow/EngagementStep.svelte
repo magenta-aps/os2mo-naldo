@@ -55,10 +55,6 @@
       engagementInfo.isValid(false)
     }
   }
-
-  $: {
-    console.log($engagementInfo.primary)
-  }
 </script>
 
 <form on:submit|preventDefault={async () => await validateForm()}>

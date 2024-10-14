@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n"
+  import { capital } from "$lib/util/translationUtils"
   import EmployeeSummary from "$lib/components/userflow/EmployeeSummary.svelte"
   import EngagementSummary from "$lib/components/userflow/EngagementSummary.svelte"
   import ItUserSummary from "$lib/components/userflow/ItUserSummary.svelte"
@@ -13,6 +15,9 @@
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
   import { gql } from "graphql-request"
+  import { page } from "$app/stores"
+  import Error from "$lib/components/alerts/Error.svelte"
+  import { success, error } from "$lib/stores/alert"
   import { employeeInfo } from "$lib/stores/employeeInfoStore"
   import { engagementInfo } from "$lib/stores/engagementInfoStore"
   import { addressInfo } from "$lib/stores/addressInfoStore"
@@ -34,6 +39,7 @@
       employee_create(input: $employeeInput) {
         current(at: $date) {
           uuid
+          name
         }
       }
       engagements_create(input: $engagementInput) {
@@ -130,7 +136,7 @@
 
     try {
       // Send mutation request
-      await graphQLClient().request(UserFlowCreateDocument, {
+      const mutation = await graphQLClient().request(UserFlowCreateDocument, {
         employeeInput: employeeData,
         engagementInput: engagementData,
         ituserInput: ituserData,
@@ -139,15 +145,25 @@
         date: $date,
       })
       // Create a reusable function for this, so it can be reused for a `clear` button.
+      $success = {
+        message: capital(
+          $_("success_create", {
+            values: {
+              name: mutation.employee_create.current?.name,
+            },
+          })
+        ),
+        uuid: mutation.employee_create.current?.uuid,
+        type: "employee",
+      }
       employeeInfo.reset()
       engagementInfo.reset()
       ituserInfo.reset()
       managerInfo.reset()
       addressInfo.reset()
       step.updateStep(1)
-      goto(`${base}/employee/${employeeUUID}`)
-    } catch (error) {
-      console.error("Error during mutation:", error)
+    } catch (err) {
+      $error = { message: err }
     }
   }
 </script>
@@ -165,5 +181,6 @@
       class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
       >Submit</button
     >
+    <Error />
   </div>
 </div>
