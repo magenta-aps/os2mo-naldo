@@ -9,6 +9,8 @@
   import type { ItUserCreateInput } from "$lib/graphql/types"
   import type { ManagerCreateInput } from "$lib/graphql/types"
   import type { AddressCreateInput } from "$lib/graphql/types"
+  import { goto } from "$app/navigation"
+  import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
   import { gql } from "graphql-request"
   import { employeeInfo } from "$lib/stores/employeeInfoStore"
@@ -18,6 +20,7 @@
   import { UserFlowCreateDocument } from "./query.generated"
   import { ituserInfo } from "$lib/stores/ituserInfoStore"
   import { managerInfo } from "$lib/stores/managerInfoStore"
+  import { step } from "$lib/stores/stepStore"
 
   gql`
     mutation UserFlowCreate(
@@ -57,8 +60,9 @@
   `
 
   const submitData = async () => {
+    const employeeUUID = $employeeInfo.uuid
     const employeeData: EmployeeCreateInput = {
-      uuid: $employeeInfo.uuid,
+      uuid: employeeUUID,
       cpr_number: $employeeInfo.cprNumber.cpr_no,
       given_name: $employeeInfo.firstName,
       surname: $employeeInfo.lastName,
@@ -67,7 +71,7 @@
     }
     const engagementData: EngagementCreateInput | [] = $engagementInfo.validated
       ? {
-          person: $employeeInfo.uuid,
+          person: employeeUUID,
           user_key: $engagementInfo.userkey,
           org_unit: $engagementInfo.orgUnit?.uuid,
           engagement_type: $engagementInfo.engagementType.uuid,
@@ -81,7 +85,7 @@
       : []
     const ituserData: ItUserCreateInput | [] = $ituserInfo.validated
       ? {
-          person: $employeeInfo.uuid,
+          person: employeeUUID,
           itsystem: $ituserInfo.itSystem.uuid,
           user_key: $ituserInfo.userkey,
           note: $ituserInfo.notes,
@@ -94,7 +98,7 @@
       : []
     const managerData: ManagerCreateInput | [] = $managerInfo.validated
       ? {
-          person: $employeeInfo.uuid,
+          person: employeeUUID,
           org_unit: $managerInfo.orgUnit?.uuid,
           manager_type: $managerInfo.managerType.uuid,
           manager_level: $managerInfo.managerLevel.uuid,
@@ -109,7 +113,7 @@
       : []
     const addressData: AddressCreateInput | [] = $addressInfo.validated
       ? {
-          person: $employeeInfo.uuid,
+          person: employeeUUID,
           address_type: $addressInfo.addressType.uuid,
           value:
             typeof $addressInfo.addressValue === "object"
@@ -126,7 +130,7 @@
 
     try {
       // Send mutation request
-      const response = await graphQLClient().request(UserFlowCreateDocument, {
+      await graphQLClient().request(UserFlowCreateDocument, {
         employeeInput: employeeData,
         engagementInput: engagementData,
         ituserInput: ituserData,
@@ -134,7 +138,14 @@
         addressInput: addressData,
         date: $date,
       })
-      console.log("Mutation response:", response)
+      // Create a reusable function for this, so it can be reused for a `clear` button.
+      employeeInfo.reset()
+      engagementInfo.reset()
+      ituserInfo.reset()
+      managerInfo.reset()
+      addressInfo.reset()
+      step.updateStep(1)
+      goto(`${base}/employee/${employeeUUID}`)
     } catch (error) {
       console.error("Error during mutation:", error)
     }
