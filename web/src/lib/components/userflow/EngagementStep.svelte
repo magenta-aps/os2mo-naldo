@@ -112,7 +112,12 @@
         />
         <Breadcrumbs orgUnit={$engagementInfo.orgUnit} />
         <div class="flex flex-row gap-6">
-          <Input title="ID" id="user-key" extra_classes="basis-1/2" />
+          <Input
+            title="ID"
+            id="user-key"
+            bind:value={$engagementInfo.userkey}
+            extra_classes="basis-1/2"
+          />
           <Select
             title={capital($_("job_function", { values: { n: 1 } }))}
             id="job-function"

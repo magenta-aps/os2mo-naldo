@@ -68,6 +68,7 @@
     const engagementData: EngagementCreateInput | [] = $engagementInfo.validated
       ? {
           person: $employeeInfo.uuid,
+          user_key: $engagementInfo.userkey,
           org_unit: $engagementInfo.orgUnit?.uuid,
           engagement_type: $engagementInfo.engagementType.uuid,
           job_function: $engagementInfo.jobFunction.uuid,
