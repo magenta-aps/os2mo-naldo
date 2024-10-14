@@ -231,6 +231,11 @@ export const formatQueryDates = (validity: Validity | OpenValidity): string => {
 
 // Setting `validities: any` to avoid having to create the types in `Search.svelte` by hand
 export const findClosestValidity = (validities: any, date: string) => {
+  // Return early if only 1 validity is present (this should always be the case, unless `PUBLIC_SEARCH_INFINITY: "true"`)
+  if (validities.length === 1) {
+    return validities[0]
+  }
+
   let closestValidity = null
   let closestDistance = Infinity // Initialize to a very large number
   const filterDate = parseISO(date)
