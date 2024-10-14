@@ -8,8 +8,11 @@
   export let size: string = "sm"
   export let id: string
   export let name: string = id
-  export let value: CprLookupResponse | undefined | null = undefined
-  export let cprNumber: string | number | null | undefined = undefined
+  export let startValue: string | null | undefined = undefined
+  export let value: string | null | undefined = undefined
+  value = startValue ? startValue : value
+  export let cprNumber: string | null | undefined = undefined
+  export let cprObject: CprLookupResponse | undefined | null = undefined
   export let required = false
   export let type = "text"
   export let disabled = false
@@ -23,8 +26,12 @@
     node.type = type
   }
 
-  $: if (value?.cpr_no) {
-    cprNumber = value.cpr_no
+  $: if (value) {
+    cprNumber = value
+    cprObject = {
+      name: "",
+      cpr_no: value,
+    }
   }
 </script>
 
@@ -48,7 +55,7 @@
       {id}
       {name}
       placeholder={capital($_("enter_cpr"))}
-      bind:value={cprNumber}
+      bind:value
       type="text"
       class="input input-bordered input-{size} rounded text-base font-normal w-full focus:outline-0
         {errors.length ? 'input-error' : 'focus:input-primary'}"

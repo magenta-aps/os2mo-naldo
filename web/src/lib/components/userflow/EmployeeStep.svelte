@@ -52,8 +52,6 @@
       employeeInfo.isValid(false)
     }
   }
-
-  // TODO: FIX inputs - not working perfectly.
 </script>
 
 <form on:submit|preventDefault={async () => await validateForm()}>
@@ -72,11 +70,9 @@
       </div>
     </div>
   {:then data}
-    <!-- LAV VALIDATION -->
     {@const SpEnabled = data.configuration.objects[0].jsonified_value === "true"}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
-        <!-- TODO: Support SP, like in `employee -> create` -->
         {#if SpEnabled}
           <CprLookup
             title={capital($_("cpr_number"))}
@@ -138,7 +134,8 @@
           <CPRInput
             title={capital($_("cpr_number"))}
             id="cpr-number"
-            bind:value={$employeeInfo.cprNumber}
+            startValue={$employeeInfo.cprNumber.cpr_no}
+            bind:cprObject={$employeeInfo.cprNumber}
             bind:cprNumber={$cprNumber.value}
             errors={$cprNumber.errors}
             required={true}
