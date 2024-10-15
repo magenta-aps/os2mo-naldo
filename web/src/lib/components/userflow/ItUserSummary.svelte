@@ -34,7 +34,7 @@
     <div class="grid grid-cols-2">
       <dt>{capital($_("primary"))}:</dt>
       {#if $ituserInfo.validated === true}
-        <dd>{$ituserInfo.primary ? $ituserInfo.primary : ""}</dd>
+        <dd>{$ituserInfo.primary ? $ituserInfo.primary.name : ""}</dd>
       {/if}
     </div>
     <div class="grid grid-cols-2">

@@ -95,7 +95,7 @@
           itsystem: $ituserInfo.itSystem.uuid,
           user_key: $ituserInfo.userkey,
           note: $ituserInfo.notes,
-          primary: $ituserInfo.primary ? $ituserInfo.primary : null,
+          primary: $ituserInfo.primary ? $ituserInfo.primary.uuid : null,
           validity: {
             from: $engagementInfo.fromDate,
             to: $engagementInfo.toDate ? $engagementInfo.toDate : null,

@@ -14,12 +14,14 @@
   import { date } from "$lib/stores/date"
   import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
   import { getClassUuidByUserKey } from "$lib/util/get_classes"
+  import { getClassByUserKey } from "$lib/util/get_classes"
   import { getITSystemNames, type UnpackedClass } from "$lib/util/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
   import { env } from "$env/dynamic/public"
+  import ItUserCheckbox from "./ItUserCheckbox.svelte"
 
   gql`
     query ItSystemsAndPrimary($primaryClass: String!, $currentDate: DateTime!) {
@@ -38,6 +40,7 @@
           validities {
             uuid
             user_key
+            name
           }
         }
       }
@@ -95,6 +98,10 @@
   {:then data}
     {@const itSystems = data.itsystems.objects}
     {@const classes = data.classes.objects}
+    {@const primaryClass = getClassByUserKey(
+      classes,
+      env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary"
+    )}
 
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -136,21 +143,20 @@
           />
         </div>
         <div class="flex">
-          <Checkbox
-            title={capital($_("primary"))}
+          <ItUserCheckbox
             id="primary"
-            value={getClassUuidByUserKey(
-              classes,
-              env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary"
-            )}
+            title={capital($_("primary"))}
+            startValue={$ituserInfo.primary.uuid}
+            value={primaryClass.uuid}
+            on:change={() => {
+              if ($ituserInfo.primary.uuid !== primaryClass.uuid) {
+                $ituserInfo.primary = primaryClass
+              } else {
+                $ituserInfo.primary = getClassByUserKey(classes, "non-primary")
+              }
+            }}
           />
         </div>
-        <input
-          hidden
-          name="non-primary"
-          id="non-primary"
-          value={getClassUuidByUserKey(classes, "non-primary")}
-        />
         <TextArea
           title={capital($_("notes"))}
           id="notes"
