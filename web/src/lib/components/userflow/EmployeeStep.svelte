@@ -46,7 +46,12 @@
   const lastName = field("last_name", "", [required()])
   const svelteForm = form(cprNumber, firstName, lastName)
 
-  const validateForm = async () => {
+  const validateOnFocusOut = async () => {
+    await svelteForm.validate()
+    employeeInfo.isValid($svelteForm.valid)
+  }
+
+  const validateOnFormSubmit = async () => {
     await svelteForm.validate()
     if ($svelteForm.valid) {
       employeeInfo.isValid(true)
@@ -57,7 +62,10 @@
   }
 </script>
 
-<form on:submit|preventDefault={async () => await validateForm()}>
+<form
+  on:submit|preventDefault={async () => await validateOnFormSubmit()}
+  on:focusout={async () => await validateOnFocusOut()}
+>
   {#await graphQLClient().request(GetSpConfigDocument)}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
