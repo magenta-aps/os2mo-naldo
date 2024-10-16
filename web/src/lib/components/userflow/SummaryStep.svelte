@@ -11,11 +11,8 @@
   import type { ItUserCreateInput } from "$lib/graphql/types"
   import type { ManagerCreateInput } from "$lib/graphql/types"
   import type { AddressCreateInput } from "$lib/graphql/types"
-  import { goto } from "$app/navigation"
-  import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
   import { gql } from "graphql-request"
-  import { page } from "$app/stores"
   import Error from "$lib/components/alerts/Error.svelte"
   import { success, error } from "$lib/stores/alert"
   import { employeeInfo } from "$lib/stores/employeeInfoStore"
@@ -26,6 +23,7 @@
   import { ituserInfo } from "$lib/stores/ituserInfoStore"
   import { managerInfo } from "$lib/stores/managerInfoStore"
   import { step } from "$lib/stores/stepStore"
+  import { resetStores } from "$lib/stores/resetStores"
 
   gql`
     mutation UserFlowCreate(
@@ -65,7 +63,7 @@
     }
   `
 
-  const submitData = async () => {
+  const submitForm = async () => {
     const employeeUUID = $employeeInfo.uuid
     const employeeData: EmployeeCreateInput = {
       uuid: employeeUUID,
@@ -135,7 +133,6 @@
       : []
 
     try {
-      // Send mutation request
       const mutation = await graphQLClient().request(UserFlowCreateDocument, {
         employeeInput: employeeData,
         engagementInput: engagementData,
@@ -144,7 +141,6 @@
         addressInput: addressData,
         date: $date,
       })
-      // Create a reusable function for this, so it can be reused for a `clear` button.
       $success = {
         message: capital(
           $_("success_create", {
@@ -156,11 +152,7 @@
         uuid: mutation.employee_create.current?.uuid,
         type: "employee",
       }
-      employeeInfo.reset()
-      engagementInfo.reset()
-      ituserInfo.reset()
-      managerInfo.reset()
-      addressInfo.reset()
+      resetStores([employeeInfo, engagementInfo, ituserInfo, managerInfo, addressInfo])
       step.updateStep(1)
     } catch (err) {
       $error = { message: err }
@@ -175,12 +167,13 @@
     <ItUserSummary />
     <ManagerSummary />
     <AddressSummary />
-    <button
-      on:click={submitData}
-      disabled={!$employeeInfo.validated}
-      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-      >Submit</button
-    >
-    <Error />
   </div>
 </div>
+<div class="flex py-6 gap-4">
+  <button
+    class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+    disabled={!$employeeInfo.validated}
+    on:click={submitForm}>{capital($_("submit"))}</button
+  >
+</div>
+<Error />

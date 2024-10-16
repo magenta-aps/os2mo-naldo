@@ -5,7 +5,7 @@
 </script>
 
 <div>
-  <h2 class="pb-2">{capital($_("engagement", { values: { n: 1 } }))}</h2>
+  <h3 class="pb-2 text-primary">{capital($_("engagement", { values: { n: 1 } }))}</h3>
   <dl class="grid gap-1">
     <div class="grid grid-cols-2">
       <dt>{capital($_("date.start_date"))}:</dt>

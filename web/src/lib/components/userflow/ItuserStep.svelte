@@ -12,8 +12,6 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
-  import { getClassUuidByUserKey } from "$lib/util/get_classes"
   import { getClassByUserKey } from "$lib/util/get_classes"
   import { getITSystemNames, type UnpackedClass } from "$lib/util/helpers"
   import { form, field } from "svelte-forms"
@@ -199,17 +197,17 @@
     </div>
     <div class="flex py-6 gap-4">
       <button
-        type="submit"
-        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >{capital($_("next"))}</button
-      >
-      <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
         on:click={() => step.updateStep("dec")}
       >
         {capital($_("back"))}
       </button>
+      <button
+        type="submit"
+        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+        >{capital($_("next"))}</button
+      >
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"

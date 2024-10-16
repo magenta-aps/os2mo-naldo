@@ -12,9 +12,7 @@
 </script>
 
 <div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">
-    {capital($_("flow"))}
-  </h3>
+  <h1 class="mb-4">{capital($_("userflow"))}</h1>
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />

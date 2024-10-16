@@ -27,11 +27,14 @@
 
   $: {
     const name = $employeeInfo.cprNumber?.name
-    // :peepocry:
 
     if (name && name.trim() !== "") {
       $employeeInfo.firstName = name.split(" ").slice(0, -1).join(" ")
       $employeeInfo.lastName = name.split(" ").slice(-1).join(" ")
+    } else if (name === undefined) {
+      // name should only be undefined when SP is enabled, therefore we can clear the names when this is true
+      $employeeInfo.firstName = ""
+      $employeeInfo.lastName = ""
     }
   }
 
@@ -129,8 +132,6 @@
             </div>
           {/if}
         {:else}
-          <!-- FIXME: Doesn't work correctly -->
-          <!-- Hard to support both SP and no SP in a smart way, when we need to store the data -->
           <CPRInput
             title={capital($_("cpr_number"))}
             id="cpr-number"
@@ -142,7 +143,7 @@
           />
           <div class="flex flex-row gap-6">
             <Input
-              title={capital($_("givennameasd", { values: { n: 2 } }))}
+              title={capital($_("givenname", { values: { n: 2 } }))}
               id="first-name"
               bind:value={$employeeInfo.firstName}
               bind:cprName={$firstName.value}

@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { _ } from "svelte-i18n"
-
   export let title: string | undefined = undefined
   export let id: string
   export let name: string = id
