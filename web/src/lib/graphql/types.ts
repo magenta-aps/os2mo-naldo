@@ -7414,6 +7414,8 @@ export type Mutation = {
   rolebinding_terminate: RoleBindingResponse;
   /** Update a rolebinding. */
   rolebinding_update: RoleBindingResponse;
+  /** Creates a list of rolebindings. */
+  rolebindings_create: Array<RoleBindingResponse>;
   /**
    * Upload a file.
    *
@@ -8383,6 +8385,18 @@ export type MutationRolebinding_TerminateArgs = {
  */
 export type MutationRolebinding_UpdateArgs = {
   input: RoleBindingUpdateInput;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationRolebindings_CreateArgs = {
+  input: Array<RoleBindingCreateInput>;
 };
 
 

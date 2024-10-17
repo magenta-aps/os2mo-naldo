@@ -2,7 +2,6 @@ import { browser } from "$app/environment"
 import { writable } from "svelte/store"
 
 type EngagementInfo = {
-  person: string
   fromDate: string
   toDate: string
   orgUnit: { uuid: string; name: string } | undefined
@@ -14,7 +13,6 @@ type EngagementInfo = {
 }
 
 const defaultValue: EngagementInfo = {
-  person: "", // Somehow get employeeInfoStore.uuid
   fromDate: "",
   toDate: "",
   orgUnit: undefined,

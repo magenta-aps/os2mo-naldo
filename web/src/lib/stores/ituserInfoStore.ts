@@ -1,8 +1,9 @@
 import { browser } from "$app/environment"
 import { writable } from "svelte/store"
+import { v4 as uuidv4 } from "uuid"
 
 type ItUserInfo = {
-  person: string
+  uuid: string
   fromDate: string
   toDate: string
   itSystem: { uuid: string; name: string }
@@ -13,7 +14,7 @@ type ItUserInfo = {
 }
 
 const defaultValue: ItUserInfo = {
-  person: "", // Somehow get employeeInfoStore.uuid
+  uuid: uuidv4(),
   fromDate: "",
   toDate: "",
   itSystem: { uuid: "", name: "" },

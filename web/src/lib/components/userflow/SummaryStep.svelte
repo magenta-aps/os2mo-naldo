@@ -4,11 +4,13 @@
   import EmployeeSummary from "$lib/components/userflow/EmployeeSummary.svelte"
   import EngagementSummary from "$lib/components/userflow/EngagementSummary.svelte"
   import ItUserSummary from "$lib/components/userflow/ItUserSummary.svelte"
+  import RolebindingSummary from "$lib/components/userflow/RolebindingSummary.svelte"
   import ManagerSummary from "$lib/components/userflow/ManagerSummary.svelte"
   import AddressSummary from "$lib/components/userflow/AddressSummary.svelte"
   import type { EmployeeCreateInput } from "$lib/graphql/types"
   import type { EngagementCreateInput } from "$lib/graphql/types"
   import type { ItUserCreateInput } from "$lib/graphql/types"
+  import type { RoleBindingCreateInput } from "$lib/graphql/types"
   import type { ManagerCreateInput } from "$lib/graphql/types"
   import type { AddressCreateInput } from "$lib/graphql/types"
   import { date } from "$lib/stores/date"
@@ -17,11 +19,12 @@
   import { success, error } from "$lib/stores/alert"
   import { employeeInfo } from "$lib/stores/employeeInfoStore"
   import { engagementInfo } from "$lib/stores/engagementInfoStore"
+  import { ituserInfo } from "$lib/stores/ituserInfoStore"
+  import { rolebindingInfo } from "$lib/stores/rolebindingInfoStore"
+  import { managerInfo } from "$lib/stores/managerInfoStore"
   import { addressInfo } from "$lib/stores/addressInfoStore"
   import { graphQLClient } from "$lib/util/http"
   import { UserFlowCreateDocument } from "./query.generated"
-  import { ituserInfo } from "$lib/stores/ituserInfoStore"
-  import { managerInfo } from "$lib/stores/managerInfoStore"
   import { step } from "$lib/stores/stepStore"
   import { resetStores } from "$lib/stores/resetStores"
 
@@ -30,6 +33,7 @@
       $employeeInput: EmployeeCreateInput!
       $engagementInput: [EngagementCreateInput!]!
       $ituserInput: [ITUserCreateInput!]!
+      $rolebindingInput: [RoleBindingCreateInput!]!
       $managerInput: [ManagerCreateInput!]!
       $addressInput: [AddressCreateInput!]!
       $date: DateTime!
@@ -46,6 +50,11 @@
         }
       }
       itusers_create(input: $ituserInput) {
+        current(at: $date) {
+          uuid
+        }
+      }
+      rolebindings_create(input: $rolebindingInput) {
         current(at: $date) {
           uuid
         }
@@ -90,16 +99,34 @@
     const ituserData: ItUserCreateInput | [] = $ituserInfo.validated
       ? {
           person: employeeUUID,
+          uuid: $ituserInfo.uuid,
           itsystem: $ituserInfo.itSystem.uuid,
           user_key: $ituserInfo.userkey,
           note: $ituserInfo.notes,
-          primary: $ituserInfo.primary ? $ituserInfo.primary.uuid : null,
+          primary: $ituserInfo.primary
+            ? $ituserInfo.primary.uuid !== ""
+              ? $ituserInfo.primary.uuid
+              : null
+            : null,
           validity: {
             from: $engagementInfo.fromDate,
             to: $engagementInfo.toDate ? $engagementInfo.toDate : null,
           },
         }
       : []
+    // Only post rolebindingData, if ituser data is valid
+    const rolebindingData: RoleBindingCreateInput | [] =
+      $ituserInfo.validated && $rolebindingInfo.role.uuid
+        ? {
+            ituser: $ituserInfo.uuid,
+            role: $rolebindingInfo.role.uuid,
+            validity: {
+              from: $rolebindingInfo.fromDate,
+              to: $rolebindingInfo.toDate ? $rolebindingInfo.toDate : null,
+            },
+          }
+        : []
+
     const managerData: ManagerCreateInput | [] = $managerInfo.validated
       ? {
           person: employeeUUID,
@@ -137,6 +164,7 @@
         employeeInput: employeeData,
         engagementInput: engagementData,
         ituserInput: ituserData,
+        rolebindingInput: rolebindingData,
         managerInput: managerData,
         addressInput: addressData,
         date: $date,
@@ -152,7 +180,14 @@
         uuid: mutation.employee_create.current?.uuid,
         type: "employee",
       }
-      resetStores([employeeInfo, engagementInfo, ituserInfo, managerInfo, addressInfo])
+      resetStores([
+        employeeInfo,
+        engagementInfo,
+        ituserInfo,
+        rolebindingInfo,
+        managerInfo,
+        addressInfo,
+      ])
       step.updateStep(1)
     } catch (err) {
       $error = { message: err }
@@ -165,6 +200,7 @@
     <EmployeeSummary />
     <EngagementSummary />
     <ItUserSummary />
+    <RolebindingSummary />
     <ManagerSummary />
     <AddressSummary />
   </div>

@@ -2,13 +2,17 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import { ituserInfo } from "$lib/stores/ituserInfoStore"
+  import { rolebindingInfo } from "$lib/stores/rolebindingInfoStore"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
   import { step } from "$lib/stores/stepStore"
   import { graphQLClient } from "$lib/util/http"
-  import { ItSystemsAndPrimaryDocument } from "./query.generated"
+  import {
+    ItSystemsAndPrimaryDocument,
+    GetItSystemRolesDocument,
+  } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
@@ -20,6 +24,7 @@
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
   import { env } from "$env/dynamic/public"
   import ItUserCheckbox from "./ItUserCheckbox.svelte"
+  import { onMount } from "svelte"
 
   gql`
     query ItSystemsAndPrimary($primaryClass: String!, $currentDate: DateTime!) {
@@ -43,7 +48,7 @@
         }
       }
     }
-    query GetITSystemRoles($itSystemUuid: [UUID!], $currentDate: DateTime!) {
+    query GetITSystemRoles($itSystemUuid: [UUID!]) {
       classes(
         filter: {
           facet: { user_keys: "role" }
@@ -76,6 +81,22 @@
       ituserInfo.isValid(false)
     }
   }
+  let itSystemRoles: UnpackedClass | undefined
+
+  const fetchItSystemRoles = async (itSystemUuid: string | undefined | null) => {
+    const res = await graphQLClient().request(GetItSystemRolesDocument, {
+      itSystemUuid: itSystemUuid,
+    })
+    itSystemRoles = res.classes?.objects
+      .map((cls) => cls.validities[0])
+      .sort((a, b) => (a.name > b.name ? 1 : -1))
+  }
+
+  onMount(async () => {
+    if ($ituserInfo.itSystem.uuid) {
+      fetchItSystemRoles($ituserInfo.itSystem.uuid)
+    }
+  })
 </script>
 
 <form on:submit|preventDefault={async () => await validateForm()}>
@@ -126,6 +147,9 @@
             bind:value={$ituserInfo.itSystem}
             bind:name={$itSystemField.value}
             errors={$itSystemField.errors}
+            on:change={() => {
+              fetchItSystemRoles($ituserInfo.itSystem.uuid)
+            }}
             iterable={getITSystemNames(itSystems)}
             extra_classes="basis-1/2"
             required={true}
@@ -160,18 +184,20 @@
           id="notes"
           bind:value={$ituserInfo.notes}
         />
-        <!-- <div class="divider p-0 m-0 mb-4 w-full" />
+        <div class="divider p-0 m-0 mb-4 w-full" />
         <h4>{capital($_("rolebinding", { values: { n: 1 } }))}</h4>
         <div class="flex flex-row gap-6">
           <DateInput
             startValue={$date}
-            bind:value={rolebindingFromDate}
+            bind:value={$rolebindingInfo.fromDate}
             title={capital($_("date.start_date"))}
             id="rolebinding-from"
           />
           <DateInput
-            bind:value={toDate}
+            bind:value={$rolebindingInfo.toDate}
             title={capital($_("date.end_date"))}
+            min={$ituserInfo.fromDate}
+            max={$ituserInfo.toDate ? $ituserInfo.toDate : undefined}
             id="rolebinding-to"
           />
         </div>
@@ -179,7 +205,7 @@
           {#key itSystemRoles}
             <Select
               title={capital($_("role", { values: { n: 1 } }))}
-              bind:value={role}
+              bind:value={$rolebindingInfo.role}
               id="it-system-role-uuid"
               iterable={itSystemRoles}
               extra_classes="basis-1/2"
@@ -192,7 +218,7 @@
             extra_classes="basis-1/2"
             disabled
           />
-        {/if} -->
+        {/if}
       </div>
     </div>
     <div class="flex py-6 gap-4">
