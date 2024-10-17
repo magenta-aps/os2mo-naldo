@@ -2,20 +2,16 @@ import { browser } from "$app/environment"
 import { writable } from "svelte/store"
 
 type AddressInfo = {
-  person: string
   fromDate: string
   toDate: string
   visibility: { uuid: string; name: string; userkey: string } | undefined
   addressType: { uuid: string; name: string; userkey: string; scope: string }
-  // adressValue should handle DAR addresses better - right now it's just a string meaning value or ID.
-  // ID is useless when showing in Summary, since it's a UUID.
   addressValue: { name?: string; value: string } | string
   userkey: string
   validated: boolean
 }
 
 const defaultValue: AddressInfo = {
-  person: "", // Somehow get employeeInfoStore.uuid
   fromDate: "",
   toDate: "",
   visibility: undefined,

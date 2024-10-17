@@ -8,7 +8,6 @@
   import { managerInfo } from "$lib/stores/managerInfoStore"
   import { addressInfo } from "$lib/stores/addressInfoStore"
 
-  // FIX: Should this be changed somehow?
   $: items = [
     {
       name: `${capital(
@@ -49,7 +48,6 @@
   ]
 </script>
 
-<!-- TODO: Mobile -->
 <div class="tabs tabs-bordered whitespace-nowrap">
   {#each items as item}
     <button
