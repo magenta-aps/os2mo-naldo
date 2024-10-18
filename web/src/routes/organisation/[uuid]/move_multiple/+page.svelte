@@ -15,7 +15,14 @@
   import { page } from "$app/stores"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
-  import { EngagementsDocument, MoveEngagementsDocument } from "./query.generated"
+  import {
+    EngagementsDocument,
+    MoveEngagementsDocument,
+    type EngagementsQuery,
+  } from "./query.generated"
+  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
+
+  type Engagements = EngagementsQuery["engagements"]["objects"][0]
 
   gql`
     query Engagements($org_unit: [UUID!], $currentDate: DateTime) {
@@ -98,6 +105,13 @@
         }
       }
     }
+
+  const toggleSelectAll = (engagements: Engagements[]) => {
+    selectedEngagements =
+      selectedEngagements.length === engagements.length
+        ? []
+        : engagements.map((engagement) => engagement.current?.uuid)
+  }
 </script>
 
 <title>{capital($_("move_engagements"))} | OS2mo</title>
@@ -109,7 +123,21 @@
 <div class="divider p-0 m-0 mb-4 w-full" />
 
 {#await graphQLClient().request( EngagementsDocument, { org_unit: $page.params.uuid, currentDate: $date } )}
-  VENTER
+  <div class="mx-6">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+      <div class="p-8">
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+        <Skeleton />
+      </div>
+    </div>
+  </div>
 {:then data}
   {@const engagements = data.engagements.objects}
   {@const orgUnit = data.org_units.objects[0].current}
@@ -154,6 +182,11 @@
             <legend class="text-sm pb-1">
               {capital($_("engagement", { values: { n: 2 } }))}</legend
             >
+            <button
+              type="button"
+              class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+              on:click={() => toggleSelectAll(engagements)}
+            />
             <ul id="engagement-list">
               {#each engagements as engagement}
                 <div class="flex text-secondary">
