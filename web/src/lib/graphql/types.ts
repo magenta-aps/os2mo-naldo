@@ -7266,6 +7266,14 @@ export type Mutation = {
   engagement_update: EngagementResponse;
   /** Creates a list of engagements. */
   engagements_create: Array<EngagementResponse>;
+  /**
+   * Updates a list of engagements.
+   *
+   * Note: If any of the updates in the transaction is a noop, the whole
+   * transaction will fail with a meaningless error.
+   *
+   */
+  engagements_update: Array<EngagementResponse>;
   /** Creates a facet. */
   facet_create: FacetResponse;
   /**
@@ -7781,6 +7789,18 @@ export type MutationEngagement_UpdateArgs = {
  */
 export type MutationEngagements_CreateArgs = {
   input: Array<EngagementCreateInput>;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationEngagements_UpdateArgs = {
+  input: Array<EngagementUpdateInput>;
 };
 
 
