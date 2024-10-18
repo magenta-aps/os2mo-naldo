@@ -128,6 +128,7 @@
 	"manager_type": "manager type",
 	"mo": "Employee - Organisation",
 	"move": "move",
+	"move_engagements": "Move engagements",
 	"move_root": "is moved to the root",
 	"name": "name",
 	"navigation": {
@@ -187,6 +188,7 @@
 	"success_edit": "{name} has been edited.",
 	"success_edit_item": "{item} {name, select, undefined {} other {for {name}}} has been edited.",
 	"success_move": "{name} has been moved.",
+	"success_move_engagements": "the engagements has been moved.",
 	"success_move_item": "{item} {name, select, undefined {} other {for {name}}} has been moved.",
 	"success_rename": "{name} has been renamed.",
 	"success_terminate": "{name} has been terminated.",
