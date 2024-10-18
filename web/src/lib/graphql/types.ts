@@ -2961,6 +2961,7 @@ export type EmployeesBoundEngagementFilter = {
 export type EmployeesBoundItUserFilter = {
   employee?: InputMaybe<EmployeeFilter>;
   engagement?: InputMaybe<EngagementFilter>;
+  external_ids?: InputMaybe<Array<Scalars['String']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   itsystem?: InputMaybe<ItSystemFilter>;
   itsystem_uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -5149,6 +5150,21 @@ export type ItUserFilter = {
    *
    */
   engagement?: InputMaybe<EngagementFilter>;
+  /**
+   * Only return IT users with this `external_id` filter limiting which entries are returned.
+   *
+   * | `external_id`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  external_ids?: InputMaybe<Array<Scalars['String']['input']>>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -7157,6 +7173,8 @@ export type Mutation = {
   address_terminate: AddressResponse;
   /** Updates an address. */
   address_update: AddressResponse;
+  /** Creates a list of address. */
+  addresses_create: Array<AddressResponse>;
   /** Creates an association. */
   association_create: AssociationResponse;
   /** Refresh associations. */
@@ -7246,6 +7264,8 @@ export type Mutation = {
   engagement_terminate: EngagementResponse;
   /** Updates an engagement. */
   engagement_update: EngagementResponse;
+  /** Creates a list of engagements. */
+  engagements_create: Array<EngagementResponse>;
   /** Creates a facet. */
   facet_create: FacetResponse;
   /**
@@ -7333,6 +7353,8 @@ export type Mutation = {
   ituser_terminate: ItUserResponse;
   /** Updates an IT-User. */
   ituser_update: ItUserResponse;
+  /** Creates a list of itusers. */
+  itusers_create: Array<ItUserResponse>;
   /** Creates a KLE annotation. */
   kle_create: KleResponse;
   /** Refresh KLEs. */
@@ -7357,6 +7379,8 @@ export type Mutation = {
   manager_terminate: ManagerResponse;
   /** Updates a manager relation. */
   manager_update: ManagerResponse;
+  /** Creates a list of managers. */
+  managers_create: Array<ManagerResponse>;
   /**
    * Creates the root-organisation.
    * @deprecated The root organisation concept will be removed in a future version of OS2mo.
@@ -7390,6 +7414,8 @@ export type Mutation = {
   rolebinding_terminate: RoleBindingResponse;
   /** Update a rolebinding. */
   rolebinding_update: RoleBindingResponse;
+  /** Creates a list of rolebindings. */
+  rolebindings_create: Array<RoleBindingResponse>;
   /**
    * Upload a file.
    *
@@ -7487,6 +7513,18 @@ export type MutationAddress_TerminateArgs = {
  */
 export type MutationAddress_UpdateArgs = {
   input: AddressUpdateInput;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationAddresses_CreateArgs = {
+  input: Array<AddressCreateInput>;
 };
 
 
@@ -7741,6 +7779,18 @@ export type MutationEngagement_UpdateArgs = {
  * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
  *
  */
+export type MutationEngagements_CreateArgs = {
+  input: Array<EngagementCreateInput>;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationFacet_CreateArgs = {
   input: FacetCreateInput;
 };
@@ -7969,6 +8019,18 @@ export type MutationItuser_UpdateArgs = {
  * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
  *
  */
+export type MutationItusers_CreateArgs = {
+  input: Array<ItUserCreateInput>;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationKle_CreateArgs = {
   input: KleCreateInput;
 };
@@ -8115,6 +8177,18 @@ export type MutationManager_TerminateArgs = {
  */
 export type MutationManager_UpdateArgs = {
   input: ManagerUpdateInput;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationManagers_CreateArgs = {
+  input: Array<ManagerCreateInput>;
 };
 
 
@@ -8321,6 +8395,18 @@ export type MutationRolebinding_UpdateArgs = {
  * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
  *
  */
+export type MutationRolebindings_CreateArgs = {
+  input: Array<RoleBindingCreateInput>;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationUpload_FileArgs = {
   file: Scalars['Upload']['input'];
   file_store: FileStore;
@@ -8384,6 +8470,7 @@ export type OrgUnitsboundituserfilter = {
   employee?: InputMaybe<EmployeeFilter>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   engagement?: InputMaybe<EngagementFilter>;
+  external_ids?: InputMaybe<Array<Scalars['String']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   itsystem?: InputMaybe<ItSystemFilter>;
   itsystem_uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -11061,6 +11148,7 @@ export type UuidsBoundItUserFilter = {
   employee?: InputMaybe<EmployeeFilter>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   engagement?: InputMaybe<EngagementFilter>;
+  external_ids?: InputMaybe<Array<Scalars['String']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   itsystem?: InputMaybe<ItSystemFilter>;
   itsystem_uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
