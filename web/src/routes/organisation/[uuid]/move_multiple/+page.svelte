@@ -15,7 +15,14 @@
   import { page } from "$app/stores"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
-  import { EngagementsDocument, MoveEngagementsDocument } from "./query.generated"
+  import {
+    EngagementsDocument,
+    MoveEngagementsDocument,
+    type EngagementsQuery,
+  } from "./query.generated"
+  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
+
+  type Engagements = EngagementsQuery["engagements"]["objects"][0]
 
   gql`
     query Engagements($org_unit: [UUID!], $currentDate: DateTime) {
@@ -98,6 +105,13 @@
         }
       }
     }
+
+  const toggleSelectAll = (engagements: Engagements[]) => {
+    selectedEngagements =
+      selectedEngagements.length === engagements.length
+        ? []
+        : engagements.map((engagement) => engagement.current?.uuid)
+  }
 </script>
 
 <title>{capital($_("move_engagements"))} | OS2mo</title>
@@ -109,7 +123,21 @@
 <div class="divider p-0 m-0 mb-4 w-full" />
 
 {#await graphQLClient().request( EngagementsDocument, { org_unit: $page.params.uuid, currentDate: $date } )}
-  VENTER
+  <div class="mx-6">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+      <div class="p-8">
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+        <Skeleton />
+      </div>
+    </div>
+  </div>
 {:then data}
   {@const engagements = data.engagements.objects}
   {@const orgUnit = data.org_units.objects[0].current}
@@ -149,12 +177,34 @@
             extra_classes="basis-1/2"
           />
         </div>
-        <div class="form-control text-secondary pb-3">
+        <div class="text-secondary pb-3">
           <fieldset>
             <legend class="text-sm pb-1">
               {capital($_("engagement", { values: { n: 2 } }))}</legend
             >
-            <ul id="engagement-list">
+            <ul
+              id="engagement-list"
+              class="max-h-48 overflow-y-auto bg-base-100 rounded p-1"
+            >
+              <div class="flex text-secondary">
+                <label
+                  class="label text-sm text-secondary cursor-pointer break-words gap-4"
+                >
+                  <input
+                    type="checkbox"
+                    on:click={() => toggleSelectAll(engagements)}
+                    class="checkbox checkbox-primary rounded normal-case font-normal text-base text-base-100"
+                    checked={selectedEngagements.length === engagements.length}
+                    indeterminate={selectedEngagements.length > 0 &&
+                      selectedEngagements.length < engagements.length}
+                  />
+                  <span class="label-text text-secondary"
+                    >{selectedEngagements.length !== engagements.length
+                      ? capital($_("select_all"))
+                      : capital($_("deselect_all"))}</span
+                  >
+                </label>
+              </div>
               {#each engagements as engagement}
                 <div class="flex text-secondary">
                   <label
@@ -167,7 +217,9 @@
                       value={engagement.current?.uuid}
                       class="checkbox checkbox-primary rounded normal-case font-normal text-base text-base-100"
                     />
-                    <span class="label-text">{engagement.current?.person[0].name}</span>
+                    <span class="label-text text-secondary"
+                      >{engagement.current?.person[0].name}</span
+                    >
                   </label>
                 </div>
               {/each}

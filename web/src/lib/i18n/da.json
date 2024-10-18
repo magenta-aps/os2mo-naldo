@@ -31,6 +31,7 @@
 	},
 	"default_filename": "Defaulter til 'insights'",
 	"description": "beskrivelse",
+	"deselect_all": "fravælg alle",
 	"download_as_csv": "download som csv",
 	"edit_item": "redigér {item}",
 	"employee": "{n, plural, =0 {medarbejderen} one {medarbejder} other {medarbejdere}}",
@@ -176,6 +177,7 @@
 		"organisation": "Søg efter organisation",
 		"person": "Søg efter person"
 	},
+	"select_all": "vælg alle",
 	"select_item": "vælg {item}",
 	"skip": "spring over",
 	"specify": "angiv",
