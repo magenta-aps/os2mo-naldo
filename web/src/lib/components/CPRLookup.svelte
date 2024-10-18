@@ -17,6 +17,11 @@
   $: if (value?.cpr_no) {
     cprNumber = value.cpr_no
   }
+
+  $: if (value?.cpr_no == "") {
+    value = undefined
+    cprNumber = undefined
+  }
   const itemId = "cpr_no" // Used by the component to differentiate between items
 
   const fetchCPR = async (filterText: string) => {

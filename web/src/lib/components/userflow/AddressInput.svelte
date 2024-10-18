@@ -7,10 +7,9 @@
   export let size: string = "sm"
   export let id: string
   export let name: string = id
-  export let value: string | number | null | undefined = undefined
-  export let cprName: string | number | null | undefined = undefined
-  export let startValue: string | number | null | undefined = undefined
-  value = startValue ? startValue : value
+  export let value: string | { name?: string; value: string } | undefined
+  export let validationField: string | undefined | { name?: string; value: string } =
+    undefined
   export let required = false
   export let placeholder: string | undefined = undefined
   export let type = "text"
@@ -26,7 +25,10 @@
   }
 
   // This is only for the name inputs in create employee
-  $: cprName = value
+
+  $: if (value) {
+    validationField = value
+  }
 </script>
 
 <div class="form-control pb-3 {extra_classes}">
@@ -52,7 +54,7 @@
       bind:value
       type="text"
       class="input input-bordered input-{size} rounded text-base font-normal w-full focus:outline-0
-      {errors.length ? 'input-error' : 'focus:input-primary'}"
+        {errors.length ? 'input-error' : 'focus:input-primary'}"
       {readonly}
       {disabled}
     />

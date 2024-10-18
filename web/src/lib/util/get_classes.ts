@@ -56,3 +56,11 @@ export const getClassUuidByUserKey = (classes: Class[], user_key: string) => {
   }
   return foundClass.validities[0].uuid
 }
+
+export const getClassByUserKey = (classes: Class[], user_key: string) => {
+  const foundClass = classes.find((cls) => cls.validities[0].user_key === user_key)
+  if (!foundClass) {
+    throw new Error("user_key did not match any of the given classes")
+  }
+  return foundClass.validities[0]
+}
