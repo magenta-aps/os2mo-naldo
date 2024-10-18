@@ -31,6 +31,7 @@
 	},
 	"default_filename": "Defaults to 'insights'",
 	"description": "description",
+	"deselect_all": "deselect all",
 	"download_as_csv": "download as csv",
 	"edit_item": "edit {item}",
 	"employee": "{n, plural, =0 {the employee} one {employee} other {employees}}",
@@ -176,6 +177,7 @@
 		"organisation": "Search for organisation",
 		"person": "Search for person"
 	},
+	"select_all": "select all",
 	"select_item": "select {item}",
 	"skip": "skip",
 	"specify": "specify",
