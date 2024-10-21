@@ -169,13 +169,6 @@
             disabled
             extra_classes="basis-1/2"
           />
-          <Search
-            type="org-unit"
-            id="org-unit"
-            title="{capital($_('move'))} {$_('to')}"
-            required
-            extra_classes="basis-1/2"
-          />
         </div>
         <div class="text-secondary pb-3">
           <fieldset>
@@ -225,6 +218,15 @@
               {/each}
             </ul>
           </fieldset>
+        </div>
+        <div class="flex flex-row gap-6">
+          <Search
+            type="org-unit"
+            id="org-unit"
+            title="{capital($_('move'))} {$_('to')}"
+            required
+            extra_classes="basis-1/2"
+          />
         </div>
       </div>
     </div>
