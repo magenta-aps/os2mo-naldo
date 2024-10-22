@@ -7270,7 +7270,11 @@ export type Mutation = {
    * Updates a list of engagements.
    *
    * Note: If any of the updates in the transaction is a noop, the whole
-   * transaction will fail with a meaningless error.
+   * transaction will fail with the error:
+   * `(psycopg.errors.InFailedSqlTransaction) current transaction is aborted,
+   * commands ignored until end of transaction block`
+   *
+   * https://redmine.magenta.dk/issues/60573
    *
    */
   engagements_update: Array<EngagementResponse>;

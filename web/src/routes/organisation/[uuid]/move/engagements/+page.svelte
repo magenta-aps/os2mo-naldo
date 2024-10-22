@@ -80,14 +80,17 @@
 
   let selectedEngagements: string[] = []
 
-  const handler: SubmitFunction =
+  // FIXME: `handler: SubmitFunction` gives TS-error:
+  // Argument of type 'SubmitFunction' is not assignable to parameter of type 'SubmitFunction<Record<string, unknown> | undefined, never>'.
+  // Ignored for now, by removing typing and typing result to `any`.
+  const handler =
     () =>
-    async ({ result }) => {
+    async ({ result }: any) => {
       // Await the validation, before we continue
       await svelteForm.validate()
 
       if ($svelteForm.valid) {
-        if (result.type === "success" && result.data) {
+        if (result.type === "success" && result.data && result.data.length) {
           try {
             const mutation = await graphQLClient().request(MoveEngagementsDocument, {
               input: result.data,
@@ -114,10 +117,10 @@
   }
 </script>
 
-<title>{capital($_("move_engagements"))} | OS2mo</title>
+<title>{capital($_("navigation.move_engagements"))} | OS2mo</title>
 
 <div class="flex align-center px-6 pt-6 pb-4">
-  <h3 class="flex-1">{capital($_("move_engagements"))}</h3>
+  <h3 class="flex-1">{capital($_("navigation.move_engagements"))}</h3>
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
@@ -141,6 +144,8 @@
 {:then data}
   {@const engagements = data.engagements.objects}
   {@const orgUnit = data.org_units.objects[0].current}
+  <!-- FIXME: handler gives TS-error, because type is `SubmitFunction<Record<string, unknown> | undefined, never>`  -->
+  <!-- Instead of `SubmitFunction`. This is ignored by typing it to `any`. -->
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -234,7 +239,7 @@
       <button
         type="submit"
         class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >{capital($_("move_engagements"))}</button
+        >{capital($_("navigation.move_engagements"))}</button
       >
       <button
         type="button"
