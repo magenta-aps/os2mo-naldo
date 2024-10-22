@@ -48,7 +48,7 @@
         }
       }
     }
-    query GetITSystemRoles($itSystemUuid: [UUID!]) {
+    query GetITSystemRoles($itSystemUuid: [UUID!], $currentDate: DateTime!) {
       classes(
         filter: {
           facet: { user_keys: "role" }
@@ -86,6 +86,7 @@
   const fetchItSystemRoles = async (itSystemUuid: string | undefined | null) => {
     const res = await graphQLClient().request(GetItSystemRolesDocument, {
       itSystemUuid: itSystemUuid,
+      currentDate: $date,
     })
     itSystemRoles = res.classes?.objects
       .map((cls) => cls.validities[0])
