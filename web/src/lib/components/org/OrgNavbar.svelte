@@ -12,6 +12,7 @@
     CREATE = "create",
     RENAME = "rename",
     MOVE = "move",
+    MOVE_ENGAGEMENTS = "move/engagements",
     TERMINATE = "terminate",
   }
 </script>
@@ -44,6 +45,13 @@
     >
       <Icon icon={swapHorizRounded} width="20" height="20" />
       <p class="text-base-100">{$_("navigation.move_unit")}</p>
+    </a>
+    <a
+      href={`${base}/organisation/${$page.params.uuid}/${Form.MOVE_ENGAGEMENTS}`}
+      class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
+    >
+      <Icon icon={swapHorizRounded} width="20" height="20" />
+      <p class="text-base-100">{$_("navigation.move_engagements")}</p>
     </a>
     <a
       href={`${base}/organisation/${Form.TERMINATE}${
