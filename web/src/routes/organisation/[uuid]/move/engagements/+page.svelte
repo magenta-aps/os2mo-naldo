@@ -135,9 +135,11 @@
         </div>
         <div class="flex flex-row gap-6">
           <Skeleton extra_classes="basis-1/2" />
+        </div>
+        <Skeleton extra_classes="basis-1/2" height="h-48" />
+        <div class="flex flex-row gap-6">
           <Skeleton extra_classes="basis-1/2" />
         </div>
-        <Skeleton />
       </div>
     </div>
   </div>
