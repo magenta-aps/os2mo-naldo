@@ -19,9 +19,7 @@
 <div class="navbar bg-primary min-h-0 text-base-100">
   <div class="flex-1">
     <a
-      href={`${base}/organisation/${Form.CREATE}${
-        $page.params.uuid ? `#uuid=${$page.params.uuid}` : ""
-      }`}
+      href={`${base}/organisation/${$page.params.uuid}/${Form.CREATE}/unit`}
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal align-middle"
     >
       <Icon icon={addCircleOutlineRounded} width="20" height="20" />

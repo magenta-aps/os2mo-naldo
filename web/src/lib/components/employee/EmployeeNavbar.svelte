@@ -19,34 +19,28 @@
 <div class="navbar bg-primary min-h-0 text-base-100">
   <div class="flex-1">
     <a
-      href="{base}/employee/{Form.CREATE}"
+      href="{base}/employee/{Form.CREATE}/employee"
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <Icon icon={personAddOutlineRounded} width="20" height="20" />
       <p class="text-base-100">{$_("navigation.create_employee")}</p>
     </a>
     <a
-      href={`${base}/employee/${Form.CREATE}/leave/${
-        $page.params.uuid ? `#uuid=${$page.params.uuid}` : ""
-      }`}
+      href={`${base}/employee/${$page.params.uuid}/${Form.CREATE}/leave`}
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <Icon icon={personAlertOutlineRounded} width="20" height="20" />
       <p class="text-base-100">{$_("navigation.leave")}</p>
     </a>
     <a
-      href={`${base}/employee/${Form.MOVE}${
-        $page.params.uuid ? `#uuid=${$page.params.uuid}` : ""
-      }`}
+      href={`${base}/employee/${$page.params.uuid}/${Form.MOVE}`}
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <Icon icon={swapHorizRounded} width="20" height="20" />
       <p class="text-base-100">{$_("navigation.move_engagement")}</p>
     </a>
     <a
-      href={`${base}/employee/${Form.TERMINATE}${
-        $page.params.uuid ? `#uuid=${$page.params.uuid}` : ""
-      }`}
+      href={`${base}/employee/${$page.params.uuid}/${Form.TERMINATE}/employee`}
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <Icon icon={personCancelOutlineRounded} width="20" height="20" />

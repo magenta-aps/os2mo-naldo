@@ -3,6 +3,7 @@
   import { capital } from "$lib/util/translationUtils"
   import Error from "$lib/components/alerts/Error.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
+  import Input from "$lib/components/forms/shared/Input.svelte"
   import { enhance } from "$app/forms"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
@@ -41,23 +42,11 @@
   }
   let engagements: EngagementTitleAndUuid[] | undefined
 
-  const urlHashEmployeeUuid = getUuidFromHash($page.url.hash)
-  const includeEmployee = urlHashEmployeeUuid ? true : false
-
   gql`
-    query Engagements(
-      $uuid: [UUID!]
-      $fromDate: DateTime!
-      $includeEngagement: Boolean!
-    ) {
-      ...getEngagements
-    }
-
-    fragment getEngagements on Query {
-      employees(filter: { uuids: $uuid, from_date: $fromDate })
-        @include(if: $includeEngagement) {
+    query Engagements($uuid: [UUID!], $currentDate: DateTime!) {
+      employees(filter: { uuids: $uuid }) {
         objects {
-          objects {
+          current(at: $currentDate) {
             uuid
             name
             engagements {
@@ -120,17 +109,19 @@
         }
       }
     }
-  async function updateEngagements(employeeUuid: string | undefined | null) {
+  const updateEngagements = async (employeeUuid: string | undefined | null) => {
     const res = await graphQLClient().request(EngagementsDocument, {
       uuid: employeeUuid,
-      fromDate: $date,
-      includeEngagement: employeeUuid ? true : false,
+      currentDate: $date,
     })
-    engagements = res.employees?.objects[0].objects[0].engagements
+
+    engagements = res.employees?.objects[0].current?.engagements
   }
 
   onMount(async () => {
-    await updateEngagements(urlHashEmployeeUuid)
+    if ($page.params.uuid) {
+      await updateEngagements($page.params.uuid)
+    }
   })
 </script>
 
@@ -144,43 +135,58 @@
 
 <!-- LOOKATME: FIXME: SOMETHING: Form here or inside await? -->
 <form method="post" class="mx-6" use:enhance={handler}>
-  {#await graphQLClient().request( EngagementsDocument, { uuid: urlHashEmployeeUuid, fromDate: $date, includeEngagement: includeEmployee } )}
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
-      <div class="p-8">
-        <div class="flex flex-row gap-6">
-          <Skeleton extra_classes="basis-1/2" />
-        </div>
-        <Skeleton />
-        <Skeleton />
-        <Skeleton />
+  <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+    <div class="p-8">
+      <div class="flex flex-row gap-6">
+        <DateInput
+          startValue={$date}
+          bind:value={$fromDate.value}
+          errors={$fromDate.errors}
+          title={capital($_("date.move_date"))}
+          id="from"
+          min={undefined}
+          max={undefined}
+          required={true}
+        />
       </div>
-    </div>
-  {:then data}
-    {@const startValueEmployee = data.employees?.objects[0].objects[0]}
-    {@const minDate = startValueEmployee?.engagements[0]?.validity.from}
-
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
-      <div class="p-8">
-        <div class="flex flex-row gap-6">
-          <DateInput
-            startValue={$date}
-            bind:value={$fromDate.value}
-            errors={$fromDate.errors}
-            title={capital($_("date.move_date"))}
-            id="from"
-            min={minDate ? minDate : null}
+      {#if $page.params.uuid}
+        {#await graphQLClient().request( EngagementsDocument, { uuid: $page.params.uuid, currentDate: $date } )}
+          <Input
+            title="{capital($_('specify'))} {$_('employee', { values: { n: 1 } })}"
+            id="employee-uuid"
+            disabled
+            placeholder="{capital($_('loading'))} {$_('employee', {
+              values: { n: 1 },
+            })}..."
             required={true}
           />
-        </div>
+        {:then data}
+          {@const startValueEmployee = data.employees?.objects[0].current}
+
+          <Search
+            type="employee"
+            title={capital($_("employee", { values: { n: 1 } }))}
+            startValue={startValueEmployee
+              ? {
+                  uuid: startValueEmployee.uuid,
+                  name: startValueEmployee.name,
+                }
+              : undefined}
+            bind:value={employee}
+            bind:name={$employeeField.value}
+            errors={$employeeField.errors}
+            on:change={() => updateEngagements(employee.uuid)}
+            on:clear={() => {
+              $employeeField.value = ""
+              $engagement.value = ""
+              engagements = undefined
+            }}
+            required={true}
+          />
+        {/await}
+      {:else}
         <Search
           type="employee"
-          title={capital($_("employee", { values: { n: 1 } }))}
-          startValue={startValueEmployee
-            ? {
-                uuid: startValueEmployee.uuid,
-                name: startValueEmployee.name,
-              }
-            : undefined}
           bind:value={employee}
           bind:name={$employeeField.value}
           errors={$employeeField.errors}
@@ -192,54 +198,55 @@
           }}
           required={true}
         />
-        {#if engagements && engagements.length}
-          {#key engagements}
-            <Select
-              title={capital($_("engagements", { values: { n: 2 } }))}
-              id="engagement-uuid"
-              bind:name={$engagement.value}
-              errors={$engagement.errors}
-              startValue={getEngagementTitlesAndUuid(engagements)[0]}
-              iterable={getEngagementTitlesAndUuid(engagements)}
-              required={true}
-            />
-          {/key}
-        {:else}
+      {/if}
+
+      {#if engagements && engagements.length}
+        {#key engagements}
           <Select
             title={capital($_("engagements", { values: { n: 2 } }))}
             id="engagement-uuid"
             bind:name={$engagement.value}
             errors={$engagement.errors}
-            disabled
+            startValue={getEngagementTitlesAndUuid(engagements)[0]}
+            iterable={getEngagementTitlesAndUuid(engagements)}
             required={true}
           />
-        {/if}
-        <Search
-          type="org-unit"
-          title="{capital($_('move'))} {$_('to')}"
-          bind:name={$orgUnitField.value}
-          errors={$orgUnitField.errors}
-          on:clear={() => ($orgUnitField.value = "")}
-          bind:value={selectedOrgUnit}
+        {/key}
+      {:else}
+        <Select
+          title={capital($_("engagements", { values: { n: 2 } }))}
+          id="engagement-uuid"
+          bind:name={$engagement.value}
+          errors={$engagement.errors}
+          disabled
           required={true}
         />
-        <Breadcrumbs orgUnit={selectedOrgUnit} />
-      </div>
+      {/if}
+      <Search
+        type="org-unit"
+        title="{capital($_('move'))} {$_('to')}"
+        bind:name={$orgUnitField.value}
+        errors={$orgUnitField.errors}
+        on:clear={() => ($orgUnitField.value = "")}
+        bind:value={selectedOrgUnit}
+        required={true}
+      />
+      <Breadcrumbs orgUnit={selectedOrgUnit} />
     </div>
-    <div class="flex py-6 gap-4">
-      <button
-        type="submit"
-        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >{$_("navigation.move_engagement")}</button
-      >
-      <button
-        type="button"
-        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        on:click={() => history.back()}
-      >
-        {capital($_("cancel"))}
-      </button>
-    </div>
-    <Error />
-  {/await}
+  </div>
+  <div class="flex py-6 gap-4">
+    <button
+      type="submit"
+      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+      >{$_("navigation.move_engagement")}</button
+    >
+    <button
+      type="button"
+      class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+      on:click={() => history.back()}
+    >
+      {capital($_("cancel"))}
+    </button>
+  </div>
+  <Error />
 </form>

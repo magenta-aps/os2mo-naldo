@@ -122,7 +122,7 @@
       <ValidityTableCell validity={org_unit.validity} />
       <td>
         <a
-          href="{base}/organisation/{$page.params.uuid}/edit{formatQueryDates(
+          href="{base}/organisation/{$page.params.uuid}/edit/unit{formatQueryDates(
             org_unit.validity
           )}"
         >

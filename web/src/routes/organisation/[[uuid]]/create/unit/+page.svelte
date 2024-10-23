@@ -150,7 +150,6 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-<!-- LOOKATME: FIXME: SOMETHING: Form here or inside await? -->
 <form method="post" class="mx-6" use:enhance={handler}>
   {#await graphQLClient().request(FacetsDocument, { currentDate: $date })}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -160,7 +159,6 @@
           <Skeleton extra_classes="basis-1/2" />
         </div>
         <Skeleton />
-        <!-- TODO: Make Skeleton better for Breadcrumbs? -->
         <Skeleton />
         <Skeleton />
         <Skeleton />
