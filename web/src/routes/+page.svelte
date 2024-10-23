@@ -58,7 +58,7 @@
           <ul class="menu px-0">
             <li>
               <a
-                href="{base}/employee/create"
+                href="{base}/employee/create/employee"
                 class="text-white hover:no-underline flex items-center gap-2"
               >
                 <Icon icon={personAddOutlineRounded} width="20" height="20" />
@@ -84,8 +84,10 @@
               </a>
             </li>
             <li>
+              <!-- NOTE: `employee/terminate/employee` vs  `employee/terminate` -->
+              <!-- /employee gives more structure, but seems redundant, just like `/unit` -->
               <a
-                href="{base}/employee/terminate"
+                href="{base}/employee/terminate/employee"
                 class="text-white hover:no-underline flex items-center gap-2"
               >
                 <Icon icon={personCancelOutlineRounded} width="20" height="20" />

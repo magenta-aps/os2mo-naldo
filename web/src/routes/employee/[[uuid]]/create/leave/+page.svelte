@@ -4,6 +4,7 @@
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
+  import Input from "$lib/components/forms/shared/Input.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { success, error } from "$lib/stores/alert"
@@ -14,13 +15,12 @@
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import {
     CreateLeaveDocument,
-    LeaveTypeAndEmployeeDocument,
+    LeaveTypeDocument,
     GetEmployeeDocument,
   } from "./query.generated"
   import {
     getEngagementTitlesAndUuid,
     type EngagementTitleAndUuid,
-    getUuidFromHash,
     getMinMaxValidities,
   } from "$lib/util/helpers"
   import Search from "$lib/components/Search.svelte"
@@ -43,11 +43,7 @@
   }
   let engagements: EngagementTitleAndUuid[] | undefined
   gql`
-    query LeaveTypeAndEmployee(
-      $uuid: [UUID!]
-      $includeEmployee: Boolean!
-      $currentDate: DateTime
-    ) {
+    query LeaveType($currentDate: DateTime) {
       facets(filter: { user_keys: ["leave_type"] }) {
         objects {
           validities {
@@ -61,28 +57,12 @@
           }
         }
       }
-      employees(filter: { uuids: $uuid, from_date: null, to_date: null })
-        @include(if: $includeEmployee) {
-        objects {
-          current {
-            uuid
-            name
-          }
-          validities {
-            validity {
-              from
-              to
-            }
-          }
-        }
-      }
     }
 
-    query GetEmployee($uuid: [UUID!], $includeEmployee: Boolean!) {
-      employees(filter: { uuids: $uuid, from_date: null, to_date: null })
-        @include(if: $includeEmployee) {
+    query GetEmployee($uuid: [UUID!], $currentDate: DateTime) {
+      employees(filter: { uuids: $uuid, from_date: null, to_date: null }) {
         objects {
-          current {
+          current(at: $currentDate) {
             uuid
             name
             engagements {
@@ -150,19 +130,17 @@
       }
     }
 
-  const urlHashEmployeeUuid = getUuidFromHash($page.url.hash)
-  const includeEmployee = urlHashEmployeeUuid ? true : false
-
   async function updateEngagements(employeeUuid: string | undefined | null) {
     const res = await graphQLClient().request(GetEmployeeDocument, {
       uuid: employeeUuid,
-      includeEmployee: employeeUuid ? true : false,
+      // Maybe this should be `fromdate`?
+      currentDate: $date,
     })
     engagements = res.employees?.objects[0].current?.engagements
   }
 
   onMount(async () => {
-    await updateEngagements(urlHashEmployeeUuid)
+    await updateEngagements($page.params.uuid)
   })
 </script>
 
@@ -188,46 +166,36 @@
 
 <!-- LOOKATME: FIXME: SOMETHING: Form here or inside await? -->
 <form method="post" class="mx-6" use:enhance={handler}>
-  {#await graphQLClient().request( LeaveTypeAndEmployeeDocument, { uuid: urlHashEmployeeUuid, includeEmployee: includeEmployee, currentDate: $date } )}
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
-      <div class="p-8">
-        <div class="flex flex-row gap-6">
-          <Skeleton extra_classes="basis-1/2" />
-          <Skeleton extra_classes="basis-1/2" />
-        </div>
-        <Skeleton />
-        <Skeleton />
-        <Skeleton />
+  <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+    <div class="p-8">
+      <div class="flex flex-row gap-6">
+        <!-- TODO: dynamically change dates depending on which engagement has been chosen -->
+        <!-- TODO: This should be possible with smarter if/await logic -->
+        <DateInput
+          startValue={$date}
+          bind:value={$fromDate.value}
+          errors={$fromDate.errors}
+          title={capital($_("date.start_date"))}
+          id="from"
+          max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
+          required={true}
+        />
+        <DateInput
+          bind:value={toDate}
+          title={capital($_("date.end_date"))}
+          id="to"
+          min={$fromDate.value ? $fromDate.value : undefined}
+          max={undefined}
+        />
       </div>
-    </div>
-  {:then data}
-    {@const facets = data.facets.objects}
-    {@const startValueEmployee = data.employees?.objects[0].current}
-    {@const validities = getMinMaxValidities(data.employees?.objects[0].validities)}
-
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
-      <div class="p-8">
-        <div class="flex flex-row gap-6">
-          <!-- TODO: dynamically change dates depending on which engagement has been chosen -->
-          <DateInput
-            startValue={$date}
-            bind:value={$fromDate.value}
-            errors={$fromDate.errors}
-            title={capital($_("date.start_date"))}
-            id="from"
-            min={validities.from}
-            max={toDate ? toDate : validities.to}
-            required={true}
-          />
-          <DateInput
-            bind:value={toDate}
-            title={capital($_("date.end_date"))}
-            id="to"
-            min={$fromDate.value}
-            max={validities.to}
-          />
-        </div>
-
+      {#await graphQLClient().request(LeaveTypeDocument, { currentDate: $date })}
+        <Select
+          title={capital($_("leave_type"))}
+          id="leave-type-uuid"
+          required={true}
+        />
+      {:then data}
+        {@const facets = data.facets.objects}
         <Select
           title={capital($_("leave_type"))}
           id="leave-type-uuid"
@@ -236,14 +204,44 @@
           iterable={getClassesByFacetUserKey(facets, "leave_type")}
           required={true}
         />
+      {/await}
+
+      {#if $page.params.uuid}
+        {#await graphQLClient().request( GetEmployeeDocument, { uuid: $page.params.uuid, currentDate: $date } )}
+          <Input
+            title="{capital($_('specify'))} {$_('employee', { values: { n: 1 } })}"
+            id="employee-uuid"
+            disabled
+            placeholder="{capital($_('loading'))} {$_('employee', {
+              values: { n: 1 },
+            })}..."
+            required={true}
+          />
+        {:then employeeData}
+          {@const startValueEmployee = employeeData.employees?.objects[0].current}
+          <Search
+            type="employee"
+            startValue={startValueEmployee
+              ? {
+                  uuid: startValueEmployee.uuid,
+                  name: startValueEmployee.name,
+                }
+              : undefined}
+            bind:value={employee}
+            bind:name={$employeeField.value}
+            errors={$employeeField.errors}
+            on:change={() => updateEngagements(employee.uuid)}
+            on:clear={() => {
+              $employeeField.value = ""
+              $engagement.value = ""
+              engagements = undefined
+            }}
+            required={true}
+          />
+        {/await}
+      {:else}
         <Search
           type="employee"
-          startValue={startValueEmployee
-            ? {
-                uuid: startValueEmployee.uuid,
-                name: startValueEmployee.name,
-              }
-            : undefined}
           bind:value={employee}
           bind:name={$employeeField.value}
           errors={$employeeField.errors}
@@ -255,48 +253,49 @@
           }}
           required={true}
         />
-        {#if engagements && engagements.length}
-          {#key engagements}
-            <Select
-              title={capital($_("engagements", { values: { n: 2 } }))}
-              id="engagement-uuid"
-              bind:name={$engagement.value}
-              errors={$engagement.errors}
-              startValue={getEngagementTitlesAndUuid(engagements)[0]}
-              iterable={getEngagementTitlesAndUuid(engagements)}
-              required={true}
-            />
-          {/key}
-        {:else}
+      {/if}
+
+      {#if engagements && engagements.length}
+        {#key engagements}
           <Select
             title={capital($_("engagements", { values: { n: 2 } }))}
             id="engagement-uuid"
             bind:name={$engagement.value}
             errors={$engagement.errors}
-            disabled
+            startValue={getEngagementTitlesAndUuid(engagements)[0]}
+            iterable={getEngagementTitlesAndUuid(engagements)}
             required={true}
           />
-        {/if}
-      </div>
+        {/key}
+      {:else}
+        <Select
+          title={capital($_("engagements", { values: { n: 2 } }))}
+          id="engagement-uuid"
+          bind:name={$engagement.value}
+          errors={$engagement.errors}
+          disabled
+          required={true}
+        />
+      {/if}
     </div>
-    <div class="flex py-6 gap-4">
-      <button
-        type="submit"
-        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >{capital(
-          $_("create_item", {
-            values: { item: $_("leave", { values: { n: 1 } }) },
-          })
-        )}
-      </button>
-      <button
-        type="button"
-        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        on:click={() => history.back()}
-      >
-        {capital($_("cancel"))}
-      </button>
-    </div>
-    <Error />
-  {/await}
+  </div>
+  <div class="flex py-6 gap-4">
+    <button
+      type="submit"
+      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+      >{capital(
+        $_("create_item", {
+          values: { item: $_("leave", { values: { n: 1 } }) },
+        })
+      )}
+    </button>
+    <button
+      type="button"
+      class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+      on:click={() => history.back()}
+    >
+      {capital($_("cancel"))}
+    </button>
+  </div>
+  <Error />
 </form>

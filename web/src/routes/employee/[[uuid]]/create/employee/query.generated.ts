@@ -1,4 +1,4 @@
-import type * as Types from '../../../lib/graphql/types';
+import type * as Types from '../../../../../lib/graphql/types';
 
 import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type GetSpConfigQueryVariables = Types.Exact<{ [key: string]: never; }>;
