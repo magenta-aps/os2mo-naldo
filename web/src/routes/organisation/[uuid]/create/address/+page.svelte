@@ -184,6 +184,7 @@
           <Skeleton extra_classes="basis-1/2" />
           <Skeleton extra_classes="basis-1/2" />
         </div>
+        <Skeleton />
       </div>
     </div>
   </div>
