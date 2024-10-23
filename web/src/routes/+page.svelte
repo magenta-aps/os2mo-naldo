@@ -99,7 +99,7 @@
           <ul class="menu px-0">
             <li>
               <a
-                href="{base}/organisation/create"
+                href="{base}/organisation/create/unit"
                 class="text-white hover:no-underline flex items-center gap-2"
               >
                 <Icon icon={addCircleOutlineRounded} width="20" height="20" />

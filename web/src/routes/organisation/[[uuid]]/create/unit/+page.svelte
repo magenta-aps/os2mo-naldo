@@ -47,6 +47,8 @@
 
   const urlHashOrgUnitUuid = getUuidFromHash($page.url.hash)
   const includeOrgUnit = urlHashOrgUnitUuid ? true : false
+  console.log($page.params.uuid)
+
   gql`
     query GetOrgUnitAndFacets(
       $uuid: [UUID!]
