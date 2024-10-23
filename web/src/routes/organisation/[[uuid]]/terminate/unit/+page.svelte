@@ -25,27 +25,15 @@
 
   const toDate = field("to", "", [required()])
   const orgUnitField = field("org_unit", "", [required()])
-
   const svelteForm = form(toDate, orgUnitField)
 
-  const urlHashOrgUnitUuid = getUuidFromHash($page.url.hash)
-
   gql`
-    query OrgUnit($uuid: [UUID!], $fromDate: DateTime!, $includeOrgUnit: Boolean!) {
-      ...getOrgUnitData
-    }
-
-    fragment getOrgUnitData on Query {
-      org_units(filter: { uuids: $uuid, from_date: $fromDate })
-        @include(if: $includeOrgUnit) {
+    query OrgUnit($uuid: [UUID!], $currentDate: DateTime!) {
+      org_units(filter: { uuids: $uuid }) {
         objects {
-          validities {
+          current(at: $currentDate) {
             uuid
             name
-            validity {
-              from
-              to
-            }
             parent {
               validity {
                 from
@@ -120,44 +108,30 @@
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
-
-{#await graphQLClient().request( OrgUnitDocument, { uuid: urlHashOrgUnitUuid, fromDate: $date, includeOrgUnit: urlHashOrgUnitUuid ? true : false } )}
-  <div class="mx-6">
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
-      <div class="p-8">
-        <Skeleton />
-        <Skeleton />
-      </div>
-    </div>
-  </div>
-{:then data}
-  {@const orgUnit = data.org_units?.objects[0].validities[0]}
-  <!-- TODO: Fix this when: https://redmine.magenta.dk/issues/58621 is done -->
-  <!-- We can't use getMinMaxValidities since `parent` can't be a list, or it'll crash -->
-  <!-- Update dates depending on chosen org_unit -->
-  {@const orgUnitValidities = getMinMaxValidities(
-    data.org_units?.objects[0].validities
-  )}
-  <form method="post" class="mx-6" use:enhance={handler}>
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
-      <div class="p-8">
-        <DateInput
-          startValue={$date}
-          bind:value={$toDate.value}
-          errors={$toDate.errors}
-          title={capital($_("date.end_date"))}
-          id="to"
-          min={orgUnitValidities.from}
-          max={undefined}
-          required={true}
-        />
-        {#if orgUnit}
+<!-- TODO: Fix this when: https://redmine.magenta.dk/issues/58621 is done -->
+<!-- We can't use getMinMaxValidities since `parent` can't be a list, or it'll crash -->
+<!-- Update dates depending on chosen org_unit -->
+<form method="post" class="mx-6" use:enhance={handler}>
+  <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+    <div class="p-8">
+      <DateInput
+        startValue={$date}
+        bind:value={$toDate.value}
+        title={capital($_("date.end_date"))}
+        id="to"
+        min={undefined}
+        max={undefined}
+        required={true}
+      />
+      {#if $page.params.uuid}
+        {#await graphQLClient().request( OrgUnitDocument, { uuid: $page.params.uuid, currentDate: $date } ) then data}
+          {@const orgUnit = data.org_units.objects[0].current}
           <Search
             type="org-unit"
             title="{capital($_('specify'))} {$_('unit', { values: { n: 1 } })}"
             startValue={{
-              uuid: orgUnit.uuid,
-              name: orgUnit.name,
+              uuid: orgUnit?.uuid ? orgUnit.uuid : undefined,
+              name: orgUnit?.name ? orgUnit.name : "",
             }}
             bind:name={$orgUnitField.value}
             on:clear={() => ($orgUnitField.value = "")}
@@ -165,38 +139,38 @@
             bind:value={selectedOrgUnit}
             required={true}
           />
-        {:else}
-          <Search
-            type="org-unit"
-            title="{capital($_('specify'))} {$_('parent')}"
-            bind:name={$orgUnitField.value}
-            on:clear={() => ($orgUnitField.value = "")}
-            errors={$orgUnitField.errors}
-            bind:value={selectedOrgUnit}
-            required={true}
-          />
-        {/if}
-        <Breadcrumbs orgUnit={selectedOrgUnit} />
-      </div>
+        {/await}
+      {:else}
+        <Search
+          type="org-unit"
+          title="{capital($_('specify'))} {$_('parent')}"
+          bind:name={$orgUnitField.value}
+          on:clear={() => ($orgUnitField.value = "")}
+          errors={$orgUnitField.errors}
+          bind:value={selectedOrgUnit}
+          required={true}
+        />
+      {/if}
+      <Breadcrumbs orgUnit={selectedOrgUnit} />
     </div>
-    <div class="flex py-6 gap-4">
-      <button
-        type="submit"
-        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >{capital(
-          $_("terminate_item", {
-            values: { item: $_("unit", { values: { n: 1 } }) },
-          })
-        )}</button
-      >
-      <button
-        type="button"
-        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        on:click={() => history.back()}
-      >
-        {capital($_("cancel"))}
-      </button>
-      <Error />
-    </div>
-  </form>
-{/await}
+  </div>
+  <div class="flex py-6 gap-4">
+    <button
+      type="submit"
+      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+      >{capital(
+        $_("terminate_item", {
+          values: { item: $_("unit", { values: { n: 1 } }) },
+        })
+      )}</button
+    >
+    <button
+      type="button"
+      class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+      on:click={() => history.back()}
+    >
+      {capital($_("cancel"))}
+    </button>
+    <Error />
+  </div>
+</form>

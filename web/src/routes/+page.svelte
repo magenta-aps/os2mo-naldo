@@ -108,7 +108,7 @@
             </li>
             <li>
               <a
-                href="{base}/organisation/rename"
+                href="{base}/organisation/rename/unit"
                 class="text-white hover:no-underline flex items-center gap-2"
               >
                 <Icon icon={editSquareOutlineRounded} width="20" height="20" />
@@ -117,7 +117,7 @@
             </li>
             <li>
               <a
-                href="{base}/organisation/move"
+                href="{base}/organisation/move/unit"
                 class="text-white hover:no-underline flex items-center gap-2"
               >
                 <Icon icon={swapHorizRounded} width="20" height="20" />
@@ -126,7 +126,7 @@
             </li>
             <li>
               <a
-                href="{base}/organisation/terminate"
+                href="{base}/organisation/terminate/unit"
                 class="text-white hover:no-underline flex items-center gap-2"
               >
                 <Icon icon={cancelOutlineRounded} width="20" height="20" />

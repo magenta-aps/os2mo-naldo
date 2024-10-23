@@ -28,18 +28,14 @@
       <p class="text-base-100">{$_("navigation.create_unit")}</p>
     </a>
     <a
-      href={`${base}/organisation/${Form.RENAME}${
-        $page.params.uuid ? `#uuid=${$page.params.uuid}` : ""
-      }`}
+      href={`${base}/organisation/${$page.params.uuid}/${Form.RENAME}/unit`}
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <Icon icon={editSquareOutlineRounded} width="20" height="20" />
       <p class="text-base-100">{$_("navigation.rename_unit")}</p>
     </a>
     <a
-      href={`${base}/organisation/${Form.MOVE}${
-        $page.params.uuid ? `#uuid=${$page.params.uuid}` : ""
-      }`}
+      href={`${base}/organisation/${$page.params.uuid}/${Form.MOVE}/unit`}
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <Icon icon={swapHorizRounded} width="20" height="20" />
