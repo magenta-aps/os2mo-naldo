@@ -113,9 +113,15 @@
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="text-sm p-4">
         {#if isOrg}
-          <a href="{base}/employee/{association.employee[0].uuid}">
-            {association.employee[0].name}
-          </a>
+          <!-- GraphQL and Naldo doesn't allow creating vacant associations, but the old frontend did -->
+          <!-- This means that some customers might have them, and therefore we need this check. -->
+          {#if association.employee[0]?.name}
+            <a href="{base}/employee/{association.employee[0].uuid}">
+              {association.employee[0].name}
+            </a>
+          {:else}
+            {capital($_("vacant"))}
+          {/if}
         {:else}
           <a
             href="{base}/organisation/{association.org_unit[0].uuid}"
