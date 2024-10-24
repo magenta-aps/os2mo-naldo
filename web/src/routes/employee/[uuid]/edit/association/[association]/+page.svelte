@@ -39,8 +39,7 @@
   const fromDate = field("from", "", [required()])
   const orgUnit = field("org_unit", "", [required()])
   const associationTypeField = field("association_type", "", [required()])
-  let substitute = field("substitute", "")
-  let svelteForm = form(fromDate, orgUnit, associationTypeField, substitute)
+  let svelteForm = form(fromDate, orgUnit, associationTypeField)
 
   let getDynamicFacet: boolean = false
   let dynamicFacetUuid: string | undefined
@@ -51,20 +50,12 @@
     dynamicFacetUuid = JSON.parse($MOConfig.confdb_association_dynamic_facets)
   }
 
-  const isSubstituteNeeded = (associationTypeUuid: string) => {
-    // Check if the selected associationType needs a substitute, if true, make the field required and update the form validation
-    if (
-      $MOConfig &&
+  const allowSubstitute = (associationTypeUuid: string) => {
+    // Check if the selected associationType allows a substitute
+    return $MOConfig &&
       JSON.parse($MOConfig.confdb_substitute_roles).includes(associationTypeUuid)
-    ) {
-      substitute = field("substitute", "", [required()])
-      svelteForm = form(fromDate, orgUnit, associationTypeField, substitute)
-      return true
-    } else {
-      substitute = field("substitute", "")
-      svelteForm = form(fromDate, orgUnit, associationTypeField, substitute)
-      return false
-    }
+      ? true
+      : false
   }
 
   gql`
@@ -326,7 +317,7 @@
           />
         </div>
         {#if associationType}
-          {#if isSubstituteNeeded(associationTypeUuid)}
+          {#if allowSubstitute(associationTypeUuid)}
             <Search
               id="substitute"
               title={capital($_("substitute"))}
@@ -336,10 +327,7 @@
                     name: association.substitute[0].name,
                   }
                 : undefined}
-              bind:name={$substitute.value}
-              errors={$substitute.errors}
               type="employee"
-              required={true}
             />
           {/if}
         {/if}
