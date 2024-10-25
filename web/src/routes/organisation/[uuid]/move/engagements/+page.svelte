@@ -205,7 +205,11 @@
                   >
                 </label>
               </div>
-              {#each engagements as engagement}
+              {#each engagements.sort((a, b) => {
+                const nameA = a.current?.person[0]?.name?.toLowerCase() || ""
+                const nameB = b.current?.person[0]?.name?.toLowerCase() || ""
+                return nameA > nameB ? 1 : -1
+              }) as engagement}
                 <div class="flex text-secondary">
                   <label
                     class="label text-sm text-secondary cursor-pointer break-words gap-4"
