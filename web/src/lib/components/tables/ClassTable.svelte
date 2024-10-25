@@ -18,7 +18,7 @@
   let data: Classes
 
   export let tense: Tense
-  export let facetUuid: string
+  export let facetUuid: string | undefined = undefined
 
   gql`
     query Class($facetUuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {

@@ -43,6 +43,8 @@
   ) {
     headers = headers.filter((header) => header.title !== capital($_("trade_union")))
   }
+
+  $: facetProps = facetUuid ? { facetUuid } : {}
 </script>
 
 <DetailTable {headers}>
@@ -52,7 +54,7 @@
         >{capital($_("future"))}</th
       >
     </tr>
-    <svelte:component this={table} tense="future" {facetUuid} />
+    <svelte:component this={table} tense="future" {...facetProps} />
   {/if}
   {#if $tenses.present}
     <tr>
@@ -60,7 +62,7 @@
         >{capital($_("present"))}</th
       ></tr
     >
-    <svelte:component this={table} tense="present" {facetUuid} />
+    <svelte:component this={table} tense="present" {...facetProps} />
   {/if}
   {#if $tenses.past}
     <tr>
@@ -68,6 +70,6 @@
         >{capital($_("past"))}</th
       >
     </tr>
-    <svelte:component this={table} tense="past" {facetUuid} />
+    <svelte:component this={table} tense="past" {...facetProps} />
   {/if}
 </DetailTable>
