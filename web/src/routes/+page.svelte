@@ -128,6 +128,15 @@
             </li>
             <li>
               <a
+                href="{base}/organisation/move/engagements"
+                class="text-white hover:no-underline flex items-center gap-2"
+              >
+                <Icon icon={swapHorizRounded} width="20" height="20" />
+                <span class="text-base-100">{$_("navigation.move_engagements")}</span>
+              </a>
+            </li>
+            <li>
+              <a
                 href="{base}/organisation/terminate/unit"
                 class="text-white hover:no-underline flex items-center gap-2"
               >

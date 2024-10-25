@@ -109,7 +109,6 @@
     }
 
   const updateEngagements = async (orgUnitUuid: string | undefined | null) => {
-    console.log(orgUnitUuid)
     const res = await graphQLClient().request(GetEngagementsDocument, {
       org_unit: orgUnitUuid,
       currentDate: $date,
