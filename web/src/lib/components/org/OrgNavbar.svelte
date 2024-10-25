@@ -46,6 +46,13 @@
       <p class="text-base-100">{$_("navigation.move_unit")}</p>
     </a>
     <a
+      href={`${base}/organisation/${$page.params.uuid}/${Form.MOVE}/engagements`}
+      class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
+    >
+      <Icon icon={swapHorizRounded} width="20" height="20" />
+      <p class="text-base-100">{$_("navigation.move_engagements")}</p>
+    </a>
+    <a
       href={`${base}/organisation/${Form.TERMINATE}${
         $page.params.uuid ? `#uuid=${$page.params.uuid}` : ""
       }`}
