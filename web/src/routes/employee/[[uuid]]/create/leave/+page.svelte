@@ -130,7 +130,7 @@
       }
     }
 
-  async function updateEngagements(employeeUuid: string | undefined | null) {
+  const updateEngagements = async (employeeUuid: string | undefined | null) => {
     const res = await graphQLClient().request(GetEmployeeDocument, {
       uuid: employeeUuid,
       // Maybe this should be `fromdate`?
