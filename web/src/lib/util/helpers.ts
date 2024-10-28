@@ -15,12 +15,6 @@ import { _ } from "svelte-i18n"
 import { capital } from "$lib/util/translationUtils"
 import { get } from "svelte/store"
 
-export const getUuidFromHash = (hash: string) => {
-  let uuidFromHash = hash.split("&").find((e) => e.startsWith("#uuid="))
-
-  return uuidFromHash ? uuidFromHash.replace("#uuid=", "") : undefined
-}
-
 export const tenseToValidity = (
   tense: Tense,
   date: string

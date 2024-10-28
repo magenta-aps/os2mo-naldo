@@ -12,7 +12,7 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import Search from "$lib/components/Search.svelte"
-  import { getMinMaxValidities, getUuidFromHash } from "$lib/util/helpers"
+  import { getMinMaxValidities } from "$lib/util/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"

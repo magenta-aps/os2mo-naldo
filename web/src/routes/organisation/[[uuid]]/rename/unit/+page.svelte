@@ -13,7 +13,6 @@
   import Search from "$lib/components/Search.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import { page } from "$app/stores"
-  import { getUuidFromHash } from "$lib/util/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"

@@ -15,7 +15,6 @@
   import Search from "$lib/components/Search.svelte"
   import {
     getEngagementTitlesAndUuid,
-    getUuidFromHash,
     type EngagementTitleAndUuid,
   } from "$lib/util/helpers"
   import { onMount } from "svelte"

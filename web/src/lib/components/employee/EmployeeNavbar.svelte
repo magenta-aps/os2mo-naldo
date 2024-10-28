@@ -26,21 +26,27 @@
       <p class="text-base-100">{$_("navigation.create_employee")}</p>
     </a>
     <a
-      href={`${base}/employee/${$page.params.uuid}/${Form.CREATE}/leave`}
+      href={`${base}/employee/${$page.params.uuid ? `${$page.params.uuid}/` : ""}${
+        Form.CREATE
+      }/leave`}
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <Icon icon={personAlertOutlineRounded} width="20" height="20" />
       <p class="text-base-100">{$_("navigation.leave")}</p>
     </a>
     <a
-      href={`${base}/employee/${$page.params.uuid}/${Form.MOVE}`}
+      href={`${base}/employee/${$page.params.uuid ? `${$page.params.uuid}/` : ""}${
+        Form.MOVE
+      }`}
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <Icon icon={swapHorizRounded} width="20" height="20" />
       <p class="text-base-100">{$_("navigation.move_engagement")}</p>
     </a>
     <a
-      href={`${base}/employee/${$page.params.uuid}/${Form.TERMINATE}/employee`}
+      href={`${base}/employee/${$page.params.uuid ? `${$page.params.uuid}/` : ""}${
+        Form.TERMINATE
+      }/employee`}
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <Icon icon={personCancelOutlineRounded} width="20" height="20" />
