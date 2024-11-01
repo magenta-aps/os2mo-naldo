@@ -3066,8 +3066,7 @@ export type Engagement = {
   /**
    * Whether this engagement is the primary engagement.
    *
-   * Checks this engagements against the users other engagements. The engagement with the highest scope in the associated primary class
-   * is marked as primary. Only one engagement can be primary.
+   * Checks if the `primary` field contains either a class with user-key: `"primary"` or `"explicitly-primary"`.
    *
    */
   is_primary: Scalars['Boolean']['output'];
