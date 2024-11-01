@@ -10,7 +10,7 @@
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
-  import { getITUserITSystemName } from "$lib/util/helpers"
+  import { getITUserITSystemName, getValidities } from "$lib/util/helpers"
   import {
     FacetClassesAndEmployeeDocument,
     CreateItAssociationDocument,
@@ -28,7 +28,6 @@
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string
   let selectedOrgUnit: {
@@ -67,9 +66,9 @@
           }
         }
       }
-      employees(filter: { uuids: $uuid, from_date: null, to_date: null }) {
+      employees(filter: { uuids: $uuid }) {
         objects {
-          current {
+          current(at: $currentDate) {
             uuid
             name
             itusers {
@@ -78,12 +77,6 @@
               }
               user_key
               uuid
-            }
-          }
-          validities {
-            validity {
-              from
-              to
             }
           }
         }
@@ -100,6 +93,20 @@
       }
     }
   `
+
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  $: if (selectedOrgUnit) {
+    ;(async () => {
+      validities = await getValidities(selectedOrgUnit.uuid)
+    })()
+  } else {
+    validities = { from: null, to: null }
+  }
 
   const handler: SubmitFunction =
     () =>
@@ -178,13 +185,11 @@
   {@const itusers = data.employees.objects[0].current?.itusers}
   {@const primaryClasses = data.classes.objects}
   {@const employee = data.employees.objects[0].current}
-  {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
-          <!-- TODO: dynamically change dates depending on which org has been chosen -->
           <DateInput
             startValue={$date}
             bind:value={$fromDate.value}
@@ -203,8 +208,6 @@
             max={validities.to}
           />
         </div>
-        <!-- FIXME: Either allow undefined or use `validities` when datepickers -->
-        <!-- use org_unit validities instead of employee -->
         <Search
           type="employee"
           startValue={{
@@ -224,8 +227,6 @@
         />
         <Breadcrumbs orgUnit={selectedOrgUnit} />
         <div class="flex flex-row gap-6">
-          <!-- FIXME: Either allow undefined or use `validities` when datepickers -->
-          <!-- use org_unit validities instead of employee -->
           <Select
             title={capital($_("ituser", { values: { n: 1 } }))}
             id="it-user-uuid"

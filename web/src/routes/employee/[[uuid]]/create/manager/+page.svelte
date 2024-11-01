@@ -21,7 +21,7 @@
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getMinMaxValidities } from "$lib/util/helpers"
+  import { getValidities } from "$lib/util/helpers"
 
   let toDate: string
   let selectedOrgUnit: {
@@ -43,7 +43,7 @@
   )
 
   gql`
-    query FacetsAndOrg($uuid: [UUID!], $currentDate: DateTime!) {
+    query FacetsAndOrg($currentDate: DateTime!) {
       facets(
         filter: { user_keys: ["manager_type", "manager_level", "responsibility"] }
       ) {
@@ -55,16 +55,6 @@
               name
               uuid
               user_key
-            }
-          }
-        }
-      }
-      employees(filter: { uuids: $uuid, from_date: null, to_date: null }) {
-        objects {
-          validities {
-            validity {
-              from
-              to
             }
           }
         }
@@ -81,6 +71,20 @@
       }
     }
   `
+
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  $: if (selectedOrgUnit) {
+    ;(async () => {
+      validities = await getValidities(selectedOrgUnit.uuid)
+    })()
+  } else {
+    validities = { from: null, to: null }
+  }
 
   const handler: SubmitFunction =
     () =>
@@ -134,7 +138,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( FacetsAndOrgDocument, { uuid: $page.params.uuid, currentDate: $date } )}
+{#await graphQLClient().request(FacetsAndOrgDocument, { currentDate: $date })}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -153,7 +157,6 @@
   </div>
 {:then data}
   {@const facets = data.facets.objects}
-  {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">

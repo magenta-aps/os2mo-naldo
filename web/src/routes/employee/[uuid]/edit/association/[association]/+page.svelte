@@ -23,7 +23,7 @@
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getMinMaxValidities } from "$lib/util/helpers"
+  import { getValidities } from "$lib/util/helpers"
   import { MOConfig } from "$lib/stores/config"
   import SelectGroup from "$lib/components/forms/shared/SelectGroup.svelte"
 
@@ -123,16 +123,6 @@
           }
         }
       }
-      employees(filter: { uuids: $employeeUuid, from_date: null, to_date: null }) {
-        objects {
-          validities {
-            validity {
-              from
-              to
-            }
-          }
-        }
-      }
       ...MedOrg
     }
 
@@ -166,6 +156,20 @@
       }
     }
   `
+
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  $: if (selectedOrgUnit) {
+    ;(async () => {
+      validities = await getValidities(selectedOrgUnit.uuid)
+    })()
+  } else {
+    validities = { from: null, to: null }
+  }
 
   const handler: SubmitFunction =
     () =>
@@ -239,7 +243,6 @@
   {@const association = data.associations.objects[0].validities[0]}
   {@const employee = association.person[0]}
   {@const facets = data.facets.objects}
-  {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
   {@const topLevelFacets = data.classes?.objects}
 
   <form method="post" class="mx-6" use:enhance={handler}>

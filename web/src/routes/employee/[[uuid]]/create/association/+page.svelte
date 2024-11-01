@@ -24,7 +24,7 @@
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import SelectGroup from "$lib/components/forms/shared/SelectGroup.svelte"
-  import { getMinMaxValidities } from "$lib/util/helpers"
+  import { getMinMaxValidities, getValidities } from "$lib/util/helpers"
   import { MOConfig } from "$lib/stores/config"
 
   let toDate: string
@@ -77,17 +77,11 @@
           }
         }
       }
-      employees(filter: { uuids: $uuid, from_date: null, to_date: null }) {
+      employees(filter: { uuids: $uuid }) {
         objects {
-          current {
+          current(at: $currentDate) {
             uuid
             name
-          }
-          validities {
-            validity {
-              from
-              to
-            }
           }
         }
       }
@@ -123,6 +117,19 @@
       }
     }
   `
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  $: if (selectedOrgUnit) {
+    ;(async () => {
+      validities = await getValidities(selectedOrgUnit.uuid)
+    })()
+  } else {
+    validities = { from: null, to: null }
+  }
 
   const handler: SubmitFunction =
     () =>
@@ -196,14 +203,12 @@
 {:then data}
   {@const facets = data.facets.objects}
   {@const employee = data.employees.objects[0].current}
-  {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
   {@const topLevelFacets = data.classes?.objects}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
-          <!-- TODO: dynamically change dates depending on which org has been chosen -->
           <DateInput
             startValue={$date}
             bind:value={$fromDate.value}
@@ -222,9 +227,6 @@
             max={validities.to}
           />
         </div>
-        <!-- FIXME: Either allow undefined or use `validities` when datepickers -->
-        <!-- use org_unit validities instead of employee -->
-
         <!-- TODO: make optional when GraphQL agrees -->
         <Search
           type="employee"

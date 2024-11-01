@@ -92,12 +92,14 @@
   let validities: {
     from: string | undefined | null
     to: string | undefined | null
-  } | null = { from: null, to: null }
+  } = { from: null, to: null }
 
   $: if (parent) {
     ;(async () => {
       validities = await getValidities(parent.uuid)
     })()
+  } else {
+    validities = { from: null, to: null }
   }
 
   const handler: SubmitFunction =
@@ -183,16 +185,16 @@
             errors={$fromDate.errors}
             title={capital($_("date.move_date"))}
             id="from"
-            min={validities?.from ? validities.from : null}
-            max={toDate ? toDate : validities?.to}
+            min={validities.from}
+            max={toDate ? toDate : validities.to}
             required={true}
           />
           <DateInput
             bind:value={toDate}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : validities?.from}
-            max={validities?.to}
+            min={$fromDate.value ? $fromDate.value : validities.from}
+            max={validities.to}
           />
         </div>
         {#if $page.params.uuid}
@@ -203,9 +205,6 @@
               title="{capital($_('specify'))} {$_('parent')}"
               id="parent-uuid"
               bind:value={parent}
-              on:clear={() => {
-                validities = { from: null, to: null }
-              }}
               startValue={{
                 uuid: orgUnit?.uuid ? orgUnit.uuid : undefined,
                 name: orgUnit?.name ? orgUnit?.name : "",
@@ -218,9 +217,6 @@
             title="{capital($_('specify'))} {$_('parent')}"
             id="parent-uuid"
             bind:value={parent}
-            on:clear={() => {
-              validities = { from: null, to: null }
-            }}
           />
         {/if}
         <Breadcrumbs

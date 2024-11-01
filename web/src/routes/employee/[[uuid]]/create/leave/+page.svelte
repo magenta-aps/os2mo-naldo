@@ -20,8 +20,8 @@
   } from "./query.generated"
   import {
     getEngagementTitlesAndUuid,
+    getEngagementValidities,
     type EngagementTitleAndUuid,
-    getMinMaxValidities,
   } from "$lib/util/helpers"
   import Search from "$lib/components/Search.svelte"
   import { onMount } from "svelte"
@@ -42,6 +42,10 @@
     name: string
   }
   let engagements: EngagementTitleAndUuid[] | undefined
+  let selectedEngagement: {
+    uuid: string
+    name: string
+  }
   gql`
     query LeaveType($currentDate: DateTime) {
       facets(filter: { user_keys: ["leave_type"] }) {
@@ -77,12 +81,6 @@
               }
             }
           }
-          validities {
-            validity {
-              from
-              to
-            }
-          }
         }
       }
     }
@@ -98,6 +96,20 @@
       }
     }
   `
+
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  $: if (selectedEngagement) {
+    ;(async () => {
+      validities = await getEngagementValidities(selectedEngagement.uuid)
+    })()
+  } else {
+    validities = { from: null, to: null }
+  }
 
   const handler: SubmitFunction =
     () =>
@@ -164,7 +176,6 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-<!-- LOOKATME: FIXME: SOMETHING: Form here or inside await? -->
 <form method="post" class="mx-6" use:enhance={handler}>
   <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
     <div class="p-8">
@@ -177,15 +188,16 @@
           errors={$fromDate.errors}
           title={capital($_("date.start_date"))}
           id="from"
-          max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
+          min={validities.from}
+          max={toDate ? toDate : validities.to}
           required={true}
         />
         <DateInput
           bind:value={toDate}
           title={capital($_("date.end_date"))}
           id="to"
-          min={$fromDate.value ? $fromDate.value : undefined}
-          max={undefined}
+          min={$fromDate.value ? $fromDate.value : validities.from}
+          max={validities.to}
         />
       </div>
       {#await graphQLClient().request(LeaveTypeDocument, { currentDate: $date })}
@@ -261,8 +273,8 @@
             title={capital($_("engagements", { values: { n: 2 } }))}
             id="engagement-uuid"
             bind:name={$engagement.value}
+            bind:value={selectedEngagement}
             errors={$engagement.errors}
-            startValue={getEngagementTitlesAndUuid(engagements)[0]}
             iterable={getEngagementTitlesAndUuid(engagements)}
             required={true}
           />
@@ -271,6 +283,7 @@
         <Select
           title={capital($_("engagements", { values: { n: 2 } }))}
           id="engagement-uuid"
+          bind:value={selectedEngagement}
           bind:name={$engagement.value}
           errors={$engagement.errors}
           disabled

@@ -17,6 +17,7 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
+  import { getValidities } from "$lib/util/helpers"
 
   let toDate: string
   let selectedOrgUnit: {
@@ -52,6 +53,20 @@
       }
     }
   `
+
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  $: if (parent) {
+    ;(async () => {
+      validities = await getValidities(parent.uuid)
+    })()
+  } else {
+    validities = { from: null, to: null }
+  }
 
   const handler: SubmitFunction =
     () =>
@@ -105,15 +120,16 @@
           errors={$fromDate.errors}
           title={capital($_("date.move_date"))}
           id="from"
-          max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
+          min={validities.from}
+          max={toDate ? toDate : validities.to}
           required={true}
         />
         <DateInput
           bind:value={toDate}
           title={capital($_("date.end_date"))}
           id="to"
-          min={$fromDate.value ? $fromDate.value : undefined}
-          max={undefined}
+          min={$fromDate.value ? $fromDate.value : validities.from}
+          max={validities.to}
         />
         <!-- FIXME: min/max -->
       </div>

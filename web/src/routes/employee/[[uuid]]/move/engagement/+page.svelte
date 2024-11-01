@@ -15,6 +15,7 @@
   import Search from "$lib/components/Search.svelte"
   import {
     getEngagementTitlesAndUuid,
+    getValidities,
     type EngagementTitleAndUuid,
   } from "$lib/util/helpers"
   import { onMount } from "svelte"
@@ -78,6 +79,20 @@
     }
   `
 
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  $: if (selectedOrgUnit) {
+    ;(async () => {
+      validities = await getValidities(selectedOrgUnit.uuid)
+    })()
+  } else {
+    validities = { from: null, to: null }
+  }
+
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
@@ -132,7 +147,6 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-<!-- LOOKATME: FIXME: SOMETHING: Form here or inside await? -->
 <form method="post" class="mx-6" use:enhance={handler}>
   <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
     <div class="p-8">
@@ -143,8 +157,8 @@
           errors={$fromDate.errors}
           title={capital($_("date.move_date"))}
           id="from"
-          min={undefined}
-          max={undefined}
+          min={validities.from}
+          max={validities.to}
           required={true}
         />
       </div>

@@ -25,6 +25,7 @@
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { onMount } from "svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
+  import { getValidities } from "$lib/util/helpers"
 
   type Engagements = GetEngagementsQuery["engagements"]["objects"][0]
 
@@ -65,6 +66,20 @@
     }
   `
 
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  $: if (newOrgUnit) {
+    ;(async () => {
+      validities = await getValidities(newOrgUnit.uuid)
+    })()
+  } else {
+    validities = { from: null, to: null }
+  }
+
   let toDate: string
 
   const fromDate = field("from", "", [required()])
@@ -74,6 +89,10 @@
   let engagements: Engagements[]
 
   let orgUnit: {
+    uuid: string
+    name: string
+  }
+  let newOrgUnit: {
     uuid: string
     name: string
   }
@@ -152,9 +171,17 @@
           errors={$fromDate.errors}
           title={capital($_("date.start_date"))}
           id="from"
+          min={validities.from}
+          max={toDate ? toDate : validities.to}
           required={true}
         />
-        <DateInput bind:value={toDate} title={capital($_("date.end_date"))} id="to" />
+        <DateInput
+          bind:value={toDate}
+          title={capital($_("date.end_date"))}
+          id="to"
+          min={$fromDate.value ? $fromDate.value : validities.from}
+          max={validities.to}
+        />
       </div>
       <div class="flex flex-row gap-6">
         {#if $page.params.uuid}
@@ -268,6 +295,7 @@
           type="org-unit"
           id="org-unit"
           title="{capital($_('move'))} {$_('to')}"
+          bind:value={newOrgUnit}
           required
         />
       </div>
@@ -282,7 +310,7 @@
     <button
       type="button"
       class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-      on:click={() => goto(`${base}/organisation/${$page.params.uuid}`)}
+      on:click={() => history.back()}
     >
       {capital($_("cancel"))}
     </button>

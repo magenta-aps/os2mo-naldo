@@ -22,13 +22,12 @@
     getClassesByFacetUserKey,
   } from "$lib/util/get_classes"
   import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
-  import { getITUserITSystemName } from "$lib/util/helpers"
+  import { getITUserITSystemName, getValidities } from "$lib/util/helpers"
   import Search from "$lib/components/Search.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string
   let selectedOrgUnit: {
@@ -126,16 +125,6 @@
           }
         }
       }
-      employees(filter: { uuids: $employeeUuid, from_date: null, to_date: null }) {
-        objects {
-          validities {
-            validity {
-              from
-              to
-            }
-          }
-        }
-      }
     }
 
     mutation UpdateITAssociation($input: ITAssociationUpdateInput!, $date: DateTime!) {
@@ -148,6 +137,20 @@
       }
     }
   `
+
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  $: if (selectedOrgUnit) {
+    ;(async () => {
+      validities = await getValidities(selectedOrgUnit.uuid)
+    })()
+  } else {
+    validities = { from: null, to: null }
+  }
 
   const handler: SubmitFunction =
     () =>
@@ -227,7 +230,6 @@
   {@const itusers = itassociation.person[0].itusers}
   {@const facets = data.facets.objects}
   {@const classes = data.classes.objects}
-  {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
   {@const itUserStartValue = getITUserITSystemName(itassociation.it_user)}
 
   <form method="post" class="mx-6" use:enhance={handler}>

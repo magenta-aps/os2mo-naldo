@@ -21,7 +21,7 @@
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getMinMaxValidities } from "$lib/util/helpers"
+  import { getValidities } from "$lib/util/helpers"
 
   let toDate: string
   let selectedOrgUnit: {
@@ -36,7 +36,7 @@
   const svelteForm = form(fromDate, orgUnit, jobFunction, engagementType)
 
   gql`
-    query FacetAndOrg($uuid: [UUID!], $currentDate: DateTime!) {
+    query FacetAndOrg($currentDate: DateTime!) {
       facets(
         filter: {
           user_keys: ["engagement_type", "engagement_job_function", "primary_type"]
@@ -54,16 +54,6 @@
           }
         }
       }
-      employees(filter: { uuids: $uuid, from_date: null, to_date: null }) {
-        objects {
-          validities {
-            validity {
-              from
-              to
-            }
-          }
-        }
-      }
     }
 
     mutation CreateEngagement($input: EngagementCreateInput!, $date: DateTime!) {
@@ -76,6 +66,21 @@
       }
     }
   `
+
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  $: if (selectedOrgUnit) {
+    ;(async () => {
+      validities = await getValidities(selectedOrgUnit.uuid)
+    })()
+  } else {
+    validities = { from: null, to: null }
+  }
+
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
@@ -150,13 +155,11 @@
   </div>
 {:then data}
   {@const facets = data.facets.objects}
-  {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
-          <!-- TODO: dynamically change dates depending on which org has been chosen -->
           <DateInput
             startValue={$date}
             bind:value={$fromDate.value}
