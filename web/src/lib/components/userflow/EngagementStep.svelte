@@ -17,6 +17,7 @@
   import Search from "$lib/components/Search.svelte"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
+  import { getValidities } from "$lib/util/helpers"
 
   gql`
     query EngagementFacets($currentDate: DateTime!) {
@@ -39,6 +40,22 @@
       }
     }
   `
+
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  $: if ($engagementInfo.orgUnit?.uuid) {
+    ;(async () => {
+      validities = await getValidities(
+        $engagementInfo.orgUnit ? $engagementInfo.orgUnit.uuid : ""
+      )
+    })()
+  } else {
+    validities = { from: null, to: null }
+  }
 
   const fromDate = field("from", "", [required()])
   const orgUnit = field("org_unit", "", [required()])
@@ -90,12 +107,16 @@
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
+            min={validities.from}
+            max={$engagementInfo.toDate ? $engagementInfo.toDate : validities.to}
             required={true}
           />
           <DateInput
             bind:value={$engagementInfo.toDate}
             title={capital($_("date.end_date"))}
             id="to"
+            min={$fromDate.value ? $fromDate.value : validities.from}
+            max={validities.to}
           />
         </div>
         <Search
