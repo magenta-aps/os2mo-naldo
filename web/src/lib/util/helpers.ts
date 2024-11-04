@@ -14,11 +14,51 @@ import {
 import { _ } from "svelte-i18n"
 import { capital } from "$lib/util/translationUtils"
 import { get } from "svelte/store"
+import { graphQLClient } from "$lib/util/http"
+import { gql } from "graphql-request"
+import {
+  GetOrgUnitValiditiesDocument,
+  GetEngagementValiditiesDocument,
+} from "./query.generated"
 
-export const getUuidFromHash = (hash: string) => {
-  let uuidFromHash = hash.split("&").find((e) => e.startsWith("#uuid="))
+gql`
+  query GetOrgUnitValidities($uuid: [UUID!]) {
+    org_units(filter: { uuids: $uuid, from_date: null, to_date: null }) {
+      objects {
+        validities {
+          validity {
+            from
+            to
+          }
+        }
+      }
+    }
+  }
+  query GetEngagementValidities($uuid: [UUID!]) {
+    engagements(filter: { uuids: $uuid, from_date: null, to_date: null }) {
+      objects {
+        validities {
+          validity {
+            from
+            to
+          }
+        }
+      }
+    }
+  }
+`
 
-  return uuidFromHash ? uuidFromHash.replace("#uuid=", "") : undefined
+export const getValidities = async (uuid: string) => {
+  const res = await graphQLClient().request(GetOrgUnitValiditiesDocument, {
+    uuid: uuid,
+  })
+  return getMinMaxValidities(res.org_units.objects[0].validities)
+}
+export const getEngagementValidities = async (uuid: string) => {
+  const res = await graphQLClient().request(GetEngagementValiditiesDocument, {
+    uuid: uuid,
+  })
+  return getMinMaxValidities(res.engagements.objects[0].validities)
 }
 
 export const tenseToValidity = (

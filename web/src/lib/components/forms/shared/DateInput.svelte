@@ -9,8 +9,8 @@
   value = startValue ? startValue : value
   export let required = false
   export let disabled = false
-  export let min: string | undefined = undefined
-  export let max: string | undefined = undefined
+  export let min: string | undefined | null = undefined
+  export let max: string | undefined | null = undefined
   export let errors: string[] = []
   // We changed from `pb-4` to having `pb-3` and `pb-1`, which messed with the navbar DateInput.
   // This is a workaround.

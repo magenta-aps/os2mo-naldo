@@ -22,13 +22,12 @@
     getClassesByFacetUserKey,
   } from "$lib/util/get_classes"
   import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
-  import { getITUserITSystemName } from "$lib/util/helpers"
+  import { getITUserITSystemName, getValidities } from "$lib/util/helpers"
   import Search from "$lib/components/Search.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string
   let selectedOrgUnit: {
@@ -45,7 +44,6 @@
   gql`
     query ITAssociationAndFacets(
       $uuid: [UUID!]
-      $employeeUuid: [UUID!]
       $fromDate: DateTime
       $toDate: DateTime
       $currentDate: DateTime!
@@ -126,16 +124,6 @@
           }
         }
       }
-      employees(filter: { uuids: $employeeUuid, from_date: null, to_date: null }) {
-        objects {
-          validities {
-            validity {
-              from
-              to
-            }
-          }
-        }
-      }
     }
 
     mutation UpdateITAssociation($input: ITAssociationUpdateInput!, $date: DateTime!) {
@@ -148,6 +136,20 @@
       }
     }
   `
+
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  $: if (selectedOrgUnit) {
+    ;(async () => {
+      validities = await getValidities(selectedOrgUnit.uuid)
+    })()
+  } else {
+    validities = { from: null, to: null }
+  }
 
   const handler: SubmitFunction =
     () =>
@@ -204,7 +206,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ItAssociationAndFacetsDocument, { uuid: $page.params.itassociation, employeeUuid: $page.params.uuid, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), currentDate: $date } )}
+{#await graphQLClient().request( ItAssociationAndFacetsDocument, { uuid: $page.params.itassociation, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), currentDate: $date } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -227,14 +229,12 @@
   {@const itusers = itassociation.person[0].itusers}
   {@const facets = data.facets.objects}
   {@const classes = data.classes.objects}
-  {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
   {@const itUserStartValue = getITUserITSystemName(itassociation.it_user)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
-          <!-- TODO: dynamically change dates depending on which org has been chosen -->
           <DateInput
             startValue={$date}
             bind:value={$fromDate.value}

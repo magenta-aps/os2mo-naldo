@@ -24,7 +24,7 @@
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getMinMaxValidities } from "$lib/util/helpers"
+  import { getMinMaxValidities, getValidities } from "$lib/util/helpers"
 
   let toDate: string
   let selectedOrgUnit: {
@@ -41,7 +41,6 @@
   gql`
     query EngagementAndFacet(
       $uuid: [UUID!]
-      $employeeUuid: [UUID!]
       $fromDate: DateTime
       $toDate: DateTime
       $currentDate: DateTime
@@ -95,16 +94,6 @@
           }
         }
       }
-      employees(filter: { uuids: $employeeUuid, from_date: null, to_date: null }) {
-        objects {
-          validities {
-            validity {
-              from
-              to
-            }
-          }
-        }
-      }
     }
 
     mutation UpdateEngagement($input: EngagementUpdateInput!, $date: DateTime!) {
@@ -117,6 +106,20 @@
       }
     }
   `
+
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  $: if (selectedOrgUnit) {
+    ;(async () => {
+      validities = await getValidities(selectedOrgUnit.uuid)
+    })()
+  } else {
+    validities = { from: null, to: null }
+  }
 
   const handler: SubmitFunction =
     () =>
@@ -170,7 +173,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( EngagementAndFacetDocument, { uuid: $page.params.engagement, employeeUuid: $page.params.uuid, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), currentDate: $date } )}
+{#await graphQLClient().request( EngagementAndFacetDocument, { uuid: $page.params.engagement, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), currentDate: $date } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -195,13 +198,11 @@
 {:then data}
   {@const engagement = data.engagements.objects[0].validities[0]}
   {@const facets = data.facets.objects}
-  {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
-          <!-- TODO: dynamically change dates depending on which org has been chosen -->
           <DateInput
             startValue={$date}
             bind:value={$fromDate.value}

@@ -19,43 +19,45 @@
 <div class="navbar bg-primary min-h-0 text-base-100">
   <div class="flex-1">
     <a
-      href={`${base}/organisation/${Form.CREATE}${
-        $page.params.uuid ? `#uuid=${$page.params.uuid}` : ""
-      }`}
+      href={`${base}/organisation/${$page.params.uuid ? `${$page.params.uuid}/` : ""}${
+        Form.CREATE
+      }/unit`}
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal align-middle"
     >
       <Icon icon={addCircleOutlineRounded} width="20" height="20" />
       <p class="text-base-100">{$_("navigation.create_unit")}</p>
     </a>
     <a
-      href={`${base}/organisation/${Form.RENAME}${
-        $page.params.uuid ? `#uuid=${$page.params.uuid}` : ""
-      }`}
+      href={`${base}/organisation/${$page.params.uuid ? `${$page.params.uuid}/` : ""}${
+        Form.RENAME
+      }/unit`}
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <Icon icon={editSquareOutlineRounded} width="20" height="20" />
       <p class="text-base-100">{$_("navigation.rename_unit")}</p>
     </a>
     <a
-      href={`${base}/organisation/${Form.MOVE}${
-        $page.params.uuid ? `#uuid=${$page.params.uuid}` : ""
-      }`}
+      href={`${base}/organisation/${$page.params.uuid ? `${$page.params.uuid}/` : ""}${
+        Form.MOVE
+      }/unit`}
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <Icon icon={swapHorizRounded} width="20" height="20" />
       <p class="text-base-100">{$_("navigation.move_unit")}</p>
     </a>
     <a
-      href={`${base}/organisation/${$page.params.uuid}/${Form.MOVE}/engagements`}
+      href={`${base}/organisation/${$page.params.uuid ? `${$page.params.uuid}/` : ""}${
+        Form.MOVE
+      }/engagements`}
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <Icon icon={swapHorizRounded} width="20" height="20" />
       <p class="text-base-100">{$_("navigation.move_engagements")}</p>
     </a>
     <a
-      href={`${base}/organisation/${Form.TERMINATE}${
-        $page.params.uuid ? `#uuid=${$page.params.uuid}` : ""
-      }`}
+      href={`${base}/organisation/${$page.params.uuid ? `${$page.params.uuid}/` : ""}${
+        Form.TERMINATE
+      }/unit`}
       class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal"
     >
       <Icon icon={cancelOutlineRounded} width="20" height="20" />

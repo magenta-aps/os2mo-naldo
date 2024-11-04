@@ -24,7 +24,7 @@
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getMinMaxValidities } from "$lib/util/helpers"
+  import { getValidities } from "$lib/util/helpers"
 
   let toDate: string
   let selectedOrgUnit: {
@@ -118,6 +118,19 @@
     }
   `
 
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  $: if (selectedOrgUnit) {
+    ;(async () => {
+      validities = await getValidities(selectedOrgUnit.uuid)
+    })()
+  } else {
+    validities = { from: null, to: null }
+  }
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
@@ -195,14 +208,11 @@
 {:then data}
   {@const engagement = data.engagements.objects[0].validities[0]}
   {@const facets = data.facets.objects}
-  {@const validities = getMinMaxValidities(data.org_units.objects[0].validities)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
-          <!-- FIXME: Dates should be dynamic -->
-          <!-- Meaning they should update, if org_unit is changed -->
           <DateInput
             startValue={$date}
             bind:value={$fromDate.value}
@@ -220,7 +230,7 @@
               : null}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value}
+            min={$fromDate.value ? $fromDate.value : validities.from}
             max={validities.to}
           />
         </div>

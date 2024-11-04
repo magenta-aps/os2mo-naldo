@@ -28,7 +28,6 @@
           >
         </li>
         {#if $isAdmin}
-          <!-- TODO: Create real featureflag that locks the page, and doesn't just remove the link -->
           {#if env.PUBLIC_SHOW_ADMIN_PANEL !== "false"}
             <li>
               <a
@@ -38,7 +37,6 @@
               >
             </li>
           {/if}
-          <!-- TODO: Create real featureflag that locks the page, and doesn't just remove the link -->
           {#if env.PUBLIC_SHOW_INSIGHTS !== "false"}
             <li>
               <a
