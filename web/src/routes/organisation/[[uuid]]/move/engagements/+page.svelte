@@ -164,7 +164,6 @@
   <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
     <div class="p-8">
       <div class="flex flex-row gap-6">
-        <!-- TODO: dynamically change dates depending on which org has been chosen -->
         <DateInput
           startValue={$date}
           bind:value={$fromDate.value}

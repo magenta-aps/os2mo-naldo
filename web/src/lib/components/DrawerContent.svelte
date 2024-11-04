@@ -54,7 +54,6 @@
         </a>
       </li>
       {#if $isAdmin}
-        <!-- TODO: Create real featureflag that locks the page, and doesn't just remove the link -->
         {#if env.PUBLIC_SHOW_ADMIN_PANEL !== "false"}
           <li>
             <a class="w-100 text-secondary hover:no-underline" href="{base}/admin">
@@ -62,7 +61,6 @@
             </a>
           </li>
         {/if}
-        <!-- TODO: Create real featureflag that locks the page, and doesn't just remove the link -->
         {#if env.PUBLIC_SHOW_INSIGHTS !== "false"}
           <li>
             <a class="w-100 text-secondary hover:no-underline" href="{base}/insights">

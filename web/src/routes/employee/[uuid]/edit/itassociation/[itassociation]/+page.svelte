@@ -44,7 +44,6 @@
   gql`
     query ITAssociationAndFacets(
       $uuid: [UUID!]
-      $employeeUuid: [UUID!]
       $fromDate: DateTime
       $toDate: DateTime
       $currentDate: DateTime!
@@ -207,7 +206,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ItAssociationAndFacetsDocument, { uuid: $page.params.itassociation, employeeUuid: $page.params.uuid, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), currentDate: $date } )}
+{#await graphQLClient().request( ItAssociationAndFacetsDocument, { uuid: $page.params.itassociation, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), currentDate: $date } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -236,7 +235,6 @@
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
-          <!-- TODO: dynamically change dates depending on which org has been chosen -->
           <DateInput
             startValue={$date}
             bind:value={$fromDate.value}

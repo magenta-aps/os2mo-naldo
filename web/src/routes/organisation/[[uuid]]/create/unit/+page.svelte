@@ -174,7 +174,6 @@
     </div>
   {:then data}
     {@const facets = data.facets.objects}
-    <!-- TODO: these dates needs to be dynamically linked to the `parent.validity` -->
 
     <div class="sm:w-full md:w-3/4 xl:w-1/2 mb-6 bg-slate-100 rounded">
       <div class="p-8">

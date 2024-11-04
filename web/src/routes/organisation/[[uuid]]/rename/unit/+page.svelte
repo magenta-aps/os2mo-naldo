@@ -97,8 +97,6 @@
     }
 </script>
 
-<!-- TODO: getMinMaxValidities -->
-
 <title>{capital($_("rename"))} {$_("org_unit", { values: { n: 1 } })} | OS2mo</title>
 
 <div class="flex align-center px-6 pt-6 pb-4">
@@ -128,7 +126,6 @@
           min={$fromDate.value ? $fromDate.value : validities.from}
           max={validities.to}
         />
-        <!-- FIXME: min/max -->
       </div>
       {#if $page.params.uuid}
         {#await graphQLClient().request( OrgUnitDocument, { uuid: $page.params.uuid, currentDate: $date } )}
