@@ -47,7 +47,7 @@
     "date-fns-tz": "^2.0.1",
     "graphql": "^16.10.0",
     "gql-query-builder": "^3.8.0",
-    "graphql-request": "^6.0.0",
+    "graphql-request": "^7.1.2",
     "json2csv": "^6.0.0-alpha.2",
     "keycloak-js": "^26.0.7",
     "prettier": "<3.0.0",
