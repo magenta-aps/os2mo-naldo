@@ -58,7 +58,7 @@
           <ul class="menu px-0">
             <li>
               <a
-                href="{base}/employee/create"
+                href="{base}/employee/create/employee"
                 class="text-white hover:no-underline flex items-center gap-2"
               >
                 <Icon icon={personAddOutlineRounded} width="20" height="20" />
@@ -76,7 +76,7 @@
             </li>
             <li>
               <a
-                href="{base}/employee/move"
+                href="{base}/employee/move/engagement"
                 class="text-white hover:no-underline flex items-center gap-2"
               >
                 <Icon icon={swapHorizRounded} width="20" height="20" />
@@ -84,8 +84,10 @@
               </a>
             </li>
             <li>
+              <!-- NOTE: `employee/terminate/employee` vs  `employee/terminate` -->
+              <!-- /employee gives more structure, but seems redundant, just like `/unit` -->
               <a
-                href="{base}/employee/terminate"
+                href="{base}/employee/terminate/employee"
                 class="text-white hover:no-underline flex items-center gap-2"
               >
                 <Icon icon={personCancelOutlineRounded} width="20" height="20" />
@@ -99,7 +101,7 @@
           <ul class="menu px-0">
             <li>
               <a
-                href="{base}/organisation/create"
+                href="{base}/organisation/create/unit"
                 class="text-white hover:no-underline flex items-center gap-2"
               >
                 <Icon icon={addCircleOutlineRounded} width="20" height="20" />
@@ -108,7 +110,7 @@
             </li>
             <li>
               <a
-                href="{base}/organisation/rename"
+                href="{base}/organisation/rename/unit"
                 class="text-white hover:no-underline flex items-center gap-2"
               >
                 <Icon icon={editSquareOutlineRounded} width="20" height="20" />
@@ -117,7 +119,7 @@
             </li>
             <li>
               <a
-                href="{base}/organisation/move"
+                href="{base}/organisation/move/unit"
                 class="text-white hover:no-underline flex items-center gap-2"
               >
                 <Icon icon={swapHorizRounded} width="20" height="20" />
@@ -126,7 +128,16 @@
             </li>
             <li>
               <a
-                href="{base}/organisation/terminate"
+                href="{base}/organisation/move/engagements"
+                class="text-white hover:no-underline flex items-center gap-2"
+              >
+                <Icon icon={swapHorizRounded} width="20" height="20" />
+                <span class="text-base-100">{$_("navigation.move_engagements")}</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="{base}/organisation/terminate/unit"
                 class="text-white hover:no-underline flex items-center gap-2"
               >
                 <Icon icon={cancelOutlineRounded} width="20" height="20" />

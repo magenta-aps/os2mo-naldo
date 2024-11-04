@@ -15,14 +15,21 @@
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import { LeaveAndFacetDocument, UpdateLeaveDocument } from "./query.generated"
-  import { getEngagementTitlesAndUuid } from "$lib/util/helpers"
+  import {
+    getEngagementTitlesAndUuid,
+    getEngagementValidities,
+  } from "$lib/util/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Search from "$lib/components/Search.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getMinMaxValidities } from "$lib/util/helpers"
 
   let toDate: string
+
+  let selectedEngagement: {
+    uuid: string
+    name: string
+  }
 
   const fromDate = field("from", "", [required()])
   const leaveType = field("leave_type", "", [required()])
@@ -32,7 +39,6 @@
   gql`
     query LeaveAndFacet(
       $uuid: [UUID!]
-      $employeeUuid: [UUID!]
       $fromDate: DateTime
       $toDate: DateTime
       $currentDate: DateTime
@@ -94,16 +100,6 @@
           }
         }
       }
-      employees(filter: { uuids: $employeeUuid, from_date: null, to_date: null }) {
-        objects {
-          validities {
-            validity {
-              from
-              to
-            }
-          }
-        }
-      }
     }
 
     mutation UpdateLeave($input: LeaveUpdateInput!, $date: DateTime!) {
@@ -116,6 +112,20 @@
       }
     }
   `
+
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  $: if (selectedEngagement) {
+    ;(async () => {
+      validities = await getEngagementValidities(selectedEngagement.uuid)
+    })()
+  } else {
+    validities = { from: null, to: null }
+  }
 
   const handler: SubmitFunction =
     () =>
@@ -169,7 +179,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( LeaveAndFacetDocument, { uuid: $page.params.leave, employeeUuid: $page.params.uuid, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), currentDate: $date } )}
+{#await graphQLClient().request( LeaveAndFacetDocument, { uuid: $page.params.leave, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), currentDate: $date } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -189,13 +199,11 @@
   {@const engagements = leave.person[0].engagements}
   {@const employee = leave.person[0]}
   {@const engagementStartValue = getEngagementTitlesAndUuid([leave.engagement])[0]}
-  {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
-          <!-- TODO: dynamically change dates depending on which org has been chosen -->
           <DateInput
             startValue={$date}
             bind:value={$fromDate.value}
@@ -238,6 +246,7 @@
           title={capital($_("engagement", { values: { n: 2 } }))}
           id="engagement-uuid"
           startValue={engagementStartValue}
+          bind:value={selectedEngagement}
           bind:name={$engagement.value}
           errors={$engagement.errors}
           iterable={getEngagementTitlesAndUuid(engagements)}

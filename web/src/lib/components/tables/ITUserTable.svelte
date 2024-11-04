@@ -90,9 +90,9 @@
       class="{i % 2 === 0 ? '' : 'bg-slate-100'} 
       p-4 leading-5 border-t border-slate-300 text-secondary"
     >
-      <td class="p-4">{ituser.itsystem.name} </td>
-      <td class="p-4">{ituser.user_key}</td>
-      <td class="p-4">{ituser.primary ? ituser.primary.name : ""}</td>
+      <td class="text-sm p-4">{ituser.itsystem.name} </td>
+      <td class="text-sm p-4">{ituser.user_key}</td>
+      <td class="text-sm p-4">{ituser.primary ? ituser.primary.name : ""}</td>
       <ValidityTableCell validity={ituser.validity} />
       <td>
         <a
@@ -115,7 +115,7 @@
     </tr>
   {:else}
     <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
-      <td class="p-4"
+      <td class="text-sm p-4"
         >{capital(
           $_("no_item", { values: { item: $_("ituser", { values: { n: 2 } }) } })
         )}</td
