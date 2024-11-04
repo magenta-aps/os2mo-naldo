@@ -32,6 +32,10 @@
   }
 }
 
+.menu li > *:not(ul):not(.menu-title):not(details):active {
+  @apply bg-primary;
+}
+
 /* svelte-select overrides */
 /* I have no clue why this is needed, but it is and it sucks. */
 .svelte-select {
