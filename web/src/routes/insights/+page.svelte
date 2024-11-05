@@ -71,9 +71,8 @@
                     // If mainQuery.operation is not org_units, we insert the operation e.g. `engagements {...}`
                     if (query.mainQuery && query.mainQuery.operation !== "org_units") {
                       return {
-                        [query.mainQuery.operation]: query.chosenFields.map(
-                          (field) => field.subString
-                        ),
+                        [`${query.mainQuery.operation}(filter: { from_date: $date })`]:
+                          query.chosenFields.map((field) => field.subString),
                       }
                       // If operation === org_units, we just add the fields directly - if !mainQuery -> skip
                     } else {
