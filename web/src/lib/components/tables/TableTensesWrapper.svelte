@@ -7,6 +7,7 @@
   import { MOConfig } from "$lib/stores/config"
   import AssociationTable from "$lib/components/tables/AssociationTable.svelte"
   import EngagementTable from "$lib/components/tables/EngagementTable.svelte"
+  import { env } from "$env/dynamic/public"
 
   export let headers: Header[]
   export let table: ComponentType<SvelteComponent>
@@ -42,6 +43,10 @@
     table == AssociationTable
   ) {
     headers = headers.filter((header) => header.title !== capital($_("trade_union")))
+  }
+
+  if (env.PUBLIC_SHOW_EXTENSION_1 !== "true") {
+    headers = headers.filter((header) => header.title !== capital($_("extension_1")))
   }
 </script>
 

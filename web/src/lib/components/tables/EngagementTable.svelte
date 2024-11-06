@@ -18,6 +18,8 @@
   import { formatQueryDates } from "$lib/util/helpers"
   import { MOConfig } from "$lib/stores/config"
   import { updateGlobalNavigation } from "$lib/stores/navigation"
+  import { env } from "$env/dynamic/public"
+  import { PUBLIC_SHOW_INSIGHTS } from "$env/static/public"
 
   let inheritManager: boolean | undefined
 
@@ -62,6 +64,7 @@
             job_function {
               name
             }
+            extension_1
             engagement_type {
               name
             }
@@ -143,6 +146,11 @@
       </td>
       <td class="text-sm p-4">{engagement.user_key}</td>
       <td class="text-sm p-4">{engagement.job_function.name}</td>
+      {#if env.PUBLIC_SHOW_EXTENSION_1 === "true"}
+        <td class="text-sm p-4"
+          >{engagement.extension_1 ? engagement.extension_1 : ""}</td
+        >
+      {/if}
       <td class="text-sm p-4">{engagement.engagement_type.name}</td>
       {#if !isOrg}
         <td class="text-sm p-4">
