@@ -105,36 +105,44 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
         const itemsArray = orgUnit[mainQuery.operation]
 
         if (itemsArray && Array.isArray(itemsArray)) {
-          itemsArray.forEach((item: any) => {
-            const row: string[] = [...orgUnitData] // Start each row with orgUnitData
+          if (itemsArray.length) {
+            itemsArray.forEach((item: any) => {
+              const row: string[] = [...orgUnitData] // Start each row with orgUnitData
 
-            let currentOffset = startOffset
-            chosenFields.forEach((header) => {
-              const fieldValue = resolveFieldValue(item, header)
-              let values: string[] = []
+              let currentOffset = startOffset
+              chosenFields.forEach((header) => {
+                const fieldValue = resolveFieldValue(item, header)
+                let values: string[] = []
 
-              if (header.value === "related_unit") {
-                // Handle related units
-                values = [item.org_units[0]?.name || "", item.org_units[1]?.name || ""]
-              } else if (header.value === "validity") {
-                // Handle validity field
-                const fromValue = item.validity?.from || ""
-                const toValue = item.validity?.to || ""
-                values = [fromValue, toValue]
-              } else {
-                // Handle general case
-                values = fieldValue ? [JSON.stringify(fieldValue)] : [""]
-              }
+                if (header.value === "related_unit") {
+                  // Handle related units
+                  values = [
+                    item.org_units[0]?.name || "",
+                    item.org_units[1]?.name || "",
+                  ]
+                } else if (header.value === "validity") {
+                  // Handle validity field
+                  const fromValue = item.validity?.from || ""
+                  const toValue = item.validity?.to || ""
+                  values = [fromValue, toValue]
+                } else {
+                  // Handle general case
+                  values = fieldValue ? [JSON.stringify(fieldValue)] : [""]
+                }
 
-              // Insert values into the row array at the correct positions
-              values.forEach((value) => {
-                row[currentOffset] = value
-                currentOffset++
+                // Insert values into the row array at the correct positions
+                values.forEach((value) => {
+                  row[currentOffset] = value
+                  currentOffset++
+                })
               })
-            })
 
+              csvRows.push(row.join(","))
+            })
+          } else {
+            const row: string[] = [...orgUnitData] // Start each row with orgUnitData
             csvRows.push(row.join(","))
-          })
+          }
         }
       }
     })
