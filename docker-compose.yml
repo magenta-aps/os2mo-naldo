@@ -17,6 +17,7 @@ services:
       # PUBLIC_PRIMARY_CLASS_USER_KEY: "primary"
       PUBLIC_SHOW_ROLEBINDINGS: "true"
       PUBLIC_SEARCH_INFINITY: "false"
+      PUBLIC_SHOW_EXTENSION_1: "false"
     ports:
       - 4173:3000 # prod - node
     restart: on-failure
@@ -37,6 +38,7 @@ services:
       # PUBLIC_PRIMARY_CLASS_USER_KEY: "primary"
       PUBLIC_SHOW_ROLEBINDINGS: "true"
       PUBLIC_SEARCH_INFINITY: "false"
+      PUBLIC_SHOW_EXTENSION_1: "false"
     ports:
       - 5173:5173 # dev
       - 24678:24678 # hot module reloading

@@ -18,6 +18,7 @@
   import { formatQueryDates } from "$lib/util/helpers"
   import { MOConfig } from "$lib/stores/config"
   import { updateGlobalNavigation } from "$lib/stores/navigation"
+  import { env } from "$env/dynamic/public"
 
   let inheritManager: boolean | undefined
 
@@ -25,7 +26,7 @@
     inheritManager = false
   }
 
-  type Engagements = EngagementsQuery["engagements"]["objects"][0]["objects"]
+  type Engagements = EngagementsQuery["engagements"]["objects"][0]["validities"]
   let data: Engagements
 
   export let tense: Tense
@@ -45,35 +46,39 @@
     ) {
       engagements(
         filter: {
-          employees: $employee
-          org_units: $org_unit
+          employee: { uuids: $employee }
+          org_unit: { uuids: $org_unit }
           from_date: $fromDate
           to_date: $toDate
         }
       ) {
         objects {
-          objects {
+          validities {
             uuid
             user_key
-            employee {
+            person(filter: { from_date: $fromDate, to_date: $toDate }) {
               uuid
               name
             }
-            job_function {
+            job_function(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
             }
-            engagement_type {
+            extension_1
+            engagement_type(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
             }
-            org_unit {
+            org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
               uuid
-              managers(inherit: $inherit) {
-                person {
+              managers(
+                filter: { from_date: $fromDate, to_date: $toDate }
+                inherit: $inherit
+              ) {
+                person(filter: { from_date: $fromDate, to_date: $toDate }) {
                   name
                   uuid
                 }
-                org_unit {
+                org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
                   name
                 }
               }
@@ -82,7 +87,7 @@
               from
               to
             }
-            primary {
+            primary(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
             }
           }
@@ -109,7 +114,7 @@
     // Filters and flattens the data
     for (const outer of res.engagements.objects) {
       // TODO: Remove when GraphQL is able to do this for us
-      const filtered = outer.objects.filter((obj) => {
+      const filtered = outer.validities.filter((obj) => {
         return tenseFilter(obj, tense)
       })
       engagements.push(...filtered)
@@ -130,8 +135,8 @@
     >
       <td class="text-sm p-4">
         {#if isOrg}
-          <a href="{base}/employee/{engagement.employee[0].uuid}"
-            >{engagement.employee[0].name}</a
+          <a href="{base}/employee/{engagement.person[0].uuid}"
+            >{engagement.person[0].name}</a
           >
         {:else}
           <a
@@ -143,6 +148,11 @@
       </td>
       <td class="text-sm p-4">{engagement.user_key}</td>
       <td class="text-sm p-4">{engagement.job_function.name}</td>
+      {#if env.PUBLIC_SHOW_EXTENSION_1 === "true"}
+        <td class="text-sm p-4"
+          >{engagement.extension_1 ? engagement.extension_1 : ""}</td
+        >
+      {/if}
       <td class="text-sm p-4">{engagement.engagement_type.name}</td>
       {#if !isOrg}
         <td class="text-sm p-4">
