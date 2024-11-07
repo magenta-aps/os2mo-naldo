@@ -18,6 +18,9 @@ export const actions: Actions = {
     return {
       uuid: params.association,
       validity: { from: startDate, ...(endDate && { to: endDate }) },
+      // FIX: This is a quick fix, since if we don't send the org_unit, the owner role won't work correctly.
+      // Problem is, for e.g. terminate, this is not possible, since the mutator doesn't allow `org_unit` in input.
+      org_unit: params.uuid,
       ...(associationType && { association_type: associationType }),
       ...(employeeUuid && { employee: employeeUuid }),
       ...(primary && { primary: primary }),
