@@ -40,9 +40,11 @@
   let dynamicFacetUuid: string | undefined
 
   // Maybe we need to JSON.parse our config, so we avoid doing it here?
-  if ($MOConfig && JSON.parse($MOConfig.confdb_association_dynamic_facets)) {
-    getDynamicFacet = true
-    dynamicFacetUuid = JSON.parse($MOConfig.confdb_association_dynamic_facets)
+  $: if ($MOConfig) {
+    if (JSON.parse($MOConfig.confdb_association_dynamic_facets)) {
+      getDynamicFacet = true
+      dynamicFacetUuid = JSON.parse($MOConfig.confdb_association_dynamic_facets)
+    }
   }
 
   const allowSubstitute = (associationTypeUuid: string) => {

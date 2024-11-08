@@ -26,8 +26,11 @@
 
   let inheritManager: boolean | undefined
 
-  if ($MOConfig && $MOConfig.confdb_inherit_manager === "false") {
-    inheritManager = false
+  // FIX: On reload, this doesn't work
+  $: if ($MOConfig) {
+    if ($MOConfig.confdb_inherit_manager === "false") {
+      inheritManager = false
+    }
   }
 
   export let tense: Tense
