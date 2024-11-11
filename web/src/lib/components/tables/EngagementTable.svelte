@@ -46,8 +46,8 @@
     ) {
       engagements(
         filter: {
-          employee: { uuids: $employee }
-          org_unit: { uuids: $org_unit }
+          employees: $employee
+          org_units: $org_unit
           from_date: $fromDate
           to_date: $toDate
         }
