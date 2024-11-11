@@ -36,6 +36,7 @@
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
 
+  // Use deprecated filter, because `employee`/`org_unit` filters will query for every object, if uuid is set to null
   gql`
     query Engagements(
       $employee: [UUID!]
@@ -46,8 +47,8 @@
     ) {
       engagements(
         filter: {
-          employee: { uuids: $employee }
-          org_unit: { uuids: $org_unit }
+          employees: $employee
+          org_units: $org_unit
           from_date: $fromDate
           to_date: $toDate
         }
