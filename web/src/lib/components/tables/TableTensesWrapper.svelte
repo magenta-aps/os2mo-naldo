@@ -48,6 +48,11 @@
   if (env.PUBLIC_SHOW_EXTENSION_1 !== "true") {
     headers = headers.filter((header) => header.title !== capital($_("extension_1")))
   }
+
+  if (env.PUBLIC_AUDITLOG !== "true" && table === EngagementTable) {
+    // If we don't want to show Auditlog-button, remove one of the empty headers. Otherwise the table looks weird
+    headers.pop()
+  }
 </script>
 
 <DetailTable {headers}>

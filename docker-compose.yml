@@ -11,6 +11,7 @@ services:
       PUBLIC_DAR_ACCESS_ADDRESSES: "true"
       PUBLIC_SHOW_ADMIN_PANEL: "true"
       PUBLIC_SHOW_INSIGHTS: "true"
+      PUBLIC_AUDITLOG: "true"
       # AAK Specific (true)
       PUBLIC_OPTIONAL_TIME_PLANNING: "false"
       # user_key of primary class ("primary" is used, if not set) 
@@ -32,6 +33,7 @@ services:
       PUBLIC_DAR_ACCESS_ADDRESSES: "true"
       PUBLIC_SHOW_ADMIN_PANEL: "true"
       PUBLIC_SHOW_INSIGHTS: "true"
+      PUBLIC_AUDITLOG: "true"
       # AAK Specific (true)
       PUBLIC_OPTIONAL_TIME_PLANNING: "false"
       # user_key of primary class ("primary" is used, if not set) 
