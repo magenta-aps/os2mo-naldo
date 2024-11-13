@@ -46,7 +46,7 @@
   }
 
   if (env.PUBLIC_SHOW_EXTENSION_1 !== "true") {
-    headers = headers.filter((header) => header.title !== capital($_("extension_1")))
+    headers.splice(3, 1)
   }
 
   if (env.PUBLIC_AUDITLOG !== "true" && table === EngagementTable) {

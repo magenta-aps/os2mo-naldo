@@ -22,6 +22,7 @@
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getValidities } from "$lib/util/helpers"
+  import { env } from "$env/dynamic/public"
 
   let toDate: string
   let selectedOrgUnit: {
@@ -190,7 +191,9 @@
         <div class="flex flex-row gap-6">
           <Input title="ID" id="user-key" extra_classes="basis-1/2" />
           <Select
-            title={capital($_("job_function", { values: { n: 1 } }))}
+            title={env.PUBLIC_SHOW_EXTENSION_1 === "true"
+              ? capital($_("job_code"))
+              : capital($_("job_function", { values: { n: 1 } }))}
             id="job-function"
             bind:name={$jobFunction.value}
             errors={$jobFunction.errors}
