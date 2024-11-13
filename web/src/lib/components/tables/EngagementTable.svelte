@@ -15,6 +15,7 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
+  import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { formatQueryDates } from "$lib/util/helpers"
   import { MOConfig } from "$lib/stores/config"
   import { updateGlobalNavigation } from "$lib/stores/navigation"
@@ -194,6 +195,13 @@
         <td class="text-sm p-4">{engagement.primary ? engagement.primary.name : ""}</td>
       {/if}
       <ValidityTableCell validity={engagement.validity} />
+      {#if env.PUBLIC_AUDITLOG === "true"}
+        <td>
+          <a href={`${base}/auditlog/${engagement.uuid}`}>
+            <Icon icon={historyRounded} width="25" height="25" />
+          </a>
+        </td>
+      {/if}
       <td>
         <a
           href="{base}/{$page.route.id?.split(
