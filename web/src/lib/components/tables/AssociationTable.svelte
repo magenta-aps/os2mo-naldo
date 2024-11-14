@@ -18,6 +18,8 @@
   import { formatQueryDates } from "$lib/util/helpers"
   import { MOConfig } from "$lib/stores/config"
   import { updateGlobalNavigation } from "$lib/stores/navigation"
+  import historyRounded from "@iconify/icons-material-symbols/history-rounded"
+  import { env } from "$env/dynamic/public"
 
   type Associations = AssociationsQuery["associations"]["objects"][0]["objects"]
   let data: Associations
@@ -146,6 +148,13 @@
         >
       {/if}
       <ValidityTableCell validity={association.validity} />
+      {#if env.PUBLIC_AUDITLOG === "true"}
+        <td>
+          <a href={`${base}/auditlog/${association.uuid}`}>
+            <Icon icon={historyRounded} width="25" height="25" />
+          </a>
+        </td>
+      {/if}
       <td>
         <a
           href="{base}/{$page.route.id?.split(

@@ -23,6 +23,8 @@
   import { formatQueryDates } from "$lib/util/helpers"
   import { MOConfig } from "$lib/stores/config"
   import { updateGlobalNavigation } from "$lib/stores/navigation"
+  import historyRounded from "@iconify/icons-material-symbols/history-rounded"
+  import { env } from "$env/dynamic/public"
 
   let inheritManager: boolean | undefined
 
@@ -210,6 +212,13 @@
       <td class="text-sm p-4">{orgOrEmployee.manager_type.name}</td>
       <td class="text-sm p-4">{orgOrEmployee.manager_level.name}</td>
       <ValidityTableCell validity={orgOrEmployee.validity} />
+      {#if env.PUBLIC_AUDITLOG === "true"}
+        <td>
+          <a href={`${base}/auditlog/${orgOrEmployee.uuid}`}>
+            <Icon icon={historyRounded} width="25" height="25" />
+          </a>
+        </td>
+      {/if}
       <td>
         <a
           href="{base}/{$page.route.id?.split(

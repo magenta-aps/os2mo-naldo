@@ -16,6 +16,8 @@
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import { formatQueryDates } from "$lib/util/helpers"
   import { MOConfig } from "$lib/stores/config"
+  import historyRounded from "@iconify/icons-material-symbols/history-rounded"
+  import { env } from "$env/dynamic/public"
 
   type OrgUnits = OrgUnitQuery["org_units"]["objects"][0]["objects"]
   let data: OrgUnits
@@ -120,6 +122,13 @@
         </td>
       {/if}
       <ValidityTableCell validity={org_unit.validity} />
+      {#if env.PUBLIC_AUDITLOG === "true"}
+        <td>
+          <a href={`${base}/auditlog/${org_unit.uuid}`}>
+            <Icon icon={historyRounded} width="25" height="25" />
+          </a>
+        </td>
+      {/if}
       <td>
         <a
           href="{base}/organisation/{$page.params.uuid}/edit/unit{formatQueryDates(

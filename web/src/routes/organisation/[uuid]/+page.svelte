@@ -194,6 +194,7 @@
           { title: capital($_("time_planning")), sortPath: "time_planning.name" },
           { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
+          { title: "" },
         ]}
       />
     {:else if activeItem === OrgTab.ADDRESS}
@@ -206,6 +207,7 @@
           // TODO: Make it possible to sort optional fields maybe? visibility and primary for example
           { title: capital($_("visibility")) },
           { title: capital($_("date.date")), sortPath: "validity.from" },
+          { title: "" },
           { title: "" },
           { title: "" },
         ]}
@@ -250,6 +252,7 @@
           { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
+          { title: "" },
         ]}
       />
     {:else if activeItem === OrgTab.IT}
@@ -267,6 +270,7 @@
             { title: capital($_("account_name")), sortPath: "user_key" },
             { title: capital($_("primary")) },
             { title: capital($_("date.date")), sortPath: "validity.from" },
+            { title: "" },
             { title: "" },
             { title: "" },
           ]}
@@ -290,6 +294,7 @@
             { title: capital($_("date.date")), sortPath: "validity.from" },
             { title: "" },
             { title: "" },
+            { title: "" },
           ]}
         />
       {/if}
@@ -304,6 +309,7 @@
           { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
+          { title: "" },
         ]}
       />
     {:else if activeItem === OrgTab.KLE}
@@ -315,6 +321,7 @@
           { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
+          { title: "" },
         ]}
       />
     {:else if activeItem === OrgTab.OWNER}
@@ -323,6 +330,7 @@
         headers={[
           { title: capital($_("name")), sortPath: "owner[0].name" },
           { title: capital($_("date.date")), sortPath: "validity.from" },
+          { title: "" },
           { title: "" },
           { title: "" },
         ]}
