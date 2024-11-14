@@ -45,7 +45,7 @@
     headers = headers.filter((header) => header.title !== capital($_("trade_union")))
   }
 
-  if (env.PUBLIC_SHOW_EXTENSION_1 !== "true") {
+  if (env.PUBLIC_SHOW_EXTENSION_1 !== "true" && table === EngagementTable) {
     headers.splice(3, 1)
   }
 
