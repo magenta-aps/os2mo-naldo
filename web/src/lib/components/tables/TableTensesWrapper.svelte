@@ -8,6 +8,7 @@
   import AssociationTable from "$lib/components/tables/AssociationTable.svelte"
   import EngagementTable from "$lib/components/tables/EngagementTable.svelte"
   import { env } from "$env/dynamic/public"
+  import RelatedUnitsTable from "./RelatedUnitsTable.svelte"
 
   export let headers: Header[]
   export let table: ComponentType<SvelteComponent>
@@ -49,7 +50,7 @@
     headers.splice(3, 1)
   }
 
-  if (env.PUBLIC_AUDITLOG !== "true" && table === EngagementTable) {
+  if (env.PUBLIC_AUDITLOG !== "true" && table !== RelatedUnitsTable) {
     // If we don't want to show Auditlog-button, remove one of the empty headers. Otherwise the table looks weird
     headers.pop()
   }
