@@ -2,6 +2,7 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import { engagementInfo } from "$lib/stores/engagementInfoStore"
+  import { env } from "$env/dynamic/public"
 </script>
 
 <div>
@@ -32,7 +33,11 @@
       {/if}
     </div>
     <div class="grid grid-cols-2">
-      <dt>{capital($_("job_function", { values: { n: 1 } }))}:</dt>
+      <dt>
+        {env.PUBLIC_SHOW_EXTENSION_1 === "true"
+          ? capital($_("job_code"))
+          : capital($_("job_function", { values: { n: 1 } }))}:
+      </dt>
       {#if $engagementInfo.validated === true}
         <dd>{$engagementInfo.jobFunction.name}</dd>
       {/if}

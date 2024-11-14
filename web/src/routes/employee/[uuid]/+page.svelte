@@ -171,7 +171,10 @@
             sortPath: "user_key",
           },
           {
-            title: capital($_("job_function", { values: { n: 1 } })),
+            title:
+              env.PUBLIC_SHOW_EXTENSION_1 === "true"
+                ? capital($_("job_code"))
+                : capital($_("job_function", { values: { n: 1 } })),
             sortPath: "job_function.name",
           },
           { title: capital($_("extension_1")), sortPath: "extension_1" },
@@ -226,7 +229,10 @@
             sortPath: "org_unit[0].name",
           },
           {
-            title: capital($_("job_function", { values: { n: 1 } })),
+            title:
+              env.PUBLIC_SHOW_EXTENSION_1 === "true"
+                ? capital($_("job_code"))
+                : capital($_("job_function", { values: { n: 1 } })),
             sortPath: "job_function.name",
           },
           { title: capital($_("it_system")), sortPath: "it_user[0].itsystem.name" },
