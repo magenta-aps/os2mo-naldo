@@ -16,6 +16,8 @@
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import { formatQueryDates } from "$lib/util/helpers"
+  import historyRounded from "@iconify/icons-material-symbols/history-rounded"
+  import { env } from "$env/dynamic/public"
 
   type ITUsers =
     | OrgUnitItUsersQuery["byEngagement"]["objects"][0]["validities"]
@@ -124,6 +126,13 @@
       <td class="text-sm p-4">{ituser.user_key}</td>
       <td class="text-sm p-4">{ituser.primary ? ituser.primary.name : ""}</td>
       <ValidityTableCell validity={ituser.validity} />
+      {#if env.PUBLIC_AUDITLOG === "true"}
+        <td>
+          <a href={`${base}/auditlog/${ituser.uuid}`}>
+            <Icon icon={historyRounded} width="25" height="25" />
+          </a>
+        </td>
+      {/if}
       <td>
         <a
           href="{base}/{$page.route.id?.split(

@@ -156,6 +156,7 @@
           { title: capital($_("nickname")), sortPath: "nickname" },
           { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
+          { title: "" },
         ]}
       />
     {:else if activeItem === EmployeeTab.ENGAGEMENT}
@@ -204,6 +205,7 @@
           { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
+          { title: "" },
         ]}
       />
     {:else if activeItem === EmployeeTab.ASSOCIATION}
@@ -219,6 +221,7 @@
           { title: capital($_("trade_union")) },
           { title: capital($_("primary")) },
           { title: capital($_("date.date")), sortPath: "validity.from" },
+          { title: "" },
           { title: "" },
           { title: "" },
         ]}
@@ -244,6 +247,7 @@
           { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
+          { title: "" },
         ]}
       />
     {:else if activeItem === EmployeeTab.IT}
@@ -261,6 +265,7 @@
             { title: capital($_("account_name")), sortPath: "user_key" },
             { title: capital($_("primary")) },
             { title: capital($_("date.date")), sortPath: "validity.from" },
+            { title: "" },
             { title: "" },
             { title: "" },
           ]}
@@ -284,6 +289,7 @@
             { title: capital($_("date.date")), sortPath: "validity.from" },
             { title: "" },
             { title: "" },
+            { title: "" },
           ]}
         />
       {/if}
@@ -297,6 +303,7 @@
             sortPath: "engagement.job_function.name",
           },
           { title: capital($_("date.date")), sortPath: "validity.from" },
+          { title: "" },
           { title: "" },
           { title: "" },
         ]}
@@ -315,6 +322,7 @@
           { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
+          { title: "" },
         ]}
       />
     {:else if activeItem === EmployeeTab.OWNER}
@@ -323,6 +331,7 @@
         headers={[
           { title: capital($_("name")), sortPath: "owner[0].name" },
           { title: capital($_("date.date")), sortPath: "validity.from" },
+          { title: "" },
           { title: "" },
           { title: "" },
         ]}
