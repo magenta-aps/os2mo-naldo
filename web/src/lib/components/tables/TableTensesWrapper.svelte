@@ -16,33 +16,36 @@
   export let facetUuid: string | undefined = undefined
 
   // Filter out all the tabs that are dependent on environment variables
-  if ($MOConfig && $MOConfig.confdb_show_level === "false") {
-    headers = headers.filter((header) => header.title !== capital($_("org_unit_level")))
-  }
-  if ($MOConfig && $MOConfig.confdb_show_time_planning === "false") {
-    headers = headers.filter((header) => header.title !== capital($_("time_planning")))
-  }
+  $: if ($MOConfig) {
+    if ($MOConfig.confdb_show_level === "false") {
+      headers = headers.filter(
+        (header) => header.title !== capital($_("org_unit_level"))
+      )
+    }
+    if ($MOConfig.confdb_show_time_planning === "false") {
+      headers = headers.filter(
+        (header) => header.title !== capital($_("time_planning"))
+      )
+    }
 
-  if (
-    $MOConfig &&
-    $MOConfig.confdb_show_primary_engagement === "false" &&
-    table == EngagementTable
-  ) {
-    headers = headers.filter((header) => header.title !== capital($_("primary")))
-  }
-  if (
-    $MOConfig &&
-    $MOConfig.confdb_show_primary_association === "false" &&
-    table == AssociationTable
-  ) {
-    headers = headers.filter((header) => header.title !== capital($_("primary")))
-  }
-  if (
-    $MOConfig &&
-    !JSON.parse($MOConfig.confdb_association_dynamic_facets) &&
-    table == AssociationTable
-  ) {
-    headers = headers.filter((header) => header.title !== capital($_("trade_union")))
+    if (
+      $MOConfig.confdb_show_primary_engagement === "false" &&
+      table == EngagementTable
+    ) {
+      headers = headers.filter((header) => header.title !== capital($_("primary")))
+    }
+    if (
+      $MOConfig.confdb_show_primary_association === "false" &&
+      table == AssociationTable
+    ) {
+      headers = headers.filter((header) => header.title !== capital($_("primary")))
+    }
+    if (
+      !JSON.parse($MOConfig.confdb_association_dynamic_facets) &&
+      table == AssociationTable
+    ) {
+      headers = headers.filter((header) => header.title !== capital($_("trade_union")))
+    }
   }
 
   if (env.PUBLIC_SHOW_EXTENSION_1 !== "true" && table === EngagementTable) {

@@ -23,8 +23,10 @@
 
   let inheritManager: boolean | undefined
 
-  if ($MOConfig && $MOConfig.confdb_inherit_manager === "false") {
-    inheritManager = false
+  $: if ($MOConfig) {
+    if ($MOConfig.confdb_inherit_manager === "false") {
+      inheritManager = false
+    }
   }
 
   type Engagements = EngagementsQuery["engagements"]["objects"][0]["validities"]

@@ -9,7 +9,7 @@ interface ConfigObject {
 // `data.configuration.objects.[{...}]`
 // to:
 // `{ key: value, ... }`
-export function formatConfig(configObjects: GetConfigQuery) {
+export const formatConfig = (configObjects: GetConfigQuery) => {
   const formattedConfig: ConfigObject = {}
   for (const item of configObjects.configuration.objects) {
     formattedConfig[item.key] = item.jsonified_value

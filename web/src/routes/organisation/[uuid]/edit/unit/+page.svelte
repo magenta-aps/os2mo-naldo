@@ -38,12 +38,13 @@
   let svelteForm = form(fromDate, name, orgUnitType)
 
   // This is needed, since `timePlanning` is required, but only used by some.
-  if (
-    $MOConfig &&
-    $MOConfig.confdb_show_time_planning === "true" &&
-    env.PUBLIC_OPTIONAL_TIME_PLANNING !== "true"
-  ) {
-    svelteForm = form(fromDate, name, orgUnitType, timePlanning)
+  $: if ($MOConfig) {
+    if (
+      $MOConfig.confdb_show_time_planning === "true" &&
+      env.PUBLIC_OPTIONAL_TIME_PLANNING !== "true"
+    ) {
+      svelteForm = form(fromDate, name, orgUnitType, timePlanning)
+    }
   }
 
   gql`
