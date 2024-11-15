@@ -47,6 +47,30 @@
             </li>
           {/if}
         {/if}
+        <!-- Show by default -->
+        {#if env.PUBLIC_DOCS_LINK !== "false"}
+          <li>
+            <a
+              on:click={handleClickItem}
+              class="w-100 text-secondary hover:no-underline"
+              href="https://rammearkitektur.docs.magenta.dk/os2mo/home/manual.html"
+              target="_blank">{capital($_("documentation"))}</a
+            >
+          </li>
+        {/if}
+        <!-- Don't show by default -->
+        {#if env.PUBLIC_ONBOARDING_LINK === "true"}
+          <li>
+            <a
+              on:click={handleClickItem}
+              class="w-100 text-secondary hover:no-underline"
+              href="{base}/userflow"
+            >
+              {capital($_("onboarding"))}</a
+            >
+          </li>
+        {/if}
+
         {#if $MOConfig && JSON.parse($MOConfig.navlinks).length}
           {@const links = JSON.parse($MOConfig.navlinks)}
           {#each links as link}
