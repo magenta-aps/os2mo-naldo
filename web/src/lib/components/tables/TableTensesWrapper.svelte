@@ -7,6 +7,7 @@
   import { MOConfig } from "$lib/stores/config"
   import AssociationTable from "$lib/components/tables/AssociationTable.svelte"
   import EngagementTable from "$lib/components/tables/EngagementTable.svelte"
+  import RelatedUnitsTable from "./RelatedUnitsTable.svelte"
   import { env } from "$env/dynamic/public"
 
   export let headers: Header[]
@@ -52,7 +53,7 @@
     headers.splice(3, 1)
   }
 
-  if (env.PUBLIC_AUDITLOG !== "true" && table === EngagementTable) {
+  if (env.PUBLIC_AUDITLOG !== "true" && table !== RelatedUnitsTable) {
     // If we don't want to show Auditlog-button, remove one of the empty headers. Otherwise the table looks weird
     headers.pop()
   }
