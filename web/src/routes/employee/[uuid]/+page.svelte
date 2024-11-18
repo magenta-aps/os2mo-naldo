@@ -135,7 +135,7 @@
           class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5 hover:no-underline"
           href={`${base}/employee/${
             activeItem === EmployeeTab.EMPLOYEE
-              ? "create"
+              ? "create/employee"
               : `${$page.params.uuid}/create/${activeItem}`
           }`}
         >
