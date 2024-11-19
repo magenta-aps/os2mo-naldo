@@ -16,6 +16,12 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
+  import { getValidities } from "$lib/util/helpers"
+
+  let selectedPerson: {
+    uuid: string
+    name: string
+  }
 
   const toDate = field("to", "", [required()])
   const employeeField = field("employee", "", [required()])
@@ -47,6 +53,20 @@
       }
     }
   `
+
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  $: if (selectedPerson) {
+    ;(async () => {
+      validities = await getValidities(selectedPerson.uuid)
+    })()
+  } else {
+    validities = { from: null, to: null }
+  }
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
@@ -98,18 +118,16 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-<!-- LOOKATME: FIXME: SOMETHING: Form here or inside await? -->
 <form method="post" class="mx-6" use:enhance={handler}>
   <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
     <div class="p-8">
       <div class="flex flex-row gap-6">
-        <!-- FIX: Fix min/max before merge. -->
         <DateInput
           startValue={$date}
           bind:value={$toDate.value}
           title={capital($_("date.end_date"))}
           id="to"
-          min={undefined}
+          min={validities.from}
           max={undefined}
           required={true}
         />
@@ -135,6 +153,7 @@
               uuid: employee?.uuid ? employee.uuid : undefined,
               name: employee?.name ? employee.name : "",
             }}
+            bind:value={selectedPerson}
             bind:name={$employeeField.value}
             on:clear={() => ($employeeField.value = "")}
             errors={$employeeField.errors}
@@ -145,6 +164,7 @@
         <Search
           type="employee"
           title={capital($_("employee", { values: { n: 1 } }))}
+          bind:value={selectedPerson}
           bind:name={$employeeField.value}
           on:clear={() => ($employeeField.value = "")}
           errors={$employeeField.errors}

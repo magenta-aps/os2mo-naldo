@@ -183,7 +183,6 @@
           <Skeleton extra_classes="basis-1/2" />
         </div>
         <Skeleton />
-        <!-- TODO: Make Skeleton better for Breadcrumbs? -->
         <Skeleton />
         <div class="flex flex-row gap-6">
           <Skeleton extra_classes="basis-1/2" />
