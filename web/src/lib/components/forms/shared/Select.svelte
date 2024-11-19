@@ -3,10 +3,6 @@
   import { capital } from "$lib/util/translationUtils"
   import SvelteSelect from "svelte-select"
 
-  // TODO: Maybe clean up these "hacks", e.g.
-  //   $: if (value?.name) {
-  //      name = value?.name
-  //   }
   type Value = {
     uuid: string | null
     name: string

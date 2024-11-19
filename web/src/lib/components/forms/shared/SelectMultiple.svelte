@@ -1,22 +1,25 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import SvelteSelect from "svelte-select"
+
+  type Value = {
+    uuid: string | null
+    name: string
+    user_key?: string | null
+  }
   export let title: string | undefined = undefined
   export let id: string
-  export let iterable: any[] | undefined = undefined
+  export let iterable: Value[] | undefined = undefined
   export let name: string[] | undefined | null = undefined
   export let required = false
   export let placeholder: string = ""
   export let disabled = false
-  // TODO: Why is multiple false in 'SelectMultiple'?
-  export let multiple = false
-  // TODO: Types needs to be fixed OVERALL
-  export let startValue: any[] | undefined = undefined
-  export let value: any[] | undefined = startValue || undefined
+  export let startValue: Value[] | undefined = undefined
+  export let value: Value[] | undefined = startValue || undefined
   export let errors: string[] = []
 
   $: if (value) {
-    name = value
+    name = value.map((val) => val.name)
   }
 
   const itemId = "uuid" // Used by the component to differentiate between items
@@ -56,7 +59,7 @@
       clearable={false}
       {placeholder}
       items={iterable}
-      {multiple}
+      multiple={true}
       searchable={false}
       hasError={errors.length ? true : false}
       clearFilterTextOnBlur={false}

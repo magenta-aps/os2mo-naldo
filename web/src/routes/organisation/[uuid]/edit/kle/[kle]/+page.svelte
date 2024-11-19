@@ -199,7 +199,6 @@
           id="kle-aspects"
           startValue={kle.kle_aspects}
           iterable={getClassesByFacetUserKey(facets, "kle_aspect")}
-          multiple={true}
           required={true}
         />
       </div>

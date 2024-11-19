@@ -191,7 +191,6 @@
           id="responsibility"
           iterable={getClassesByFacetUserKey(facets, "responsibility")}
           required={true}
-          multiple={true}
         />
       </div>
     </div>
