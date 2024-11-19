@@ -339,7 +339,10 @@
       <TableTensesWrapper
         table={RelatedUnitsTable}
         headers={[
-          { title: capital($_("related_unit", { values: { n: 1 } })) },
+          {
+            title: capital($_("related_unit", { values: { n: 1 } })),
+            sortPath: "org_units[0].name",
+          },
           { title: capital($_("date.date")), sortPath: "validity.from" },
         ]}
       />
