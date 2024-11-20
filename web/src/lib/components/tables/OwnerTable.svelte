@@ -47,15 +47,15 @@
               from
               to
             }
-            person {
+            person(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
               uuid
             }
-            org_unit {
+            org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
               uuid
             }
-            owner {
+            owner(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
               uuid
             }

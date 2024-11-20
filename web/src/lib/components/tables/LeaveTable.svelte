@@ -22,7 +22,7 @@
   export let tense: Tense
 
   const uuid = $page.params.uuid
-  type Leaves = EmployeeLeavesQuery["leaves"]["objects"][0]["objects"]
+  type Leaves = EmployeeLeavesQuery["leaves"]["objects"][0]["validities"]
   let data: Leaves
 
   gql`
@@ -35,7 +35,7 @@
         filter: { employees: $employee_uuid, from_date: $fromDate, to_date: $toDate }
       ) {
         objects {
-          objects {
+          validities {
             uuid
             validity {
               from
@@ -74,7 +74,7 @@
     // Filters and flattens the data
     for (const outer of res.leaves.objects) {
       // TODO: Remove when GraphQL is able to do this for us
-      const filtered = outer.objects.filter((obj) => {
+      const filtered = outer.validities.filter((obj) => {
         return tenseFilter(obj, tense)
       })
       leaves.push(...filtered)

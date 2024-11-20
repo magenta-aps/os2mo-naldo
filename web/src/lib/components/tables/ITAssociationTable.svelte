@@ -22,7 +22,7 @@
 
   export let tense: Tense
 
-  type ItAssociations = ItAssociationsQuery["associations"]["objects"][0]["objects"]
+  type ItAssociations = ItAssociationsQuery["associations"]["objects"][0]["validities"]
   let data: ItAssociations
 
   const uuid = $page.params.uuid
@@ -38,9 +38,9 @@
         }
       ) {
         objects {
-          objects {
+          validities {
             uuid
-            org_unit {
+            org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
               uuid
             }
@@ -50,7 +50,7 @@
             primary {
               name
             }
-            it_user {
+            it_user(filter: { from_date: $fromDate, to_date: $toDate }) {
               itsystem {
                 name
               }
@@ -82,7 +82,7 @@
     // Filters and flattens the data
     for (const outer of res.associations.objects) {
       // TODO: Remove when GraphQL is able to do this for us
-      const filtered = outer.objects.filter((obj) => {
+      const filtered = outer.validities.filter((obj) => {
         return tenseFilter(obj, tense)
       })
       itAssociations.push(...filtered)

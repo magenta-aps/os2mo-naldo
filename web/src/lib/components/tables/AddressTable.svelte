@@ -26,7 +26,7 @@
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
 
-  type Addresses = AddressQuery["addresses"]["objects"][0]["objects"]
+  type Addresses = AddressQuery["addresses"]["objects"][0]["validities"]
   let data: Addresses
 
   gql`
@@ -45,7 +45,7 @@
         }
       ) {
         objects {
-          objects {
+          validities {
             name
             uuid
             user_key
@@ -83,7 +83,7 @@
     // Filters and flattens the data
     for (const outer of res.addresses.objects) {
       // TODO: Remove when GraphQL is able to do this for us
-      const filtered = outer.objects.filter((obj) => {
+      const filtered = outer.validities.filter((obj) => {
         return tenseFilter(obj, tense)
       })
       addresses.push(...filtered)

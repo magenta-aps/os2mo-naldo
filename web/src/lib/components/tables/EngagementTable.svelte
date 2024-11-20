@@ -75,15 +75,12 @@
             org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
               uuid
-              managers(
-                filter: { from_date: $fromDate, to_date: $toDate }
-                inherit: $inherit
-              ) {
-                person(filter: { from_date: $fromDate, to_date: $toDate }) {
+              managers(inherit: $inherit) {
+                person {
                   name
                   uuid
                 }
-                org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
+                org_unit {
                   name
                 }
               }

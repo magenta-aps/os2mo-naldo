@@ -28,7 +28,7 @@
       ) {
         objects {
           validities {
-            org_units {
+            org_units(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
               uuid
             }
