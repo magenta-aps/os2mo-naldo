@@ -40,6 +40,7 @@
   const org_unit = isOrg ? uuid : null
 
   // Use deprecated filter, because `employee`/`org_unit` filters will query for every object, if uuid is set to null
+  // TODO: When https://redmine.magenta.dk/issues/62968 is fixed, add date-filters to classes
   gql`
     query Engagements(
       $employee: [UUID!]
@@ -64,11 +65,11 @@
               uuid
               name
             }
-            job_function(filter: { from_date: $fromDate, to_date: $toDate }) {
+            job_function {
               name
             }
             extension_1
-            engagement_type(filter: { from_date: $fromDate, to_date: $toDate }) {
+            engagement_type {
               name
             }
             org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
@@ -91,7 +92,7 @@
               from
               to
             }
-            primary(filter: { from_date: $fromDate, to_date: $toDate }) {
+            primary {
               name
             }
           }
