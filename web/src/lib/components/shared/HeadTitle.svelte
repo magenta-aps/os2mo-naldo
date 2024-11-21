@@ -2,6 +2,7 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import { page } from "$app/stores"
+  import { date } from "$lib/stores/date"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { EmployeeDocument, OrgUnitDocument } from "./query.generated"
@@ -18,20 +19,20 @@
   export let type: TitleType
 
   gql`
-    query OrgUnit($uuid: [UUID!]) {
+    query OrgUnit($uuid: [UUID!], $currentDate: DateTime!) {
       org_units(filter: { uuids: $uuid }) {
         objects {
-          validities {
+          current(at: $currentDate) {
             name
           }
         }
       }
     }
 
-    query Employee($uuid: [UUID!]) {
+    query Employee($uuid: [UUID!], $currentDate: DateTime!) {
       employees(filter: { uuids: $uuid }) {
         objects {
-          validities {
+          current(at: $currentDate) {
             name
           }
         }
@@ -39,15 +40,23 @@
     }
   `
 
-  const fetchTitleName = async (uuid: string): Promise<String> => {
+  const fetchTitleName = async (uuid: string): Promise<String | undefined> => {
     switch (type) {
       case Title.ORGANISATION:
-        return (await graphQLClient().request(OrgUnitDocument, { uuid: uuid }))
-          .org_units.objects[0].validities[0].name
+        return (
+          await graphQLClient().request(OrgUnitDocument, {
+            uuid: uuid,
+            currentDate: $date,
+          })
+        ).org_units.objects[0].current?.name
 
       case Title.EMPLOYEE:
-        return (await graphQLClient().request(EmployeeDocument, { uuid: uuid }))
-          .employees.objects[0].validities[0].name
+        return (
+          await graphQLClient().request(EmployeeDocument, {
+            uuid: uuid,
+            currentDate: $date,
+          })
+        ).employees.objects[0].current?.name
 
       case Title.INSIGHTS:
         return capital($_("insights"))
