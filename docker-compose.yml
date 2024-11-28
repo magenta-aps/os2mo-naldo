@@ -31,7 +31,7 @@ services:
       dockerfile: docker/web.Dockerfile
       target: dev
     environment:
-      PUBLIC_BASE_URL: http://127.0.0.1:5001
+      PUBLIC_BASE_URL: http://localhost:5001
       PUBLIC_DAR_ACCESS_ADDRESSES: "true"
       PUBLIC_SHOW_ADMIN_PANEL: "true"
       PUBLIC_SHOW_INSIGHTS: "true"
