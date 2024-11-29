@@ -216,7 +216,6 @@
           title={capital($_("manager_responsibility"))}
           id="responsibility"
           iterable={getClassesByFacetUserKey(facets, "responsibility")}
-          multiple={true}
           required={true}
         />
       </div>

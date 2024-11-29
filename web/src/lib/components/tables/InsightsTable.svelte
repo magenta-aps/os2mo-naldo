@@ -121,30 +121,6 @@
                   {/each}
                 </tr>
               {/each}
-              <!-- TODO: Special case: If the key is not an array, it handles the org_unit data structure -->
-              <!-- {:else if mainQuery}
-              <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
-                {#each headers as selectedQuery}
-                  {#each selectedQuery.chosenFields as chosenField}
-                    {#if chosenField.value === "validity" && mainQuery.validity}
-                      <td class="p-4">
-                        {mainQuery.validity.from
-                          ? formatDate(mainQuery.validity.from)
-                          : "N/A"}
-                      </td>
-                      <td class="p-4">
-                        {mainQuery.validity.to
-                          ? formatDate(mainQuery.validity.to)
-                          : "N/A"}
-                      </td>
-                    {:else}
-                      <td class="p-4">
-                        {resolveFieldValue(mainQuery, chosenField)}
-                      </td>
-                    {/if}
-                  {/each}
-                {/each}
-              </tr> -->
             {/if}
           {/each}
         {/each}

@@ -19,7 +19,7 @@
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$env/dynamic/public"
 
-  type KLEs = KleQuery["kles"]["objects"][0]["objects"]
+  type KLEs = KleQuery["kles"]["objects"][0]["validities"]
   let data: KLEs
 
   export let tense: Tense
@@ -30,7 +30,7 @@
     query Kle($org_unit: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
       kles(filter: { org_units: $org_unit, from_date: $fromDate, to_date: $toDate }) {
         objects {
-          objects {
+          validities {
             uuid
             kle_number {
               name
@@ -65,7 +65,7 @@
     // Filters and flattens the data
     for (const outer of res.kles.objects) {
       // TODO: Remove when GraphQL is able to do this for us
-      const filtered = outer.objects.filter((obj) => {
+      const filtered = outer.validities.filter((obj) => {
         return tenseFilter(obj, tense)
       })
       kles.push(...filtered)

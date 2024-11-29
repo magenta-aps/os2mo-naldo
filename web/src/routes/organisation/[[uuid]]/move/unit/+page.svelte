@@ -112,8 +112,6 @@
   <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
     <div class="p-8">
       <div class="flex flex-row gap-6">
-        <!-- TODO: Can't fix getMinMaxValidities before dates update dynamically -->
-        <!-- TODO: These inputs needs to update, when org-unit is changed -->
         <DateInput
           startValue={$date}
           bind:value={$fromDate.value}
@@ -131,7 +129,6 @@
           min={$fromDate.value ? $fromDate.value : validities.from}
           max={validities.to}
         />
-        <!-- FIXME: min/max -->
       </div>
       {#if $page.params.uuid}
         {#await graphQLClient().request( OrgUnitDocument, { uuid: $page.params.uuid, currentDate: $date } )}

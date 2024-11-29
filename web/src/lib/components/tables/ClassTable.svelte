@@ -14,7 +14,7 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
 
-  type Classes = ClassQuery["classes"]["objects"][0]["objects"]
+  type Classes = ClassQuery["classes"]["objects"][0]["validities"]
   let data: Classes
 
   export let tense: Tense
@@ -26,7 +26,7 @@
         filter: { facet: { uuids: $facetUuid }, from_date: $fromDate, to_date: $toDate }
       ) {
         objects {
-          objects {
+          validities {
             name
             user_key
             uuid
@@ -57,7 +57,7 @@
     // Filters and flattens the data
     for (const outer of res.classes.objects) {
       // TODO: Remove when GraphQL is able to do this for us
-      const filtered = outer.objects.filter((obj) => {
+      const filtered = outer.validities.filter((obj) => {
         return tenseFilter(obj, tense)
       })
       classes.push(...filtered)

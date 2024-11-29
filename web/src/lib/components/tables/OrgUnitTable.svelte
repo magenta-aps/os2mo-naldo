@@ -19,7 +19,7 @@
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$env/dynamic/public"
 
-  type OrgUnits = OrgUnitQuery["org_units"]["objects"][0]["objects"]
+  type OrgUnits = OrgUnitQuery["org_units"]["objects"][0]["validities"]
   let data: OrgUnits
 
   export let tense: Tense
@@ -30,7 +30,7 @@
     query OrgUnit($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
       org_units(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
-          objects {
+          validities {
             name
             uuid
             unit_type {
@@ -76,7 +76,7 @@
     // Filters and flattens the data
     for (const outer of res.org_units.objects) {
       // TODO: Remove when GraphQL is able to do this for us
-      const filtered = outer.objects.filter((obj) => {
+      const filtered = outer.validities.filter((obj) => {
         return tenseFilter(obj, tense)
       })
       orgUnits.push(...filtered)

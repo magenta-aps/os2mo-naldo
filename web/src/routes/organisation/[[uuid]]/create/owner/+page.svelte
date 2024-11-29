@@ -119,7 +119,6 @@
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
-          <!-- TODO: Make input look at currently selected org_unit? Right now it's the employee's validity as a placeholder -->
           <DateInput
             startValue={$date}
             bind:value={$fromDate.value}
