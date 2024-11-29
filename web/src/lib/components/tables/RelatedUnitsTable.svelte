@@ -13,7 +13,8 @@
   import { onMount } from "svelte"
   import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
 
-  type RelatedUnits = RelatedUnitsQuery["related_units"]["objects"][0]["objects"]
+  type RelatedUnits = RelatedUnitsQuery["related_units"]["objects"][0]["validities"]
+  type RelatedUnit = RelatedUnitsQuery["related_units"]["objects"][0]["validities"]
   let data: RelatedUnits
 
   export let tense: Tense
@@ -26,8 +27,8 @@
         filter: { org_units: $org_unit, from_date: $fromDate, to_date: $toDate }
       ) {
         objects {
-          objects {
-            org_units {
+          validities {
+            org_units(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
               uuid
             }
@@ -53,20 +54,24 @@
       fromDate: $date,
       ...tenseToValidity(tense, $date),
     })
-    const relatedUnits: RelatedUnits = []
+    const relatedUnits = []
 
     for (const outer of res.related_units.objects) {
-      // TODO: Remove when GraphQL is able to do this for us
-      const filtered = outer.objects.filter((obj) => {
+      const filtered = outer.validities.filter((obj) => {
         return tenseFilter(obj, tense)
       })
       relatedUnits.push(...filtered)
     }
-    data = relatedUnits
+    // Filter out the highlighted org_unit, so we only have the actual relation left.
+    // This allows for cleaner templating and sorting by name
+    data = relatedUnits.map((unit) =>
+      unit.org_units[0].uuid === $page.params.uuid
+        ? { org_units: [unit.org_units[1]], validity: unit.validity }
+        : { org_units: [unit.org_units[0]], validity: unit.validity }
+    )
   })
 </script>
 
-<!-- TODO: We can't sort on name, since we don't know if we use [0] or [1] -->
 {#if !data}
   <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
     <td class="text-sm p-4">{capital($_("loading"))}</td>
@@ -75,15 +80,9 @@
   {#each data as related_unit}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="text-sm p-4">
-        {#if related_unit.org_units[0].uuid == $page.params.uuid}
-          <a href="{base}/organisation/{related_unit.org_units[1].uuid}">
-            {related_unit.org_units[1].name}
-          </a>
-        {:else}
-          <a href="{base}/organisation/{related_unit.org_units[0].uuid}">
-            {related_unit.org_units[0].name}
-          </a>
-        {/if}
+        <a href="{base}/organisation/{related_unit.org_units[0].uuid}">
+          {related_unit.org_units[0].name}
+        </a>
       </td>
       <ValidityTableCell validity={related_unit.validity} />
     </tr>

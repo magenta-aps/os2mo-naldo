@@ -22,7 +22,7 @@
   import type { RoleBindingFilter } from "$lib/graphql/types"
   import { formatQueryDates } from "$lib/util/helpers"
 
-  type Rolebinding = RolebindingsQuery["rolebindings"]["objects"][0]["objects"]
+  type Rolebinding = RolebindingsQuery["rolebindings"]["objects"][0]["validities"]
   let data: Rolebinding
 
   export let tense: Tense
@@ -40,7 +40,7 @@
     query Rolebindings($filter: RoleBindingFilter!) {
       rolebindings(filter: $filter) {
         objects {
-          objects {
+          validities {
             uuid
             ituser {
               user_key
@@ -76,7 +76,7 @@
     // Filters and flattens the data
     for (const outer of res.rolebindings.objects) {
       // TODO: Remove when GraphQL is able to do this for us
-      const filtered = outer.objects.filter((obj) => {
+      const filtered = outer.validities.filter((obj) => {
         return tenseFilter(obj, tense)
       })
       rolebindings.push(...filtered)

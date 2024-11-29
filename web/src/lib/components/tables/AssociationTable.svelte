@@ -21,7 +21,7 @@
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$env/dynamic/public"
 
-  type Associations = AssociationsQuery["associations"]["objects"][0]["objects"]
+  type Associations = AssociationsQuery["associations"]["objects"][0]["validities"]
   let data: Associations
 
   export let tense: Tense
@@ -48,13 +48,13 @@
         }
       ) {
         objects {
-          objects {
+          validities {
             uuid
-            org_unit {
+            org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
               uuid
             }
-            employee {
+            person(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
               uuid
             }
@@ -64,7 +64,7 @@
             trade_union {
               name
             }
-            substitute {
+            substitute(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
             }
             primary {
@@ -97,7 +97,7 @@
     // Filters and flattens the data
     for (const outer of res.associations.objects) {
       // TODO: Remove when GraphQL is able to do this for us
-      const filtered = outer.objects.filter((obj) => {
+      const filtered = outer.validities.filter((obj) => {
         return tenseFilter(obj, tense)
       })
       associations.push(...filtered)
@@ -117,9 +117,9 @@
         {#if isOrg}
           <!-- GraphQL and Naldo doesn't allow creating vacant associations, but the old frontend did -->
           <!-- This means that some customers might have them, and therefore we need this check. -->
-          {#if association.employee[0]?.name}
-            <a href="{base}/employee/{association.employee[0].uuid}">
-              {association.employee[0].name}
+          {#if association.person[0]?.name}
+            <a href="{base}/employee/{association.person[0].uuid}">
+              {association.person[0].name}
             </a>
           {:else}
             {capital($_("vacant"))}

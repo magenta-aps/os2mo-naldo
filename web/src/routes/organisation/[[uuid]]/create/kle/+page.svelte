@@ -172,7 +172,6 @@
           title={capital($_("kle_aspect"))}
           id="kle-aspects"
           iterable={getClassesByFacetUserKey(facets, "kle_aspect")}
-          multiple={true}
           required={true}
         />
       </div>

@@ -18,7 +18,7 @@
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$env/dynamic/public"
 
-  type Employees = EmployeeQuery["employees"]["objects"][0]["objects"]
+  type Employees = EmployeeQuery["employees"]["objects"][0]["validities"]
   let data: Employees
 
   export let tense: Tense
@@ -29,7 +29,7 @@
     query Employee($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
       employees(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
-          objects {
+          validities {
             name
             uuid
             nickname
@@ -59,7 +59,7 @@
     // Filters and flattens the data
     for (const outer of res.employees.objects) {
       // TODO: Remove when GraphQL is able to do this for us
-      const filtered = outer.objects.filter((obj) => {
+      const filtered = outer.validities.filter((obj) => {
         return tenseFilter(obj, tense)
       })
       engagements.push(...filtered)
