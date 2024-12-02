@@ -106,6 +106,7 @@
 	"for": "for",
 	"future": "fremtid",
 	"givenname": "{n, plural, one {fornavn} other {fornavn(e)}}",
+	"graphql": "API (GraphQL)",
 	"id": "id",
 	"inherited_manager": "nedarvet leder fra {org_unit}",
 	"inherited_owner": "nedarvet ejer fra {org_unit}",

@@ -106,6 +106,7 @@
 	"for": "for",
 	"future": "future",
 	"givenname": "{n, plural, one {first name} other {first name(s)}}",
+	"graphql": "API (GraphQL)",
 	"id": "id",
 	"inherited_manager": "inherited manager from {org_unit}",
 	"inherited_owner": "inherited owner from {org_unit}",
