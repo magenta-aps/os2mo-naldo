@@ -62,7 +62,8 @@
           <a
             on:click={handleClickItem}
             class="w-100 text-secondary hover:no-underline"
-            href="{env.PUBLIC_BASE_URL}/graphql">{capital($_("graphql"))}</a
+            href="{env.PUBLIC_BASE_URL}/graphql"
+            target="_blank">{capital($_("graphql"))}</a
           >
         </li>
         <!-- Don't show by default -->
