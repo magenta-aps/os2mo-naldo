@@ -108,6 +108,7 @@
 	"givenname": "{n, plural, one {fornavn} other {fornavn(e)}}",
 	"graphql": "API (GraphQL)",
 	"id": "id",
+	"include_children_text": "Søg på enkelt enhed / Med underenheder",
 	"inherited_manager": "nedarvet leder fra {org_unit}",
 	"inherited_owner": "nedarvet ejer fra {org_unit}",
 	"insights": "indsigt",

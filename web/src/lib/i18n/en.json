@@ -108,6 +108,7 @@
 	"givenname": "{n, plural, one {first name} other {first name(s)}}",
 	"graphql": "API (GraphQL)",
 	"id": "id",
+	"include_children_text": "Search for single unit / Including children",
 	"inherited_manager": "inherited manager from {org_unit}",
 	"inherited_owner": "inherited owner from {org_unit}",
 	"insights": "insights",
