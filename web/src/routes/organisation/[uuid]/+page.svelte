@@ -216,7 +216,7 @@
       <TableTensesWrapper
         table={EngagementTable}
         headers={[
-          { title: capital($_("name")), sortPath: "employee[0].name" },
+          { title: capital($_("name")), sortPath: "person[0].name" },
           {
             title: upperCase($_("id")),
             sortPath: "user_key",
@@ -244,7 +244,7 @@
       <TableTensesWrapper
         table={AssociationTable}
         headers={[
-          { title: capital($_("name")), sortPath: "employee[0].name" },
+          { title: capital($_("name")), sortPath: "person[0].name" },
           { title: capital($_("association_type")), sortPath: "association_type.name" },
           { title: capital($_("substitute")), sortPath: "substitute[0].name" },
           { title: capital($_("trade_union")) },
@@ -302,7 +302,7 @@
       <TableTensesWrapper
         table={ManagerTable}
         headers={[
-          { title: capital($_("name")), sortPath: "employee[0].name" },
+          { title: capital($_("name")), sortPath: "person[0].name" },
           { title: capital($_("manager_responsibility")) },
           { title: capital($_("manager_type")), sortPath: "manager_type.name" },
           { title: capital($_("manager_level")), sortPath: "manager_level.name" },
