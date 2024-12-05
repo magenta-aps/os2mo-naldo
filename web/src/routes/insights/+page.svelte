@@ -11,6 +11,8 @@
   import type { SelectedQuery } from "$lib/util/helpers"
   import { downloadHandler } from "$lib/util/csv"
   import Icon from "@iconify/svelte"
+  import homeOutlineRounded from "@iconify/icons-material-symbols/home-outline-rounded"
+  import homeWorkOutlineRounded from "@iconify/icons-material-symbols/home-work-outline-rounded"
   import removeRounded from "@iconify/icons-material-symbols/remove-rounded"
   import addRounded from "@iconify/icons-material-symbols/add-rounded"
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
@@ -22,6 +24,7 @@
   let loading = false
   // Random variable, is only used to trigger updates in `Selects`
   let removed = 0
+  let includeChildren: boolean
 
   let selectedQueries: SelectedQuery[] = [
     {
@@ -48,9 +51,11 @@
   const updateQuery = async () => {
     if (!selectedQueries) return
     loading = true
-    let filterValue = {
-      ancestor: { uuids: orgUnit?.uuid, from_date: null, to_date: null },
-    }
+    let filterValue = includeChildren
+      ? {
+          ancestor: { uuids: orgUnit?.uuid, from_date: null, to_date: null },
+        }
+      : { uuids: orgUnit?.uuid, from_date: null, to_date: null }
     const gqlQuery = query([
       {
         operation: "org_units",
@@ -134,7 +139,38 @@
         bind:value={orgUnit}
         required={true}
       />
+      <div class="form-control pb-3">
+        <div class="pb-1 text-secondary">
+          <label for="includeChildren" class="text-sm text-secondary pb-1">
+            {$_("include_children_text")}
+          </label>
+          <div>
+            <button
+              on:click={() => {
+                includeChildren = false
+              }}
+              class="text-secondary"
+            >
+              <Icon icon={homeOutlineRounded} width="25" height="25" />
+            </button>
+            <input
+              id="includeChildren"
+              type="checkbox"
+              class="toggle bg-secondary hover:bg-secondary"
+              bind:checked={includeChildren}
+            />
 
+            <button
+              on:click={() => {
+                includeChildren = true
+              }}
+              class="text-secondary"
+            >
+              <Icon icon={homeWorkOutlineRounded} width="25" height="25" />
+            </button>
+          </div>
+        </div>
+      </div>
       {#key removed}
         {#each selectedQueries as querySet, index}
           <Selects {mainQueries} {querySet} {index} bind:data={selectedQueries} />
