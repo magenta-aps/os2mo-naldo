@@ -18,6 +18,7 @@
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import SelectMultiple from "$lib/components/forms/shared/SelectMultiple.svelte"
   import { getValidities } from "$lib/util/helpers"
+  import { resetUserflowStores } from "$lib/stores/resetStores"
 
   gql`
     query ManagerFacets($currentDate: DateTime!) {
@@ -162,25 +163,34 @@
         />
       </div>
     </div>
-    <div class="flex py-6 gap-4">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 flex justify-between py-6 gap-4">
+      <div class="flex gap-4">
+        <button
+          type="button"
+          class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+          on:click={() => step.updateStep("dec")}
+        >
+          {capital($_("back"))}
+        </button>
+        <button
+          type="submit"
+          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+          >{capital($_("next"))}</button
+        >
+        <button
+          type="button"
+          class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+          on:click={() => step.updateStep("inc")}
+        >
+          {capital($_("skip"))}
+        </button>
+      </div>
       <button
         type="button"
         class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        on:click={() => step.updateStep("dec")}
+        on:click={() => resetUserflowStores()}
       >
-        {capital($_("back"))}
-      </button>
-      <button
-        type="submit"
-        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >{capital($_("next"))}</button
-      >
-      <button
-        type="button"
-        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        on:click={() => step.updateStep("inc")}
-      >
-        {capital($_("skip"))}
+        {capital($_("start_over"))}
       </button>
     </div>
     <Error />
