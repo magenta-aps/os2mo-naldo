@@ -25,8 +25,7 @@
   import { addressInfo } from "$lib/stores/addressInfoStore"
   import { graphQLClient } from "$lib/util/http"
   import { UserFlowCreateDocument } from "./query.generated"
-  import { step } from "$lib/stores/stepStore"
-  import { resetStores } from "$lib/stores/resetStores"
+  import { resetUserflowStores } from "$lib/stores/resetStores"
 
   gql`
     mutation UserFlowCreate(
@@ -180,15 +179,7 @@
         uuid: mutation.employee_create.current?.uuid,
         type: "employee",
       }
-      resetStores([
-        employeeInfo,
-        engagementInfo,
-        ituserInfo,
-        rolebindingInfo,
-        managerInfo,
-        addressInfo,
-      ])
-      step.updateStep(1)
+      resetUserflowStores()
     } catch (err) {
       $error = { message: err }
     }
@@ -205,11 +196,18 @@
     <AddressSummary />
   </div>
 </div>
-<div class="flex py-6 gap-4">
+<div class="sm:w-full md:w-3/4 xl:w-1/2 flex justify-between py-6 gap-4">
   <button
     class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
     disabled={!$employeeInfo.validated}
     on:click={submitForm}>{capital($_("submit"))}</button
   >
+  <button
+    type="button"
+    class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+    on:click={() => resetUserflowStores()}
+  >
+    {capital($_("start_over"))}
+  </button>
 </div>
 <Error />
