@@ -73,8 +73,25 @@
                 variables: { date: { name: "at", value: $date, type: "DateTime" } },
                 fields: selectedQueries
                   .map((query) => {
+                    if (query.mainQuery && query.mainQuery.operation === "itusers") {
+                      return {
+                        [`it: engagements(filter: { from_date: $date })`]: [
+                          {
+                            [`person(filter: { from_date: $date })`]: [
+                              {
+                                [`${query.mainQuery.operation}(filter: { from_date: $date })`]:
+                                  query.chosenFields.map((field) => field.subString),
+                              },
+                            ],
+                          },
+                        ],
+                      }
+                    }
                     // If mainQuery.operation is not org_units, we insert the operation e.g. `engagements {...}`
-                    if (query.mainQuery && query.mainQuery.operation !== "org_units") {
+                    else if (
+                      query.mainQuery &&
+                      query.mainQuery.operation !== "org_units"
+                    ) {
                       return {
                         [`${query.mainQuery.operation}(filter: { from_date: $date })`]:
                           query.chosenFields.map((field) => field.subString),
@@ -91,6 +108,8 @@
         ],
       },
     ])
+    console.log(gqlQuery)
+
     data = await getData(gqlQuery)
     loading = false
   }

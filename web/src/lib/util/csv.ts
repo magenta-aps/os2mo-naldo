@@ -102,7 +102,16 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
       const startOffset = columnOffsets[queryIndex]
 
       if (mainQuery && mainQuery.operation !== "org_units") {
-        const itemsArray = orgUnit[mainQuery.operation]
+        let itemsArray
+        console.log(orgUnit)
+
+        if (mainQuery.operation === "itusers") {
+          // ["it"]["engagements"]["person"]
+          itemsArray = orgUnit["it"][mainQuery.operation]
+        } else {
+          itemsArray = orgUnit[mainQuery.operation]
+        }
+        console.log(itemsArray)
 
         if (itemsArray && Array.isArray(itemsArray)) {
           if (itemsArray.length) {
@@ -167,7 +176,7 @@ export const downloadHandler = (
   const csvData: string = json2csv(data, selectedQueries)
   const blob: Blob = new Blob([csvData], { type: "text/csv" })
   const link: HTMLAnchorElement = document.createElement("a")
-  link.href = URL.createObjectURL(blob)
-  link.download = filename ? `${filename}.csv` : "insights.csv"
-  link.click()
+  // link.href = URL.createObjectURL(blob)
+  // link.download = filename ? `${filename}.csv` : "insights.csv"
+  // link.click()
 }
