@@ -1,3 +1,5 @@
+import { env } from "$env/dynamic/public"
+
 export const mainQueries = [
   // {
   //   operation: "addresses",
@@ -31,7 +33,12 @@ export const mainQueries = [
     fields: [
       { value: "subject", subString: "__typename" },
       { value: "name", subString: "person {name}" },
-      { value: "job_function", subString: "job_function {name}" },
+      ...(env.PUBLIC_SHOW_EXTENSION_1 === "true"
+        ? [
+            { value: "job_code", subString: "job_function {name}" },
+            { value: "job_function", subString: "extension_1" },
+          ]
+        : [{ value: "job_function", subString: "job_function {name}" }]),
       { value: "engagement_type", subString: "engagement_type {name}" },
       { value: "primary", subString: "primary {name}" },
       { value: "validity", subString: "validity {from to}" },
