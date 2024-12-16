@@ -53,9 +53,11 @@
     loading = true
     let filterValue = includeChildren
       ? {
-          ancestor: { uuids: orgUnit?.uuid, from_date: null, to_date: null },
+          ancestor: { uuids: orgUnit?.uuid, from_date: $date, to_date: null },
+          from_date: $date,
+          to_date: null,
         }
-      : { uuids: orgUnit?.uuid, from_date: null, to_date: null }
+      : { uuids: orgUnit?.uuid, from_date: $date, to_date: null }
     const gqlQuery = query([
       {
         operation: "org_units",
@@ -76,7 +78,7 @@
                     // If mainQuery.operation is not org_units, we insert the operation e.g. `engagements {...}`
                     if (query.mainQuery && query.mainQuery.operation !== "org_units") {
                       return {
-                        [`${query.mainQuery.operation}(filter: { from_date: $date })`]:
+                        [`${query.mainQuery.operation}(filter: { from_date: $date, to_date: null })`]:
                           query.chosenFields.map((field) => field.subString),
                       }
                       // If operation === org_units, we just add the fields directly - if !mainQuery -> skip
