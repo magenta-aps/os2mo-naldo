@@ -377,6 +377,18 @@ export const resolveFieldValue = (searchObject: any, header: Field) => {
     return searchObject.ituser[0].user_key ?? ""
   } else if (header.value === "role" && searchObject.role) {
     return searchObject.role[0].name ?? ""
+  } else if (
+    env.PUBLIC_SHOW_EXTENSION_1 === "true" &&
+    header.value === "job_function" &&
+    header.subString === "extension_1"
+  ) {
+    return searchObject.extension_1 ?? ""
+  } else if (
+    env.PUBLIC_SHOW_EXTENSION_1 === "true" &&
+    header.value === "job_code" &&
+    searchObject.job_function
+  ) {
+    return searchObject.job_function?.name ?? ""
   } else if (header.value === "related_unit") {
     return [
       searchObject.org_units[0]?.name ?? "",
