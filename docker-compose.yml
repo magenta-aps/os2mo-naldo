@@ -42,7 +42,7 @@ services:
       # PUBLIC_PRIMARY_CLASS_USER_KEY: "primary"
       PUBLIC_SHOW_ROLEBINDINGS: "true"
       PUBLIC_SEARCH_INFINITY: "false"
-      PUBLIC_SHOW_EXTENSION_1: "false"
+      PUBLIC_SHOW_EXTENSION_1: "true"
       PUBLIC_DOCS_LINK: "true"
       PUBLIC_ONBOARDING_LINK: "true"
     ports:
