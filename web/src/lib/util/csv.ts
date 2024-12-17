@@ -167,7 +167,7 @@ export const downloadHandler = (
   const csvData: string = json2csv(data, selectedQueries)
   const blob: Blob = new Blob([csvData], { type: "text/csv" })
   const link: HTMLAnchorElement = document.createElement("a")
-  link.href = URL.createObjectURL(blob)
-  link.download = filename ? `${filename}.csv` : "insights.csv"
-  link.click()
+  // link.href = URL.createObjectURL(blob)
+  // link.download = filename ? `${filename}.csv` : "insights.csv"
+  // link.click()
 }

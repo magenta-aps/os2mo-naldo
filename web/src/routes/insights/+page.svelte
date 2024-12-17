@@ -47,6 +47,8 @@
     selectedQueries = selectedQueries.filter((_, i) => i !== index)
     removed++
   }
+  const fromDate = "2024-12-17"
+  const toDate = "2024-12-30"
 
   const updateQuery = async () => {
     if (!selectedQueries) return
@@ -69,28 +71,41 @@
           {
             objects: [
               {
-                operation: "current",
-                variables: { date: { name: "at", value: $date, type: "DateTime" } },
-                fields: selectedQueries
+                validities: selectedQueries
                   .map((query) => {
-                    // If mainQuery.operation is not org_units, we insert the operation e.g. `engagements {...}`
                     if (query.mainQuery && query.mainQuery.operation !== "org_units") {
                       return {
-                        [`${query.mainQuery.operation}(filter: { from_date: $date })`]:
+                        [`${query.mainQuery.operation}(filter: { from_date: "${fromDate}", to_date: "${toDate}" })`]:
                           query.chosenFields.map((field) => field.subString),
                       }
-                      // If operation === org_units, we just add the fields directly - if !mainQuery -> skip
                     } else {
                       return query.chosenFields.map((field) => field.subString ?? "")
                     }
                   })
                   .flat(),
+                // operation: "current",
+                // variables: { date: { name: "at", value: $date, type: "DateTime" } },
+                // fields: selectedQueries
+                //   .map((query) => {
+                // If mainQuery.operation is not org_units, we insert the operation e.g. `engagements {...}`
+                // if (query.mainQuery && query.mainQuery.operation !== "org_units") {
+                //   return {
+                //     [`${query.mainQuery.operation}(filter: { from_date: $date })`]:
+                //       query.chosenFields.map((field) => field.subString),
+                //   }
+                //   // If operation === org_units, we just add the fields directly - if !mainQuery -> skip
+                // } else {
+                //   return query.chosenFields.map((field) => field.subString ?? "")
+                // }
+                //   })
+                //   .flat(),
               },
             ],
           },
         ],
       },
     ])
+    console.log(gqlQuery)
     data = await getData(gqlQuery)
     loading = false
   }
