@@ -97,11 +97,11 @@
               filter: { from_date: $fromDate, to_date: $toDate }
             ) {
               uuid
-              person {
+              person(filter: { from_date: $fromDate, to_date: $toDate }) {
                 name
                 uuid
               }
-              org_unit {
+              org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
                 name
                 uuid
               }
