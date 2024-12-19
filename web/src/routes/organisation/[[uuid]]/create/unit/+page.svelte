@@ -183,7 +183,7 @@
             startValue={$date}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
-            title={capital($_("date.move_date"))}
+            title={capital($_("date.start_date"))}
             id="from"
             min={validities.from}
             max={toDate ? toDate : validities.to}
