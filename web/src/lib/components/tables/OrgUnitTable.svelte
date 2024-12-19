@@ -39,7 +39,7 @@
             org_unit_level {
               name
             }
-            parent {
+            parent(filter: {from_date: $fromDate, to_date: $toDate}) {
               name
               uuid
               parent {
