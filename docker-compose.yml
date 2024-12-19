@@ -1,11 +1,9 @@
-version: "3.7"
-
 services:
-  prod:
+  dev:
     build:
       context: .
       dockerfile: docker/web.Dockerfile
-      target: prod
+      target: dev
     environment:
       PUBLIC_BASE_URL: http://localhost:5000
       PUBLIC_DAR_ACCESS_ADDRESSES: "true"
@@ -14,7 +12,7 @@ services:
       PUBLIC_AUDITLOG: "true"
       # AAK Specific (true)
       PUBLIC_OPTIONAL_TIME_PLANNING: "false"
-      # user_key of primary class ("primary" is used, if not set) 
+      # user_key of primary class ("primary" is used, if not set)
       # PUBLIC_PRIMARY_CLASS_USER_KEY: "primary"
       PUBLIC_SHOW_ROLEBINDINGS: "true"
       PUBLIC_SEARCH_INFINITY: "false"
@@ -22,32 +20,8 @@ services:
       PUBLIC_DOCS_LINK: "true"
       PUBLIC_ONBOARDING_LINK: "true"
     ports:
-      - 4173:3000 # prod - node
-    restart: on-failure
-
-  dev:
-    build:
-      context: .
-      dockerfile: docker/web.Dockerfile
-      target: dev
-    environment:
-      PUBLIC_BASE_URL: http://localhost:5001
-      PUBLIC_DAR_ACCESS_ADDRESSES: "true"
-      PUBLIC_SHOW_ADMIN_PANEL: "true"
-      PUBLIC_SHOW_INSIGHTS: "true"
-      PUBLIC_AUDITLOG: "true"
-      # AAK Specific (true)
-      PUBLIC_OPTIONAL_TIME_PLANNING: "false"
-      # user_key of primary class ("primary" is used, if not set) 
-      # PUBLIC_PRIMARY_CLASS_USER_KEY: "primary"
-      PUBLIC_SHOW_ROLEBINDINGS: "true"
-      PUBLIC_SEARCH_INFINITY: "false"
-      PUBLIC_SHOW_EXTENSION_1: "false"
-      PUBLIC_DOCS_LINK: "true"
-      PUBLIC_ONBOARDING_LINK: "true"
-    ports:
-      - 5173:5173 # dev
-      - 24678:24678 # hot module reloading
+      - "127.0.0.1:5173:5173"
+      - "127.0.0.1:24678:24678" # hot module reloading
     volumes:
       - ./web/src:/app/src
       - ./web/.svelte-kit:/app/.svelte-kit
