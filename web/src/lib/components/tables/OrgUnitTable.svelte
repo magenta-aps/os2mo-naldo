@@ -46,6 +46,7 @@
                 name
               }
             }
+            parent_uuid
             time_planning {
               name
             }
@@ -105,8 +106,9 @@
       {/if}
       <td class="text-sm p-4">
         {#if org_unit.parent}
-          <a href="{base}/organisation/{org_unit.parent.uuid}">
-            {org_unit.parent.name}
+          <a href="{base}/organisation/{org_unit.parent_uuid}">
+            <!-- Fall back to ugly UUID if the parent doesn't exist today -->
+            {org_unit.parent ? org_unit.parent.name : org_unit.parent_uuid}
           </a>
         {:else}
           {capital(
