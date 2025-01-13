@@ -11,17 +11,18 @@
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
-  import { GetOrgUnitAndFacetsDocument, UpdateOrgUnitDocument } from "./query.generated"
+  import { GetOrgUnitDocument, UpdateOrgUnitDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
+  import type { FacetValidities } from "$lib/util/get_classes"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import Search from "$lib/components/Search.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getMinMaxValidities } from "$lib/util/helpers"
+  import { getClasses, getMinMaxValidities } from "$lib/util/helpers"
   import { MOConfig } from "$lib/stores/config"
   import { env } from "$env/dynamic/public"
 
@@ -48,27 +49,7 @@
   }
 
   gql`
-    query GetOrgUnitAndFacets(
-      $uuid: [UUID!]
-      $fromDate: DateTime
-      $toDate: DateTime
-      $currentDate: DateTime!
-    ) {
-      facets(
-        filter: { user_keys: ["org_unit_level", "org_unit_type", "time_planning"] }
-      ) {
-        objects {
-          validities {
-            uuid
-            user_key
-            classes(filter: { from_date: $currentDate }) {
-              name
-              uuid
-              user_key
-            }
-          }
-        }
-      }
+    query GetOrgUnit($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
       org_units(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
           validities {
@@ -145,6 +126,18 @@
         }
       }
     }
+
+  let facets: FacetValidities[]
+
+  $: {
+    ;(async () => {
+      facets = await getClasses({
+        currentDate: $date,
+        orgUuid: parent ? parent.uuid : null,
+        facetUserKeys: ["org_unit_level", "org_unit_type", "time_planning"],
+      })
+    })()
+  }
 </script>
 
 <title
@@ -167,7 +160,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( GetOrgUnitAndFacetsDocument, { uuid: $page.params.uuid, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), currentDate: $date } )}
+{#await graphQLClient().request( GetOrgUnitDocument, { uuid: $page.params.uuid, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to") } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -188,7 +181,6 @@
   </div>
 {:then data}
   {@const orgUnit = data.org_units.objects[0].validities[0]}
-  {@const facets = data.facets.objects}
   <!-- TODO: Fix this when: https://redmine.magenta.dk/issues/58621 is done -->
   <!-- We can't use getMinMaxValidities since `parent` can't be a list, or it'll crash -->
   {@const minDate = orgUnit.parent?.validity.from.split("T")[0]}
@@ -242,43 +234,45 @@
           startValue={orgUnit.name}
           required={true}
         />
-        {#if $MOConfig && $MOConfig.confdb_show_time_planning === "true"}
-          <Select
-            title={capital($_("time_planning"))}
-            id="time-planning"
-            bind:name={$timePlanning.value}
-            errors={$timePlanning.errors}
-            startValue={orgUnit.time_planning ? orgUnit.time_planning : undefined}
-            iterable={getClassesByFacetUserKey(facets, "time_planning")}
-            isClearable={true}
-            required={env.PUBLIC_OPTIONAL_TIME_PLANNING !== "true"}
-            on:clear={() => ($timePlanning.value = "")}
-          />
-        {/if}
-        <div class="flex flex-row gap-6">
-          {#if $MOConfig && $MOConfig.confdb_show_level === "true"}
+        {#if facets}
+          {#if $MOConfig && $MOConfig.confdb_show_time_planning === "true"}
             <Select
-              title={capital($_("org_unit_level"))}
-              id="org-level"
-              startValue={orgUnit.org_unit_level ? orgUnit.org_unit_level : undefined}
-              extra_classes="basis-1/2"
-              iterable={getClassesByFacetUserKey(facets, "org_unit_level")}
+              title={capital($_("time_planning"))}
+              id="time-planning"
+              bind:name={$timePlanning.value}
+              errors={$timePlanning.errors}
+              startValue={orgUnit.time_planning ? orgUnit.time_planning : undefined}
+              iterable={getClassesByFacetUserKey(facets, "time_planning")}
               isClearable={true}
+              required={env.PUBLIC_OPTIONAL_TIME_PLANNING !== "true"}
+              on:clear={() => ($timePlanning.value = "")}
             />
           {/if}
-          <Select
-            title={capital($_("org_unit_type"))}
-            id="org-type"
-            bind:name={$orgUnitType.value}
-            errors={$orgUnitType.errors}
-            startValue={orgUnit.unit_type ? orgUnit.unit_type : undefined}
-            on:clear={() => ($orgUnitType.value = "")}
-            extra_classes="basis-1/2"
-            iterable={getClassesByFacetUserKey(facets, "org_unit_type")}
-            isClearable={true}
-            required={true}
-          />
-        </div>
+          <div class="flex flex-row gap-6">
+            {#if $MOConfig && $MOConfig.confdb_show_level === "true"}
+              <Select
+                title={capital($_("org_unit_level"))}
+                id="org-level"
+                startValue={orgUnit.org_unit_level ? orgUnit.org_unit_level : undefined}
+                extra_classes="basis-1/2"
+                iterable={getClassesByFacetUserKey(facets, "org_unit_level")}
+                isClearable={true}
+              />
+            {/if}
+            <Select
+              title={capital($_("org_unit_type"))}
+              id="org-type"
+              bind:name={$orgUnitType.value}
+              errors={$orgUnitType.errors}
+              startValue={orgUnit.unit_type ? orgUnit.unit_type : undefined}
+              on:clear={() => ($orgUnitType.value = "")}
+              extra_classes="basis-1/2"
+              iterable={getClassesByFacetUserKey(facets, "org_unit_type")}
+              isClearable={true}
+              required={true}
+            />
+          </div>
+        {/if}
       </div>
     </div>
     <div class="flex py-6 gap-4">
