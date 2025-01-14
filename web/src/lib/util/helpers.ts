@@ -81,12 +81,15 @@ export const getEngagementValidities = async (uuid: string) => {
   })
   return getMinMaxValidities(res.engagements.objects[0].validities)
 }
-export const getClasses = async (variables: {
-  currentDate: string
-  orgUuid: string | null
-  facetUserKeys: string[]
-}) => {
-  const res = await graphQLClient().request(FacetsDocument, variables)
+export const getClasses = async (
+  variables: {
+    currentDate: string
+    orgUuid: string | null
+    facetUserKeys: string[]
+  },
+  signal?: AbortSignal
+) => {
+  const res = await graphQLClient(signal).request(FacetsDocument, variables)
   return res.facets.objects
 }
 
