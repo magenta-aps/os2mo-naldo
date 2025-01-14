@@ -133,8 +133,7 @@
       addressField = field(Addresses.SKOLEKODE, "", [required()])
       break
     case Addresses.TELEFON:
-      // This regex is not perfect, as it allows ex. `12345678` and `+45123456`, but use it for now
-      addressField = field(Addresses.TELEFON, "", [required(), pattern(/(\+45)?\d{8}/)])
+      addressField = field(Addresses.TELEFON, "", [required(), pattern(/^\+?\d+$/)])
       break
     case Addresses.WEBADRESSE:
       // URL skal have http(s), ftp, git eller svn :shrug: Skal vi acceptere `www.lol.dk`?

@@ -83,8 +83,7 @@
       addressField = field(Addresses.POSTADRESSE, "", [required()])
       break
     case Addresses.TELEFON:
-      // This regex is not perfect, as it allows ex. `12345678` and `+45123456`, but use it for now
-      addressField = field(Addresses.TELEFON, "", [required(), pattern(/(\+45)?\d{8}/)])
+      addressField = field(Addresses.TELEFON, "", [required(), pattern(/^\+?\d+$/)])
       break
     default:
       break
