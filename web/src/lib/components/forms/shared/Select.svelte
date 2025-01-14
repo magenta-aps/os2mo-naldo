@@ -2,6 +2,7 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import SvelteSelect from "svelte-select"
+  import { afterUpdate } from "svelte"
 
   type Value = {
     uuid: string | null
@@ -30,10 +31,22 @@
   export let errors: string[] = []
   export let searchable: boolean = false
 
-  $: if (value?.name) {
-    name = value?.name
+  $: if (value) {
+    if (value?.name) {
+      name = value?.name
+    } else if (value?.name === "") {
+      name = value?.name
+      // For some reason the `setTimeout` is needed, for the actual selection to be cleared and
+      // then clear the value afterwards.
+      setTimeout(() => (value = undefined), 1)
+    }
   }
-
+  afterUpdate(() => {
+    // Workaround for when a select updates and the selected item should no longer be an option.
+    if (value?.uuid && !iterable?.some((item) => item.uuid === value?.uuid)) {
+      value.name = ""
+    }
+  })
   const itemId = "uuid" // Used by the component to differentiate between items
 
   const floatingConfig = {

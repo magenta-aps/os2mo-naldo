@@ -9,17 +9,14 @@
   import Select from "$lib/components/forms/shared/Select.svelte"
   import { enhance } from "$app/forms"
   import { gql } from "graphql-request"
-  import {
-    OrgUnitDocument,
-    FacetsDocument,
-    CreateOrgUnitDocument,
-  } from "./query.generated"
+  import { OrgUnitDocument, CreateOrgUnitDocument } from "./query.generated"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import type { SubmitFunction } from "./$types"
+  import type { FacetValidities } from "$lib/util/get_classes"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
   import Search from "$lib/components/Search.svelte"
-  import { getValidities } from "$lib/util/helpers"
+  import { getClasses, getValidities } from "$lib/util/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
@@ -49,26 +46,7 @@
     uuid: string
     name: string
   }
-
   gql`
-    query Facets($currentDate: DateTime!) {
-      facets(
-        filter: { user_keys: ["org_unit_level", "org_unit_type", "time_planning"] }
-      ) {
-        objects {
-          validities {
-            uuid
-            user_key
-            classes(filter: { from_date: $currentDate }) {
-              name
-              uuid
-              user_key
-            }
-          }
-        }
-      }
-    }
-
     query OrgUnit($uuid: [UUID!], $currentDate: DateTime!) {
       org_units(filter: { uuids: $uuid, from_date: null, to_date: null }) {
         objects {
@@ -95,12 +73,16 @@
     to: string | undefined | null
   } = { from: null, to: null }
 
-  $: if (parent) {
+  let facets: FacetValidities[]
+  $: {
     ;(async () => {
-      validities = await getValidities(parent.uuid)
+      validities = parent ? await getValidities(parent.uuid) : { from: null, to: null }
+      facets = await getClasses({
+        currentDate: $date,
+        orgUuid: parent ? parent.uuid : null,
+        facetUserKeys: ["org_unit_level", "org_unit_type", "time_planning"],
+      })
     })()
-  } else {
-    validities = { from: null, to: null }
   }
 
   const handler: SubmitFunction =
@@ -155,83 +137,63 @@
 <div class="divider p-0 m-0 mb-4 w-full" />
 
 <form method="post" class="mx-6" use:enhance={handler}>
-  {#await graphQLClient().request(FacetsDocument, { currentDate: $date })}
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
-      <div class="p-8">
-        <div class="flex flex-row gap-6">
-          <Skeleton extra_classes="basis-1/2" />
-          <Skeleton extra_classes="basis-1/2" />
-        </div>
-        <Skeleton />
-        <Skeleton />
-        <Skeleton />
-        <Skeleton />
-        <Skeleton />
-        <div class="flex flex-row gap-6">
-          <Skeleton extra_classes="basis-1/2" />
-          <Skeleton extra_classes="basis-1/2" />
-        </div>
+  <div class="sm:w-full md:w-3/4 xl:w-1/2 mb-6 bg-slate-100 rounded">
+    <div class="p-8">
+      <div class="flex flex-row gap-6">
+        <DateInput
+          startValue={$date}
+          bind:value={$fromDate.value}
+          errors={$fromDate.errors}
+          title={capital($_("date.start_date"))}
+          id="from"
+          min={validities.from}
+          max={toDate ? toDate : validities.to}
+          required={true}
+        />
+        <DateInput
+          bind:value={toDate}
+          title={capital($_("date.end_date"))}
+          id="to"
+          min={$fromDate.value ? $fromDate.value : validities.from}
+          max={validities.to}
+        />
       </div>
-    </div>
-  {:then data}
-    {@const facets = data.facets.objects}
-
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 mb-6 bg-slate-100 rounded">
-      <div class="p-8">
-        <div class="flex flex-row gap-6">
-          <DateInput
-            startValue={$date}
-            bind:value={$fromDate.value}
-            errors={$fromDate.errors}
-            title={capital($_("date.start_date"))}
-            id="from"
-            min={validities.from}
-            max={toDate ? toDate : validities.to}
-            required={true}
-          />
-          <DateInput
-            bind:value={toDate}
-            title={capital($_("date.end_date"))}
-            id="to"
-            min={$fromDate.value ? $fromDate.value : validities.from}
-            max={validities.to}
-          />
-        </div>
-        {#if $page.params.uuid}
-          {#await graphQLClient().request( OrgUnitDocument, { uuid: $page.params.uuid, currentDate: $date } ) then orgUnitData}
-            {@const orgUnit = orgUnitData.org_units?.objects[0].current}
-            <Search
-              type="org-unit"
-              title="{capital($_('specify'))} {$_('parent')}"
-              id="parent-uuid"
-              bind:value={parent}
-              startValue={{
-                uuid: orgUnit?.uuid ? orgUnit.uuid : undefined,
-                name: orgUnit?.name ? orgUnit?.name : "",
-              }}
-            />
-          {/await}
-        {:else}
+      {#if $page.params.uuid}
+        {#await graphQLClient().request( OrgUnitDocument, { uuid: $page.params.uuid, currentDate: $date } ) then orgUnitData}
+          {@const orgUnit = orgUnitData.org_units?.objects[0].current}
           <Search
             type="org-unit"
             title="{capital($_('specify'))} {$_('parent')}"
             id="parent-uuid"
             bind:value={parent}
+            startValue={{
+              uuid: orgUnit?.uuid ? orgUnit.uuid : undefined,
+              name: orgUnit?.name ? orgUnit?.name : "",
+            }}
           />
-        {/if}
-        <Breadcrumbs
-          orgUnit={parent}
-          emptyMessage="{capital(
-            $name.value ? $name.value : $_('unit', { values: { n: 0 } })
-          )} {$_('empty_breadcrumbs')}"
+        {/await}
+      {:else}
+        <Search
+          type="org-unit"
+          title="{capital($_('specify'))} {$_('parent')}"
+          id="parent-uuid"
+          bind:value={parent}
         />
-        <Input
-          title={capital($_("name"))}
-          id="name"
-          required={true}
-          bind:value={$name.value}
-          errors={$name.errors}
-        />
+      {/if}
+      <Breadcrumbs
+        orgUnit={parent}
+        emptyMessage="{capital(
+          $name.value ? $name.value : $_('unit', { values: { n: 0 } })
+        )} {$_('empty_breadcrumbs')}"
+      />
+      <Input
+        title={capital($_("name"))}
+        id="name"
+        required={true}
+        bind:value={$name.value}
+        errors={$name.errors}
+      />
+      {#if facets}
         {#if $MOConfig && $MOConfig.confdb_show_level === "true"}
           <Select
             title={capital($_("org_unit_level"))}
@@ -271,26 +233,32 @@
             extra_classes="basis-1/2"
           />
         </div>
-      </div>
+      {:else}
+        <Skeleton />
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+      {/if}
     </div>
-    <div class="flex py-6 gap-4">
-      <button
-        type="submit"
-        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >{capital(
-          $_("create_item", {
-            values: { item: $_("unit", { values: { n: 1 } }) },
-          })
-        )}</button
-      >
-      <button
-        type="button"
-        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        on:click={() => history.back()}
-      >
-        {capital($_("cancel"))}
-      </button>
-    </div>
-    <Error />
-  {/await}
+  </div>
+  <div class="flex py-6 gap-4">
+    <button
+      type="submit"
+      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+      >{capital(
+        $_("create_item", {
+          values: { item: $_("unit", { values: { n: 1 } }) },
+        })
+      )}</button
+    >
+    <button
+      type="button"
+      class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
+      on:click={() => history.back()}
+    >
+      {capital($_("cancel"))}
+    </button>
+  </div>
+  <Error />
 </form>

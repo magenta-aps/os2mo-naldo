@@ -493,6 +493,8 @@ export type AddressFilter = {
    *
    */
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Visibility filter limiting which entries are returned. */
+  visibility?: InputMaybe<ClassFilter>;
 };
 
 /** Address registration filter. */
@@ -1928,6 +1930,11 @@ export type ClassFilter = {
    */
   it_system?: InputMaybe<ItSystemFilter>;
   /**
+   * Owner filter limiting which entries are returned.
+   *
+   */
+  owner?: InputMaybe<ClassOwnerFilter>;
+  /**
    * Parent filter limiting which entries are returned.
    *
    */
@@ -1984,6 +1991,208 @@ export type ClassFilter = {
    *
    */
   scope?: InputMaybe<Array<Scalars['String']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * User-key filter limiting which entries are returned.
+   *
+   * | `user_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * UUID filter limiting which entries are returned.
+   *
+   * | `uuids`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+/** Class owner filter */
+export type ClassOwnerFilter = {
+  /**
+   * Select organisation units which have an ancestor matching the given filter.
+   *
+   * Note that every node is its own ancestor as per [CLRS] 12.2-6.
+   *
+   * Given the following tree:
+   * ```
+   * A
+   * ├── B
+   * │   ├── C
+   * │   │   └── D
+   * │   └── E
+   * └── F
+   * ```
+   * the `ancestor` filter behaves according to the following table:
+   *
+   * | Filter | Returned    |
+   * |--------|-------------|
+   * |      A | A B C D E F |
+   * |      B | B C D E     |
+   * |      C | C D         |
+   * |      D | D           |
+   * |      E | E           |
+   * |      F | F           |
+   *
+   */
+  ancestor?: InputMaybe<OrganisationUnitFilter>;
+  /**
+   * Select organisation units which have a descendant matching the given filter.
+   *
+   * Note that every node is its own descendant as per [CLRS] 12.2-6.
+   *
+   * Given the following tree:
+   * ```
+   * A
+   * ├── B
+   * │   ├── C
+   * │   │   └── D
+   * │   └── E
+   * └── F
+   * ```
+   * the `descendant` filter behaves according to the following table:
+   *
+   * | Filter | Returned    |
+   * |--------|-------------|
+   * |      A | A           |
+   * |      B | A B         |
+   * |      C | A B C       |
+   * |      D | A B C D     |
+   * |      E | A B E       |
+   * |      F | A F         |
+   *
+   */
+  descendant?: InputMaybe<OrganisationUnitFilter>;
+  /**
+   * Filter organisation units to only include matches pointed to by engagements.
+   *
+   * Can be used to find organisation units for certain engagements.
+   *
+   */
+  engagement?: InputMaybe<EngagementFilter>;
+  /** Limit the elements returned by their starting validity. */
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Filter organisation units by their organisational hierarchy labels.
+   *
+   * Can be used to extract a subset of the organisational structure.
+   *
+   * Examples of user-keys:
+   * * `"Line-management"`
+   * * `"Self-owned institution"`
+   * * `"Outside organisation"`
+   * * `"Hidden"`
+   *
+   * Note:
+   * The organisation-gatekeeper integration is one option to keep hierarchy labels up-to-date.
+   *
+   * | `hierarchies`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   * @deprecated Replaced by the 'hierarchy' filter
+   */
+  hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Hierarchy filter limiting which entries are returned.
+   *
+   * Filter organisation units by their organisational hierarchy labels.
+   *
+   * Can be used to extract a subset of the organisational structure.
+   *
+   * Examples of user-keys:
+   * * `"Line-management"`
+   * * `"Self-owned institution"`
+   * * `"Outside organisation"`
+   * * `"Hidden"`
+   *
+   * Note:
+   * The organisation-gatekeeper integration is one option to keep hierarchy labels up-to-date.
+   *
+   */
+  hierarchy?: InputMaybe<ClassFilter>;
+  /**
+   * Include classes with `owner=None`.
+   *
+   */
+  include_none?: Scalars['Boolean']['input'];
+  /**
+   * Name filter finding exact matches by name.
+   *
+   * | `names`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  names?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * Select organisation units whose parent matches the given filter.
+   *
+   * Set to `None` to find root units.
+   *
+   */
+  parent?: InputMaybe<OrganisationUnitFilter>;
+  /**
+   * Parent UUID filter limiting which entries are returned.
+   *
+   * | `parents`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   * @deprecated Replaced by the 'parent' filter
+   */
+  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Free text search.
+   *
+   * Does best effort lookup to find entities matching the query string.
+   * No quarantees are given w.r.t. the entries returned.
+   *
+   */
+  query?: InputMaybe<Scalars['String']['input']>;
+  /**
+   * Registration filter limiting which entries are returned.
+   *
+   */
+  registration?: InputMaybe<OrganisationUnitRegistrationFilter>;
+  /** @deprecated Renamed to 'descendant' */
+  subtree?: InputMaybe<OrganisationUnitFilter>;
   /** Limit the elements returned by their ending validity. */
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -2929,6 +3138,7 @@ export type EmployeesBoundAddressFilter = {
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  visibility?: InputMaybe<ClassFilter>;
 };
 
 export type EmployeesBoundAssociationFilter = {
@@ -4228,6 +4438,7 @@ export type FacetsBoundClassFilter = {
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   it_system?: InputMaybe<ItSystemFilter>;
+  owner?: InputMaybe<ClassOwnerFilter>;
   parent?: InputMaybe<ClassFilter>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -5519,6 +5730,7 @@ export type ItuserBoundAddressFilter = {
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  visibility?: InputMaybe<ClassFilter>;
 };
 
 export type ItuserBoundRoleBindingFilter = {
@@ -8460,6 +8672,7 @@ export type OrgUnitsboundaddressfilter = {
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  visibility?: InputMaybe<ClassFilter>;
 };
 
 export type OrgUnitsboundassociationfilter = {
@@ -9934,6 +10147,7 @@ export type ParentsBoundClassFilter = {
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   it_system?: InputMaybe<ItSystemFilter>;
+  owner?: InputMaybe<ClassOwnerFilter>;
   parent?: InputMaybe<ClassFilter>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   registration?: InputMaybe<ClassRegistrationFilter>;
@@ -11120,6 +11334,7 @@ export type UuidsBoundClassFilter = {
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   it_system?: InputMaybe<ItSystemFilter>;
+  owner?: InputMaybe<ClassOwnerFilter>;
   parent?: InputMaybe<ClassFilter>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   parents?: InputMaybe<Array<Scalars['UUID']['input']>>;

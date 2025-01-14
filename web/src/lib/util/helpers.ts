@@ -19,6 +19,7 @@ import { gql } from "graphql-request"
 import {
   GetOrgUnitValiditiesDocument,
   GetEngagementValiditiesDocument,
+  FacetsDocument,
 } from "./query.generated"
 
 gql`
@@ -46,6 +47,26 @@ gql`
       }
     }
   }
+  query Facets($currentDate: DateTime!, $orgUuid: [UUID!], $facetUserKeys: [String!]) {
+    facets(filter: { user_keys: $facetUserKeys }) {
+      objects {
+        validities {
+          uuid
+          user_key
+          classes(
+            filter: {
+              from_date: $currentDate
+              owner: { include_none: true, descendant: { uuids: $orgUuid } }
+            }
+          ) {
+            name
+            uuid
+            user_key
+          }
+        }
+      }
+    }
+  }
 `
 
 export const getValidities = async (uuid: string) => {
@@ -59,6 +80,14 @@ export const getEngagementValidities = async (uuid: string) => {
     uuid: uuid,
   })
   return getMinMaxValidities(res.engagements.objects[0].validities)
+}
+export const getClasses = async (variables: {
+  currentDate: string
+  orgUuid: string | null
+  facetUserKeys: string[]
+}) => {
+  const res = await graphQLClient().request(FacetsDocument, variables)
+  return res.facets.objects
 }
 
 export const tenseToValidity = (
