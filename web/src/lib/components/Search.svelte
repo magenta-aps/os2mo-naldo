@@ -49,12 +49,14 @@
   export let disabled = false
   export let errors: string[] = []
 
+  // Custom variable for loading/spinner, since aborting queries makes svelte-select set `loading = true`
+  let spinner = false
+
   $: if (value?.name) {
     name = value?.name
   }
 
   const itemId = "uuid" // Used by the component to differentiate between items
-  let loading = false
 
   let items: SearchItems
 
@@ -168,11 +170,17 @@
     }
   `
 
+  let abortController: AbortController
   const searchItems = async (filterText: string) => {
     if (!filterText.length) return []
     if (filterText.length < 3) return []
 
-    loading = true
+    spinner = true
+    if (abortController) {
+      abortController.abort()
+    }
+    abortController = new AbortController()
+
     let res:
       | SearchEmployeeQuery
       | SearchOrgUnitQuery
@@ -188,11 +196,14 @@
         } else {
           employeeFilter = { from_date: $date, query: filterText }
         }
-        res = await graphQLClient().request(SearchEmployeeDocument, {
-          filter: employeeFilter,
-        })
+        res = await graphQLClient(abortController.signal).request(
+          SearchEmployeeDocument,
+          {
+            filter: employeeFilter,
+          }
+        )
 
-        items = items = res.employees.objects
+        items = res.employees.objects
           .map((item) => findClosestValidity(item.validities, $date))
           .sort((a, b) => (a.name > b.name ? 1 : -1))
 
@@ -207,16 +218,18 @@
           lazyEmployeeFilter = { from_date: $date, uuids: items.map((e) => e.uuid) }
         }
 
-        res = await graphQLClient().request(LazyEmployeeSearchDocument, {
-          employeeFilter: lazyEmployeeFilter,
-        })
+        res = await graphQLClient(abortController.signal).request(
+          LazyEmployeeSearchDocument,
+          {
+            employeeFilter: lazyEmployeeFilter,
+          }
+        )
 
         if (res.employees) {
-          items = items = res.employees.objects
+          return (items = res.employees.objects
             .map((item) => findClosestValidity(item.validities, $date))
-            .sort((a, b) => (a.name > b.name ? 1 : -1))
+            .sort((a, b) => (a.name > b.name ? 1 : -1)))
         }
-        break
 
       case "org-unit":
         let orgUnitFilter
@@ -226,11 +239,14 @@
         } else {
           orgUnitFilter = { from_date: $date, query: filterText }
         }
-        res = await graphQLClient().request(SearchOrgUnitDocument, {
-          filter: orgUnitFilter,
-        })
+        res = await graphQLClient(abortController.signal).request(
+          SearchOrgUnitDocument,
+          {
+            filter: orgUnitFilter,
+          }
+        )
 
-        items = items = res.org_units.objects
+        items = res.org_units.objects
           .map((item) => findClosestValidity(item.validities, $date))
           .sort((a, b) => (a.name > b.name ? 1 : -1))
 
@@ -245,19 +261,20 @@
           lazyOrgFilter = { from_date: $date, uuids: items.map((e) => e.uuid) }
         }
 
-        res = await graphQLClient().request(LazyOrgUnitSearchDocument, {
-          orgUnitFilter: lazyOrgFilter,
-        })
+        res = await graphQLClient(abortController.signal).request(
+          LazyOrgUnitSearchDocument,
+          {
+            orgUnitFilter: lazyOrgFilter,
+          }
+        )
 
         if (res.org_units) {
-          items = items = res.org_units.objects
+          return (items = res.org_units.objects
             .map((item) => findClosestValidity(item.validities, $date))
-            .sort((a, b) => (a.name > b.name ? 1 : -1))
+            .sort((a, b) => (a.name > b.name ? 1 : -1)))
         }
-        break
     }
-
-    loading = false
+    spinner = false
   }
 
   const floatingConfig = {
@@ -296,7 +313,7 @@
       {disabled}
       {itemId}
       hasError={errors.length ? true : false}
-      {loading}
+      loading={spinner}
       bind:value
       hideEmptyState={true}
       placeholder={type === "employee"
