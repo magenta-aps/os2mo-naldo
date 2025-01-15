@@ -74,14 +74,30 @@
   } = { from: null, to: null }
 
   let facets: FacetValidities[]
+  let abortController: AbortController
   $: {
+    const params = {
+      currentDate: $date,
+      orgUuid: parent ? parent.uuid : null,
+      facetUserKeys: ["org_unit_level", "org_unit_type", "time_planning"],
+    }
+
+    // Abort the previous request if a new one is about to start
+    if (abortController) {
+      abortController.abort() // Cancel any in-progress request
+    }
+
+    abortController = new AbortController()
     ;(async () => {
       validities = parent ? await getValidities(parent.uuid) : { from: null, to: null }
-      facets = await getClasses({
-        currentDate: $date,
-        orgUuid: parent ? parent.uuid : null,
-        facetUserKeys: ["org_unit_level", "org_unit_type", "time_planning"],
-      })
+      try {
+        const result = await getClasses(params, abortController.signal)
+        facets = result // Update facets if the request is successful
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          console.error("Request failed:", err) // Handle other errors
+        }
+      }
     })()
   }
 
