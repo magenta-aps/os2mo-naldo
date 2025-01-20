@@ -172,6 +172,10 @@
             sortPath: "user_key",
           },
           {
+            title: upperCase($_("org_id")),
+            sortPath: "org_unit[0].user_key",
+          },
+          {
             title:
               env.PUBLIC_SHOW_EXTENSION_1 === "true"
                 ? capital($_("job_code"))

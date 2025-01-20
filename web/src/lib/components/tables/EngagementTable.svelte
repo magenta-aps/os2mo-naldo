@@ -8,7 +8,7 @@
   import { page } from "$app/stores"
   import { EngagementsDocument, type EngagementsQuery } from "./query.generated"
   import { date } from "$lib/stores/date"
-  import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
+  import { isUUID, tenseFilter, tenseToValidity } from "$lib/util/helpers"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { sortData } from "$lib/util/sorting"
   import { onMount } from "svelte"
@@ -75,6 +75,7 @@
             org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
               uuid
+              user_key
               managers(inherit: $inherit) {
                 person {
                   name
@@ -148,7 +149,14 @@
           >
         {/if}
       </td>
-      <td class="text-sm p-4">{engagement.user_key}</td>
+      <td class="text-sm p-4"
+        >{!isUUID(engagement.user_key) ? engagement.user_key : ""}</td
+      >
+      <td class="text-sm p-4"
+        >{!isUUID(engagement.org_unit[0].user_key)
+          ? engagement.org_unit[0].user_key
+          : ""}</td
+      >
       <td class="text-sm p-4">{engagement.job_function.name}</td>
       {#if env.PUBLIC_SHOW_EXTENSION_1 === "true"}
         <td class="text-sm p-4"
