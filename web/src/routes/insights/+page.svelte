@@ -4,7 +4,7 @@
   import { query } from "gql-query-builder"
   import Selects from "$lib/components/insights/Selects.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
-  import { debounce } from "$lib/util/helpers"
+  import { debounce, paginateQuery } from "$lib/util/helpers"
   import { graphQLClient } from "$lib/util/http"
   import { date } from "$lib/stores/date"
   import Search from "$lib/components/Search.svelte"
@@ -25,6 +25,7 @@
   // Random variable, is only used to trigger updates in `Selects`
   let removed = 0
   let includeChildren: boolean
+  let requestCount = 0
 
   let selectedQueries: SelectedQuery[] = [
     {
@@ -60,11 +61,19 @@
       : { uuids: orgUnit?.uuid, from_date: $date, to_date: null }
     const gqlQuery = query([
       {
-        operation: "org_units",
+        operation: "page: org_units",
         variables: {
           filter: {
             value: filterValue,
             type: "OrganisationUnitFilter",
+          },
+          limit: {
+            value: null,
+            type: "int",
+          },
+          cursor: {
+            value: null,
+            type: "Cursor",
           },
         },
         fields: [
@@ -89,6 +98,7 @@
                   .flat(),
               },
             ],
+            page_info: ["next_cursor"],
           },
         ],
       },
@@ -101,14 +111,22 @@
     query: string
     variables: { filter: object }
   }) => {
+    const onProgress = (requestCount: number) => {
+      console.log(`Current page requests: ${requestCount}`)
+    }
     if (!selectedQueries || !generatedQuery) return
-    const res: any = await graphQLClient().request(
+    const res: any = await paginateQuery(
       generatedQuery.query,
-      generatedQuery.variables
+      generatedQuery.variables,
+      // Limit
+      1,
+      (currentRequestCount) => {
+        requestCount = currentRequestCount // Update reactive variable
+      }
     )
 
     const results = []
-    for (const outer of res.org_units.objects) {
+    for (const outer of res) {
       results.push(outer.current)
     }
     return results
@@ -220,7 +238,9 @@
       }}
       >{capital($_("download_as_csv"))}
       {#if loading}<span class="loading loading-spinner" />{/if}</button
-    >
+    >{#if loading}
+      <p>{requestCount}</p>
+    {/if}
   </div>
 
   <!-- {#key data}

@@ -68,7 +68,37 @@ gql`
     }
   }
 `
+export const paginateQuery = async (
+  query,
+  variableValues = {},
+  pageSize: Number = 100,
+  onProgress = () => {}
+) => {
+  let nextCursor = null
+  const results = []
+  let requestCount = 0
 
+  while (true) {
+    requestCount++
+    onProgress(requestCount)
+    const variables = {
+      ...variableValues,
+      limit: pageSize || undefined,
+      cursor: nextCursor || undefined,
+    }
+
+    // Simulate executing a query (replace with actual query execution logic)
+    const result = await graphQLClient().request(query, variables)
+
+    for (const obj of result.page.objects) {
+      results.push(obj) // Collect the results or yield them
+    }
+    nextCursor = result.page["page_info"]["next_cursor"]
+    if (!nextCursor) break // Exit if no more pages
+  }
+
+  return results
+}
 export const getValidities = async (uuid: string) => {
   const res = await graphQLClient().request(GetOrgUnitValiditiesDocument, {
     uuid: uuid,
