@@ -6,7 +6,7 @@ stages:
   - deploy
 
 variables:
-  DOCKERFILE: ${CI_PROJECT_DIR}/docker/web.Dockerfile
+  DOCKERFILE: ${CI_PROJECT_DIR}/Dockerfile
   RELEASE_REGISTRY: docker.io
   RELEASE_REGISTRY_IMAGE: index.docker.io/magentaaps/os2mo-naldo
   IMAGE_SHA: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
