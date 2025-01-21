@@ -12,11 +12,14 @@
   import { downloadHandler } from "$lib/util/csv"
   import Icon from "@iconify/svelte"
   import homeOutlineRounded from "@iconify/icons-material-symbols/home-outline-rounded"
+  import Warning from "$lib/components/alerts/Warning.svelte"
+  import { success, error, warning } from "$lib/stores/alert"
   import homeWorkOutlineRounded from "@iconify/icons-material-symbols/home-work-outline-rounded"
   import removeRounded from "@iconify/icons-material-symbols/remove-rounded"
   import addRounded from "@iconify/icons-material-symbols/add-rounded"
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
   import { mainQueries } from "./mainQueries"
+  import { onDestroy } from "svelte"
 
   let orgUnit: { name: string; uuid: string } | undefined
   let data: any
@@ -26,6 +29,12 @@
   let removed = 0
   let includeChildren: boolean
   let requestCount = 0
+  let controller: AbortController
+
+  // This is used to cancel ongoing request and break out of the loop, when navigating away from the page.
+  onDestroy(() => {
+    controller.abort()
+  })
 
   let selectedQueries: SelectedQuery[] = [
     {
@@ -111,19 +120,25 @@
     query: string
     variables: { filter: object }
   }) => {
-    const onProgress = (requestCount: number) => {
-      console.log(`Current page requests: ${requestCount}`)
-    }
     if (!selectedQueries || !generatedQuery) return
+
+    controller = new AbortController()
+    const abortSignal = controller.signal
+
     const res: any = await paginateQuery(
       generatedQuery.query,
       generatedQuery.variables,
       // Limit
       1,
       (currentRequestCount) => {
-        requestCount = currentRequestCount // Update reactive variable
-      }
+        requestCount = currentRequestCount
+      },
+      abortSignal
     )
+
+    if (abortSignal.aborted) {
+      throw new Error("CSV download was aborted")
+    }
 
     const results = []
     for (const outer of res) {
@@ -233,8 +248,14 @@
         selectedQueries[selectedQueries.length - 1].mainQuery === null ||
         !orgUnit}
       on:click={async (event) => {
-        await debounce(updateQuery)
-        downloadHandler(event, data, selectedQueries, filename)
+        try {
+          await debounce(updateQuery)
+          downloadHandler(event, data, selectedQueries, filename)
+        } catch (warn) {
+          // Catch if the csv download is aborted
+          console.log(warn)
+          $warning = { message: capital($_("csv_warning")) }
+        }
       }}
       >{capital($_("download_as_csv"))}
       {#if loading}<span class="loading loading-spinner" />{/if}</button

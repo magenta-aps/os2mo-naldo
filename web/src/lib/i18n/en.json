@@ -20,6 +20,7 @@
 	"copy": "copy",
 	"cpr_number": "CPR number",
 	"create_item": "create {item}",
+	"csv_warning": "csv download was aborted",
 	"date": {
 		"change": "date of change",
 		"date": "date",

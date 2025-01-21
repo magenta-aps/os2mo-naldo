@@ -20,6 +20,7 @@
 	"copy": "kopiér",
 	"cpr_number": "CPR nummer",
 	"create_item": "opret {item}",
+	"csv_warning": "csv download blev afbrudt",
 	"date": {
 		"change": "dato for ændring",
 		"date": "dato",

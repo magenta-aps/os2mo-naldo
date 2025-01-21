@@ -72,29 +72,37 @@ export const paginateQuery = async (
   query,
   variableValues = {},
   pageSize: Number = 100,
-  onProgress = () => {}
+  onProgress = () => {},
+  abortSignal?: AbortSignal
 ) => {
   let nextCursor = null
   const results = []
   let requestCount = 0
+  try {
+    while (true) {
+      if (abortSignal?.aborted) {
+        break
+      }
 
-  while (true) {
-    requestCount++
-    onProgress(requestCount)
-    const variables = {
-      ...variableValues,
-      limit: pageSize || undefined,
-      cursor: nextCursor || undefined,
+      requestCount++
+      onProgress(requestCount)
+      const variables = {
+        ...variableValues,
+        limit: pageSize || undefined,
+        cursor: nextCursor || undefined,
+      }
+
+      // Simulate executing a query (replace with actual query execution logic)
+      const result = await graphQLClient().request(query, variables)
+
+      for (const obj of result.page.objects) {
+        results.push(obj) // Collect the results or yield them
+      }
+      nextCursor = result.page["page_info"]["next_cursor"]
+      if (!nextCursor) break // Exit if no more pages
     }
-
-    // Simulate executing a query (replace with actual query execution logic)
-    const result = await graphQLClient().request(query, variables)
-
-    for (const obj of result.page.objects) {
-      results.push(obj) // Collect the results or yield them
-    }
-    nextCursor = result.page["page_info"]["next_cursor"]
-    if (!nextCursor) break // Exit if no more pages
+  } catch (error) {
+    throw error
   }
 
   return results
