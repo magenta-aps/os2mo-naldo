@@ -44,6 +44,7 @@
 	"engagement_type": "engagementstype",
 	"enter_cpr": "indtast CPR nummer",
 	"entire_organisation": "bruttoorganisation",
+	"estimated_time_remaining": "estimeret tid tilbage",
 	"facet": "{n, plural, =0 {facetten} one {facet} other {facetter}}",
 	"facets": {
 		"name": {
@@ -157,6 +158,7 @@
 	"no_item": "ingen {item}",
 	"not_set": "ikke sat",
 	"notes": "noter",
+	"of": "af",
 	"onboarding": "onboarding",
 	"org_unit": "{n, plural, =0 {organisationsenheden} one {organisationsenhed} other {organisationsenheder}}",
 	"org_unit_level": "enhedsniveau",

@@ -12,14 +12,15 @@
   import { downloadHandler } from "$lib/util/csv"
   import Icon from "@iconify/svelte"
   import homeOutlineRounded from "@iconify/icons-material-symbols/home-outline-rounded"
-  import Warning from "$lib/components/alerts/Warning.svelte"
-  import { success, error, warning } from "$lib/stores/alert"
+  import { warning } from "$lib/stores/alert"
   import homeWorkOutlineRounded from "@iconify/icons-material-symbols/home-work-outline-rounded"
   import removeRounded from "@iconify/icons-material-symbols/remove-rounded"
   import addRounded from "@iconify/icons-material-symbols/add-rounded"
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
   import { mainQueries } from "./mainQueries"
   import { onDestroy } from "svelte"
+  import { gql } from "graphql-request"
+  import { GetOrgUnitCountDocument } from "./query.generated"
 
   let orgUnit: { name: string; uuid: string } | undefined
   let data: any
@@ -28,8 +29,11 @@
   // Random variable, is only used to trigger updates in `Selects`
   let removed = 0
   let includeChildren: boolean
-  let requestCount = 0
   let controller: AbortController
+  let requestCount = 0
+  let totalCount: number = 0
+  let startTime: number = 0
+  let estimatedTime: string
 
   // This is used to cancel ongoing request and break out of the loop, when navigating away from the page.
   onDestroy(() => {
@@ -57,6 +61,42 @@
     selectedQueries = selectedQueries.filter((_, i) => i !== index)
     removed++
   }
+  const estimateTimeRemaining = (
+    totalCount: number,
+    requestCount: number,
+    startTime: number
+  ) => {
+    const elapsedTime = (Date.now() - startTime) / 1000 // Elapsed time in seconds
+    const averageTimePerRequest = elapsedTime / requestCount // Average time per request
+    const remainingRequests = totalCount - requestCount
+
+    const estimatedSecondsRemaining = Math.round(
+      averageTimePerRequest * remainingRequests
+    )
+    const minutes = Math.floor(estimatedSecondsRemaining / 60)
+    const seconds = estimatedSecondsRemaining % 60
+
+    return `${minutes}m ${seconds}s`
+  }
+
+  const fetchTotalCount = async (filter) => {
+    gql`
+      query GetOrgUnitCount($date: DateTime, $filter: OrganisationUnitFilter) {
+        org_units(filter: $filter) {
+          objects {
+            current(at: $date) {
+              uuid
+            }
+          }
+        }
+      }
+    `
+    const res = await graphQLClient().request(GetOrgUnitCountDocument, {
+      filter: filter,
+      date: $date,
+    })
+    return res.org_units.objects.length
+  }
 
   const updateQuery = async () => {
     if (!selectedQueries) return
@@ -68,6 +108,13 @@
           to_date: null,
         }
       : { uuids: orgUnit?.uuid, from_date: $date, to_date: null }
+
+    if (includeChildren) {
+      totalCount = await fetchTotalCount(filterValue)
+      startTime = Date.now()
+      estimatedTime = estimateTimeRemaining(totalCount, requestCount, startTime)
+    }
+
     const gqlQuery = query([
       {
         operation: "page: org_units",
@@ -122,6 +169,9 @@
   }) => {
     if (!selectedQueries || !generatedQuery) return
 
+    if (controller) {
+      controller.abort()
+    }
     controller = new AbortController()
     const abortSignal = controller.signal
 
@@ -157,6 +207,13 @@
       },
     ]
     removed++
+  }
+
+  const updateEstimatedTime = () => {
+    estimatedTime = estimateTimeRemaining(totalCount, requestCount, startTime)
+  }
+  $: if (requestCount) {
+    updateEstimatedTime()
   }
 </script>
 
@@ -246,7 +303,8 @@
           selectedQuery.mainQuery === null || selectedQuery.mainQuery === undefined
       ) ||
         selectedQueries[selectedQueries.length - 1].mainQuery === null ||
-        !orgUnit}
+        !orgUnit ||
+        loading}
       on:click={async (event) => {
         try {
           await debounce(updateQuery)
@@ -259,12 +317,9 @@
       }}
       >{capital($_("download_as_csv"))}
       {#if loading}<span class="loading loading-spinner" />{/if}</button
-    >{#if loading}
-      <p>{requestCount}</p>
+    >{#if loading && estimatedTime}
+      {`${capital($_("estimated_time_remaining"))}: ${estimatedTime}`}
+      {`${requestCount} ${$_("of")} ${totalCount}`}
     {/if}
   </div>
-
-  <!-- {#key data}
-    <InsightsTable {data} headers={selectedQueries} />
-  {/key} -->
 </div>
