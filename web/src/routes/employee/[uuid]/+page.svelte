@@ -111,8 +111,8 @@
             ? `(${employee.cpr_number.slice(0, 6)}-${employee.cpr_number.slice(-4)})`
             : ""}
         </span>
-        <CopyToClipboard uuid={employee.uuid} name={employee.name} />
       {/if}
+      <CopyToClipboard uuid={employee.uuid} name={employee.name} />
     </h1>
 
     <Tabs {activeItem} {items} on:tabChange={tabChange} />
