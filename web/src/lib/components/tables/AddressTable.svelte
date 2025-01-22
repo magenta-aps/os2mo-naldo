@@ -104,7 +104,9 @@
     >
       <td class="text-sm p-4">{address.address_type.name}</td>
       <td class="text-sm p-4"
-        >{address.user_key !== address.value ? address.user_key : ""}</td
+        >{address.user_key !== address.value && address.user_key !== address.uuid
+          ? address.user_key
+          : ""}</td
       >
       <td class="text-sm p-4">{address.name}</td>
       <td class="text-sm p-4"
