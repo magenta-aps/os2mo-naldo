@@ -79,7 +79,7 @@
     return `${minutes}m ${seconds}s`
   }
 
-  const fetchTotalCount = async (filter) => {
+  const fetchTotalCount = async (filter: any) => {
     gql`
       query GetOrgUnitCount($date: DateTime, $filter: OrganisationUnitFilter) {
         org_units(filter: $filter) {
@@ -101,6 +101,11 @@
   const updateQuery = async () => {
     if (!selectedQueries) return
     loading = true
+    // Reset estimate variables. This is mainly for the case where we start a 2nd download.
+    startTime = Date.now()
+    estimatedTime = `${capital($_("calculating"))}...`
+    requestCount = 0
+    totalCount = 0
     let filterValue = includeChildren
       ? {
           ancestor: { uuids: orgUnit?.uuid, from_date: $date, to_date: null },
@@ -175,7 +180,7 @@
     controller = new AbortController()
     const abortSignal = controller.signal
 
-    const res: any = await paginateQuery(
+    const res = await paginateQuery(
       generatedQuery.query,
       generatedQuery.variables,
       // Limit
@@ -318,8 +323,15 @@
       >{capital($_("download_as_csv"))}
       {#if loading}<span class="loading loading-spinner" />{/if}</button
     >{#if loading && estimatedTime}
-      {`${capital($_("estimated_time_remaining"))}: ${estimatedTime}`}
-      {`${requestCount} ${$_("of")} ${totalCount}`}
+      <div class="normal-case font-normal text-base text-base-100">
+        <p>{`${capital($_("estimated_time_remaining"))}: ${estimatedTime}`}</p>
+        <p>
+          {`${requestCount} ${$_("of")} ${totalCount} ${$_("unit", {
+            values: { n: 2 },
+          })}`}
+        </p>
+      </div>
+      <p class="text-secondary text-xs">* {capital($_("insights_note"))}</p>
     {/if}
   </div>
 </div>

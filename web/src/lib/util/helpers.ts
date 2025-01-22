@@ -69,10 +69,10 @@ gql`
   }
 `
 export const paginateQuery = async (
-  query,
-  variableValues = {},
-  pageSize: Number = 100,
-  onProgress = () => {},
+  query: string,
+  variableValues: Record<string, any> = {},
+  pageSize: number,
+  onProgress: (count: number) => void = () => {},
   abortSignal?: AbortSignal
 ) => {
   let nextCursor = null
@@ -88,15 +88,14 @@ export const paginateQuery = async (
       onProgress(requestCount)
       const variables = {
         ...variableValues,
-        limit: pageSize || undefined,
-        cursor: nextCursor || undefined,
+        limit: pageSize,
+        cursor: nextCursor,
       }
 
-      // Simulate executing a query (replace with actual query execution logic)
-      const result = await graphQLClient().request(query, variables)
+      const result: any = await graphQLClient().request(query, variables)
 
       for (const obj of result.page.objects) {
-        results.push(obj) // Collect the results or yield them
+        results.push(obj)
       }
       nextCursor = result.page["page_info"]["next_cursor"]
       if (!nextCursor) break // Exit if no more pages
