@@ -17,7 +17,6 @@
     headers={[
       { title: capital($_("date.date")), sortPath: "start" },
       { title: capital($_("actor")), sortPath: "actor" },
-      { title: capital($_("id")), sortPath: "registration_id" },
       { title: capital($_("note")), sortPath: "model" },
     ]}
   >

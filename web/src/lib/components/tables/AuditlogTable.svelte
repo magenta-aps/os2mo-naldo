@@ -3,6 +3,7 @@
   import { capital } from "$lib/util/translationUtils"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
+  import { base } from "$app/paths"
   import { AuditlogDocument, type AuditlogQuery } from "./query.generated"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { sortData } from "$lib/util/sorting"
@@ -18,12 +19,27 @@
       registrations(filter: { uuids: $uuid }) {
         objects {
           uuid
-          registration_id
-          note
           model
           start
-          end
-          actor
+          note
+          actor_object {
+            uuid
+            ... on SpecialActor {
+              details
+              uuid
+            }
+            ... on PersonActor {
+              person {
+                current {
+                  name
+                  uuid
+                }
+              }
+            }
+            ... on IntegrationActor {
+              name
+            }
+          }
         }
       }
     }
@@ -34,6 +50,16 @@
   $: {
     if (data) {
       data = sortData(data, $sortKey, $sortDirection)
+    }
+  }
+
+  const resolveActor = (actor: any) => {
+    if (actor.actor_object["person"]) {
+      return [actor.actor_object["person"].current, "person"]
+    } else if (actor.actor_object["details"]) {
+      return [actor.actor_object, "special"]
+    } else {
+      return [actor.actor_object, "integration"]
     }
   }
 
@@ -57,10 +83,19 @@
   </tr>
 {:else}
   {#each data as auditlog}
+    {@const [actor, type] = resolveActor(auditlog)}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="text-sm p-4">{formatDateTime(auditlog.start)}</td>
-      <td class="text-sm p-4">{auditlog.actor}</td>
-      <td class="text-sm p-4">{auditlog.registration_id}</td>
+
+      <td class="text-sm p-4">
+        {#if type == "person"}
+          <a href="{base}/employee/{actor.uuid}">{actor.name}</a>
+        {:else if type == "integration"}
+          {actor.name}
+        {:else}
+          {actor.details}
+        {/if}
+      </td>
       <td class="text-sm p-4">{auditlog.note}</td>
     </tr>
   {:else}

@@ -21,6 +21,10 @@ export type Scalars = {
   int: { input: any; output: any; }
 };
 
+export type Actor = {
+  uuid: Scalars['UUID']['output'];
+};
+
 /**
  * Address information for either an employee or organisational unit
  *
@@ -1471,6 +1475,11 @@ export type AuditLog = {
    *
    */
   actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
   /**
    * UUID of the audit entry itself.
    *
@@ -5713,6 +5722,12 @@ export type ItUserUpdateInput = {
   uuid: Scalars['UUID']['input'];
   /** Validity of the created IT user object. */
   validity: RaValidityInput;
+};
+
+export type IntegrationActor = Actor & {
+  __typename?: 'IntegrationActor';
+  name: Scalars['String']['output'];
+  uuid: Scalars['UUID']['output'];
 };
 
 export type ItuserBoundAddressFilter = {
@@ -10184,6 +10199,12 @@ export type ParentsBoundOrganisationUnitFilter = {
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
+export type PersonActor = Actor & {
+  __typename?: 'PersonActor';
+  person: EmployeeResponse;
+  uuid: Scalars['UUID']['output'];
+};
+
 /** Entrypoint for all read-operations */
 export type Query = {
   __typename?: 'Query';
@@ -10454,6 +10475,11 @@ export type Registration = {
    *
    */
   actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
   /**
    * End of the bitemporal interval.
    *
@@ -11306,6 +11332,12 @@ export type RoleRegistrationFilter = {
   end?: InputMaybe<Scalars['DateTime']['input']>;
   /** Limit the elements returned by their starting validity. */
   start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type SpecialActor = Actor & {
+  __typename?: 'SpecialActor';
+  details: Scalars['String']['output'];
+  uuid: Scalars['UUID']['output'];
 };
 
 /** Result page in cursor-based pagination. */
