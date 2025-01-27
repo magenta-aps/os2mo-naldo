@@ -3,6 +3,7 @@
   import "$lib/global.css"
   import SuccessAlert from "$lib/components/alerts/Success.svelte"
   import ErrorAlert from "$lib/components/alerts/Error.svelte"
+  import WarningAlert from "$lib/components/alerts/Warning.svelte"
   import Navbar from "$lib/components/Navbar.svelte"
   import { onMount } from "svelte"
   import { initKeycloak } from "$lib/util/keycloak"
@@ -13,7 +14,7 @@
   import { GetConfigDocument } from "./query.generated"
   import { graphQLClient } from "$lib/util/http"
   import { isAuth } from "$lib/stores/auth"
-  import { error } from "$lib/stores/alert"
+  import { error, success, warning } from "$lib/stores/alert"
 
   gql`
     query GetConfig {
@@ -61,3 +62,4 @@
 <SuccessAlert />
 <!-- TODO: Handle Errors on GraphQL reads better.. -->
 <ErrorAlert />
+<WarningAlert />

@@ -2,7 +2,7 @@ services:
   dev:
     build:
       context: .
-      dockerfile: docker/web.Dockerfile
+      dockerfile: Dockerfile
       target: dev
     environment:
       PUBLIC_BASE_URL: http://localhost:5000
