@@ -4,7 +4,7 @@
   import { query } from "gql-query-builder"
   import Selects from "$lib/components/insights/Selects.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
-  import { debounce } from "$lib/util/helpers"
+  import { debounce, paginateQuery } from "$lib/util/helpers"
   import { graphQLClient } from "$lib/util/http"
   import { date } from "$lib/stores/date"
   import Search from "$lib/components/Search.svelte"
@@ -12,11 +12,15 @@
   import { downloadHandler } from "$lib/util/csv"
   import Icon from "@iconify/svelte"
   import homeOutlineRounded from "@iconify/icons-material-symbols/home-outline-rounded"
+  import { warning } from "$lib/stores/alert"
   import homeWorkOutlineRounded from "@iconify/icons-material-symbols/home-work-outline-rounded"
   import removeRounded from "@iconify/icons-material-symbols/remove-rounded"
   import addRounded from "@iconify/icons-material-symbols/add-rounded"
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
   import { mainQueries } from "./mainQueries"
+  import { onDestroy } from "svelte"
+  import { gql } from "graphql-request"
+  import { GetOrgUnitCountDocument } from "./query.generated"
 
   let orgUnit: { name: string; uuid: string } | undefined
   let data: any
@@ -25,6 +29,16 @@
   // Random variable, is only used to trigger updates in `Selects`
   let removed = 0
   let includeChildren: boolean
+  let controller: AbortController
+  let requestCount = 0
+  let totalCount: number = 0
+  let startTime: number = 0
+  let estimatedTime: string
+
+  // This is used to cancel ongoing request and break out of the loop, when navigating away from the page.
+  onDestroy(() => {
+    controller.abort()
+  })
 
   let selectedQueries: SelectedQuery[] = [
     {
@@ -47,10 +61,51 @@
     selectedQueries = selectedQueries.filter((_, i) => i !== index)
     removed++
   }
+  const estimateTimeRemaining = (
+    totalCount: number,
+    requestCount: number,
+    startTime: number
+  ) => {
+    const elapsedTime = (Date.now() - startTime) / 1000 // Elapsed time in seconds
+    const averageTimePerRequest = elapsedTime / requestCount // Average time per request
+    const remainingRequests = totalCount - requestCount
+
+    const estimatedSecondsRemaining = Math.round(
+      averageTimePerRequest * remainingRequests
+    )
+    const minutes = Math.floor(estimatedSecondsRemaining / 60)
+    const seconds = estimatedSecondsRemaining % 60
+
+    return `${minutes}m ${seconds}s`
+  }
+
+  const fetchTotalCount = async (filter: any) => {
+    gql`
+      query GetOrgUnitCount($date: DateTime, $filter: OrganisationUnitFilter) {
+        org_units(filter: $filter) {
+          objects {
+            current(at: $date) {
+              uuid
+            }
+          }
+        }
+      }
+    `
+    const res = await graphQLClient().request(GetOrgUnitCountDocument, {
+      filter: filter,
+      date: $date,
+    })
+    return res.org_units.objects.length
+  }
 
   const updateQuery = async () => {
     if (!selectedQueries) return
     loading = true
+    // Reset estimate variables. This is mainly for the case where we start a 2nd download.
+    startTime = Date.now()
+    estimatedTime = `${capital($_("calculating"))}...`
+    requestCount = 0
+    totalCount = 0
     let filterValue = includeChildren
       ? {
           ancestor: { uuids: orgUnit?.uuid, from_date: $date, to_date: null },
@@ -58,13 +113,28 @@
           to_date: null,
         }
       : { uuids: orgUnit?.uuid, from_date: $date, to_date: null }
+
+    if (includeChildren) {
+      totalCount = await fetchTotalCount(filterValue)
+      startTime = Date.now()
+      estimatedTime = estimateTimeRemaining(totalCount, requestCount, startTime)
+    }
+
     const gqlQuery = query([
       {
-        operation: "org_units",
+        operation: "page: org_units",
         variables: {
           filter: {
             value: filterValue,
             type: "OrganisationUnitFilter",
+          },
+          limit: {
+            value: null,
+            type: "int",
+          },
+          cursor: {
+            value: null,
+            type: "Cursor",
           },
         },
         fields: [
@@ -89,6 +159,7 @@
                   .flat(),
               },
             ],
+            page_info: ["next_cursor"],
           },
         ],
       },
@@ -102,13 +173,30 @@
     variables: { filter: object }
   }) => {
     if (!selectedQueries || !generatedQuery) return
-    const res: any = await graphQLClient().request(
+
+    if (controller) {
+      controller.abort()
+    }
+    controller = new AbortController()
+    const abortSignal = controller.signal
+
+    const res = await paginateQuery(
       generatedQuery.query,
-      generatedQuery.variables
+      generatedQuery.variables,
+      // Limit
+      1,
+      (currentRequestCount) => {
+        requestCount = currentRequestCount
+      },
+      abortSignal
     )
 
+    if (abortSignal.aborted) {
+      throw new Error("CSV download was aborted")
+    }
+
     const results = []
-    for (const outer of res.org_units.objects) {
+    for (const outer of res) {
       results.push(outer.current)
     }
     return results
@@ -124,6 +212,13 @@
       },
     ]
     removed++
+  }
+
+  const updateEstimatedTime = () => {
+    estimatedTime = estimateTimeRemaining(totalCount, requestCount, startTime)
+  }
+  $: if (requestCount) {
+    updateEstimatedTime()
   }
 </script>
 
@@ -213,17 +308,30 @@
           selectedQuery.mainQuery === null || selectedQuery.mainQuery === undefined
       ) ||
         selectedQueries[selectedQueries.length - 1].mainQuery === null ||
-        !orgUnit}
+        !orgUnit ||
+        loading}
       on:click={async (event) => {
-        await debounce(updateQuery)
-        downloadHandler(event, data, selectedQueries, filename)
+        try {
+          await debounce(updateQuery)
+          downloadHandler(event, data, selectedQueries, filename)
+        } catch (warn) {
+          // Catch if the csv download is aborted
+          console.log(warn)
+          $warning = { message: capital($_("csv_warning")) }
+        }
       }}
       >{capital($_("download_as_csv"))}
       {#if loading}<span class="loading loading-spinner" />{/if}</button
-    >
+    >{#if loading && estimatedTime}
+      <div class="normal-case font-normal text-base text-base-100">
+        <p>{`${capital($_("estimated_time_remaining"))}: ${estimatedTime}`}</p>
+        <p>
+          {`${requestCount} ${$_("of")} ${totalCount} ${$_("unit", {
+            values: { n: 2 },
+          })}`}
+        </p>
+      </div>
+      <p class="text-secondary text-xs">* {capital($_("insights_note"))}</p>
+    {/if}
   </div>
-
-  <!-- {#key data}
-    <InsightsTable {data} headers={selectedQueries} />
-  {/key} -->
 </div>

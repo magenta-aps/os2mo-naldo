@@ -164,6 +164,9 @@ export const downloadHandler = (
   filename: string
 ) => {
   event.preventDefault()
+  if (!data) {
+    throw new Error("Data was empty")
+  }
 
   // Generate CSV and trigger download
   const csvData: string = json2csv(data, selectedQueries)

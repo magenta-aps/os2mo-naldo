@@ -7,6 +7,7 @@
 	"association_type": "affiliation type",
 	"authenticating": "authenticating",
 	"back": "back",
+	"calculating": "calculating",
 	"cancel": "cancel",
 	"choose_header": "choose headers",
 	"class": "{n, plural, =0 {the class} one {class} other {classes}}",
@@ -20,6 +21,7 @@
 	"copy": "copy",
 	"cpr_number": "CPR number",
 	"create_item": "create {item}",
+	"csv_warning": "csv download was aborted",
 	"date": {
 		"change": "date of change",
 		"date": "date",
@@ -43,6 +45,7 @@
 	"engagement_type": "employment type",
 	"enter_cpr": "enter CPR number",
 	"entire_organisation": "entire organisation",
+	"estimated_time_remaining": "estimated time remaining",
 	"facet": "{n, plural, =0 {the facet} one {facet} other {facets}}",
 	"facets": {
 		"name": {
@@ -112,6 +115,7 @@
 	"inherited_manager": "inherited manager from {org_unit}",
 	"inherited_owner": "inherited owner from {org_unit}",
 	"insights": "insights",
+	"insights_note": "note, that if it takes a long time to generate the file, you can open MO in a new tab and continue working.",
 	"it_system": "IT system",
 	"itsystem": "IT system",
 	"itassociation": "{n, plural, =0 {the IT affiliation} one {IT affiliation} other {IT affiliations}}",
@@ -156,6 +160,7 @@
 	"no_item": "no {item}",
 	"not_set": "not set",
 	"notes": "notes",
+	"of": "of",
 	"onboarding": "onboarding",
 	"org_unit": "{n, plural, =0 {the organisation unit} one {organisation unit} other {organisation units}}",
 	"org_unit_level": "unit level",
