@@ -61,6 +61,7 @@
           validities {
             uuid
             user_key
+            # sd_code
             person(filter: { from_date: $fromDate, to_date: $toDate }) {
               uuid
               name
@@ -148,6 +149,11 @@
           >
         {/if}
       </td>
+      {#if env.PUBLIC_SHOW_SD_CODE === "true"}
+        <td class="text-sm p-4">
+          <!-- {engagement.sd_code} -->
+        </td>
+      {/if}
       <td class="text-sm p-4">{engagement.user_key}</td>
       <td class="text-sm p-4">{engagement.job_function.name}</td>
       {#if env.PUBLIC_SHOW_EXTENSION_1 === "true"}

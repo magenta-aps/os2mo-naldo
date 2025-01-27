@@ -218,6 +218,10 @@
         headers={[
           { title: capital($_("name")), sortPath: "person[0].name" },
           {
+            title: capital($_("department_code")),
+            sortPath: "sd_code",
+          },
+          {
             title: upperCase($_("id")),
             sortPath: "user_key",
           },

@@ -168,6 +168,10 @@
             sortPath: "org_unit[0].name",
           },
           {
+            title: capital($_("department_code")),
+            sortPath: "sd_code",
+          },
+          {
             title: upperCase($_("id")),
             sortPath: "user_key",
           },
