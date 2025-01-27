@@ -19,8 +19,10 @@ services:
       PUBLIC_SHOW_EXTENSION_1: "false"
       PUBLIC_DOCS_LINK: "true"
       PUBLIC_ONBOARDING_LINK: "true"
-      # Region syd specific (true)
+      # Region syd specific
       PUBLIC_SHOW_SD_CODE_IN_TREES: "false"
+      # Region syd specific for showing lønorg SD code in EngagementTable
+      PUBLIC_SHOW_SD_CODE: "false"
     ports:
       - "127.0.0.1:5173:5173"
       - "127.0.0.1:24678:24678" # hot module reloading

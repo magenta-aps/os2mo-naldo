@@ -49,6 +49,12 @@
     }
   }
 
+  if (env.PUBLIC_SHOW_SD_CODE !== "true" && table === EngagementTable) {
+    headers = headers.filter(
+      (header) => header.title !== capital($_("department_code"))
+    )
+  }
+
   if (env.PUBLIC_SHOW_EXTENSION_1 !== "true" && table === EngagementTable) {
     headers.splice(3, 1)
   }
@@ -62,7 +68,7 @@
 <DetailTable {headers}>
   {#if $tenses.future}
     <tr>
-      <th class="px-4 py-3 text-left font-bold text-secondary bg-slate-200" colSpan={10}
+      <th class="px-4 py-3 text-left font-bold text-secondary bg-slate-200" colSpan={15}
         >{capital($_("future"))}</th
       >
     </tr>
@@ -70,7 +76,7 @@
   {/if}
   {#if $tenses.present}
     <tr>
-      <th class="px-4 py-3 text-left font-bold text-secondary bg-slate-200" colSpan={10}
+      <th class="px-4 py-3 text-left font-bold text-secondary bg-slate-200" colSpan={15}
         >{capital($_("present"))}</th
       ></tr
     >
@@ -78,7 +84,7 @@
   {/if}
   {#if $tenses.past}
     <tr>
-      <th class="px-4 py-3 text-left font-bold text-secondary bg-slate-200" colSpan={10}
+      <th class="px-4 py-3 text-left font-bold text-secondary bg-slate-200" colSpan={15}
         >{capital($_("past"))}</th
       >
     </tr>
