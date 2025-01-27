@@ -49,6 +49,12 @@
     }
   }
 
+  if (env.PUBLIC_SHOW_SD_CODE !== "true" && table === EngagementTable) {
+    headers = headers.filter(
+      (header) => header.title !== capital($_("department_code"))
+    )
+  }
+
   if (env.PUBLIC_SHOW_EXTENSION_1 !== "true" && table === EngagementTable) {
     headers.splice(3, 1)
   }

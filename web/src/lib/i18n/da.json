@@ -32,6 +32,7 @@
 		"end": "slut"
 	},
 	"default_filename": "Defaulter til 'insights'",
+	"department_code": "afdelingskode",
 	"description": "beskrivelse",
 	"deselect_all": "fravælg alle",
 	"documentation": "dokumentation",
