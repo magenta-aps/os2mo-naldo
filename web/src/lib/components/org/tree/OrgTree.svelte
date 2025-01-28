@@ -56,6 +56,7 @@
           objects {
             validities {
               name
+              user_key
               uuid
               has_children(filter: { from_date: $fromDate })
             }
@@ -79,6 +80,7 @@
           objects {
             validities {
               name
+              user_key
               uuid
               has_children(
                 filter: {

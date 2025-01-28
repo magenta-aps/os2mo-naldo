@@ -8,6 +8,7 @@
   import keyboardArrowDownRounded from "@iconify/icons-material-symbols/keyboard-arrow-down-rounded"
   import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
   import RadioButton from "$lib/components/forms/shared/RadioButton.svelte"
+  import { checkSDIdentifier } from "$lib/util/helpers"
 
   type Child = {
     uuid: string
@@ -16,6 +17,7 @@
   }
 
   export let name = ""
+  export let user_key = ""
   export let children: Child[] = []
   export let indent = 0
   export let uuid = ""
@@ -35,6 +37,7 @@
         objects {
           validities {
             name
+            user_key
             uuid
             has_children(filter: { from_date: $fromDate })
           }
@@ -121,12 +124,18 @@
       <div class="w-5 h-5" />
     {/if}
     {#if type === "radio"}
-      <RadioButton id={uuid} name="origin" title={name} value={uuid} noPadding={true} />
+      <RadioButton
+        id={uuid}
+        name="origin"
+        title={checkSDIdentifier(name, user_key)}
+        value={uuid}
+        noPadding={true}
+      />
     {:else}
       <Checkbox
         id={uuid}
         name="destination"
-        title={name}
+        title={checkSDIdentifier(name, user_key)}
         value={uuid}
         checked={selectedDestinationOrgs.includes(uuid)}
         disabled={!selectedOriginOrg || selectedOriginOrg === uuid}

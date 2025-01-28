@@ -13,8 +13,10 @@
   } from "./query.generated"
   import Icon from "@iconify/svelte"
   import keyboardArrowDownRounded from "@iconify/icons-material-symbols/keyboard-arrow-down-rounded"
+  import { checkSDIdentifier } from "$lib/util/helpers"
 
   export let name = ""
+  export let user_key = ""
   export let children: any[] = []
   export let has_children: boolean
   export let indent = 8
@@ -32,6 +34,7 @@
         objects {
           validities {
             name
+            user_key
             uuid
             has_children(filter: { from_date: $fromDate })
           }
@@ -58,6 +61,7 @@
           validities {
             name
             uuid
+            user_key
             has_children(
               filter: {
                 descendant: {
@@ -166,7 +170,7 @@
         <div class="w-5 h-5" />
       {/if}
       <p class="text-sm text-secondary break-words">
-        {name}
+        {checkSDIdentifier(name, user_key)}
       </p>
     </div>
   </li>
