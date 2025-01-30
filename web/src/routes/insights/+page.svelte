@@ -37,7 +37,9 @@
 
   // This is used to cancel ongoing request and break out of the loop, when navigating away from the page.
   onDestroy(() => {
-    controller.abort()
+    if (controller) {
+      controller.abort()
+    }
   })
 
   let selectedQueries: SelectedQuery[] = [
