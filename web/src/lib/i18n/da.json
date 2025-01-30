@@ -133,7 +133,7 @@
 	"logout": "log ud",
 	"manager": "{n, plural, =0 {lederen} one {leder} other {ledere}}",
 	"manager_level": "lederniveau",
-	"manager_responsibility": "lederansvar",
+	"manager_responsibility": "ledelsesansvar",
 	"manager_type": "ledertype",
 	"mo": "Medarbejder - Organisation",
 	"move": "flyt",
