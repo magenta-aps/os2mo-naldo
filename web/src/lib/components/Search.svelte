@@ -21,6 +21,7 @@
     type LazyOrgUnitSearchQuery,
   } from "./query.generated"
   import { env } from "$env/dynamic/public"
+  import { validate as isValidUUID } from 'uuid'
 
   type Employees = SearchEmployeeQuery["employees"]["objects"][0]["validities"]
   type OrgUnits = SearchOrgUnitQuery["org_units"]["objects"][0]["validities"]
@@ -189,12 +190,15 @@
 
     switch (type) {
       case "employee":
-        let employeeFilter
-        // Check if FF is true, else search "normally"
+        let employeeFilter = { from_date: $date }
         if (env.PUBLIC_SEARCH_INFINITY === "true" && action === "goto") {
-          employeeFilter = { from_date: null, to_date: null, query: filterText }
-        } else {
-          employeeFilter = { from_date: $date, query: filterText }
+          employeeFilter = { from_date: null, to_date: null }
+        }
+        if (isValidUUID(filterText)) {
+          employeeFilter["uuids"] = [filterText]
+        }
+        else {
+          employeeFilter["query"] = filterText
         }
         res = await graphQLClient(abortController.signal).request(
           SearchEmployeeDocument,
@@ -232,12 +236,16 @@
         }
 
       case "org-unit":
-        let orgUnitFilter
+        let orgUnitFilter = { from_date: $date }
         // Check if FF is true, else search "normally"
         if (env.PUBLIC_SEARCH_INFINITY === "true" && action === "goto") {
-          orgUnitFilter = { from_date: null, to_date: null, query: filterText }
-        } else {
-          orgUnitFilter = { from_date: $date, query: filterText }
+          orgUnitFilter = { from_date: null, to_date: null }
+        }
+        if (isValidUUID(filterText)) {
+          orgUnitFilter["uuids"] = [filterText]
+        }
+        else {
+          orgUnitFilter["query"] = filterText
         }
         res = await graphQLClient(abortController.signal).request(
           SearchOrgUnitDocument,
