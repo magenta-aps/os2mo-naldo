@@ -12,6 +12,7 @@
   import { sortData } from "$lib/util/sorting"
   import { onMount } from "svelte"
   import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
+  import { updateGlobalNavigation } from "$lib/stores/navigation"
 
   type RelatedUnits = RelatedUnitsQuery["related_units"]["objects"][0]["validities"]
   type RelatedUnit = RelatedUnitsQuery["related_units"]["objects"][0]["validities"]
@@ -80,8 +81,10 @@
   {#each data as related_unit}
     <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
       <td class="text-sm p-4">
-        <a href="{base}/organisation/{related_unit.org_units[0].uuid}">
-          {related_unit.org_units[0].name}
+        <a
+          href="{base}/organisation/{related_unit.org_units[0].uuid}"
+          on:click={() => updateGlobalNavigation(related_unit.org_units[0].uuid)}
+          >{related_unit.org_units[0].name}
         </a>
       </td>
       <ValidityTableCell validity={related_unit.validity} />
