@@ -28,18 +28,13 @@
   const svelteForm = form(fromDate, kleNumber, kleAspects)
 
   gql`
-    query KLEAndFacet(
-      $uuid: [UUID!]
-      $fromDate: DateTime
-      $toDate: DateTime
-      $currentDate: DateTime!
-    ) {
+    query KLEAndFacet($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
       facets(filter: { user_keys: ["kle_aspect", "kle_number"] }) {
         objects {
           validities {
             uuid
             user_key
-            classes(filter: { from_date: $currentDate }) {
+            classes(filter: { from_date: null, to_date: null }) {
               name
               uuid
               user_key
@@ -56,7 +51,7 @@
               user_key
               uuid
             }
-            kle_number {
+            kle_number(filter: { from_date: null, to_date: null }) {
               name
               user_key
               uuid
@@ -138,7 +133,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( KleAndFacetDocument, { uuid: $page.params.kle, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), currentDate: $date } )}
+{#await graphQLClient().request( KleAndFacetDocument, { uuid: $page.params.kle, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to") } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -185,7 +180,7 @@
         <Select
           title={capital($_("kle_number"))}
           id="kle-number"
-          startValue={kle.kle_number}
+          startValue={kle.kle_number[0]}
           bind:name={$kleNumber.value}
           errors={$kleNumber.errors}
           searchable={true}
