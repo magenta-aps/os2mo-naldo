@@ -9,7 +9,7 @@ export type KleAndFacetQueryVariables = Types.Exact<{
 }>;
 
 
-export type KleAndFacetQuery = { facets: { objects: Array<{ validities: Array<{ uuid: any, user_key: string, classes: Array<{ name: string, uuid: any, user_key: string }> }> }> }, kles: { objects: Array<{ validities: Array<{ uuid: any, kle_aspects: Array<{ name: string, user_key: string, uuid: any }>, kle_number: { name: string, user_key: string, uuid: any }, validity: { from: any, to?: any | null }, org_unit: Array<{ validity: { from: any, to?: any | null } }> }> }> } };
+export type KleAndFacetQuery = { facets: { objects: Array<{ validities: Array<{ uuid: any, user_key: string, classes: Array<{ name: string, uuid: any, user_key: string }> }> }> }, kles: { objects: Array<{ validities: Array<{ uuid: any, kle_aspects: Array<{ name: string, user_key: string, uuid: any }>, kle_number: Array<{ name: string, user_key: string, uuid: any }>, validity: { from: any, to?: any | null }, org_unit: Array<{ validity: { from: any, to?: any | null } }> }> }> } };
 
 export type UpdateKleMutationVariables = Types.Exact<{
   input: Types.KleUpdateInput;
