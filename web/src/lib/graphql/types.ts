@@ -2599,6 +2599,23 @@ export type DefaultAddress = ResolvedAddress & {
   value: Scalars['String']['output'];
 };
 
+export type DescendantParentBoundOrganisationUnitFilter = {
+  ancestor?: InputMaybe<OrganisationUnitFilter>;
+  child?: InputMaybe<OrganisationUnitFilter>;
+  engagement?: InputMaybe<EngagementFilter>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  hierarchy?: InputMaybe<ClassFilter>;
+  names?: InputMaybe<Array<Scalars['String']['input']>>;
+  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  query?: InputMaybe<Scalars['String']['input']>;
+  registration?: InputMaybe<OrganisationUnitRegistrationFilter>;
+  subtree?: InputMaybe<OrganisationUnitFilter>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
 /** Employee/identity specific information */
 export type Employee = {
   __typename?: 'Employee';
@@ -3211,6 +3228,7 @@ export type EmployeesBoundLeaveFilter = {
 
 export type EmployeesBoundManagerFilter = {
   employee?: InputMaybe<EmployeeFilter>;
+  exclude?: InputMaybe<EmployeeFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -3322,6 +3340,14 @@ export type Engagement = {
    */
   leave_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
+   * Managerial roles for the engagement's organisation unit.
+   *
+   * May be empty in which case managers are usually inherited from parents.
+   * See the `inherit`-flag for details.
+   *
+   */
+  managers: Array<Manager>;
+  /**
    * The organisation unit where the engagement is being fulfilled.
    *
    * **Warning**:
@@ -3428,6 +3454,14 @@ export type EngagementLeaveArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<UuidsBoundLeaveFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Employee engagement in an organisation unit */
+export type EngagementManagersArgs = {
+  exclude_self?: Scalars['Boolean']['input'];
+  filter?: InputMaybe<OrgUnitsboundmanagerfilter>;
+  inherit?: Scalars['Boolean']['input'];
 };
 
 
@@ -7035,6 +7069,11 @@ export type ManagerFilter = {
    * @deprecated Replaced by the 'employee' filter
    */
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Employee filter for managers to exclude from the result.
+   *
+   */
+  exclude?: InputMaybe<EmployeeFilter>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -8758,9 +8797,24 @@ export type OrgUnitsboundleavefilter = {
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
-export type OrgUnitsboundrelatedunitfilter = {
+export type OrgUnitsboundmanagerfilter = {
+  employee?: InputMaybe<EmployeeFilter>;
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  exclude?: InputMaybe<EmployeeFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
+  registration?: InputMaybe<ManagerRegistrationFilter>;
+  responsibility?: InputMaybe<ClassFilter>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+export type OrgUnitsboundrelatedunitfilter = {
+  exclude?: InputMaybe<OrganisationUnitFilter>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
+  registration?: InputMaybe<RelatedUnitRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -9032,6 +9086,11 @@ export type OrganisationUnit = {
    */
   related_units: Array<RelatedUnit>;
   /**
+   * The top-unit (root) of the organisation unit, in the hierarchy.
+   *
+   */
+  root?: Maybe<Array<OrganisationUnit>>;
+  /**
    * Time planning strategy.
    *
    */
@@ -9207,8 +9266,15 @@ export type OrganisationUnitParentArgs = {
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitRelated_UnitsArgs = {
-  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  exclude_self?: Scalars['Boolean']['input'];
   filter?: InputMaybe<OrgUnitsboundrelatedunitfilter>;
+};
+
+
+/** Organisation unit within the organisation tree */
+export type OrganisationUnitRootArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<DescendantParentBoundOrganisationUnitFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
 };
 
@@ -10716,6 +10782,11 @@ export type RelatedUnitOrg_UnitsArgs = {
 
 /** Related unit filter. */
 export type RelatedUnitFilter = {
+  /**
+   * Employee filter for managers to exclude from the result.
+   *
+   */
+  exclude?: InputMaybe<OrganisationUnitFilter>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -10739,6 +10810,11 @@ export type RelatedUnitFilter = {
    * @deprecated Replaced by the 'org_unit' filter
    */
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Registration filter limiting which entries are returned.
+   *
+   */
+  registration?: InputMaybe<RelatedUnitRegistrationFilter>;
   /** Limit the elements returned by their ending validity. */
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -10771,6 +10847,31 @@ export type RelatedUnitFilter = {
    *
    */
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+/** Related unit registration filter. */
+export type RelatedUnitRegistrationFilter = {
+  /**
+   * Filter registrations by their changing actor.
+   *
+   * Can be used to select all changes made by a particular user or integration.
+   *
+   * | `actors`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  /** Limit the elements returned by their starting validity. */
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /**

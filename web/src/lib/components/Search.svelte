@@ -118,6 +118,9 @@
                 }
               }
             }
+            root {
+              name
+            }
             parent {
               name
             }
