@@ -1,4 +1,4 @@
-schema: "http://127.0.0.1:5001/graphql/v22"
+schema: "http://127.0.0.1:5001/graphql/v23"
 inputValueDeprecation: true
 generates:
   src/lib/graphql/types.ts:

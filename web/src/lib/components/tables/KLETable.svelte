@@ -32,7 +32,7 @@
         objects {
           validities {
             uuid
-            kle_number {
+            kle_number(filter: { from_date: null, to_date: null }) {
               name
               user_key
             }
@@ -90,9 +90,9 @@
           {/each}
         </ul>
       </td>
-      <td class="text-sm p-4"
-        >{`${kle.kle_number.user_key} - ${kle.kle_number.name}`}</td
-      >
+      <td class="text-sm p-4">
+        • {`${kle.kle_number[0].user_key} - ${kle.kle_number[0].name}`}
+      </td>
       <ValidityTableCell validity={kle.validity} />
       {#if env.PUBLIC_AUDITLOG === "true"}
         <td>

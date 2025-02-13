@@ -2055,6 +2055,16 @@ export type ClassOwnerFilter = {
    */
   ancestor?: InputMaybe<OrganisationUnitFilter>;
   /**
+   * Select organisation units whose children matches the given filter.
+   *
+   * Set to `None` to find leaf node units.
+   * Set to `{}` to find inner node units.
+   *
+   * This endpoint behaves to descendant as parent does to ancestor.
+   *
+   */
+  child?: InputMaybe<OrganisationUnitFilter>;
+  /**
    * Select organisation units which have a descendant matching the given filter.
    *
    * Note that every node is its own descendant as per [CLRS] 12.2-6.
@@ -2159,6 +2169,9 @@ export type ClassOwnerFilter = {
    * Select organisation units whose parent matches the given filter.
    *
    * Set to `None` to find root units.
+   * Set to `{}` to find non-root units.
+   *
+   * This endpoint behaves to ancestor as child does to descendant.
    *
    */
   parent?: InputMaybe<OrganisationUnitFilter>;
@@ -3158,6 +3171,7 @@ export type EmployeesBoundAssociationFilter = {
 
 export type EmployeesBoundEngagementFilter = {
   employee?: InputMaybe<EmployeeFilter>;
+  engagement_type?: InputMaybe<ClassFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   job_function?: InputMaybe<ClassFilter>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
@@ -3574,6 +3588,11 @@ export type EngagementFilter = {
    * @deprecated Replaced by the 'employee' filter
    */
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Engagement type filter limiting which entries are returned.
+   *
+   */
+  engagement_type?: InputMaybe<ClassFilter>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -5804,7 +5823,7 @@ export type Kle = {
    * For more details read the `KLE` description.
    *
    */
-  kle_number: Class;
+  kle_number: Array<Class>;
   /**
    * UUID of the KLE number.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -8693,6 +8712,7 @@ export type OrgUnitsboundassociationfilter = {
 export type OrgUnitsboundengagementfilter = {
   employee?: InputMaybe<EmployeeFilter>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  engagement_type?: InputMaybe<ClassFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   job_function?: InputMaybe<ClassFilter>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
@@ -9219,7 +9239,48 @@ export type OrganisationUnitCreateInput = {
   validity: RaValidityInput;
 };
 
-/** Organisation unit filter. */
+/**
+ * Organisation unit filter.
+ *
+ * Consider the tree:
+ * ```
+ *     root
+ *     / \
+ *    l   r
+ *   /   / \
+ * ll   rl  rr
+ * ```
+ * Setting a filter to `filter=value`, yields:
+ *
+ * filter     | value  | result                | note           |
+ * -----------|--------|-----------------------|----------------|
+ * user_keys  | `root` | `[root]`              |                |
+ * user_keys  | `r`    | `[r]`                 |                |
+ * user_keys  | `rl`   | `[rl]`                |                |
+ * child      | `null` | `[ll, rl, rr]`        | Leaf nodes     |
+ * child      | `{}`   | `[root, l, r]`        | Inner nodes    |
+ * child      | `r`    | `[root]`              | Parent node    |
+ * child      | `rl`   | `[r]`                 | Parent node    |
+ * descendant | `null` | `[root,l,r,ll,rl,rr]` | All nodes      |
+ * descendant | `{}`   | `[root,l,r,ll,rl,rr]` | All nodes      |
+ * descendant | `r`    | `[root, r]`           |                |
+ * descendant | `rl`   | `[root, r, rl]`       |                |
+ * parent     | `null` | `[root]`              | Root node      |
+ * parent     | `{}`   | `[l,r,ll,rl,rr]`      | Non-root nodes |
+ * parent     | `r`    | `[rl,rr]`             | Child nodes    |
+ * parent     | `rl`   | `[]`                  | No children    |
+ * ancestor   | `null` | `[root,l,r,ll,rl,rr]` | All nodes      |
+ * ancestor   | `{}`   | `[root,l,r,ll,rl,rr]` | All nodes      |
+ * ancestor   | `r`    | `[r, rl, rr]`         |                |
+ * ancestor   | `rl`   | `[rl]`                |                |
+ *
+ * These can ofcourse be combined too, such that:
+ * * `{child: {}, parent: {}}` returns all non-root inner nodes.
+ * * `{child: null, parent: null}` returns all childless roots.
+ * * `{child: {}, parent: null}` returns all roots with children.
+ * * ...
+ *
+ */
 export type OrganisationUnitFilter = {
   /**
    * Select organisation units which have an ancestor matching the given filter.
@@ -9248,6 +9309,16 @@ export type OrganisationUnitFilter = {
    *
    */
   ancestor?: InputMaybe<OrganisationUnitFilter>;
+  /**
+   * Select organisation units whose children matches the given filter.
+   *
+   * Set to `None` to find leaf node units.
+   * Set to `{}` to find inner node units.
+   *
+   * This endpoint behaves to descendant as parent does to ancestor.
+   *
+   */
+  child?: InputMaybe<OrganisationUnitFilter>;
   /**
    * Select organisation units which have a descendant matching the given filter.
    *
@@ -9348,6 +9419,9 @@ export type OrganisationUnitFilter = {
    * Select organisation units whose parent matches the given filter.
    *
    * Set to `None` to find root units.
+   * Set to `{}` to find non-root units.
+   *
+   * This endpoint behaves to ancestor as child does to descendant.
    *
    */
   parent?: InputMaybe<OrganisationUnitFilter>;
@@ -10169,6 +10243,7 @@ export type ParentsBoundFacetFilter = {
 
 export type ParentsBoundOrganisationUnitFilter = {
   ancestor?: InputMaybe<OrganisationUnitFilter>;
+  child?: InputMaybe<OrganisationUnitFilter>;
   descendant?: InputMaybe<OrganisationUnitFilter>;
   engagement?: InputMaybe<EngagementFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
@@ -11356,6 +11431,7 @@ export type UuidsBoundEmployeeFilter = {
 export type UuidsBoundEngagementFilter = {
   employee?: InputMaybe<EmployeeFilter>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  engagement_type?: InputMaybe<ClassFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   job_function?: InputMaybe<ClassFilter>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
@@ -11410,6 +11486,7 @@ export type UuidsBoundLeaveFilter = {
 
 export type UuidsBoundOrganisationUnitFilter = {
   ancestor?: InputMaybe<OrganisationUnitFilter>;
+  child?: InputMaybe<OrganisationUnitFilter>;
   descendant?: InputMaybe<OrganisationUnitFilter>;
   engagement?: InputMaybe<EngagementFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;

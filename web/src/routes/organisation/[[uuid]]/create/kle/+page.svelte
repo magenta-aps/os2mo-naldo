@@ -28,13 +28,13 @@
   const svelteForm = form(fromDate, kleNumber, kleAspects)
 
   gql`
-    query FacetsAndOrg($uuid: [UUID!], $currentDate: DateTime!) {
+    query FacetsAndOrg($uuid: [UUID!]) {
       facets(filter: { user_keys: ["kle_aspect", "kle_number"] }) {
         objects {
           validities {
             uuid
             user_key
-            classes(filter: { from_date: $currentDate }) {
+            classes(filter: { from_date: null, to_date: null }) {
               name
               uuid
               user_key
@@ -116,7 +116,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( FacetsAndOrgDocument, { uuid: $page.params.uuid, currentDate: $date } )}
+{#await graphQLClient().request(FacetsAndOrgDocument, { uuid: $page.params.uuid })}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
