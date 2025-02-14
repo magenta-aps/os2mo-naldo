@@ -1629,6 +1629,8 @@ export type Class = {
    *
    */
   children: Array<Class>;
+  /** Description of the class */
+  description?: Maybe<Scalars['String']['output']>;
   /**
    * Example usage.
    *
@@ -1859,6 +1861,8 @@ export type ClassParentArgs = {
 };
 
 export type ClassCreateInput = {
+  /** Description of class. */
+  description?: InputMaybe<Scalars['String']['input']>;
   /** Example usage. */
   example?: InputMaybe<Scalars['String']['input']>;
   /** UUID of the related facet. */
@@ -2475,6 +2479,8 @@ export type ClassTerminateInput = {
 };
 
 export type ClassUpdateInput = {
+  /** Description of class. */
+  description?: InputMaybe<Scalars['String']['input']>;
   /** Example usage. */
   example?: InputMaybe<Scalars['String']['input']>;
   /** UUID of the related facet. */
@@ -8811,10 +8817,8 @@ export type OrgUnitsboundmanagerfilter = {
 };
 
 export type OrgUnitsboundrelatedunitfilter = {
-  exclude?: InputMaybe<OrganisationUnitFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
-  registration?: InputMaybe<RelatedUnitRegistrationFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -9228,8 +9232,10 @@ export type OrganisationUnitLeavesArgs = {
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitManagersArgs = {
-  filter?: InputMaybe<ManagerFilter>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<OrgUnitsboundmanagerfilter>;
   inherit?: Scalars['Boolean']['input'];
+  limit?: InputMaybe<Scalars['int']['input']>;
 };
 
 
@@ -9266,8 +9272,9 @@ export type OrganisationUnitParentArgs = {
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitRelated_UnitsArgs = {
-  exclude_self?: Scalars['Boolean']['input'];
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<OrgUnitsboundrelatedunitfilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
 };
 
 
@@ -10782,11 +10789,6 @@ export type RelatedUnitOrg_UnitsArgs = {
 
 /** Related unit filter. */
 export type RelatedUnitFilter = {
-  /**
-   * Employee filter for managers to exclude from the result.
-   *
-   */
-  exclude?: InputMaybe<OrganisationUnitFilter>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -10810,11 +10812,6 @@ export type RelatedUnitFilter = {
    * @deprecated Replaced by the 'org_unit' filter
    */
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  /**
-   * Registration filter limiting which entries are returned.
-   *
-   */
-  registration?: InputMaybe<RelatedUnitRegistrationFilter>;
   /** Limit the elements returned by their ending validity. */
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -10847,31 +10844,6 @@ export type RelatedUnitFilter = {
    *
    */
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
-};
-
-/** Related unit registration filter. */
-export type RelatedUnitRegistrationFilter = {
-  /**
-   * Filter registrations by their changing actor.
-   *
-   * Can be used to select all changes made by a particular user or integration.
-   *
-   * | `actors`      | Elements returned                            |
-   * |--------------|----------------------------------------------|
-   * | not provided | All                                          |
-   * | `null`       | All                                          |
-   * | `[]`         | None                                         |
-   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
-   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
-   *
-   * `*`: Elements returned depends on which elements were found.
-   *
-   */
-  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  /** Limit the elements returned by their ending validity. */
-  end?: InputMaybe<Scalars['DateTime']['input']>;
-  /** Limit the elements returned by their starting validity. */
-  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /**
