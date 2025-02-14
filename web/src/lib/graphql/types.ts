@@ -9228,8 +9228,10 @@ export type OrganisationUnitLeavesArgs = {
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitManagersArgs = {
-  filter?: InputMaybe<ManagerFilter>;
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<OrgUnitsboundmanagerfilter>;
   inherit?: Scalars['Boolean']['input'];
+  limit?: InputMaybe<Scalars['int']['input']>;
 };
 
 

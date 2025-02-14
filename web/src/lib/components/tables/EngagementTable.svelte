@@ -75,14 +75,14 @@
             org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
               uuid
-              managers(inherit: $inherit) {
-                person {
-                  name
-                  uuid
-                }
-                org_unit {
-                  name
-                }
+            }
+            managers(inherit: $inherit, exclude_self: true) {
+              person {
+                name
+                uuid
+              }
+              org_unit {
+                name
               }
             }
             validity {
@@ -160,9 +160,9 @@
         <td class="text-sm p-4">
           <!-- If there's more than 1 manager, create a list -->
           <!-- Extra if/else logic implemented, so we can add <a>-tags to the managers -->
-          {#if engagement.org_unit[0].managers.length > 1}
+          {#if engagement.managers.length > 1}
             <ul>
-              {#each engagement.org_unit[0].managers as manager}
+              {#each engagement.managers as manager}
                 <li>
                   {#if manager.person}
                     <a href="{base}/employee/{manager.person?.[0].uuid}">
@@ -175,14 +175,14 @@
               {/each}
             </ul>
             <!-- If there's only 1 manager and it's not vacant -->
-          {:else if engagement.org_unit[0].managers[0] && engagement.org_unit[0].managers[0].person?.[0]}
-            <a
-              href="{base}/employee/{engagement.org_unit[0].managers[0].person[0].uuid}"
-            >
-              {engagement.org_unit[0].managers[0].person[0].name}
+          {:else if engagement.managers[0] && engagement.managers[0].person?.[0]}
+            <a href="{base}/employee/{engagement.managers[0].person[0].uuid}">
+              {engagement.managers[0].person[0].name}
             </a>
             <!-- 1 vacant manager -->
-          {:else if engagement.org_unit[0].managers[0]}
+            <!-- TODO: probably implement vacant manager filter when done? -->
+            <!-- https://git.magenta.dk/rammearkitektur/os2mo/-/merge_requests/2555 -->
+          {:else if engagement.managers[0]}
             {capital($_("vacant"))}
           {:else}
             {capital(
