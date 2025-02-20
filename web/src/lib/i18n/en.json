@@ -180,6 +180,7 @@
 	"role": "{n, plural, =0 {the role} one {role} other {roles}}",
 	"role_type": "role type",
 	"rolebinding": "{n, plural, =0 {the rolebinding} one {rolebinding} other {rolebindings}}",
+	"root": "root unit",
 	"save": "save",
 	"search": "search",
 	"search_for": {

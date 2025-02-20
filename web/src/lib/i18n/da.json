@@ -180,6 +180,7 @@
 	"role": "{n, plural, =0 {rollen} one {rolle} other {roller}}",
 	"role_type": "rolletype",
 	"rolebinding": "{n, plural, =0 {rollebindingen} one {rollebinding} other {rollebindinger}}",
+	"root": "rodenhed",
 	"save": "gem",
 	"search": "søg",
 	"search_for": {
