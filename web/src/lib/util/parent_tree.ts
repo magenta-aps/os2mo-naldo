@@ -3,10 +3,10 @@ import { gql } from "graphql-request"
 import { GetParentDocument } from "./query.generated"
 
 gql`
-  query GetParent($uuid: [UUID!], $fromDate: DateTime) {
-    org_units(filter: { uuids: $uuid, from_date: $fromDate }) {
+  query GetParent($uuid: [UUID!], $currentDate: DateTime) {
+    org_units(filter: { uuids: $uuid }) {
       objects {
-        validities {
+        current(at: $currentDate) {
           parent {
             name
             uuid
@@ -17,27 +17,25 @@ gql`
   }
 `
 
-const fetchParent = async (uuid: string, fromDate: string) => {
+const fetchParent = async (uuid: string, currentDate: string) => {
   const res = await graphQLClient().request(GetParentDocument, {
     uuid: uuid,
-    fromDate: fromDate,
+    currentDate: currentDate,
   })
 
   // Empty objects can happen when there's no present org after changing the global time
-  return res.org_units.objects.length
-    ? res.org_units.objects[0].validities[0].parent
-    : null
+  return res.org_units.objects.length ? res.org_units.objects[0].current?.parent : null
 }
 
 export const fetchParentTree = async (
   uuid: string,
-  fromDate: string
+  currentDate: string
 ): Promise<{ name: string; uuid: any | null }[]> => {
-  const parent = await fetchParent(uuid, fromDate)
+  const parent = await fetchParent(uuid, currentDate)
 
   if (!parent) {
     return []
   }
 
-  return [parent].concat(await fetchParentTree(parent.uuid, fromDate))
+  return [parent].concat(await fetchParentTree(parent.uuid, currentDate))
 }
