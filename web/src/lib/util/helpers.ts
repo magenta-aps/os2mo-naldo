@@ -510,7 +510,12 @@ export const isUUID = (value: string) => {
 }
 
 export const checkSDIdentifier = (name: string, user_key: string) => {
-  if (name === user_key || user_key === "-" || isUUID(user_key)) {
+  if (
+    env.PUBLIC_SHOW_SD_CODE_IN_TREES !== "true" ||
+    name === user_key ||
+    user_key === "-" ||
+    isUUID(user_key)
+  ) {
     return name
   }
   return `${name} (${user_key})`
