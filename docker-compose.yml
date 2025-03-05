@@ -19,6 +19,8 @@ services:
       PUBLIC_SHOW_EXTENSION_1: "false"
       PUBLIC_DOCS_LINK: "true"
       PUBLIC_ONBOARDING_LINK: "true"
+      # Region syd specific (true)
+      PUBLIC_SHOW_SD_CODE_IN_TREES: "false"
     ports:
       - "127.0.0.1:5173:5173"
       - "127.0.0.1:24678:24678" # hot module reloading
