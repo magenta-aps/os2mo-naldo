@@ -13,7 +13,7 @@
     type EmployeeManagersQuery,
   } from "./query.generated"
   import { date } from "$lib/stores/date"
-  import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
+  import { findClosestValidity, tenseFilter, tenseToValidity } from "$lib/util/helpers"
   import { sortData } from "$lib/util/sorting"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { onMount } from "svelte"
@@ -65,10 +65,18 @@
               person(filter: { from_date: $fromDate, to_date: $toDate }) {
                 name
                 uuid
+                validity {
+                  from
+                  to
+                }
               }
               org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
                 name
                 uuid
+                validity {
+                  from
+                  to
+                }
               }
               manager_level {
                 name
@@ -100,10 +108,18 @@
               person(filter: { from_date: $fromDate, to_date: $toDate }) {
                 name
                 uuid
+                validity {
+                  from
+                  to
+                }
               }
               org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
                 name
                 uuid
+                validity {
+                  from
+                  to
+                }
               }
               manager_level {
                 name
@@ -179,7 +195,7 @@
         {#if isOrg}
           {#if orgOrEmployee.person}
             <a href="{base}/employee/{orgOrEmployee.person[0].uuid}">
-              {orgOrEmployee.person[0].name}
+              {findClosestValidity(orgOrEmployee.person, $date).name}
             </a>
           {:else}
             {capital($_("vacant"))}
@@ -189,7 +205,9 @@
             <span
               title={capital(
                 $_("inherited_manager", {
-                  values: { org_unit: orgOrEmployee.org_unit[0].name },
+                  values: {
+                    org_unit: findClosestValidity(orgOrEmployee.org_unit, $date).name,
+                  },
                 })
               )}>(*)</span
             >
@@ -199,7 +217,7 @@
             href="{base}/organisation/{orgOrEmployee.org_unit[0].uuid}"
             on:click={() => updateGlobalNavigation(orgOrEmployee.org_unit[0].uuid)}
           >
-            {orgOrEmployee.org_unit[0].name}
+            {findClosestValidity(orgOrEmployee.org_unit, $date).name}
           </a>
         {/if}
       </td>

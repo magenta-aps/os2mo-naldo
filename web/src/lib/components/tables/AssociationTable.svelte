@@ -8,7 +8,7 @@
   import { page } from "$app/stores"
   import { AssociationsDocument, type AssociationsQuery } from "./query.generated"
   import { date } from "$lib/stores/date"
-  import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
+  import { findClosestValidity, tenseFilter, tenseToValidity } from "$lib/util/helpers"
   import { sortData } from "$lib/util/sorting"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { onMount } from "svelte"
@@ -53,10 +53,18 @@
             org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
               uuid
+              validity {
+                from
+                to
+              }
             }
             person(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
               uuid
+              validity {
+                from
+                to
+              }
             }
             association_type {
               name
@@ -119,7 +127,7 @@
           <!-- This means that some customers might have them, and therefore we need this check. -->
           {#if association.person[0]?.name}
             <a href="{base}/employee/{association.person[0].uuid}">
-              {association.person[0].name}
+              {findClosestValidity(association.person, $date).name}
             </a>
           {:else}
             {capital($_("vacant"))}
@@ -129,7 +137,7 @@
             href="{base}/organisation/{association.org_unit[0].uuid}"
             on:click={() => updateGlobalNavigation(association.org_unit[0].uuid)}
           >
-            {association.org_unit[0].name}</a
+            {findClosestValidity(association.org_unit, $date).name}</a
           >
         {/if}
       </td>

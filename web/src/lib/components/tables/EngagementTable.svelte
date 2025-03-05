@@ -8,7 +8,7 @@
   import { page } from "$app/stores"
   import { EngagementsDocument, type EngagementsQuery } from "./query.generated"
   import { date } from "$lib/stores/date"
-  import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
+  import { findClosestValidity, tenseFilter, tenseToValidity } from "$lib/util/helpers"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { sortData } from "$lib/util/sorting"
   import { onMount } from "svelte"
@@ -64,6 +64,10 @@
             person(filter: { from_date: $fromDate, to_date: $toDate }) {
               uuid
               name
+              validity {
+                from
+                to
+              }
             }
             job_function {
               name
@@ -75,14 +79,19 @@
             org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
               uuid
+              validity {
+                from
+                to
+              }
             }
             managers(inherit: $inherit, exclude_self: true) {
-              person {
+              person(filter: { from_date: $fromDate, to_date: $toDate }) {
                 name
                 uuid
-              }
-              org_unit {
-                name
+                validity {
+                  from
+                  to
+                }
               }
             }
             validity {
@@ -138,13 +147,13 @@
       <td class="text-sm p-4">
         {#if isOrg}
           <a href="{base}/employee/{engagement.person[0].uuid}"
-            >{engagement.person[0].name}</a
+            >{findClosestValidity(engagement.person, $date).name}</a
           >
         {:else}
           <a
             href="{base}/organisation/{engagement.org_unit[0].uuid}"
             on:click={() => updateGlobalNavigation(engagement.org_unit[0].uuid)}
-            >{engagement.org_unit[0].name}</a
+            >{findClosestValidity(engagement.org_unit, $date).name}</a
           >
         {/if}
       </td>
@@ -166,7 +175,7 @@
                 <li>
                   {#if manager.person}
                     <a href="{base}/employee/{manager.person?.[0].uuid}">
-                      • {manager.person?.[0].name}
+                      • {findClosestValidity(manager.person, $date).name}
                     </a>
                   {:else}
                     • {capital($_("vacant"))}
@@ -177,11 +186,9 @@
             <!-- If there's only 1 manager and it's not vacant -->
           {:else if engagement.managers[0] && engagement.managers[0].person?.[0]}
             <a href="{base}/employee/{engagement.managers[0].person[0].uuid}">
-              {engagement.managers[0].person[0].name}
+              {findClosestValidity(engagement.managers[0].person, $date).name}
             </a>
             <!-- 1 vacant manager -->
-            <!-- TODO: probably implement vacant manager filter when done? -->
-            <!-- https://git.magenta.dk/rammearkitektur/os2mo/-/merge_requests/2555 -->
           {:else if engagement.managers[0]}
             {capital($_("vacant"))}
           {:else}

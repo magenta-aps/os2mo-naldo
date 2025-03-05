@@ -7,7 +7,7 @@
   import ValidityTableCell from "$lib/components/shared/ValidityTableCell.svelte"
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
-  import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
+  import { findClosestValidity, tenseFilter, tenseToValidity } from "$lib/util/helpers"
   import { onMount } from "svelte"
   import { sortKey, sortDirection } from "$lib/stores/sorting"
   import { sortData } from "$lib/util/sorting"
@@ -44,9 +44,13 @@
             leave_type {
               name
             }
-            engagement {
-              org_unit {
+            engagement(filter: { from_date: $fromDate, to_date: $toDate }) {
+              org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
               job_function {
                 name
@@ -94,7 +98,10 @@
         {leave.leave_type.name}
       </td>
       <td class="text-sm p-4">
-        {leave.engagement.job_function.name}, {leave.engagement.org_unit[0].name}
+        {leave.engagement.job_function.name}, {findClosestValidity(
+          leave.engagement.org_unit,
+          $date
+        ).name}
       </td>
       <ValidityTableCell validity={leave.validity} />
       {#if env.PUBLIC_AUDITLOG === "true"}
