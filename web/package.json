@@ -18,7 +18,7 @@
     "@graphql-codegen/near-operation-file-preset": "^3.0.0",
     "@graphql-codegen/typed-document-node": "^5.0.9",
     "@graphql-codegen/typescript": "^4.0.9",
-    "@graphql-codegen/typescript-operations": "^4.0.1",
+    "@graphql-codegen/typescript-operations": "^4.2.3",
     "@graphql-typed-document-node/core": "^3.2.0",
     "@iconify/icons-circle-flags": "^1.2.41",
     "@iconify/icons-material-symbols": "^1.2.58",
