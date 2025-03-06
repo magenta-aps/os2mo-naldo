@@ -502,3 +502,21 @@ export const resolveFieldValue = (searchObject: any, header: Field) => {
     return searchObject[header.value]?.name ?? ""
   }
 }
+
+export const isUUID = (value: string) => {
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+  return uuidRegex.test(value)
+}
+
+export const checkSDIdentifier = (name: string, user_key: string) => {
+  if (
+    env.PUBLIC_SHOW_SD_CODE_IN_TREES !== "true" ||
+    name === user_key ||
+    user_key === "-" ||
+    isUUID(user_key)
+  ) {
+    return name
+  }
+  return `${name} (${user_key})`
+}

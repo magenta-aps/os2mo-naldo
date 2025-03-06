@@ -31,6 +31,7 @@
           validities {
             name
             uuid
+            user_key
             has_children(filter: { from_date: $fromDate })
           }
         }
