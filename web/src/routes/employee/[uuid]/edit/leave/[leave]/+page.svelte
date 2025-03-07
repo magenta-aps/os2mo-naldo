@@ -85,9 +85,9 @@
             person {
               uuid
               name
-              engagements {
+              engagements(filter: { from_date: $fromDate, to_date: $toDate }) {
                 uuid
-                org_unit {
+                org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
                   uuid
                   name
                 }

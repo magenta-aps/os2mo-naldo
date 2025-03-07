@@ -323,7 +323,7 @@
             max={rolebindingToDate ? rolebindingToDate : toDate}
           />
           <DateInput
-            bind:value={toDate}
+            bind:value={rolebindingToDate}
             title={capital($_("date.end_date"))}
             id="rolebinding-to"
             min={$fromDate.value ? $fromDate.value : rolebindingFromDate}

@@ -69,8 +69,8 @@
           current(at: $currentDate) {
             uuid
             name
-            engagements {
-              org_unit {
+            engagements(filter: { from_date: $currentDate }) {
+              org_unit(filter: { from_date: $currentDate }) {
                 name
                 user_key
               }

@@ -7,7 +7,7 @@
   import ValidityTableCell from "$lib/components/shared/ValidityTableCell.svelte"
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
-  import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
+  import { findClosestValidity, tenseFilter, tenseToValidity } from "$lib/util/helpers"
   import { onMount } from "svelte"
   import { sortKey, sortDirection } from "$lib/stores/sorting"
   import { sortData } from "$lib/util/sorting"
@@ -43,6 +43,10 @@
             org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
               uuid
+              validity {
+                from
+                to
+              }
             }
             job_function {
               name
@@ -55,6 +59,10 @@
                 name
               }
               user_key
+              validity {
+                from
+                to
+              }
             }
             validity {
               from
@@ -103,12 +111,16 @@
           href="{base}/organisation/{itassociation.org_unit[0].uuid}"
           on:click={() => updateGlobalNavigation(itassociation.org_unit[0].uuid)}
         >
-          {itassociation.org_unit[0].name}
+          {findClosestValidity(itassociation.org_unit, $date).name}
         </a>
       </td>
       <td class="text-sm p-4">{itassociation.job_function?.name}</td>
-      <td class="text-sm p-4">{itassociation.it_user[0].itsystem.name}</td>
-      <td class="text-sm p-4">{itassociation.it_user[0].user_key}</td>
+      <td class="text-sm p-4"
+        >{findClosestValidity(itassociation.it_user, $date).itsystem.name}</td
+      >
+      <td class="text-sm p-4"
+        >{findClosestValidity(itassociation.it_user, $date).user_key}</td
+      >
       <td class="text-sm p-4"
         >{itassociation.primary ? itassociation.primary?.name : ""}</td
       >
