@@ -52,6 +52,10 @@ export const mainQueries = [
         subString:
           'person { phone: addresses(filter: { address_type: { scope: "PHONE" } }) {name}}',
       },
+      {
+        value: "manager",
+        subString: "managers(exclude_self: true, inherit: true) { person {name}}",
+      },
     ],
   },
   {
