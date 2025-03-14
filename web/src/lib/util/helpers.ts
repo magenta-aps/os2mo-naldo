@@ -443,6 +443,8 @@ export const resolveFieldValue = (searchObject: any, header: Field) => {
   }
   if (header.subString === "name") {
     return searchObject.name ?? ""
+  } else if (header.value === "breadcrumbs") {
+    return searchObject.ancestors.reverse()
   } else if (
     header.value === "name" &&
     header.subString !== "name" &&

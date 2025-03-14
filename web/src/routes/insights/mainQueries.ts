@@ -20,6 +20,7 @@ export const mainQueries = [
     n: 1,
     fields: [
       { value: "name", subString: "name" },
+      { value: "breadcrumbs", subString: "ancestors {name}" },
       { value: "parent", subString: "parent {name}" },
       { value: "org_unit_level", subString: "org_unit_level {name}" },
       { value: "validity", subString: "validity {from to}" },

@@ -8,6 +8,7 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
   let csvHeader: string[] = []
   let csvRows: string[] = []
   let columnOffsets: number[] = [] // Keeps track of column start positions for each query
+  let maxBreadcrumbs = 0
 
   // Check if `org_units` is the only subject
   const hasOtherQueries = selectedQueries.some(
@@ -25,11 +26,18 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
 
     // Create headers for org_units
     const orgUnitHeader = chosenFields.flatMap((header) => {
-      const headerText = capital(get(_)(header.value, { values: { n: 1 } }))
+      if (header.value === "breadcrumbs") {
+        data.forEach((orgUnit) => {
+          if (orgUnit.ancestors && Array.isArray(orgUnit.ancestors)) {
+            maxBreadcrumbs = Math.max(maxBreadcrumbs, orgUnit.ancestors.length)
+          }
+        })
+        return Array.from({ length: maxBreadcrumbs }, (_, i) => `Org unit ${i + 1}`)
+      }
       if (header.value === "validity") {
         return [`${capital(get(_)("from"))}`, `${capital(get(_)("to"))}`]
       }
-      return headerText
+      return capital(get(_)(header.value, { values: { n: 1 } }))
     })
 
     // Add org_unit headers at the start
@@ -76,7 +84,14 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
           let values: string[] = []
           const fieldValue = resolveFieldValue(orgUnit, field)
 
-          if (field.value === "validity") {
+          if (field.value === "breadcrumbs") {
+            // Create breadcrumbs
+            values = fieldValue
+              ? fieldValue.map((ancestor: { name: string }) => ancestor.name)
+              : []
+            // Add empty string to match `maxBreadcrumbs` length
+            values = [...values, ...new Array(maxBreadcrumbs - values.length).fill("")]
+          } else if (field.value === "validity") {
             // Handle validity field
             values = [orgUnit.validity?.from || "", orgUnit.validity?.to || ""]
           } else {
