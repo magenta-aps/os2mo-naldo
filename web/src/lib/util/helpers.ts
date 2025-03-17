@@ -465,6 +465,14 @@ export const resolveFieldValue = (searchObject: any, header: Field) => {
     searchObject.owner
   ) {
     return searchObject.owner[0]?.name ?? ""
+  } else if (
+    header.value === "manager" &&
+    header.subString !== "name" &&
+    searchObject.managers
+  ) {
+    return searchObject.managers
+      .map((manager: { person: { name: string }[] }) => manager.person[0].name)
+      .join(", ")
   } else if (header.value === "subject") {
     return searchObject.__typename
   } else if (header.value === "validity") {
