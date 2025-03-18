@@ -323,6 +323,7 @@
         ? capital($_("search_for.person"))
         : capital($_("search_for.organisation"))}
       clearFilterTextOnBlur={false}
+      debounceWait={1000}
       on:change
       on:clear
       bind:items
