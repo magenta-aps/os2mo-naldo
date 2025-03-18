@@ -22,6 +22,7 @@ export const mainQueries = [
       { value: "name", subString: "name" },
       { value: "breadcrumbs", subString: "ancestors {name}" },
       { value: "parent", subString: "parent {name}" },
+      { value: "unit_type", subString: "unit_type {name}" },
       { value: "org_unit_level", subString: "org_unit_level {name}" },
       { value: "validity", subString: "validity {from to}" },
     ],
@@ -40,9 +41,10 @@ export const mainQueries = [
             { value: "job_function", subString: "extension_1" },
           ]
         : [{ value: "job_function", subString: "job_function {name}" }]),
+      { value: "user_key", subString: "user_key" },
+      { value: "cpr_number", subString: "person { cpr_number }" },
       { value: "engagement_type", subString: "engagement_type {name}" },
       { value: "primary", subString: "primary {name}" },
-      { value: "validity", subString: "validity {from to}" },
       {
         value: "email",
         subString:
@@ -57,6 +59,12 @@ export const mainQueries = [
         value: "manager",
         subString: "managers(exclude_self: true, inherit: true) { person {name}}",
       },
+      {
+        value: "manager_email",
+        subString:
+          'managers(exclude_self: true, inherit: true) { person { addresses(filter: { address_type: { scope: "EMAIL" } }) {name}}}',
+      },
+      { value: "validity", subString: "validity {from to}" },
     ],
   },
   {
