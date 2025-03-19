@@ -61,8 +61,8 @@
   let items: SearchItems
 
   gql`
-    query SearchEmployee($filter: EmployeeFilter!) {
-      employees(filter: $filter) {
+    query SearchEmployee($filter: EmployeeFilter!, $limit: int) {
+      employees(filter: $filter, limit: $limit) {
         objects {
           validities {
             uuid
@@ -77,8 +77,8 @@
       }
     }
 
-    query SearchOrgUnit($filter: OrganisationUnitFilter!) {
-      org_units(filter: $filter) {
+    query SearchOrgUnit($filter: OrganisationUnitFilter!, $limit: int) {
+      org_units(filter: $filter, limit: $limit) {
         objects {
           validities {
             uuid
@@ -203,6 +203,7 @@
           SearchEmployeeDocument,
           {
             filter: employeeFilter,
+            limit: 15,
           }
         )
 
@@ -246,6 +247,7 @@
           SearchOrgUnitDocument,
           {
             filter: orgUnitFilter,
+            limit: 15,
           }
         )
 

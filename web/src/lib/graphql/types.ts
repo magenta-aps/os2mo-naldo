@@ -22,6 +22,163 @@ export type Scalars = {
 };
 
 /**
+ * Access log entry.
+ *
+ * Mostly useful for auditing purposes seeing when data-reads were done and by whom.
+ *
+ */
+export type AccessLog = {
+  __typename?: 'AccessLog';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * UUID of the access log entry itself.
+   *
+   */
+  id: Scalars['UUID']['output'];
+  /**
+   * Model of the modified entity.
+   *
+   */
+  model: AccessLogModel;
+  /**
+   * When the read occured.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  time: Scalars['DateTime']['output'];
+  /**
+   * UUIDs of entities that were read.
+   *
+   */
+  uuids: Array<Scalars['UUID']['output']>;
+};
+
+/** Access log log filter. */
+export type AccessLogFilter = {
+  /**
+   * Filter access log events by their reading actor.
+   *
+   * Can be used to select all data read by a particular user or integration.
+   *
+   * | `actors`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /** Limit the elements returned by their ending validity. */
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * ID filter limiting which entries are returned.
+   *
+   * | `ids`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  ids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Filter access log events by their model type.
+   *
+   * Can be used to select all reads for a data type.
+   *
+   * Can be one of:
+   * * `"AccessLog"`
+   * * `"Bruger"`
+   * * `"Facet"`
+   * * `"ItSystem"`
+   * * `"Klasse"`
+   * * `"Organisation"`
+   * * `"OrganisationEnhed"`
+   * * `"OrganisationFunktion"`
+   *
+   * | `models`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  models?: InputMaybe<Array<AccessLogModel>>;
+  /** Limit the elements returned by their starting validity. */
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * UUID filter limiting which entries are returned.
+   *
+   * | `uuids`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+export enum AccessLogModel {
+  AccessLog = 'ACCESS_LOG',
+  Class = 'CLASS',
+  Facet = 'FACET',
+  ItSystem = 'IT_SYSTEM',
+  /** @deprecated The root organisation concept will be removed in a future version of OS2mo. */
+  Organisation = 'ORGANISATION',
+  OrganisationFunction = 'ORGANISATION_FUNCTION',
+  OrganisationUnit = 'ORGANISATION_UNIT',
+  Person = 'PERSON'
+}
+
+/** Result page in cursor-based pagination. */
+export type AccessLogPaged = {
+  __typename?: 'AccessLogPaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<AccessLog>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
+};
+
+/**
  * Address information for either an employee or organisational unit
  *
  */
@@ -1452,163 +1609,6 @@ export type AssociationUpdateInput = {
   uuid: Scalars['UUID']['input'];
   /** Validity range for the org-unit. */
   validity: RaValidityInput;
-};
-
-/**
- * AuditLog entry.
- *
- * Mostly useful for auditing purposes seeing when data-reads were done and by whom.
- *
- */
-export type AuditLog = {
-  __typename?: 'AuditLog';
-  /**
-   * UUID of the actor (integration or user) who changed the data.
-   *
-   * Note:
-   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
-   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
-   *
-   */
-  actor: Scalars['UUID']['output'];
-  /**
-   * UUID of the audit entry itself.
-   *
-   */
-  id: Scalars['UUID']['output'];
-  /**
-   * Model of the modified entity.
-   *
-   */
-  model: AuditLogModel;
-  /**
-   * When the read occured.
-   *
-   * Examples:
-   * * `"1970-01-01T00:00:00.000000+00:00"`
-   * * `"2019-12-18T12:55:15.348614+00:00"`
-   *
-   */
-  time: Scalars['DateTime']['output'];
-  /**
-   * UUIDs of entities that were read.
-   *
-   */
-  uuids: Array<Scalars['UUID']['output']>;
-};
-
-/** Audit log filter. */
-export type AuditLogFilter = {
-  /**
-   * Filter audit events by their reading actor.
-   *
-   * Can be used to select all data read by a particular user or integration.
-   *
-   * | `actors`      | Elements returned                            |
-   * |--------------|----------------------------------------------|
-   * | not provided | All                                          |
-   * | `null`       | All                                          |
-   * | `[]`         | None                                         |
-   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
-   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
-   *
-   * `*`: Elements returned depends on which elements were found.
-   *
-   */
-  actors?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  /** Limit the elements returned by their ending validity. */
-  end?: InputMaybe<Scalars['DateTime']['input']>;
-  /**
-   * ID filter limiting which entries are returned.
-   *
-   * | `ids`      | Elements returned                            |
-   * |--------------|----------------------------------------------|
-   * | not provided | All                                          |
-   * | `null`       | All                                          |
-   * | `[]`         | None                                         |
-   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
-   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
-   *
-   * `*`: Elements returned depends on which elements were found.
-   *
-   */
-  ids?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  /**
-   * Filter audit events by their model type.
-   *
-   * Can be used to select all reads for a data type.
-   *
-   * Can be one of:
-   * * `"AuditLog"`
-   * * `"Bruger"`
-   * * `"Facet"`
-   * * `"ItSystem"`
-   * * `"Klasse"`
-   * * `"Organisation"`
-   * * `"OrganisationEnhed"`
-   * * `"OrganisationFunktion"`
-   *
-   * | `models`      | Elements returned                            |
-   * |--------------|----------------------------------------------|
-   * | not provided | All                                          |
-   * | `null`       | All                                          |
-   * | `[]`         | None                                         |
-   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
-   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
-   *
-   * `*`: Elements returned depends on which elements were found.
-   *
-   */
-  models?: InputMaybe<Array<AuditLogModel>>;
-  /** Limit the elements returned by their starting validity. */
-  start?: InputMaybe<Scalars['DateTime']['input']>;
-  /**
-   * UUID filter limiting which entries are returned.
-   *
-   * | `uuids`      | Elements returned                            |
-   * |--------------|----------------------------------------------|
-   * | not provided | All                                          |
-   * | `null`       | All                                          |
-   * | `[]`         | None                                         |
-   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
-   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
-   *
-   * `*`: Elements returned depends on which elements were found.
-   *
-   */
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
-};
-
-export enum AuditLogModel {
-  AuditLog = 'AUDIT_LOG',
-  Class = 'CLASS',
-  Facet = 'FACET',
-  ItSystem = 'IT_SYSTEM',
-  /** @deprecated The root organisation concept will be removed in a future version of OS2mo. */
-  Organisation = 'ORGANISATION',
-  OrganisationFunction = 'ORGANISATION_FUNCTION',
-  OrganisationUnit = 'ORGANISATION_UNIT',
-  Person = 'PERSON'
-}
-
-/** Result page in cursor-based pagination. */
-export type AuditLogPaged = {
-  __typename?: 'AuditLogPaged';
-  /**
-   * List of results.
-   *
-   * The number of elements is defined by the `limit` argument.
-   *
-   */
-  objects: Array<AuditLog>;
-  /**
-   * Container for page information.
-   *
-   * Contains the cursors necessary to fetch other pages.
-   * Contains information on when to stop iteration.
-   *
-   */
-  page_info: PageInfo;
 };
 
 /**
@@ -10336,17 +10336,17 @@ export type ParentsBoundOrganisationUnitFilter = {
 /** Entrypoint for all read-operations */
 export type Query = {
   __typename?: 'Query';
-  /** Get addresses. */
-  addresses: AddressResponsePaged;
-  /** Get associations. */
-  associations: AssociationResponsePaged;
   /**
-   * Get a list of audit events.
+   * Get a list of access events.
    *
    * Mostly useful for auditing purposes seeing when data was read and by whom.
    *
    */
-  auditlog: AuditLogPaged;
+  access_log: AccessLogPaged;
+  /** Get addresses. */
+  addresses: AddressResponsePaged;
+  /** Get associations. */
+  associations: AssociationResponsePaged;
   /** Get classes. */
   classes: ClassResponsePaged;
   /** Get configuration variables. */
@@ -10407,6 +10407,14 @@ export type Query = {
 
 
 /** Entrypoint for all read-operations */
+export type QueryAccess_LogArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<AccessLogFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Entrypoint for all read-operations */
 export type QueryAddressesArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<AddressFilter>;
@@ -10418,14 +10426,6 @@ export type QueryAddressesArgs = {
 export type QueryAssociationsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<AssociationFilter>;
-  limit?: InputMaybe<Scalars['int']['input']>;
-};
-
-
-/** Entrypoint for all read-operations */
-export type QueryAuditlogArgs = {
-  cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  filter?: InputMaybe<AuditLogFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
 };
 
