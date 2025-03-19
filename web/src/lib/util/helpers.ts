@@ -445,6 +445,8 @@ export const resolveFieldValue = (searchObject: any, header: Field) => {
     return searchObject.name ?? ""
   } else if (header.value === "breadcrumbs") {
     return searchObject.ancestors.reverse()
+  } else if (header.value === "cpr_number") {
+    return searchObject.person[0].cpr_number
   } else if (
     header.value === "name" &&
     header.subString !== "name" &&
@@ -473,7 +475,10 @@ export const resolveFieldValue = (searchObject: any, header: Field) => {
     searchObject.managers
   ) {
     return searchObject.managers
-      .map((manager: { person: { name: string }[] }) => manager.person[0].name)
+      .map(
+        (manager: { person: { name: string }[] }) =>
+          manager.person?.[0].name ?? capital(get(_)("vacant"))
+      )
       .join(", ")
   } else if (header.value === "subject") {
     return searchObject.__typename
@@ -487,6 +492,8 @@ export const resolveFieldValue = (searchObject: any, header: Field) => {
     return searchObject.ituser[0].user_key ?? ""
   } else if (header.value === "role" && searchObject.role) {
     return searchObject.role[0].name ?? ""
+  } else if (header.value === "user_key") {
+    return searchObject.user_key ?? ""
   } else if (
     env.PUBLIC_SHOW_EXTENSION_1 === "true" &&
     header.value === "job_function" &&
@@ -507,6 +514,12 @@ export const resolveFieldValue = (searchObject: any, header: Field) => {
   } else if (header.value === "manager_responsibility") {
     return searchObject.responsibilities
       .map((responsibility: { name: string }) => responsibility.name)
+      .join(", ")
+  } else if (header.value === "manager_email") {
+    return searchObject.managers
+      .flatMap((manager: { person: { addresses: { name: string }[] }[] }) =>
+        manager.person?.[0].addresses.map((address) => address.name ?? "")
+      )
       .join(", ")
   } else {
     return searchObject[header.value]?.name ?? ""

@@ -42,11 +42,7 @@
 <InsightsSelectMultiple
   title={capital($_("fields"))}
   id={`fields-${index}`}
-  iterable={querySet.mainQuery
-    ? querySet.mainQuery.fields.sort((a, b) =>
-        $_(a.value).toLowerCase() > $_(b.value).toLowerCase() ? 1 : -1
-      )
-    : undefined}
+  iterable={querySet.mainQuery ? querySet.mainQuery.fields : undefined}
   bind:value={chosenFields}
   on:input={() => {
     updateValue()
