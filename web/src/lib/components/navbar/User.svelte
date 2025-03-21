@@ -29,7 +29,7 @@
 <div class="dropdown dropdown-end z-10 hidden xl:inline-block">
   <div tabindex="-1" class="btn btn-ghost flex">
     <div class="join gap-2">
-      <p class="invisible xl:visible text-base-100 self-center">{fullName()}</p>
+      <p class=" text-base-100 self-center">{fullName()}</p>
       <div class="bg-accent rounded-full p-1">
         <Icon icon={personOutlineRounded} width="25" height="25" />
       </div>

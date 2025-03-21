@@ -6,22 +6,14 @@
   import SearchBar from "$lib/components/navbar/SearchBar.svelte"
   import Icon from "@iconify/svelte"
   import menuRounded from "@iconify/icons-material-symbols/menu-rounded"
+  import personAddOutlineRounded from "@iconify/icons-material-symbols/person-add-outline-rounded"
+  import personCancelOutlineRounded from "@iconify/icons-material-symbols/person-cancel-outline-rounded"
+  import personAlertOutlineRounded from "@iconify/icons-material-symbols/person-alert-outline-rounded"
+  import swapHorizRounded from "@iconify/icons-material-symbols/swap-horiz-rounded"
+  import addCircleOutlineRounded from "@iconify/icons-material-symbols/add-circle-outline-rounded"
+  import link from "@iconify/icons-material-symbols/link"
 </script>
 
-<div class="navbar bg-secondary">
-  <div class="navbar-start text-base-100">
-    <label for="drawer" class="btn btn-square btn-ghost xl:hidden">
-      <Icon icon={menuRounded} width="25" height="25" />
-    </label>
-
-    <a class="btn btn-ghost normal-case text-xl hover:no-underline" href="{base}/"
-      >OS2mo</a
-    >
-    <NavLinks />
-  </div>
-
-  <div class="navbar-end flex gap-10">
-    <SearchBar />
-    <User />
-  </div>
+<div class="navbar bg-primary h-4">
+  <SearchBar />
 </div>
