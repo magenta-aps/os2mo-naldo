@@ -14,6 +14,7 @@
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
+  import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import { formatQueryDates } from "$lib/util/helpers"
   import { MOConfig } from "$lib/stores/config"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
@@ -138,6 +139,11 @@
           )}"
         >
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
+        </a>
+      </td>
+      <td>
+        <a href="{base}/organisation/{$page.params.uuid}/terminate/unit">
+          <Icon icon={cancelOutlineRounded} width="25" height="25" />
         </a>
       </td>
     </tr>
