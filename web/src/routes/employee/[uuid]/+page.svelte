@@ -157,6 +157,7 @@
           { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },
           { title: "" },
+          { title: "" },
         ]}
       />
     {:else if activeItem === EmployeeTab.ENGAGEMENT}
