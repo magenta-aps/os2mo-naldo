@@ -12,34 +12,22 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import Search from "$lib/components/search/Search.svelte"
   import { getMinMaxValidities } from "$lib/util/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
-  import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
 
-  let selectedOrgUnit: {
-    uuid: string
-    name: string
-  }
-
   const toDate = field("to", "", [required()])
-  const orgUnitField = field("org_unit", "", [required()])
-  const svelteForm = form(toDate, orgUnitField)
+  const svelteForm = form(toDate)
 
   gql`
-    query OrgUnit($uuid: [UUID!], $currentDate: DateTime!) {
+    query OrgUnit($uuid: [UUID!]) {
       org_units(filter: { uuids: $uuid }) {
         objects {
-          current(at: $currentDate) {
-            uuid
-            name
-            parent {
-              validity {
-                from
-                to
-              }
+          validities {
+            validity {
+              from
+              to
             }
           }
         }
@@ -109,67 +97,47 @@
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
-<!-- TODO: Fix this when: https://redmine.magenta.dk/issues/58621 is done -->
-<!-- We can't use getMinMaxValidities since `parent` can't be a list, or it'll crash -->
-<!-- Update dates depending on chosen org_unit -->
-<form method="post" class="mx-6" use:enhance={handler}>
-  <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
-    <div class="p-8">
-      <DateInput
-        startValue={$date}
-        bind:value={$toDate.value}
-        title={capital($_("date.end_date"))}
-        id="to"
-        min={undefined}
-        max={undefined}
-        required={true}
-      />
-      {#if $page.params.uuid}
-        {#await graphQLClient().request( OrgUnitDocument, { uuid: $page.params.uuid, currentDate: $date } ) then data}
-          {@const orgUnit = data.org_units.objects[0].current}
-          <Search
-            type="org-unit"
-            title="{capital($_('specify'))} {$_('unit', { values: { n: 1 } })}"
-            startValue={{
-              uuid: orgUnit?.uuid ? orgUnit.uuid : undefined,
-              name: orgUnit?.name ? orgUnit.name : "",
-            }}
-            bind:name={$orgUnitField.value}
-            on:clear={() => ($orgUnitField.value = "")}
-            errors={$orgUnitField.errors}
-            bind:value={selectedOrgUnit}
-            required={true}
-          />
-        {/await}
-      {:else}
-        <Search
-          type="org-unit"
-          title="{capital($_('specify'))} {$_('parent')}"
-          bind:name={$orgUnitField.value}
-          on:clear={() => ($orgUnitField.value = "")}
-          errors={$orgUnitField.errors}
-          bind:value={selectedOrgUnit}
-          required={true}
-        />
-      {/if}
-      <Breadcrumbs orgUnit={selectedOrgUnit} />
+{#await graphQLClient().request(OrgUnitDocument, { uuid: $page.params.uuid })}
+  <div class="mx-6">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+      <div class="p-8">
+        <Skeleton />
+      </div>
     </div>
   </div>
-  <div class="flex py-6 gap-4">
-    <Button
-      type="submit"
-      title={capital(
-        $_("terminate_item", {
-          values: { item: $_("unit", { values: { n: 1 } }) },
-        })
-      )}
-    />
-    <Button
-      type="button"
-      title={capital($_("cancel"))}
-      outline={true}
-      onClick={() => history.back()}
-    />
+{:then data}
+  {@const validities = getMinMaxValidities(data.org_units.objects[0].validities)}
+
+  <form method="post" class="mx-6" use:enhance={handler}>
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+      <div class="p-8">
+        <DateInput
+          startValue={$date}
+          bind:value={$toDate.value}
+          title={capital($_("date.end_date"))}
+          id="to"
+          min={validities.from}
+          max={undefined}
+          required={true}
+        />
+      </div>
+    </div>
+    <div class="flex py-6 gap-4">
+      <Button
+        type="submit"
+        title={capital(
+          $_("terminate_item", {
+            values: { item: $_("unit", { values: { n: 1 } }) },
+          })
+        )}
+      />
+      <Button
+        type="button"
+        title={capital($_("cancel"))}
+        outline={true}
+        onClick={() => history.back()}
+      />
+    </div>
     <Error />
-  </div>
-</form>
+  </form>
+{/await}
