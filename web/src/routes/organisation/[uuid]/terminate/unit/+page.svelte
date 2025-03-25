@@ -22,7 +22,7 @@
 
   gql`
     query OrgUnit($uuid: [UUID!]) {
-      org_units(filter: { uuids: $uuid }) {
+      org_units(filter: { uuids: $uuid, from_date: null, to_date: null }) {
         objects {
           validities {
             validity {
@@ -111,6 +111,7 @@
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
+        <!-- Ideally we would use validities from 'parent' if it's present, but since parent can't be a list of validities, we can't get min/max -->
         <DateInput
           startValue={$date}
           bind:value={$toDate.value}
