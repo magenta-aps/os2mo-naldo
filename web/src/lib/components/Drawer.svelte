@@ -4,35 +4,60 @@
   import { isAuth } from "$lib/stores/auth"
   import DrawerContent from "$lib/components/DrawerContent.svelte"
   import { defaultDrawerWidth, drawerWidth } from "$lib/stores/drawerWidth"
-  import { onMount } from "svelte"
+  import { onMount, afterUpdate } from "svelte"
   import Icon from "@iconify/svelte"
   import dragIndicator from "@iconify/icons-material-symbols/drag-indicator"
 
   let screenSize: number
   let isResizing = false
+  let drawerStartX = 0
+  let drawerElement: HTMLDivElement
+  let resizeHandle: HTMLDivElement
+
+  // Function to update the height of the resize handle to match the drawer height
+  const updateResizeHandleHeight = () => {
+    if (drawerElement && resizeHandle) {
+      resizeHandle.style.height = `${drawerElement.scrollHeight}px`
+    }
+  }
+
+  // Mouse move handler
+  const moveComponent = (event: MouseEvent) => {
+    if (!isResizing) return
+    const offsetX = event.clientX - drawerStartX
+    const newWidth = Math.max(240, $drawerWidth + offsetX) // Keep the width within a reasonable range
+    $drawerWidth = newWidth
+    drawerStartX = event.clientX
+  }
+
+  // Mouse up handler
+  const stop = () => {
+    isResizing = false
+  }
+
+  // Mouse down handler to start resizing
+  const startResizing = (event: MouseEvent) => {
+    isResizing = true
+    drawerStartX = event.clientX
+  }
 
   onMount(() => {
-    // Ensures that the resize stops no matter where in the window the user releases the mouse
-    // If it is only done in the HTML part, it can be difficult for the user to 'release' the resize
-    window.addEventListener("mouseup", () => (isResizing = false))
-    window.addEventListener("mousemove", (e) => {
-      if (!isResizing) return
-      const newWidth = Math.max(e.clientX, defaultDrawerWidth)
+    // Set initial height for resize handle and observe size changes
+    updateResizeHandleHeight()
 
-      // Max width of 1000px
-      if (newWidth < 1000) {
-        $drawerWidth = newWidth
-      }
-    })
+    if (drawerElement) {
+      new ResizeObserver(updateResizeHandleHeight).observe(drawerElement)
+    }
   })
-
-  // Keeps track of when the screen goes between mobile and desktop view
-  $: isLargeScreen = screenSize >= 1280
 </script>
 
-<svelte:window bind:innerWidth={screenSize} />
+<svelte:window
+  bind:innerWidth={screenSize}
+  on:mousemove={moveComponent}
+  on:mouseup={stop}
+/>
 
-<div class="drawer xl:drawer-open">
+<div class="drawer drawer-open">
   <input id="drawer" type="checkbox" class="drawer-toggle" />
   <label for="drawer" class="drawer-overlay cursor-pointer" aria-hidden="true" />
 
@@ -48,30 +73,26 @@
       </div>
     {/if}
   </div>
+
   <div
-    class="drawer-side fixed h-screen xl:h-[calc(100vh-4rem)] overflow-x-hidden"
-    style="width: {isLargeScreen ? `${$drawerWidth}px` : '100%'}"
+    bind:this={drawerElement}
+    class="drawer-side fixed h-[calc(100vh-4rem)] overflow-x-hidden overflow-y-auto"
+    style="width: {`${$drawerWidth}px`}"
   >
     <label for="drawer" class="drawer-overlay" />
-    <ul class="bg-base-100 w-1/2 xl:w-full h-screen xl:h-fit">
+    <ul class="bg-base-100 w-full h-fit">
       <div>
         <DrawerContent />
       </div>
     </ul>
-    {#if isLargeScreen}
-      <!-- Only show resize button in desktop view -->
-      <!-- TODO: Fix resize button, should be clickable on whole y-axis. -->
-      <button
-        class="absolute top-[50%] right-1 cursor-ew-resize w-1 flex items-center justify-center"
-        on:mousedown={() => {
-          isResizing = true
-        }}
-        tabindex="0"
-      >
-        <div class="flex flex-col">
-          <Icon icon={dragIndicator} width="20" height="20" />
-        </div>
-      </button>
-    {/if}
+
+    <!-- Resizable handle dynamically adjusting to drawer height -->
+    <div
+      bind:this={resizeHandle}
+      class="absolute top-0 right-0 w-2 cursor-ew-resize bg-transparent {isResizing
+        ? 'select-none'
+        : 'select-auto'}"
+      on:mousedown={startResizing}
+    />
   </div>
 </div>
