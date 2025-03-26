@@ -1934,6 +1934,11 @@ export type ClassFilter = {
    */
   it_system?: InputMaybe<ItSystemFilter>;
   /**
+   * Name filter finding exact matches by name.
+   *
+   */
+  name?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
    * Owner filter limiting which entries are returned.
    *
    */
@@ -4498,6 +4503,7 @@ export type FacetsBoundClassFilter = {
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   it_system?: InputMaybe<ItSystemFilter>;
+  name?: InputMaybe<Array<Scalars['String']['input']>>;
   owner?: InputMaybe<ClassOwnerFilter>;
   parent?: InputMaybe<ClassFilter>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -10295,6 +10301,7 @@ export type ParentsBoundClassFilter = {
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   it_system?: InputMaybe<ItSystemFilter>;
+  name?: InputMaybe<Array<Scalars['String']['input']>>;
   owner?: InputMaybe<ClassOwnerFilter>;
   parent?: InputMaybe<ClassFilter>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -11484,6 +11491,7 @@ export type UuidsBoundClassFilter = {
   facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   it_system?: InputMaybe<ItSystemFilter>;
+  name?: InputMaybe<Array<Scalars['String']['input']>>;
   owner?: InputMaybe<ClassOwnerFilter>;
   parent?: InputMaybe<ClassFilter>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
