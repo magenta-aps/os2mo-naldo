@@ -99,12 +99,12 @@
 <div class="flex h-screen">
   <!-- Navbar Container -->
   <div
-    class={`flex flex-col h-full bg-secondary transition-all max-w-60 duration-300 ease-in-out ${
+    class={`flex flex-col h-full bg-secondary transition-all duration-300 ease-in-out ${
       isOpen ? "w-80" : "w-16"
     }`}
   >
     <!-- Navbar with Icons and Expandable Text -->
-    <ul class="menu p-0 flex-grow max-w-60">
+    <ul class="menu p-0 flex-grow">
       <!-- Navigation Items -->
       <li class="flex flex-row justify-between items-center h-16">
         {#if isOpen}
@@ -220,7 +220,9 @@
         {/each}
       {/if}
 
-      <div class="divider divider-accent p-0 m-0" />
+      <div
+        class="divider divider-accent before:h-[.025rem] after:h-[.025rem] p-0 m-0"
+      />
 
       <li>
         <a
@@ -268,7 +270,8 @@
       </li>
     </ul>
 
-    <div class="divider divider-accent p-0 m-0" />
+    <div class="divider divider-accent before:h-[.025rem] after:h-[.025rem] p-0 m-0" />
+
     <!-- Bottom Section with Language Switch, Logout, Profile Icon -->
     <ul class="menu p-0">
       <li>
