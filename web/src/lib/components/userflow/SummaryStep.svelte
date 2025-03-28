@@ -88,7 +88,7 @@
           org_unit: $engagementInfo.orgUnit?.uuid,
           engagement_type: $engagementInfo.engagementType.uuid,
           job_function: $engagementInfo.jobFunction.uuid,
-          primary: $engagementInfo.primary.uuid,
+          primary: $engagementInfo.primary?.uuid,
           validity: {
             from: $engagementInfo.fromDate,
             to: $engagementInfo.toDate ? $engagementInfo.toDate : null,

@@ -138,7 +138,7 @@
           bind:value={$addressInfo.userkey}
         />
         <!-- FIXME: Translate address_types -->
-        {#if $addressInfo.addressType.scope}
+        {#if $addressInfo.addressType}
           {#if $addressInfo.addressType.scope === "DAR"}
             <DarSearch
               title={$addressInfo.addressType.name}
