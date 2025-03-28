@@ -33,6 +33,7 @@
   import inventory2OutlineRounded from "@iconify/icons-material-symbols/inventory-2-outline-rounded"
   import searchRounded from "@iconify/icons-material-symbols/search-rounded"
   import book2OutlineRounded from "@iconify/icons-material-symbols/book-2-outline-rounded"
+  import homeOutlineRounded from "@iconify/icons-material-symbols/home-outline-rounded"
   import codeRounded from "@iconify/icons-material-symbols/code-rounded"
   // import graph2 from "@iconify/material-symbols/graph-4"
   import language from "@iconify/icons-material-symbols/language"
@@ -98,17 +99,16 @@
 
 <div class="flex h-screen">
   <!-- Navbar Container -->
-  <div
-    class={`flex flex-col h-full bg-secondary transition-all duration-300 ease-in-out ${
-      isOpen ? "w-80" : "w-16"
-    }`}
-  >
+  <div class="flex flex-col h-full bg-secondary">
+    <!-- TODO: Feedback from Carl - Make links into squares (more like mockup) -->
     <!-- Navbar with Icons and Expandable Text -->
     <ul class="menu p-0 flex-grow">
       <!-- Navigation Items -->
       <li class="flex flex-row justify-between items-center h-16">
         {#if isOpen}
-          <a href="/" class="text-white text-xl font-bold hover:no-underline">OS2mo</a>
+          <a href="{base}/" class="text-white text-xl font-bold hover:no-underline"
+            >OS2mo</a
+          >
         {/if}
         <button
           on:click={() => (isOpen = !isOpen)}
@@ -116,18 +116,29 @@
         >
           <Icon
             icon={keyboardArrowDownRounded}
-            width="25"
-            height="25"
+            width="20"
+            height="20"
             rotate={isOpen ? 1 : 3}
           />
         </button>
       </li>
       <li>
         <a
+          href="{base}/"
+          class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
+        >
+          <Icon icon={homeOutlineRounded} width="20" height="20" />
+          {#if isOpen}
+            <span class="font-bold">{capital($_("home"))}</span>
+          {/if}
+        </a>
+      </li>
+      <li>
+        <a
           href="{base}/reports"
           class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
         >
-          <Icon icon={assignmentOutlineRounded} width="25" height="25" />
+          <Icon icon={assignmentOutlineRounded} width="20" height="20" />
           {#if isOpen}
             <span class="font-bold">{capital($_("report", { values: { n: 2 } }))}</span>
           {/if}
@@ -141,7 +152,7 @@
               href="{base}/admin"
               class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
             >
-              <Icon icon={inventory2OutlineRounded} width="25" height="25" />
+              <Icon icon={inventory2OutlineRounded} width="20" height="20" />
               {#if isOpen}
                 <span class="font-bold">{capital($_("classifications"))}</span>
               {/if}
@@ -154,7 +165,7 @@
               href="{base}/insights"
               class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
             >
-              <Icon icon={searchRounded} width="25" height="25" />
+              <Icon icon={searchRounded} width="20" height="20" />
               {#if isOpen}
                 <span class="font-bold">{capital($_("insights"))}</span>
               {/if}
@@ -169,7 +180,7 @@
             target="_blank"
             class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
           >
-            <Icon icon={book2OutlineRounded} width="25" height="25" />
+            <Icon icon={book2OutlineRounded} width="20" height="20" />
             {#if isOpen}
               <span class="font-bold">{capital($_("documentation"))}</span>
             {/if}
@@ -182,7 +193,7 @@
           target="_blank"
           class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
         >
-          <Icon icon={codeRounded} width="25" height="25" />
+          <Icon icon={codeRounded} width="20" height="20" />
           {#if isOpen}
             <span class="font-bold">{$_("graphql")}</span>
           {/if}
@@ -194,7 +205,7 @@
             href="{base}/userflow"
             class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
           >
-            <Icon icon={personAddOutlineRounded} width="25" height="25" />
+            <Icon icon={personAddOutlineRounded} width="20" height="20" />
             {#if isOpen}
               <span class="font-bold">{capital($_("onboarding"))}</span>
             {/if}
@@ -211,7 +222,7 @@
               class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
             >
               <!-- For some reason graph-2 is not in the module, so have to use it directly.  -->
-              <Icon icon="material-symbols:graph-2" width="25" height="25" />
+              <Icon icon="material-symbols:graph-2" width="20" height="20" />
               {#if isOpen}
                 <span class="font-bold">{link.text}</span>
               {/if}
@@ -229,7 +240,7 @@
           href="{base}/employee/create/employee"
           class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
         >
-          <Icon icon={personAddOutlineRounded} width="25" height="25" />
+          <Icon icon={personAddOutlineRounded} width="20" height="20" />
           {#if isOpen}
             <span class="font-bold">{$_("navigation.create_employee")}</span>
           {/if}
@@ -240,7 +251,7 @@
           href="{base}/organisation/move/engagements"
           class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
         >
-          <Icon icon={swapHorizRounded} width="25" height="25" />
+          <Icon icon={swapHorizRounded} width="20" height="20" />
           {#if isOpen}
             <span class="font-bold">{$_("navigation.move_engagements")}</span>
           {/if}
@@ -251,7 +262,7 @@
           href="{base}/organisation/create/unit"
           class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
         >
-          <Icon icon={addCircleOutlineRounded} width="25" height="25" />
+          <Icon icon={addCircleOutlineRounded} width="20" height="20" />
           {#if isOpen}
             <span class="font-bold">{$_("navigation.create_unit")}</span>
           {/if}
@@ -260,9 +271,9 @@
       <li>
         <a
           href="{base}/connections"
-          class="text-white hover:no-underline hover:bg-accent hover:text-secondary max-w-60 break-words"
+          class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
         >
-          <Icon icon={link} width="25" height="25" />
+          <Icon icon={link} width="20" height="20" />
           {#if isOpen}
             <span class="font-bold break-words">{$_("navigation.connections")}</span>
           {/if}
@@ -273,13 +284,13 @@
     <div class="divider divider-accent before:h-[.025rem] after:h-[.025rem] p-0 m-0" />
 
     <!-- Bottom Section with Language Switch, Logout, Profile Icon -->
-    <ul class="menu p-0">
+    <ul class="menu mb-1 p-0">
       <li>
         <button
           on:click={changeLanguage}
-          class="btn btn-ghost justify-start text-white hover:no-underline hover:bg-accent hover:text-secondary"
+          class="text-white hover:no-underline hover:bg-accent focus:text-white hover:text-secondary"
         >
-          <Icon icon={language} width="25" height="25" />
+          <Icon icon={language} width="20" height="20" />
           <span class={isOpen ? "visible" : "hidden"}>
             {$locale === "en-GB" ? "Dansk" : "English"}
           </span>
@@ -290,9 +301,9 @@
       <li>
         <button
           on:click={logoutKeycloak}
-          class="btn btn-ghost justify-start text-white hover:no-underline hover:bg-accent hover:text-secondary"
+          class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
         >
-          <Icon icon={logout} width="25" height="25" />
+          <Icon icon={logout} width="20" height="20" />
           <span class={isOpen ? "visible" : "hidden"}>
             {capital($_("logout"))}
           </span>
@@ -303,15 +314,15 @@
       <li>
         <button
           on:click={() => (isOpen = !isOpen)}
-          class="btn btn-ghost justify-start text-white hover:no-underline hover:bg-accent hover:text-secondary group"
+          class="text-white hover:no-underline hover:bg-accent hover:text-secondary group"
         >
           <Icon
             icon={personOutlineRounded}
-            width="25"
-            height="25"
+            width="20"
+            height="20"
             class="bg-accent text-secondary rounded-full p-1 transition-all group-hover:bg-secondary group-hover:text-accent"
           />
-          <span class={isOpen ? "visible" : "hidden"}>
+          <span class="{isOpen ? 'visible' : 'hidden'} font-bold">
             {fullName()}
           </span>
         </button>
