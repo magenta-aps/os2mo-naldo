@@ -103,6 +103,8 @@
       isOpen ? "w-80" : "w-16"
     }`}
   >
+    <!-- TODO: Feedback from Carl - Make links into squares (more like mockup) -->
+    <!-- TODO: Add 'Home' button -->
     <!-- Navbar with Icons and Expandable Text -->
     <ul class="menu p-0 flex-grow">
       <!-- Navigation Items -->
