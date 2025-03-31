@@ -25,7 +25,9 @@
 </script>
 
 <!-- TODO: Handle tabs when screen gets smaller, e.g. as a dropdown? -->
-<div class="tabs tabs-bordered whitespace-nowrap {extra_classes}">
+<div
+  class="whitespace-wrap block xl:tabs tabs-bordered xxl:whitespace-nowrap {extra_classes}"
+>
   {#each items as item}
     <a
       href="#{item.value}"
