@@ -71,6 +71,7 @@
             }
             job_function {
               name
+              user_key
             }
             extension_1
             engagement_type {
@@ -158,7 +159,11 @@
         {/if}
       </td>
       <td class="text-sm p-4">{engagement.user_key}</td>
-      <td class="text-sm p-4">{engagement.job_function.name}</td>
+      <td class="text-sm p-4"
+        >{env.PUBLIC_SHOW_JOB_FUNCTION_USER_KEY === "true"
+          ? `${engagement.job_function.user_key} - ${engagement.job_function.name}`
+          : engagement.job_function.name}</td
+      >
       {#if env.PUBLIC_SHOW_EXTENSION_1 === "true"}
         <td class="text-sm p-4"
           >{engagement.extension_1 ? engagement.extension_1 : ""}</td
