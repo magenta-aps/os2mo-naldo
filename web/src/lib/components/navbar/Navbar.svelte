@@ -177,7 +177,7 @@
       {/each}
     {/if}
 
-    <div class="divider divider-accent before:h-[.025rem] after:h-[.025rem] p-0 m-0" />
+    <div class="divider divider-accent before:h-[.05rem] after:h-[.05rem] p-0 m-0" />
     <!-- Quick actions -->
     <li>
       <a
@@ -225,7 +225,7 @@
     </li>
   </ul>
 
-  <div class="divider divider-accent before:h-[.025rem] after:h-[.025rem] p-0 m-0" />
+  <div class="divider divider-accent before:h-[.05rem] after:h-[.05rem] p-0 m-0" />
 
   <!-- Bottom Section with Language Switch, Logout, Profile Icon -->
   <ul class="menu mb-1 p-0">
@@ -273,3 +273,15 @@
     </li>
   </ul>
 </div>
+
+<style>
+  /* Apparently Firefox and Chrome doesn't show pixels the same way, 
+    so this is a workaround to make the divider thin in both browsers.. */
+
+  @supports (-moz-appearance: none) {
+    .divider::before,
+    .divider::after {
+      height: 0.0625rem !important;
+    }
+  }
+</style>
