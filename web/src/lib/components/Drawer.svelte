@@ -3,7 +3,7 @@
   import { capital } from "$lib/util/translationUtils"
   import { isAuth } from "$lib/stores/auth"
   import DrawerContent from "$lib/components/DrawerContent.svelte"
-  import { defaultDrawerWidth, drawerWidth } from "$lib/stores/drawer_width"
+  import { defaultDrawerWidth, drawerWidth } from "$lib/stores/drawerWidth"
   import { onMount } from "svelte"
   import Icon from "@iconify/svelte"
   import dragIndicator from "@iconify/icons-material-symbols/drag-indicator"

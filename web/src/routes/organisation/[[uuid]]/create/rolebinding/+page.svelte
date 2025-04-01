@@ -23,7 +23,7 @@
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getITUserITSystemName, getMinMaxValidities } from "$lib/util/helpers"
-  import Search from "$lib/components/Search.svelte"
+  import Search from "$lib/components/search/Search.svelte"
 
   let itUser: {
     uuid: string | null

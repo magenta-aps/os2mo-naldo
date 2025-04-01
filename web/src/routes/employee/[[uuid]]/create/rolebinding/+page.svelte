@@ -30,7 +30,6 @@
   import Icon from "@iconify/svelte"
   import removeRounded from "@iconify/icons-material-symbols/remove-rounded"
   import addRounded from "@iconify/icons-material-symbols/add-rounded"
-  import { getClassesByFacetUserKey } from "$lib/util/get_classes"
 
   let toDate: string
 

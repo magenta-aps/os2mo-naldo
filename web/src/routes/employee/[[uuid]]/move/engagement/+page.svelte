@@ -12,7 +12,7 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import Search from "$lib/components/Search.svelte"
+  import Search from "$lib/components/search/Search.svelte"
   import {
     getEngagementTitlesAndUuid,
     getValidities,

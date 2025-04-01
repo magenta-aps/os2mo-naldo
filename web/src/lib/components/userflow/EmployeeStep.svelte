@@ -7,7 +7,7 @@
   import Input from "$lib/components/forms/shared/Input.svelte"
   import { form, field } from "svelte-forms"
   import { required, pattern } from "svelte-forms/validators"
-  import CprLookup from "$lib/components/CPRLookup.svelte"
+  import CprLookup from "$lib/components/forms/shared/CPRLookup.svelte"
   import CPRInput from "$lib/components/userflow/CPRInput.svelte"
   import { graphQLClient } from "$lib/util/http"
   import { GetSpConfigDocument } from "./query.generated"

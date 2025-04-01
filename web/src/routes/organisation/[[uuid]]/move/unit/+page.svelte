@@ -10,7 +10,7 @@
   import { UpdateOrgUnitDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { date } from "$lib/stores/date"
-  import Search from "$lib/components/Search.svelte"
+  import Search from "$lib/components/search/Search.svelte"
   import { page } from "$app/stores"
   import { OrgUnitDocument } from "./query.generated"
   import Input from "$lib/components/forms/shared/Input.svelte"

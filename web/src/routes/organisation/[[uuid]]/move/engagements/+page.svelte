@@ -11,7 +11,7 @@
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
   import { success, error } from "$lib/stores/alert"
-  import Search from "$lib/components/Search.svelte"
+  import Search from "$lib/components/search/Search.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import { page } from "$app/stores"
   import { form, field } from "svelte-forms"

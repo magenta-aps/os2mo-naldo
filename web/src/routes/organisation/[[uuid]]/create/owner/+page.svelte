@@ -13,7 +13,7 @@
   import { date } from "$lib/stores/date"
   import type { SubmitFunction } from "./$types"
   import { OrgUnitDocument, CreateOwnerDocument } from "./query.generated"
-  import Search from "$lib/components/Search.svelte"
+  import Search from "$lib/components/search/Search.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"

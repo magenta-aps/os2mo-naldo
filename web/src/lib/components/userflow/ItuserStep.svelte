@@ -16,7 +16,7 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import { getClassByUserKey } from "$lib/util/get_classes"
+  import { getClassByUserKey } from "$lib/util/getClasses"
   import { getITSystemNames, type UnpackedClass } from "$lib/util/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"

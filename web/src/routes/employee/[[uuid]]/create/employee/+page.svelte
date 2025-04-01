@@ -11,7 +11,7 @@
   import { gql } from "graphql-request"
   import { form, field } from "svelte-forms"
   import { required, pattern } from "svelte-forms/validators"
-  import CprLookup from "$lib/components/CPRLookup.svelte"
+  import CprLookup from "$lib/components/forms/shared/CPRLookup.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
 
   let person: CprLookupResponse

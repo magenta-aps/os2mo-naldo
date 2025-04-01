@@ -3,7 +3,7 @@
   import { capital, upperCase } from "$lib/util/translationUtils"
   import { page } from "$app/stores"
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
-  import CopyToClipboard from "$lib/components/Clipboard.svelte"
+  import CopyToClipboard from "$lib/components/shared/Clipboard.svelte"
   import TenseTabs from "$lib/components/shared/TenseTabs.svelte"
   import { ItTab, OrgTab, activeItTab, activeOrgTab } from "$lib/stores/tab"
   import { base } from "$app/paths"

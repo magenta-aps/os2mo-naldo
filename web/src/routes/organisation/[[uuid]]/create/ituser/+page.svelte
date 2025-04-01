@@ -16,7 +16,7 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
-  import { getClassUuidByUserKey } from "$lib/util/get_classes"
+  import { getClassUuidByUserKey } from "$lib/util/getClasses"
   import { getITSystemNames } from "$lib/util/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"

@@ -2,7 +2,7 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import { graphQLClient } from "$lib/util/http"
-  import { fetchParentTree } from "$lib/util/parent_tree.js"
+  import { fetchParentTree } from "$lib/util/parentTree"
   import Node from "./node.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "../connections/$types"

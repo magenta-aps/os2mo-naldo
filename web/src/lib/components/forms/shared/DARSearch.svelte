@@ -3,7 +3,7 @@
   import { capital } from "$lib/util/translationUtils"
   import { env } from "$env/dynamic/public"
   import SvelteSelect from "svelte-select"
-  import DarItem from "$lib/components/DARItem.svelte"
+  import DarItem from "$lib/components/forms/shared/DARItem.svelte"
 
   export let startValue: DarAddressResponse | undefined = undefined
   export let value: DarAddressResponse | undefined = startValue || undefined

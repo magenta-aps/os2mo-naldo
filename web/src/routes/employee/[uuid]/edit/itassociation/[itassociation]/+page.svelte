@@ -17,13 +17,10 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import {
-    getClassUuidByUserKey,
-    getClassesByFacetUserKey,
-  } from "$lib/util/get_classes"
+  import { getClassUuidByUserKey, getClassesByFacetUserKey } from "$lib/util/getClasses"
   import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
   import { getITUserITSystemName, getValidities } from "$lib/util/helpers"
-  import Search from "$lib/components/Search.svelte"
+  import Search from "$lib/components/search/Search.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"

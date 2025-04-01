@@ -13,7 +13,7 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import { getClassesByFacetUserKey } from "$lib/util/getClasses"
   import { LeaveAndFacetDocument, UpdateLeaveDocument } from "./query.generated"
   import {
     getEngagementTitlesAndUuid,
@@ -21,7 +21,7 @@
   } from "$lib/util/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
-  import Search from "$lib/components/Search.svelte"
+  import Search from "$lib/components/search/Search.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
 
   let toDate: string

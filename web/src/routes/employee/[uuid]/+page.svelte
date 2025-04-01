@@ -2,7 +2,7 @@
   import { _ } from "svelte-i18n"
   import { capital, upperCase } from "$lib/util/translationUtils"
   import Tabs from "$lib/components/shared/Tabs.svelte"
-  import CopyToClipboard from "$lib/components/Clipboard.svelte"
+  import CopyToClipboard from "$lib/components/shared/Clipboard.svelte"
   import { EmployeeTab, ItTab, activeEmployeeTab, activeItTab } from "$lib/stores/tab"
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
   import { page } from "$app/stores"
