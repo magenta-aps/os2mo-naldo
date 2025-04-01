@@ -32,6 +32,7 @@
 		"end": "end"
 	},
 	"default_filename": "Defaults to 'insights'",
+	"department_code": "department code",
 	"description": "description",
 	"deselect_all": "deselect all",
 	"documentation": "documentation",

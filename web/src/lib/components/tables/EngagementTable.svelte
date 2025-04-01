@@ -74,6 +74,7 @@
               user_key
             }
             extension_1
+            extension_2
             engagement_type {
               name
             }
@@ -158,6 +159,11 @@
           >
         {/if}
       </td>
+      {#if env.PUBLIC_SHOW_SD_CODE === "true"}
+        <td class="text-sm p-4">
+          {engagement.extension_2 ? engagement.extension_2 : ""}
+        </td>
+      {/if}
       <td class="text-sm p-4">{engagement.user_key}</td>
       <td class="text-sm p-4"
         >{env.PUBLIC_SHOW_JOB_FUNCTION_USER_KEY === "true"
