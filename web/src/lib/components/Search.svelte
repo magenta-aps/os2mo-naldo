@@ -211,6 +211,10 @@
           .map((item) => findClosestValidity(item.validities, $date))
           .sort((a, b) => (a.name > b.name ? 1 : -1))
 
+        if (env.PUBLIC_SIMPLE_SEARCH === "true") {
+          return items
+        }
+
         let lazyEmployeeFilter
         if (env.PUBLIC_SEARCH_INFINITY === "true" && action === "goto") {
           lazyEmployeeFilter = {
@@ -254,6 +258,10 @@
         items = res.org_units.objects
           .map((item) => findClosestValidity(item.validities, $date))
           .sort((a, b) => (a.name > b.name ? 1 : -1))
+
+        if (env.PUBLIC_SIMPLE_SEARCH === "true") {
+          return items
+        }
 
         let lazyOrgFilter
         if (env.PUBLIC_SEARCH_INFINITY === "true" && action === "goto") {
