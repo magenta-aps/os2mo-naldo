@@ -7,6 +7,7 @@
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
+  import Rolebinding from "$lib/components/forms/shared/Rolebinding.svelte"
   import { step } from "$lib/stores/stepStore"
   import { graphQLClient } from "$lib/util/http"
   import {
@@ -24,6 +25,9 @@
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
   import { env } from "$env/dynamic/public"
   import ItUserCheckbox from "./ItUserCheckbox.svelte"
+  import Icon from "@iconify/svelte"
+  import removeRounded from "@iconify/icons-material-symbols/remove-rounded"
+  import addRounded from "@iconify/icons-material-symbols/add-rounded"
   import { onMount } from "svelte"
   import { resetUserflowStores } from "$lib/stores/resetStores"
 
@@ -72,10 +76,25 @@
   const itSystemField = field("it_system", "", [required()])
   const accountName = field("accountName", "", [required()])
   const svelteForm = form(fromDate, itSystemField, accountName)
+  let rolebindingFromDate: string
+  let rolebindingToDate: string
 
+  // Random variable, is only used to trigger updates in `Selects`
+  let removed = 0
   const validateForm = async () => {
     await svelteForm.validate()
-    if ($svelteForm.valid) {
+    const ituserValid = $svelteForm.valid
+    let rolebindingsValid = true
+
+    if (ituserValid) {
+      const hasFilledRolebinding = $rolebindingInfo.some((rb) => rb.role?.uuid)
+
+      if (hasFilledRolebinding) {
+        rolebindingsValid = rolebindingInfo.validateAll()
+      }
+    }
+
+    if (ituserValid && rolebindingsValid) {
       ituserInfo.isValid(true)
       step.updateStep("inc")
     } else {
@@ -95,10 +114,17 @@
   }
 
   onMount(async () => {
-    if ($ituserInfo.itSystem.uuid) {
+    if ($ituserInfo.itSystem?.uuid) {
       fetchItSystemRoles($ituserInfo.itSystem.uuid)
     }
   })
+  // Update all rolebinding dates, when dates change
+  $: if (rolebindingFromDate) {
+    rolebindingInfo.updateRolebindingDates(rolebindingFromDate, "fromDate")
+  }
+  $: if (rolebindingToDate) {
+    rolebindingInfo.updateRolebindingDates(rolebindingToDate, "toDate")
+  }
 </script>
 
 <form on:submit|preventDefault={async () => await validateForm()}>
@@ -191,36 +217,58 @@
         <div class="flex flex-row gap-6">
           <DateInput
             startValue={$date}
-            bind:value={$rolebindingInfo.fromDate}
+            bind:value={rolebindingFromDate}
             title={capital($_("date.start_date"))}
             id="rolebinding-from"
-          />
-          <DateInput
-            bind:value={$rolebindingInfo.toDate}
-            title={capital($_("date.end_date"))}
             min={$ituserInfo.fromDate}
+            max={$ituserInfo.toDate}
+          />
+          <!-- FIX: If a to-date is set and another rolebinding is added afterwards, the to-dates are not aligned. -->
+          <DateInput
+            bind:value={rolebindingToDate}
+            title={capital($_("date.end_date"))}
+            min={rolebindingFromDate}
             max={$ituserInfo.toDate ? $ituserInfo.toDate : undefined}
             id="rolebinding-to"
           />
         </div>
-        {#if itSystemRoles && itSystemRoles.length}
-          {#key itSystemRoles}
-            <Select
-              title={capital($_("role", { values: { n: 1 } }))}
-              bind:value={$rolebindingInfo.role}
-              id="it-system-role-uuid"
-              iterable={itSystemRoles}
-              extra_classes="basis-1/2"
-            />
-          {/key}
-        {:else}
-          <Select
-            title={capital($_("role", { values: { n: 1 } }))}
-            id="it-system-role-uuid"
-            extra_classes="basis-1/2"
-            disabled
-          />
-        {/if}
+        {#key removed}
+          {#each $rolebindingInfo as rolebinding, index}
+            {#if itSystemRoles && itSystemRoles.length}
+              {#key itSystemRoles}
+                <Rolebinding {rolebinding} {index} {itSystemRoles} />
+              {/key}
+            {:else}
+              <Select
+                title={capital($_("role", { values: { n: 1 } }))}
+                id="it-system-role-uuid"
+                extra_classes="basis-1/2"
+                disabled
+              />
+            {/if}
+            {#if $rolebindingInfo.length > 1}
+              <button
+                class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100"
+                on:click={(e) => {
+                  e.preventDefault()
+                  rolebindingInfo.removeRolebinding(index)
+                }}><Icon icon={removeRounded} width="20" height="20" /></button
+              >
+            {/if}
+            {#if index === $rolebindingInfo.length - 1}
+              <button
+                class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100 mb-4"
+                on:click={() =>
+                  rolebindingInfo.addRolebinding(
+                    rolebindingFromDate,
+                    rolebindingToDate
+                  )}><Icon icon={addRounded} width="20" height="20" /></button
+              >
+            {:else}
+              <div class="divider p-0 m-0 my-2 w-full" />
+            {/if}
+          {/each}
+        {/key}
       </div>
     </div>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 flex justify-between py-6 gap-4">
