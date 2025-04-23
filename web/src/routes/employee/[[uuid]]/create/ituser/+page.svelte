@@ -7,6 +7,7 @@
   import Select from "$lib/components/forms/shared/Select.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
+  import type { RoleBindingCreateInput } from "$lib/graphql/types"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
@@ -27,6 +28,9 @@
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
+  import Icon from "@iconify/svelte"
+  import removeRounded from "@iconify/icons-material-symbols/remove-rounded"
+  import addRounded from "@iconify/icons-material-symbols/add-rounded"
   import { getMinMaxValidities } from "$lib/util/helpers"
   import { env } from "$env/dynamic/public"
 
@@ -50,6 +54,30 @@
   }
   let itSystemRoles: UnpackedClass | undefined
 
+  let rolebindings: RoleBindingCreateInput[] = [
+    {
+      ituser: "",
+      role: { uuid: "", user_key: "", name: "" },
+      validity: { from: "", to: "" },
+    },
+  ]
+
+  // Random variable, is only used to trigger updates in `Selects`
+  let removed = 0
+  const addRolebinding = () => {
+    rolebindings = [
+      ...rolebindings,
+      {
+        ituser: "",
+        role: { uuid: "", user_key: "", name: "" },
+        validity: { from: "", to: "" },
+      },
+    ]
+  }
+  const removeRolebinding = (index: number) => {
+    rolebindings = rolebindings.filter((_, i) => i !== index)
+    removed++
+  }
   gql`
     query ItSystemsClassAndEmployee(
       $uuid: [UUID!]
@@ -101,7 +129,7 @@
 
     mutation CreateItUserAndRolebinding(
       $itUserInput: ITUserCreateInput!
-      $rolebindingInput: RoleBindingCreateInput!
+      $rolebindingInput: [RoleBindingCreateInput!]!
       $date: DateTime!
     ) {
       ituser_create(input: $itUserInput) {
@@ -115,7 +143,7 @@
           }
         }
       }
-      rolebinding_create(input: $rolebindingInput) {
+      rolebindings_create(input: $rolebindingInput) {
         uuid
       }
     }
@@ -144,7 +172,7 @@
         if (result.type === "success" && result.data) {
           const itUserInput = result.data.itUserInput
           const rolebindingInput = result.data.rolebindingInput
-          if (role && rolebindingInput) {
+          if (rolebindings && rolebindingInput) {
             try {
               const mutation = await graphQLClient().request(
                 CreateItUserAndRolebindingDocument,
@@ -330,24 +358,44 @@
             max={toDate ? toDate : validities.to}
           />
         </div>
-        {#if itSystemRoles && itSystemRoles.length}
-          {#key itSystemRoles}
+        {#each rolebindings as rolebinding, index}
+          {#if itSystemRoles && itSystemRoles.length}
+            {#key itSystemRoles}
+              <Select
+                title={capital($_("role", { values: { n: 1 } }))}
+                bind:value={rolebinding.role}
+                id="it-system-role-uuid"
+                iterable={itSystemRoles}
+                extra_classes="basis-1/2"
+              />
+            {/key}
+          {:else}
             <Select
               title={capital($_("role", { values: { n: 1 } }))}
-              bind:value={role}
               id="it-system-role-uuid"
-              iterable={itSystemRoles}
               extra_classes="basis-1/2"
+              disabled
             />
-          {/key}
-        {:else}
-          <Select
-            title={capital($_("role", { values: { n: 1 } }))}
-            id="it-system-role-uuid"
-            extra_classes="basis-1/2"
-            disabled
-          />
-        {/if}
+          {/if}
+          {#if rolebindings.length > 1}
+            <button
+              class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100"
+              on:click={(e) => {
+                e.preventDefault()
+                removeRolebinding(index)
+              }}><Icon icon={removeRounded} width="20" height="20" /></button
+            >
+          {/if}
+          {#if index === rolebindings.length - 1}
+            <button
+              class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100 mb-4"
+              on:click={() => addRolebinding()}
+              ><Icon icon={addRounded} width="20" height="20" /></button
+            >
+          {:else}
+            <div class="divider p-0 m-0 my-2 w-full" />
+          {/if}
+        {/each}
       </div>
     </div>
     <div class="flex py-6 gap-4">
