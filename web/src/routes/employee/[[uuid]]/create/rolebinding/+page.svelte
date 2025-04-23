@@ -26,6 +26,10 @@
     getMinMaxValidities,
     type UnpackedClass,
   } from "$lib/util/helpers"
+  import type { RoleBindingCreateInput } from "$lib/graphql/types"
+  import Icon from "@iconify/svelte"
+  import removeRounded from "@iconify/icons-material-symbols/remove-rounded"
+  import addRounded from "@iconify/icons-material-symbols/add-rounded"
   import { getClassesByFacetUserKey } from "$lib/util/get_classes"
 
   let toDate: string
@@ -86,8 +90,8 @@
       }
     }
 
-    mutation CreateRoleBinding($input: RoleBindingCreateInput!, $date: DateTime!) {
-      rolebinding_create(input: $input) {
+    mutation CreateRoleBinding($input: [RoleBindingCreateInput!]!, $date: DateTime!) {
+      rolebindings_create(input: $input) {
         current(at: $date) {
           ituser {
             person {
@@ -109,14 +113,14 @@
           try {
             const mutation = await graphQLClient().request(CreateRoleBindingDocument, {
               input: result.data,
-              date: result.data.validity.from,
+              date: result.data[0].validity.from,
             })
             $success = {
               message: capital(
                 $_("success_create_item", {
                   values: {
                     item: $_("rolebinding", { values: { n: 0 } }),
-                    name: mutation.rolebinding_create.current?.ituser?.[0].person?.[0]
+                    name: mutation.rolebindings_create.current?.ituser?.[0].person?.[0]
                       .name,
                   },
                 })
@@ -138,6 +142,28 @@
     itSystemRoles = res.classes?.objects
       .map((cls) => cls.objects[0])
       .sort((a, b) => (a.name > b.name ? 1 : -1))
+  }
+
+  let rolebindings: RoleBindingCreateInput[] = [
+    {
+      ituser: "",
+      role: { uuid: "", user_key: "", name: "" },
+      validity: { from: "", to: "" },
+    },
+  ]
+
+  const addRolebinding = () => {
+    rolebindings = [
+      ...rolebindings,
+      {
+        ituser: "",
+        role: { uuid: "", user_key: "", name: "" },
+        validity: { from: "", to: "" },
+      },
+    ]
+  }
+  const removeRolebinding = (index: number) => {
+    rolebindings = rolebindings.filter((_, i) => i !== index)
   }
 </script>
 
@@ -202,28 +228,31 @@
             max={validities.to}
           />
         </div>
-        <div class="flex flex-row gap-6">
-          <Select
-            title={capital($_("ituser", { values: { n: 1 } }))}
-            id="it-user-uuid"
-            bind:value={itUser}
-            iterable={itUsers}
-            on:change={() => {
-              fetchItSystemRoles(itUser.itsystem.uuid)
-            }}
-            required={true}
-            extra_classes="basis-1/2"
-          />
+        <Select
+          title={capital($_("ituser", { values: { n: 1 } }))}
+          id="it-user-uuid"
+          bind:value={itUser}
+          iterable={itUsers}
+          on:change={() => {
+            fetchItSystemRoles(itUser.itsystem.uuid)
+          }}
+          required={true}
+          extra_classes="basis-1/2"
+        />
+        {#each rolebindings as rolebinding, index}
           {#if itSystemRoles && itSystemRoles.length}
-            <Select
-              title={capital($_("role", { values: { n: 1 } }))}
-              id="role-uuid"
-              bind:name={$roleField.value}
-              errors={$roleField.errors}
-              iterable={itSystemRoles}
-              extra_classes="basis-1/2"
-              required
-            />
+            {#key itSystemRoles}
+              <Select
+                title={capital($_("role", { values: { n: 1 } }))}
+                id="role-uuid"
+                bind:value={rolebinding.role}
+                bind:name={$roleField.value}
+                errors={$roleField.errors}
+                iterable={itSystemRoles}
+                extra_classes="basis-1/2"
+                required
+              />
+            {/key}
           {:else}
             <Select
               title={capital($_("role", { values: { n: 1 } }))}
@@ -235,7 +264,25 @@
               disabled
             />
           {/if}
-        </div>
+          {#if rolebindings.length > 1}
+            <button
+              class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100"
+              on:click={(e) => {
+                e.preventDefault()
+                removeRolebinding(index)
+              }}><Icon icon={removeRounded} width="20" height="20" /></button
+            >
+          {/if}
+          {#if index === rolebindings.length - 1}
+            <button
+              class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100 mb-4"
+              on:click={() => addRolebinding()}
+              ><Icon icon={addRounded} width="20" height="20" /></button
+            >
+          {:else}
+            <div class="divider p-0 m-0 my-2 w-full" />
+          {/if}
+        {/each}
       </div>
     </div>
     <div class="flex py-6 gap-4">
