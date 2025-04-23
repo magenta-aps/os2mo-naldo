@@ -43,11 +43,6 @@
   const accountName = field("accountName", "", [required()])
   const svelteForm = form(fromDate, itSystemField, accountName)
 
-  let role: {
-    uuid: string
-    name: string
-  }
-
   let itSystem: {
     uuid: string
     name: string
@@ -62,8 +57,6 @@
     },
   ]
 
-  // Random variable, is only used to trigger updates in `Selects`
-  let removed = 0
   const addRolebinding = () => {
     rolebindings = [
       ...rolebindings,
@@ -76,7 +69,6 @@
   }
   const removeRolebinding = (index: number) => {
     rolebindings = rolebindings.filter((_, i) => i !== index)
-    removed++
   }
   gql`
     query ItSystemsClassAndEmployee(

@@ -5,17 +5,19 @@ export const actions: Actions = {
   default: async ({
     request,
     params,
-  }: RequestEvent): Promise<[RoleBindingCreateInput]> => {
+  }: RequestEvent): Promise<{ rolebindingInput: RoleBindingCreateInput[] }> => {
     const data = await request.formData()
     const ituserUuid = data.get("it-user-uuid")
-    const roleUuids = data.getAll("role-uuid")
+    const roles = data.getAll("role-uuid") as string[]
     const startDate = data.get("from")
     const endDate = data.get("to")
 
-    return roleUuids.map((role: string) => ({
-      ituser: ituserUuid,
-      role: role,
-      validity: { from: startDate, ...(endDate && { to: endDate }) },
-    }))
+    return {
+      rolebindingInput: roles.map((role: string) => ({
+        ituser: ituserUuid,
+        role: role,
+        validity: { from: startDate, ...(endDate && { to: endDate }) },
+      })),
+    }
   },
 }

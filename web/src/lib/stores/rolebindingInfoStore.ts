@@ -32,13 +32,6 @@ const createRolebindingInfoStore = () => {
     set(defaultValue)
   }
 
-  const isValid = (valid: boolean) => {
-    update((rolebindingStore) => {
-      rolebindingStore.validated = valid
-      return rolebindingStore
-    })
-  }
-
   const validateAll = () => {
     let allValid = true
     update((infos) =>
@@ -84,7 +77,6 @@ const createRolebindingInfoStore = () => {
     subscribe,
     set,
     reset,
-    isValid,
     validateAll,
     addRolebinding,
     removeRolebinding,

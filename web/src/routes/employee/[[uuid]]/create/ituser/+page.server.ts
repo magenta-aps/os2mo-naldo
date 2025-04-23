@@ -8,10 +8,9 @@ export const actions: Actions = {
     params,
   }: RequestEvent): Promise<{
     itUserInput: ItUserCreateInput
-    rolebindingInput?: [RoleBindingCreateInput]
+    rolebindingInput?: RoleBindingCreateInput[]
   }> => {
     const data = await request.formData()
-    console.log(data)
 
     // Ituser data
     const itUserUuid = uuidv4()
@@ -22,7 +21,7 @@ export const actions: Actions = {
     const startDate = data.get("from")
     const endDate = data.get("to")
     // Rolebinding data
-    const role = data.getAll("it-system-role-uuid")
+    const roles = data.getAll("it-system-role-uuid") as string[]
     const rolebindingStartDate = data.get("rolebinding-from")
     const rolebindingEndDate = data.get("rolebinding-to")
 
@@ -36,9 +35,9 @@ export const actions: Actions = {
         ...(notes && { note: notes }),
         validity: { from: startDate, ...(endDate && { to: endDate }) },
       },
-      rolebindingInput: role.map((roleUuid: string) => ({
+      rolebindingInput: roles.map((role: string) => ({
         ituser: itUserUuid,
-        role: roleUuid,
+        role: role,
         validity: {
           from: rolebindingStartDate,
           ...(rolebindingEndDate && { to: rolebindingEndDate }),

@@ -112,16 +112,16 @@
         if (result.type === "success" && result.data) {
           try {
             const mutation = await graphQLClient().request(CreateRoleBindingDocument, {
-              input: result.data,
-              date: result.data[0].validity.from,
+              input: result.data.rolebindingInput,
+              date: result.data.rolebindingInput[0].validity.from,
             })
             $success = {
               message: capital(
                 $_("success_create_item", {
                   values: {
                     item: $_("rolebinding", { values: { n: 0 } }),
-                    name: mutation.rolebindings_create.current?.ituser?.[0].person?.[0]
-                      .name,
+                    name: mutation.rolebindings_create[0].current?.ituser?.[0]
+                      .person?.[0].name,
                   },
                 })
               ),

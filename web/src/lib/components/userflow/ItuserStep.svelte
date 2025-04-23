@@ -7,7 +7,6 @@
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
-  import Rolebinding from "$lib/components/forms/shared/Rolebinding.svelte"
   import { step } from "$lib/stores/stepStore"
   import { graphQLClient } from "$lib/util/http"
   import {
@@ -79,8 +78,6 @@
   let rolebindingFromDate: string
   let rolebindingToDate: string
 
-  // Random variable, is only used to trigger updates in `Selects`
-  let removed = 0
   const validateForm = async () => {
     await svelteForm.validate()
     const ituserValid = $svelteForm.valid
@@ -232,43 +229,45 @@
             id="rolebinding-to"
           />
         </div>
-        {#key removed}
-          {#each $rolebindingInfo as rolebinding, index}
-            {#if itSystemRoles && itSystemRoles.length}
-              {#key itSystemRoles}
-                <Rolebinding {rolebinding} {index} {itSystemRoles} />
-              {/key}
-            {:else}
+        {#each $rolebindingInfo as rolebinding, index}
+          {#if itSystemRoles && itSystemRoles.length}
+            {#key itSystemRoles}
               <Select
                 title={capital($_("role", { values: { n: 1 } }))}
                 id="it-system-role-uuid"
-                extra_classes="basis-1/2"
-                disabled
+                bind:value={rolebinding.role}
+                iterable={itSystemRoles}
+                errors={rolebinding.validated ? [] : ["required"]}
               />
-            {/if}
-            {#if $rolebindingInfo.length > 1}
-              <button
-                class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100"
-                on:click={(e) => {
-                  e.preventDefault()
-                  rolebindingInfo.removeRolebinding(index)
-                }}><Icon icon={removeRounded} width="20" height="20" /></button
-              >
-            {/if}
-            {#if index === $rolebindingInfo.length - 1}
-              <button
-                class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100 mb-4"
-                on:click={() =>
-                  rolebindingInfo.addRolebinding(
-                    rolebindingFromDate,
-                    rolebindingToDate
-                  )}><Icon icon={addRounded} width="20" height="20" /></button
-              >
-            {:else}
-              <div class="divider p-0 m-0 my-2 w-full" />
-            {/if}
-          {/each}
-        {/key}
+            {/key}
+          {:else}
+            <Select
+              title={capital($_("role", { values: { n: 1 } }))}
+              id="it-system-role-uuid"
+              extra_classes="basis-1/2"
+              disabled
+            />
+          {/if}
+          {#if $rolebindingInfo.length > 1}
+            <button
+              class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100"
+              on:click={(e) => {
+                e.preventDefault()
+                rolebindingInfo.removeRolebinding(index)
+              }}><Icon icon={removeRounded} width="20" height="20" /></button
+            >
+          {/if}
+          {#if index === $rolebindingInfo.length - 1}
+            <button
+              class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100 mb-4"
+              on:click={() =>
+                rolebindingInfo.addRolebinding(rolebindingFromDate, rolebindingToDate)}
+              ><Icon icon={addRounded} width="20" height="20" /></button
+            >
+          {:else}
+            <div class="divider p-0 m-0 my-2 w-full" />
+          {/if}
+        {/each}
       </div>
     </div>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 flex justify-between py-6 gap-4">
