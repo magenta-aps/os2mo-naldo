@@ -5,6 +5,7 @@
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
+  import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
@@ -212,22 +213,20 @@
       </div>
     </div>
     <div class="flex py-6 gap-4">
-      <button
+      <Button
         type="submit"
-        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >{capital(
+        title={capital(
           $_("create_item", {
             values: { item: $_("engagement", { values: { n: 1 } }) },
           })
-        )}</button
-      >
-      <button
+        )}
+      />
+      <Button
         type="button"
-        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        on:click={() => goto(`${base}/organisation/${$page.params.uuid}`)}
-      >
-        {capital($_("cancel"))}
-      </button>
+        title={capital($_("cancel"))}
+        outline={true}
+        href="{base}/organisation/{$page.params.uuid}"
+      />
     </div>
     <Error />
   </form>
