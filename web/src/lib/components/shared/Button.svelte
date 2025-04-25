@@ -15,6 +15,8 @@
   export let width: string = "25"
   export let height: string = "25"
 
+  export let extraClasses: string = ""
+
   // Log a warning, since not setting `type="button"`, while doing an onClick might lead to weird bugs
   if (type === "submit" && onClick) {
     console.warn(
@@ -28,7 +30,7 @@
     {href}
     class="btn btn-{size} btn-primary {outline
       ? 'btn-outline'
-      : ''} rounded normal-case font-normal text-base-100 hover:no-underline"
+      : ''} rounded normal-case font-normal text-base-100 hover:no-underline {extraClasses}"
   >
     {#if icon}
       <Icon {icon} {width} {height} />
@@ -42,7 +44,7 @@
     {type}
     class="btn btn-{size} btn-primary {outline
       ? 'btn-outline'
-      : ''} rounded normal-case font-normal text-base-100"
+      : ''} rounded normal-case font-normal text-base-100 {extraClasses}"
     on:click={onClick}
     {disabled}
   >

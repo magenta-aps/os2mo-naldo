@@ -6,6 +6,7 @@
   import ClassTable from "$lib/components/tables/ClassTable.svelte"
   import TableTensesWrapper from "$lib/components/tables/TableTensesWrapper.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
+  import Button from "$lib/components/shared/Button.svelte"
   import { GetFacetsDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { graphQLClient } from "$lib/util/http"
@@ -92,27 +93,27 @@
     <div class="flex justify-between">
       <TenseTabs />
       {#if facetUuid}
-        <a
-          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
-          href="{base}/admin/facet/{facetUuid}/create/class"
-        >
-          {capital(
+        <Button
+          type="button"
+          title={capital(
             $_("create_item", {
               values: { item: $_(facet.name, { values: { n: 1 } }) },
             })
           )}
-        </a>
+          href="{base}/admin/facet/{facetUuid}/create/class"
+          extraClasses="my-5"
+        />
       {:else}
-        <a
-          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5"
-          href="{base}/admin/facet/create/class"
-        >
-          {capital(
+        <Button
+          type="button"
+          title={capital(
             $_("create_item", {
               values: { item: $_("class", { values: { n: 1 } }) },
             })
           )}
-        </a>
+          href="{base}/admin/facet/{facetUuid}/create/class"
+          extraClasses="my-5"
+        />
       {/if}
     </div>
     <TableTensesWrapper

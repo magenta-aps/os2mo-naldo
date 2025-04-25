@@ -10,6 +10,7 @@
   import { graphQLClient } from "$lib/util/http"
   import { EmployeeDocument } from "./query.generated"
   import TenseTabs from "$lib/components/shared/TenseTabs.svelte"
+  import Button from "$lib/components/shared/Button.svelte"
   import { env } from "$env/dynamic/public"
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
@@ -120,31 +121,29 @@
     <div class="flex justify-between">
       <TenseTabs />
       {#if activeItem === EmployeeTab.IT}
-        <a
-          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5 hover:no-underline"
-          href={`${base}/employee/${$page.params.uuid}/create/${itActiveItem}`}
-        >
-          {capital(
+        <Button
+          type="button"
+          title={capital(
             $_("create_item", {
               values: { item: $_(itActiveItem, { values: { n: 1 } }) },
             })
           )}
-        </a>
+          href="{base}/employee/{$page.params.uuid}/create/{itActiveItem}"
+          extraClasses="my-5"
+        />
       {:else}
-        <a
-          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5 hover:no-underline"
-          href={`${base}/employee/${
-            activeItem === EmployeeTab.EMPLOYEE
-              ? "create/employee"
-              : `${$page.params.uuid}/create/${activeItem}`
-          }`}
-        >
-          {capital(
+        <Button
+          type="button"
+          title={capital(
             $_("create_item", {
               values: { item: $_(activeItem, { values: { n: 1 } }) },
             })
           )}
-        </a>
+          href="{base}/employee/{activeItem === EmployeeTab.EMPLOYEE
+            ? 'create/employee'
+            : `${$page.params.uuid}/create/${activeItem}`}"
+          extraClasses="my-5"
+        />
       {/if}
     </div>
 

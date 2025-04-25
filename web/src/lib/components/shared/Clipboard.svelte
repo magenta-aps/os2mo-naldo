@@ -2,6 +2,7 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import { success } from "$lib/stores/alert"
+  import Button from "$lib/components/shared/Button.svelte"
   import Icon from "@iconify/svelte"
   import fileCopyOutlineRounded from "@iconify/icons-material-symbols/file-copy-outline-rounded"
 
@@ -16,10 +17,11 @@
 </script>
 
 <div class="tooltip tooltip-bottom" data-tip="{capital($_('copy'))} {name} uuid">
-  <button
-    on:click={copyToClipboard}
-    class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-  >
-    <Icon icon={fileCopyOutlineRounded} width="20" height="20" />
-  </button>
+  <Button
+    outline={true}
+    onClick={copyToClipboard}
+    icon={fileCopyOutlineRounded}
+    width="20"
+    height="20"
+  />
 </div>

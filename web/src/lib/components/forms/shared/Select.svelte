@@ -43,7 +43,11 @@
   }
   afterUpdate(() => {
     // Workaround for when a select updates and the selected item should no longer be an option.
-    if (value?.uuid && !iterable?.some((item) => item.uuid === value?.uuid)) {
+    if (
+      value?.uuid &&
+      iterable &&
+      !iterable?.some((item) => item.uuid === value?.uuid)
+    ) {
       value.name = ""
     }
   })

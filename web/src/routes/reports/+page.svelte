@@ -6,6 +6,7 @@
   import { GetFileNamesDocument, GetFileDocument } from "./query.generated"
   import Icon from "@iconify/svelte"
   import fileDownload from "@iconify/icons-material-symbols/file-download"
+  import Button from "$lib/components/shared/Button.svelte"
 
   gql`
     query GetFileNames {
@@ -96,15 +97,16 @@
   {:then data}
     {#each data.files.objects as file}
       <div>
-        <button
-          class="btn btn-sm btn-primary text-base-100 hover:no-underline normal-case font-normal my-1"
-          on:click={() => {
+        <Button
+          title={file.file_name}
+          type="button"
+          onClick={() => {
             downloadFile(file.file_name)
           }}
-        >
-          <Icon icon={fileDownload} width="20" height="20" />
-          {file.file_name}
-        </button>
+          icon={fileDownload}
+          width="20"
+          height="20"
+        />
       </div>
     {/each}
   {/await}

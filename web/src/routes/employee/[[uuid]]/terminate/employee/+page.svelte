@@ -11,6 +11,7 @@
   import { graphQLClient } from "$lib/util/http"
   import { EmployeeDocument, TerminateEmployeeDocument } from "./query.generated"
   import { gql } from "graphql-request"
+  import { base } from "$app/paths"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import Search from "$lib/components/search/Search.svelte"
