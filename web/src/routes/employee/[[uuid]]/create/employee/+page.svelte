@@ -3,6 +3,7 @@
   import { capital } from "$lib/util/translationUtils"
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
+  import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { success, error } from "$lib/stores/alert"
@@ -219,22 +220,20 @@
       </div>
     </div>
     <div class="flex py-6 gap-4">
-      <button
+      <Button
         type="submit"
-        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >{capital(
+        title={capital(
           $_("create_item", {
             values: { item: $_("employee", { values: { n: 1 } }) },
           })
-        )}</button
-      >
-      <button
+        )}
+      />
+      <Button
         type="button"
-        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        on:click={() => history.back()}
-      >
-        {capital($_("cancel"))}
-      </button>
+        title={capital($_("cancel"))}
+        outline={true}
+        onClick={() => history.back()}
+      />
     </div>
     <Error />
   {/await}
