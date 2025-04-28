@@ -34,6 +34,7 @@
       {name}
       bind:value
       type="date"
+      on:change
       {min}
       {max}
       class="input input-bordered input-sm rounded text-base text-secondary font-normal w-full cursor-pointer focus:outline-0 {errors.length

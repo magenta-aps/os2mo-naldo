@@ -11,6 +11,7 @@
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
   import { ManagerAndFacetsDocument, UpdateManagerDocument } from "./query.generated"
+  import { findClosestValidity } from "$lib/util/helpers"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
@@ -79,7 +80,7 @@
               from
               to
             }
-            org_unit {
+            org_unit(filter: { from_date: null, to_date: null }) {
               uuid
               name
             }
@@ -210,8 +211,8 @@
           type="org-unit"
           disabled={true}
           startValue={{
-            uuid: manager.org_unit[0].uuid,
-            name: manager.org_unit[0].name,
+            uuid: findClosestValidity(manager.org_unit, $date).uuid,
+            name: findClosestValidity(manager.org_unit, $date).name,
           }}
           required={true}
         />
