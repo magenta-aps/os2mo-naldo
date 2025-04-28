@@ -147,7 +147,7 @@
             {capital($_("vacant"))}
           {/if}
           <!-- Add (*) if manager-object is inherited -->
-          {#if manager.org_unit[0].uuid !== $page.params.uuid}
+          {#if manager.org_unit?.[0].uuid !== $page.params.uuid}
             <span
               title={capital(
                 $_("inherited_manager", {

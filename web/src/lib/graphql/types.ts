@@ -16,8 +16,10 @@ export type Scalars = {
   Cursor: { input: any; output: any; }
   Date: { input: any; output: any; }
   DateTime: { input: any; output: any; }
+  EventToken: { input: any; output: any; }
   UUID: { input: any; output: any; }
   Upload: { input: any; output: any; }
+  Void: { input: any; output: any; }
   int: { input: any; output: any; }
 };
 
@@ -4054,6 +4056,71 @@ export type EngagementUpdateInput = {
   validity: RaValidityInput;
 };
 
+/**
+ * Event.
+ *
+ * You need to use the `token` to acknowledge that the event has been handled properly by calling `event_acknowledge`.
+ *
+ * Your integration is supposed to handle *all* events that the listener subscribes to. If your integration does not need to do anything for a particular event, it still needs to be acknowledged.
+ *
+ * You might see events in the `events` collection that you do not appear to receive when calling `event_fetch`. This is because OS2mo will not spam you with the same event over and over if it fails.
+ *
+ */
+export type Event = {
+  __typename?: 'Event';
+  /** Priority of the event. */
+  priority: Scalars['Int']['output'];
+  /** An identifier of the subject. All subjects in the (default) "mo" namespace have UUIDs as identifier. */
+  subject: Scalars['String']['output'];
+  /**
+   * EventTokens are opaque tokens needed to acknowledge events.
+   *
+   */
+  token: Scalars['EventToken']['output'];
+};
+
+/** Acknowledge an event. */
+export type EventAcknowledgeInput = {
+  token: Scalars['EventToken']['input'];
+};
+
+/** Event filter. */
+export type EventFilter = {
+  /** ID of listener. */
+  listener: Scalars['UUID']['input'];
+};
+
+export type EventSendInput = {
+  /** Namespace to send the event in. */
+  namespace: Scalars['String']['input'];
+  /** Priority of the event. 1 is the highest priority. */
+  priority?: Scalars['Int']['input'];
+  /** Routing key of the event. */
+  routing_key: Scalars['String']['input'];
+  /** Subject the event is about. */
+  subject: Scalars['String']['input'];
+};
+
+/**
+ * Silence an event.
+ *
+ * Silenced events are not received with `event_fetch`.
+ *
+ */
+export type EventSilenceInput = {
+  /** Only silence the event for these listeners. */
+  listeners: ListenerFilter;
+  /** Subjects to silence. */
+  subjects: Array<Scalars['String']['input']>;
+};
+
+/** Unsilence all matching events. */
+export type EventUnsilenceInput = {
+  listeners?: InputMaybe<ListenerFilter>;
+  priorities?: InputMaybe<Array<Scalars['Int']['input']>>;
+  subjects?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
 /** The key component of the class/facet choice setup */
 export type Facet = {
   __typename?: 'Facet';
@@ -4644,6 +4711,48 @@ export enum FileStore {
    */
   Insights = 'INSIGHTS'
 }
+
+/** FullEvent */
+export type FullEvent = {
+  __typename?: 'FullEvent';
+  /** The listener that will receive this event. */
+  listener: Listener;
+  /** The priority of an event. Lower means higher priority. The default is 10000. */
+  priority: Scalars['Int']['output'];
+  /** Whether the event is silenced. Silenced event cannot be read by `event_fetch`. */
+  silenced: Scalars['Boolean']['output'];
+  /** An identifier of the subject. All subjects in OS2mo have UUIDs as identifier. */
+  subject: Scalars['String']['output'];
+};
+
+/** Event filter. */
+export type FullEventFilter = {
+  listeners?: InputMaybe<ListenerFilter>;
+  priorities?: InputMaybe<Array<Scalars['Int']['input']>>;
+  /** Filter based on silence status. */
+  silenced?: InputMaybe<Scalars['Boolean']['input']>;
+  subjects?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+/** Result page in cursor-based pagination. */
+export type FullEventPaged = {
+  __typename?: 'FullEventPaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<FullEvent>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
+};
 
 /** Status on whether a specific subsystem is working */
 export type Health = {
@@ -6855,6 +6964,126 @@ export type LeaveUpdateInput = {
   validity: RaValidityInput;
 };
 
+/** Event listeners. */
+export type Listener = {
+  __typename?: 'Listener';
+  /** Pending events for this listener. Use `event_fetch` to consume events. */
+  events: Array<FullEvent>;
+  /** The namespace of the listener. */
+  namespace: Namespace;
+  /** Owner of the listener. Only the owner can fetch the listeners' events. */
+  owner: Scalars['UUID']['output'];
+  /** The routing key for the listeners */
+  routing_key: Scalars['String']['output'];
+  /** The user_key for a listener is a user-supplied identifier. It must be unique per (namespace, owner). It is useful when a consumer needs to listen to the same (namespace, routing_key) multiple times. */
+  user_key: Scalars['String']['output'];
+  /** ID of the listener. */
+  uuid: Scalars['UUID']['output'];
+};
+
+
+/** Event listeners. */
+export type ListenerEventsArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<ListenersBoundFullEventFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+/** Create a listener. */
+export type ListenerCreateInput = {
+  /** Namespace of listener. Defaults to "mo", which means you will get events from os2mo. */
+  namespace?: Scalars['String']['input'];
+  /** Routing key of listener. */
+  routing_key: Scalars['String']['input'];
+  /** User key of listener. */
+  user_key: Scalars['String']['input'];
+};
+
+/** Delete a listener. */
+export type ListenerDeleteInput = {
+  /** Delete all events awaiting acknowledgement for this listener. */
+  delete_pending_events?: Scalars['Boolean']['input'];
+  /** Listener ID to delete. */
+  uuid: Scalars['UUID']['input'];
+};
+
+/** Listener filter. */
+export type ListenerFilter = {
+  /** Only match listeners in this namespace */
+  namespaces?: InputMaybe<NamespaceFilter>;
+  /**
+   * Owner filter limiting which entries are returned.
+   *
+   * | `owners`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  owners?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Routing key filter limiting which entries are returned.
+   *
+   * | `routing_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  routing_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * UUID filter limiting which entries are returned.
+   *
+   * | `uuids`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+/** Result page in cursor-based pagination. */
+export type ListenerPaged = {
+  __typename?: 'ListenerPaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<Listener>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
+};
+
+export type ListenersBoundFullEventFilter = {
+  priorities?: InputMaybe<Array<Scalars['Int']['input']>>;
+  silenced?: InputMaybe<Scalars['Boolean']['input']>;
+  subjects?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
 /**
  * Managers of organisation units and their connected identities.
  *
@@ -7560,6 +7789,46 @@ export type Mutation = {
    *
    */
   engagements_update: Array<EngagementResponse>;
+  /** Acknowledge an event. */
+  event_acknowledge?: Maybe<Scalars['Void']['output']>;
+  /**
+   * Create a listener.
+   *
+   * This operation is idempotent, so it can always be called upon application startup.
+   *
+   * Use different user_keys to listen for the same (namespace, routing_key) multiple times. The user_key must be unique for each listener in your integration.
+   *
+   */
+  event_listener_declare: Listener;
+  /** Delete a listener. */
+  event_listener_delete?: Maybe<Scalars['Void']['output']>;
+  /**
+   * Create a namespace.
+   *
+   * This operation is idempotent, so it can be called upon application startup.
+   *
+   * Namespaces are used to create your own event systems.
+   *
+   */
+  event_namespace_declare: Namespace;
+  /**
+   * Delete a namespace.
+   *
+   * Use `event_listener_delete` first, if there are any listeners.
+   *
+   */
+  event_namespace_delete?: Maybe<Scalars['Void']['output']>;
+  /** Send an event. */
+  event_send?: Maybe<Scalars['Void']['output']>;
+  /**
+   * Silence an event.
+   *
+   * In general, this should only be done by humans while the implementation of a fix is in the works.
+   *
+   */
+  event_silence?: Maybe<Scalars['Void']['output']>;
+  /** Unsilence all matching events */
+  event_unsilence?: Maybe<Scalars['Void']['output']>;
   /** Creates a facet. */
   facet_create: FacetResponse;
   /**
@@ -7782,6 +8051,7 @@ export type MutationAddress_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<AddressFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -7846,6 +8116,7 @@ export type MutationAssociation_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<AssociationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -7910,6 +8181,7 @@ export type MutationClass_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<ClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -7974,6 +8246,7 @@ export type MutationEmployee_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<EmployeeFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -8038,6 +8311,7 @@ export type MutationEngagement_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<EngagementFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -8097,6 +8371,102 @@ export type MutationEngagements_UpdateArgs = {
  * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
  *
  */
+export type MutationEvent_AcknowledgeArgs = {
+  input: EventAcknowledgeInput;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationEvent_Listener_DeclareArgs = {
+  input: ListenerCreateInput;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationEvent_Listener_DeleteArgs = {
+  input: ListenerDeleteInput;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationEvent_Namespace_DeclareArgs = {
+  input: NamespaceCreateInput;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationEvent_Namespace_DeleteArgs = {
+  input: NamespaceDeleteInput;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationEvent_SendArgs = {
+  input: EventSendInput;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationEvent_SilenceArgs = {
+  input: EventSilenceInput;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationEvent_UnsilenceArgs = {
+  input: EventUnsilenceInput;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationFacet_CreateArgs = {
   input: FacetCreateInput;
 };
@@ -8126,6 +8496,7 @@ export type MutationFacet_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<FacetFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -8226,6 +8597,7 @@ export type MutationItsystem_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<ItSystemFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -8290,6 +8662,7 @@ export type MutationItuser_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<ItUserFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -8354,6 +8727,7 @@ export type MutationKle_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<KleFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -8406,6 +8780,7 @@ export type MutationLeave_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<LeaveFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -8458,6 +8833,7 @@ export type MutationManager_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<ManagerFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -8534,6 +8910,7 @@ export type MutationOrg_Unit_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<OrganisationUnitFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -8586,6 +8963,7 @@ export type MutationOwner_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<OwnerFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -8626,6 +9004,7 @@ export type MutationRelated_Unit_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<RelatedUnitFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -8666,6 +9045,7 @@ export type MutationRolebinding_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<RoleBindingFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -8717,6 +9097,116 @@ export type MutationUpload_FileArgs = {
   file: Scalars['Upload']['input'];
   file_store: FileStore;
   force?: Scalars['Boolean']['input'];
+};
+
+/**
+ * Event namespace.
+ *
+ * Event namespaces can be used to create other event exchanges, than the one OS2mo comes with.
+ *
+ * You do not need to think about namespaces if you only receive events from OS2mo.
+ *
+ */
+export type Namespace = {
+  __typename?: 'Namespace';
+  /** Listeners for this namespace */
+  listeners: Array<Listener>;
+  /** Name of the namespace - unique. */
+  name: Scalars['String']['output'];
+  /** Owner of the namespace. If the namespace isn't public; only the owner can create listeners in it. */
+  owner: Scalars['UUID']['output'];
+  /** Whether others can create listeners in the namespace */
+  public: Scalars['Boolean']['output'];
+};
+
+
+/**
+ * Event namespace.
+ *
+ * Event namespaces can be used to create other event exchanges, than the one OS2mo comes with.
+ *
+ * You do not need to think about namespaces if you only receive events from OS2mo.
+ *
+ */
+export type NamespaceListenersArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<NamespacesBoundListenerFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+/** Create a namespace. */
+export type NamespaceCreateInput = {
+  /** Name of the namespace. This is also the identifier for namespaces. */
+  name: Scalars['String']['input'];
+  /** Can others create listeners in the namespace? */
+  public?: Scalars['Boolean']['input'];
+};
+
+/** Delete a namespace. */
+export type NamespaceDeleteInput = {
+  /** Name of namespace to delete */
+  name: Scalars['String']['input'];
+};
+
+/** Listener filter. */
+export type NamespaceFilter = {
+  /**
+   * Name filter limiting which entries are returned.
+   *
+   * | `names`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  names?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
+   * Owner filter limiting which entries are returned.
+   *
+   * | `owners`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  owners?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  public?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+/** Result page in cursor-based pagination. */
+export type NamespacePaged = {
+  __typename?: 'NamespacePaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<Namespace>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
+};
+
+export type NamespacesBoundListenerFilter = {
+  owners?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  routing_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 /** Validity of objects with optional from date */
@@ -10362,6 +10852,32 @@ export type Query = {
   employees: EmployeeResponsePaged;
   /** Get engagements. */
   engagements: EngagementResponsePaged;
+  /**
+   * Get an event.
+   *
+   * `event_fetch` is a key operation for event-driven integrations.
+   *
+   * Fetched events must be acknowledged by the consumer after it has been processed.
+   *
+   * Consumers cannot rely on the order of events, and may receive the same event multiple times.
+   *
+   */
+  event_fetch?: Maybe<Event>;
+  /** Get event listeners. */
+  event_listeners: ListenerPaged;
+  /** Get event namespaces. */
+  event_namespaces: NamespacePaged;
+  /**
+   * Get full events.
+   *
+   * FullEvents represent Events, but they do not have a token for acknowledgement.
+   *
+   * Use `event_fetch` for event-driven applications.
+   *
+   * This collection is intended for inspection by humans.
+   *
+   */
+  events: FullEventPaged;
   /** Get facets. */
   facets: FacetResponsePaged;
   /**
@@ -10465,6 +10981,36 @@ export type QueryEmployeesArgs = {
 export type QueryEngagementsArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<EngagementFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Entrypoint for all read-operations */
+export type QueryEvent_FetchArgs = {
+  filter: EventFilter;
+};
+
+
+/** Entrypoint for all read-operations */
+export type QueryEvent_ListenersArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<ListenerFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Entrypoint for all read-operations */
+export type QueryEvent_NamespacesArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<NamespaceFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Entrypoint for all read-operations */
+export type QueryEventsArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<FullEventFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
 };
 

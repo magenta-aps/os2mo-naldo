@@ -114,17 +114,22 @@
         }
       : []
     // Only post rolebindingData, if ituser data is valid
-    const rolebindingData: RoleBindingCreateInput | [] =
-      $ituserInfo.validated && $rolebindingInfo.role.uuid
-        ? {
-            ituser: $ituserInfo.uuid,
-            role: $rolebindingInfo.role.uuid,
-            validity: {
-              from: $rolebindingInfo.fromDate,
-              to: $rolebindingInfo.toDate ? $rolebindingInfo.toDate : null,
-            },
-          }
-        : []
+    let rolebindingData: RoleBindingCreateInput[] = []
+    if (
+      $ituserInfo.validated &&
+      $rolebindingInfo.every((rolebinding) => rolebinding.role?.uuid)
+    ) {
+      for (const rb of $rolebindingInfo) {
+        rolebindingData.push({
+          ituser: $ituserInfo.uuid,
+          role: rb.role.uuid,
+          validity: {
+            from: rb.fromDate,
+            to: rb.toDate || null,
+          },
+        })
+      }
+    }
 
     const managerData: ManagerCreateInput | [] = $managerInfo.validated
       ? {

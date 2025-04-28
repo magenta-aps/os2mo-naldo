@@ -8,35 +8,65 @@ type RolebindingInfo = {
   validated: boolean
 }
 
-const defaultValue: RolebindingInfo = {
-  fromDate: "",
-  toDate: "",
-  role: { uuid: "", name: "", user_key: "" },
-  validated: false,
-}
+const defaultValue: RolebindingInfo[] = [
+  {
+    fromDate: "",
+    toDate: "",
+    role: { uuid: "", name: "", user_key: "" },
+    validated: false,
+  },
+]
 
 const createRolebindingInfoStore = () => {
-  let initialValue = defaultValue
+  let initialValue: RolebindingInfo[] = defaultValue
 
   if (browser) {
-    const storedRolebindingInfo = localStorage.getItem("rolebinding-info")
-    initialValue = storedRolebindingInfo
-      ? JSON.parse(storedRolebindingInfo)
-      : defaultValue
+    const stored = localStorage.getItem("rolebinding-info")
+    initialValue = stored ? JSON.parse(stored) : defaultValue
   }
 
-  const { subscribe, update, set } = writable<RolebindingInfo>(initialValue)
+  const { subscribe, update, set } = writable<RolebindingInfo[]>(initialValue)
 
   const reset = () => {
     if (browser) localStorage.removeItem("rolebinding-info")
     set(defaultValue)
   }
 
-  const isValid = (valid: boolean) => {
-    update((rolebindingStore) => {
-      rolebindingStore.validated = valid
-      return rolebindingStore
-    })
+  const validateAll = () => {
+    let allValid = true
+    update((infos) =>
+      infos.map((info) => {
+        const isValid = !!info.role?.uuid && !!info.fromDate
+        if (!isValid) allValid = false
+        return { ...info, validated: isValid }
+      })
+    )
+    return allValid
+  }
+
+  const addRolebinding = (fromDate: string, toDate: string) => {
+    update((items) => [
+      ...items,
+      {
+        fromDate: fromDate,
+        toDate: toDate || "",
+        role: { uuid: "", name: "", user_key: "" },
+        validated: false,
+      },
+    ])
+  }
+
+  const removeRolebinding = (index: number) => {
+    update((items) => items.filter((_, i) => i !== index))
+  }
+
+  const updateRolebindingDates = (newDate: string, dateType: "fromDate" | "toDate") => {
+    update((rolebindings) =>
+      rolebindings.map((rb) => ({
+        ...rb,
+        [dateType]: newDate,
+      }))
+    )
   }
 
   subscribe((value) => {
@@ -47,7 +77,10 @@ const createRolebindingInfoStore = () => {
     subscribe,
     set,
     reset,
-    isValid,
+    validateAll,
+    addRolebinding,
+    removeRolebinding,
+    updateRolebindingDates,
   }
 }
 
