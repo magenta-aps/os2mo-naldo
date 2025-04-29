@@ -207,13 +207,13 @@
     type="submit"
     title={capital($_("submit"))}
     disabled={!$employeeInfo.validated}
-    onClick={submitForm}
+    on:click={submitForm}
   />
   <Button
     type="button"
     title={capital($_("start_over"))}
     outline={true}
-    onClick={() => resetUserflowStores()}
+    on:click={() => resetUserflowStores()}
   />
 </div>
 <Error />

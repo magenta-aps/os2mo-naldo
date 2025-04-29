@@ -7,6 +7,7 @@
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
+  import CircleButton from "$lib/components/shared/CircleButton.svelte"
   import OnboardingFormButtons from "$lib/components/userflow/OnboardingFormButtons.svelte"
   import { step } from "$lib/stores/stepStore"
   import { graphQLClient } from "$lib/util/http"
@@ -249,21 +250,24 @@
             />
           {/if}
           {#if $rolebindingInfo.length > 1}
-            <button
-              class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100"
-              on:click={(e) => {
-                e.preventDefault()
+            <CircleButton
+              on:click={() => {
                 rolebindingInfo.removeRolebinding(index)
-              }}><Icon icon={removeRounded} width="20" height="20" /></button
-            >
+              }}
+              icon={removeRounded}
+              width="20"
+              height="20"
+            />
           {/if}
           {#if index === $rolebindingInfo.length - 1}
-            <button
-              class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100 mb-4"
+            <CircleButton
               on:click={() =>
                 rolebindingInfo.addRolebinding(rolebindingFromDate, rolebindingToDate)}
-              ><Icon icon={addRounded} width="20" height="20" /></button
-            >
+              icon={addRounded}
+              width="20"
+              height="20"
+              extraClasses="mb-4"
+            />
           {:else}
             <div class="divider p-0 m-0 my-2 w-full" />
           {/if}

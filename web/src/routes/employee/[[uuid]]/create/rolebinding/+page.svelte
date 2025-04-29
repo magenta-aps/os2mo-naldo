@@ -5,6 +5,7 @@
   import Error from "$lib/components/alerts/Error.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
   import Button from "$lib/components/shared/Button.svelte"
+  import CircleButton from "$lib/components/shared/CircleButton.svelte"
   import { enhance } from "$app/forms"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
@@ -265,20 +266,23 @@
             />
           {/if}
           {#if rolebindings.length > 1}
-            <button
-              class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100"
-              on:click={(e) => {
-                e.preventDefault()
+            <CircleButton
+              on:click={() => {
                 removeRolebinding(index)
-              }}><Icon icon={removeRounded} width="20" height="20" /></button
-            >
+              }}
+              icon={removeRounded}
+              width="20"
+              height="20"
+            />
           {/if}
           {#if index === rolebindings.length - 1}
-            <button
-              class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100 mb-4"
+            <CircleButton
               on:click={() => addRolebinding()}
-              ><Icon icon={addRounded} width="20" height="20" /></button
-            >
+              icon={addRounded}
+              width="20"
+              height="20"
+              extraClasses="mb-4"
+            />
           {:else}
             <div class="divider p-0 m-0 my-2 w-full" />
           {/if}

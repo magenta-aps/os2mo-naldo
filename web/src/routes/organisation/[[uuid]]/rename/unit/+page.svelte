@@ -196,7 +196,7 @@
       type="button"
       title={capital($_("cancel"))}
       outline={true}
-      onClick={() => history.back()}
+      on:click={() => history.back()}
     />
   </div>
   <Error />

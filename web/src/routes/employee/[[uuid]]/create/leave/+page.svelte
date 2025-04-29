@@ -306,7 +306,7 @@
       type="button"
       title={capital($_("cancel"))}
       outline={true}
-      onClick={() => goto(`${base}/employee/${$page.params.uuid}`)}
+      on:click={() => goto(`${base}/employee/${$page.params.uuid}`)}
     />
   </div>
   <Error />
