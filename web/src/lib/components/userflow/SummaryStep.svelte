@@ -16,6 +16,7 @@
   import { date } from "$lib/stores/date"
   import { gql } from "graphql-request"
   import Error from "$lib/components/alerts/Error.svelte"
+  import Button from "$lib/components/shared/Button.svelte"
   import { success, error } from "$lib/stores/alert"
   import { employeeInfo } from "$lib/stores/employeeInfoStore"
   import { engagementInfo } from "$lib/stores/engagementInfoStore"
@@ -202,17 +203,17 @@
   </div>
 </div>
 <div class="sm:w-full md:w-3/4 xl:w-1/2 flex justify-between py-6 gap-4">
-  <button
-    class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+  <Button
+    type="submit"
+    title={capital($_("submit"))}
     disabled={!$employeeInfo.validated}
-    on:click={submitForm}>{capital($_("submit"))}</button
-  >
-  <button
+    onClick={submitForm}
+  />
+  <Button
     type="button"
-    class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-    on:click={() => resetUserflowStores()}
-  >
-    {capital($_("start_over"))}
-  </button>
+    title={capital($_("start_over"))}
+    outline={true}
+    onClick={() => resetUserflowStores()}
+  />
 </div>
 <Error />

@@ -5,6 +5,7 @@
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
+  import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import type { RoleBindingCreateInput } from "$lib/graphql/types"
@@ -22,7 +23,7 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
-  import { getClassUuidByUserKey } from "$lib/util/get_classes"
+  import { getClassUuidByUserKey } from "$lib/util/getClasses"
   import { getITSystemNames, type UnpackedClass } from "$lib/util/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
@@ -391,22 +392,20 @@
       </div>
     </div>
     <div class="flex py-6 gap-4">
-      <button
+      <Button
         type="submit"
-        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >{capital(
+        title={capital(
           $_("create_item", {
             values: { item: $_("ituser", { values: { n: 1 } }) },
           })
-        )}</button
-      >
-      <button
+        )}
+      />
+      <Button
         type="button"
-        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        on:click={() => goto(`${base}/employee/${$page.params.uuid}`)}
-      >
-        {capital($_("cancel"))}
-      </button>
+        title={capital($_("cancel"))}
+        outline={true}
+        href="{base}/employee/{$page.params.uuid}"
+      />
     </div>
     <Error />
   </form>

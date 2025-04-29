@@ -4,15 +4,17 @@
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
+  import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
   import { EmployeeDocument, TerminateEmployeeDocument } from "./query.generated"
   import { gql } from "graphql-request"
+  import { base } from "$app/paths"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import Search from "$lib/components/Search.svelte"
+  import Search from "$lib/components/search/Search.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
@@ -174,22 +176,20 @@
     </div>
   </div>
   <div class="flex py-6 gap-4">
-    <button
+    <Button
       type="submit"
-      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-      >{capital(
+      title={capital(
         $_("terminate_item", {
           values: { item: $_("employee", { values: { n: 1 } }) },
         })
-      )}</button
-    >
-    <button
+      )}
+    />
+    <Button
       type="button"
-      class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-      on:click={() => history.back()}
-    >
-      {capital($_("cancel"))}
-    </button>
+      title={capital($_("cancel"))}
+      outline={true}
+      href="{base}/employee/{$page.params.uuid}"
+    />
   </div>
   <Error />
 </form>

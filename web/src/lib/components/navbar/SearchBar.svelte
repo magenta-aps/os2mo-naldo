@@ -2,7 +2,7 @@
   import { _ } from "svelte-i18n"
   import { date } from "$lib/stores/date"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
-  import Search from "$lib/components/Search.svelte"
+  import Search from "$lib/components/search/Search.svelte"
   import Icon from "@iconify/svelte"
   import personOutlineRounded from "@iconify/icons-material-symbols/person-outline-rounded"
   import homeWorkOutlineRounded from "@iconify/icons-material-symbols/home-work-outline-rounded"

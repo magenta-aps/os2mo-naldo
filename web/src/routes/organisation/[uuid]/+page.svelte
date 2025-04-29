@@ -3,8 +3,9 @@
   import { capital, upperCase } from "$lib/util/translationUtils"
   import { page } from "$app/stores"
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
-  import CopyToClipboard from "$lib/components/Clipboard.svelte"
+  import CopyToClipboard from "$lib/components/shared/Clipboard.svelte"
   import TenseTabs from "$lib/components/shared/TenseTabs.svelte"
+  import Button from "$lib/components/shared/Button.svelte"
   import { ItTab, OrgTab, activeItTab, activeOrgTab } from "$lib/stores/tab"
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
@@ -153,32 +154,30 @@
     <div class="flex justify-between">
       <TenseTabs />
       {#if activeItem === OrgTab.IT}
-        <a
-          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5 hover:no-underline"
-          href={`${base}/organisation/${$page.params.uuid}/create/${itActiveItem}`}
-        >
-          {capital(
+        <Button
+          type="button"
+          title={capital(
             $_("create_item", {
               values: { item: $_(itActiveItem, { values: { n: 1 } }) },
             })
           )}
-        </a>
+          href="{base}/organisation/{$page.params.uuid}/create/{itActiveItem}"
+          extraClasses="my-5"
+        />
       {:else}
         <!-- Links are different on `org_unit` and `related`-tabs -->
-        <a
-          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100 my-5 hover:no-underline"
-          href={`${base}/${
-            activeItem === OrgTab.RELATED_UNIT
-              ? "connections"
-              : `organisation/${$page.params.uuid}/create/${activeItem}`
-          }`}
-        >
-          {capital(
+        <Button
+          type="button"
+          title={capital(
             $_("create_item", {
               values: { item: $_(activeItem, { values: { n: 1 } }) },
             })
           )}
-        </a>
+          href="{base}/{activeItem === OrgTab.RELATED_UNIT
+            ? 'connections'
+            : `organisation/${$page.params.uuid}/create/${activeItem}`}"
+          extraClasses="my-5"
+        />
       {/if}
     </div>
   {/await}

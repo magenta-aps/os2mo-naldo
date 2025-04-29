@@ -3,7 +3,7 @@
   import { capital } from "$lib/util/translationUtils"
   import { page } from "$app/stores"
   import { graphQLClient } from "$lib/util/http"
-  import { fetchParentTree } from "$lib/util/parent_tree.js"
+  import { fetchParentTree } from "$lib/util/parentTree"
   import Node from "$lib/components/org/tree/Node.svelte"
   import { success } from "$lib/stores/alert"
   import { date } from "$lib/stores/date"
@@ -16,7 +16,7 @@
     type OrgUnitsWithFilteredChildrenQuery,
     OrgUnitsWithFilteredChildrenDocument,
   } from "./query.generated"
-  import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import { getClassesByFacetUserKey } from "$lib/util/getClasses"
   import Select from "$lib/components/forms/shared/Select.svelte"
 
   const brutto = {

@@ -1,7 +1,7 @@
 import { env } from "$env/dynamic/public"
 import type { OpenValidity, Validity } from "$lib/graphql/types"
 import { date } from "$lib/stores/date"
-import type { Facet } from "$lib/util/get_classes"
+import type { Facet } from "$lib/util/getClasses"
 import { keycloak } from "$lib/util/keycloak"
 import {
   format,

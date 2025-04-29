@@ -13,6 +13,7 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import Input from "$lib/components/forms/shared/Input.svelte"
+  import Button from "$lib/components/shared/Button.svelte"
   import type { SubmitFunction } from "./$types"
   import { CreateClassDocument, FacetDocument } from "./query.generated"
   import { form, field } from "svelte-forms"
@@ -180,22 +181,20 @@
       </div>
     </div>
     <div class="flex py-6 gap-4">
-      <button
+      <Button
         type="submit"
-        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >{capital(
+        title={capital(
           $_("create_item", {
             values: { item: $_("class", { values: { n: 1 } }) },
           })
-        )}</button
-      >
-      <button
+        )}
+      />
+      <Button
         type="button"
-        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        on:click={() => goto(`${base}/admin`)}
-      >
-        {capital($_("cancel"))}
-      </button>
+        title={capital($_("cancel"))}
+        outline={true}
+        href="{base}/admin"
+      />
     </div>
     <Error />
   </form>

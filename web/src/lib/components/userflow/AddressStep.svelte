@@ -7,6 +7,7 @@
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
+  import OnboardingFormButtons from "$lib/components/userflow/OnboardingFormButtons.svelte"
   import { graphQLClient } from "$lib/util/http"
   import { AddressFacetsDocument } from "./query.generated"
   import { gql } from "graphql-request"
@@ -14,8 +15,8 @@
   import { form, field } from "svelte-forms"
   import { required, email, pattern } from "svelte-forms/validators"
   import AddressInput from "$lib/components/userflow/AddressInput.svelte"
-  import { getClassesByFacetUserKey } from "$lib/util/get_classes"
-  import DarSearch from "$lib/components/DARSearch.svelte"
+  import { getClassesByFacetUserKey } from "$lib/util/getClasses"
+  import DarSearch from "$lib/components/forms/shared/DARSearch.svelte"
   import { Addresses } from "$lib/util/addresses"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { resetUserflowStores } from "$lib/stores/resetStores"
@@ -168,36 +169,7 @@
         {/if}
       </div>
     </div>
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 flex justify-between py-6 gap-4">
-      <div class="flex gap-4">
-        <button
-          type="button"
-          class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-          on:click={() => step.updateStep("dec")}
-        >
-          {capital($_("back"))}
-        </button>
-        <button
-          type="submit"
-          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-          >{capital($_("next"))}</button
-        >
-        <button
-          type="button"
-          class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-          on:click={() => step.updateStep("inc")}
-        >
-          {capital($_("skip"))}
-        </button>
-      </div>
-      <button
-        type="button"
-        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        on:click={() => resetUserflowStores()}
-      >
-        {capital($_("start_over"))}
-      </button>
-    </div>
+    <OnboardingFormButtons />
     <Error />
   {/await}
 </form>

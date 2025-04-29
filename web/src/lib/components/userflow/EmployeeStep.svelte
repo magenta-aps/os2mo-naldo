@@ -5,9 +5,10 @@
   import { step } from "$lib/stores/stepStore"
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
+  import OnboardingFormButtons from "$lib/components/userflow/OnboardingFormButtons.svelte"
   import { form, field } from "svelte-forms"
   import { required, pattern } from "svelte-forms/validators"
-  import CprLookup from "$lib/components/CPRLookup.svelte"
+  import CprLookup from "$lib/components/forms/shared/CPRLookup.svelte"
   import CPRInput from "$lib/components/userflow/CPRInput.svelte"
   import { graphQLClient } from "$lib/util/http"
   import { GetSpConfigDocument } from "./query.generated"
@@ -186,13 +187,7 @@
         </div>
       </div>
     </div>
-    <div class="flex py-6 gap-4">
-      <button
-        type="submit"
-        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >{capital($_("next"))}</button
-      >
-    </div>
+    <OnboardingFormButtons isFirst={true} />
     <Error />
   {/await}
 </form>

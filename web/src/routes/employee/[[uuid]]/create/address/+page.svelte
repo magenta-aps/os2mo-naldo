@@ -5,20 +5,21 @@
   import Error from "$lib/components/alerts/Error.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
+  import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
   import { FacetsAndEmployeeDocument, CreateAddressDocument } from "./query.generated"
-  import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import { getClassesByFacetUserKey } from "$lib/util/getClasses"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import type { SubmitFunction } from "./$types"
   import { form, field } from "svelte-forms"
   import { required, email, pattern } from "svelte-forms/validators"
-  import DarSearch from "$lib/components/DARSearch.svelte"
+  import DarSearch from "$lib/components/forms/shared/DARSearch.svelte"
   import { Addresses } from "$lib/util/addresses"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getMinMaxValidities } from "$lib/util/helpers"
@@ -226,22 +227,20 @@
       </div>
     </div>
     <div class="flex py-6 gap-4">
-      <button
+      <Button
         type="submit"
-        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >{capital(
+        title={capital(
           $_("create_item", {
             values: { item: $_("address", { values: { n: 1 } }) },
           })
-        )}</button
-      >
-      <button
+        )}
+      />
+      <Button
         type="button"
-        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        on:click={() => goto(`${base}/employee/${$page.params.uuid}`)}
-      >
-        {capital($_("cancel"))}
-      </button>
+        title={capital($_("cancel"))}
+        outline={true}
+        href="{base}/employee/{$page.params.uuid}"
+      />
     </div>
     <Error />
   </form>

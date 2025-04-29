@@ -7,7 +7,7 @@
   import { debounce, paginateQuery } from "$lib/util/helpers"
   import { graphQLClient } from "$lib/util/http"
   import { date } from "$lib/stores/date"
-  import Search from "$lib/components/Search.svelte"
+  import Search from "$lib/components/search/Search.svelte"
   import type { SelectedQuery } from "$lib/util/helpers"
   import { downloadHandler } from "$lib/util/csv"
   import Icon from "@iconify/svelte"

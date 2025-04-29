@@ -2,7 +2,7 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import { graphQLClient } from "$lib/util/http"
-  import { fetchParentTree } from "$lib/util/parent_tree.js"
+  import { fetchParentTree } from "$lib/util/parentTree"
   import Node from "./node.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "../connections/$types"
@@ -15,6 +15,7 @@
     RelatedUnitsDocument,
   } from "./query.generated"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
+  import Button from "$lib/components/shared/Button.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
 
@@ -192,18 +193,12 @@
   </div>
 
   <div class="gap-4 py-6">
-    <button
-      type="submit"
-      class="text-base font-normal normal-case rounded btn btn-sm btn-primary text-base-100"
-      disabled={!selectedOriginOrg}
-      >{capital($_("save"))}
-    </button>
-    <button
+    <Button type="submit" title={capital($_("save"))} disabled={!selectedOriginOrg} />
+    <Button
       type="button"
-      class="text-base font-normal normal-case rounded btn btn-sm btn-outline btn-primary"
-      on:click={() => history.back()}
-    >
-      {capital($_("cancel"))}
-    </button>
+      title={capital($_("cancel"))}
+      outline={true}
+      onClick={() => history.back()}
+    />
   </div>
 </form>

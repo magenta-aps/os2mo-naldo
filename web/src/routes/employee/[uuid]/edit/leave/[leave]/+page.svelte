@@ -4,6 +4,7 @@
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
+  import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { goto } from "$app/navigation"
@@ -13,7 +14,7 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import { getClassesByFacetUserKey } from "$lib/util/getClasses"
   import { LeaveAndFacetDocument, UpdateLeaveDocument } from "./query.generated"
   import {
     getEngagementTitlesAndUuid,
@@ -21,7 +22,7 @@
   } from "$lib/util/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
-  import Search from "$lib/components/Search.svelte"
+  import Search from "$lib/components/search/Search.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
 
   let toDate: string
@@ -255,22 +256,20 @@
       </div>
     </div>
     <div class="flex py-6 gap-4">
-      <button
+      <Button
         type="submit"
-        class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-        >{capital(
+        title={capital(
           $_("edit_item", {
             values: { item: $_("leave", { values: { n: 1 } }) },
           })
-        )}</button
-      >
-      <button
+        )}
+      />
+      <Button
         type="button"
-        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        on:click={() => goto(`${base}/employee/${$page.params.uuid}`)}
-      >
-        {capital($_("cancel"))}
-      </button>
+        title={capital($_("cancel"))}
+        outline={true}
+        href="{base}/employee/{$page.params.uuid}"
+      />
     </div>
     <Error />
   </form>

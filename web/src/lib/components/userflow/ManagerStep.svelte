@@ -6,19 +6,19 @@
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
+  import OnboardingFormButtons from "$lib/components/userflow/OnboardingFormButtons.svelte"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { ManagerFacetsDocument } from "./query.generated"
   import { date } from "$lib/stores/date"
-  import { getClassesByFacetUserKey } from "$lib/util/get_classes"
+  import { getClassesByFacetUserKey } from "$lib/util/getClasses"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
-  import Search from "$lib/components/Search.svelte"
+  import Search from "$lib/components/search/Search.svelte"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import SelectMultiple from "$lib/components/forms/shared/SelectMultiple.svelte"
   import { getValidities } from "$lib/util/helpers"
-  import { resetUserflowStores } from "$lib/stores/resetStores"
 
   gql`
     query ManagerFacets($currentDate: DateTime!) {
@@ -163,36 +163,7 @@
         />
       </div>
     </div>
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 flex justify-between py-6 gap-4">
-      <div class="flex gap-4">
-        <button
-          type="button"
-          class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-          on:click={() => step.updateStep("dec")}
-        >
-          {capital($_("back"))}
-        </button>
-        <button
-          type="submit"
-          class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-          >{capital($_("next"))}</button
-        >
-        <button
-          type="button"
-          class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-          on:click={() => step.updateStep("inc")}
-        >
-          {capital($_("skip"))}
-        </button>
-      </div>
-      <button
-        type="button"
-        class="btn btn-sm btn-outline btn-primary rounded normal-case font-normal text-base"
-        on:click={() => resetUserflowStores()}
-      >
-        {capital($_("start_over"))}
-      </button>
-    </div>
+    <OnboardingFormButtons />
     <Error />
   {/await}
 </form>
