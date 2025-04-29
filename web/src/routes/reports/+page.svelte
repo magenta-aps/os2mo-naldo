@@ -100,7 +100,7 @@
         <Button
           title={file.file_name}
           type="button"
-          onClick={() => {
+          on:click={() => {
             downloadFile(file.file_name)
           }}
           icon={fileDownload}
