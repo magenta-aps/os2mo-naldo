@@ -56,7 +56,7 @@
         )}{/if}
     </div>
     {#if isLazy(item)}
-      {#if isLazyOrg(item) && item.root}
+      {#if isLazyOrg(item) && item.root?.length}
         <br />
         <div class="inline-block text-primary text-sm">
           {capital($_("root"))}: {item.root[0].name}
