@@ -8,6 +8,7 @@
   import personAddOutlineRounded from "@iconify/icons-material-symbols/person-add-outline-rounded"
   import keyboardArrowDownRounded from "@iconify/icons-material-symbols/keyboard-arrow-down-rounded"
   import Icon from "@iconify/svelte"
+  import NavbarButton from "$lib/components/navbar/NavbarButton.svelte"
   import swapHorizRounded from "@iconify/icons-material-symbols/swap-horiz-rounded"
   import addCircleOutlineRounded from "@iconify/icons-material-symbols/add-circle-outline-rounded"
   import link from "@iconify/icons-material-symbols/link"
@@ -41,237 +42,160 @@
     }
   }
 
-  let isOpen = false
+  let isOpen = true
 </script>
 
 <div class="flex flex-col h-full bg-secondary">
   <!-- TODO: Feedback from Carl - Make links into squares (more like mockup) -->
   <!-- Navbar with Icons and Expandable Text -->
-  <ul class="menu p-0 flex-grow">
+  <ul class="menu flex-grow">
     <!-- Navigation Items -->
-    <li class="flex flex-row justify-between items-center h-16">
-      {#if isOpen}
-        <a href="{base}/" class="text-white text-xl font-bold hover:no-underline"
-          >OS2mo</a
-        >
-      {/if}
-      <button
-        on:click={() => (isOpen = !isOpen)}
-        class="btn btn-ghost justify-between min-h-16 text-white hover:no-underline hover:bg-accent hover:text-secondary text-xl"
-      >
-        <Icon
-          icon={keyboardArrowDownRounded}
-          width="20"
-          height="20"
-          rotate={isOpen ? 1 : 3}
-        />
-      </button>
-    </li>
     <!-- Links -->
-    <li>
-      <a
-        href="{base}/"
-        class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
-      >
-        <Icon icon={homeOutlineRounded} width="20" height="20" />
-        {#if isOpen}
-          <span class="font-bold">{capital($_("home"))}</span>
-        {/if}
-      </a>
-    </li>
-    <li>
-      <a
-        href="{base}/reports"
-        class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
-      >
-        <Icon icon={assignmentOutlineRounded} width="20" height="20" />
-        {#if isOpen}
-          <span class="font-bold">{capital($_("report", { values: { n: 2 } }))}</span>
-        {/if}
-      </a>
-    </li>
-
+    <NavbarButton
+      title={capital($_("home"))}
+      href="{base}/"
+      icon={homeOutlineRounded}
+      open={isOpen}
+    />
+    <NavbarButton
+      title={capital($_("report", { values: { n: 2 } }))}
+      href="{base}/reports"
+      icon={assignmentOutlineRounded}
+      open={isOpen}
+    />
     {#if $isAdmin}
       {#if env.PUBLIC_SHOW_ADMIN_PANEL !== "false"}
-        <li>
-          <a
-            href="{base}/admin"
-            class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
-          >
-            <Icon icon={inventory2OutlineRounded} width="20" height="20" />
-            {#if isOpen}
-              <span class="font-bold">{capital($_("classifications"))}</span>
-            {/if}
-          </a>
-        </li>
+        <NavbarButton
+          title={capital($_("classifications"))}
+          href="{base}/admin"
+          icon={inventory2OutlineRounded}
+          open={isOpen}
+        />
       {/if}
       {#if env.PUBLIC_SHOW_INSIGHTS !== "false"}
-        <li>
-          <a
-            href="{base}/insights"
-            class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
-          >
-            <Icon icon={searchRounded} width="20" height="20" />
-            {#if isOpen}
-              <span class="font-bold">{capital($_("insights"))}</span>
-            {/if}
-          </a>
-        </li>
+        <NavbarButton
+          title={capital($_("insights"))}
+          href="{base}/insights"
+          icon={searchRounded}
+          open={isOpen}
+        />
       {/if}
     {/if}
+
     {#if env.PUBLIC_DOCS_LINK !== "false"}
-      <li>
-        <a
-          href="https://rammearkitektur.docs.magenta.dk/os2mo/home/manual.html"
-          target="_blank"
-          class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
-        >
-          <Icon icon={book2OutlineRounded} width="20" height="20" />
-          {#if isOpen}
-            <span class="font-bold">{capital($_("documentation"))}</span>
-          {/if}
-        </a>
-      </li>
+      <NavbarButton
+        title={capital($_("documentation"))}
+        href="https://rammearkitektur.docs.magenta.dk/os2mo/home/manual.html"
+        icon={book2OutlineRounded}
+        open={isOpen}
+        external
+      />
     {/if}
-    <li>
-      <a
-        href="{env.PUBLIC_BASE_URL}/graphql"
-        target="_blank"
-        class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
-      >
-        <Icon icon={codeRounded} width="20" height="20" />
-        {#if isOpen}
-          <span class="font-bold">{$_("graphql")}</span>
-        {/if}
-      </a>
-    </li>
+
+    <NavbarButton
+      title={$_("graphql")}
+      href="{env.PUBLIC_BASE_URL}/graphql"
+      icon={codeRounded}
+      open={isOpen}
+      external
+    />
+
     {#if env.PUBLIC_ONBOARDING_LINK === "true"}
-      <li>
-        <a
-          href="{base}/userflow"
-          class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
-        >
-          <Icon icon={personAddOutlineRounded} width="20" height="20" />
-          {#if isOpen}
-            <span class="font-bold">{capital($_("onboarding"))}</span>
-          {/if}
-        </a>
-      </li>
+      <NavbarButton
+        title={capital($_("onboarding"))}
+        href="{base}/userflow"
+        icon={personAddOutlineRounded}
+        open={isOpen}
+      />
     {/if}
 
     {#if $MOConfig && JSON.parse($MOConfig.navlinks).length}
       {@const links = JSON.parse($MOConfig.navlinks)}
       {#each links as link}
-        <li>
-          <a
-            href={link.href}
-            class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
-          >
-            <!-- For some reason graph-2 is not in the module, so have to use it directly.  -->
-            <Icon icon="material-symbols:graph-2" width="20" height="20" />
-            {#if isOpen}
-              <span class="font-bold">{link.text}</span>
-            {/if}
-          </a>
-        </li>
+        <NavbarButton
+          title={link.text}
+          href={link.href}
+          icon="material-symbols:graph-2"
+          open={isOpen}
+        />
       {/each}
     {/if}
 
     <div class="divider divider-accent before:h-[.05rem] after:h-[.05rem] p-0 m-0" />
     <!-- Quick actions -->
-    <li>
-      <a
-        href="{base}/employee/create/employee"
-        class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
-      >
-        <Icon icon={personAddOutlineRounded} width="20" height="20" />
-        {#if isOpen}
-          <span class="font-bold">{$_("navigation.create_employee")}</span>
-        {/if}
-      </a>
-    </li>
-    <li>
-      <a
-        href="{base}/organisation/move/engagements"
-        class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
-      >
-        <Icon icon={swapHorizRounded} width="20" height="20" />
-        {#if isOpen}
-          <span class="font-bold">{$_("navigation.move_engagements")}</span>
-        {/if}
-      </a>
-    </li>
-    <li>
-      <a
-        href="{base}/organisation/create/unit"
-        class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
-      >
-        <Icon icon={addCircleOutlineRounded} width="20" height="20" />
-        {#if isOpen}
-          <span class="font-bold">{$_("navigation.create_unit")}</span>
-        {/if}
-      </a>
-    </li>
-    <li>
-      <a
-        href="{base}/connections"
-        class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
-      >
-        <Icon icon={link} width="20" height="20" />
-        {#if isOpen}
-          <span class="font-bold break-words">{$_("navigation.connections")}</span>
-        {/if}
-      </a>
-    </li>
+    <NavbarButton
+      title={$_("navigation.create_employee")}
+      href="{base}/employee/create/employee"
+      icon={personAddOutlineRounded}
+      open={isOpen}
+    />
+    <NavbarButton
+      title={$_("navigation.move_engagements")}
+      href="{base}/organisation/move/engagements"
+      icon={swapHorizRounded}
+      open={isOpen}
+    />
+    <NavbarButton
+      title={$_("navigation.create_unit")}
+      href="{base}/organisation/create/unit"
+      icon={addCircleOutlineRounded}
+      open={isOpen}
+    />
+    <NavbarButton
+      title={$_("navigation.connections")}
+      href="{base}/connections"
+      icon={link}
+      open={isOpen}
+    />
   </ul>
 
   <div class="divider divider-accent before:h-[.05rem] after:h-[.05rem] p-0 m-0" />
 
   <!-- Bottom Section with Language Switch, Logout, Profile Icon -->
-  <ul class="menu mb-1 p-0">
-    <li>
-      <button
-        on:click={changeLanguage}
-        class="text-white hover:no-underline hover:bg-accent focus:text-white hover:text-secondary"
-      >
-        <Icon icon={language} width="20" height="20" />
-        <span class={isOpen ? "visible" : "hidden"}>
-          {$locale === "en-GB" ? "Dansk" : "English"}
-        </span>
-      </button>
-    </li>
-
-    <!-- Logout Button -->
-    <li>
-      <button
-        on:click={logoutKeycloak}
-        class="text-white hover:no-underline hover:bg-accent hover:text-secondary"
-      >
-        <Icon icon={logout} width="20" height="20" />
-        <span class={isOpen ? "visible" : "hidden"}>
-          {capital($_("logout"))}
-        </span>
-      </button>
-    </li>
-
-    <!-- Profile Icon Button -->
-    <li>
-      <button
-        on:click={() => (isOpen = !isOpen)}
-        class="text-white hover:no-underline hover:bg-accent hover:text-secondary group"
-      >
-        <Icon
-          icon={personOutlineRounded}
-          width="20"
-          height="20"
-          class="bg-accent text-secondary rounded-full p-1 transition-all group-hover:bg-secondary group-hover:text-accent"
-        />
-        <span class="{isOpen ? 'visible' : 'hidden'} font-bold">
-          {fullName()}
-        </span>
-      </button>
-    </li>
-  </ul>
+  <!-- <ul class="menu mb-1 p-0"> -->
+  <!--   <li> -->
+  <!--     <button -->
+  <!--       on:click={changeLanguage} -->
+  <!--       class="text-white hover:no-underline hover:bg-accent focus:text-white hover:text-secondary" -->
+  <!--     > -->
+  <!--       <Icon icon={language} width="20" height="20" /> -->
+  <!--       <span class={isOpen ? "visible" : "hidden"}> -->
+  <!--         {$locale === "en-GB" ? "Dansk" : "English"} -->
+  <!--       </span> -->
+  <!--     </button> -->
+  <!--   </li> -->
+  <!---->
+  <!--   <!-- Logout Button --> -->
+  <!--   <li> -->
+  <!--     <button -->
+  <!--       on:click={logoutKeycloak} -->
+  <!--       class="text-white hover:no-underline hover:bg-accent hover:text-secondary" -->
+  <!--     > -->
+  <!--       <Icon icon={logout} width="20" height="20" /> -->
+  <!--       <span class={isOpen ? "visible" : "hidden"}> -->
+  <!--         {capital($_("logout"))} -->
+  <!--       </span> -->
+  <!--     </button> -->
+  <!--   </li> -->
+  <!---->
+  <!--   <!-- Profile Icon Button --> -->
+  <!--   <li> -->
+  <!--     <button -->
+  <!--       on:click={() => (isOpen = !isOpen)} -->
+  <!--       class="text-white hover:no-underline hover:bg-accent hover:text-secondary group" -->
+  <!--     > -->
+  <!--       <Icon -->
+  <!--         icon={personOutlineRounded} -->
+  <!--         width="20" -->
+  <!--         height="20" -->
+  <!--         class="bg-accent text-secondary rounded-full p-1 transition-all group-hover:bg-secondary group-hover:text-accent" -->
+  <!--       /> -->
+  <!--       <span class="{isOpen ? 'visible' : 'hidden'} font-bold"> -->
+  <!--         {fullName()} -->
+  <!--       </span> -->
+  <!--     </button> -->
+  <!--   </li> -->
+  <!-- </ul> -->
 </div>
 
 <style>
