@@ -24,7 +24,7 @@
 
 <!-- Toggle -->
 <div class="navbar bg-primary h-16 px-6 w-full">
-  <div class="flex gap-2">
+  <div class="flex justify-center gap-2 w-full items-center">
     <button
       on:click={() => {
         orgChecked = false
