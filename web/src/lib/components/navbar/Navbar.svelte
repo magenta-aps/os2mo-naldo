@@ -177,7 +177,7 @@
       <li class="flex">
         <button
           type="button"
-          class="btn btn-secondary text-white hover:no-underline hover:bg-accent focus:text-white hover:text-secondary group {isOpen
+          class="btn btn-secondary flex-nowrap text-white hover:no-underline hover:bg-accent focus:text-white hover:text-secondary group {isOpen
             ? 'justify-start'
             : 'btn-square'}"
           on:click={() => (isOpen = !isOpen)}
@@ -190,7 +190,7 @@
           />
 
           {#if isOpen}
-            <span>
+            <span class="nowrap">
               {fullName()}
             </span>
           {/if}
@@ -207,7 +207,7 @@
           <Icon icon={language} width="20" height="20" />
 
           {#if isOpen}
-            <span>
+            <span class="nowrap">
               {$locale === "en-GB" ? "Dansk" : "English"}
             </span>
           {/if}
@@ -224,7 +224,7 @@
           <Icon icon={logout} width="20" height="20" />
 
           {#if isOpen}
-            <span>
+            <span class="nowrap">
               {capital($_("logout"))}
             </span>
           {/if}
