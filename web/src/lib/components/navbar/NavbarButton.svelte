@@ -6,7 +6,7 @@
   export let title: string | undefined = undefined
   export let href: string | undefined = undefined
 
-  export let icon: IconifyIcon
+  export let icon: IconifyIcon | string
   export let width: string = "20"
   export let height: string = "20"
   export let open: boolean = false

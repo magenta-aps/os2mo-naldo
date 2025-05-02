@@ -12,7 +12,7 @@
   let isResizing = false
   let drawerStartX = 0
   let drawerElement: HTMLDivElement
-  let resizeHandle: HTMLDivElement
+  let resizeHandle: HTMLButtonElement
 
   // Function to update the height of the resize handle to match the drawer height
   const updateResizeHandleHeight = () => {
@@ -87,7 +87,8 @@
     </ul>
 
     <!-- Resizable handle dynamically adjusting to drawer height -->
-    <div
+    <button
+      type="button"
       bind:this={resizeHandle}
       class="absolute top-0 right-0 w-2 cursor-ew-resize bg-transparent {isResizing
         ? 'select-none'
