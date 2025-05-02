@@ -10,6 +10,7 @@
   import Icon from "@iconify/svelte"
   import NavbarButton from "$lib/components/navbar/NavbarButton.svelte"
   import swapHorizRounded from "@iconify/icons-material-symbols/swap-horiz-rounded"
+  import badgeOutlineRounded from "@iconify/icons-material-symbols/badge-outline-rounded"
   import addCircleOutlineRounded from "@iconify/icons-material-symbols/add-circle-outline-rounded"
   import link from "@iconify/icons-material-symbols/link"
   import personOutlineRounded from "@iconify/icons-material-symbols/person-outline-rounded"
@@ -42,160 +43,195 @@
     }
   }
 
-  let isOpen = true
+  let isOpen = false
 </script>
 
-<div class="flex flex-col h-full bg-secondary">
-  <!-- TODO: Feedback from Carl - Make links into squares (more like mockup) -->
-  <!-- Navbar with Icons and Expandable Text -->
-  <ul class="menu flex-grow">
-    <!-- Navigation Items -->
-    <!-- Links -->
-    <NavbarButton
-      title={capital($_("home"))}
-      href="{base}/"
-      icon={homeOutlineRounded}
-      open={isOpen}
-    />
-    <NavbarButton
-      title={capital($_("report", { values: { n: 2 } }))}
-      href="{base}/reports"
-      icon={assignmentOutlineRounded}
-      open={isOpen}
-    />
-    {#if $isAdmin}
-      {#if env.PUBLIC_SHOW_ADMIN_PANEL !== "false"}
-        <NavbarButton
-          title={capital($_("classifications"))}
-          href="{base}/admin"
-          icon={inventory2OutlineRounded}
-          open={isOpen}
-        />
-      {/if}
-      {#if env.PUBLIC_SHOW_INSIGHTS !== "false"}
-        <NavbarButton
-          title={capital($_("insights"))}
-          href="{base}/insights"
-          icon={searchRounded}
-          open={isOpen}
-        />
-      {/if}
-    {/if}
-
-    {#if env.PUBLIC_DOCS_LINK !== "false"}
+<div class="flex h-sceen">
+  <div class="flex flex-col h-full bg-secondary">
+    <!-- TODO: Feedback from Carl - Make links into squares (more like mockup) -->
+    <ul class="menu">
+      <li class="flex flex-row justify-between h-16">
+        {#if isOpen}
+          <a href="{base}/" class="text-white text-xl font-bold hover:no-underline">
+            OS2mo
+          </a>
+        {/if}
+        <button
+          type="button"
+          class="btn btn-square btn-secondary text-start text-white hover:bg-accent hover:text-secondary"
+          on:click={() => (isOpen = !isOpen)}
+        >
+          <Icon
+            icon={keyboardArrowDownRounded}
+            width="20"
+            height="20"
+            rotate={isOpen ? 1 : 3}
+          />
+        </button>
+      </li>
+      <!-- Navigation Items -->
       <NavbarButton
-        title={capital($_("documentation"))}
-        href="https://rammearkitektur.docs.magenta.dk/os2mo/home/manual.html"
-        icon={book2OutlineRounded}
+        title={capital($_("home"))}
+        href="{base}/"
+        icon={homeOutlineRounded}
+        open={isOpen}
+      />
+
+      {#if env.PUBLIC_ONBOARDING_LINK === "true"}
+        <NavbarButton
+          title={capital($_("onboarding"))}
+          href="{base}/userflow"
+          icon={badgeOutlineRounded}
+          open={isOpen}
+        />
+      {/if}
+      {#if $isAdmin}
+        {#if env.PUBLIC_SHOW_ADMIN_PANEL !== "false"}
+          <NavbarButton
+            title={capital($_("classifications"))}
+            href="{base}/admin"
+            icon={inventory2OutlineRounded}
+            open={isOpen}
+          />
+        {/if}
+        {#if env.PUBLIC_SHOW_INSIGHTS !== "false"}
+          <NavbarButton
+            title={capital($_("insights"))}
+            href="{base}/insights"
+            icon={searchRounded}
+            open={isOpen}
+          />
+        {/if}
+      {/if}
+      <NavbarButton
+        title={capital($_("report", { values: { n: 2 } }))}
+        href="{base}/reports"
+        icon={assignmentOutlineRounded}
+        open={isOpen}
+      />
+
+      {#if $MOConfig && JSON.parse($MOConfig.navlinks).length}
+        {@const links = JSON.parse($MOConfig.navlinks)}
+        {#each links as link}
+          <NavbarButton
+            title={link.text}
+            href={link.href}
+            icon="material-symbols:graph-2"
+            open={isOpen}
+          />
+        {/each}
+      {/if}
+
+      {#if env.PUBLIC_DOCS_LINK !== "false"}
+        <NavbarButton
+          title={capital($_("documentation"))}
+          href="https://rammearkitektur.docs.magenta.dk/os2mo/home/manual.html"
+          icon={book2OutlineRounded}
+          open={isOpen}
+          external
+        />
+      {/if}
+
+      <NavbarButton
+        title={$_("graphql")}
+        href="{env.PUBLIC_BASE_URL}/graphql"
+        icon={codeRounded}
         open={isOpen}
         external
       />
-    {/if}
+    </ul>
 
-    <NavbarButton
-      title={$_("graphql")}
-      href="{env.PUBLIC_BASE_URL}/graphql"
-      icon={codeRounded}
-      open={isOpen}
-      external
-    />
+    <div class="divider divider-accent before:h-[.05rem] after:h-[.05rem] p-0 m-0" />
 
-    {#if env.PUBLIC_ONBOARDING_LINK === "true"}
+    <ul class="menu flex-grow">
+      <!-- Quick actions -->
       <NavbarButton
-        title={capital($_("onboarding"))}
-        href="{base}/userflow"
+        title={$_("navigation.create_employee")}
+        href="{base}/employee/create/employee"
         icon={personAddOutlineRounded}
         open={isOpen}
       />
-    {/if}
-
-    {#if $MOConfig && JSON.parse($MOConfig.navlinks).length}
-      {@const links = JSON.parse($MOConfig.navlinks)}
-      {#each links as link}
-        <NavbarButton
-          title={link.text}
-          href={link.href}
-          icon="material-symbols:graph-2"
-          open={isOpen}
-        />
-      {/each}
-    {/if}
+      <NavbarButton
+        title={$_("navigation.create_unit")}
+        href="{base}/organisation/create/unit"
+        icon={addCircleOutlineRounded}
+        open={isOpen}
+      />
+      <NavbarButton
+        title={$_("navigation.move_engagements")}
+        href="{base}/organisation/move/engagements"
+        icon={swapHorizRounded}
+        open={isOpen}
+      />
+      <NavbarButton
+        title={$_("navigation.connections")}
+        href="{base}/connections"
+        icon={link}
+        open={isOpen}
+      />
+    </ul>
 
     <div class="divider divider-accent before:h-[.05rem] after:h-[.05rem] p-0 m-0" />
-    <!-- Quick actions -->
-    <NavbarButton
-      title={$_("navigation.create_employee")}
-      href="{base}/employee/create/employee"
-      icon={personAddOutlineRounded}
-      open={isOpen}
-    />
-    <NavbarButton
-      title={$_("navigation.move_engagements")}
-      href="{base}/organisation/move/engagements"
-      icon={swapHorizRounded}
-      open={isOpen}
-    />
-    <NavbarButton
-      title={$_("navigation.create_unit")}
-      href="{base}/organisation/create/unit"
-      icon={addCircleOutlineRounded}
-      open={isOpen}
-    />
-    <NavbarButton
-      title={$_("navigation.connections")}
-      href="{base}/connections"
-      icon={link}
-      open={isOpen}
-    />
-  </ul>
 
-  <div class="divider divider-accent before:h-[.05rem] after:h-[.05rem] p-0 m-0" />
+    <ul class="menu">
+      <li class="flex">
+        <button
+          type="button"
+          class="btn btn-secondary text-white hover:no-underline hover:bg-accent focus:text-white hover:text-secondary group {isOpen
+            ? 'justify-start'
+            : 'btn-square'}"
+          on:click={() => (isOpen = !isOpen)}
+        >
+          <Icon
+            icon={personOutlineRounded}
+            class="bg-accent text-secondary rounded-full p-1 transition-all group-hover:bg-secondary group-hover:text-accent"
+            width="20"
+            height="20"
+          />
 
-  <!-- Bottom Section with Language Switch, Logout, Profile Icon -->
-  <!-- <ul class="menu mb-1 p-0"> -->
-  <!--   <li> -->
-  <!--     <button -->
-  <!--       on:click={changeLanguage} -->
-  <!--       class="text-white hover:no-underline hover:bg-accent focus:text-white hover:text-secondary" -->
-  <!--     > -->
-  <!--       <Icon icon={language} width="20" height="20" /> -->
-  <!--       <span class={isOpen ? "visible" : "hidden"}> -->
-  <!--         {$locale === "en-GB" ? "Dansk" : "English"} -->
-  <!--       </span> -->
-  <!--     </button> -->
-  <!--   </li> -->
-  <!---->
-  <!--   <!-- Logout Button --> -->
-  <!--   <li> -->
-  <!--     <button -->
-  <!--       on:click={logoutKeycloak} -->
-  <!--       class="text-white hover:no-underline hover:bg-accent hover:text-secondary" -->
-  <!--     > -->
-  <!--       <Icon icon={logout} width="20" height="20" /> -->
-  <!--       <span class={isOpen ? "visible" : "hidden"}> -->
-  <!--         {capital($_("logout"))} -->
-  <!--       </span> -->
-  <!--     </button> -->
-  <!--   </li> -->
-  <!---->
-  <!--   <!-- Profile Icon Button --> -->
-  <!--   <li> -->
-  <!--     <button -->
-  <!--       on:click={() => (isOpen = !isOpen)} -->
-  <!--       class="text-white hover:no-underline hover:bg-accent hover:text-secondary group" -->
-  <!--     > -->
-  <!--       <Icon -->
-  <!--         icon={personOutlineRounded} -->
-  <!--         width="20" -->
-  <!--         height="20" -->
-  <!--         class="bg-accent text-secondary rounded-full p-1 transition-all group-hover:bg-secondary group-hover:text-accent" -->
-  <!--       /> -->
-  <!--       <span class="{isOpen ? 'visible' : 'hidden'} font-bold"> -->
-  <!--         {fullName()} -->
-  <!--       </span> -->
-  <!--     </button> -->
-  <!--   </li> -->
-  <!-- </ul> -->
+          {#if isOpen}
+            <span>
+              {fullName()}
+            </span>
+          {/if}
+        </button>
+      </li>
+      <li>
+        <button
+          type="button"
+          class="btn btn-secondary text-white hover:no-underline hover:bg-accent focus:text-white hover:text-secondary {isOpen
+            ? 'justify-start'
+            : 'btn-square'}"
+          on:click={changeLanguage}
+        >
+          <Icon icon={language} width="20" height="20" />
+
+          {#if isOpen}
+            <span>
+              {$locale === "en-GB" ? "Dansk" : "English"}
+            </span>
+          {/if}
+        </button>
+      </li>
+      <li>
+        <button
+          type="button"
+          class="btn btn-secondary text-white hover:no-underline hover:bg-accent focus:text-white hover:text-secondary {isOpen
+            ? 'justify-start'
+            : 'btn-square'}"
+          on:click={logoutKeycloak}
+        >
+          <Icon icon={logout} width="20" height="20" />
+
+          {#if isOpen}
+            <span>
+              {capital($_("logout"))}
+            </span>
+          {/if}
+        </button>
+      </li>
+    </ul>
+  </div>
 </div>
 
 <style>
