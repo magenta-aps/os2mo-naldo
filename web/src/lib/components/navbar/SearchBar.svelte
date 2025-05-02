@@ -22,9 +22,9 @@
   }
 </script>
 
-<!-- Toggle -->
 <div class="navbar bg-primary h-16 px-6 w-full">
   <div class="flex justify-center gap-2 w-full items-center">
+    <!-- Toggle -->
     <button
       on:click={() => {
         orgChecked = false
