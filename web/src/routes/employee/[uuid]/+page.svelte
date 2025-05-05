@@ -47,6 +47,7 @@
     { label: "rolebinding", value: "rolebinding", n: 2 },
   ]
 
+  let uuidFromUrl = $page.params.uuid
   let activeItem = $activeEmployeeTab
   const tabChange = (e: CustomEvent) => {
     $activeEmployeeTab = activeItem = e.detail
@@ -89,12 +90,17 @@
       }
     }
   })
+
+  // Prevents the #await from re-fetching when the tabs changes the hash in the URL
+  $: if (uuidFromUrl !== $page.params.uuid) {
+    uuidFromUrl = $page.params.uuid
+  }
 </script>
 
 <HeadTitle type="employee" />
 
 <div class="px-12 pt-6">
-  {#await graphQLClient().request( EmployeeDocument, { uuid: $page.params.uuid, fromDate: $date } )}
+  {#await graphQLClient().request( EmployeeDocument, { uuid: uuidFromUrl, fromDate: $date } )}
     <p>
       {capital($_("loading"))}
       {$_("employee", { values: { n: 1 } })}...
