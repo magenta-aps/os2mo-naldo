@@ -119,8 +119,11 @@
     <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
-  {#each data as association}
-    <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+  {#each data as association, i}
+    <tr
+      class="{i % 2 === 0 ? '' : 'bg-slate-100'} 
+      leading-5 border-t border-slate-300 text-secondary"
+    >
       <td class="text-sm p-4">
         {#if isOrg}
           <!-- GraphQL and Naldo doesn't allow creating vacant associations, but the old frontend did -->
@@ -185,7 +188,7 @@
       </td>
     </tr>
   {:else}
-    <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
+    <tr class="leading-5 border-t border-slate-300 text-secondary">
       <td class="text-sm p-4"
         >{capital(
           $_("no_item", { values: { item: $_("association", { values: { n: 2 } }) } })

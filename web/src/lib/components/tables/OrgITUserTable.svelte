@@ -113,14 +113,14 @@
 </script>
 
 {#if !data}
-  <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+  <tr class="leading-5 border-t border-slate-300 text-secondary">
     <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
   {#each data as ituser, i}
     <tr
       class="{i % 2 === 0 ? '' : 'bg-slate-100'} 
-        p-4 leading-5 border-t border-slate-300 text-secondary"
+        leading-5 border-t border-slate-300 text-secondary"
     >
       <td class="text-sm p-4">{ituser.itsystem.name} </td>
       <td class="text-sm p-4">{ituser.user_key}</td>
@@ -153,7 +153,7 @@
       </td>
     </tr>
   {:else}
-    <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
+    <tr class="leading-5 border-t border-slate-300 text-secondary">
       <td class="text-sm p-4"
         >{capital(
           $_("no_item", { values: { item: $_("ituser", { values: { n: 2 } }) } })

@@ -52,19 +52,22 @@
 </script>
 
 {#if !data}
-  <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+  <tr class="leading-5 border-t border-slate-300 text-secondary">
     <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
-  {#each data as auditlog}
-    <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+  {#each data as auditlog, i}
+    <tr
+      class="{i % 2 === 0 ? '' : 'bg-slate-100'} 
+        leading-5 border-t border-slate-300 text-secondary"
+    >
       <td class="text-sm p-4">{formatDateTime(auditlog.start)}</td>
       <td class="text-sm p-4">{auditlog.actor}</td>
       <td class="text-sm p-4">{auditlog.registration_id}</td>
       <td class="text-sm p-4">{auditlog.note}</td>
     </tr>
   {:else}
-    <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
+    <tr class="leading-5 border-t border-slate-300 text-secondary">
       <td class="text-sm p-4"
         >{capital(
           $_("no_item", { values: { item: $_("employee", { values: { n: 2 } }) } })
