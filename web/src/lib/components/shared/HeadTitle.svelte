@@ -15,6 +15,8 @@
     AUDITLOG = "auditlog",
   }
 
+  let uuidFromUrl = $page.params.uuid
+
   type TitleType = `${Title}`
   export let type: TitleType
 
@@ -71,10 +73,15 @@
         throw TypeError("Wrong or no title type used")
     }
   }
+
+  // Prevents the #await from re-fetching when the tabs changes the hash in the URL
+  $: if (uuidFromUrl !== $page.params.uuid) {
+    uuidFromUrl = $page.params.uuid
+  }
 </script>
 
 <svelte:head>
-  {#await fetchTitleName($page.params.uuid)}
+  {#await fetchTitleName(uuidFromUrl)}
     <title>... | OS2mo</title>
   {:then value}
     <title>{value} | OS2mo</title>
