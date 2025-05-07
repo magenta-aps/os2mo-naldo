@@ -29,7 +29,7 @@
   export let isClearable: boolean | undefined = false
   export let extra_classes = ""
   export let errors: string[] = []
-  export let searchable: boolean = false
+  export let searchable: boolean = true
 
   $: if (value) {
     if (value?.name) {

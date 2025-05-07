@@ -162,7 +162,6 @@
           id="kle-number"
           bind:name={$kleNumber.value}
           errors={$kleNumber.errors}
-          searchable={true}
           iterable={getKleNumberTitleAndUuid(kleNumbers ? kleNumbers : [])}
           required={true}
         />
