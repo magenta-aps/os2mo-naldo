@@ -46,9 +46,8 @@
   let isOpen = false
 </script>
 
-<div class="flex h-sceen">
-  <div class="flex flex-col h-full bg-secondary">
-    <!-- TODO: Feedback from Carl - Make links into squares (more like mockup) -->
+<div class="flex h-screen sticky top-0">
+  <div class="flex flex-col bg-secondary">
     <ul class="menu">
       <li class="flex flex-row justify-between h-16">
         {#if isOpen}
@@ -118,6 +117,7 @@
             href={link.href}
             icon="material-symbols:graph-2"
             open={isOpen}
+            external
           />
         {/each}
       {/if}
