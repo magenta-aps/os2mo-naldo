@@ -14,6 +14,8 @@ export const test = base.extend<{
 
   snapshot: async ({ moClient }, use) => {
     const snap = await moClient.post("/testing/database/snapshot")
+    console.log(snap)
+
     if (!snap.ok()) throw new Error("Snapshot failed")
 
     await use()
