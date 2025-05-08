@@ -55,7 +55,7 @@
   <title>OS2mo</title>
 </svelte:head>
 
-<div class="flex h-screen">
+<div class="flex min-h-screen">
   <Navbar />
   <div class="flex-col w-full">
     <SearchBar />
