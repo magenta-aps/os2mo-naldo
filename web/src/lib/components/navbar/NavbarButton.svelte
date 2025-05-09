@@ -17,6 +17,7 @@
 
 <li class="flex">
   <a
+    {title}
     {href}
     class="btn btn-secondary flex-nowrap text-start hover:no-underline hover:bg-accent hover:text-secondary
       {open ? 'justify-start' : 'btn-square'} {$page.url.pathname === href
