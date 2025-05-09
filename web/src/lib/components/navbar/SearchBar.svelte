@@ -4,6 +4,7 @@
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Search from "$lib/components/search/Search.svelte"
   import Icon from "@iconify/svelte"
+  import { gql } from "graphql-request"
   import personOutlineRounded from "@iconify/icons-material-symbols/person-outline-rounded"
   import homeWorkOutlineRounded from "@iconify/icons-material-symbols/home-work-outline-rounded"
 
@@ -22,7 +23,9 @@
   }
 </script>
 
-<div class="navbar bg-gradient-to-r from-primary to-secondary h-16 px-6 w-full">
+<div
+  class="navbar bg-gradient-to-r from-primary via-primary to-secondary h-16 px-6 w-full"
+>
   <div class="flex justify-center gap-2 w-full items-center">
     <!-- Toggle -->
     <button

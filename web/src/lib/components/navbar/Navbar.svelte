@@ -10,6 +10,9 @@
   import Icon from "@iconify/svelte"
   import NavbarButton from "$lib/components/navbar/NavbarButton.svelte"
   import swapHorizRounded from "@iconify/icons-material-symbols/swap-horiz-rounded"
+  import { graphQLClient } from "$lib/util/http"
+  import { gql } from "graphql-request"
+  import { VersionDocument } from "./query.generated"
   import badgeOutlineRounded from "@iconify/icons-material-symbols/badge-outline-rounded"
   import addCircleOutlineRounded from "@iconify/icons-material-symbols/add-circle-outline-rounded"
   import link from "@iconify/icons-material-symbols/link"
@@ -25,6 +28,14 @@
   import language from "@iconify/icons-material-symbols/language"
   import logout from "@iconify/icons-material-symbols/logout-rounded"
   import { env } from "$env/dynamic/public"
+
+  gql`
+    query Version {
+      version {
+        mo_version
+      }
+    }
+  `
 
   $: fullName = (): string => {
     if (!$isAuth) {
@@ -51,9 +62,22 @@
     <ul class="menu">
       <li class="flex flex-row justify-between h-16">
         {#if isOpen}
-          <a href="{base}/" class="text-white text-xl font-bold hover:no-underline">
-            OS2mo
-          </a>
+          {#if $isAuth}
+            {#await graphQLClient().request(VersionDocument)}
+              <a href="{base}/" class="text-white text-xl font-bold hover:no-underline">
+                OS2mo
+              </a>
+            {:then data}
+              <a
+                title={`OS2mo version: ${data.version.mo_version} 
+OS2mo-frontend version: ${env.PUBLIC_COMMIT_TAG}`}
+                href="{base}/"
+                class="text-white text-xl font-bold hover:no-underline"
+              >
+                OS2mo
+              </a>
+            {/await}
+          {/if}
         {/if}
         <button
           type="button"
