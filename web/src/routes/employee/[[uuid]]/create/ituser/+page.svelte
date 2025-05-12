@@ -377,16 +377,12 @@
                 removeRolebinding(index)
               }}
               icon={removeRounded}
-              width="20"
-              height="20"
             />
           {/if}
           {#if index === rolebindings.length - 1}
             <CircleButton
               on:click={() => addRolebinding()}
               icon={addRounded}
-              width="20"
-              height="20"
               extraClasses="mb-4"
             />
           {:else}

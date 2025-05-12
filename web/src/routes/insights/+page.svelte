@@ -289,8 +289,6 @@
             <CircleButton
               on:click={() => removeSelect(index)}
               icon={removeRounded}
-              width="20"
-              height="20"
               extraClasses="mb-4"
             />
           {/if}
@@ -298,8 +296,6 @@
             <CircleButton
               on:click={() => addNewSelect()}
               icon={addRounded}
-              width="20"
-              height="20"
               extraClasses="mb-4"
             />
           {:else}

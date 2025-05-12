@@ -255,8 +255,6 @@
                 rolebindingInfo.removeRolebinding(index)
               }}
               icon={removeRounded}
-              width="20"
-              height="20"
             />
           {/if}
           {#if index === $rolebindingInfo.length - 1}
@@ -264,8 +262,6 @@
               on:click={() =>
                 rolebindingInfo.addRolebinding(rolebindingFromDate, rolebindingToDate)}
               icon={addRounded}
-              width="20"
-              height="20"
               extraClasses="mb-4"
             />
           {:else}

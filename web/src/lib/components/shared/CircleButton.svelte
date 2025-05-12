@@ -3,8 +3,8 @@
   import Icon from "@iconify/svelte"
 
   export let icon: IconifyIcon
-  export let width: string = "25"
-  export let height: string = "25"
+  export let width: string = "20"
+  export let height: string = "20"
   export let extraClasses: string = ""
 </script>
 
