@@ -10,6 +10,7 @@ variables:
   RELEASE_REGISTRY: docker.io
   RELEASE_REGISTRY_IMAGE: index.docker.io/magentaaps/os2mo-naldo
   IMAGE_SHA: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
+  OS2MO_INIT_CONFIG: "/builds/$CI_PROJECT_PATH/init.config.yml"
 
   PRODUCT: os2mo
   COMPONENT: naldo
@@ -36,6 +37,11 @@ include:
       - gitlab-ci-templates/common/docker-release.v1.yml
       - gitlab-ci-templates/common/config-updater-salt.v1.yml
       - gitlab-ci-templates/common/config-updater-flux.v1.yml
+
+
+  - project: rammearkitektur/os2mo
+    file:
+      - gitlab-ci-templates/integration-test-meta.v1.yml
 
 # Workflow
 ###########
@@ -78,3 +84,8 @@ Build Naldo:
     - .build-docker
   variables:
     BUILD_DOCKER_EXTRA_FLAGS: --build-arg=COMMIT_TAG=${CI_COMMIT_TAG}
+
+
+Integration-test:
+  extends:
+    - .integration-test:mo

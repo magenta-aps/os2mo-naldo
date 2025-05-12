@@ -1,7 +1,7 @@
 import { test } from "./fixtures/snapshot.ts"
 import { expect } from "@playwright/test"
 
-test("test heading says welcome to gir", async ({ page, moClient, snapshot }) => {
+test("test heading says welcome to gir", async ({ page }) => {
   await page.goto("http://localhost:5173/")
 
   // Keycloak auth

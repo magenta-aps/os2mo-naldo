@@ -1,0 +1,26 @@
+facets:
+  org_unit_address_type: {}
+  manager_address_type: {}
+  address_property: {}
+  engagement_job_function: {}
+  org_unit_type: {}
+  engagement_type:
+    qa_engineer:
+      title: "Software Integration Tester"
+      scope: "TEXT"
+  association_type: {}
+  role_type: {}
+  leave_type: {}
+  manager_type: {}
+  responsibility: {}
+  manager_level: {}
+  visibility: {}
+  time_planning: {}
+  org_unit_level: {}
+  primary_type: {}
+  org_unit_hierarchy: {}
+  kle_number: {}
+  kle_aspect: {}
+
+it_systems:
+  FOOBAR: "The Foo Bar"
