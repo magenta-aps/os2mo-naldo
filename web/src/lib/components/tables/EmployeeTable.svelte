@@ -14,6 +14,7 @@
   import { page } from "$app/stores"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
+  import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import { formatQueryDates } from "$lib/util/helpers"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$env/dynamic/public"
@@ -90,6 +91,11 @@
       <td>
         <a href="{base}/employee/{uuid}/edit{formatQueryDates(employee.validity)}">
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
+        </a>
+      </td>
+      <td>
+        <a href="{base}/employee/{uuid}/terminate/employee">
+          <Icon icon={cancelOutlineRounded} width="25" height="25" />
         </a>
       </td>
     </tr>
