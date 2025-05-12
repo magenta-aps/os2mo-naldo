@@ -4,6 +4,7 @@
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Search from "$lib/components/search/Search.svelte"
   import Icon from "@iconify/svelte"
+  import { gql } from "graphql-request"
   import personOutlineRounded from "@iconify/icons-material-symbols/person-outline-rounded"
   import homeWorkOutlineRounded from "@iconify/icons-material-symbols/home-work-outline-rounded"
 
@@ -22,43 +23,47 @@
   }
 </script>
 
-<!-- Toggle -->
-<div class="flex gap-2 items-center justify-center">
-  <button
-    on:click={() => {
-      orgChecked = false
-    }}
-    class="text-base-100"
-  >
-    <Icon icon={personOutlineRounded} width="25" height="25" />
-  </button>
-  <input type="checkbox" class="toggle" bind:checked={orgChecked} />
+<div
+  class="navbar bg-gradient-to-r from-primary via-primary to-secondary h-16 px-6 w-full"
+>
+  <div class="flex justify-center gap-2 w-full items-center">
+    <!-- Toggle -->
+    <button
+      on:click={() => {
+        orgChecked = false
+      }}
+      class="text-base-100"
+    >
+      <Icon icon={personOutlineRounded} width="25" height="25" />
+    </button>
+    <input type="checkbox" class="toggle" bind:checked={orgChecked} />
 
-  <button
-    on:click={() => {
-      orgChecked = true
-    }}
-    class="text-base-100 pr-2"
-  >
-    <Icon icon={homeWorkOutlineRounded} width="25" height="25" />
-  </button>
+    <button
+      on:click={() => {
+        orgChecked = true
+      }}
+      class="text-base-100 pr-2"
+    >
+      <Icon icon={homeWorkOutlineRounded} width="25" height="25" />
+    </button>
 
-  <!-- Search -->
-  <div class="w-60 xl:w-96 flex items-center justify-center">
-    {#if orgChecked}
-      <Search action="goto" type={"org-unit"} />
-    {:else}
-      <Search action="goto" type={"employee"} />
-    {/if}
-  </div>
+    <!-- Search -->
+    <div class="w-60 xl:w-96 flex items-center justify-center">
+      {#if orgChecked}
+        <Search action="goto" type={"org-unit"} />
+      {:else}
+        <Search action="goto" type={"employee"} />
+      {/if}
+    </div>
 
-  <!-- Datepicker -->
-  <div>
-    <DateInput
-      bind:value={selectedDate}
-      id="other-end-date"
-      max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
-      noPadding={true}
-    />
+    <!-- Datepicker -->
+    <div>
+      <DateInput
+        bind:value={selectedDate}
+        id="other-end-date"
+        max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
+        noPadding={true}
+      />
+    </div>
   </div>
 </div>
