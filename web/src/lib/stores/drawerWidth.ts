@@ -1,20 +1,28 @@
 import { browser } from "$app/environment"
 import { writable } from "svelte/store"
 
-export const defaultDrawerWidth = 314.95 // Standard width of the drawer (also minimum width for sidebar-resizing)
+export const minDrawerWidth = 240 // Minimum width the drawer can shrink to
+export const defaultDrawerWidth = 314.95 // Default size of the drawer
+export const maxDrawerWidth = 800
 
 export const drawerWidth = writable(
   browser && localStorage.drawerWidth
-    ? Math.max(Number(localStorage.drawerWidth), defaultDrawerWidth)
+    ? Math.max(Number(localStorage.drawerWidth), minDrawerWidth) // Ensure it's not smaller than minDrawerWidth
     : defaultDrawerWidth
 )
 
 if (browser) {
   drawerWidth.subscribe((width) => {
-    if (width < defaultDrawerWidth) {
-      drawerWidth.set(defaultDrawerWidth)
-    } else {
-      localStorage.drawerWidth = width
+    // Adjust the width based on the minDrawerWidth
+    const adjustedDrawerWidth = Math.max(
+      minDrawerWidth,
+      Math.min(width, maxDrawerWidth)
+    ) // Prevent going below minDrawerWidth
+
+    if (width !== adjustedDrawerWidth) {
+      drawerWidth.set(adjustedDrawerWidth)
     }
+
+    localStorage.drawerWidth = adjustedDrawerWidth
   })
 }

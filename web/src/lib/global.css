@@ -33,7 +33,7 @@
 }
 
 .menu li > *:not(ul):not(.menu-title):not(details):active {
-  @apply bg-primary;
+  @apply bg-accent text-secondary;
 }
 
 /* svelte-select overrides */
