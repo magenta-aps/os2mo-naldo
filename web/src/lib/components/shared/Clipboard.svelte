@@ -19,7 +19,7 @@
 <div class="tooltip tooltip-bottom" data-tip="{capital($_('copy'))} {name} uuid">
   <Button
     outline={true}
-    onClick={copyToClipboard}
+    on:click={copyToClipboard}
     icon={fileCopyOutlineRounded}
     width="20"
     height="20"

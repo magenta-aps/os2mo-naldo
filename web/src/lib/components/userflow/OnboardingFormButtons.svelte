@@ -18,21 +18,21 @@
         type="button"
         title={capital($_("back"))}
         outline={true}
-        onClick={() => step.updateStep("dec")}
+        on:click={() => step.updateStep("dec")}
       />
       <Button type="submit" title={capital($_("next"))} />
       <Button
         type="button"
         title={capital($_("skip"))}
         outline={true}
-        onClick={() => step.updateStep("inc")}
+        on:click={() => step.updateStep("inc")}
       />
     </div>
     <Button
       type="button"
       title={capital($_("start_over"))}
       outline={true}
-      onClick={() => resetUserflowStores()}
+      on:click={() => resetUserflowStores()}
     />
   </div>
 {/if}
