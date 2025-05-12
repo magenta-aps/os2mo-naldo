@@ -4,6 +4,8 @@
   import { query } from "gql-query-builder"
   import Selects from "$lib/components/insights/Selects.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
+  import Button from "$lib/components/shared/Button.svelte"
+  import CircleButton from "$lib/components/shared/CircleButton.svelte"
   import { debounce, paginateQuery } from "$lib/util/helpers"
   import { graphQLClient } from "$lib/util/http"
   import { date } from "$lib/stores/date"
@@ -215,6 +217,16 @@
     ]
     removed++
   }
+  const handleDownloadClick = async (event: MouseEvent): Promise<void> => {
+    try {
+      await debounce(updateQuery)
+      downloadHandler(event, data, selectedQueries, filename)
+    } catch (warn) {
+      // Catch if the csv download is aborted
+      console.log(warn)
+      $warning = { message: capital($_("csv_warning")) }
+    }
+  }
 
   const updateEstimatedTime = () => {
     estimatedTime = estimateTimeRemaining(totalCount, requestCount, startTime)
@@ -274,28 +286,25 @@
         {#each selectedQueries as querySet, index}
           <Selects {mainQueries} {querySet} {index} bind:data={selectedQueries} />
           {#if selectedQueries.length > 1}
-            <button
-              class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100"
+            <CircleButton
               on:click={() => removeSelect(index)}
-              ><Icon icon={removeRounded} width="20" height="20" /></button
-            >
+              icon={removeRounded}
+              extraClasses="mb-4"
+            />
           {/if}
           {#if index === selectedQueries.length - 1}
-            <button
-              class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100 mb-4"
+            <CircleButton
               on:click={() => addNewSelect()}
-              ><Icon icon={addRounded} width="20" height="20" /></button
-            >
+              icon={addRounded}
+              extraClasses="mb-4"
+            />
           {:else}
             <div class="divider p-0 m-0 my-2 w-full" />
           {/if}
         {/each}
       {/key}
     </div>
-    <button
-      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
-      on:click={() => clearFilter()}>{capital($_("clear"))}</button
-    >
+    <Button type="button" title={capital($_("clear"))} on:click={() => clearFilter()} />
     <div class="divider p-0 m-0 my-2 w-full" />
     <Input
       title={capital($_("filename"))}
@@ -303,8 +312,10 @@
       bind:value={filename}
       placeholder={$_("default_filename")}
     />
-    <button
-      class="btn btn-sm btn-primary rounded normal-case font-normal text-base text-base-100"
+    <Button
+      type="button"
+      title={capital($_("download_as_csv"))}
+      on:click={handleDownloadClick}
       disabled={selectedQueries.some(
         (selectedQuery) =>
           selectedQuery.mainQuery === null || selectedQuery.mainQuery === undefined
@@ -312,19 +323,9 @@
         selectedQueries[selectedQueries.length - 1].mainQuery === null ||
         !orgUnit ||
         loading}
-      on:click={async (event) => {
-        try {
-          await debounce(updateQuery)
-          downloadHandler(event, data, selectedQueries, filename)
-        } catch (warn) {
-          // Catch if the csv download is aborted
-          console.log(warn)
-          $warning = { message: capital($_("csv_warning")) }
-        }
-      }}
-      >{capital($_("download_as_csv"))}
-      {#if loading}<span class="loading loading-spinner" />{/if}</button
-    >{#if loading && estimatedTime}
+      spinner={loading}
+    />
+    {#if loading && estimatedTime}
       <div class="normal-case font-normal text-base text-base-100">
         <p>{`${capital($_("estimated_time_remaining"))}: ${estimatedTime}`}</p>
         <p>

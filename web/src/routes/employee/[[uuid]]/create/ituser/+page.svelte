@@ -6,6 +6,7 @@
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
   import Button from "$lib/components/shared/Button.svelte"
+  import CircleButton from "$lib/components/shared/CircleButton.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import type { RoleBindingCreateInput } from "$lib/graphql/types"
@@ -371,20 +372,19 @@
             />
           {/if}
           {#if rolebindings.length > 1}
-            <button
-              class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100"
-              on:click={(e) => {
-                e.preventDefault()
+            <CircleButton
+              on:click={() => {
                 removeRolebinding(index)
-              }}><Icon icon={removeRounded} width="20" height="20" /></button
-            >
+              }}
+              icon={removeRounded}
+            />
           {/if}
           {#if index === rolebindings.length - 1}
-            <button
-              class="btn btn-xs btn-circle btn-primary normal-case font-normal text-base text-base-100 mb-4"
+            <CircleButton
               on:click={() => addRolebinding()}
-              ><Icon icon={addRounded} width="20" height="20" /></button
-            >
+              icon={addRounded}
+              extraClasses="mb-4"
+            />
           {:else}
             <div class="divider p-0 m-0 my-2 w-full" />
           {/if}
