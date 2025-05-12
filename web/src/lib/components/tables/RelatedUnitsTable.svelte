@@ -74,12 +74,15 @@
 </script>
 
 {#if !data}
-  <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+  <tr class="leading-5 border-t border-slate-300 text-secondary">
     <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
-  {#each data as related_unit}
-    <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+  {#each data as related_unit, i}
+    <tr
+      class="{i % 2 === 0 ? '' : 'bg-slate-100'} 
+        leading-5 border-t border-slate-300 text-secondary"
+    >
       <td class="text-sm p-4">
         <a
           href="{base}/organisation/{related_unit.org_units[0].uuid}"
@@ -90,7 +93,7 @@
       <ValidityTableCell validity={related_unit.validity} />
     </tr>
   {:else}
-    <tr class="py-4 leading-5 border-t border-slate-300 text-secondary">
+    <tr class="leading-5 border-t border-slate-300 text-secondary">
       <td class="text-sm p-4"
         >{capital(
           $_("no_item", { values: { item: $_("related_unit", { values: { n: 2 } }) } })
