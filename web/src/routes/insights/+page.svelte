@@ -329,7 +329,7 @@
         loading}
       spinner={loading}
     />
-    >{#if loading && estimatedTime}
+    {#if loading && estimatedTime}
       <div class="normal-case font-normal text-base text-base-100">
         <p>{`${capital($_("estimated_time_remaining"))}: ${estimatedTime}`}</p>
         <p>
