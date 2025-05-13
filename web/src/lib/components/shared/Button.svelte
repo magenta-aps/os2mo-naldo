@@ -5,7 +5,6 @@
 
   export let type: "button" | "submit" = "submit"
   export let title: string | undefined = undefined
-  export let size: "xs" | "sm" | "md" | "lg" | "xl" = "sm"
   export let outline: boolean = false
   export let disabled: boolean = false
   export let href: string | undefined = undefined
@@ -21,7 +20,7 @@
 {#if href}
   <a
     {href}
-    class="btn btn-{size} btn-primary {outline
+    class="btn btn-sm btn-primary {outline
       ? 'btn-outline'
       : ''} rounded normal-case font-normal text-base-100 hover:no-underline {extraClasses}"
   >
@@ -35,7 +34,7 @@
 {:else}
   <button
     {type}
-    class="btn btn-{size} btn-primary {outline
+    class="btn btn-sm btn-primary {outline
       ? 'btn-outline'
       : ''} rounded normal-case font-normal text-base-100 {extraClasses}"
     on:click
