@@ -90,7 +90,7 @@
     <button
       type="button"
       bind:this={resizeHandle}
-      class="absolute top-0 right-0 w-2 cursor-ew-resize bg-transparent {isResizing
+      class="absolute top-0 right-0 w-4 cursor-ew-resize bg-transparent {isResizing
         ? 'select-none'
         : 'select-auto'}"
       on:mousedown={startResizing}
