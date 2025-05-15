@@ -12,7 +12,8 @@ module.exports = {
     require('daisyui')
   ],
   daisyui: {
-    themes: [{
+    themes: [
+    {
       magenta: {
 
         // Primary
@@ -38,6 +39,8 @@ module.exports = {
         info: "#1053AB",
         warning: "#FBBD23",
       }
-    }],
+    },
+    "coffee"
+    ]
   }
 }
