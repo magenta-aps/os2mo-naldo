@@ -27,6 +27,7 @@
   import OwnerTable from "$lib/components/tables/OwnerTable.svelte"
   import RoleBindingTable from "$lib/components/tables/RoleBindingTable.svelte"
   import { MOConfig } from "$lib/stores/config"
+  import Ads from "$lib/components/Ads.svelte"
 
   // Tabs
   // "n" used for deciding which translation to use in Tabs
@@ -348,4 +349,5 @@
       />
     {/if}
   {/await}
+  <Ads />
 </div>

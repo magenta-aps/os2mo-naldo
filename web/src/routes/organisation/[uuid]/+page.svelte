@@ -29,6 +29,7 @@
   import { MOConfig } from "$lib/stores/config"
   import { tenseFilter } from "$lib/util/helpers"
   import { env } from "$env/dynamic/public"
+  import Ads from "$lib/components/Ads.svelte"
 
   // Tabs
   let items = [
@@ -352,4 +353,5 @@
       />
     {/if}
   {/key}
+  <Ads />
 </div>

@@ -2,6 +2,7 @@
   import { _ } from "svelte-i18n"
   import indexPageImage from "$lib/assets/alex.jpg"
   import { doomStore } from "$lib/stores/doomStore"
+  import Ads from "$lib/components/Ads.svelte"
 </script>
 
 <svelte:head>
@@ -52,7 +53,7 @@
       {:else}
         <img class="mx-auto max-w-xl" src={indexPageImage} alt={$_("welcome_message")} />
       {/if}
+      <Ads />
     </div>
   </div>
-
 </div>
