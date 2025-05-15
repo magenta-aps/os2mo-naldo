@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import indexPageImage from "$lib/assets/index_page_image.svg"
+  import indexPageImage from "$lib/assets/alex.jpg"
 </script>
 
 <svelte:head>
