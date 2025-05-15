@@ -109,6 +109,21 @@
     }
   `
 
+  const fire = () => {
+    var parts = 50;
+    var fireContainer = document.getElementById('termbutton');
+
+    while (parts--) {
+        var particle = document.createElement('div');
+        particle.className = 'particle';
+        fireContainer.appendChild(particle);
+    }
+  }
+
+  const extinguish = () => {
+    document.querySelectorAll(".particle").forEach(element => {element.remove()})
+  }
+
   $: {
     if (data) {
       data = sortData(data, $sortKey, $sortDirection)
@@ -231,8 +246,12 @@
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>
       </td>
-      <td>
+      <td
+          on:mouseenter={fire}
+          on:mouseleave={extinguish}>
         <a
+          id="termbutton"
+          on:mouseenter={() => { console.log("DO NOT REMOVE THIS MISSION CRITICAL PRINT") }}
           href="{base}/{$page.route.id?.split(
             '/'
           )[1]}/{uuid}/terminate/engagement/{engagement.uuid}"
