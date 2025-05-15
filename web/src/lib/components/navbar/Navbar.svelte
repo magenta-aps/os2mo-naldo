@@ -19,6 +19,7 @@
   import personOutlineRounded from "@iconify/icons-material-symbols/person-outline-rounded"
   import { capital } from "$lib/util/translationUtils"
   import { locale } from "svelte-i18n"
+  import phoneEnabled from "@iconify/icons-material-symbols/phone-enabled"
   import assignmentOutlineRounded from "@iconify/icons-material-symbols/assignment-outline-rounded"
   import inventory2OutlineRounded from "@iconify/icons-material-symbols/inventory-2-outline-rounded"
   import searchRounded from "@iconify/icons-material-symbols/search-rounded"
@@ -144,6 +145,12 @@ OS2mo-frontend version: ${env.PUBLIC_COMMIT_TAG}`}
         title={capital($_("report", { values: { n: 2 } }))}
         href="{base}/reports"
         icon={assignmentOutlineRounded}
+        open={isOpen}
+      />
+      <NavbarButton
+        title="Phonebook"
+        href="{base}/phonebook"
+        icon={phoneEnabled}
         open={isOpen}
       />
 
