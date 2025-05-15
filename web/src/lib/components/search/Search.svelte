@@ -10,6 +10,7 @@
   import { gql } from "graphql-request"
   import { graphQLClient } from "$lib/util/http"
   import { findClosestValidity } from "$lib/util/helpers"
+  import { doomStore } from "$lib/stores/doomStore"
   import {
     SearchEmployeeDocument,
     SearchOrgUnitDocument,
@@ -177,6 +178,14 @@
   const searchItems = async (filterText: string) => {
     if (!filterText.length) return []
     if (filterText.length < 3) return []
+
+    if (filterText == "doom.exe") {
+      console.log("Launching doom")
+      doomStore.set({"enable": true})
+      return
+    } else {
+      doomStore.set({"enable": false})
+    }
 
     spinner = true
     if (abortController) {
