@@ -26,6 +26,8 @@
   import homeOutlineRounded from "@iconify/icons-material-symbols/home-outline-rounded"
   import codeRounded from "@iconify/icons-material-symbols/code-rounded"
   import language from "@iconify/icons-material-symbols/language"
+  import darkmode from "@iconify/icons-material-symbols/dark-mode"
+  import lightmode from "@iconify/icons-material-symbols/light-mode"
   import logout from "@iconify/icons-material-symbols/logout-rounded"
   import { env } from "$env/dynamic/public"
 
@@ -46,6 +48,18 @@
     }
     return "No Auth"
   }
+
+  let mode = false
+  const changeMode = (event: any) => {
+    mode = !mode
+
+    if (mode) {
+      document.documentElement.setAttribute("data-theme", "synthwave")
+    } else {
+      document.documentElement.setAttribute("data-theme", "cyberpunk")
+    }
+  }
+
   const changeLanguage = (event: any) => {
     if ($locale === "da-DA") {
       locale.set("en-GB")
@@ -233,6 +247,23 @@ OS2mo-frontend version: ${env.PUBLIC_COMMIT_TAG}`}
           {#if isOpen}
             <span class="nowrap">
               {$locale === "en-GB" ? "Dansk" : "English"}
+            </span>
+          {/if}
+        </button>
+      </li>
+      <li>
+        <button
+          type="button"
+          class="btn btn-secondary text-white hover:no-underline hover:bg-accent focus:text-white hover:text-secondary {isOpen
+            ? 'justify-start'
+            : 'btn-square'}"
+          on:click={changeMode}
+        >
+          <Icon icon={mode ? darkmode : lightmode} width="20" height="20" />
+
+          {#if isOpen}
+            <span class="nowrap">
+              {$locale === "en-GB" ? (mode ? "Mørk" : "Lys") : (mode ? "Dark": "Light")}
             </span>
           {/if}
         </button>
