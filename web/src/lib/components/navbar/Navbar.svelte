@@ -56,7 +56,7 @@
     if (mode) {
       document.documentElement.setAttribute("data-theme", "synthwave")
     } else {
-      document.documentElement.setAttribute("data-theme", "cyberpunk")
+      document.documentElement.setAttribute("data-theme", "magenta")
     }
   }
 
