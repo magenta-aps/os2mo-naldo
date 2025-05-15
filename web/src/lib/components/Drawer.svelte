@@ -80,7 +80,7 @@
     style="width: {`${$drawerWidth}px`}"
   >
     <label for="drawer" class="drawer-overlay" />
-    <ul class="bg-base-100 w-full h-fit">
+    <ul class="w-full h-fit">
       <div>
         <DrawerContent />
       </div>
