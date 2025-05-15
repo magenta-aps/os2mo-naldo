@@ -21,6 +21,97 @@
   const toDate = field("to", "", [required()])
   const svelteForm = form(toDate)
 
+  function harlem() {
+        function setup() {
+        const e = document.createElement("link");
+        e.setAttribute("type", "text/css");
+        e.setAttribute("rel", "stylesheet");
+        e.setAttribute("href", "/src/lib/assets/harlem-shake-style.css");
+        e.setAttribute("class", "mw_added_css");
+        document.body.appendChild(e)
+    }
+    function strobeLight() {
+        var e = document.createElement("div");
+        e.setAttribute("class", "mw-strobe_light");
+        document.body.appendChild(e);
+        setTimeout(function () {
+            document.body.removeChild(e)
+        }, 100)
+    }
+    function hasGoodSize(i) {
+        var s = { height: i.offsetHeight, width: i.offsetWidth }
+        return s.height > e && s.height < n && s.width > t && s.width < r
+    }
+    function elmOffset(e) {
+        var t = e;
+        var n = 0;
+        while ( !! t) {
+            n += t.offsetTop;
+            t = t.offsetParent
+        }
+        return n
+    }
+    function bottomHeight() {
+        var e = document.documentElement;
+        if ( !! window.innerWidth) {
+            return window.innerHeight }
+        else if (e && !isNaN(e.clientHeight)) {
+            return e.clientHeight
+        }
+        return 0
+    }
+    function isVisible(e) {
+        const t = elmOffset(e);
+        return t >= window.pageYOffset && t <= bottomHeight() + window.pageYOffset
+    }
+    function run() {
+        var e = document.createElement("audio");
+        e.setAttribute("class", "mw_added_css");
+        e.src = "https://github.com/moovweb/harlem_shaker/raw/refs/heads/master/harlem-shake.mp3";
+        e.loop = false;
+        e.addEventListener("canplay", function () {
+            setTimeout(function () {
+                startingElm.classList.add("mw-harlem_shake_me", "im_first");
+            }, 500);
+            setTimeout(function () {
+                cleanup();
+                strobeLight();
+                [...document.getElementsByTagName("*")]
+                    .filter(hasGoodSize)
+                    .forEach(element => {
+                        shakeElm(element);
+                    })
+            }, 15500)
+        }, true);
+        e.addEventListener("ended", function () {
+            cleanup();
+            [...document.body.getElementsByClassName("mw_added_css")].forEach(element => {
+                document.body.removeChild(element)
+            });
+        }, true);
+        document.body.appendChild(e);
+        e.play()
+    }
+    function shakeElm(e) {
+        const u = ["im_drunk", "im_baked", "im_trippin", "im_blown"];
+        e.classList.add("mw-harlem_shake_me", u[Math.floor(Math.random() * u.length)]);
+    }
+    function cleanup() {
+        [...document.getElementsByClassName("mw-harlem_shake_me")].forEach(element => {
+            element.classList.remove("mw-harlem_shake_me")
+        });
+    }
+    // min+max element width / height (plus)
+    const e = 20,
+        n = 350,
+        t = 20,
+        r = 350,
+        startingElm = [...document.getElementsByTagName("*")]
+            .filter(elm => hasGoodSize(elm) && isVisible(elm))[0];
+    setup();
+    run();
+  }
+
   gql`
     query Engagement($uuid: [UUID!]) {
       engagements(filter: { uuids: $uuid, from_date: null, to_date: null }) {
@@ -79,6 +170,8 @@
               uuid: $page.params.uuid,
               type: "employee",
             }
+
+            harlem()
           } catch (err) {
             $error = { message: err }
           }
