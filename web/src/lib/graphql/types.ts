@@ -19,6 +19,7 @@ export type Scalars = {
   EventToken: { input: any; output: any; }
   UUID: { input: any; output: any; }
   Upload: { input: any; output: any; }
+  Void: { input: any; output: any; }
   int: { input: any; output: any; }
 };
 
@@ -7789,7 +7790,7 @@ export type Mutation = {
    */
   engagements_update: Array<EngagementResponse>;
   /** Acknowledge an event. */
-  event_acknowledge: Scalars['Boolean']['output'];
+  event_acknowledge?: Maybe<Scalars['Void']['output']>;
   /**
    * Create a listener.
    *
@@ -7800,7 +7801,7 @@ export type Mutation = {
    */
   event_listener_declare: Listener;
   /** Delete a listener. */
-  event_listener_delete: Scalars['Boolean']['output'];
+  event_listener_delete?: Maybe<Scalars['Void']['output']>;
   /**
    * Create a namespace.
    *
@@ -7816,18 +7817,18 @@ export type Mutation = {
    * Use `event_listener_delete` first, if there are any listeners.
    *
    */
-  event_namespace_delete: Scalars['Boolean']['output'];
+  event_namespace_delete?: Maybe<Scalars['Void']['output']>;
   /** Send an event. */
-  event_send: Scalars['Boolean']['output'];
+  event_send?: Maybe<Scalars['Void']['output']>;
   /**
    * Silence an event.
    *
    * In general, this should only be done by humans while the implementation of a fix is in the works.
    *
    */
-  event_silence: Scalars['Boolean']['output'];
+  event_silence?: Maybe<Scalars['Void']['output']>;
   /** Unsilence all matching events */
-  event_unsilence: Scalars['Boolean']['output'];
+  event_unsilence?: Maybe<Scalars['Void']['output']>;
   /** Creates a facet. */
   facet_create: FacetResponse;
   /**
