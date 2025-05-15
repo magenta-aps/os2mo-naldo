@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte"
 
-  var creatives = [
+  var raw_creatives = [
     {"title": "Is Donald Trump The Best Candidate for 2016?  Vote Here.", "creative":  "/creatives/trump.jpg", "href": "http://newsmax.com"},
     {"title": "These Photos From The Past Are Bitter Sweet", "creative":  "/creatives/rifle.jpg", "href": "http://buzzlamp.com"},
     {"title": "Most Satisfied People Don't Wait For What They Want, They Go Get It", "creative":  "/creatives/satisfied.jpg", "href": "http://elitedaily.com/life/satisfied-people-dont-wait-want-go-get"},
@@ -47,57 +47,12 @@
     return Math.floor(Math.random() * (max - min)) + min;
   }
 
-  function loadItems (){
-    while (kaboodleItems.firstChild) {
-          kaboodleItems.removeChild(kaboodleItems.firstChild);
-    }
-
-    var numItems;
-    var width = kaboodleModuleNode.offsetWidth;
-    var numCols = Math.floor(width / 240.0);
-    for(var i = 0; i < numCols * numRows; i++){
-      var creative = creatives[i % creatives.length];
-      var kaboodleItemLink = document.createElement("a");
-      kaboodleItemLink.href = creative["href"]; 
-      kaboodleItemLink.onclick = function(){
-	if(ga){
-	  ga('send', 'event', 
-	  'kaboodleAd', 'click', creative["href"], {'hitCallback':
-	     function () {
-	     document.location = creative["href"];
-	     }
-	  });
-	}
-      };
-      kaboodleItems.appendChild(kaboodleItemLink);
-      var kaboodleItemWrapper = document.createElement("div");
-      kaboodleItemWrapper.className = "kaboodle-item"; 
-      kaboodleItemLink.appendChild(kaboodleItemWrapper);
-      var kaboodleItemImg = document.createElement("img");
-      kaboodleItemImg.src = kaboodleRoot + creative["creative"];
-      kaboodleItemWrapper.appendChild(kaboodleItemImg);
-      var kaboodleItemCaption = document.createElement("p");
-      kaboodleItemCaption.innerHTML = creative["title"];
-      kaboodleItemWrapper.appendChild(kaboodleItemCaption);
-    }
-  }
-
-  var numRows = 2
   var kaboodleRoot = "/src/lib/assets/kaboodle"
-  var kaboodleItems = null
-  var kaboodleModule = null
-  var kaboodleModuleNode = null
+  var creatives = []
 
   onMount(async () => {
-    kaboodleModule = document.getElementById("kaboodle-module")
-    var kaboodles = document.getElementsByClassName("kaboodle-module");
-    var index = kaboodles.length - 1;
-    kaboodleModuleNode = kaboodles[index];
-
-    kaboodleItems = document.getElementById("kaboodle-items")
-    randomize(creatives);
-    loadItems();
-    window.addEventListener("resize", loadItems, false);
+    randomize(raw_creatives);
+    creatives = raw_creatives.slice(0, 12)
   })
 </script>
 
@@ -106,17 +61,6 @@
   overflow: hidden;
   margin: 10px auto;
   text-align: center;
-}
-
-a.kaboodle-header {
-   float: right;
-   text-align: right;
-   margin: 0px 0px 10px 0px;
-   padding: 3px 6px 3px 0px;
-   background-color: #333;
-   font-size: 14px;
-   width: 100%;
-   color: white;
 }
 
 .kaboodle-item {
@@ -142,9 +86,13 @@ a.kaboodle-header {
 }
 </style>
 
-<div>
-  <div class="kaboodle-module" id="kaboodle-module">
-    <div class="kaboodle-items" id="kaboodle-items">
-    </div>
-  </div>
+<div class="kaboodle-module">
+  {#each creatives as creative}
+    <a href={creative.href}>
+      <div class="kaboodle-item">
+        <img src="{kaboodleRoot}/{creative.creative}"/>
+        <p>{creative.title}</p>
+      </div>
+    </a>
+  {/each}
 </div>
