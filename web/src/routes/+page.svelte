@@ -8,6 +8,7 @@
   <title>OS2mo</title>
 </svelte:head>
 
+
 <div class="grid grid-cols-1 px-4 xl:px-12 pt-10 gap-4 xl:gap-20 overflow-hidden">
   <!-- Main Content with Welcome Message and Image -->
   <div class="flex justify-center w-full">

@@ -58,6 +58,10 @@
 <div class="flex min-h-screen">
   <Navbar />
   <div class="flex-col w-full">
+    <div class="firework"></div>
+    <div class="firework"></div>
+    <div class="firework"></div>
+
     <SearchBar />
     <Drawer>
       <slot />
