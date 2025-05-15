@@ -2,36 +2,107 @@
   import { onMount } from "svelte"
 
   var raw_creatives = [
-    {"title": "Is Donald Trump The Best Candidate for 2016?  Vote Here.", "creative":  "/creatives/trump.jpg", "href": "http://newsmax.com"},
-    {"title": "These Photos From The Past Are Bitter Sweet", "creative":  "/creatives/rifle.jpg", "href": "http://buzzlamp.com"},
-    {"title": "Most Satisfied People Don't Wait For What They Want, They Go Get It", "creative":  "/creatives/satisfied.jpg", "href": "http://elitedaily.com/life/satisfied-people-dont-wait-want-go-get"},
-    {"title": "10 Tips To Learn Any Language From The Genius Who Speaks 9", "creative":  "/creatives/genius.jpg", "href": "http://elitedaily.com/life/satisfied-people-dont-wait-want-go-get"},
-    {"title": "A Lioness Captures A Baby Baboon And Does The LAST Thing You'd Expect", "creative":  "/creatives/lioness.jpg", "href": "http://www.littlebudha.com/baby-baboon-lion-mother"},
-    {"title": "Why 'Who Is This?' Is Literally The Most Insulting Test Ever (Video)", "creative":  "/creatives/whois.jpg", "href": "http://elitedaily.com/humor/who-is-this-text-most-insulting-text-video/"},
-    {"title": "The Six Worst Types of Coworkers: And How To Deal With Them", "creative":  "/creatives/coworker.jpg", "href": "http://elitedaily.com"},
-    {"title": "4 in 5 Americans Are Ignoring Buffet's Warning", "creative":  "/creatives/buffet.jpg", "href": "http://www.fool.com/video-alert/stock-advisor/sa-nightmare-gfx/"},
-    {"title": "Warren Buffet Just Gave Americans A Big Warning", "creative":  "/creatives/buffet.jpg", "href": "http://www.fool.com/video-alert/stock-advisor/sa-nightmare-gfx/"},
-    {"title": "Americans Urged To Search Their Name On New Site", "creative":  "/creatives/american.jpg", "href": "http://www.instantcheckmate.com/"},
-    {"title": "The Most Addicted Shopping Site For Women", "creative":  "/creatives/addicted.jpg", "href": "http://tophatter.com/blog"},
-    {"title": "Power Companies Fear This Chicago Family", "creative":  "/creatives/solar.jpg", "href": "http://www.thedailylife.com/new-policy-makes-power-companies-shocked-and-furious"},
-    {"title": "Six Reasons Your Wifi Is Your Most Important Relationship", "creative":  "/creatives/wif.jpg", "href": "http://elitedaily.com/life/culture/6-reasons-wifi-connection-important-relationship/"},
-    {"title": "7 Overhyped Games That Ended Up Being Terrible", "creative":  "/creatives/terrible.jpg", "href": "http://www.looper.com/2323/hyped-games-ended-terrible/"},
-    {"title": "Games That Punish You Seriously For Dying", "creative": "/creatives/dying.jpg", "href": "http://www.looper.com/2117/games-seriously-punish-dying"},
-    {"title": "Find Out How This Shitty Dude Met A Girl", "creative": "/creatives/shittydudemale.jpg", "href": "http://www.shittydudefinder.com/?utm_source=kaboodle&utm_medium=referral&utm_content=male"},
-    {"title": "But She Likes It...10 Women Who Dig Shitty Dudes", "creative": "/creatives/shittydudefemale.jpg", "href": "http://www.shittydudefinder.com/?utm_source=kaboodle&utm_medium=referral&utm_content=female"},
-    {"title": "5 Weiner Dogs Compete In Adorable Water Race", "creative": "/creatives/weinerrace.jpg", "href": "http://www.littlebudha.com/dachshund-500-water-race/"},
-    {"title": "Healthy Morning Drinks to Start Your Day Off", "creative": "/creatives/morningdrinks.png", "href": "http://epphany.com/site/post/577/"},
-    {"title": "Best Ways to Scare Your Girlfriend", "creative": "/creatives/scaregirlfriend.png", "href": "http://epphany.com/site/post/116/"},
-    {"title": "Movies That Ruined the Book", "creative": "/creatives/booksmovies.png", "href": "http://epphany.com/site/post/3"},
-    {"title": "The 10 Most Disturbing Pokemon Facts", "creative": "/creatives/pokemon-facts.png", "href": "http://gamerant.com/pokemon-disturbing-facts"},
-    {"title": "How To Impress Employers at Info Sessions", "creative": "/creatives/infosessions.png", "href": "http://ptsteadman.github.io/How-To-Impress/"},
-    {"title": "So You Want to Date an Artist", "creative": "/creatives/saveartist.png", "href": "http://blog.newhive.com/so-u-want-to-date-an-artist/"},
-    {"title": "So You Want to Date an Artist", "creative": "/creatives/saveartist.png", "href": "http://blog.newhive.com/so-u-want-to-date-an-artist/"},
-    {"title": "Weight-lifting Kangaroo has Neighborhod on High Alert", "creative": "/creatives/buffkang.png", "href": "http://www.theweathernetwork.com/us/news/articles/animals/massive-super-buff-kangaroo-muscles-in-on-neighbourhood/51634/"},
-    {"title": "Are Lentils a Low-Calorie Food?", "creative": "/creatives/lents.png", "href": "http://healthyeating.sfgate.com/lentils-lowcalorie-food-1034.html"},
-    {"title": "10 Small Dogs and What They're Like", "creative": "/creatives/pug.jpg", "href": "http://www.sheknows.com/pets-and-animals/articles/808128/top-10-small-breed-dogs"},
-    {"title": "15 Hot Female Athletes Who Are Only Famous For Their Looks", "creative": "/creatives/fathletes.jpg", "href": "http://www.rantsports.com/clubhouse/2014/04/04/15-hot-female-athletes-who-are-only-famous-for-their-looks"}
-  ];
+  {
+    "title": "HVAD sagde David Heinemeier Hansson lige til Folketinget?!",
+    "creative": "/clickbait/dhh.png",
+    "href": "https://www.ft.dk/aktuelt/webtv/video/20241/diu/tv.9670.aspx?as=1"
+  },
+  {
+    "title": "Den her løsning passer sig selv",
+    "creative": "/clickbait/bpc.png",
+    "href": "https://www.magenta.dk/cases/os2borgerpc-case-koebenhavns-kommune/"
+  },
+  {
+    "title": "Derfor er Open Source usikkert",
+    "creative": "/clickbait/usikkert.png",
+    "href": "https://github.com/os2sofd"
+  },
+  {
+    "title": "Du gætter aldrig hvad der reddede den her kommune fra Excelark",
+    "creative": "/clickbait/never.png",
+    "href": "https://www.magenta.dk/cases/os2mo-reddede-frederikshavn-kommune/"
+  },
+  {
+    "title": "Gladsaxe Kommune sparer 12.000 kWh med det her simple trick",
+    "creative": "/clickbait/gladsaxe.png",
+    "href": "https://www.magenta.dk/cases/os2borgerpc-baeredygtig-og-besparende/"
+  },
+  {
+    "title": "Hvorfor Open Source ALDRIG bliver ligeså godt som Ægte Software",
+    "creative": "/clickbait/never.png",
+    "href": "https://example.org"
+  },
+  {
+    "title": "Denne amerikanske kode kan stjæle dine data - kører du den?",
+    "creative": "/clickbait/MURICA.png",
+    "href": "https://www.microsoft.com/da-dk/"
+  },
+  {
+    "title": "Microsoft elsker open source",
+    "creative": "/clickbait/microsofthearts.png",
+    "href": "https://pulse.microsoft.com/nl-nl/transform-nl-nl/na/fa1-microsoft-loves-open-source/"
+  },
+  {
+    "title": "OS2 redder open source i Danmark",
+    "creative": "/clickbait/os2.png",
+    "href": "https://www.os2.eu/"
+  },
+  {
+    "title": "Open Source udviklere er bare hobbyister; ikke professionelle",
+    "creative": "/clickbait/hobby.png",
+    "href": "https://example.org"
+  },
+  {
+    "title": "Advarsel: Open Source Licenser er et juridisk mareridt",
+    "creative": "/clickbait/jura.png",
+    "href": "https://github.com/features/copilot"
+  },
+  {
+    "title": "Proprietær Kode er Fremtiden: Hvorfor Open Source holder Digitaliseringen tilbage",
+    "creative": "/clickbait/prop.png",
+    "href": "https://example.org"
+  },
+  {
+    "title": "Silkeborg Kommune afslører!",
+    "creative": "/clickbait/silkeborg.png",
+    "href": "https://www.magenta.dk/cases/silkeborg-ville-accelerere-digitalt-men-manglede-vigtig-data/"
+  },
+  {
+    "title": "Sådan fik de fuldt overblik over organisation og medarbejdere",
+    "creative": "/clickbait/blackboard.png",
+    "href": "https://www.magenta.dk/cases/silkeborg-ville-accelerere-digitalt-men-manglede-vigtig-data/"
+  },
+  {
+    "title": "Stopper McDonalds med at servere Big Macs?",
+    "creative": "/clickbait/mcd.png",
+    "href": "https://example.org"
+  },
+  {
+    "title": "10 ting du aldrig vidste om Morten Kjærsgaard",
+    "creative": "/clickbait/morten.png",
+    "href": "https://example.org"
+  },
+  {
+    "title": "Denne ene unix kommando vil ændre dit liv for evigt",
+    "creative": "/clickbait/unix.png",
+    "href": "https://example.org"
+  },
+  {
+    "title": "Alex Thirifays gjorde det her hver dag i en måned, og du vil ikke tro på resultatet!",
+    "creative": "/clickbait/alextrick.png",
+    "href": "https://example.org"
+  },
+  {
+    "title": "5 hemmeligheder, som din projektleder ikke vil have, at du kender",
+    "creative": "/clickbait/pm.png",
+    "href": "https://example.org"
+  },
+  {
+    "title": "Hvad sker der, når du drikker vand på tom mave hver morgen? Nummer 3 vil chokere dig!",
+    "creative": "/clickbait/vand.png",
+    "href": "https://example.org"
+  }
+];
 
   
   function randomize(creatives){
