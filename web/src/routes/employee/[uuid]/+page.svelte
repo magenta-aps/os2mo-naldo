@@ -155,6 +155,7 @@
     </div>
 
     {#if activeItem === EmployeeTab.EMPLOYEE}
+      <img src=https://cultofthepartyparrot.com/parrots/hd/parrot.gif>
       <TableTensesWrapper
         table={EmployeeTable}
         headers={[
@@ -167,6 +168,7 @@
         ]}
       />
     {:else if activeItem === EmployeeTab.ENGAGEMENT}
+      <img src=https://cultofthepartyparrot.com/parrots/hd/hardhatparrot.gif>
       <TableTensesWrapper
         table={EngagementTable}
         headers={[
@@ -205,6 +207,7 @@
         ]}
       />
     {:else if activeItem === EmployeeTab.ADDRESS}
+    <img src=https://cultofthepartyparrot.com/parrots/hd/stayhomeparrot.gif>
       <TableTensesWrapper
         table={AddressTable}
         headers={[
@@ -220,6 +223,7 @@
         ]}
       />
     {:else if activeItem === EmployeeTab.ASSOCIATION}
+    <img src=https://cultofthepartyparrot.com/parrots/hd/boredparrot.gif>
       <TableTensesWrapper
         table={AssociationTable}
         headers={[
@@ -238,6 +242,7 @@
         ]}
       />
     {:else if activeItem === EmployeeTab.ITASSOCIATION}
+    <img src=https://cultofthepartyparrot.com/parrots/hd/confusedparrot.gif>
       <TableTensesWrapper
         table={ItAssociationTable}
         headers={[
@@ -262,6 +267,7 @@
         ]}
       />
     {:else if activeItem === EmployeeTab.IT}
+    <img src=https://cultofthepartyparrot.com/parrots/hd/laptop_parrot.gif>
       <Tabs
         activeItem={itActiveItem}
         items={itItems}
@@ -282,6 +288,7 @@
           ]}
         />
       {:else if itActiveItem === ItTab.ROLEBINDING}
+      <img src=https://cultofthepartyparrot.com/parrots/databaseparrot.gif>
         <TableTensesWrapper
           table={RoleBindingTable}
           headers={[
@@ -305,6 +312,7 @@
         />
       {/if}
     {:else if activeItem === EmployeeTab.LEAVE}
+    <img src=https://cultofthepartyparrot.com/parrots/hd/sleepingparrot.gif>
       <TableTensesWrapper
         table={LeaveTable}
         headers={[
@@ -320,6 +328,7 @@
         ]}
       />
     {:else if activeItem === EmployeeTab.MANAGER}
+    <img src=https://cultofthepartyparrot.com/parrots/hd/dealwithitparrot.gif>
       <TableTensesWrapper
         table={ManagerTable}
         headers={[
@@ -337,6 +346,7 @@
         ]}
       />
     {:else if activeItem === EmployeeTab.OWNER}
+    <img src=https://cultofthepartyparrot.com/parrots/matrixparrot.gif>
       <TableTensesWrapper
         table={OwnerTable}
         headers={[

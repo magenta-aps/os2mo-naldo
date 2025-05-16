@@ -184,6 +184,7 @@
   {/await}
   {#key $date + uuidFromUrl}
     {#if activeItem === OrgTab.ORG_UNIT}
+    <img src=https://cultofthepartyparrot.com/parrots/hd/congaparrot.gif>
       <TableTensesWrapper
         table={OrgUnitTable}
         headers={[
@@ -199,6 +200,7 @@
         ]}
       />
     {:else if activeItem === OrgTab.ADDRESS}
+    <img src=https://cultofthepartyparrot.com/parrots/hd/mailparrot.gif>
       <TableTensesWrapper
         table={AddressTable}
         headers={[
@@ -214,6 +216,7 @@
         ]}
       />
     {:else if activeItem === OrgTab.ENGAGEMENT}
+    <img src=https://cultofthepartyparrot.com/parrots/hd/hardhatparrot.gif>
       <TableTensesWrapper
         table={EngagementTable}
         headers={[
@@ -246,6 +249,7 @@
         ]}
       />
     {:else if activeItem === OrgTab.ASSOCIATION}
+    <img src=https://cultofthepartyparrot.com/parrots/hd/boredparrot.gif>
       <TableTensesWrapper
         table={AssociationTable}
         headers={[
@@ -261,6 +265,7 @@
         ]}
       />
     {:else if activeItem === OrgTab.IT}
+    <img src=https://cultofthepartyparrot.com/parrots/hd/laptop_parrot.gif>
       <Tabs
         activeItem={itActiveItem}
         items={itItems}
@@ -304,6 +309,7 @@
         />
       {/if}
     {:else if activeItem === OrgTab.MANAGER}
+    <img src=https://cultofthepartyparrot.com/parrots/hd/dealwithitparrot.gif>
       <TableTensesWrapper
         table={ManagerTable}
         headers={[
@@ -318,6 +324,7 @@
         ]}
       />
     {:else if activeItem === OrgTab.KLE}
+    <img src=https://cultofthepartyparrot.com/parrots/hd/confusedparrot.gif>
       <TableTensesWrapper
         table={KleTable}
         headers={[
@@ -330,6 +337,7 @@
         ]}
       />
     {:else if activeItem === OrgTab.OWNER}
+    <img src=https://cultofthepartyparrot.com/parrots/matrixparrot.gif>
       <TableTensesWrapper
         table={OwnerTable}
         headers={[
@@ -341,6 +349,7 @@
         ]}
       />
     {:else if activeItem === OrgTab.RELATED_UNIT}
+    <img src=https://cultofthepartyparrot.com/parrots/portalparrot.gif>
       <TableTensesWrapper
         table={RelatedUnitsTable}
         headers={[
