@@ -1,105 +1,126 @@
 <script lang="ts">
   import { page } from "$app/stores"
 
+  import dhh from "$lib/assets/kaboodle/clickbait/dhh.png"
+  import bpc from "$lib/assets/kaboodle/clickbait/bpc.png"
+  import usikkert from "$lib/assets/kaboodle/clickbait/usikkert.png"
+  import never from "$lib/assets/kaboodle/clickbait/never.png"
+  import gladsaxe from "$lib/assets/kaboodle/clickbait/gladsaxe.png"
+  import nevah from "$lib/assets/kaboodle/clickbait/never.png"
+  import MURICA from "$lib/assets/kaboodle/clickbait/MURICA.png"
+  import microsofthearts from "$lib/assets/kaboodle/clickbait/microsofthearts.png"
+  import os2 from "$lib/assets/kaboodle/clickbait/os2.png"
+  import hobby from "$lib/assets/kaboodle/clickbait/hobby.png"
+  import jura from "$lib/assets/kaboodle/clickbait/jura.png"
+  import prop from "$lib/assets/kaboodle/clickbait/prop.png"
+  import silkeborg from "$lib/assets/kaboodle/clickbait/silkeborg.png"
+  import blackboard from "$lib/assets/kaboodle/clickbait/blackboard.png"
+  import mcd from "$lib/assets/kaboodle/clickbait/mcd.png"
+  import morten from "$lib/assets/kaboodle/clickbait/morten.png"
+  import unix from "$lib/assets/kaboodle/clickbait/unix.png"
+  import alextrick from "$lib/assets/kaboodle/clickbait/alextrick.png"
+  import pm from "$lib/assets/kaboodle/clickbait/pm.png"
+  import vand from "$lib/assets/kaboodle/clickbait/vand.png"
+
   var raw_creatives = [
   {
     "title": "HVAD sagde David Heinemeier Hansson lige til Folketinget?!",
-    "creative": "/clickbait/dhh.png",
+    "creative": dhh,
     "href": "https://www.ft.dk/aktuelt/webtv/video/20241/diu/tv.9670.aspx?as=1"
   },
   {
     "title": "Den her løsning passer sig selv",
-    "creative": "/clickbait/bpc.png",
+    "creative": bpc,
     "href": "https://www.magenta.dk/cases/os2borgerpc-case-koebenhavns-kommune/"
   },
   {
     "title": "Derfor er Open Source usikkert",
-    "creative": "/clickbait/usikkert.png",
+    "creative": usikkert,
     "href": "https://os2mo.dk/"
   },
   {
     "title": "Du gætter aldrig hvad der reddede den her kommune fra Excelark",
-    "creative": "/clickbait/never.png",
+    "creative": nevah,
     "href": "https://www.magenta.dk/cases/os2mo-reddede-frederikshavn-kommune/"
   },
   {
     "title": "Gladsaxe Kommune sparer 12.000 kWh med det her simple trick",
-    "creative": "/clickbait/gladsaxe.png",
+    "creative": gladsaxe,
     "href": "https://www.magenta.dk/cases/os2borgerpc-baeredygtig-og-besparende/"
   },
   {
     "title": "Hvorfor Open Source ALDRIG bliver ligeså godt som Ægte Software",
-    "creative": "/clickbait/never.png",
+    "creative": never,
     "href": "https://git.caspervk.net/caspervk"
   },
   {
     "title": "Denne amerikanske kode kan stjæle dine data - kører du den?",
-    "creative": "/clickbait/MURICA.png",
+    "creative": MURICA,
     "href": "https://www.microsoft.com/da-dk/"
   },
   {
     "title": "Microsoft elsker open source",
-    "creative": "/clickbait/microsofthearts.png",
+    "creative": microsofthearts,
     "href": "https://pulse.microsoft.com/nl-nl/transform-nl-nl/na/fa1-microsoft-loves-open-source/"
   },
   {
     "title": "OS2 redder open source i Danmark",
-    "creative": "/clickbait/os2.png",
+    "creative": os2,
     "href": "https://github.com/os2sofd"
   },
   {
     "title": "Open Source udviklere er bare hobbyister; ikke professionelle",
-    "creative": "/clickbait/hobby.png",
+    "creative": hobby,
     "href": "https://git.caspervk.net/caspervk"
   },
   {
     "title": "Advarsel: Open Source Licenser er et juridisk mareridt",
-    "creative": "/clickbait/jura.png",
+    "creative": jura,
     "href": "https://github.com/features/copilot"
   },
   {
     "title": "Proprietær Kode er Fremtiden: Hvorfor Open Source holder Digitaliseringen tilbage",
-    "creative": "/clickbait/prop.png",
+    "creative": prop,
     "href": "https://www.os2.eu/"
   },
   {
     "title": "Silkeborg Kommune afslører!",
-    "creative": "/clickbait/silkeborg.png",
+    "creative": silkeborg,
     "href": "https://www.magenta.dk/cases/silkeborg-ville-accelerere-digitalt-men-manglede-vigtig-data/"
   },
   {
     "title": "Sådan fik de fuldt overblik over organisation og medarbejdere",
-    "creative": "/clickbait/blackboard.png",
+    "creative": blackboard,
     "href": "https://www.magenta.dk/cases/silkeborg-ville-accelerere-digitalt-men-manglede-vigtig-data/"
   },
   {
     "title": "Stopper McDonalds med at servere Big Macs?",
-    "creative": "/clickbait/mcd.png",
+    "creative": mcd,
     "href": "https://en.wikipedia.org/wiki/Betteridge%27s_law_of_headlines"
   },
   {
     "title": "10 ting du aldrig vidste om MORTEN KJÆRSGAARD",
-    "creative": "/clickbait/morten.png",
+    "creative": morten,
     "href": "https://example.org"
   },
   {
     "title": "Denne ene UNIX kommando vil ÆNDRE DIT LIV FOR EVIGT",
-    "creative": "/clickbait/unix.png",
+    "creative": unix,
     "href": "https://github.com/astral-sh/ty"
   },
   {
     "title": "Alex Thirifays gjorde det her hver dag i en måned, og du vil ikke tro på resultatet!",
-    "creative": "/clickbait/alextrick.png",
+    "creative": alextrick,
     "href": "https://example.org"
   },
   {
     "title": "5 hemmeligheder, som din projektleder ikke vil have, at du kender",
-    "creative": "/clickbait/pm.png",
+    "creative": pm,
     "href": "https://old.reddit.com/r/overemployed/"
   },
   {
     "title": "Hvad sker der, når du drikker vand på tom mave hver morgen? NUMMER 3 VIL CHOKERE DIG!",
-    "creative": "/clickbait/vand.png",
+    "creative": vand,
     "href": "https://dhmo.org/facts.html"
   }
 ];
@@ -118,7 +139,6 @@
     return Math.floor(Math.random() * (max - min)) + min;
   }
 
-  var kaboodleRoot = "/src/lib/assets/kaboodle"
   var creatives = []
 
   $: if ($page) {
@@ -162,7 +182,7 @@
   {#each creatives as creative}
     <a href={creative.href}>
       <div class="kaboodle-item">
-        <img src="{kaboodleRoot}/{creative.creative}"/>
+        <img src="{creative.creative}"/>
         <p>{creative.title}</p>
       </div>
     </a>
