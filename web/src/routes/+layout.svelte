@@ -10,6 +10,7 @@
   import { initKeycloak } from "$lib/util/keycloak"
   import Favicon from "$lib/assets/favicon.png"
   import Drawer from "$lib/components/Drawer.svelte"
+  import BackgroundQuote from "$lib/components/BackgroundQuote.svelte"
   import { MOConfig, formatConfig } from "$lib/stores/config"
   import { gql } from "graphql-request"
   import { GetConfigDocument } from "./query.generated"
@@ -61,6 +62,7 @@
     <div class="firework"></div>
     <div class="firework"></div>
     <div class="firework"></div>
+    <BackgroundQuote />
 
     <SearchBar />
     <Drawer>
