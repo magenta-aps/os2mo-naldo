@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte"
+  import { page } from "$app/stores"
 
   var raw_creatives = [
   {
@@ -15,7 +15,7 @@
   {
     "title": "Derfor er Open Source usikkert",
     "creative": "/clickbait/usikkert.png",
-    "href": "https://github.com/os2sofd"
+    "href": "https://os2mo.dk/"
   },
   {
     "title": "Du gætter aldrig hvad der reddede den her kommune fra Excelark",
@@ -30,7 +30,7 @@
   {
     "title": "Hvorfor Open Source ALDRIG bliver ligeså godt som Ægte Software",
     "creative": "/clickbait/never.png",
-    "href": "https://example.org"
+    "href": "https://git.caspervk.net/caspervk"
   },
   {
     "title": "Denne amerikanske kode kan stjæle dine data - kører du den?",
@@ -45,12 +45,12 @@
   {
     "title": "OS2 redder open source i Danmark",
     "creative": "/clickbait/os2.png",
-    "href": "https://www.os2.eu/"
+    "href": "https://github.com/os2sofd"
   },
   {
     "title": "Open Source udviklere er bare hobbyister; ikke professionelle",
     "creative": "/clickbait/hobby.png",
-    "href": "https://example.org"
+    "href": "https://git.caspervk.net/caspervk"
   },
   {
     "title": "Advarsel: Open Source Licenser er et juridisk mareridt",
@@ -60,7 +60,7 @@
   {
     "title": "Proprietær Kode er Fremtiden: Hvorfor Open Source holder Digitaliseringen tilbage",
     "creative": "/clickbait/prop.png",
-    "href": "https://example.org"
+    "href": "https://www.os2.eu/"
   },
   {
     "title": "Silkeborg Kommune afslører!",
@@ -75,17 +75,17 @@
   {
     "title": "Stopper McDonalds med at servere Big Macs?",
     "creative": "/clickbait/mcd.png",
-    "href": "https://example.org"
+    "href": "https://en.wikipedia.org/wiki/Betteridge%27s_law_of_headlines"
   },
   {
-    "title": "10 ting du aldrig vidste om Morten Kjærsgaard",
+    "title": "10 ting du aldrig vidste om MORTEN KJÆRSGAARD",
     "creative": "/clickbait/morten.png",
     "href": "https://example.org"
   },
   {
-    "title": "Denne ene unix kommando vil ændre dit liv for evigt",
+    "title": "Denne ene UNIX kommando vil ÆNDRE DIT LIV FOR EVIGT",
     "creative": "/clickbait/unix.png",
-    "href": "https://example.org"
+    "href": "https://github.com/astral-sh/ty"
   },
   {
     "title": "Alex Thirifays gjorde det her hver dag i en måned, og du vil ikke tro på resultatet!",
@@ -95,12 +95,12 @@
   {
     "title": "5 hemmeligheder, som din projektleder ikke vil have, at du kender",
     "creative": "/clickbait/pm.png",
-    "href": "https://example.org"
+    "href": "https://old.reddit.com/r/overemployed/"
   },
   {
-    "title": "Hvad sker der, når du drikker vand på tom mave hver morgen? Nummer 3 vil chokere dig!",
+    "title": "Hvad sker der, når du drikker vand på tom mave hver morgen? NUMMER 3 VIL CHOKERE DIG!",
     "creative": "/clickbait/vand.png",
-    "href": "https://example.org"
+    "href": "https://dhmo.org/facts.html"
   }
 ];
 
@@ -121,14 +121,15 @@
   var kaboodleRoot = "/src/lib/assets/kaboodle"
   var creatives = []
 
-  onMount(async () => {
+  $: if ($page) {
     randomize(raw_creatives);
-    creatives = raw_creatives.slice(0, 12)
-  })
+    creatives = raw_creatives.slice(0, 5)
+  }
 </script>
 
 <style>
 .kaboodle-module {
+  display: flex;
   overflow: hidden;
   margin: 10px auto;
   text-align: center;
@@ -136,14 +137,14 @@
 
 .kaboodle-item {
   display: inline-block;
-  width: 220px;
+  width: 320px;
   overflow: hidden;
   margin: 8px 10px 2px 10px;
   text-align: left;
 }
 
 .kaboodle-item p {
-  height: 60px;
+  min-height: 60px;
   margin-bottom: 0px;
   overflow: hidden;
   font-weight: bold;
