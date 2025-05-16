@@ -7,6 +7,7 @@
   import { gql } from "graphql-request"
   import personOutlineRounded from "@iconify/icons-material-symbols/person-outline-rounded"
   import homeWorkOutlineRounded from "@iconify/icons-material-symbols/home-work-outline-rounded"
+  import WeatherForecast from "$lib/components/WeatherForecast.svelte"
 
   let orgChecked: boolean
 
@@ -65,5 +66,8 @@
         noPadding={true}
       />
     </div>
+  </div>
+  <div class="flex justify-right gap-2 items-center">
+    <WeatherForecast />
   </div>
 </div>
