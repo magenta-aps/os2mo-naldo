@@ -227,9 +227,8 @@ OS2mo-frontend version: ${env.PUBLIC_COMMIT_TAG}`}
             : 'btn-square'}"
           on:click={() => (isOpen = !isOpen)}
         >
-          <Icon
-            icon={personOutlineRounded}
-            class="bg-accent text-secondary rounded-full p-1 transition-all group-hover:bg-secondary group-hover:text-accent"
+          <img src="https://api.dicebear.com/9.x/avataaars-neutral/png?seed={fullName()}"
+            class="bg-accent text-secondary rounded-full transition-all group-hover:bg-secondary group-hover:text-accent"
             width="20"
             height="20"
           />
