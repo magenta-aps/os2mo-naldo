@@ -122,6 +122,7 @@
       {/if}
       <CopyToClipboard uuid={employee.uuid} name={employee.name} />
     </h1>
+    <img src="https://robohash.org/{employee.name}.png?set=set2"/>
 
     <Tabs {activeItem} {items} on:tabChange={tabChange} />
 
