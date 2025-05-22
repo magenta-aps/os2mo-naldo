@@ -1,51 +1,63 @@
 import { browser } from "$app/environment"
-import { writable } from "svelte/store"
+import { writable, get } from "svelte/store"
 import { v4 as uuidv4 } from "uuid"
+import { date } from "$lib/stores/date"
 
-type ItUserInfo = {
+export type ItUserInfo = {
   uuid: string
   fromDate: string
   toDate: string
   itSystem: { uuid: string; name: string }
   userkey: string
   notes: string
-  primary: { uuid: string; name?: string; user_key: string }
+  primary: { uuid: string; name: string; user_key: string }
+  rolebindings: RolebindingInfo[]
   validated: boolean
 }
 
-const defaultValue: ItUserInfo = {
+export const createDefaultItUser = (): ItUserInfo => ({
   uuid: uuidv4(),
-  fromDate: "",
+  fromDate: get(date),
   toDate: "",
   itSystem: { uuid: "", name: "" },
   userkey: "",
   notes: "",
   primary: { uuid: "", name: "", user_key: "" },
+  rolebindings: [createDefaultRolebinding()],
   validated: false,
+})
+
+export type RolebindingInfo = {
+  fromDate: string
+  toDate: string
+  role: { uuid: string; name: string; user_key: string }
+  validated: boolean
 }
 
-const createItUserInfoStore = () => {
-  let initialValue = defaultValue
+export const createDefaultRolebinding = (): RolebindingInfo => ({
+  fromDate: get(date),
+  toDate: "",
+  role: { uuid: "", name: "", user_key: "" },
+  validated: false,
+})
 
+export const ituserInfo = (() => {
+  const defaultValue: ItUserInfo[] = [createDefaultItUser()]
+
+  let initialValue = defaultValue
   if (browser) {
-    const storedItUserInfo = localStorage.getItem("ituser-info")
-    initialValue = storedItUserInfo ? JSON.parse(storedItUserInfo) : defaultValue
+    const stored = localStorage.getItem("ituser-info")
+    initialValue = stored ? JSON.parse(stored) : defaultValue
   }
 
-  const { subscribe, update, set } = writable<ItUserInfo>(initialValue)
+  const { subscribe, update, set } = writable<ItUserInfo[]>([createDefaultItUser()])
 
   const reset = () => {
     if (browser) localStorage.removeItem("ituser-info")
-    set(defaultValue)
+    set([createDefaultItUser()])
   }
 
-  const isValid = (valid: boolean) => {
-    update((ituserStore) => {
-      ituserStore.validated = valid
-      return ituserStore
-    })
-  }
-
+  // Save to localStorage on any change
   subscribe((value) => {
     if (browser) localStorage.setItem("ituser-info", JSON.stringify(value))
   })
@@ -53,9 +65,35 @@ const createItUserInfoStore = () => {
   return {
     subscribe,
     set,
-    reset,
-    isValid,
-  }
-}
+    update,
+    addItUser: (newUser: ItUserInfo) => update((users) => [...users, newUser]),
+    // Flexible updater
+    updateItUserAtIndex: (index: number, updater: (user: ItUserInfo) => ItUserInfo) =>
+      update((users) => users.map((user, i) => (i === index ? updater(user) : user))),
 
-export const ituserInfo = createItUserInfoStore()
+    addRolebinding: (userIndex: number) =>
+      update((users) =>
+        users.map((user, i) =>
+          i === userIndex
+            ? {
+                ...user,
+                rolebindings: [...user.rolebindings, createDefaultRolebinding()],
+              }
+            : user
+        )
+      ),
+    removeRolebinding: (userIndex: number, rolebindingIndex: number) =>
+      update((users) =>
+        users.map((user, i) =>
+          i === userIndex
+            ? {
+                ...user,
+                rolebindings: user.rolebindings.filter(
+                  (_, j) => j !== rolebindingIndex
+                ),
+              }
+            : user
+        )
+      ),
+  }
+})()

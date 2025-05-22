@@ -1,8 +1,11 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
-  import { ituserInfo } from "$lib/stores/ituserInfoStore"
-  import { rolebindingInfo } from "$lib/stores/rolebindingInfoStore"
+  import {
+    ituserInfo,
+    createDefaultItUser,
+    createDefaultRolebinding,
+  } from "$lib/stores/ituserInfoStore"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
@@ -78,19 +81,20 @@
   const svelteForm = form(fromDate, itSystemField, accountName)
   let rolebindingFromDate: string
   let rolebindingToDate: string
+  let selectedTab = 0
 
   const validateForm = async () => {
     await svelteForm.validate()
     const ituserValid = $svelteForm.valid
     let rolebindingsValid = true
 
-    if (ituserValid) {
-      const hasFilledRolebinding = $rolebindingInfo.some((rb) => rb.role?.uuid)
-
-      if (hasFilledRolebinding) {
-        rolebindingsValid = rolebindingInfo.validateAll()
-      }
-    }
+    // if (ituserValid) {
+    //   const hasFilledRolebinding = $rolebindingInfo.some((rb) => rb.role?.uuid)
+    //
+    //   if (hasFilledRolebinding) {
+    //     rolebindingsValid = rolebindingInfo.validateAll()
+    //   }
+    // }
 
     if (ituserValid && rolebindingsValid) {
       ituserInfo.isValid(true)
@@ -110,6 +114,51 @@
       .map((cls) => cls.validities[0])
       .sort((a, b) => (a.name > b.name ? 1 : -1))
   }
+  const addItUser = () => {
+    ituserInfo.update((users) => [...users, createDefaultItUser()])
+    selectedTab = $ituserInfo.length - 1
+  }
+
+  const removeItUser = (index: number) => {
+    ituserInfo.update((users) => {
+      const updated = users.filter((_, i) => i !== index)
+      if (selectedTab >= updated.length) {
+        selectedTab = Math.max(0, updated.length - 1)
+      }
+      return updated
+    })
+  }
+
+  const addRolebinding = (itUserIndex: number) => {
+    ituserInfo.update((users) => {
+      return users.map((user, i) => {
+        if (i === itUserIndex) {
+          return {
+            ...user,
+            rolebindings: [...user.rolebindings, createDefaultRolebinding()],
+          }
+        }
+        return user
+      })
+    })
+  }
+
+  const removeRolebinding = (itUserIndex: number, rolebindingIndex: number) => {
+    ituserInfo.update((users) => {
+      return users.map((user, i) => {
+        if (i === itUserIndex) {
+          const updatedRolebindings = user.rolebindings.filter(
+            (_, j) => j !== rolebindingIndex
+          )
+          return {
+            ...user,
+            rolebindings: updatedRolebindings,
+          }
+        }
+        return user
+      })
+    })
+  }
 
   onMount(async () => {
     if ($ituserInfo.itSystem?.uuid) {
@@ -117,12 +166,13 @@
     }
   })
   // Update all rolebinding dates, when dates change
-  $: if (rolebindingFromDate) {
-    rolebindingInfo.updateRolebindingDates(rolebindingFromDate, "fromDate")
-  }
-  $: if (rolebindingToDate) {
-    rolebindingInfo.updateRolebindingDates(rolebindingToDate, "toDate")
-  }
+  // $: if (rolebindingFromDate) {
+  //   rolebindingInfo.updateRolebindingDates(rolebindingFromDate, "fromDate")
+  // }
+  // $: if (rolebindingToDate) {
+  //   rolebindingInfo.updateRolebindingDates(rolebindingToDate, "toDate")
+  // }
+  $: ituser = $ituserInfo[selectedTab]
 </script>
 
 <form on:submit|preventDefault={async () => await validateForm()}>
@@ -147,13 +197,69 @@
       classes,
       env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary"
     )}
-
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+      <div class="tabs tabs-lifted mb-4 flex flex-wrap gap-1">
+        {#each $ituserInfo as _, ituserIndex}
+          <div
+            class="tab flex items-center gap-2 px-4 py-2 cursor-pointer"
+            class:tab-active={selectedTab === ituserIndex}
+            on:click={() => (selectedTab = ituserIndex)}
+          >
+            <span>IT-user {ituserIndex + 1}</span>
+            <button
+              class="btn btn-xs btn-circle btn-ghost hover:bg-error hover:text-error-content"
+              type="button"
+              on:click={(e) => {
+                e.stopPropagation()
+                removeItUser(ituserIndex)
+              }}
+              aria-label="Close IT-user tab"
+            >
+              <Icon icon="mdi:close" class="w-3.5 h-3.5" />
+            </button>
+          </div>
+        {/each}
+
+        <!-- Add (+) tab -->
+        <div
+          class="tab btn btn-sm btn-ghost text-xl"
+          on:click={addItUser}
+          aria-label="Add IT-user"
+        >
+          <Icon icon="mdi:plus" class="w-5 h-5" />
+        </div>
+      </div>
+      <!-- <div class="tabs tabs-lifted mb-4"> -->
+      <!--   {#each $ituserInfo as _, index} -->
+      <!--     <button -->
+      <!--       class="tab {selectedTab === index ? 'tab-active' : ''}" -->
+      <!--       on:click={() => (selectedTab = index)} -->
+      <!--     > -->
+      <!--       It-user {index + 1} -->
+      <!--     </button> -->
+      <!--   {/each} -->
+      <!--   <CircleButton -->
+      <!--     icon={addRounded} -->
+      <!--     on:click={() => { -->
+      <!--       ituserInfo.addItUser({ -->
+      <!--         fromDate: $date, -->
+      <!--         toDate: "", -->
+      <!--         itSystem: { uuid: "", name: "" }, -->
+      <!--         userkey: "", -->
+      <!--         primary: getClassByUserKey(classes, "non-primary"), -->
+      <!--         notes: "", -->
+      <!--         rolebindings: [], -->
+      <!--       }) -->
+      <!--       selectedTab = $ituserInfo.length - 1 -->
+      <!--     }} -->
+      <!--     extraClasses="ml-2" -->
+      <!--   /> -->
+      <!-- </div> -->
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
             startValue={$date}
-            bind:value={$ituserInfo.fromDate}
+            bind:value={ituser.fromDate}
             bind:validationValue={$fromDate.value}
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
@@ -161,7 +267,7 @@
             required={true}
           />
           <DateInput
-            bind:value={$ituserInfo.toDate}
+            bind:value={ituser.toDate}
             title={capital($_("date.end_date"))}
             id="to"
           />
@@ -170,18 +276,18 @@
           <Select
             title={capital($_("it_system"))}
             id="it-system"
-            bind:value={$ituserInfo.itSystem}
+            bind:value={ituser.itSystem}
             bind:name={$itSystemField.value}
             errors={$itSystemField.errors}
             on:change={() => {
-              fetchItSystemRoles($ituserInfo.itSystem.uuid)
+              fetchItSystemRoles(ituser.itSystem.uuid)
             }}
             iterable={getITSystemNames(itSystems)}
             extra_classes="basis-1/2"
             required={true}
           />
           <Input
-            bind:value={$ituserInfo.userkey}
+            bind:value={ituser.userkey}
             bind:cprName={$accountName.value}
             errors={$accountName.errors}
             extra_classes="basis-1/2"
@@ -194,22 +300,18 @@
           <ItUserCheckbox
             id="primary"
             title={capital($_("primary"))}
-            startValue={$ituserInfo.primary.uuid}
+            startValue={ituser.primary}
             value={primaryClass.uuid}
             on:change={() => {
-              if ($ituserInfo.primary.uuid !== primaryClass.uuid) {
-                $ituserInfo.primary = primaryClass
+              if (ituser.primary.uuid !== primaryClass.uuid) {
+                ituser.primary = primaryClass
               } else {
-                $ituserInfo.primary = getClassByUserKey(classes, "non-primary")
+                ituser.primary = getClassByUserKey(classes, "non-primary")
               }
             }}
           />
         </div>
-        <TextArea
-          title={capital($_("notes"))}
-          id="notes"
-          bind:value={$ituserInfo.notes}
-        />
+        <TextArea title={capital($_("notes"))} id="notes" bind:value={ituser.notes} />
         <div class="divider p-0 m-0 mb-4 w-full" />
         <h4>{capital($_("rolebinding", { values: { n: 1 } }))}</h4>
         <div class="flex flex-row gap-6">
@@ -218,19 +320,19 @@
             bind:value={rolebindingFromDate}
             title={capital($_("date.start_date"))}
             id="rolebinding-from"
-            min={$ituserInfo.fromDate}
-            max={$ituserInfo.toDate}
+            min={ituser.fromDate}
+            max={ituser.toDate}
           />
           <!-- FIX: If a to-date is set and another rolebinding is added afterwards, the to-dates are not aligned. -->
           <DateInput
             bind:value={rolebindingToDate}
             title={capital($_("date.end_date"))}
-            min={rolebindingFromDate}
-            max={$ituserInfo.toDate ? $ituserInfo.toDate : undefined}
+            max={ituser.toDate ? ituser.toDate : undefined}
             id="rolebinding-to"
           />
         </div>
-        {#each $rolebindingInfo as rolebinding, index}
+        {console.log(ituser.rolebindings)}
+        {#each ituser.rolebindings as rolebinding, rolebindingIndex}
           {#if itSystemRoles && itSystemRoles.length}
             {#key itSystemRoles}
               <Select
@@ -249,18 +351,19 @@
               disabled
             />
           {/if}
-          {#if $rolebindingInfo.length > 1}
+          {#if rolebinding.length > 1}
             <CircleButton
               on:click={() => {
-                rolebindingInfo.removeRolebinding(index)
+                removeRolebinding(selectedTab, rolebindingIndex)
               }}
               icon={removeRounded}
             />
           {/if}
-          {#if index === $rolebindingInfo.length - 1}
+          {#if rolebindingIndex === ituser.rolebindings.length - 1}
             <CircleButton
-              on:click={() =>
-                rolebindingInfo.addRolebinding(rolebindingFromDate, rolebindingToDate)}
+              on:click={() => {
+                addRolebinding(selectedTab)
+              }}
               icon={addRounded}
               extraClasses="mb-4"
             />
