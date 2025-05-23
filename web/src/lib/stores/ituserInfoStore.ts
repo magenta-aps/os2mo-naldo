@@ -41,21 +41,21 @@ export const createDefaultRolebinding = (): RolebindingInfo => ({
   validated: false,
 })
 
+export const validateRolebinding = (rb: RolebindingInfo): boolean => {
+  return Boolean(rb.role?.uuid && rb.fromDate)
+}
+
 export const ituserInfo = (() => {
   const defaultValue: ItUserInfo[] = [createDefaultItUser()]
 
   let initialValue = defaultValue
+
   if (browser) {
     const stored = localStorage.getItem("ituser-info")
     initialValue = stored ? JSON.parse(stored) : defaultValue
   }
 
-  const { subscribe, update, set } = writable<ItUserInfo[]>([createDefaultItUser()])
-
-  const reset = () => {
-    if (browser) localStorage.removeItem("ituser-info")
-    set([createDefaultItUser()])
-  }
+  const { subscribe, update, set } = writable<ItUserInfo[]>(initialValue)
 
   // Save to localStorage on any change
   subscribe((value) => {
@@ -66,6 +66,10 @@ export const ituserInfo = (() => {
     subscribe,
     set,
     update,
+    reset: () => {
+      if (browser) localStorage.removeItem("ituser-info")
+      set([createDefaultItUser()])
+    },
     addItUser: (newUser: ItUserInfo) => update((users) => [...users, newUser]),
     // Flexible updater
     updateItUserAtIndex: (index: number, updater: (user: ItUserInfo) => ItUserInfo) =>
@@ -94,6 +98,13 @@ export const ituserInfo = (() => {
               }
             : user
         )
+      ),
+    isValid: (valid: boolean) =>
+      update((users) =>
+        users.map((user) => ({
+          ...user,
+          validated: valid,
+        }))
       ),
   }
 })()
