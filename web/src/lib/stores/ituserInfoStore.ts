@@ -41,6 +41,10 @@ export const createDefaultRolebinding = (): RolebindingInfo => ({
   validated: false,
 })
 
+export const validateRolebinding = (rb: RolebindingInfo): boolean => {
+  return Boolean(rb.role?.uuid && rb.fromDate) // Add more conditions if needed
+}
+
 export const ituserInfo = (() => {
   const defaultValue: ItUserInfo[] = [createDefaultItUser()]
 
@@ -94,6 +98,13 @@ export const ituserInfo = (() => {
               }
             : user
         )
+      ),
+    isValid: (valid: boolean) =>
+      update((users) =>
+        users.map((user) => ({
+          ...user,
+          validated: valid,
+        }))
       ),
   }
 })()
