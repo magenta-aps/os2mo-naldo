@@ -5,6 +5,7 @@
     ituserInfo,
     createDefaultItUser,
     createDefaultRolebinding,
+    validateRolebinding,
   } from "$lib/stores/ituserInfoStore"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
@@ -87,14 +88,20 @@
     await svelteForm.validate()
     const ituserValid = $svelteForm.valid
     let rolebindingsValid = true
-
-    // if (ituserValid) {
-    //   const hasFilledRolebinding = $rolebindingInfo.some((rb) => rb.role?.uuid)
-    //
-    //   if (hasFilledRolebinding) {
-    //     rolebindingsValid = rolebindingInfo.validateAll()
-    //   }
-    // }
+    if (ituserValid) {
+      // Update rolebindings and validate
+      ituserInfo.update((users) =>
+        users.map((user) => {
+          const updatedRolebindings = user.rolebindings.map((rb) => {
+            const filled = Boolean(rb.role?.uuid)
+            const isValid = filled ? validateRolebinding(rb) : false
+            if (filled && !isValid) rolebindingsValid = false
+            return { ...rb, validated: isValid }
+          })
+          return { ...user, rolebindings: updatedRolebindings }
+        })
+      )
+    }
 
     if (ituserValid && rolebindingsValid) {
       ituserInfo.isValid(true)
@@ -103,6 +110,7 @@
       ituserInfo.isValid(false)
     }
   }
+
   let itSystemRoles: UnpackedClass | undefined
 
   const fetchItSystemRoles = async (itSystemUuid: string | undefined | null) => {
@@ -161,8 +169,8 @@
   }
 
   onMount(async () => {
-    if ($ituserInfo.itSystem?.uuid) {
-      fetchItSystemRoles($ituserInfo.itSystem.uuid)
+    if (ituser.itSystem?.uuid) {
+      fetchItSystemRoles(ituser.itSystem.uuid)
     }
   })
   // Update all rolebinding dates, when dates change
@@ -198,11 +206,13 @@
       env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary"
     )}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
-      <div class="tabs tabs-lifted mb-4 flex flex-wrap gap-1">
+      <div class="tabs tabs-lifted mb-4 flex flex-wrap">
         {#each $ituserInfo as _, ituserIndex}
           <div
-            class="tab flex items-center gap-2 px-4 py-2 cursor-pointer"
+            class="tab flex items-center gap-2 px-4 py-2 cursor-pointer border-0"
             class:tab-active={selectedTab === ituserIndex}
+            class:[--tab-bg:bg-slate-100]={selectedTab === ituserIndex}
+            class:bg-white={selectedTab !== ituserIndex}
             on:click={() => (selectedTab = ituserIndex)}
           >
             <span>IT-user {ituserIndex + 1}</span>
@@ -229,32 +239,6 @@
           <Icon icon="mdi:plus" class="w-5 h-5" />
         </div>
       </div>
-      <!-- <div class="tabs tabs-lifted mb-4"> -->
-      <!--   {#each $ituserInfo as _, index} -->
-      <!--     <button -->
-      <!--       class="tab {selectedTab === index ? 'tab-active' : ''}" -->
-      <!--       on:click={() => (selectedTab = index)} -->
-      <!--     > -->
-      <!--       It-user {index + 1} -->
-      <!--     </button> -->
-      <!--   {/each} -->
-      <!--   <CircleButton -->
-      <!--     icon={addRounded} -->
-      <!--     on:click={() => { -->
-      <!--       ituserInfo.addItUser({ -->
-      <!--         fromDate: $date, -->
-      <!--         toDate: "", -->
-      <!--         itSystem: { uuid: "", name: "" }, -->
-      <!--         userkey: "", -->
-      <!--         primary: getClassByUserKey(classes, "non-primary"), -->
-      <!--         notes: "", -->
-      <!--         rolebindings: [], -->
-      <!--       }) -->
-      <!--       selectedTab = $ituserInfo.length - 1 -->
-      <!--     }} -->
-      <!--     extraClasses="ml-2" -->
-      <!--   /> -->
-      <!-- </div> -->
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
@@ -331,7 +315,6 @@
             id="rolebinding-to"
           />
         </div>
-        {console.log(ituser.rolebindings)}
         {#each ituser.rolebindings as rolebinding, rolebindingIndex}
           {#if itSystemRoles && itSystemRoles.length}
             {#key itSystemRoles}
@@ -351,26 +334,23 @@
               disabled
             />
           {/if}
-          {#if rolebinding.length > 1}
-            <CircleButton
-              on:click={() => {
-                removeRolebinding(selectedTab, rolebindingIndex)
-              }}
-              icon={removeRounded}
-            />
-          {/if}
-          {#if rolebindingIndex === ituser.rolebindings.length - 1}
-            <CircleButton
-              on:click={() => {
-                addRolebinding(selectedTab)
-              }}
-              icon={addRounded}
-              extraClasses="mb-4"
-            />
-          {:else}
-            <div class="divider p-0 m-0 my-2 w-full" />
-          {/if}
+          <CircleButton
+            on:click={() => {
+              removeRolebinding(selectedTab, rolebindingIndex)
+            }}
+            icon={removeRounded}
+          />
         {/each}
+
+        <CircleButton
+          on:click={() => {
+            addRolebinding(selectedTab)
+          }}
+          icon={addRounded}
+          extraClasses="mb-4"
+        />
+
+        <div class="divider p-0 m-0 my-2 w-full" />
       </div>
     </div>
     <OnboardingFormButtons />

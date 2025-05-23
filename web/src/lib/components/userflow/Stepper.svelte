@@ -8,6 +8,8 @@
   import { managerInfo } from "$lib/stores/managerInfoStore"
   import { addressInfo } from "$lib/stores/addressInfoStore"
 
+  console.log($ituserInfo)
+
   $: items = [
     {
       name: `${capital(
@@ -28,7 +30,7 @@
         $_("create_item", { values: { item: $_("ituser", { values: { n: 1 } }) } })
       )}`,
       count: 3,
-      valid: $ituserInfo.validated,
+      valid: $ituserInfo.every((ituser) => ituser.validated),
     },
     {
       name: `${capital(
