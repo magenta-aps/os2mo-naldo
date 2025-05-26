@@ -10,7 +10,7 @@ export type ItUserInfo = {
   itSystem: { uuid: string; name: string }
   userkey: string
   notes: string
-  primary: { uuid: string; name: string; user_key: string }
+  primary: { uuid: string; name?: string; user_key: string }
   rolebindings: RolebindingInfo[]
   validated: boolean
 }
@@ -28,21 +28,23 @@ export const createDefaultItUser = (): ItUserInfo => ({
 })
 
 export type RolebindingInfo = {
-  fromDate: string
-  toDate: string
+  // Disabled for now, since `ituser dates == rolebinding dates` on creation
+  // fromDate: string
+  // toDate: string
   role: { uuid: string; name: string; user_key: string }
   validated: boolean
 }
 
 export const createDefaultRolebinding = (): RolebindingInfo => ({
-  fromDate: get(date),
-  toDate: "",
+  // Disabled for now, since `ituser dates == rolebinding dates` on creation
+  // fromDate: get(date),
+  // toDate: "",
   role: { uuid: "", name: "", user_key: "" },
   validated: false,
 })
 
 export const validateRolebinding = (rb: RolebindingInfo): boolean => {
-  return Boolean(rb.role?.uuid && rb.fromDate)
+  return Boolean(rb.role?.uuid)
 }
 
 export const ituserInfo = (() => {

@@ -10,18 +10,6 @@
     {#each $ituserInfo as ituser}
       {#each ituser.rolebindings as rolebinding}
         <div class="grid grid-cols-2">
-          <dt>{capital($_("date.start_date"))}:</dt>
-          {#if rolebinding.validated === true}
-            <dd>{rolebinding.fromDate}</dd>
-          {/if}
-        </div>
-        <div class="grid grid-cols-2">
-          <dt>{capital($_("date.end_date"))}:</dt>
-          {#if rolebinding.validated === true}
-            <dd>{rolebinding.toDate}</dd>
-          {/if}
-        </div>
-        <div class="grid grid-cols-2">
           <dt>{capital($_("role", { values: { n: 1 } }))}:</dt>
           {#if rolebinding.validated === true}
             <dd>{rolebinding.role.name}</dd>

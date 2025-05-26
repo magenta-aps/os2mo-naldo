@@ -80,8 +80,6 @@
   const itSystemField = field("it_system", "", [required()])
   const accountName = field("accountName", "", [required()])
   const svelteForm = form(fromDate, itSystemField, accountName)
-  let rolebindingFromDate: string
-  let rolebindingToDate: string
   let selectedTab = 0
 
   const validateForm = async () => {
@@ -173,13 +171,7 @@
       fetchItSystemRoles(ituser.itSystem.uuid)
     }
   })
-  // Update all rolebinding dates, when dates change
-  // $: if (rolebindingFromDate) {
-  //   rolebindingInfo.updateRolebindingDates(rolebindingFromDate, "fromDate")
-  // }
-  // $: if (rolebindingToDate) {
-  //   rolebindingInfo.updateRolebindingDates(rolebindingToDate, "toDate")
-  // }
+
   $: ituser = $ituserInfo[selectedTab]
 </script>
 
@@ -207,37 +199,45 @@
     )}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="tabs tabs-lifted mb-4 flex flex-wrap">
-        {#each $ituserInfo as _, ituserIndex}
-          <div
-            class="tab flex items-center gap-2 px-4 py-2 cursor-pointer border-0"
+        {#each $ituserInfo as _ituser, ituserIndex}
+          <button
+            class="tab flex gap-2 cursor-pointer [--tab-border-color:transparent]"
             class:tab-active={selectedTab === ituserIndex}
             class:[--tab-bg:bg-slate-100]={selectedTab === ituserIndex}
             class:bg-white={selectedTab !== ituserIndex}
-            on:click={() => (selectedTab = ituserIndex)}
+            on:click={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              selectedTab = ituserIndex
+            }}
           >
-            <span>IT-user {ituserIndex + 1}</span>
+            <span>{capital($_("ituser", { values: { n: 1 } }))} {ituserIndex + 1}</span>
             <button
-              class="btn btn-xs btn-circle btn-ghost hover:bg-error hover:text-error-content"
+              class="btn btn-xs btn-circle btn-ghost text-secondary hover:bg-error"
               type="button"
               on:click={(e) => {
+                e.preventDefault()
                 e.stopPropagation()
                 removeItUser(ituserIndex)
               }}
               aria-label="Close IT-user tab"
             >
-              <Icon icon="mdi:close" class="w-3.5 h-3.5" />
+              <Icon
+                icon="material-symbols:close-small-outline-rounded"
+                width="20"
+                height="20"
+              />
             </button>
-          </div>
+          </button>
         {/each}
 
-        <!-- Add (+) tab -->
-        <div
-          class="tab btn btn-sm btn-ghost text-xl"
+        <button
+          class="btn btn-sm btn-ghost px-2"
           on:click={addItUser}
           aria-label="Add IT-user"
         >
-          <Icon icon="mdi:plus" class="w-5 h-5" />
-        </div>
+          <Icon icon={addRounded} width="20" height="20" />
+        </button>
       </div>
       <div class="p-8">
         <div class="flex flex-row gap-6">
@@ -284,7 +284,7 @@
           <ItUserCheckbox
             id="primary"
             title={capital($_("primary"))}
-            startValue={ituser.primary}
+            startValue={ituser.primary.uuid}
             value={primaryClass.uuid}
             on:change={() => {
               if (ituser.primary.uuid !== primaryClass.uuid) {
@@ -298,23 +298,6 @@
         <TextArea title={capital($_("notes"))} id="notes" bind:value={ituser.notes} />
         <div class="divider p-0 m-0 mb-4 w-full" />
         <h4>{capital($_("rolebinding", { values: { n: 1 } }))}</h4>
-        <div class="flex flex-row gap-6">
-          <DateInput
-            startValue={$date}
-            bind:value={rolebindingFromDate}
-            title={capital($_("date.start_date"))}
-            id="rolebinding-from"
-            min={ituser.fromDate}
-            max={ituser.toDate}
-          />
-          <!-- FIX: If a to-date is set and another rolebinding is added afterwards, the to-dates are not aligned. -->
-          <DateInput
-            bind:value={rolebindingToDate}
-            title={capital($_("date.end_date"))}
-            max={ituser.toDate ? ituser.toDate : undefined}
-            id="rolebinding-to"
-          />
-        </div>
         {#each ituser.rolebindings as rolebinding, rolebindingIndex}
           {#if itSystemRoles && itSystemRoles.length}
             {#key itSystemRoles}
