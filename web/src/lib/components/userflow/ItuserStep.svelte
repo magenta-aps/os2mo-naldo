@@ -297,7 +297,7 @@
         </div>
         <TextArea title={capital($_("notes"))} id="notes" bind:value={ituser.notes} />
         <div class="divider p-0 m-0 mb-4 w-full" />
-        <h4>{capital($_("rolebinding", { values: { n: 1 } }))}</h4>
+        <h4>{capital($_("rolebinding", { values: { n: 2 } }))}</h4>
         {#each ituser.rolebindings as rolebinding, rolebindingIndex}
           {#if itSystemRoles && itSystemRoles.length}
             {#key itSystemRoles}
