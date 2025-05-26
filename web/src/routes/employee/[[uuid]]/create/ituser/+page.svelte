@@ -30,15 +30,12 @@
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
-  import Icon from "@iconify/svelte"
   import removeRounded from "@iconify/icons-material-symbols/remove-rounded"
   import addRounded from "@iconify/icons-material-symbols/add-rounded"
   import { getMinMaxValidities } from "$lib/util/helpers"
   import { env } from "$env/dynamic/public"
 
   let toDate: string
-  let rolebindingFromDate: string
-  let rolebindingToDate: string
 
   const fromDate = field("from", "", [required()])
   const itSystemField = field("it_system", "", [required()])
@@ -333,25 +330,7 @@
         />
         <TextArea title={capital($_("notes"))} id="notes" />
         <div class="divider p-0 m-0 mb-4 w-full" />
-        <h4>{capital($_("rolebinding", { values: { n: 1 } }))}</h4>
-        <div class="flex flex-row gap-6">
-          <DateInput
-            startValue={$date}
-            bind:value={rolebindingFromDate}
-            errors={$fromDate.errors}
-            title={capital($_("date.start_date"))}
-            id="rolebinding-from"
-            min={$fromDate.value ? $fromDate.value : validities.from}
-            max={rolebindingToDate ? rolebindingToDate : toDate}
-          />
-          <DateInput
-            bind:value={rolebindingToDate}
-            title={capital($_("date.end_date"))}
-            id="rolebinding-to"
-            min={$fromDate.value ? $fromDate.value : rolebindingFromDate}
-            max={toDate ? toDate : validities.to}
-          />
-        </div>
+        <h4>{capital($_("rolebinding", { values: { n: 2 } }))}</h4>
         {#each rolebindings as rolebinding, index}
           {#if itSystemRoles && itSystemRoles.length}
             {#key itSystemRoles}

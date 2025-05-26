@@ -23,7 +23,7 @@ export const createDefaultItUser = (): ItUserInfo => ({
   userkey: "",
   notes: "",
   primary: { uuid: "", name: "", user_key: "" },
-  rolebindings: [createDefaultRolebinding()],
+  rolebindings: [],
   validated: false,
 })
 
