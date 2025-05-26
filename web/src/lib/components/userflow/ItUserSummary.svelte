@@ -5,45 +5,57 @@
 </script>
 
 <div>
-  <h3 class="pb-2 text-primary">{capital($_("ituser", { values: { n: 1 } }))}</h3>
-  <dl class="grid gap-1">
-    {#each $ituserInfo as ituser}
-      <div class="grid grid-cols-2">
-        <dt>{capital($_("date.start_date"))}:</dt>
-        {#if ituser.validated === true}
-          <dd>{ituser.fromDate}</dd>
+  <h3 class=" text-primary">{capital($_("ituser", { values: { n: 2 } }))}</h3>
+  {#each $ituserInfo as ituser, index}
+    {#if ituser.validated === true}
+      <div class="grid gap-1 pb-2 text-secondary">
+        <h4>
+          {capital($_("ituser", { values: { n: 1 } }))}
+          {index + 1}
+        </h4>
+        <div class="pb-1">
+          <div class="grid grid-cols-2">
+            <span>{capital($_("date.start_date"))}:</span>
+            <span>{ituser.fromDate}</span>
+          </div>
+          <div class="grid grid-cols-2">
+            <span>{capital($_("date.end_date"))}:</span>
+            <span>{ituser.toDate}</span>
+          </div>
+          <div class="grid grid-cols-2">
+            <span>{capital($_("itsystem"))}:</span>
+            <span>{ituser.itSystem.name}</span>
+          </div>
+          <div class="grid grid-cols-2">
+            <span>{capital($_("account_name"))}:</span>
+            <span>{ituser.userkey}</span>
+          </div>
+          <div class="grid grid-cols-2">
+            <span>{capital($_("primary"))}:</span>
+            <span>{ituser.primary ? ituser.primary.name : ""}</span>
+          </div>
+          <div class="grid grid-cols-2">
+            <span>{capital($_("notes"))}:</span>
+            <span>{ituser.notes || ""}</span>
+          </div>
+        </div>
+
+        {#if ituser.rolebindings.length > 0}
+          <h4>
+            {capital($_("rolebinding", { values: { n: 2 } }))}:
+          </h4>
+          <div>
+            {#each ituser.rolebindings as rolebinding}
+              {#if rolebinding.validated === true}
+                <div class="grid grid-cols-2">
+                  <span>{capital($_("role", { values: { n: 1 } }))}:</span>
+                  <span>{rolebinding.role.name}</span>
+                </div>
+              {/if}
+            {/each}
+          </div>
         {/if}
       </div>
-      <div class="grid grid-cols-2">
-        <dt>{capital($_("date.end_date"))}:</dt>
-        {#if ituser.validated === true}
-          <dd>{ituser.toDate}</dd>
-        {/if}
-      </div>
-      <div class="grid grid-cols-2">
-        <dt>{capital($_("itsystem"))}:</dt>
-        {#if ituser.validated === true}
-          <dd>{ituser.itSystem.name}</dd>
-        {/if}
-      </div>
-      <div class="grid grid-cols-2">
-        <dt>{capital($_("account_name"))}:</dt>
-        {#if ituser.validated === true}
-          <dd>{ituser.userkey}</dd>
-        {/if}
-      </div>
-      <div class="grid grid-cols-2">
-        <dt>{capital($_("primary"))}:</dt>
-        {#if ituser.validated === true}
-          <dd>{ituser.primary ? ituser.primary.name : ""}</dd>
-        {/if}
-      </div>
-      <div class="grid grid-cols-2">
-        <dt>{capital($_("notes"))}:</dt>
-        {#if ituser.validated === true}
-          <dd>{ituser.notes ? ituser.notes : ""}</dd>
-        {/if}
-      </div>
-    {/each}
-  </dl>
+    {/if}
+  {/each}
 </div>
