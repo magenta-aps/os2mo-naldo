@@ -122,8 +122,8 @@
           ituser: ituser.uuid,
           role: rb.role.uuid,
           validity: {
-            from: rb.fromDate,
-            to: rb.toDate || null,
+            from: ituser.fromDate,
+            to: ituser.toDate || null,
           },
         }))
 
