@@ -4,7 +4,6 @@
   import EmployeeSummary from "$lib/components/userflow/EmployeeSummary.svelte"
   import EngagementSummary from "$lib/components/userflow/EngagementSummary.svelte"
   import ItUserSummary from "$lib/components/userflow/ItUserSummary.svelte"
-  import RolebindingSummary from "$lib/components/userflow/RolebindingSummary.svelte"
   import ManagerSummary from "$lib/components/userflow/ManagerSummary.svelte"
   import AddressSummary from "$lib/components/userflow/AddressSummary.svelte"
   import type { EmployeeCreateInput } from "$lib/graphql/types"
@@ -21,7 +20,6 @@
   import { employeeInfo } from "$lib/stores/employeeInfoStore"
   import { engagementInfo } from "$lib/stores/engagementInfoStore"
   import { ituserInfo } from "$lib/stores/ituserInfoStore"
-  import { rolebindingInfo } from "$lib/stores/rolebindingInfoStore"
   import { managerInfo } from "$lib/stores/managerInfoStore"
   import { addressInfo } from "$lib/stores/addressInfoStore"
   import { graphQLClient } from "$lib/util/http"
@@ -195,7 +193,6 @@
     <EmployeeSummary />
     <EngagementSummary />
     <ItUserSummary />
-    <!-- <RolebindingSummary /> -->
     <ManagerSummary />
     <AddressSummary />
   </div>

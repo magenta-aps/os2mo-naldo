@@ -8,8 +8,6 @@
   import { managerInfo } from "$lib/stores/managerInfoStore"
   import { addressInfo } from "$lib/stores/addressInfoStore"
 
-  console.log($ituserInfo)
-
   $: items = [
     {
       name: `${capital(
