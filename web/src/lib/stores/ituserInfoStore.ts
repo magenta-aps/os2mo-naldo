@@ -12,7 +12,7 @@ export type ItUserInfo = {
   notes: string
   primary: { uuid: string; name?: string; user_key: string }
   rolebindings: RolebindingInfo[]
-  validated: boolean
+  validated?: boolean
 }
 
 export const createDefaultItUser = (): ItUserInfo => ({
@@ -24,15 +24,19 @@ export const createDefaultItUser = (): ItUserInfo => ({
   notes: "",
   primary: { uuid: "", name: "", user_key: "" },
   rolebindings: [],
-  validated: false,
+  validated: undefined,
 })
+
+export const validateItuser = (ituser: ItUserInfo): boolean => {
+  return !!ituser.fromDate && !!ituser.itSystem?.uuid && !!ituser.userkey
+}
 
 export type RolebindingInfo = {
   // Disabled for now, since `ituser dates == rolebinding dates` on creation
   // fromDate: string
   // toDate: string
   role: { uuid: string; name: string; user_key: string }
-  validated: boolean
+  validated?: boolean
 }
 
 export const createDefaultRolebinding = (): RolebindingInfo => ({
@@ -40,11 +44,11 @@ export const createDefaultRolebinding = (): RolebindingInfo => ({
   // fromDate: get(date),
   // toDate: "",
   role: { uuid: "", name: "", user_key: "" },
-  validated: false,
+  validated: undefined,
 })
 
 export const validateRolebinding = (rb: RolebindingInfo): boolean => {
-  return Boolean(rb.role?.uuid)
+  return !!rb.role?.uuid
 }
 
 export const ituserInfo = (() => {
@@ -72,39 +76,41 @@ export const ituserInfo = (() => {
       if (browser) localStorage.removeItem("ituser-info")
       set([createDefaultItUser()])
     },
-    addItUser: (newUser: ItUserInfo) => update((users) => [...users, newUser]),
+    addItUser: (newUser: ItUserInfo) => update((itusers) => [...itusers, newUser]),
     // Flexible updater
-    updateItUserAtIndex: (index: number, updater: (user: ItUserInfo) => ItUserInfo) =>
-      update((users) => users.map((user, i) => (i === index ? updater(user) : user))),
+    updateItUserAtIndex: (index: number, updater: (ituser: ItUserInfo) => ItUserInfo) =>
+      update((itusers) =>
+        itusers.map((ituser, i) => (i === index ? updater(ituser) : ituser))
+      ),
 
-    addRolebinding: (userIndex: number) =>
-      update((users) =>
-        users.map((user, i) =>
-          i === userIndex
+    addRolebinding: (ituserIndex: number) =>
+      update((itusers) =>
+        itusers.map((ituser, i) =>
+          i === ituserIndex
             ? {
-                ...user,
-                rolebindings: [...user.rolebindings, createDefaultRolebinding()],
+                ...ituser,
+                rolebindings: [...ituser.rolebindings, createDefaultRolebinding()],
               }
-            : user
+            : ituser
         )
       ),
-    removeRolebinding: (userIndex: number, rolebindingIndex: number) =>
-      update((users) =>
-        users.map((user, i) =>
-          i === userIndex
+    removeRolebinding: (ituserIndex: number, rolebindingIndex: number) =>
+      update((itusers) =>
+        itusers.map((ituser, i) =>
+          i === ituserIndex
             ? {
-                ...user,
-                rolebindings: user.rolebindings.filter(
+                ...ituser,
+                rolebindings: ituser.rolebindings.filter(
                   (_, j) => j !== rolebindingIndex
                 ),
               }
-            : user
+            : ituser
         )
       ),
     isValid: (valid: boolean) =>
-      update((users) =>
-        users.map((user) => ({
-          ...user,
+      update((itusers) =>
+        itusers.map((ituser) => ({
+          ...ituser,
           validated: valid,
         }))
       ),
