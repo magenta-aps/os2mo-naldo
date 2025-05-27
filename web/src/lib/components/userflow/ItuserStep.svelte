@@ -6,6 +6,7 @@
     createDefaultItUser,
     createDefaultRolebinding,
     validateRolebinding,
+    validateItuser,
   } from "$lib/stores/ituserInfoStore"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
@@ -24,8 +25,6 @@
   import { date } from "$lib/stores/date"
   import { getClassByUserKey } from "$lib/util/getClasses"
   import { getITSystemNames, type UnpackedClass } from "$lib/util/helpers"
-  import { form, field } from "svelte-forms"
-  import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
   import { env } from "$env/dynamic/public"
@@ -76,36 +75,30 @@
     }
   `
 
-  const fromDate = field("from", "", [required()])
-  const itSystemField = field("it_system", "", [required()])
-  const accountName = field("accountName", "", [required()])
-  const svelteForm = form(fromDate, itSystemField, accountName)
   let selectedTab = 0
 
   const validateForm = async () => {
-    await svelteForm.validate()
-    const ituserValid = $svelteForm.valid
-    let rolebindingsValid = true
-    if (ituserValid) {
-      // Update rolebindings and validate
-      ituserInfo.update((users) =>
-        users.map((user) => {
-          const updatedRolebindings = user.rolebindings.map((rb) => {
-            const filled = Boolean(rb.role?.uuid)
-            const isValid = filled ? validateRolebinding(rb) : false
-            if (filled && !isValid) rolebindingsValid = false
-            return { ...rb, validated: isValid }
-          })
-          return { ...user, rolebindings: updatedRolebindings }
-        })
-      )
-    }
+    const updatedItusers = $ituserInfo.map((ituser) => {
+      const updatedRolebindings = ituser.rolebindings.map((rb) => {
+        return { ...rb, validated: validateRolebinding(rb) }
+      })
 
-    if (ituserValid && rolebindingsValid) {
-      ituserInfo.isValid(true)
+      return {
+        ...ituser,
+        validated: validateItuser(ituser),
+        rolebindings: updatedRolebindings,
+      }
+    })
+
+    ituserInfo.set(updatedItusers)
+
+    // Check if every user and every rolebinding is valid
+    const formIsValid = updatedItusers.every(
+      (ituser) => ituser.validated && ituser.rolebindings.every((rb) => rb.validated)
+    )
+
+    if (formIsValid) {
       step.updateStep("inc")
-    } else {
-      ituserInfo.isValid(false)
     }
   }
 
@@ -121,13 +114,13 @@
       .sort((a, b) => (a.name > b.name ? 1 : -1))
   }
   const addItUser = () => {
-    ituserInfo.update((users) => [...users, createDefaultItUser()])
+    ituserInfo.update((itusers) => [...itusers, createDefaultItUser()])
     selectedTab = $ituserInfo.length - 1
   }
 
   const removeItUser = (index: number) => {
-    ituserInfo.update((users) => {
-      const updated = users.filter((_, i) => i !== index)
+    ituserInfo.update((itusers) => {
+      const updated = itusers.filter((_, i) => i !== index)
       if (selectedTab >= updated.length) {
         selectedTab = Math.max(0, updated.length - 1)
       }
@@ -136,32 +129,32 @@
   }
 
   const addRolebinding = (itUserIndex: number) => {
-    ituserInfo.update((users) => {
-      return users.map((user, i) => {
+    ituserInfo.update((itusers) => {
+      return itusers.map((ituser, i) => {
         if (i === itUserIndex) {
           return {
-            ...user,
-            rolebindings: [...user.rolebindings, createDefaultRolebinding()],
+            ...ituser,
+            rolebindings: [...ituser.rolebindings, createDefaultRolebinding()],
           }
         }
-        return user
+        return ituser
       })
     })
   }
 
   const removeRolebinding = (itUserIndex: number, rolebindingIndex: number) => {
-    ituserInfo.update((users) => {
-      return users.map((user, i) => {
+    ituserInfo.update((itusers) => {
+      return itusers.map((ituser, i) => {
         if (i === itUserIndex) {
-          const updatedRolebindings = user.rolebindings.filter(
+          const updatedRolebindings = ituser.rolebindings.filter(
             (_, j) => j !== rolebindingIndex
           )
           return {
-            ...user,
+            ...ituser,
             rolebindings: updatedRolebindings,
           }
         }
-        return user
+        return ituser
       })
     })
   }
@@ -172,7 +165,7 @@
     }
   })
 
-  $: ituser = $ituserInfo[selectedTab]
+  $: ituser = $ituserInfo[selectedTab] ?? $ituserInfo[0]
 </script>
 
 <form on:submit|preventDefault={async () => await validateForm()}>
@@ -204,6 +197,7 @@
             class="tab flex gap-2 cursor-pointer [--tab-border-color:transparent]"
             class:tab-active={selectedTab === ituserIndex}
             class:[--tab-bg:bg-slate-100]={selectedTab === ituserIndex}
+            class:text-error={_ituser.validated === false}
             class:bg-white={selectedTab !== ituserIndex}
             on:click={(e) => {
               e.preventDefault()
@@ -212,28 +206,34 @@
             }}
           >
             <span>{capital($_("ituser", { values: { n: 1 } }))} {ituserIndex + 1}</span>
-            <button
-              class="btn btn-xs btn-circle btn-ghost text-secondary hover:bg-error"
-              type="button"
-              on:click={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                removeItUser(ituserIndex)
-              }}
-              aria-label="Close IT-user tab"
-            >
-              <Icon
-                icon="material-symbols:close-small-outline-rounded"
-                width="20"
-                height="20"
-              />
-            </button>
+            {#if $ituserInfo.length}
+              <button
+                class="btn btn-xs btn-circle btn-ghost text-secondary hover:bg-error"
+                type="button"
+                on:click={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  removeItUser(ituserIndex)
+                }}
+                aria-label="Close IT-user tab"
+              >
+                <Icon
+                  icon="material-symbols:close-small-outline-rounded"
+                  width="20"
+                  height="20"
+                />
+              </button>
+            {/if}
           </button>
         {/each}
 
         <button
           class="btn btn-sm btn-ghost px-2"
-          on:click={addItUser}
+          on:click={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            addItUser()
+          }}
           aria-label="Add IT-user"
         >
           <Icon icon={addRounded} width="20" height="20" />
@@ -244,8 +244,7 @@
           <DateInput
             startValue={$date}
             bind:value={ituser.fromDate}
-            bind:validationValue={$fromDate.value}
-            errors={$fromDate.errors}
+            errors={ituser.validated === false && !ituser.fromDate ? ["required"] : []}
             title={capital($_("date.start_date"))}
             id="from"
             required={true}
@@ -261,8 +260,9 @@
             title={capital($_("it_system"))}
             id="it-system"
             bind:value={ituser.itSystem}
-            bind:name={$itSystemField.value}
-            errors={$itSystemField.errors}
+            errors={ituser.validated === false && !ituser.itSystem?.uuid
+              ? ["required"]
+              : []}
             on:change={() => {
               fetchItSystemRoles(ituser.itSystem.uuid)
             }}
@@ -272,8 +272,7 @@
           />
           <Input
             bind:value={ituser.userkey}
-            bind:cprName={$accountName.value}
-            errors={$accountName.errors}
+            errors={ituser.validated === false && !ituser.userkey ? ["required"] : []}
             extra_classes="basis-1/2"
             title={capital($_("account_name"))}
             id="account-name"
@@ -306,7 +305,7 @@
                 id="it-system-role-uuid"
                 bind:value={rolebinding.role}
                 iterable={itSystemRoles}
-                errors={rolebinding.validated ? [] : ["required"]}
+                errors={rolebinding.validated === false ? ["required"] : []}
               />
             {/key}
           {:else}
