@@ -3,7 +3,7 @@
   import { capital } from "$lib/util/translationUtils"
   import {
     ituserInfo,
-    createDefaultItUser,
+    createDefaultItuser,
     createDefaultRolebinding,
     validateRolebinding,
     validateItuser,
@@ -28,7 +28,7 @@
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
   import { env } from "$env/dynamic/public"
-  import ItUserCheckbox from "./ItUserCheckbox.svelte"
+  import ItuserCheckbox from "$lib/components/userflow/ItuserCheckbox.svelte"
   import Icon from "@iconify/svelte"
   import removeRounded from "@iconify/icons-material-symbols/remove-rounded"
   import addRounded from "@iconify/icons-material-symbols/add-rounded"
@@ -113,12 +113,12 @@
       .map((cls) => cls.validities[0])
       .sort((a, b) => (a.name > b.name ? 1 : -1))
   }
-  const addItUser = () => {
-    ituserInfo.update((itusers) => [...itusers, createDefaultItUser()])
+  const addItuser = () => {
+    ituserInfo.update((itusers) => [...itusers, createDefaultItuser()])
     selectedTab = $ituserInfo.length - 1
   }
 
-  const removeItUser = (index: number) => {
+  const removeItuser = (index: number) => {
     ituserInfo.update((itusers) => {
       const updated = itusers.filter((_, i) => i !== index)
       if (selectedTab >= updated.length) {
@@ -128,10 +128,10 @@
     })
   }
 
-  const addRolebinding = (itUserIndex: number) => {
+  const addRolebinding = (ituserIndex: number) => {
     ituserInfo.update((itusers) => {
       return itusers.map((ituser, i) => {
-        if (i === itUserIndex) {
+        if (i === ituserIndex) {
           return {
             ...ituser,
             rolebindings: [...ituser.rolebindings, createDefaultRolebinding()],
@@ -142,10 +142,10 @@
     })
   }
 
-  const removeRolebinding = (itUserIndex: number, rolebindingIndex: number) => {
+  const removeRolebinding = (ituserIndex: number, rolebindingIndex: number) => {
     ituserInfo.update((itusers) => {
       return itusers.map((ituser, i) => {
-        if (i === itUserIndex) {
+        if (i === ituserIndex) {
           const updatedRolebindings = ituser.rolebindings.filter(
             (_, j) => j !== rolebindingIndex
           )
@@ -213,7 +213,7 @@
                 on:click={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
-                  removeItUser(ituserIndex)
+                  removeItuser(ituserIndex)
                 }}
                 aria-label="Close IT-user tab"
               >
@@ -232,7 +232,7 @@
           on:click={(e) => {
             e.preventDefault()
             e.stopPropagation()
-            addItUser()
+            addItuser()
           }}
           aria-label="Add IT-user"
         >
@@ -280,7 +280,7 @@
           />
         </div>
         <div class="flex">
-          <ItUserCheckbox
+          <ItuserCheckbox
             id="primary"
             title={capital($_("primary"))}
             startValue={ituser.primary.uuid}

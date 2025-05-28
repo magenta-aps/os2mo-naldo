@@ -3,7 +3,7 @@ import { writable, get } from "svelte/store"
 import { v4 as uuidv4 } from "uuid"
 import { date } from "$lib/stores/date"
 
-export type ItUserInfo = {
+export type ItuserInfo = {
   uuid: string
   fromDate: string
   toDate: string
@@ -15,7 +15,7 @@ export type ItUserInfo = {
   validated?: boolean
 }
 
-export const createDefaultItUser = (): ItUserInfo => ({
+export const createDefaultItuser = (): ItuserInfo => ({
   uuid: uuidv4(),
   fromDate: get(date),
   toDate: "",
@@ -27,7 +27,7 @@ export const createDefaultItUser = (): ItUserInfo => ({
   validated: undefined,
 })
 
-export const validateItuser = (ituser: ItUserInfo): boolean => {
+export const validateItuser = (ituser: ItuserInfo): boolean => {
   return !!ituser.fromDate && !!ituser.itSystem?.uuid && !!ituser.userkey
 }
 
@@ -52,7 +52,7 @@ export const validateRolebinding = (rb: RolebindingInfo): boolean => {
 }
 
 export const ituserInfo = (() => {
-  const defaultValue: ItUserInfo[] = [createDefaultItUser()]
+  const defaultValue: ItuserInfo[] = [createDefaultItuser()]
 
   let initialValue = defaultValue
 
@@ -61,7 +61,7 @@ export const ituserInfo = (() => {
     initialValue = stored ? JSON.parse(stored) : defaultValue
   }
 
-  const { subscribe, update, set } = writable<ItUserInfo[]>(initialValue)
+  const { subscribe, update, set } = writable<ItuserInfo[]>(initialValue)
 
   // Save to localStorage on any change
   subscribe((value) => {
@@ -74,11 +74,11 @@ export const ituserInfo = (() => {
     update,
     reset: () => {
       if (browser) localStorage.removeItem("ituser-info")
-      set([createDefaultItUser()])
+      set([createDefaultItuser()])
     },
-    addItUser: (newUser: ItUserInfo) => update((itusers) => [...itusers, newUser]),
+    addItuser: (newUser: ItuserInfo) => update((itusers) => [...itusers, newUser]),
     // Flexible updater
-    updateItUserAtIndex: (index: number, updater: (ituser: ItUserInfo) => ItUserInfo) =>
+    updateItuserAtIndex: (index: number, updater: (ituser: ItuserInfo) => ItuserInfo) =>
       update((itusers) =>
         itusers.map((ituser, i) => (i === index ? updater(ituser) : ituser))
       ),
