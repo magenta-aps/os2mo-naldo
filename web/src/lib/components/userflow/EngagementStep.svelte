@@ -52,10 +52,10 @@
     to: string | undefined | null
   } = { from: null, to: null }
 
-  $: if ($engagementInfo.orgUnit?.uuid) {
+  $: if (engagement.orgUnit?.uuid) {
     ;(async () => {
       validities = await getValidities(
-        $engagementInfo.orgUnit ? $engagementInfo.orgUnit.uuid : ""
+        engagement.orgUnit ? engagement.orgUnit.uuid : ""
       )
     })()
   } else {
