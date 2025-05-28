@@ -2,54 +2,53 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import { managerInfo } from "$lib/stores/managerInfoStore"
+  import { env } from "$env/dynamic/public"
 </script>
 
 <div>
-  <h3 class="pb-2 text-primary">{capital($_("manager", { values: { n: 1 } }))}</h3>
-  <dl class="grid gap-1">
-    <div class="grid grid-cols-2">
-      <dt>{capital($_("date.start_date"))}:</dt>
-      {#if $managerInfo.validated === true}
-        <dd>{$managerInfo.fromDate}</dd>
-      {/if}
-    </div>
-    <div class="grid grid-cols-2">
-      <dt>{capital($_("date.end_date"))}:</dt>
-      {#if $managerInfo.validated === true}
-        <dd>{$managerInfo.toDate}</dd>
-      {/if}
-    </div>
-    <div class="grid grid-cols-2">
-      <dt>{capital($_("unit", { values: { n: 1 } }))}:</dt>
-      {#if $managerInfo.validated === true}
-        <dd>{$managerInfo.orgUnit?.name ? $managerInfo.orgUnit.name : ""}</dd>
-      {/if}
-    </div>
-    <div class="grid grid-cols-2">
-      <dt>{capital($_("manager_type"))}:</dt>
-      {#if $managerInfo.validated === true}
-        <dd>{$managerInfo.managerType.name ? $managerInfo.managerType.name : ""}</dd>
-      {/if}
-    </div>
-    <div class="grid grid-cols-2">
-      <dt>{capital($_("manager_level"))}:</dt>
-      {#if $managerInfo.validated === true}
-        <dd>{$managerInfo.managerLevel.name ? $managerInfo.managerLevel.name : ""}</dd>
-      {/if}
-    </div>
-    <div class="grid grid-cols-2">
-      <dt>{capital($_("manager_responsibility"))}:</dt>
-      {#if $managerInfo.validated === true}
-        <dd>
-          <ul>
-            {#each $managerInfo.responsibilities as responsibility}
-              <li>
-                • {responsibility.name}
-              </li>
-            {/each}
-          </ul>
-        </dd>
-      {/if}
-    </div>
-  </dl>
+  <h3 class="text-primary">{capital($_("manager", { values: { n: 2 } }))}</h3>
+  {#each $managerInfo as manager, index}
+    {#if manager.validated === true}
+      <div class="grid gap-1 pb-2 text-secondary">
+        <h4>
+          {capital($_("manager", { values: { n: 1 } }))}
+          {index + 1}
+        </h4>
+        <div class="pb-1">
+          <div class="grid grid-cols-2">
+            <span>{capital($_("date.start_date"))}:</span>
+            <span>{manager.fromDate}</span>
+          </div>
+          <div class="grid grid-cols-2">
+            <span>{capital($_("date.end_date"))}:</span>
+            <span>{manager.toDate}</span>
+          </div>
+          <div class="grid grid-cols-2">
+            <span>{capital($_("unit", { values: { n: 1 } }))}:</span>
+            <span>{manager.orgUnit?.name}</span>
+          </div>
+          <div class="grid grid-cols-2">
+            <span>{capital($_("manager_type"))}:</span>
+            <span>{manager.managerType?.name}</span>
+          </div>
+          <div class="grid grid-cols-2">
+            <span>
+              {capital($_("manager_level"))}:
+            </span>
+            <span>{manager.managerLevel?.name}</span>
+          </div>
+          <div class="grid grid-cols-2">
+            <span>{capital($_("manager_responsibility"))}:</span>
+            <ul>
+              {#each manager.responsibilities as responsibility}
+                <li>
+                  • {responsibility.name}
+                </li>
+              {/each}
+            </ul>
+          </div>
+        </div>
+      </div>
+    {/if}
+  {/each}
 </div>

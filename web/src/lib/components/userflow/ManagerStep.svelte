@@ -1,19 +1,22 @@
 <script lang="ts">
   import { step } from "$lib/stores/stepStore"
-  import { managerInfo } from "$lib/stores/managerInfoStore"
+  import {
+    managerInfo,
+    createDefaultManager,
+    validateManager,
+  } from "$lib/stores/managerInfoStore"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
   import OnboardingFormButtons from "$lib/components/userflow/OnboardingFormButtons.svelte"
+  import OnboardingTab from "$lib/components/userflow/OnboardingTab.svelte"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
   import { ManagerFacetsDocument } from "./query.generated"
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/getClasses"
-  import { form, field } from "svelte-forms"
-  import { required } from "svelte-forms/validators"
   import Search from "$lib/components/search/Search.svelte"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
@@ -45,38 +48,49 @@
     to: string | undefined | null
   } = { from: null, to: null }
 
-  $: if ($managerInfo.orgUnit?.uuid) {
+  $: if (manager.orgUnit?.uuid) {
     ;(async () => {
-      validities = await getValidities(
-        $managerInfo.orgUnit ? $managerInfo.orgUnit.uuid : ""
-      )
+      validities = await getValidities(manager.orgUnit ? manager.orgUnit.uuid : "")
     })()
   } else {
     validities = { from: null, to: null }
   }
 
-  const fromDate = field("from", "", [required()])
-  const orgUnit = field("org_unit", "", [required()])
-  const managerType = field("manager_type", "", [required()])
-  const managerLevel = field("manager_level", "", [required()])
-  const responsibilities = field("responsibilities", undefined, [required()])
-  const svelteForm = form(
-    fromDate,
-    orgUnit,
-    managerType,
-    managerLevel,
-    responsibilities
-  )
+  let selectedTab = 0
 
   const validateForm = async () => {
-    await svelteForm.validate()
-    if ($svelteForm.valid) {
-      managerInfo.isValid(true)
+    const updatedManagers = $managerInfo.map((manager) => {
+      return {
+        ...manager,
+        validated: validateManager(manager),
+      }
+    })
+
+    managerInfo.set(updatedManagers)
+
+    // Check if every user and every rolebinding is valid
+    const formIsValid = updatedManagers.every((manager) => manager.validated)
+
+    if (formIsValid) {
       step.updateStep("inc")
-    } else {
-      managerInfo.isValid(false)
     }
   }
+
+  const addManager = () => {
+    managerInfo.update((managers) => [...managers, createDefaultManager()])
+    selectedTab = $managerInfo.length - 1
+  }
+
+  const removeManager = (index: number) => {
+    managerInfo.update((managers) => {
+      const updated = managers.filter((_, i) => i !== index)
+      if (selectedTab >= updated.length) {
+        selectedTab = Math.max(0, updated.length - 1)
+      }
+      return updated
+    })
+  }
+  $: manager = $managerInfo[selectedTab] ?? $managerInfo[0]
 </script>
 
 <form on:submit|preventDefault={async () => await validateForm()}>
@@ -99,43 +113,54 @@
     {@const facets = data.facets.objects}
 
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+      <OnboardingTab
+        items={$managerInfo}
+        label="manager"
+        addItem={addManager}
+        removeItem={removeManager}
+        selectedIndex={selectedTab}
+        setSelectedIndex={(i) => (selectedTab = i)}
+      />
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
             startValue={$date}
-            bind:value={$managerInfo.fromDate}
-            bind:validationValue={$fromDate.value}
-            errors={$fromDate.errors}
+            bind:value={manager.fromDate}
+            errors={manager.validated === false && !manager.fromDate
+              ? ["required"]
+              : []}
             title={capital($_("date.start_date"))}
             id="from"
             min={validities.from}
-            max={$managerInfo.toDate ? $managerInfo.toDate : validities.to}
+            max={manager.toDate ? manager.toDate : validities.to}
             required={true}
           />
           <DateInput
-            bind:value={$managerInfo.toDate}
+            bind:value={manager.toDate}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : validities.from}
+            min={manager.fromDate ? manager.fromDate : validities.from}
             max={validities.to}
           />
         </div>
         <Search
           type="org-unit"
-          bind:value={$managerInfo.orgUnit}
-          on:clear={() => ($orgUnit.value = "")}
-          bind:name={$orgUnit.value}
-          errors={$orgUnit.errors}
+          bind:value={manager.orgUnit}
+          on:clear={() => (manager.orgUnit = undefined)}
+          errors={manager.validated === false && !manager.orgUnit?.uuid
+            ? ["required"]
+            : []}
           required={true}
         />
-        <Breadcrumbs orgUnit={$managerInfo.orgUnit} />
+        <Breadcrumbs orgUnit={manager.orgUnit} />
         <div class="flex flex-row gap-6">
           <Select
             title={capital($_("manager_type"))}
             id="manager-type"
-            bind:value={$managerInfo.managerType}
-            bind:name={$managerType.value}
-            errors={$managerType.errors}
+            bind:value={manager.managerType}
+            errors={manager.validated === false && !manager.managerType?.uuid
+              ? ["required"]
+              : []}
             iterable={getClassesByFacetUserKey(facets, "manager_type")}
             extra_classes="basis-1/2"
             required={true}
@@ -143,19 +168,21 @@
           <Select
             title={capital($_("manager_level"))}
             id="manager-level"
-            bind:value={$managerInfo.managerLevel}
-            bind:name={$managerLevel.value}
-            errors={$managerLevel.errors}
+            bind:value={manager.managerLevel}
+            errors={manager.validated === false && !manager.managerLevel?.uuid
+              ? ["required"]
+              : []}
             iterable={getClassesByFacetUserKey(facets, "manager_level")}
             extra_classes="basis-1/2"
             required={true}
           />
         </div>
         <SelectMultiple
-          bind:value={$managerInfo.responsibilities}
-          bind:name={$responsibilities.value}
-          errors={$responsibilities.errors}
-          on:clear={() => ($responsibilities.value = undefined)}
+          bind:value={manager.responsibilities}
+          errors={manager.validated === false && !manager.responsibilities.length
+            ? ["required"]
+            : []}
+          on:clear={() => (manager.responsibilities = [])}
           title={capital($_("manager_responsibility"))}
           id="responsibility"
           iterable={getClassesByFacetUserKey(facets, "responsibility")}
