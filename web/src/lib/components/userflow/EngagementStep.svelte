@@ -2,7 +2,11 @@
   import { step } from "$lib/stores/stepStore"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
-  import { engagementInfo } from "$lib/stores/engagementInfoStore"
+  import {
+    engagementInfo,
+    createDefaultEngagement,
+    validateEngagement,
+  } from "$lib/stores/engagementInfoStore"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
@@ -13,11 +17,10 @@
   import { gql } from "graphql-request"
   import { date } from "$lib/stores/date"
   import { getClassesByFacetUserKey } from "$lib/util/getClasses"
-  import { form, field } from "svelte-forms"
-  import { required } from "svelte-forms/validators"
   import Search from "$lib/components/search/Search.svelte"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
+  import OnboardingTab from "$lib/components/userflow/OnboardingTab.svelte"
   import { getValidities } from "$lib/util/helpers"
   import { env } from "$env/dynamic/public"
 
@@ -59,21 +62,43 @@
     validities = { from: null, to: null }
   }
 
-  const fromDate = field("from", "", [required()])
-  const orgUnit = field("org_unit", "", [required()])
-  const jobFunction = field("job_function", "", [required()])
-  const engagementType = field("engagement_type", "", [required()])
-  const svelteForm = form(fromDate, orgUnit, jobFunction, engagementType)
+  let selectedTab = 0
 
   const validateForm = async () => {
-    await svelteForm.validate()
-    if ($svelteForm.valid) {
-      engagementInfo.isValid(true)
+    const updatedEngagements = $engagementInfo.map((engagement) => {
+      return {
+        ...engagement,
+        validated: validateEngagement(engagement),
+      }
+    })
+
+    engagementInfo.set(updatedEngagements)
+
+    // Check if every user and every rolebinding is valid
+    const formIsValid = updatedEngagements.every((engagement) => engagement.validated)
+
+    if (formIsValid) {
       step.updateStep("inc")
-    } else {
-      engagementInfo.isValid(false)
     }
   }
+
+  const addEngagement = () => {
+    engagementInfo.update((engagements) => [...engagements, createDefaultEngagement()])
+    selectedTab = $engagementInfo.length - 1
+  }
+
+  const removeEngagement = (index: number) => {
+    engagementInfo.update((engagements) => {
+      const updated = engagements.filter((_, i) => i !== index)
+      if (selectedTab >= updated.length) {
+        selectedTab = Math.max(0, updated.length - 1)
+      }
+      return updated
+    })
+  }
+  $: engagement = $engagementInfo[selectedTab] ?? $engagementInfo[0]
+
+  console.log($engagementInfo)
 </script>
 
 <form on:submit|preventDefault={async () => await validateForm()}>
@@ -99,41 +124,50 @@
     {@const facets = data.facets.objects}
 
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+      <OnboardingTab
+        items={$engagementInfo}
+        label="engagement"
+        addItem={addEngagement}
+        removeItem={removeEngagement}
+        selectedIndex={selectedTab}
+        setSelectedIndex={(i) => (selectedTab = i)}
+      />
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
             startValue={$date}
-            bind:value={$engagementInfo.fromDate}
-            bind:validationValue={$fromDate.value}
-            errors={$fromDate.errors}
+            bind:value={engagement.fromDate}
+            errors={engagement.validated === false && !engagement.fromDate
+              ? ["required"]
+              : []}
             title={capital($_("date.start_date"))}
             id="from"
             min={validities.from}
-            max={$engagementInfo.toDate ? $engagementInfo.toDate : validities.to}
+            max={engagement.toDate ? engagement.toDate : validities.to}
             required={true}
           />
           <DateInput
-            bind:value={$engagementInfo.toDate}
+            bind:value={engagement.toDate}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : validities.from}
+            min={engagement.fromDate ? engagement.fromDate : validities.from}
             max={validities.to}
           />
         </div>
         <Search
           type="org-unit"
-          bind:value={$engagementInfo.orgUnit}
-          on:clear={() => ($orgUnit.value = "")}
-          bind:name={$orgUnit.value}
-          errors={$orgUnit.errors}
+          bind:value={engagement.orgUnit}
+          errors={engagement.validated === false && !engagement.orgUnit?.uuid
+            ? ["required"]
+            : []}
           required={true}
         />
-        <Breadcrumbs orgUnit={$engagementInfo.orgUnit} />
+        <Breadcrumbs orgUnit={engagement.orgUnit} />
         <div class="flex flex-row gap-6">
           <Input
             title="ID"
             id="user-key"
-            bind:value={$engagementInfo.userkey}
+            bind:value={engagement.userkey}
             extra_classes="basis-1/2"
           />
           <Select
@@ -141,9 +175,10 @@
               ? capital($_("job_code"))
               : capital($_("job_function", { values: { n: 1 } }))}
             id="job-function"
-            bind:value={$engagementInfo.jobFunction}
-            bind:name={$jobFunction.value}
-            errors={$jobFunction.errors}
+            bind:value={engagement.jobFunction}
+            errors={engagement.validated === false && !engagement.jobFunction?.uuid
+              ? ["required"]
+              : []}
             iterable={getClassesByFacetUserKey(facets, "engagement_job_function")}
             required={true}
             extra_classes="basis-1/2"
@@ -153,9 +188,10 @@
           <Select
             title={capital($_("engagement_type"))}
             id="engagement-type"
-            bind:value={$engagementInfo.engagementType}
-            bind:name={$engagementType.value}
-            errors={$engagementType.errors}
+            bind:value={engagement.engagementType}
+            errors={engagement.validated === false && !engagement.engagementType?.uuid
+              ? ["required"]
+              : []}
             iterable={getClassesByFacetUserKey(facets, "engagement_type")}
             required={true}
             extra_classes="basis-1/2"
@@ -163,7 +199,7 @@
           <Select
             title={capital($_("primary"))}
             id="primary"
-            bind:value={$engagementInfo.primary}
+            bind:value={engagement.primary}
             iterable={getClassesByFacetUserKey(facets, "primary_type")}
             extra_classes="basis-1/2"
             isClearable={true}

@@ -23,6 +23,7 @@
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
   import { env } from "$env/dynamic/public"
   import ItuserCheckbox from "$lib/components/userflow/ItuserCheckbox.svelte"
+  import OnboardingTab from "$lib/components/userflow/OnboardingTab.svelte"
   import Icon from "@iconify/svelte"
   import removeRounded from "@iconify/icons-material-symbols/remove-rounded"
   import addRounded from "@iconify/icons-material-symbols/add-rounded"
@@ -127,60 +128,14 @@
       env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary"
     )}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
-      <div class="tabs tabs-lifted mb-4 flex flex-wrap">
-        {#each $ituserInfo as _ituser, ituserIndex}
-          <button
-            class="tab flex gap-2 cursor-pointer [--tab-border-color:transparent]"
-            class:tab-active={selectedTab === ituserIndex}
-            class:[--tab-bg:bg-slate-100]={selectedTab === ituserIndex}
-            class:text-error={_ituser.validated === false}
-            class:bg-white={selectedTab !== ituserIndex}
-            on:click={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              selectedTab = ituserIndex
-            }}
-          >
-            <span>{capital($_("ituser", { values: { n: 1 } }))} {ituserIndex + 1}</span>
-            {#if $ituserInfo.length}
-              <button
-                class="btn btn-xs btn-circle btn-ghost text-secondary hover:bg-error"
-                type="button"
-                on:click={async (e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  // Don't let your LSP fool you, this `await` does indeed have effect.
-                  await ituserInfo.removeItuser(ituserIndex)
-                  if (selectedTab >= $ituserInfo.length) {
-                    selectedTab = Math.max(0, $ituserInfo.length - 1)
-                  }
-                }}
-                aria-label="Close IT-user tab"
-              >
-                <Icon
-                  icon="material-symbols:close-small-outline-rounded"
-                  width="20"
-                  height="20"
-                />
-              </button>
-            {/if}
-          </button>
-        {/each}
-
-        <button
-          class="btn btn-sm btn-ghost px-2"
-          on:click={async (e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            // Don't let your LSP fool you, this `await` does indeed have effect.
-            await ituserInfo.addItuser()
-            selectedTab = $ituserInfo.length - 1
-          }}
-          aria-label="Add IT-user"
-        >
-          <Icon icon={addRounded} width="20" height="20" />
-        </button>
-      </div>
+      <OnboardingTab
+        items={$ituserInfo}
+        label="ituser"
+        addItem={ituserInfo.addItuser}
+        removeItem={ituserInfo.removeItuser}
+        selectedIndex={selectedTab}
+        setSelectedIndex={(i) => (selectedTab = i)}
+      />
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput

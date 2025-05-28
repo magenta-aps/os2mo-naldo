@@ -6,53 +6,51 @@
 </script>
 
 <div>
-  <h3 class="pb-2 text-primary">{capital($_("engagement", { values: { n: 1 } }))}</h3>
-  <dl class="grid gap-1">
-    <div class="grid grid-cols-2">
-      <dt>{capital($_("date.start_date"))}:</dt>
-      {#if $engagementInfo.validated === true}
-        <dd>{$engagementInfo.fromDate}</dd>
-      {/if}
-    </div>
-    <div class="grid grid-cols-2">
-      <dt>{capital($_("date.end_date"))}:</dt>
-      {#if $engagementInfo.validated === true}
-        <dd>{$engagementInfo.toDate}</dd>
-      {/if}
-    </div>
-    <div class="grid grid-cols-2">
-      <dt>{capital($_("unit", { values: { n: 1 } }))}:</dt>
-      {#if $engagementInfo.validated === true}
-        <dd>{$engagementInfo.orgUnit?.name}</dd>
-      {/if}
-    </div>
-    <div class="grid grid-cols-2">
-      <dt>{capital($_("id", { values: { n: 2 } }))}:</dt>
-      {#if $engagementInfo.validated === true}
-        <dd>{$engagementInfo.userkey ? $engagementInfo.userkey : ""}</dd>
-      {/if}
-    </div>
-    <div class="grid grid-cols-2">
-      <dt>
-        {env.PUBLIC_SHOW_EXTENSION_1 === "true"
-          ? capital($_("job_code"))
-          : capital($_("job_function", { values: { n: 1 } }))}:
-      </dt>
-      {#if $engagementInfo.validated === true}
-        <dd>{$engagementInfo.jobFunction.name}</dd>
-      {/if}
-    </div>
-    <div class="grid grid-cols-2">
-      <dt>{capital($_("engagement_type", { values: { n: 1 } }))}:</dt>
-      {#if $engagementInfo.validated === true}
-        <dd>{$engagementInfo.engagementType.name}</dd>
-      {/if}
-    </div>
-    <div class="grid grid-cols-2">
-      <dt>{capital($_("primary", { values: { n: 1 } }))}:</dt>
-      {#if $engagementInfo.validated === true}
-        <dd>{$engagementInfo.primary ? $engagementInfo.primary.name : ""}</dd>
-      {/if}
-    </div>
-  </dl>
+  <h3 class="text-primary">{capital($_("engagement", { values: { n: 2 } }))}</h3>
+  {#each $engagementInfo as engagement, index}
+    {#if engagement.validated === true}
+      <div class="grid gap-1 pb-2 text-secondary">
+        <h4>
+          {capital($_("engagement", { values: { n: 1 } }))}
+          {index + 1}
+        </h4>
+        <div class="pb-1">
+          <div class="grid grid-cols-2">
+            <span>{capital($_("date.start_date"))}:</span>
+            <span>{engagement.fromDate}</span>
+          </div>
+          <div class="grid grid-cols-2">
+            <span>{capital($_("date.end_date"))}:</span>
+            <span>{engagement.toDate}</span>
+          </div>
+          <div class="grid grid-cols-2">
+            <span>{capital($_("unit", { values: { n: 1 } }))}:</span>
+            <span>{engagement.orgUnit?.name}</span>
+          </div>
+          <div class="grid grid-cols-2">
+            <span>
+              {env.PUBLIC_SHOW_EXTENSION_1 === "true"
+                ? capital($_("job_code"))
+                : capital($_("job_function", { values: { n: 1 } }))}:
+            </span>
+            <span>{engagement.jobFunction?.name}</span>
+          </div>
+          <div class="grid grid-cols-2">
+            <span>
+              {capital($_("engagement_type", { values: { n: 1 } }))}:
+            </span>
+            <span>{engagement.engagementType?.name}</span>
+          </div>
+          <div class="grid grid-cols-2">
+            <span>{capital($_("id"))}:</span>
+            <span>{engagement.userkey ? engagement.userkey : ""}</span>
+          </div>
+          <div class="grid grid-cols-2">
+            <span>{capital($_("primary"))}:</span>
+            <span>{engagement.primary ? engagement.primary.name : ""}</span>
+          </div>
+        </div>
+      </div>
+    {/if}
+  {/each}
 </div>
