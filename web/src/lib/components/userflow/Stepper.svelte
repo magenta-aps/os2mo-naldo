@@ -35,7 +35,7 @@
         $_("create_item", { values: { item: $_("manager", { values: { n: 1 } }) } })
       )}`,
       count: 4,
-      valid: $managerInfo.validated,
+      valid: $managerInfo.every((manager) => manager.validated),
     },
     {
       name: `${capital(
