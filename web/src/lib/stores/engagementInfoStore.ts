@@ -1,7 +1,8 @@
 import { browser } from "$app/environment"
-import { writable } from "svelte/store"
+import { writable, get } from "svelte/store"
+import { date } from "$lib/stores/date"
 
-type EngagementInfo = {
+export type EngagementInfo = {
   fromDate: string
   toDate: string
   orgUnit: { uuid: string; name: string } | undefined
@@ -9,43 +10,40 @@ type EngagementInfo = {
   jobFunction: { uuid: string; name: string; userkey: string }
   engagementType: { uuid: string; name: string; userkey: string }
   primary: { uuid: string; name: string; userkey: string }
-  validated: boolean
+  validated?: boolean
 }
 
-const defaultValue: EngagementInfo = {
-  fromDate: "",
+export const createDefaultEngagement = (): EngagementInfo => ({
+  fromDate: get(date),
   toDate: "",
   orgUnit: undefined,
   userkey: "",
   jobFunction: { uuid: "", name: "", userkey: "" },
   engagementType: { uuid: "", name: "", userkey: "" },
   primary: { uuid: "", name: "", userkey: "" },
-  validated: false,
+  validated: undefined,
+})
+
+export const validateEngagement = (engagement: EngagementInfo): boolean => {
+  return (
+    !!engagement.fromDate &&
+    !!engagement.orgUnit?.uuid &&
+    !!engagement.jobFunction?.uuid &&
+    !!engagement.engagementType?.uuid
+  )
 }
 
-const createEngagementInfoStore = () => {
+export const engagementInfo = (() => {
+  const defaultValue: EngagementInfo[] = [createDefaultEngagement()]
+
   let initialValue = defaultValue
 
   if (browser) {
-    const storedEngagementInfo = localStorage.getItem("engagement-info")
-    initialValue = storedEngagementInfo
-      ? JSON.parse(storedEngagementInfo)
-      : defaultValue
+    const stored = localStorage.getItem("engagement-info")
+    initialValue = stored ? JSON.parse(stored) : defaultValue
   }
 
-  const { subscribe, update, set } = writable<EngagementInfo>(initialValue)
-
-  const reset = () => {
-    if (browser) localStorage.removeItem("engagement-info")
-    set(defaultValue)
-  }
-
-  const isValid = (valid: boolean) => {
-    update((engagementStore) => {
-      engagementStore.validated = valid
-      return engagementStore
-    })
-  }
+  const { subscribe, update, set } = writable<EngagementInfo[]>(initialValue)
 
   subscribe((value) => {
     if (browser) localStorage.setItem("engagement-info", JSON.stringify(value))
@@ -54,9 +52,28 @@ const createEngagementInfoStore = () => {
   return {
     subscribe,
     set,
-    reset,
-    isValid,
+    update,
+    reset: () => {
+      if (browser) localStorage.removeItem("engagement-info")
+      set([createDefaultEngagement()])
+    },
+    addEngagement: (newEngagement: EngagementInfo) =>
+      update((engagements) => [...engagements, newEngagement]),
+    updateEngagementAtIndex: (
+      index: number,
+      updater: (e: EngagementInfo) => EngagementInfo
+    ) =>
+      update((engagements) =>
+        engagements.map((engagement, i) =>
+          i === index ? updater(engagement) : engagement
+        )
+      ),
+    isValid: (valid: boolean) =>
+      update((engagements) =>
+        engagements.map((e) => ({
+          ...e,
+          validated: valid,
+        }))
+      ),
   }
-}
-
-export const engagementInfo = createEngagementInfoStore()
+})()
