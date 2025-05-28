@@ -166,6 +166,12 @@
   })
 
   $: ituser = $ituserInfo[selectedTab] ?? $ituserInfo[0]
+  // Make sure we fetch itsystem roles when changing tabs
+  let lastFetched: string
+  $: if (ituser && !!ituser.itSystem?.uuid && ituser.itSystem?.uuid !== lastFetched) {
+    lastFetched = ituser.itSystem?.uuid
+    fetchItSystemRoles(ituser.itSystem.uuid)
+  }
 </script>
 
 <form on:submit|preventDefault={async () => await validateForm()}>

@@ -32,7 +32,7 @@
           </div>
           <div class="grid grid-cols-2">
             <span>{capital($_("primary"))}:</span>
-            <span>{ituser.primary ? ituser.primary.name : ""}</span>
+            <span>{ituser.primary.name || ""}</span>
           </div>
           <div class="grid grid-cols-2">
             <span>{capital($_("notes"))}:</span>
