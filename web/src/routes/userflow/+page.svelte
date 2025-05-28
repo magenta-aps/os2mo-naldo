@@ -4,7 +4,7 @@
   import { step } from "$lib/stores/stepStore"
   import EmployeeStep from "$lib/components/userflow/EmployeeStep.svelte"
   import EngagementStep from "$lib/components/userflow/EngagementStep.svelte"
-  import ItUserStep from "$lib/components/userflow/ItuserStep.svelte"
+  import ItuserStep from "$lib/components/userflow/ItuserStep.svelte"
   import ManagerStep from "$lib/components/userflow/ManagerStep.svelte"
   import AddressStep from "$lib/components/userflow/AddressStep.svelte"
   import Stepper from "$lib/components/userflow/Stepper.svelte"
@@ -26,7 +26,7 @@
     {:else if $step === 2}
       <EngagementStep />
     {:else if $step === 3}
-      <ItUserStep />
+      <ItuserStep />
     {:else if $step === 4}
       <ManagerStep />
     {:else if $step === 5}

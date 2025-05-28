@@ -3,7 +3,7 @@
   import { capital } from "$lib/util/translationUtils"
   import EmployeeSummary from "$lib/components/userflow/EmployeeSummary.svelte"
   import EngagementSummary from "$lib/components/userflow/EngagementSummary.svelte"
-  import ItUserSummary from "$lib/components/userflow/ItUserSummary.svelte"
+  import ItuserSummary from "$lib/components/userflow/ItuserSummary.svelte"
   import ManagerSummary from "$lib/components/userflow/ManagerSummary.svelte"
   import AddressSummary from "$lib/components/userflow/AddressSummary.svelte"
   import type { EmployeeCreateInput } from "$lib/graphql/types"
@@ -192,7 +192,7 @@
   <div class="p-8 space-y-5">
     <EmployeeSummary />
     <EngagementSummary />
-    <ItUserSummary />
+    <ItuserSummary />
     <ManagerSummary />
     <AddressSummary />
   </div>
