@@ -21,7 +21,7 @@
         $_("create_item", { values: { item: $_("engagement", { values: { n: 1 } }) } })
       )}`,
       count: 2,
-      valid: $engagementInfo.validated,
+      valid: $engagementInfo.every((engagement) => engagement.validated),
     },
     {
       name: `${capital(
