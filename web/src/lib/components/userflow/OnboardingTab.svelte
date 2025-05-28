@@ -4,7 +4,7 @@
   import Icon from "@iconify/svelte"
   import addRounded from "@iconify/icons-material-symbols/add-rounded"
 
-  export let items
+  export let items: any
   export let selectedIndex: number
   export let setSelectedIndex: (index: number) => void
   export let removeItem: (index: number) => void

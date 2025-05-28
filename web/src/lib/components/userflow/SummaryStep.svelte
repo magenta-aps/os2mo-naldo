@@ -143,8 +143,8 @@
             (responsibility) => responsibility.uuid
           ),
           validity: {
-            from: $engagementInfo.fromDate,
-            to: $engagementInfo.toDate ? $engagementInfo.toDate : null,
+            from: $managerInfo.fromDate,
+            to: $managerInfo.toDate ? $managerInfo.toDate : null,
           },
         }
       : []
@@ -159,8 +159,8 @@
           user_key: $addressInfo.userkey,
           visibility: $addressInfo.visibility?.uuid,
           validity: {
-            from: $engagementInfo.fromDate,
-            to: $engagementInfo.toDate ? $engagementInfo.toDate : null,
+            from: $addressInfo.fromDate,
+            to: $addressInfo.toDate ? $addressInfo.toDate : null,
           },
         }
       : []
