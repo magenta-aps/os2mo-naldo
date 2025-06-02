@@ -151,22 +151,21 @@
       })
     }
 
-    const addressData: AddressCreateInput | [] = $addressInfo.validated
-      ? {
-          person: employeeUUID,
-          address_type: $addressInfo.addressType.uuid,
-          value:
-            typeof $addressInfo.addressValue === "object"
-              ? $addressInfo.addressValue?.value
-              : $addressInfo.addressValue,
-          user_key: $addressInfo.userkey,
-          visibility: $addressInfo.visibility?.uuid,
-          validity: {
-            from: $addressInfo.fromDate,
-            to: $addressInfo.toDate ? $addressInfo.toDate : null,
-          },
-        }
-      : []
+    const addressData: AddressCreateInput[] = []
+    for (const address of $addressInfo) {
+      if (!address.validated) continue
+      addressData.push({
+        person: employeeUUID,
+        address_type: address.addressType.uuid,
+        value: address.addressValue.value,
+        user_key: address.userkey,
+        visibility: address.visibility?.uuid,
+        validity: {
+          from: address.fromDate,
+          to: address.toDate ? address.toDate : null,
+        },
+      })
+    }
 
     try {
       const mutation = await graphQLClient().request(UserFlowCreateDocument, {

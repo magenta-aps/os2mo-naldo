@@ -2,82 +2,86 @@
   import { step } from "$lib/stores/stepStore"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
-  import { addressInfo } from "$lib/stores/addressInfoStore"
-  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
-  import Error from "$lib/components/alerts/Error.svelte"
-  import Input from "$lib/components/forms/shared/Input.svelte"
-  import Select from "$lib/components/forms/shared/Select.svelte"
-  import OnboardingFormButtons from "$lib/components/userflow/OnboardingFormButtons.svelte"
+  import {
+    addressInfo,
+    createDefaultAddress,
+    validateAddress,
+  } from "$lib/stores/addressInfoStore"
   import { graphQLClient } from "$lib/util/http"
   import { AddressFacetsDocument } from "./query.generated"
-  import { gql } from "graphql-request"
   import { date } from "$lib/stores/date"
   import { form, field } from "svelte-forms"
   import { required, email, pattern } from "svelte-forms/validators"
-  import AddressInput from "$lib/components/userflow/AddressInput.svelte"
   import { getClassesByFacetUserKey } from "$lib/util/getClasses"
-  import DarSearch from "$lib/components/forms/shared/DARSearch.svelte"
   import { Addresses } from "$lib/util/addresses"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { resetUserflowStores } from "$lib/stores/resetStores"
+  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
+  import Input from "$lib/components/forms/shared/Input.svelte"
+  import Select from "$lib/components/forms/shared/Select.svelte"
+  import AddressInput from "$lib/components/userflow/AddressInput.svelte"
+  import DarSearch from "$lib/components/forms/shared/DARSearch.svelte"
+  import OnboardingFormButtons from "$lib/components/userflow/OnboardingFormButtons.svelte"
+  import OnboardingTab from "$lib/components/userflow/OnboardingTab.svelte"
+  import Error from "$lib/components/alerts/Error.svelte"
 
-  gql`
-    query AddressFacets($currentDate: DateTime!) {
-      facets(filter: { user_keys: ["employee_address_type", "visibility"] }) {
-        objects {
-          validities {
-            uuid
-            user_key
-            classes(filter: { from_date: $currentDate }) {
-              uuid
-              user_key
-              name
-              scope
-            }
-          }
-        }
-      }
+  let selectedTab = 0
+  $: address = $addressInfo[selectedTab] ?? $addressInfo[0]
+
+  let addressField = field("", "") // dynamic validator
+
+  $: {
+    switch (address.addressType?.name) {
+      case Addresses.EMAIL:
+        addressField = field(Addresses.EMAIL, "", [required(), email()])
+        break
+      case Addresses.LOKATION:
+        addressField = field(Addresses.LOKATION, "", [required()])
+        break
+      case Addresses.POSTADRESSE:
+        addressField = field(Addresses.POSTADRESSE, "", [required()])
+        break
+      case Addresses.TELEFON:
+        addressField = field(Addresses.TELEFON, "", [required(), pattern(/^\+?\d+$/)])
+        break
+      default:
+        addressField = field("", "")
+        break
     }
-  `
-
-  const fromDate = field("from", "", [required()])
-  const addressTypeField = field("address_type", "", [required()])
-  let addressField = field("", "")
-  $: svelteForm = form(fromDate, addressTypeField, addressField)
-
-  // Reactive statement for $addressInfo.addressType?.name, since calling the store, will override it
-  // and therefore rerun the switch-statement and empty the list of errors.
-  $: addressTypeName = $addressInfo.addressType?.name
-
-  $: switch (addressTypeName) {
-    case Addresses.EMAIL:
-      addressField = field(Addresses.EMAIL, "", [required(), email()])
-      break
-    case Addresses.LOKATION:
-      addressField = field(Addresses.LOKATION, "", [required()])
-      break
-    case Addresses.POSTADRESSE:
-      addressField = field(Addresses.POSTADRESSE, "", [required()])
-      break
-    case Addresses.TELEFON:
-      addressField = field(Addresses.TELEFON, "", [required(), pattern(/^\+?\d+$/)])
-      break
-    default:
-      break
   }
+  $: svelteForm = form(addressField)
 
   const validateForm = async () => {
     await svelteForm.validate()
-    if ($svelteForm.valid) {
-      addressInfo.isValid(true)
+    const updatedAddresses = $addressInfo.map((addr) => ({
+      ...addr,
+      validated: validateAddress(addr),
+    }))
+
+    addressInfo.set(updatedAddresses)
+
+    const formIsValid = updatedAddresses.every((a) => a.validated)
+    if (formIsValid && $svelteForm.valid) {
       step.updateStep("inc")
-    } else {
-      addressInfo.isValid(false)
     }
+  }
+
+  const addAddress = () => {
+    addressInfo.update((a) => [...a, createDefaultAddress()])
+    selectedTab = $addressInfo.length - 1
+  }
+
+  const removeAddress = (index: number) => {
+    addressInfo.update((a) => {
+      const updated = a.filter((_, i) => i !== index)
+      if (selectedTab >= updated.length) {
+        selectedTab = Math.max(0, updated.length - 1)
+      }
+      return updated
+    })
   }
 </script>
 
-<form on:submit|preventDefault={async () => await validateForm()}>
+<form on:submit|preventDefault={validateForm}>
   {#await graphQLClient().request(AddressFacetsDocument, { currentDate: $date })}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -95,19 +99,28 @@
     {@const facets = data.facets.objects}
 
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+      <OnboardingTab
+        items={$addressInfo}
+        label="address"
+        addItem={addAddress}
+        removeItem={removeAddress}
+        selectedIndex={selectedTab}
+        setSelectedIndex={(i) => (selectedTab = i)}
+      />
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
             startValue={$date}
-            bind:value={$addressInfo.fromDate}
-            bind:validationValue={$fromDate.value}
-            errors={$fromDate.errors}
+            bind:value={address.fromDate}
+            errors={address.validated === false && !address.fromDate
+              ? ["required"]
+              : []}
             title={capital($_("date.start_date"))}
             id="from"
-            required={true}
+            required
           />
           <DateInput
-            bind:value={$addressInfo.toDate}
+            bind:value={address.toDate}
             title={capital($_("date.end_date"))}
             id="to"
           />
@@ -116,54 +129,57 @@
           <Select
             title={capital($_("visibility"))}
             id="visibility"
-            bind:value={$addressInfo.visibility}
+            bind:value={address.visibility}
             iterable={getClassesByFacetUserKey(facets, "visibility")}
             extra_classes="basis-1/2"
-            isClearable={true}
+            isClearable
           />
           <Select
             title={capital($_("address_type"))}
             id="address-type"
-            bind:value={$addressInfo.addressType}
-            bind:name={$addressTypeField.value}
-            errors={$addressTypeField.errors}
-            on:change={() => ($addressInfo.addressValue = "")}
+            bind:value={address.addressType}
+            errors={address.validated === false && !address.addressType?.uuid
+              ? ["required"]
+              : []}
+            on:change={() => (address.addressValue = { name: "", value: "" })}
             iterable={getClassesByFacetUserKey(facets, "employee_address_type")}
             extra_classes="basis-1/2"
-            required={true}
+            required
           />
         </div>
         <Input
           title={capital($_("description"))}
           id="user-key"
-          bind:value={$addressInfo.userkey}
+          bind:value={address.userkey}
         />
-        <!-- FIXME: Translate address_types -->
-        {#if $addressInfo.addressType}
-          {#if $addressInfo.addressType.scope === "DAR"}
+        {#if address.addressType}
+          {#if address.addressType.scope === "DAR"}
             <DarSearch
-              title={$addressInfo.addressType.name}
+              title={address.addressType.name}
               id="value"
-              startValue={typeof $addressInfo.addressValue === "object"
+              startValue={address.addressValue
                 ? {
-                    tekst: $addressInfo.addressValue.name,
-                    adresse: { id: $addressInfo.addressValue.value },
-                    adgangsadresse: { id: $addressInfo.addressValue.value },
+                    tekst: address.addressValue.name,
+                    adresse: { id: address.addressValue.value },
+                    adgangsadresse: { id: address.addressValue.value },
                   }
                 : undefined}
-              bind:darValue={$addressInfo.addressValue}
-              bind:darName={$addressField.value}
-              errors={$addressField.errors}
-              required={true}
+              bind:darValue={address.addressValue}
+              errors={address.validated === false && !address.addressValue.value
+                ? ["required"]
+                : []}
+              on:clear={() => (address.addressValue = { name: undefined, value: "" })}
+              required
             />
           {:else}
+            <!-- FIX: Error handling is very bad and not aligned -->
             <AddressInput
-              title={$addressInfo.addressType.name}
+              title={address.addressType.name}
               id="value"
-              bind:value={$addressInfo.addressValue}
+              bind:value={address.addressValue.value}
               bind:validationField={$addressField.value}
               errors={$addressField.errors}
-              required={true}
+              required
             />
           {/if}
         {/if}

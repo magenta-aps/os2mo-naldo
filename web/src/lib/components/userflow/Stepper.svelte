@@ -42,7 +42,7 @@
         $_("create_item", { values: { item: $_("address", { values: { n: 1 } }) } })
       )}`,
       count: 5,
-      valid: $addressInfo.validated,
+      valid: $addressInfo.every((address) => address.validated),
     },
     { name: `${capital($_("summary"))}`, count: 6, valid: false },
   ]
