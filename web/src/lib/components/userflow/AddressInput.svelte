@@ -7,9 +7,8 @@
   export let size: string = "sm"
   export let id: string
   export let name: string = id
-  export let value: string | { name?: string; value: string } | undefined
-  export let validationField: string | undefined | { name?: string; value: string } =
-    undefined
+  export let value: string | undefined
+  export let validationField: string | undefined = undefined
   export let required = false
   export let placeholder: string | undefined = undefined
   export let type = "text"

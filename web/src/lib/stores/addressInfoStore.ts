@@ -1,60 +1,69 @@
 import { browser } from "$app/environment"
-import { writable } from "svelte/store"
+import { writable, get } from "svelte/store"
+import { date } from "$lib/stores/date"
 
-type AddressInfo = {
+export type AddressInfo = {
   fromDate: string
   toDate: string
   visibility: { uuid: string; name: string; userkey: string } | undefined
   addressType: { uuid: string; name: string; userkey: string; scope: string }
-  addressValue: { name?: string; value: string } | string
+  addressValue: { name?: string; value: string }
   userkey: string
-  validated: boolean
+  validated?: boolean
 }
 
-const defaultValue: AddressInfo = {
-  fromDate: "",
+export const createDefaultAddress = (): AddressInfo => ({
+  fromDate: get(date),
   toDate: "",
   visibility: undefined,
   addressType: { uuid: "", name: "", userkey: "", scope: "" },
   addressValue: { name: "", value: "" },
   userkey: "",
-  validated: false,
+  validated: undefined,
+})
+
+export const validateAddress = (address: AddressInfo): boolean => {
+  return (
+    !!address.fromDate && !!address.addressType?.uuid && !!address.addressValue.value
+  )
 }
 
-const createAddressInfoStore = () => {
+export const addressInfo = (() => {
+  const defaultValue: AddressInfo[] = [createDefaultAddress()]
+
   let initialValue = defaultValue
 
   if (browser) {
-    const storedAddressInfo = localStorage.getItem("address-info")
-    initialValue = storedAddressInfo ? JSON.parse(storedAddressInfo) : defaultValue
+    const stored = localStorage.getItem("address-info")
+    initialValue = stored ? JSON.parse(stored) : defaultValue
   }
 
-  const { subscribe, update, set } = writable<AddressInfo>(initialValue)
-
-  const reset = () => {
-    if (browser) localStorage.removeItem("address-info")
-    set(defaultValue)
-  }
-
-  const isValid = (valid: boolean) => {
-    update((addressStore) => {
-      addressStore.validated = valid
-      return addressStore
-    })
-  }
+  const { subscribe, update, set } = writable<AddressInfo[]>(initialValue)
 
   subscribe((value) => {
-    if (browser) {
-      localStorage.setItem("address-info", JSON.stringify(value))
-    }
+    if (browser) localStorage.setItem("address-info", JSON.stringify(value))
   })
 
   return {
     subscribe,
     set,
-    reset,
-    isValid,
+    update,
+    reset: () => {
+      if (browser) localStorage.removeItem("address-info")
+      set([createDefaultAddress()])
+    },
+    addAddress: (newAddress: AddressInfo) =>
+      update((addresses) => [...addresses, newAddress]),
+    updateAddressAtIndex: (index: number, updater: (e: AddressInfo) => AddressInfo) =>
+      update((addresses) =>
+        addresses.map((address, i) => (i === index ? updater(address) : address))
+      ),
+    isValid: (valid: boolean) =>
+      update((addresses) =>
+        addresses.map((a) => ({
+          ...a,
+          validated: valid,
+        }))
+      ),
   }
-}
-
-export const addressInfo = createAddressInfoStore()
+})()
