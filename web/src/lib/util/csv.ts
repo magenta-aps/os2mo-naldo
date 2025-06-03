@@ -96,12 +96,12 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
             values = [orgUnit.validity?.from || "", orgUnit.validity?.to || ""]
           } else {
             // Handle general case
-            values = fieldValue ? [JSON.stringify(fieldValue)] : [""]
+            values = fieldValue ? [fieldValue] : [""]
           }
 
           // Insert values into the orgUnitData array
           values.forEach((value) => {
-            orgUnitData[currentOffset] = value
+            orgUnitData[currentOffset] = escapeCsv(value)
             currentOffset++
           })
         })
@@ -143,21 +143,29 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
                     values = [fromValue, toValue]
                   } else {
                     // Handle general case
-                    values = fieldValue ? [JSON.stringify(fieldValue)] : [""]
+                    values = fieldValue ? [fieldValue] : [""]
                   }
 
                   // Insert values into the row array at the correct positions
                   values.forEach((value) => {
-                    row[currentOffset] = value
+                    row[currentOffset] = escapeCsv(value)
                     currentOffset++
                   })
                 })
 
-                csvRows.push(row.join(","))
+                const csvRow = row.join(",")
+                // Remove row if it's empty
+                if (csvRow.replace(/,/g, "").trim() !== "") {
+                  csvRows.push(csvRow)
+                }
               })
             } else {
-              const row: string[] = [...orgUnitData] // Start each row with orgUnitData
-              csvRows.push(row.join(","))
+              const row: string[] = [...orgUnitData]
+              const csvRow = row.join(",")
+              // Remove row if it's empty
+              if (csvRow.replace(/,/g, "").trim() !== "") {
+                csvRows.push(csvRow)
+              }
             }
           }
         }
@@ -190,4 +198,13 @@ export const downloadHandler = (
   link.href = URL.createObjectURL(blob)
   link.download = filename ? `${filename}.csv` : "insights.csv"
   link.click()
+}
+
+const escapeCsv = (value: any): string => {
+  if (value === null || value === undefined) return ""
+  const str = String(value)
+  if (str.includes(",") || str.includes("\n") || str.includes('"')) {
+    return `"${str.replace(/"/g, '""')}"`
+  }
+  return str
 }
