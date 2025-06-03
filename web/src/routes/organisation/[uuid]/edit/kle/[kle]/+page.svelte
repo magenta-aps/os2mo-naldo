@@ -75,7 +75,7 @@
     mutation UpdateKLE($input: KLEUpdateInput!, $date: DateTime!) {
       kle_update(input: $input) {
         current(at: $date) {
-          org_unit {
+          org_unit(filter: { from_date: null, to_date: null }) {
             name
           }
         }
@@ -99,7 +99,7 @@
                 $_("success_edit_item", {
                   values: {
                     item: $_("kle", { values: { n: 0 } }),
-                    name: mutation.kle_update.current?.org_unit?.[0].name,
+                    name: mutation.kle_update.current?.org_unit?.[0]?.name,
                   },
                 })
               ),

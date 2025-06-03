@@ -88,8 +88,8 @@
     mutation CreateRoleBinding($input: RoleBindingCreateInput!, $date: DateTime!) {
       rolebinding_create(input: $input) {
         current(at: $date) {
-          ituser {
-            org_unit {
+          ituser(filter: { from_date: null, to_date: null }) {
+            org_unit(filter: { from_date: null, to_date: null }) {
               name
             }
           }
@@ -114,8 +114,8 @@
                 $_("success_create_item", {
                   values: {
                     item: $_("rolebinding", { values: { n: 0 } }),
-                    name: mutation.rolebinding_create.current?.ituser?.[0].org_unit?.[0]
-                      .name,
+                    name: mutation.rolebinding_create.current?.ituser?.[0]
+                      ?.org_unit?.[0]?.name,
                   },
                 })
               ),

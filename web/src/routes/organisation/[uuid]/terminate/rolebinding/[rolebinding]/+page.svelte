@@ -47,7 +47,7 @@
     ) {
       rolebinding_terminate(input: $input) {
         current(at: $date) {
-          org_unit {
+          org_unit(filter: { from_date: null, to_date: null }) {
             name
           }
         }
@@ -75,7 +75,7 @@
                 $_("success_terminate_item", {
                   values: {
                     item: $_("rolebinding", { values: { n: 0 } }),
-                    name: mutation.rolebinding_terminate.current?.org_unit?.[0].name,
+                    name: mutation.rolebinding_terminate.current?.org_unit?.[0]?.name,
                   },
                 })
               ),
