@@ -58,7 +58,7 @@
       engagements_update(input: $input) {
         current(at: $date) {
           uuid
-          org_unit {
+          org_unit(filter: { from_date: null, to_date: null }) {
             name
             uuid
           }
@@ -118,7 +118,7 @@
 
             $success = {
               message: capital($_("success_move_engagements")),
-              uuid: mutation.engagements_update[0].current?.org_unit[0].uuid,
+              uuid: mutation.engagements_update[0].current?.org_unit[0]?.uuid,
               type: "organisation",
             }
           } catch (err) {

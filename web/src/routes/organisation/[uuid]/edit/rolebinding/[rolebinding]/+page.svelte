@@ -120,8 +120,8 @@
     mutation UpdateRoleBinding($input: RoleBindingUpdateInput!, $date: DateTime!) {
       rolebinding_update(input: $input) {
         current(at: $date) {
-          ituser {
-            org_unit {
+          ituser(filter: { from_date: null, to_date: null }) {
+            org_unit(filter: { from_date: null, to_date: null }) {
               name
             }
           }
@@ -146,8 +146,8 @@
                 $_("success_edit_item", {
                   values: {
                     item: $_("rolebinding", { values: { n: 0 } }),
-                    name: mutation.rolebinding_update.current?.ituser[0].org_unit?.[0]
-                      .name,
+                    name: mutation.rolebinding_update.current?.ituser?.[0]
+                      ?.org_unit?.[0]?.name,
                   },
                 })
               ),

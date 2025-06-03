@@ -66,7 +66,7 @@
       address_create(input: $input) {
         uuid
         current(at: $date) {
-          org_unit {
+          org_unit(filter: { from_date: null, to_date: null }) {
             name
           }
         }
@@ -137,7 +137,7 @@
                 $_("success_create_item", {
                   values: {
                     item: $_("address", { values: { n: 0 } }),
-                    name: mutation.address_create.current?.org_unit?.[0].name,
+                    name: mutation.address_create.current?.org_unit?.[0]?.name,
                   },
                 })
               ),

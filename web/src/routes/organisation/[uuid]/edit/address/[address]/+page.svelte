@@ -90,7 +90,7 @@
     mutation UpdateAddress($input: AddressUpdateInput!, $date: DateTime!) {
       address_update(input: $input) {
         current(at: $date) {
-          org_unit {
+          org_unit(filter: { from_date: null, to_date: null }) {
             name
           }
         }
@@ -162,7 +162,7 @@
                 $_("success_edit_item", {
                   values: {
                     item: $_("address", { values: { n: 0 } }),
-                    name: mutation.address_update.current?.org_unit?.[0].name,
+                    name: mutation.address_update.current?.org_unit?.[0]?.name,
                   },
                 })
               ),

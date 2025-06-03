@@ -44,7 +44,7 @@
     mutation TerminateOwner($input: OwnerTerminateInput!, $date: DateTime!) {
       owner_terminate(input: $input) {
         current(at: $date) {
-          org_unit {
+          org_unit(filter: { from_date: null, to_date: null }) {
             name
           }
         }
@@ -69,7 +69,7 @@
                 $_("success_terminate_item", {
                   values: {
                     item: $_("owner", { values: { n: 0 } }),
-                    name: mutation.owner_terminate.current?.org_unit?.[0].name,
+                    name: mutation.owner_terminate.current?.org_unit?.[0]?.name,
                   },
                 })
               ),
