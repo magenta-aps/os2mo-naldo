@@ -77,31 +77,6 @@
 
   let selectedTab = 0
 
-  const validateForm = async () => {
-    const updatedItusers = $ituserInfo.map((ituser) => {
-      const updatedRolebindings = ituser.rolebindings.map((rb) => {
-        return { ...rb, validated: validateRolebinding(rb) }
-      })
-
-      return {
-        ...ituser,
-        validated: validateItuser(ituser),
-        rolebindings: updatedRolebindings,
-      }
-    })
-
-    ituserInfo.set(updatedItusers)
-
-    // Check if every user and every rolebinding is valid
-    const formIsValid = updatedItusers.every(
-      (ituser) => ituser.validated && ituser.rolebindings.every((rb) => rb.validated)
-    )
-
-    if (formIsValid) {
-      step.updateStep("inc")
-    }
-  }
-
   let itSystemRoles: UnpackedClass | undefined
 
   const fetchItSystemRoles = async (itSystemUuid: string | undefined | null) => {
@@ -112,51 +87,6 @@
     itSystemRoles = res.classes?.objects
       .map((cls) => cls.validities[0])
       .sort((a, b) => (a.name > b.name ? 1 : -1))
-  }
-  const addItuser = () => {
-    ituserInfo.update((itusers) => [...itusers, createDefaultItuser()])
-    selectedTab = $ituserInfo.length - 1
-  }
-
-  const removeItuser = (index: number) => {
-    ituserInfo.update((itusers) => {
-      const updated = itusers.filter((_, i) => i !== index)
-      if (selectedTab >= updated.length) {
-        selectedTab = Math.max(0, updated.length - 1)
-      }
-      return updated
-    })
-  }
-
-  const addRolebinding = (ituserIndex: number) => {
-    ituserInfo.update((itusers) => {
-      return itusers.map((ituser, i) => {
-        if (i === ituserIndex) {
-          return {
-            ...ituser,
-            rolebindings: [...ituser.rolebindings, createDefaultRolebinding()],
-          }
-        }
-        return ituser
-      })
-    })
-  }
-
-  const removeRolebinding = (ituserIndex: number, rolebindingIndex: number) => {
-    ituserInfo.update((itusers) => {
-      return itusers.map((ituser, i) => {
-        if (i === ituserIndex) {
-          const updatedRolebindings = ituser.rolebindings.filter(
-            (_, j) => j !== rolebindingIndex
-          )
-          return {
-            ...ituser,
-            rolebindings: updatedRolebindings,
-          }
-        }
-        return ituser
-      })
-    })
   }
 
   onMount(async () => {
@@ -174,7 +104,13 @@
   }
 </script>
 
-<form on:submit|preventDefault={async () => await validateForm()}>
+<form
+  on:submit|preventDefault={async () => {
+    if (await ituserInfo.validateForm()) {
+      step.updateStep("inc")
+    }
+  }}
+>
   {#await graphQLClient().request( ItSystemsAndPrimaryDocument, { uuid: $page.params.uuid, primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary", currentDate: $date } )}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -216,10 +152,14 @@
               <button
                 class="btn btn-xs btn-circle btn-ghost text-secondary hover:bg-error"
                 type="button"
-                on:click={(e) => {
+                on:click={async (e) => {
                   e.preventDefault()
                   e.stopPropagation()
-                  removeItuser(ituserIndex)
+                  // Don't let your LSP fool you, this `await` does indeed have effect.
+                  await ituserInfo.removeItuser(ituserIndex)
+                  if (selectedTab >= $ituserInfo.length) {
+                    selectedTab = Math.max(0, $ituserInfo.length - 1)
+                  }
                 }}
                 aria-label="Close IT-user tab"
               >
@@ -235,10 +175,12 @@
 
         <button
           class="btn btn-sm btn-ghost px-2"
-          on:click={(e) => {
+          on:click={async (e) => {
             e.preventDefault()
             e.stopPropagation()
-            addItuser()
+            // Don't let your LSP fool you, this `await` does indeed have effect.
+            await ituserInfo.addItuser()
+            selectedTab = $ituserInfo.length - 1
           }}
           aria-label="Add IT-user"
         >
@@ -324,7 +266,7 @@
           {/if}
           <CircleButton
             on:click={() => {
-              removeRolebinding(selectedTab, rolebindingIndex)
+              ituserInfo.removeRolebinding(selectedTab, rolebindingIndex)
             }}
             icon={removeRounded}
           />
@@ -332,7 +274,7 @@
 
         <CircleButton
           on:click={() => {
-            addRolebinding(selectedTab)
+            ituserInfo.addRolebinding(selectedTab)
           }}
           icon={addRounded}
           extraClasses="mb-4"

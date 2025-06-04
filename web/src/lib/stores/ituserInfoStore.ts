@@ -76,43 +76,52 @@ export const ituserInfo = (() => {
       if (browser) localStorage.removeItem("ituser-info")
       set([createDefaultItuser()])
     },
-    addItuser: (newUser: ItuserInfo) => update((itusers) => [...itusers, newUser]),
-    // Flexible updater
-    updateItuserAtIndex: (index: number, updater: (ituser: ItuserInfo) => ItuserInfo) =>
-      update((itusers) =>
-        itusers.map((ituser, i) => (i === index ? updater(ituser) : ituser))
-      ),
-
+    addItuser: () => update((itusers) => [...itusers, createDefaultItuser()]),
+    removeItuser: (ituserIndex: number) =>
+      update((itusers) => itusers.toSpliced(ituserIndex, 1)),
     addRolebinding: (ituserIndex: number) =>
-      update((itusers) =>
-        itusers.map((ituser, i) =>
-          i === ituserIndex
-            ? {
-                ...ituser,
-                rolebindings: [...ituser.rolebindings, createDefaultRolebinding()],
-              }
-            : ituser
-        )
-      ),
-    removeRolebinding: (ituserIndex: number, rolebindingIndex: number) =>
-      update((itusers) =>
-        itusers.map((ituser, i) =>
-          i === ituserIndex
-            ? {
-                ...ituser,
-                rolebindings: ituser.rolebindings.filter(
-                  (_, j) => j !== rolebindingIndex
-                ),
-              }
-            : ituser
-        )
-      ),
-    isValid: (valid: boolean) =>
-      update((itusers) =>
-        itusers.map((ituser) => ({
+      update((itusers) => {
+        const ituser = itusers[ituserIndex]
+        return itusers.toSpliced(ituserIndex, 1, {
           ...ituser,
-          validated: valid,
-        }))
-      ),
+          rolebindings: [...ituser.rolebindings, createDefaultRolebinding()],
+        })
+      }),
+    removeRolebinding: (ituserIndex: number, rolebindingIndex: number) =>
+      update((itusers) => {
+        const ituser = itusers[ituserIndex]
+        return itusers.toSpliced(ituserIndex, 1, {
+          ...ituser,
+          rolebindings: ituser.rolebindings.toSpliced(rolebindingIndex, 1),
+        })
+      }),
+    validateForm: () => {
+      let isValid = false
+
+      update((itusers) => {
+        const updated = itusers.map((ituser) => {
+          const validatedRolebindings = ituser.rolebindings.map((rb) => ({
+            ...rb,
+            validated: validateRolebinding(rb),
+          }))
+
+          const validatedItuser = {
+            ...ituser,
+            validated: validateItuser(ituser),
+            rolebindings: validatedRolebindings,
+          }
+
+          return validatedItuser
+        })
+
+        isValid = updated.every(
+          (ituser) =>
+            ituser.validated && ituser.rolebindings.every((rb) => rb.validated)
+        )
+
+        return updated
+      })
+      return isValid
+    },
   }
 })()
