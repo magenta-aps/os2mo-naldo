@@ -57,23 +57,22 @@ export const engagementInfo = (() => {
       if (browser) localStorage.removeItem("engagement-info")
       set([createDefaultEngagement()])
     },
-    addEngagement: (newEngagement: EngagementInfo) =>
-      update((engagements) => [...engagements, newEngagement]),
-    updateEngagementAtIndex: (
-      index: number,
-      updater: (e: EngagementInfo) => EngagementInfo
-    ) =>
-      update((engagements) =>
-        engagements.map((engagement, i) =>
-          i === index ? updater(engagement) : engagement
-        )
-      ),
-    isValid: (valid: boolean) =>
-      update((engagements) =>
-        engagements.map((e) => ({
-          ...e,
-          validated: valid,
-        }))
-      ),
+    addEngagement: () =>
+      update((engagements) => [...engagements, createDefaultEngagement()]),
+    removeEngagement: (engagementIndex: number) =>
+      update((engagements) => engagements.toSpliced(engagementIndex, 1)),
+    validateForm: () => {
+      let isValid = false
+
+      update((engagements) => {
+        const updated = engagements.map((engagement) => {
+          return { ...engagement, validated: validateEngagement(engagement) }
+        })
+        isValid = updated.every((engagement) => engagement.validated)
+
+        return updated
+      })
+      return isValid
+    },
   }
 })()

@@ -2,11 +2,7 @@
   import { step } from "$lib/stores/stepStore"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
-  import {
-    engagementInfo,
-    createDefaultEngagement,
-    validateEngagement,
-  } from "$lib/stores/engagementInfoStore"
+  import { engagementInfo } from "$lib/stores/engagementInfoStore"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
@@ -64,42 +60,16 @@
 
   let selectedTab = 0
 
-  const validateForm = async () => {
-    const updatedEngagements = $engagementInfo.map((engagement) => {
-      return {
-        ...engagement,
-        validated: validateEngagement(engagement),
-      }
-    })
-
-    engagementInfo.set(updatedEngagements)
-
-    // Check if every user and every rolebinding is valid
-    const formIsValid = updatedEngagements.every((engagement) => engagement.validated)
-
-    if (formIsValid) {
-      step.updateStep("inc")
-    }
-  }
-
-  const addEngagement = () => {
-    engagementInfo.update((engagements) => [...engagements, createDefaultEngagement()])
-    selectedTab = $engagementInfo.length - 1
-  }
-
-  const removeEngagement = (index: number) => {
-    engagementInfo.update((engagements) => {
-      const updated = engagements.filter((_, i) => i !== index)
-      if (selectedTab >= updated.length) {
-        selectedTab = Math.max(0, updated.length - 1)
-      }
-      return updated
-    })
-  }
   $: engagement = $engagementInfo[selectedTab] ?? $engagementInfo[0]
 </script>
 
-<form on:submit|preventDefault={async () => await validateForm()}>
+<form
+  on:submit|preventDefault={async () => {
+    if (await engagementInfo.validateForm()) {
+      step.updateStep("inc")
+    }
+  }}
+>
   {#await graphQLClient().request(EngagementFacetsDocument, { currentDate: $date })}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -125,8 +95,8 @@
       <OnboardingTab
         items={$engagementInfo}
         label="engagement"
-        addItem={addEngagement}
-        removeItem={removeEngagement}
+        addItem={engagementInfo.addEngagement}
+        removeItem={engagementInfo.removeEngagement}
         selectedIndex={selectedTab}
         setSelectedIndex={(i) => (selectedTab = i)}
       />
