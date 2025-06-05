@@ -3,8 +3,7 @@
   import { capital } from "$lib/util/translationUtils"
   import EmployeeSummary from "$lib/components/userflow/EmployeeSummary.svelte"
   import EngagementSummary from "$lib/components/userflow/EngagementSummary.svelte"
-  import ItUserSummary from "$lib/components/userflow/ItUserSummary.svelte"
-  import RolebindingSummary from "$lib/components/userflow/RolebindingSummary.svelte"
+  import ItuserSummary from "$lib/components/userflow/ItuserSummary.svelte"
   import ManagerSummary from "$lib/components/userflow/ManagerSummary.svelte"
   import AddressSummary from "$lib/components/userflow/AddressSummary.svelte"
   import type { EmployeeCreateInput } from "$lib/graphql/types"
@@ -21,7 +20,6 @@
   import { employeeInfo } from "$lib/stores/employeeInfoStore"
   import { engagementInfo } from "$lib/stores/engagementInfoStore"
   import { ituserInfo } from "$lib/stores/ituserInfoStore"
-  import { rolebindingInfo } from "$lib/stores/rolebindingInfoStore"
   import { managerInfo } from "$lib/stores/managerInfoStore"
   import { addressInfo } from "$lib/stores/addressInfoStore"
   import { graphQLClient } from "$lib/util/http"
@@ -96,40 +94,38 @@
           },
         }
       : []
-    const ituserData: ItUserCreateInput | [] = $ituserInfo.validated
-      ? {
-          person: employeeUUID,
-          uuid: $ituserInfo.uuid,
-          itsystem: $ituserInfo.itSystem.uuid,
-          user_key: $ituserInfo.userkey,
-          note: $ituserInfo.notes,
-          primary: $ituserInfo.primary
-            ? $ituserInfo.primary.uuid !== ""
-              ? $ituserInfo.primary.uuid
-              : null
+    const ituserData: ItUserCreateInput[] = []
+    const rolebindingData: RoleBindingCreateInput[] = []
+    for (const ituser of $ituserInfo) {
+      if (!ituser.validated) continue
+      ituserData.push({
+        person: employeeUUID,
+        uuid: ituser.uuid,
+        itsystem: ituser.itSystem.uuid,
+        user_key: ituser.userkey,
+        note: ituser.notes,
+        primary:
+          ituser.primary?.uuid && ituser.primary.uuid !== ""
+            ? ituser.primary.uuid
             : null,
-          validity: {
-            from: $engagementInfo.fromDate,
-            to: $engagementInfo.toDate ? $engagementInfo.toDate : null,
-          },
-        }
-      : []
-    // Only post rolebindingData, if ituser data is valid
-    let rolebindingData: RoleBindingCreateInput[] = []
-    if (
-      $ituserInfo.validated &&
-      $rolebindingInfo.every((rolebinding) => rolebinding.role?.uuid)
-    ) {
-      for (const rb of $rolebindingInfo) {
-        rolebindingData.push({
-          ituser: $ituserInfo.uuid,
+        validity: {
+          from: ituser.fromDate,
+          to: ituser.toDate || null,
+        },
+      })
+
+      const rolebindings = ituser.rolebindings
+        .filter((rb) => rb.role?.uuid)
+        .map((rb) => ({
+          ituser: ituser.uuid,
           role: rb.role.uuid,
           validity: {
-            from: rb.fromDate,
-            to: rb.toDate || null,
+            from: ituser.fromDate,
+            to: ituser.toDate || null,
           },
-        })
-      }
+        }))
+
+      rolebindingData.push(...rolebindings)
     }
 
     const managerData: ManagerCreateInput | [] = $managerInfo.validated
@@ -196,8 +192,7 @@
   <div class="p-8 space-y-5">
     <EmployeeSummary />
     <EngagementSummary />
-    <ItUserSummary />
-    <RolebindingSummary />
+    <ItuserSummary />
     <ManagerSummary />
     <AddressSummary />
   </div>

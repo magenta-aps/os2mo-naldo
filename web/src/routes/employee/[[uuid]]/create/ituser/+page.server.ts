@@ -22,8 +22,6 @@ export const actions: Actions = {
     const endDate = data.get("to")
     // Rolebinding data
     const roles = data.getAll("it-system-role-uuid") as string[]
-    const rolebindingStartDate = data.get("rolebinding-from")
-    const rolebindingEndDate = data.get("rolebinding-to")
 
     return {
       itUserInput: {
@@ -38,10 +36,8 @@ export const actions: Actions = {
       rolebindingInput: roles.map((role: string) => ({
         ituser: itUserUuid,
         role: role,
-        validity: {
-          from: rolebindingStartDate,
-          ...(rolebindingEndDate && { to: rolebindingEndDate }),
-        },
+        // Use ituser dates
+        validity: { from: startDate, ...(endDate && { to: endDate }) },
       })),
     }
   },

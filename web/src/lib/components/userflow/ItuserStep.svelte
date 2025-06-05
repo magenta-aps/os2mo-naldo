@@ -2,7 +2,6 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import { ituserInfo } from "$lib/stores/ituserInfoStore"
-  import { rolebindingInfo } from "$lib/stores/rolebindingInfoStore"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
@@ -20,12 +19,10 @@
   import { date } from "$lib/stores/date"
   import { getClassByUserKey } from "$lib/util/getClasses"
   import { getITSystemNames, type UnpackedClass } from "$lib/util/helpers"
-  import { form, field } from "svelte-forms"
-  import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
   import { env } from "$env/dynamic/public"
-  import ItUserCheckbox from "./ItUserCheckbox.svelte"
+  import ItuserCheckbox from "$lib/components/userflow/ItuserCheckbox.svelte"
   import Icon from "@iconify/svelte"
   import removeRounded from "@iconify/icons-material-symbols/remove-rounded"
   import addRounded from "@iconify/icons-material-symbols/add-rounded"
@@ -72,33 +69,8 @@
     }
   `
 
-  const fromDate = field("from", "", [required()])
-  const itSystemField = field("it_system", "", [required()])
-  const accountName = field("accountName", "", [required()])
-  const svelteForm = form(fromDate, itSystemField, accountName)
-  let rolebindingFromDate: string
-  let rolebindingToDate: string
+  let selectedTab = 0
 
-  const validateForm = async () => {
-    await svelteForm.validate()
-    const ituserValid = $svelteForm.valid
-    let rolebindingsValid = true
-
-    if (ituserValid) {
-      const hasFilledRolebinding = $rolebindingInfo.some((rb) => rb.role?.uuid)
-
-      if (hasFilledRolebinding) {
-        rolebindingsValid = rolebindingInfo.validateAll()
-      }
-    }
-
-    if (ituserValid && rolebindingsValid) {
-      ituserInfo.isValid(true)
-      step.updateStep("inc")
-    } else {
-      ituserInfo.isValid(false)
-    }
-  }
   let itSystemRoles: UnpackedClass | undefined
 
   const fetchItSystemRoles = async (itSystemUuid: string | undefined | null) => {
@@ -112,20 +84,27 @@
   }
 
   onMount(async () => {
-    if ($ituserInfo.itSystem?.uuid) {
-      fetchItSystemRoles($ituserInfo.itSystem.uuid)
+    if (ituser.itSystem?.uuid) {
+      fetchItSystemRoles(ituser.itSystem.uuid)
     }
   })
-  // Update all rolebinding dates, when dates change
-  $: if (rolebindingFromDate) {
-    rolebindingInfo.updateRolebindingDates(rolebindingFromDate, "fromDate")
-  }
-  $: if (rolebindingToDate) {
-    rolebindingInfo.updateRolebindingDates(rolebindingToDate, "toDate")
+
+  $: ituser = $ituserInfo[selectedTab] ?? $ituserInfo[0]
+  // Make sure we fetch itsystem roles when changing tabs
+  let lastFetched: string
+  $: if (ituser && !!ituser.itSystem?.uuid && ituser.itSystem?.uuid !== lastFetched) {
+    lastFetched = ituser.itSystem?.uuid
+    fetchItSystemRoles(ituser.itSystem.uuid)
   }
 </script>
 
-<form on:submit|preventDefault={async () => await validateForm()}>
+<form
+  on:submit|preventDefault={async () => {
+    if (await ituserInfo.validateForm()) {
+      step.updateStep("inc")
+    }
+  }}
+>
   {#await graphQLClient().request( ItSystemsAndPrimaryDocument, { uuid: $page.params.uuid, primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary", currentDate: $date } )}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -147,21 +126,73 @@
       classes,
       env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary"
     )}
-
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+      <div class="tabs tabs-lifted mb-4 flex flex-wrap">
+        {#each $ituserInfo as _ituser, ituserIndex}
+          <button
+            class="tab flex gap-2 cursor-pointer [--tab-border-color:transparent]"
+            class:tab-active={selectedTab === ituserIndex}
+            class:[--tab-bg:bg-slate-100]={selectedTab === ituserIndex}
+            class:text-error={_ituser.validated === false}
+            class:bg-white={selectedTab !== ituserIndex}
+            on:click={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              selectedTab = ituserIndex
+            }}
+          >
+            <span>{capital($_("ituser", { values: { n: 1 } }))} {ituserIndex + 1}</span>
+            {#if $ituserInfo.length}
+              <button
+                class="btn btn-xs btn-circle btn-ghost text-secondary hover:bg-error"
+                type="button"
+                on:click={async (e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  // Don't let your LSP fool you, this `await` does indeed have effect.
+                  await ituserInfo.removeItuser(ituserIndex)
+                  if (selectedTab >= $ituserInfo.length) {
+                    selectedTab = Math.max(0, $ituserInfo.length - 1)
+                  }
+                }}
+                aria-label="Close IT-user tab"
+              >
+                <Icon
+                  icon="material-symbols:close-small-outline-rounded"
+                  width="20"
+                  height="20"
+                />
+              </button>
+            {/if}
+          </button>
+        {/each}
+
+        <button
+          class="btn btn-sm btn-ghost px-2"
+          on:click={async (e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            // Don't let your LSP fool you, this `await` does indeed have effect.
+            await ituserInfo.addItuser()
+            selectedTab = $ituserInfo.length - 1
+          }}
+          aria-label="Add IT-user"
+        >
+          <Icon icon={addRounded} width="20" height="20" />
+        </button>
+      </div>
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
             startValue={$date}
-            bind:value={$ituserInfo.fromDate}
-            bind:validationValue={$fromDate.value}
-            errors={$fromDate.errors}
+            bind:value={ituser.fromDate}
+            errors={ituser.validated === false && !ituser.fromDate ? ["required"] : []}
             title={capital($_("date.start_date"))}
             id="from"
             required={true}
           />
           <DateInput
-            bind:value={$ituserInfo.toDate}
+            bind:value={ituser.toDate}
             title={capital($_("date.end_date"))}
             id="to"
           />
@@ -170,20 +201,20 @@
           <Select
             title={capital($_("it_system"))}
             id="it-system"
-            bind:value={$ituserInfo.itSystem}
-            bind:name={$itSystemField.value}
-            errors={$itSystemField.errors}
+            bind:value={ituser.itSystem}
+            errors={ituser.validated === false && !ituser.itSystem?.uuid
+              ? ["required"]
+              : []}
             on:change={() => {
-              fetchItSystemRoles($ituserInfo.itSystem.uuid)
+              fetchItSystemRoles(ituser.itSystem.uuid)
             }}
             iterable={getITSystemNames(itSystems)}
             extra_classes="basis-1/2"
             required={true}
           />
           <Input
-            bind:value={$ituserInfo.userkey}
-            bind:cprName={$accountName.value}
-            errors={$accountName.errors}
+            bind:value={ituser.userkey}
+            errors={ituser.validated === false && !ituser.userkey ? ["required"] : []}
             extra_classes="basis-1/2"
             title={capital($_("account_name"))}
             id="account-name"
@@ -191,46 +222,22 @@
           />
         </div>
         <div class="flex">
-          <ItUserCheckbox
+          <ItuserCheckbox
             id="primary"
             title={capital($_("primary"))}
-            startValue={$ituserInfo.primary.uuid}
-            value={primaryClass.uuid}
-            on:change={() => {
-              if ($ituserInfo.primary.uuid !== primaryClass.uuid) {
-                $ituserInfo.primary = primaryClass
-              } else {
-                $ituserInfo.primary = getClassByUserKey(classes, "non-primary")
-              }
+            checked={ituser.primary.uuid === primaryClass.uuid}
+            on:change={(e) => {
+              if (e.target instanceof HTMLInputElement)
+                ituser.primary = e.target.checked
+                  ? primaryClass
+                  : getClassByUserKey(classes, "non-primary")
             }}
           />
         </div>
-        <TextArea
-          title={capital($_("notes"))}
-          id="notes"
-          bind:value={$ituserInfo.notes}
-        />
+        <TextArea title={capital($_("notes"))} id="notes" bind:value={ituser.notes} />
         <div class="divider p-0 m-0 mb-4 w-full" />
-        <h4>{capital($_("rolebinding", { values: { n: 1 } }))}</h4>
-        <div class="flex flex-row gap-6">
-          <DateInput
-            startValue={$date}
-            bind:value={rolebindingFromDate}
-            title={capital($_("date.start_date"))}
-            id="rolebinding-from"
-            min={$ituserInfo.fromDate}
-            max={$ituserInfo.toDate}
-          />
-          <!-- FIX: If a to-date is set and another rolebinding is added afterwards, the to-dates are not aligned. -->
-          <DateInput
-            bind:value={rolebindingToDate}
-            title={capital($_("date.end_date"))}
-            min={rolebindingFromDate}
-            max={$ituserInfo.toDate ? $ituserInfo.toDate : undefined}
-            id="rolebinding-to"
-          />
-        </div>
-        {#each $rolebindingInfo as rolebinding, index}
+        <h4>{capital($_("rolebinding", { values: { n: 2 } }))}</h4>
+        {#each ituser.rolebindings as rolebinding, rolebindingIndex}
           {#if itSystemRoles && itSystemRoles.length}
             {#key itSystemRoles}
               <Select
@@ -238,7 +245,7 @@
                 id="it-system-role-uuid"
                 bind:value={rolebinding.role}
                 iterable={itSystemRoles}
-                errors={rolebinding.validated ? [] : ["required"]}
+                errors={rolebinding.validated === false ? ["required"] : []}
               />
             {/key}
           {:else}
@@ -249,25 +256,23 @@
               disabled
             />
           {/if}
-          {#if $rolebindingInfo.length > 1}
-            <CircleButton
-              on:click={() => {
-                rolebindingInfo.removeRolebinding(index)
-              }}
-              icon={removeRounded}
-            />
-          {/if}
-          {#if index === $rolebindingInfo.length - 1}
-            <CircleButton
-              on:click={() =>
-                rolebindingInfo.addRolebinding(rolebindingFromDate, rolebindingToDate)}
-              icon={addRounded}
-              extraClasses="mb-4"
-            />
-          {:else}
-            <div class="divider p-0 m-0 my-2 w-full" />
-          {/if}
+          <CircleButton
+            on:click={() => {
+              ituserInfo.removeRolebinding(selectedTab, rolebindingIndex)
+            }}
+            icon={removeRounded}
+          />
         {/each}
+
+        <CircleButton
+          on:click={() => {
+            ituserInfo.addRolebinding(selectedTab)
+          }}
+          icon={addRounded}
+          extraClasses="mb-4"
+        />
+
+        <div class="divider p-0 m-0 my-2 w-full" />
       </div>
     </div>
     <OnboardingFormButtons />
