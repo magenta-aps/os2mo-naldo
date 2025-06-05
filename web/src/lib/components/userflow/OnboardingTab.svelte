@@ -38,7 +38,7 @@
             // Don't let your LSP fool you, this `await` does indeed have effect.
             await removeItem(i)
             if (selectedIndex >= items.length) {
-              selectedIndex = Math.max(0, items.length - 1)
+              setSelectedIndex(Math.max(0, items.length - 1))
             }
           }}
         >
@@ -59,7 +59,7 @@
       e.stopPropagation()
       // Don't let your LSP fool you, this `await` does indeed have effect.
       await addItem()
-      selectedIndex = items.length - 1
+      setSelectedIndex(items.length - 1)
     }}
     aria-label={`Add ${label}`}
   >
