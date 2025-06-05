@@ -10,9 +10,6 @@
   export let removeItem: (index: number) => void
   export let addItem: () => void
   export let label: string
-  $: {
-    console.log(items)
-  }
 </script>
 
 <div class="tabs tabs-lifted mb-4 flex flex-wrap">
@@ -34,12 +31,16 @@
         <button
           class="btn btn-xs btn-circle btn-ghost text-secondary hover:bg-error"
           type="button"
-          on:click={(e) => {
+          aria-label={`Remove ${label} ${i + 1}`}
+          on:click={async (e) => {
             e.preventDefault()
             e.stopPropagation()
-            removeItem(i)
+            // Don't let your LSP fool you, this `await` does indeed have effect.
+            await removeItem(i)
+            if (selectedIndex >= items.length) {
+              selectedIndex = Math.max(0, items.length - 1)
+            }
           }}
-          aria-label={`Remove ${label} ${i + 1}`}
         >
           <Icon
             icon="material-symbols:close-small-outline-rounded"
@@ -53,10 +54,12 @@
 
   <button
     class="btn btn-sm btn-ghost px-2"
-    on:click={(e) => {
+    on:click={async (e) => {
       e.preventDefault()
       e.stopPropagation()
-      addItem()
+      // Don't let your LSP fool you, this `await` does indeed have effect.
+      await addItem()
+      selectedIndex = items.length - 1
     }}
     aria-label={`Add ${label}`}
   >
