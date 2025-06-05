@@ -1,13 +1,7 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
-  import {
-    ituserInfo,
-    createDefaultItuser,
-    createDefaultRolebinding,
-    validateRolebinding,
-    validateItuser,
-  } from "$lib/stores/ituserInfoStore"
+  import { ituserInfo } from "$lib/stores/ituserInfoStore"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
@@ -231,14 +225,12 @@
           <ItuserCheckbox
             id="primary"
             title={capital($_("primary"))}
-            startValue={ituser.primary.uuid}
-            value={primaryClass.uuid}
-            on:change={() => {
-              if (ituser.primary.uuid !== primaryClass.uuid) {
-                ituser.primary = primaryClass
-              } else {
-                ituser.primary = getClassByUserKey(classes, "non-primary")
-              }
+            checked={ituser.primary.uuid === primaryClass.uuid}
+            on:change={(e) => {
+              if (e.target instanceof HTMLInputElement)
+                ituser.primary = e.target.checked
+                  ? primaryClass
+                  : getClassByUserKey(classes, "non-primary")
             }}
           />
         </div>
