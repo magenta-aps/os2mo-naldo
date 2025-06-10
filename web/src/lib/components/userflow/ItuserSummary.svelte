@@ -5,7 +5,7 @@
 </script>
 
 <div>
-  <h3 class=" text-primary">{capital($_("ituser", { values: { n: 2 } }))}</h3>
+  <h3 class="text-primary">{capital($_("ituser", { values: { n: 2 } }))}</h3>
   {#each $ituserInfo as ituser, index}
     {#if ituser.validated === true}
       <div class="grid gap-1 pb-2 text-secondary">

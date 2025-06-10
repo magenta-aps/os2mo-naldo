@@ -80,22 +80,27 @@
       nickname_given_name: $employeeInfo.nicknameFirstname,
       nickname_surname: $employeeInfo.nicknameLastname,
     }
-    const engagementData: EngagementCreateInput | [] = $engagementInfo.validated
-      ? {
-          person: employeeUUID,
-          user_key: $engagementInfo.userkey,
-          org_unit: $engagementInfo.orgUnit?.uuid,
-          engagement_type: $engagementInfo.engagementType.uuid,
-          job_function: $engagementInfo.jobFunction.uuid,
-          primary: $engagementInfo.primary?.uuid,
-          validity: {
-            from: $engagementInfo.fromDate,
-            to: $engagementInfo.toDate ? $engagementInfo.toDate : null,
-          },
-        }
-      : []
+
+    const engagementData: EngagementCreateInput[] = []
+    for (const engagement of $engagementInfo) {
+      if (!engagement.validated) continue
+      engagementData.push({
+        person: employeeUUID,
+        user_key: engagement.userkey,
+        org_unit: engagement.orgUnit?.uuid,
+        engagement_type: engagement.engagementType.uuid,
+        job_function: engagement.jobFunction.uuid,
+        primary: engagement.primary?.uuid || null,
+        validity: {
+          from: engagement.fromDate,
+          to: engagement.toDate || null,
+        },
+      })
+    }
+
     const ituserData: ItUserCreateInput[] = []
     const rolebindingData: RoleBindingCreateInput[] = []
+
     for (const ituser of $ituserInfo) {
       if (!ituser.validated) continue
       ituserData.push({
@@ -138,8 +143,8 @@
             (responsibility) => responsibility.uuid
           ),
           validity: {
-            from: $engagementInfo.fromDate,
-            to: $engagementInfo.toDate ? $engagementInfo.toDate : null,
+            from: $managerInfo.fromDate,
+            to: $managerInfo.toDate ? $managerInfo.toDate : null,
           },
         }
       : []
@@ -154,8 +159,8 @@
           user_key: $addressInfo.userkey,
           visibility: $addressInfo.visibility?.uuid,
           validity: {
-            from: $engagementInfo.fromDate,
-            to: $engagementInfo.toDate ? $engagementInfo.toDate : null,
+            from: $addressInfo.fromDate,
+            to: $addressInfo.toDate ? $addressInfo.toDate : null,
           },
         }
       : []
