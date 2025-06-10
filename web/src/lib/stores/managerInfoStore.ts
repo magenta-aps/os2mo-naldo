@@ -27,8 +27,8 @@ export const validateManager = (manager: ManagerInfo): boolean => {
     !!manager.fromDate &&
     !!manager.orgUnit?.uuid &&
     !!manager.managerType?.uuid &&
-    !!manager.managerLevel?.uuid
-    // responsibilities
+    !!manager.managerLevel?.uuid &&
+    !!manager.responsibilities?.length
   )
 }
 
@@ -56,18 +56,21 @@ export const managerInfo = (() => {
       if (browser) localStorage.removeItem("manager-info")
       set([createDefaultManager()])
     },
-    addManager: (newManager: ManagerInfo) =>
-      update((managers) => [...managers, newManager]),
-    updateManagerAtIndex: (index: number, updater: (e: ManagerInfo) => ManagerInfo) =>
-      update((managers) =>
-        managers.map((manager, i) => (i === index ? updater(manager) : manager))
-      ),
-    isValid: (valid: boolean) =>
-      update((managers) =>
-        managers.map((e) => ({
-          ...e,
-          validated: valid,
-        }))
-      ),
+    addManager: () => update((managers) => [...managers, createDefaultManager()]),
+    removeManager: (managerIndex: number) =>
+      update((managers) => managers.toSpliced(managerIndex, 1)),
+    validateForm: () => {
+      let isValid = false
+
+      update((managers) => {
+        const updated = managers.map((manager) => {
+          return { ...manager, validated: validateManager(manager) }
+        })
+        isValid = updated.every((manager) => manager.validated)
+
+        return updated
+      })
+      return isValid
+    },
   }
 })()

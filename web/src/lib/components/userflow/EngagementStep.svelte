@@ -2,11 +2,7 @@
   import { step } from "$lib/stores/stepStore"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
-  import {
-    engagementInfo,
-    createDefaultEngagement,
-    validateEngagement,
-  } from "$lib/stores/engagementInfoStore"
+  import { engagementInfo } from "$lib/stores/engagementInfoStore"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"

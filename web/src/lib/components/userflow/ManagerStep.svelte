@@ -1,10 +1,6 @@
 <script lang="ts">
   import { step } from "$lib/stores/stepStore"
-  import {
-    managerInfo,
-    createDefaultManager,
-    validateManager,
-  } from "$lib/stores/managerInfoStore"
+  import { managerInfo } from "$lib/stores/managerInfoStore"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
@@ -58,42 +54,16 @@
 
   let selectedTab = 0
 
-  const validateForm = async () => {
-    const updatedManagers = $managerInfo.map((manager) => {
-      return {
-        ...manager,
-        validated: validateManager(manager),
-      }
-    })
-
-    managerInfo.set(updatedManagers)
-
-    // Check if every user and every rolebinding is valid
-    const formIsValid = updatedManagers.every((manager) => manager.validated)
-
-    if (formIsValid) {
-      step.updateStep("inc")
-    }
-  }
-
-  const addManager = () => {
-    managerInfo.update((managers) => [...managers, createDefaultManager()])
-    selectedTab = $managerInfo.length - 1
-  }
-
-  const removeManager = (index: number) => {
-    managerInfo.update((managers) => {
-      const updated = managers.filter((_, i) => i !== index)
-      if (selectedTab >= updated.length) {
-        selectedTab = Math.max(0, updated.length - 1)
-      }
-      return updated
-    })
-  }
   $: manager = $managerInfo[selectedTab] ?? $managerInfo[0]
 </script>
 
-<form on:submit|preventDefault={async () => await validateForm()}>
+<form
+  on:submit|preventDefault={async () => {
+    if (await managerInfo.validateForm()) {
+      step.updateStep("inc")
+    }
+  }}
+>
   {#await graphQLClient().request(ManagerFacetsDocument, { currentDate: $date })}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -116,8 +86,8 @@
       <OnboardingTab
         items={$managerInfo}
         label="manager"
-        addItem={addManager}
-        removeItem={removeManager}
+        addItem={managerInfo.addManager}
+        removeItem={managerInfo.removeManager}
         selectedIndex={selectedTab}
         setSelectedIndex={(i) => (selectedTab = i)}
       />
