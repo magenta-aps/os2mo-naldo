@@ -2,11 +2,7 @@
   import { step } from "$lib/stores/stepStore"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
-  import {
-    addressInfo,
-    createDefaultAddress,
-    validateAddress,
-  } from "$lib/stores/addressInfoStore"
+  import { addressInfo } from "$lib/stores/addressInfoStore"
   import { graphQLClient } from "$lib/util/http"
   import { AddressFacetsDocument } from "./query.generated"
   import { date } from "$lib/stores/date"
@@ -27,7 +23,7 @@
   let selectedTab = 0
   $: address = $addressInfo[selectedTab] ?? $addressInfo[0]
 
-  let addressField = field("", "") // dynamic validator
+  let addressField = field("", "")
 
   $: {
     switch (address.addressType?.name) {
@@ -48,40 +44,15 @@
         break
     }
   }
-  $: svelteForm = form(addressField)
-
-  const validateForm = async () => {
-    await svelteForm.validate()
-    const updatedAddresses = $addressInfo.map((addr) => ({
-      ...addr,
-      validated: validateAddress(addr),
-    }))
-
-    addressInfo.set(updatedAddresses)
-
-    const formIsValid = updatedAddresses.every((a) => a.validated)
-    if (formIsValid && $svelteForm.valid) {
-      step.updateStep("inc")
-    }
-  }
-
-  const addAddress = () => {
-    addressInfo.update((a) => [...a, createDefaultAddress()])
-    selectedTab = $addressInfo.length - 1
-  }
-
-  const removeAddress = (index: number) => {
-    addressInfo.update((a) => {
-      const updated = a.filter((_, i) => i !== index)
-      if (selectedTab >= updated.length) {
-        selectedTab = Math.max(0, updated.length - 1)
-      }
-      return updated
-    })
-  }
 </script>
 
-<form on:submit|preventDefault={validateForm}>
+<form
+  on:submit|preventDefault={async () => {
+    if (await addressInfo.validateForm()) {
+      step.updateStep("inc")
+    }
+  }}
+>
   {#await graphQLClient().request(AddressFacetsDocument, { currentDate: $date })}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -102,8 +73,8 @@
       <OnboardingTab
         items={$addressInfo}
         label="address"
-        addItem={addAddress}
-        removeItem={removeAddress}
+        addItem={addressInfo.addAddress}
+        removeItem={addressInfo.removeAddress}
         selectedIndex={selectedTab}
         setSelectedIndex={(i) => (selectedTab = i)}
       />
@@ -172,13 +143,15 @@
               required
             />
           {:else}
-            <!-- FIX: Error handling is very bad and not aligned -->
+            <!-- This combines the specific value-validation and the general form validation -->
             <AddressInput
               title={address.addressType.name}
               id="value"
               bind:value={address.addressValue.value}
               bind:validationField={$addressField.value}
-              errors={$addressField.errors}
+              errors={address.validated === false && !address.addressValue.value
+                ? ["required", ...$addressField.errors]
+                : [...$addressField.errors]}
               required
             />
           {/if}

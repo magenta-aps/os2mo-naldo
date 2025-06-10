@@ -52,18 +52,21 @@ export const addressInfo = (() => {
       if (browser) localStorage.removeItem("address-info")
       set([createDefaultAddress()])
     },
-    addAddress: (newAddress: AddressInfo) =>
-      update((addresses) => [...addresses, newAddress]),
-    updateAddressAtIndex: (index: number, updater: (e: AddressInfo) => AddressInfo) =>
-      update((addresses) =>
-        addresses.map((address, i) => (i === index ? updater(address) : address))
-      ),
-    isValid: (valid: boolean) =>
-      update((addresses) =>
-        addresses.map((a) => ({
-          ...a,
-          validated: valid,
-        }))
-      ),
+    addAddress: () => update((addresses) => [...addresses, createDefaultAddress()]),
+    removeAddress: (addressIndex: number) =>
+      update((addresses) => addresses.toSpliced(addressIndex, 1)),
+    validateForm: () => {
+      let isValid = false
+
+      update((addresses) => {
+        const updated = addresses.map((address) => {
+          return { ...address, validated: validateAddress(address) }
+        })
+        isValid = updated.every((address) => address.validated)
+
+        return updated
+      })
+      return isValid
+    },
   }
 })()
