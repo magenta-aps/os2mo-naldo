@@ -133,21 +133,24 @@
       rolebindingData.push(...rolebindings)
     }
 
-    const managerData: ManagerCreateInput | [] = $managerInfo.validated
-      ? {
-          person: employeeUUID,
-          org_unit: $managerInfo.orgUnit?.uuid,
-          manager_type: $managerInfo.managerType.uuid,
-          manager_level: $managerInfo.managerLevel.uuid,
-          responsibility: $managerInfo.responsibilities.map(
-            (responsibility) => responsibility.uuid
-          ),
-          validity: {
-            from: $managerInfo.fromDate,
-            to: $managerInfo.toDate ? $managerInfo.toDate : null,
-          },
-        }
-      : []
+    const managerData: ManagerCreateInput[] = []
+    for (const manager of $managerInfo) {
+      if (!manager.validated) continue
+      managerData.push({
+        person: employeeUUID,
+        org_unit: manager.orgUnit?.uuid,
+        manager_type: manager.managerType.uuid,
+        manager_level: manager.managerLevel.uuid,
+        responsibility: manager.responsibilities.map(
+          (responsibility) => responsibility.uuid
+        ),
+        validity: {
+          from: manager.fromDate,
+          to: manager.toDate ? manager.toDate : null,
+        },
+      })
+    }
+
     const addressData: AddressCreateInput | [] = $addressInfo.validated
       ? {
           person: employeeUUID,
