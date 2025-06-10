@@ -5,47 +5,47 @@
 </script>
 
 <div>
-  <h3 class="pb-2 text-primary">{capital($_("address", { values: { n: 1 } }))}</h3>
-  <dl class="grid gap-1">
-    <div class="grid grid-cols-2">
-      <dt>{capital($_("date.start_date"))}:</dt>
-      {#if $addressInfo.validated === true}
-        <dd>{$addressInfo.fromDate}</dd>
-      {/if}
-    </div>
-    <div class="grid grid-cols-2">
-      <dt>{capital($_("date.end_date"))}:</dt>
-      {#if $addressInfo.validated === true}
-        <dd>{$addressInfo.toDate}</dd>
-      {/if}
-    </div>
-    <div class="grid grid-cols-2">
-      <dt>{capital($_("visibility"))}:</dt>
-      {#if $addressInfo.validated === true}
-        <dd>{$addressInfo.visibility?.name ? $addressInfo.visibility.name : ""}</dd>
-      {/if}
-    </div>
-    <div class="grid grid-cols-2">
-      <dt>{capital($_("description"))}:</dt>
-      {#if $addressInfo.validated === true}
-        <dd>{$addressInfo.userkey ? $addressInfo.userkey : ""}</dd>
-      {/if}
-    </div>
-    <div class="grid grid-cols-2">
-      <dt>{capital($_("address_type"))}:</dt>
-      {#if $addressInfo.validated === true}
-        <dd>{$addressInfo.addressType.name ? $addressInfo.addressType.name : ""}</dd>
-      {/if}
-    </div>
-    <div class="grid grid-cols-2">
-      {#if $addressInfo.validated === true}
-        <dt>{capital($_($addressInfo.addressType.name))}:</dt>
-        {#if typeof $addressInfo.addressValue === "object"}
-          <dd>{$addressInfo.addressValue.name}</dd>
-        {:else}
-          <dd>{$addressInfo.addressValue}</dd>
-        {/if}
-      {/if}
-    </div>
-  </dl>
+  <h3 class="text-primary">{capital($_("address", { values: { n: 2 } }))}</h3>
+  {#each $addressInfo as address, index}
+    {#if address.validated === true}
+      <div class="grid gap-1 pb-2 text-secondary">
+        <h4>
+          {capital($_("address", { values: { n: 1 } }))}
+          {index + 1}
+        </h4>
+        <div class="pb-1">
+          <div class="grid grid-cols-2">
+            <span>{capital($_("date.start_date"))}:</span>
+            <span>{address.fromDate}</span>
+          </div>
+          <div class="grid grid-cols-2">
+            <span>{capital($_("date.end_date"))}:</span>
+            <span>{address.toDate}</span>
+          </div>
+          <div class="grid grid-cols-2">
+            <span>{capital($_("visibility"))}:</span>
+            <span>{address.visibility?.name ? address.visibility.name : ""}</span>
+          </div>
+          <div class="grid grid-cols-2">
+            <span>{capital($_("description"))}:</span>
+            <span>{address.userkey ? address.userkey : ""}</span>
+          </div>
+          <div class="grid grid-cols-2">
+            <span>
+              {capital($_("address_type", { values: { n: 1 } }))}:
+            </span>
+            <span>{address.addressType?.name}</span>
+          </div>
+          <div class="grid grid-cols-2">
+            <span>{capital($_(address.addressType.name))}:</span>
+            <span
+              >{!!address.addressValue.name
+                ? address.addressValue.name
+                : address.addressValue.value}</span
+            >
+          </div>
+        </div>
+      </div>
+    {/if}
+  {/each}
 </div>

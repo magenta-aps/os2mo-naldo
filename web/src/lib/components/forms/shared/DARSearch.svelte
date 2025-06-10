@@ -84,6 +84,7 @@
       {disabled}
       {itemId}
       bind:value
+      on:clear
       on:clear={() => {
         darName = undefined
       }}
