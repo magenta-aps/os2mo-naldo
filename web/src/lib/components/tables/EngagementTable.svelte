@@ -163,7 +163,7 @@
           >
         {/if}
       </td>
-      {#if env.PUBLIC_SHOW_SD_CODE === "true"}
+      {#if env.PUBLIC_SHOW_EXTENSION_2 === "true"}
         <td class="text-sm p-4">
           {engagement.extension_2 ? engagement.extension_2 : ""}
         </td>
