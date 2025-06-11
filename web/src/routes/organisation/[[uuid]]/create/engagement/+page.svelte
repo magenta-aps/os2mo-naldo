@@ -192,6 +192,24 @@
             extra_classes="basis-1/2"
           />
         </div>
+        {#if env.PUBLIC_SHOW_EXTENSION_1 === "true" || env.PUBLIC_SHOW_EXTENSION_2 === "true"}
+          <div class="flex flex-row gap-6">
+            {#if env.PUBLIC_SHOW_EXTENSION_1 === "true"}
+              <Input
+                title={capital($_("job_function", { values: { n: 1 } }))}
+                id="extension-1"
+                extra_classes="basis-1/2"
+              />
+            {/if}
+            {#if env.PUBLIC_SHOW_EXTENSION_2 === "true"}
+              <Input
+                title={capital($_("department_code"))}
+                id="extension-2"
+                extra_classes="basis-1/2"
+              />
+            {/if}
+          </div>
+        {/if}
         <div class="flex flex-row gap-6">
           <Select
             title={capital($_("engagement_type"))}
