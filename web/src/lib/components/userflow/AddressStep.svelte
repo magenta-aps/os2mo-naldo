@@ -5,6 +5,7 @@
   import { addressInfo } from "$lib/stores/addressInfoStore"
   import { graphQLClient } from "$lib/util/http"
   import { AddressFacetsDocument } from "./query.generated"
+  import { gql } from "graphql-request"
   import { date } from "$lib/stores/date"
   import { form, field } from "svelte-forms"
   import { required, email, pattern } from "svelte-forms/validators"
@@ -20,6 +21,24 @@
   import OnboardingTab from "$lib/components/userflow/OnboardingTab.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
 
+  gql`
+    query AddressFacets($currentDate: DateTime!) {
+      facets(filter: { user_keys: ["employee_address_type", "visibility"] }) {
+        objects {
+          validities {
+            uuid
+            user_key
+            classes(filter: { from_date: $currentDate }) {
+              uuid
+              user_key
+              name
+              scope
+            }
+          }
+        }
+      }
+    }
+  `
   let selectedTab = 0
   $: address = $addressInfo[selectedTab] ?? $addressInfo[0]
 
