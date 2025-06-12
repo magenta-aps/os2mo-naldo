@@ -42,7 +42,7 @@
       }
     }
     query GetEngagements($org_unit: [UUID!], $currentDate: DateTime) {
-      engagements(filter: { org_units: $org_unit }) {
+      engagements(filter: { org_units: $org_unit, from_date: $currentDate }) {
         objects {
           current(at: $currentDate) {
             uuid
