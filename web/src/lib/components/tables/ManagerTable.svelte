@@ -117,9 +117,10 @@
 
     // Filters and flattens the data
     for (const outer of res.managers.objects) {
-      // TODO: Remove when GraphQL is able to do this for us
       const filtered = outer.validities.filter((obj) => {
-        return tenseFilter(obj, tense)
+        if (!tenseFilter(obj, tense)) return false
+        if (!isOrg && !obj.person) return false
+        return true
       })
       managers.push(...filtered)
     }
