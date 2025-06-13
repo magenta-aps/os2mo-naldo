@@ -25,7 +25,7 @@
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getValidities } from "$lib/util/helpers"
+  import { getValidities, findClosestValidity } from "$lib/util/helpers"
   import { env } from "$env/dynamic/public"
 
   let toDate: string
@@ -70,7 +70,7 @@
           validities {
             uuid
             user_key
-            person {
+            person(filter: { from_date: $fromDate, to_date: $toDate }) {
               uuid
               name
             }
@@ -90,9 +90,13 @@
               from
               to
             }
-            org_unit {
+            org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
               uuid
               name
+              validity {
+                from
+                to
+              }
             }
           }
         }
@@ -239,8 +243,8 @@
         <Search
           type="org-unit"
           startValue={{
-            uuid: engagement.org_unit[0].uuid,
-            name: engagement.org_unit[0].name,
+            uuid: findClosestValidity(engagement.org_unit, $date).uuid,
+            name: findClosestValidity(engagement.org_unit, $date).name,
           }}
           bind:name={$orgUnit.value}
           errors={$orgUnit.errors}
