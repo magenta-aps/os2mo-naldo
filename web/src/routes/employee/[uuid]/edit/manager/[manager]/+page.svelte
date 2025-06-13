@@ -10,6 +10,7 @@
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
+  import { findClosestValidity } from "$lib/util/helpers"
   import { graphQLClient } from "$lib/util/http"
   import { ManagerAndFacetsDocument, UpdateManagerDocument } from "./query.generated"
   import { gql } from "graphql-request"
@@ -224,8 +225,8 @@
         <Search
           type="org-unit"
           startValue={{
-            uuid: manager.org_unit[0].uuid,
-            name: manager.org_unit[0].name,
+            uuid: findClosestValidity(manager.org_unit, $date).uuid,
+            name: findClosestValidity(manager.org_unit, $date).name,
           }}
           bind:name={$orgUnit.value}
           errors={$orgUnit.errors}
