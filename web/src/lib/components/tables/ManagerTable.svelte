@@ -81,13 +81,13 @@
                 to
               }
             }
-            manager_level {
+            manager_level(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
             }
-            manager_type {
+            manager_type(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
             }
-            responsibilities {
+            responsibilities(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
             }
             validity {

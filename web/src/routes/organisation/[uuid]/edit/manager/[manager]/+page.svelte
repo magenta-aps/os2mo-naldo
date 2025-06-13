@@ -58,7 +58,7 @@
         objects {
           validities {
             uuid
-            person {
+            person(filter: { from_date: $fromDate, to_date: $toDate }) {
               uuid
               name
             }
@@ -81,7 +81,7 @@
               from
               to
             }
-            org_unit(filter: { from_date: null, to_date: null }) {
+            org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
               uuid
               name
               validity {
@@ -225,8 +225,8 @@
           type="employee"
           startValue={manager.person
             ? {
-                uuid: manager.person[0].uuid,
-                name: manager.person[0].name,
+                uuid: findClosestValidity(manager.person, $date).uuid,
+                name: findClosestValidity(manager.person, $date).name,
               }
             : undefined}
         />

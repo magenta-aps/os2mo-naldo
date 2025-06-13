@@ -49,6 +49,7 @@
   export let disabled = false
   export let errors: string[] = []
 
+  console.log(startValue)
   // Custom variable for loading/spinner, since aborting queries makes svelte-select set `loading = true`
   let spinner = false
 
