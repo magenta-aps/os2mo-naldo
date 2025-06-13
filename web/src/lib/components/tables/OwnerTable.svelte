@@ -54,10 +54,18 @@
             org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
               uuid
+              validity {
+                from
+                to
+              }
             }
             owner(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
               uuid
+              validity {
+                from
+                to
+              }
             }
           }
         }
@@ -74,17 +82,25 @@
                 from
                 to
               }
-              person {
+              person(filter: { from_date: $fromDate, to_date: $toDate }) {
                 name
                 uuid
               }
-              org_unit {
+              org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
                 name
                 uuid
+                validity {
+                  from
+                  to
+                }
               }
-              owner {
+              owner(filter: { from_date: $fromDate, to_date: $toDate }) {
                 name
                 uuid
+                validity {
+                  from
+                  to
+                }
               }
             }
           }

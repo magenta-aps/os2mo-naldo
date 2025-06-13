@@ -84,6 +84,10 @@
             org_unit(filter: { from_date: null, to_date: null }) {
               uuid
               name
+              validity {
+                from
+                to
+              }
             }
           }
         }
