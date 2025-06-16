@@ -23,7 +23,7 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getMinMaxValidities } from "$lib/util/helpers"
+  import { getMinMaxValidities, findClosestValidity } from "$lib/util/helpers"
   import { MOConfig } from "$lib/stores/config"
   import SelectGroup from "$lib/components/forms/shared/SelectGroup.svelte"
 
@@ -82,7 +82,7 @@
         objects {
           validities {
             uuid
-            person {
+            person(filter: { from_date: $fromDate, to_date: $toDate }) {
               uuid
               name
             }
@@ -96,9 +96,13 @@
               user_key
               name
             }
-            substitute {
+            substitute(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
               uuid
+              validity {
+                from
+                to
+              }
             }
             trade_union {
               uuid
@@ -109,7 +113,7 @@
               from
               to
             }
-            org_unit(filter: { from_date: null, to_date: null }) {
+            org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
               validity {
                 from
                 to
@@ -256,12 +260,10 @@
         <!-- TODO: make optional when GraphQL agrees -->
         <Search
           type="employee"
-          startValue={association.person[0]
-            ? {
-                uuid: association.person[0].uuid,
-                name: association.person[0].name,
-              }
-            : undefined}
+          startValue={{
+            uuid: findClosestValidity(association.person, $date).uuid,
+            name: findClosestValidity(association.person, $date).name,
+          }}
           bind:name={$employee.value}
           errors={$employee.errors}
           on:clear={() => ($employee.value = "")}
@@ -295,10 +297,10 @@
             <Search
               id="substitute"
               title={capital($_("substitute"))}
-              startValue={association.substitute[0]
+              startValue={association.substitute.length
                 ? {
-                    uuid: association.substitute[0].uuid,
-                    name: association.substitute[0].name,
+                    uuid: findClosestValidity(association.substitute, $date).uuid,
+                    name: findClosestValidity(association.substitute, $date).name,
                   }
                 : undefined}
               type="employee"
