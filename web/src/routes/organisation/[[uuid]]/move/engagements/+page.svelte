@@ -26,7 +26,7 @@
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { onMount } from "svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
-  import { getValidities } from "$lib/util/helpers"
+  import { getValidities, getMinMaxValidities } from "$lib/util/helpers"
 
   type Engagements = GetEngagementsQuery["engagements"]["objects"][0]
 
@@ -49,6 +49,12 @@
             person {
               uuid
               name
+            }
+          }
+          validities(start: null, end: null) {
+            validity {
+              from
+              to
             }
           }
         }
@@ -80,8 +86,6 @@
   } else {
     validities = { from: null, to: null }
   }
-
-  let toDate: string
 
   const fromDate = field("from", "", [required()])
   const orgUnitField = field("org_unit", "", [required()])
@@ -172,15 +176,8 @@
           title={capital($_("date.start_date"))}
           id="from"
           min={validities.from}
-          max={toDate ? toDate : validities.to}
-          required={true}
-        />
-        <DateInput
-          bind:value={toDate}
-          title={capital($_("date.end_date"))}
-          id="to"
-          min={$fromDate.value ? $fromDate.value : validities.from}
           max={validities.to}
+          required={true}
         />
       </div>
       <div class="flex flex-row gap-6">
@@ -276,6 +273,16 @@
                         >{engagement.current?.person[0].name}</span
                       >
                     </label>
+                    {#if selectedEngagements.includes(engagement.current?.uuid)}
+                      <input
+                        id="end-dates"
+                        name="end-dates"
+                        hidden
+                        value={getMinMaxValidities(engagement.validities).to
+                          ? getMinMaxValidities(engagement.validities).to
+                          : null}
+                      />
+                    {/if}
                   </div>
                 {/each}
               </ul>
