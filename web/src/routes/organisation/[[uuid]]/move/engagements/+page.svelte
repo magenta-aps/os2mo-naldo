@@ -50,6 +50,10 @@
               uuid
               name
             }
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -276,6 +280,14 @@
                         >{engagement.current?.person[0].name}</span
                       >
                     </label>
+                    <input
+                      id="end-dates"
+                      name="end-dates"
+                      hidden
+                      value={engagement.current?.validity.to
+                        ? engagement.current?.validity.to
+                        : undefined}
+                    />
                   </div>
                 {/each}
               </ul>

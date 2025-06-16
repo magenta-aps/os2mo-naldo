@@ -7,16 +7,18 @@ export const actions: Actions = {
     const orgUnitUuid = data.get("org-unit")
     const engagements = data.getAll("engagements")
     const startDate = data.get("from")
-    const endDate = data.get("to")
+    const endDates = data.getAll("end-dates")
+    console.log(endDates)
 
-    const engagementInput = engagements.map((engagement) => ({
+    const engagementInput = engagements.map((engagement, i) => ({
       uuid: engagement,
       ...(orgUnitUuid && { org_unit: orgUnitUuid }),
       validity: {
         from: startDate,
-        ...(endDate && { to: endDate }),
+        to: endDates[i],
       },
     }))
+    console.log(engagementInput)
 
     return engagementInput
   },
