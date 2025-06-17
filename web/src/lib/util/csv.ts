@@ -28,7 +28,7 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
     const orgUnitHeader = chosenFields.flatMap((header) => {
       if (header.value === "breadcrumbs") {
         data.forEach((orgUnit) => {
-          if (orgUnit.ancestors && Array.isArray(orgUnit.ancestors)) {
+          if (orgUnit && orgUnit.ancestors && Array.isArray(orgUnit.ancestors)) {
             maxBreadcrumbs = Math.max(maxBreadcrumbs, orgUnit.ancestors.length)
           }
         })
@@ -86,7 +86,7 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
 
           if (field.value === "breadcrumbs") {
             // Create breadcrumbs
-            values = fieldValue
+            values = Array.isArray(fieldValue)
               ? fieldValue.map((ancestor: { name: string }) => ancestor.name)
               : []
             // Add empty string to match `maxBreadcrumbs` length
