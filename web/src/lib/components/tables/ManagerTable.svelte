@@ -119,6 +119,8 @@
     for (const outer of res.managers.objects) {
       const filtered = outer.validities.filter((obj) => {
         if (!tenseFilter(obj, tense)) return false
+        // Filter out vacant manager-roles for employees
+        // TODO: Do this with GraphQL, when following issues are resolved (#65031) (#65303)
         if (!isOrg && !obj.person) return false
         return true
       })
