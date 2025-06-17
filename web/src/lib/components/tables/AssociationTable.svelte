@@ -106,7 +106,11 @@
     for (const outer of res.associations.objects) {
       // TODO: Remove when GraphQL is able to do this for us
       const filtered = outer.validities.filter((obj) => {
-        return tenseFilter(obj, tense)
+        if (!tenseFilter(obj, tense)) return false
+        // Check if association validity is in current org_unit ($page.params.uuid)
+        // TODO: Do this with GraphQL, when following issues are resolved (#65031) (#65303)
+        if (isOrg && obj.org_unit[0].uuid !== $page.params.uuid) return false
+        return true
       })
       associations.push(...filtered)
     }
