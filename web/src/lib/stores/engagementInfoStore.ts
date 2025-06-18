@@ -40,7 +40,12 @@ export const engagementInfo = (() => {
 
   if (browser) {
     const stored = localStorage.getItem("engagement-info")
-    initialValue = stored ? JSON.parse(stored) : defaultValue
+    try {
+      const parsed = stored ? JSON.parse(stored) : null
+      initialValue = Array.isArray(parsed) ? parsed : defaultValue
+    } catch {
+      initialValue = defaultValue
+    }
   }
 
   const { subscribe, update, set } = writable<EngagementInfo[]>(initialValue)

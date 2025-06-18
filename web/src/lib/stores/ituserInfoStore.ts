@@ -58,7 +58,12 @@ export const ituserInfo = (() => {
 
   if (browser) {
     const stored = localStorage.getItem("ituser-info")
-    initialValue = stored ? JSON.parse(stored) : defaultValue
+    try {
+      const parsed = stored ? JSON.parse(stored) : null
+      initialValue = Array.isArray(parsed) ? parsed : defaultValue
+    } catch {
+      initialValue = defaultValue
+    }
   }
 
   const { subscribe, update, set } = writable<ItuserInfo[]>(initialValue)
