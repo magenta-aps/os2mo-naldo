@@ -39,7 +39,12 @@ export const managerInfo = (() => {
 
   if (browser) {
     const stored = localStorage.getItem("manager-info")
-    initialValue = stored ? JSON.parse(stored) : defaultValue
+    try {
+      const parsed = stored ? JSON.parse(stored) : null
+      initialValue = Array.isArray(parsed) ? parsed : defaultValue
+    } catch {
+      initialValue = defaultValue
+    }
   }
 
   const { subscribe, update, set } = writable<ManagerInfo[]>(initialValue)
