@@ -4881,6 +4881,16 @@ export type ItSystem = {
    *
    */
   name: Scalars['String']['output'];
+  /**
+   * Rolebinding roles related to the IT-system.
+   *
+   * Examples of user-keys:
+   * * `"AD Read"`
+   * * `"AD Write"`
+   * * `"SAP Admin"`
+   *
+   */
+  roles: Array<ClassResponse>;
   /** The ITSystem type. */
   system_type?: Maybe<Scalars['String']['output']>;
   /**
@@ -4909,6 +4919,14 @@ export type ItSystem = {
   uuid: Scalars['UUID']['output'];
   /** Validity of the IT system object. */
   validity: OpenValidity;
+};
+
+
+/** Systems that IT users are connected to */
+export type ItSystemRolesArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<ItSystemboundclassfilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
 };
 
 export type ItSystemCreateInput = {
@@ -5887,6 +5905,23 @@ export type ItUserUpdateInput = {
   uuid: Scalars['UUID']['input'];
   /** Validity of the created IT user object. */
   validity: RaValidityInput;
+};
+
+export type ItSystemboundclassfilter = {
+  facet?: InputMaybe<FacetFilter>;
+  facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  facets?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  name?: InputMaybe<Array<Scalars['String']['input']>>;
+  owner?: InputMaybe<ClassOwnerFilter>;
+  parent?: InputMaybe<ClassFilter>;
+  parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  registration?: InputMaybe<ClassRegistrationFilter>;
+  scope?: InputMaybe<Array<Scalars['String']['input']>>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 export type ItuserBoundAddressFilter = {
@@ -9675,14 +9710,14 @@ export type OrganisationUnitAssociationsArgs = {
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitChild_CountArgs = {
-  filter?: InputMaybe<ParentsBoundOrganisationUnitFilter>;
+  filter?: InputMaybe<ParentBoundOrganisationUnitFilter>;
 };
 
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitChildrenArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  filter?: InputMaybe<ParentsBoundOrganisationUnitFilter>;
+  filter?: InputMaybe<ParentBoundOrganisationUnitFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
 };
 
@@ -9697,7 +9732,7 @@ export type OrganisationUnitEngagementsArgs = {
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitHas_ChildrenArgs = {
-  filter?: InputMaybe<ParentsBoundOrganisationUnitFilter>;
+  filter?: InputMaybe<ParentBoundOrganisationUnitFilter>;
 };
 
 
@@ -10784,6 +10819,24 @@ export type PageInfo = {
   next_cursor?: Maybe<Scalars['Cursor']['output']>;
 };
 
+export type ParentBoundOrganisationUnitFilter = {
+  ancestor?: InputMaybe<OrganisationUnitFilter>;
+  child?: InputMaybe<OrganisationUnitFilter>;
+  descendant?: InputMaybe<OrganisationUnitFilter>;
+  engagement?: InputMaybe<EngagementFilter>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  hierarchy?: InputMaybe<ClassFilter>;
+  names?: InputMaybe<Array<Scalars['String']['input']>>;
+  parents?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  query?: InputMaybe<Scalars['String']['input']>;
+  registration?: InputMaybe<OrganisationUnitRegistrationFilter>;
+  subtree?: InputMaybe<OrganisationUnitFilter>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
 export type ParentsBoundClassFilter = {
   facet?: InputMaybe<FacetFilter>;
   facet_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -10806,24 +10859,6 @@ export type ParentsBoundFacetFilter = {
   parent?: InputMaybe<FacetFilter>;
   parent_user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   registration?: InputMaybe<FacetRegistrationFilter>;
-  to_date?: InputMaybe<Scalars['DateTime']['input']>;
-  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
-  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
-};
-
-export type ParentsBoundOrganisationUnitFilter = {
-  ancestor?: InputMaybe<OrganisationUnitFilter>;
-  child?: InputMaybe<OrganisationUnitFilter>;
-  descendant?: InputMaybe<OrganisationUnitFilter>;
-  engagement?: InputMaybe<EngagementFilter>;
-  from_date?: InputMaybe<Scalars['DateTime']['input']>;
-  hierarchies?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  hierarchy?: InputMaybe<ClassFilter>;
-  names?: InputMaybe<Array<Scalars['String']['input']>>;
-  parent?: InputMaybe<OrganisationUnitFilter>;
-  query?: InputMaybe<Scalars['String']['input']>;
-  registration?: InputMaybe<OrganisationUnitRegistrationFilter>;
-  subtree?: InputMaybe<OrganisationUnitFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
