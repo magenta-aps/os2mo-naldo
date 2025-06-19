@@ -16,15 +16,16 @@ services:
       # PUBLIC_PRIMARY_CLASS_USER_KEY: "primary"
       PUBLIC_SHOW_ROLEBINDINGS: "true"
       PUBLIC_SEARCH_INFINITY: "false"
-      PUBLIC_SHOW_EXTENSION_1: "false"
       PUBLIC_DOCS_LINK: "true"
       PUBLIC_ONBOARDING_LINK: "true"
       PUBLIC_SIMPLE_SEARCH: "false"
-      # Region syd specific
+      # Specific for regions
       PUBLIC_SHOW_SD_CODE_IN_TREES: "false"
       PUBLIC_SHOW_JOB_FUNCTION_USER_KEY: "false"
-      # Region syd specific for showing lønorg SD code in EngagementTable
-      PUBLIC_SHOW_SD_CODE: "false"
+      # Changes job_function to job_code and instead populates job_function with extension_1  
+      PUBLIC_SHOW_EXTENSION_1: "false"
+      # Department code
+      PUBLIC_SHOW_EXTENSION_2: "false"
     ports:
       - "127.0.0.1:5173:5173"
       - "127.0.0.1:24678:24678" # hot module reloading
