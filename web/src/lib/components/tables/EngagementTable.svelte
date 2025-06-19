@@ -70,13 +70,13 @@
                 to
               }
             }
-            job_function {
+            job_function(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
               user_key
             }
             extension_1
             extension_2
-            engagement_type {
+            engagement_type(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
             }
             org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {

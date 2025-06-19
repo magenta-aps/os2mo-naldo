@@ -62,7 +62,7 @@ gql`
     }
   }
   query FacetsAndClasses(
-    $currentDate: DateTime!
+    $currentDate: DateTime
     $orgUuid: [UUID!]
     $facetUserKeys: [String!]
   ) {
