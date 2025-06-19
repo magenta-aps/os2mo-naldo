@@ -47,7 +47,7 @@ gql`
       }
     }
   }
-  query Facets($currentDate: DateTime!, $orgUuid: [UUID!], $facetUserKeys: [String!]) {
+  query Facets($currentDate: DateTime, $orgUuid: [UUID!], $facetUserKeys: [String!]) {
     facets(filter: { user_keys: $facetUserKeys }) {
       objects {
         validities {
