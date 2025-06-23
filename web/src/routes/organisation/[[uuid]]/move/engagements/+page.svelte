@@ -55,37 +55,6 @@
       }
     }
   `
-
-  // Logic for updating datepicker intervals
-  let validities: {
-    from: string | undefined | null
-    to: string | undefined | null
-  } = { from: null, to: null }
-
-  $: if (newOrgUnit) {
-    ;(async () => {
-      validities = await getValidities(newOrgUnit.uuid)
-    })()
-  } else {
-    validities = { from: null, to: null }
-  }
-
-  const fromDate = field("from", "", [required()])
-  const orgUnitField = field("org_unit", "", [required()])
-  const svelteForm = form(fromDate, orgUnitField)
-
-  let engagements: Engagements[]
-
-  let orgUnit: {
-    uuid: string
-    name: string
-  }
-  let newOrgUnit: {
-    uuid: string
-    name: string
-  }
-  let selectedEngagements: string[] = []
-
   // FIXME: `handler: SubmitFunction` gives TS-error:
   // Argument of type 'SubmitFunction' is not assignable to parameter of type 'SubmitFunction<Record<string, unknown> | undefined, never>'.
   // Ignored for now, by removing typing and typing result to `any`.
@@ -115,10 +84,61 @@
       }
     }
 
-  const updateEngagements = async (orgUnitUuid: string | undefined | null) => {
-    const res = await graphQLClient().request(GetEngagementsDocument, {
+  let startDate: string = $date
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  let abortController: AbortController
+  $: {
+    // Abort the previous request if a new one is about to start
+    if (abortController) {
+      abortController.abort()
+    }
+
+    abortController = new AbortController()
+    ;(async () => {
+      validities = orgUnit
+        ? await getValidities(orgUnit.uuid)
+        : { from: null, to: null }
+      if (orgUnit) {
+        try {
+          await updateEngagements(orgUnit?.uuid, startDate, abortController.signal)
+        } catch (err: any) {
+          if (err.name !== "AbortError") {
+            console.error("Request failed:", err)
+          }
+        }
+      }
+    })()
+  }
+
+  const fromDate = field("from", "", [required()])
+  const orgUnitField = field("org_unit", "", [required()])
+  const svelteForm = form(fromDate, orgUnitField)
+
+  let engagements: Engagements[]
+
+  let orgUnit: {
+    uuid: string
+    name: string
+  }
+  let newOrgUnit: {
+    uuid: string
+    name: string
+  }
+  let selectedEngagements: string[] = []
+
+  const updateEngagements = async (
+    orgUnitUuid: string | undefined | null,
+    date: string,
+    signal?: AbortSignal
+  ) => {
+    const res = await graphQLClient(signal).request(GetEngagementsDocument, {
       org_unit: orgUnitUuid,
-      currentDate: $date,
+      currentDate: date,
     })
 
     engagements = res.engagements?.objects
@@ -147,8 +167,8 @@
     <div class="p-8">
       <div class="flex flex-row gap-6">
         <DateInput
-          startValue={$date}
-          bind:value={$fromDate.value}
+          bind:value={startDate}
+          bind:validationValue={$fromDate.value}
           errors={$fromDate.errors}
           title={capital($_("date.start_date"))}
           id="from"
@@ -163,7 +183,6 @@
           bind:value={orgUnit}
           bind:name={$orgUnitField.value}
           errors={$orgUnitField.errors}
-          on:change={() => updateEngagements(orgUnit.uuid)}
           on:clear={() => {
             $orgUnitField.value = ""
             engagements = []
