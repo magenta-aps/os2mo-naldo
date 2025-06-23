@@ -8,39 +8,22 @@
   import type { SubmitFunction } from "./$types"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
-  import { goto } from "$app/navigation"
-  import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
   import { success, error } from "$lib/stores/alert"
   import Search from "$lib/components/search/Search.svelte"
-  import Input from "$lib/components/forms/shared/Input.svelte"
-  import { page } from "$app/stores"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import {
     GetEngagementsDocument,
-    GetOrgUnitDocument,
     MoveEngagementsDocument,
     type GetEngagementsQuery,
   } from "./query.generated"
-  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { onMount } from "svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
   import { getValidities, getMinMaxValidities } from "$lib/util/helpers"
 
   type Engagements = GetEngagementsQuery["engagements"]["objects"][0]
 
   gql`
-    query GetOrgUnit($org_unit: [UUID!], $currentDate: DateTime) {
-      org_units(filter: { uuids: $org_unit }) {
-        objects {
-          current(at: $currentDate) {
-            uuid
-            name
-          }
-        }
-      }
-    }
     query GetEngagements($org_unit: [UUID!], $currentDate: DateTime) {
       engagements(filter: { org_units: $org_unit, from_date: $currentDate }) {
         objects {
@@ -147,12 +130,6 @@
         ? []
         : engagements.map((engagement) => engagement.current?.uuid)
   }
-
-  onMount(async () => {
-    if ($page.params.uuid) {
-      await updateEngagements($page.params.uuid)
-    }
-  })
 </script>
 
 <title>{capital($_("navigation.move_engagements"))} | OS2mo</title>
@@ -181,47 +158,18 @@
         />
       </div>
       <div class="flex flex-row gap-6">
-        {#if $page.params.uuid}
-          {#await graphQLClient().request( GetOrgUnitDocument, { org_unit: $page.params.uuid, currentDate: $date } )}
-            <Input
-              title="{capital($_('specify'))} {$_('unit', { values: { n: 1 } })}"
-              id="organisation-uuid"
-              disabled
-              placeholder="{$_('loading')} {$_('organisation')}..."
-            />
-          {:then data}
-            {@const orgUnitStartValue = data.org_units.objects[0].current}
-            <Search
-              type="org-unit"
-              bind:value={orgUnit}
-              bind:name={$orgUnitField.value}
-              errors={$orgUnitField.errors}
-              startValue={{
-                uuid: orgUnitStartValue ? orgUnitStartValue.uuid : undefined,
-                name: orgUnitStartValue ? orgUnitStartValue.name : "",
-              }}
-              on:change={() => updateEngagements(orgUnit.uuid)}
-              on:clear={() => {
-                $orgUnitField.value = ""
-                engagements = []
-              }}
-              required
-            />
-          {/await}
-        {:else}
-          <Search
-            type="org-unit"
-            bind:value={orgUnit}
-            bind:name={$orgUnitField.value}
-            errors={$orgUnitField.errors}
-            on:change={() => updateEngagements(orgUnit.uuid)}
-            on:clear={() => {
-              $orgUnitField.value = ""
-              engagements = []
-            }}
-            required={true}
-          />
-        {/if}
+        <Search
+          type="org-unit"
+          bind:value={orgUnit}
+          bind:name={$orgUnitField.value}
+          errors={$orgUnitField.errors}
+          on:change={() => updateEngagements(orgUnit.uuid)}
+          on:clear={() => {
+            $orgUnitField.value = ""
+            engagements = []
+          }}
+          required={true}
+        />
       </div>
       <div class="text-secondary pb-3">
         {#if engagements && engagements.length}
