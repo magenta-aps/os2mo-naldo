@@ -3597,6 +3597,8 @@ export type EngagementCreateInput = {
    *
    */
   extension_10?: InputMaybe<Scalars['String']['input']>;
+  /** Worktime between 0-1000000 for the engagement object. */
+  fraction?: InputMaybe<Scalars['Int']['input']>;
   job_function: Scalars['UUID']['input'];
   /** The related org-unit object. */
   org_unit: Scalars['UUID']['input'];
@@ -4039,6 +4041,8 @@ export type EngagementUpdateInput = {
    *
    */
   extension_10?: InputMaybe<Scalars['String']['input']>;
+  /** Worktime between 0-1000000 for the engagement object. */
+  fraction?: InputMaybe<Scalars['Int']['input']>;
   /** UUID of the job function. */
   job_function?: InputMaybe<Scalars['UUID']['input']>;
   /** The related org-unit object. */
@@ -5947,6 +5951,7 @@ export type ItuserBoundRoleBindingFilter = {
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   registration?: InputMaybe<RoleRegistrationFilter>;
+  role?: InputMaybe<ClassFilter>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -11762,6 +11767,11 @@ export type RoleBindingFilter = {
    *
    */
   registration?: InputMaybe<RoleRegistrationFilter>;
+  /**
+   * Role filter limiting which entries are returned.
+   *
+   */
+  role?: InputMaybe<ClassFilter>;
   /** Limit the elements returned by their ending validity. */
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
