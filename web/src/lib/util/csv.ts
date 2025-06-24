@@ -3,6 +3,8 @@ import { capital } from "$lib/util/translationUtils"
 import { get } from "svelte/store"
 import { resolveFieldValue, type SelectedQuery, type Field } from "$lib/util/helpers"
 
+const SEPARATOR = ";"
+
 // Function to convert JSON data to CSV format
 export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string => {
   let csvHeader: string[] = []
@@ -108,7 +110,7 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
         // If only `org_units` is present in the query, push it to the row.
         // This is done, since if we have other queries, we want the orgUnitData to on every row, and not by itself.
         if (!hasOtherQueries) {
-          csvRows.push(orgUnitData.join(","))
+          csvRows.push(orgUnitData.join(SEPARATOR))
         }
       }
 
@@ -153,17 +155,17 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
                   })
                 })
 
-                const csvRow = row.join(",")
+                const csvRow = row.join(SEPARATOR)
                 // Remove row if it's empty
-                if (csvRow.replace(/,/g, "").trim() !== "") {
+                if (csvRow.replace(new RegExp(SEPARATOR, "g"), "").trim() !== "") {
                   csvRows.push(csvRow)
                 }
               })
             } else {
               const row: string[] = [...orgUnitData]
-              const csvRow = row.join(",")
+              const csvRow = row.join(SEPARATOR)
               // Remove row if it's empty
-              if (csvRow.replace(/,/g, "").trim() !== "") {
+              if (csvRow.replace(new RegExp(SEPARATOR, "g"), "").trim() !== "") {
                 csvRows.push(csvRow)
               }
             }
@@ -174,7 +176,7 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
   })
 
   // Combine header and rows
-  const csvData = [csvHeader.join(","), ...csvRows].join("\n")
+  const csvData = [csvHeader.join(SEPARATOR), ...csvRows].join("\n")
 
   return csvData
 }
@@ -193,7 +195,8 @@ export const downloadHandler = (
 
   // Generate CSV and trigger download
   const csvData: string = json2csv(data, selectedQueries)
-  const blob: Blob = new Blob([csvData], { type: "text/csv" })
+  const BOM = "\uFEFF"
+  const blob: Blob = new Blob([BOM + csvData], { type: "text/csv;charset=utf-8;" })
   const link: HTMLAnchorElement = document.createElement("a")
   link.href = URL.createObjectURL(blob)
   link.download = filename ? `${filename}.csv` : "insights.csv"
@@ -203,7 +206,7 @@ export const downloadHandler = (
 const escapeCsv = (value: any): string => {
   if (value === null || value === undefined) return ""
   const str = String(value)
-  if (str.includes(",") || str.includes("\n") || str.includes('"')) {
+  if (str.includes(SEPARATOR) || str.includes("\n") || str.includes('"')) {
     return `"${str.replace(/"/g, '""')}"`
   }
   return str
