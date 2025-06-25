@@ -111,7 +111,7 @@
               values: { item: $_("class", { values: { n: 1 } }) },
             })
           )}
-          href="{base}/admin/facet/{facetUuid}/create/class"
+          href="{base}/admin/facet/create/class"
           extraClasses="my-5"
         />
       {/if}

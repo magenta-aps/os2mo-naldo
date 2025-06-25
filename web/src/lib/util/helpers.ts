@@ -11,7 +11,7 @@ import {
   addSeconds,
   differenceInCalendarDays,
 } from "date-fns"
-import { _ } from "svelte-i18n"
+import { _, locale } from "svelte-i18n"
 import { capital } from "$lib/util/translationUtils"
 import { get } from "svelte/store"
 import { graphQLClient } from "$lib/util/http"
@@ -19,7 +19,9 @@ import { gql } from "graphql-request"
 import {
   GetOrgUnitValiditiesDocument,
   GetEngagementValiditiesDocument,
-  FacetsDocument,
+  GetFacetValiditiesDocument,
+  FacetsAndClassesDocument,
+  FacetDocument,
 } from "./query.generated"
 
 gql`
@@ -47,7 +49,23 @@ gql`
       }
     }
   }
-  query Facets($currentDate: DateTime!, $orgUuid: [UUID!], $facetUserKeys: [String!]) {
+  query GetFacetValidities($uuid: [UUID!]) {
+    facets(filter: { uuids: $uuid, from_date: null, to_date: null }) {
+      objects {
+        validities {
+          validity {
+            from
+            to
+          }
+        }
+      }
+    }
+  }
+  query FacetsAndClasses(
+    $currentDate: DateTime!
+    $orgUuid: [UUID!]
+    $facetUserKeys: [String!]
+  ) {
     facets(filter: { user_keys: $facetUserKeys }) {
       objects {
         validities {
@@ -63,6 +81,16 @@ gql`
             uuid
             user_key
           }
+        }
+      }
+    }
+  }
+  query Facet($uuid: [UUID!], $fromDate: DateTime!) {
+    facets(filter: { uuids: $uuid, from_date: $fromDate }) {
+      objects {
+        validities {
+          uuid
+          user_key
         }
       }
     }
@@ -149,6 +177,12 @@ export const getEngagementValidities = async (uuid: string) => {
   })
   return getMinMaxValidities(res.engagements.objects[0].validities)
 }
+export const getFacetValidities = async (uuid: string, signal?: AbortSignal) => {
+  const res = await graphQLClient(signal).request(GetFacetValiditiesDocument, {
+    uuid: uuid,
+  })
+  return getMinMaxValidities(res.facets.objects[0].validities)
+}
 export const getClasses = async (
   variables: {
     currentDate: string
@@ -157,8 +191,36 @@ export const getClasses = async (
   },
   signal?: AbortSignal
 ) => {
-  const res = await graphQLClient(signal).request(FacetsDocument, variables)
+  const res = await graphQLClient(signal).request(FacetsAndClassesDocument, variables)
   return res.facets.objects
+}
+
+export const getFacets = async (
+  variables: {
+    uuid: string | null
+    fromDate: string
+  },
+  signal?: AbortSignal
+) => {
+  const res = await graphQLClient(signal).request(FacetDocument, variables)
+  const items = res.facets.objects.map((facet) => {
+    // Doing both the translation and sort in here, means that changing language won't affect the list, until it's rerun
+    const closest = findClosestValidity(facet.validities, variables.fromDate)
+    return {
+      uuid: closest.uuid,
+      name: capital(
+        get(_)("facets.name." + closest.user_key, {
+          default: closest.user_key,
+        })
+      ),
+      user_key: closest.user_key,
+    }
+  })
+  return items.sort((a, b) =>
+    a.name.localeCompare(b.name, get(locale) ?? "da", {
+      sensitivity: "base", // Æ/æ = æ, case-insensitive
+    })
+  )
 }
 
 export const tenseToValidity = (
