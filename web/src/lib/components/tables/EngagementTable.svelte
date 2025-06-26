@@ -48,6 +48,7 @@
       $fromDate: DateTime
       $toDate: DateTime
       $inherit: Boolean = true
+      $isOrg: Boolean = false
     ) {
       engagements(
         filter: {
@@ -86,7 +87,7 @@
                 to
               }
             }
-            managers(inherit: $inherit, exclude_self: true) {
+            managers(inherit: $inherit, exclude_self: true) @skip(if: $isOrg) {
               person(filter: { from_date: $fromDate, to_date: $toDate }) {
                 name
                 uuid
@@ -120,6 +121,7 @@
       org_unit: org_unit,
       employee: employee,
       inherit: inheritManager,
+      isOrg: isOrg,
       ...tenseToValidity(tense, $date),
     })
     const engagements: Engagements = []
@@ -182,30 +184,33 @@
       <td class="text-sm p-4">{engagement.engagement_type.name}</td>
       {#if !isOrg}
         <td class="text-sm p-4">
-          <!-- If there's more than 1 manager, create a list -->
-          <!-- Extra if/else logic implemented, so we can add <a>-tags to the managers -->
-          {#if engagement.managers.length > 1}
-            <ul>
-              {#each engagement.managers as manager}
-                <li>
-                  {#if manager.person}
-                    <a href="{base}/employee/{manager.person?.[0].uuid}">
-                      • {findClosestValidity(manager.person, $date).name}
-                    </a>
-                  {:else}
-                    • {capital($_("vacant"))}
-                  {/if}
-                </li>
-              {/each}
-            </ul>
-            <!-- If there's only 1 manager and it's not vacant -->
-          {:else if engagement.managers[0] && engagement.managers[0].person?.[0]}
-            <a href="{base}/employee/{engagement.managers[0].person[0].uuid}">
-              {findClosestValidity(engagement.managers[0].person, $date).name}
-            </a>
-            <!-- 1 vacant manager -->
-          {:else if engagement.managers[0]}
-            {capital($_("vacant"))}
+          <!-- Make sure engagement.managers is present (needed since adding @skip to query)  -->
+          {#if engagement.managers}
+            <!-- If there's more than 1 manager, create a list -->
+            <!-- Extra if/else logic implemented, so we can add <a>-tags to the managers -->
+            {#if engagement.managers.length > 1}
+              <ul>
+                {#each engagement.managers as manager}
+                  <li>
+                    {#if manager.person}
+                      <a href="{base}/employee/{manager.person?.[0].uuid}">
+                        • {findClosestValidity(manager.person, $date).name}
+                      </a>
+                    {:else}
+                      • {capital($_("vacant"))}
+                    {/if}
+                  </li>
+                {/each}
+              </ul>
+              <!-- If there's only 1 manager and it's not vacant -->
+            {:else if engagement.managers[0] && engagement.managers[0].person?.[0]}
+              <a href="{base}/employee/{engagement.managers[0].person[0].uuid}">
+                {findClosestValidity(engagement.managers[0].person, $date).name}
+              </a>
+              <!-- 1 vacant manager -->
+            {:else if engagement.managers[0]}
+              {capital($_("vacant"))}
+            {/if}
           {:else}
             {capital(
               $_("no_item", { values: { item: $_("manager", { values: { n: 1 } }) } })
