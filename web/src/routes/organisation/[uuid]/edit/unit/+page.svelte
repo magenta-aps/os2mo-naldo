@@ -56,7 +56,7 @@
           validities {
             uuid
             name
-            parent {
+            parent(filter: { from_date: $fromDate, to_date: $toDate }) {
               uuid
               name
               validity {
