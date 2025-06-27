@@ -4,10 +4,10 @@ import { GetParentDocument } from "./query.generated"
 
 gql`
   query GetParent($uuid: [UUID!], $currentDate: DateTime) {
-    org_units(filter: { uuids: $uuid }) {
+    org_units(filter: { uuids: $uuid, from_date: $currentDate }) {
       objects {
         current(at: $currentDate) {
-          parent {
+          parent(filter: { from_date: $currentDate }) {
             name
             uuid
           }
