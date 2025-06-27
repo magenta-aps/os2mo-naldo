@@ -23,7 +23,7 @@
     "@iconify/icons-circle-flags": "^1.2.41",
     "@iconify/icons-material-symbols": "^1.2.58",
     "@iconify/svelte": "^4.0.2",
-    "@playwright/test": "^1.40.1",
+    "@playwright/test": "^1.47.2",
     "@sveltejs/kit": "^2.8.3",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.33",
