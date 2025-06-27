@@ -12,7 +12,7 @@
   export let link: boolean = false
   gql`
     query GetBreadcrumbs($uuid: [UUID!], $currentDate: DateTime) {
-      org_units(filter: { uuids: $uuid }) {
+      org_units(filter: { uuids: $uuid, from_date: $currentDate }) {
         objects {
           current(at: $currentDate) {
             ancestors {
