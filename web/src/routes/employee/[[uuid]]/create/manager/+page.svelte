@@ -7,11 +7,11 @@
   import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
-  import { goto } from "$app/navigation"
+  import type { FacetValidities } from "$lib/util/getClasses"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
-  import { FacetsAndOrgDocument, CreateManagerDocument } from "./query.generated"
+  import { CreateManagerDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
@@ -21,9 +21,21 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
-  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getValidities } from "$lib/util/helpers"
+  import { getClasses, getValidities } from "$lib/util/helpers"
 
+  gql`
+    mutation CreateManager($input: ManagerCreateInput!, $date: DateTime!) {
+      manager_create(input: $input) {
+        current(at: $date) {
+          person {
+            name
+          }
+        }
+      }
+    }
+  `
+
+  let startDate: string = $date
   let toDate: string
   let selectedOrgUnit: {
     uuid: string
@@ -43,35 +55,35 @@
     responsibilities
   )
 
-  gql`
-    query FacetsAndOrg($currentDate: DateTime!) {
-      facets(
-        filter: { user_keys: ["manager_type", "manager_level", "responsibility"] }
-      ) {
-        objects {
-          validities {
-            uuid
-            user_key
-            classes(filter: { from_date: $currentDate }) {
-              name
-              uuid
-              user_key
-            }
-          }
-        }
-      }
-    }
+  const handler: SubmitFunction =
+    () =>
+    async ({ result }) => {
+      // Await the validation, before we continue
+      await svelteForm.validate()
+      if (!$svelteForm.valid) return
+      if (result.type !== "success" || !result.data) return
 
-    mutation CreateManager($input: ManagerCreateInput!, $date: DateTime!) {
-      manager_create(input: $input) {
-        current(at: $date) {
-          person {
-            name
-          }
+      try {
+        const mutation = await graphQLClient().request(CreateManagerDocument, {
+          input: result.data,
+          date: result.data.validity.from,
+        })
+        $success = {
+          message: capital(
+            $_("success_create_item", {
+              values: {
+                item: $_("manager", { values: { n: 0 } }),
+                name: mutation.manager_create.current?.person?.[0].name,
+              },
+            })
+          ),
+          uuid: $page.params.uuid,
+          type: "employee",
         }
+      } catch (err) {
+        $error = { message: err }
       }
     }
-  `
 
   // Logic for updating datepicker intervals
   let validities: {
@@ -79,44 +91,35 @@
     to: string | undefined | null
   } = { from: null, to: null }
 
-  $: if (selectedOrgUnit) {
-    ;(async () => {
-      validities = await getValidities(selectedOrgUnit.uuid)
-    })()
-  } else {
-    validities = { from: null, to: null }
-  }
+  let facets: FacetValidities[]
+  let abortController: AbortController
+  $: {
+    const params = {
+      currentDate: startDate,
+      orgUuid: selectedOrgUnit?.uuid,
+      facetUserKeys: ["manager_type", "manager_level", "responsibility"],
+    }
 
-  const handler: SubmitFunction =
-    () =>
-    async ({ result }) => {
-      // Await the validation, before we continue
-      await svelteForm.validate()
-      if ($svelteForm.valid) {
-        if (result.type === "success" && result.data) {
-          try {
-            const mutation = await graphQLClient().request(CreateManagerDocument, {
-              input: result.data,
-              date: result.data.validity.from,
-            })
-            $success = {
-              message: capital(
-                $_("success_create_item", {
-                  values: {
-                    item: $_("manager", { values: { n: 0 } }),
-                    name: mutation.manager_create.current?.person?.[0].name,
-                  },
-                })
-              ),
-              uuid: $page.params.uuid,
-              type: "employee",
-            }
-          } catch (err) {
-            $error = { message: err }
-          }
+    // Abort the previous request if a new one is about to start
+    if (abortController) {
+      abortController.abort()
+    }
+
+    abortController = new AbortController()
+    ;(async () => {
+      validities = selectedOrgUnit
+        ? await getValidities(selectedOrgUnit.uuid)
+        : { from: null, to: null }
+      try {
+        const result = await getClasses(params, abortController.signal)
+        facets = result // Update facets if the request is successful
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          console.error("Request failed:", err)
         }
       }
-    }
+    })()
+  }
 </script>
 
 <title
@@ -139,57 +142,38 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request(FacetsAndOrgDocument, { currentDate: $date })}
-  <div class="mx-6">
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
-      <div class="p-8">
-        <div class="flex flex-row gap-6">
-          <Skeleton extra_classes="basis-1/2" />
-          <Skeleton extra_classes="basis-1/2" />
-        </div>
-        <Skeleton />
-        <div class="flex flex-row gap-6">
-          <Skeleton extra_classes="basis-1/2" />
-          <Skeleton extra_classes="basis-1/2" />
-        </div>
-        <Skeleton />
-      </div>
-    </div>
-  </div>
-{:then data}
-  {@const facets = data.facets.objects}
-
-  <form method="post" class="mx-6" use:enhance={handler}>
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
-      <div class="p-8">
-        <div class="flex flex-row gap-6">
-          <DateInput
-            startValue={$date}
-            bind:value={$fromDate.value}
-            errors={$fromDate.errors}
-            title={capital($_("date.start_date"))}
-            id="from"
-            min={validities.from}
-            max={toDate ? toDate : validities.to}
-            required={true}
-          />
-          <DateInput
-            bind:value={toDate}
-            title={capital($_("date.end_date"))}
-            id="to"
-            min={$fromDate.value ? $fromDate.value : validities.from}
-            max={validities.to}
-          />
-        </div>
-        <Search
-          type="org-unit"
-          bind:name={$orgUnit.value}
-          errors={$orgUnit.errors}
-          on:clear={() => ($orgUnit.value = "")}
-          bind:value={selectedOrgUnit}
+<form method="post" class="mx-6" use:enhance={handler}>
+  <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+    <div class="p-8">
+      <div class="flex flex-row gap-6">
+        <DateInput
+          bind:value={startDate}
+          bind:validationValue={$fromDate.value}
+          errors={$fromDate.errors}
+          title={capital($_("date.start_date"))}
+          id="from"
+          min={validities.from}
+          max={toDate ? toDate : validities.to}
           required={true}
         />
-        <Breadcrumbs orgUnit={selectedOrgUnit} />
+        <DateInput
+          bind:value={toDate}
+          title={capital($_("date.end_date"))}
+          id="to"
+          min={$fromDate.value ? $fromDate.value : validities.from}
+          max={validities.to}
+        />
+      </div>
+      <Search
+        type="org-unit"
+        bind:name={$orgUnit.value}
+        errors={$orgUnit.errors}
+        on:clear={() => ($orgUnit.value = "")}
+        bind:value={selectedOrgUnit}
+        required={true}
+      />
+      <Breadcrumbs orgUnit={selectedOrgUnit} />
+      {#if facets}
         <div class="flex flex-row gap-6">
           <Select
             title={capital($_("manager_type"))}
@@ -219,24 +203,24 @@
           iterable={getClassesByFacetUserKey(facets, "responsibility")}
           required={true}
         />
-      </div>
+      {/if}
     </div>
-    <div class="flex py-6 gap-4">
-      <Button
-        type="submit"
-        title={capital(
-          $_("create_item", {
-            values: { item: $_("manager", { values: { n: 1 } }) },
-          })
-        )}
-      />
-      <Button
-        type="button"
-        title={capital($_("cancel"))}
-        outline={true}
-        href="{base}/employee/{$page.params.uuid}"
-      />
-    </div>
-    <Error />
-  </form>
-{/await}
+  </div>
+  <div class="flex py-6 gap-4">
+    <Button
+      type="submit"
+      title={capital(
+        $_("create_item", {
+          values: { item: $_("manager", { values: { n: 1 } }) },
+        })
+      )}
+    />
+    <Button
+      type="button"
+      title={capital($_("cancel"))}
+      outline={true}
+      href="{base}/employee/{$page.params.uuid}"
+    />
+  </div>
+  <Error />
+</form>
