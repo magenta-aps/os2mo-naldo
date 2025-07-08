@@ -7,7 +7,6 @@
   import Select from "$lib/components/forms/shared/Select.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
-  import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/util/http"
@@ -25,6 +24,18 @@
   import { getClasses, getValidities } from "$lib/util/helpers"
   import { env } from "$env/dynamic/public"
 
+  gql`
+    mutation CreateEngagement($input: EngagementCreateInput!, $date: DateTime!) {
+      engagement_create(input: $input) {
+        current(at: $date) {
+          person {
+            name
+          }
+        }
+      }
+    }
+  `
+
   let startDate: string = $date
   let toDate: string
   let selectedOrgUnit: {
@@ -38,46 +49,32 @@
   const engagementType = field("engagement_type", "", [required()])
   const svelteForm = form(fromDate, orgUnit, jobFunction, engagementType)
 
-  gql`
-    mutation CreateEngagement($input: EngagementCreateInput!, $date: DateTime!) {
-      engagement_create(input: $input) {
-        current(at: $date) {
-          person {
-            name
-          }
-        }
-      }
-    }
-  `
-
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
       // Await the validation, before we continue
       await svelteForm.validate()
-      if ($svelteForm.valid) {
-        if (result.type === "success" && result.data) {
-          try {
-            const mutation = await graphQLClient().request(CreateEngagementDocument, {
-              input: result.data,
-              date: result.data.validity.from,
+      if (!$svelteForm.valid) return
+      if (result.type !== "success" || !result.data) return
+      try {
+        const mutation = await graphQLClient().request(CreateEngagementDocument, {
+          input: result.data,
+          date: result.data.validity.from,
+        })
+        $success = {
+          message: capital(
+            $_("success_create_item", {
+              values: {
+                item: $_("engagement", { values: { n: 0 } }),
+                name: mutation.engagement_create.current?.person?.[0].name,
+              },
             })
-            $success = {
-              message: capital(
-                $_("success_create_item", {
-                  values: {
-                    item: $_("engagement", { values: { n: 0 } }),
-                    name: mutation.engagement_create.current?.person?.[0].name,
-                  },
-                })
-              ),
-              uuid: $page.params.uuid,
-              type: "employee",
-            }
-          } catch (err) {
-            $error = { message: err }
-          }
+          ),
+          uuid: $page.params.uuid,
+          type: "employee",
         }
+      } catch (err) {
+        $error = { message: err }
       }
     }
 
@@ -90,25 +87,22 @@
   let facets: FacetValidities[]
   let abortController: AbortController
   $: {
+    // Abort the previous request if a new one is about to start
+    if (abortController) abortController.abort()
+    abortController = new AbortController()
+
     const params = {
       currentDate: startDate,
       orgUuid: selectedOrgUnit?.uuid,
       facetUserKeys: ["engagement_type", "engagement_job_function", "primary_type"],
     }
 
-    // Abort the previous request if a new one is about to start
-    if (abortController) {
-      abortController.abort()
-    }
-
-    abortController = new AbortController()
     ;(async () => {
       validities = selectedOrgUnit
         ? await getValidities(selectedOrgUnit.uuid)
         : { from: null, to: null }
       try {
-        const result = await getClasses(params, abortController.signal)
-        facets = result // Update facets if the request is successful
+        facets = await getClasses(params, abortController.signal)
       } catch (err: any) {
         if (err.name !== "AbortError") {
           console.error("Request failed:", err)

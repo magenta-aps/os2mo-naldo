@@ -131,16 +131,15 @@
   let facets: FacetValidities[]
   let abortController: AbortController
   $: {
+    // Abort the previous request if a new one is about to start
+    if (abortController) abortController.abort()
+    abortController = new AbortController()
+
     // Make sure `currentDate` isn't sent if startDate is null.
     const params = {
       currentDate: startDate,
       orgUuid: selectedOrgUnit?.uuid,
       facetUserKeys: ["manager_type", "manager_level", "responsibility"],
-    }
-
-    // Abort the previous request if a new one is about to start
-    if (abortController) {
-      abortController.abort()
     }
 
     abortController = new AbortController()
@@ -149,8 +148,7 @@
         ? await getValidities(selectedOrgUnit.uuid)
         : { from: null, to: null }
       try {
-        const result = await getClasses(params, abortController.signal)
-        facets = result // Update facets if the request is successful
+        facets = await getClasses(params, abortController.signal)
       } catch (err: any) {
         if (err.name !== "AbortError") {
           console.error("Request failed:", err)
