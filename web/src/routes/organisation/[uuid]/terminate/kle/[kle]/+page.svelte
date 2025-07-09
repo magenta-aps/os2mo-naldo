@@ -22,8 +22,8 @@
   const svelteForm = form(toDate)
 
   gql`
-    query KLE($uuid: [UUID!], $fromDate: DateTime!) {
-      kles(filter: { uuids: $uuid, from_date: $fromDate }) {
+    query KLE($uuid: [UUID!]) {
+      kles(filter: { uuids: $uuid, from_date: null, to_date: null }) {
         objects {
           validities {
             validity {

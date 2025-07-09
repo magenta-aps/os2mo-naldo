@@ -22,8 +22,8 @@
   const svelteForm = form(toDate)
 
   gql`
-    query Rolebinding($uuid: [UUID!], $fromDate: DateTime!) {
-      rolebindings(filter: { uuids: $uuid, from_date: $fromDate }) {
+    query Rolebinding($uuid: [UUID!]) {
+      rolebindings(filter: { uuids: $uuid, from_date: null, to_date: null }) {
         objects {
           validities {
             validity {

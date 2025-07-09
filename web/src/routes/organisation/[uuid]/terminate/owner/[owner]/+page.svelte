@@ -22,8 +22,8 @@
   const svelteForm = form(toDate)
 
   gql`
-    query Owner($uuid: [UUID!], $fromDate: DateTime!) {
-      owners(filter: { uuids: $uuid, from_date: $fromDate }) {
+    query Owner($uuid: [UUID!]) {
+      owners(filter: { uuids: $uuid, from_date: null, to_date: null }) {
         objects {
           validities {
             validity {

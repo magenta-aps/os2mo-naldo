@@ -22,8 +22,8 @@
   const svelteForm = form(toDate)
 
   gql`
-    query ITUserAndOrg($uuid: [UUID!], $fromDate: DateTime!) {
-      itusers(filter: { uuids: $uuid, from_date: $fromDate }) {
+    query ITUserAndOrg($uuid: [UUID!]) {
+      itusers(filter: { uuids: $uuid, from_date: null, to_date: null }) {
         objects {
           validities {
             validity {

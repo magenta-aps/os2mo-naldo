@@ -22,8 +22,8 @@
   const svelteForm = form(toDate)
 
   gql`
-    query Manager($uuid: [UUID!], $fromDate: DateTime!) {
-      managers(filter: { uuids: $uuid, from_date: $fromDate }) {
+    query Manager($uuid: [UUID!]) {
+      managers(filter: { uuids: $uuid, from_date: null, to_date: null }) {
         objects {
           validities {
             validity {
