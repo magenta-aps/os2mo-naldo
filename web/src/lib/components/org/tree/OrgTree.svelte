@@ -5,97 +5,75 @@
   import { graphQLClient } from "$lib/util/http"
   import { fetchParentTree } from "$lib/util/parentTree"
   import Node from "$lib/components/org/tree/Node.svelte"
+  import type { FacetValidities } from "$lib/util/getClasses"
   import { success } from "$lib/stores/alert"
   import { date } from "$lib/stores/date"
   import { globalNavigation } from "$lib/stores/navigation"
+  import { orgUnitHierarchyStore } from "$lib/stores/hierarchy"
   import { gql } from "graphql-request"
   import {
     OrgUnitsWithChildrenDocument,
-    OrgUnitHierarchiesDocument,
     type OrgUnitsWithChildrenQuery,
     type OrgUnitsWithFilteredChildrenQuery,
     OrgUnitsWithFilteredChildrenDocument,
   } from "./query.generated"
+  import { type OrgTreeItem } from "$lib/components/org/tree/orgTree"
+  import { getClasses } from "$lib/util/helpers"
   import { getClassesByFacetUserKey } from "$lib/util/getClasses"
   import Select from "$lib/components/forms/shared/Select.svelte"
-
-  const brutto = {
-    uuid: null,
-    name: capital($_("entire_organisation")),
-    user_key: null,
-  }
-  let orgUnitHierachy = brutto
+  import { onMount } from "svelte"
 
   gql`
-    query OrgUnitHierarchies($currentDate: DateTime!) {
-      facets(filter: { user_keys: "org_unit_hierarchy" }) {
+    query OrgUnitsWithChildren($fromDate: DateTime) {
+      org_units(filter: { parents: null, from_date: $fromDate }) {
         objects {
           validities {
+            name
             user_key
             uuid
-            classes(filter: { from_date: $currentDate }) {
-              name
-              user_key
-              uuid
-            }
+            has_children(filter: { from_date: $fromDate })
+          }
+        }
+      }
+    }
+
+    query OrgUnitsWithFilteredChildren(
+      $fromDate: DateTime
+      $orgUnitHierarchies: [UUID!]
+    ) {
+      org_units(
+        filter: {
+          parents: null
+          descendant: {
+            from_date: $fromDate
+            hierarchy: { uuids: $orgUnitHierarchies }
+          }
+        }
+      ) {
+        objects {
+          validities {
+            name
+            user_key
+            uuid
+            has_children(
+              filter: {
+                descendant: {
+                  from_date: $fromDate
+                  hierarchy: { uuids: $orgUnitHierarchies }
+                }
+              }
+            )
           }
         }
       }
     }
   `
 
-  // First load from index
   const fetchOrgTree = async (
     fromDate: string,
     childUuid?: string | null,
     orgUnitHierarchyUuid?: string | null
   ) => {
-    gql`
-      query OrgUnitsWithChildren($fromDate: DateTime) {
-        org_units(filter: { parents: null, from_date: $fromDate }) {
-          objects {
-            validities {
-              name
-              user_key
-              uuid
-              has_children(filter: { from_date: $fromDate })
-            }
-          }
-        }
-      }
-
-      query OrgUnitsWithFilteredChildren(
-        $fromDate: DateTime
-        $orgUnitHierarchies: [UUID!]
-      ) {
-        org_units(
-          filter: {
-            parents: null
-            descendant: {
-              from_date: $fromDate
-              hierarchy: { uuids: $orgUnitHierarchies }
-            }
-          }
-        ) {
-          objects {
-            validities {
-              name
-              user_key
-              uuid
-              has_children(
-                filter: {
-                  descendant: {
-                    from_date: $fromDate
-                    hierarchy: { uuids: $orgUnitHierarchies }
-                  }
-                }
-              )
-            }
-          }
-        }
-      }
-    `
-
     // Breadcrumbs
     let res: OrgUnitsWithChildrenQuery | OrgUnitsWithFilteredChildrenQuery
 
@@ -131,51 +109,62 @@
     return orgTree
   }
 
-  let refreshableOrgTree = fetchOrgTree($date, null, orgUnitHierachy?.uuid)
-
-  // TODO: Replace with subscriptions when implmented
-  $: if ($success.type === "organisation") {
-    refreshableOrgTree = fetchOrgTree($date, $success.uuid)
+  const brutto = {
+    uuid: null,
+    name: capital($_("entire_organisation")),
+    user_key: null,
   }
 
-  // Triggered when using the global navigation to find an organisation
+  let hierarchies: FacetValidities[]
+  let selectedHierarchy = brutto
+  let hierarchyClasses: any = []
+  let refreshableOrgTree: Promise<OrgTreeItem[]>
+
+  onMount(async () => {
+    hierarchies = await getClasses({
+      currentDate: $date,
+      orgUuid: null,
+      facetUserKeys: ["org_unit_hierarchy"],
+    })
+    hierarchyClasses =
+      getClassesByFacetUserKey(hierarchies, "org_unit_hierarchy")?.flat() ?? []
+
+    const storedUuid = $orgUnitHierarchyStore
+    selectedHierarchy =
+      [brutto, ...hierarchyClasses].find((h) => h.uuid === storedUuid) ?? brutto
+
+    orgUnitHierarchyStore.set(selectedHierarchy.uuid)
+    refreshableOrgTree = fetchOrgTree($date, null, $orgUnitHierarchyStore)
+  })
+
+  $: if ($success?.type === "organisation") {
+    refreshableOrgTree = fetchOrgTree($date, $success.uuid, selectedHierarchy.uuid)
+  }
+
   $: if ($globalNavigation || $date) {
-    refreshableOrgTree = fetchOrgTree($date, $globalNavigation)
+    refreshableOrgTree = fetchOrgTree($date, $globalNavigation, selectedHierarchy.uuid)
   }
 </script>
 
-{#await graphQLClient().request(OrgUnitHierarchiesDocument, { currentDate: $date })}
-  <div role="status" class="max-w-sm animate-pulse">
-    <div class="mb-2.5 h-10 rounded bg-base-100 max-w-4 dark:bg-accent" />
-    <span class="sr-only">{capital($_("loading"))}...</span>
-  </div>
-{:then data}
-  {#if data.facets.objects.length && data.facets.objects[0].validities[0].classes.length}
-    {@const facets = data.facets.objects}
-    <!-- Do this to avoid flat returning undefined in iterable, since `iterable: Value` -->
-    {@const hierarchies = getClassesByFacetUserKey(
-      facets,
-      "org_unit_hierarchy"
-    )?.flat()}
-    <Select
-      id="org-unit-hierarchy"
-      bind:value={orgUnitHierachy}
-      startValue={brutto}
-      iterable={[brutto, ...(hierarchies ? hierarchies : [])]}
-      on:change={() =>
-        (refreshableOrgTree = fetchOrgTree($date, null, orgUnitHierachy?.uuid))}
-    />
-  {/if}
-  {#key refreshableOrgTree}
-    {#await refreshableOrgTree}
-      <div role="status" class="max-w-sm animate-pulse">
-        <div class="mb-2.5 h-10 rounded bg-base-100 max-w-4 dark:bg-accent" />
-        <span class="sr-only">{capital($_("loading"))}...</span>
-      </div>
-    {:then orgTree}
-      {#each orgTree.sort( (a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1) ) as child}
-        <Node {...child} />
-      {/each}
-    {/await}
-  {/key}
-{/await}
+{#if hierarchyClasses && hierarchyClasses.length}
+  <Select
+    id="org-unit-hierarchy"
+    bind:value={selectedHierarchy}
+    startValue={brutto}
+    iterable={[brutto, ...hierarchyClasses]}
+    on:change={() => orgUnitHierarchyStore.set(selectedHierarchy?.uuid)}
+  />
+{/if}
+
+{#key refreshableOrgTree}
+  {#await refreshableOrgTree}
+    <div role="status" class="max-w-sm animate-pulse">
+      <div class="mb-2.5 h-10 rounded bg-base-100 max-w-4 dark:bg-accent" />
+      <span class="sr-only">{capital($_("loading"))}...</span>
+    </div>
+  {:then orgTree}
+    {#each orgTree.sort( (a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1) ) as child}
+      <Node {...child} />
+    {/each}
+  {/await}
+{/key}
