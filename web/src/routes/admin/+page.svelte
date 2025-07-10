@@ -26,15 +26,15 @@
     if ($facetStore.uuid) {
       facet = {
         name: $facetStore.name,
+        user_key: $facetStore.name,
         uuid: $facetStore.uuid,
       }
       facetUuid = $facetStore.uuid
-    } else {
-      facets = await getFacets({
-        uuid: null,
-        fromDate: $date,
-      })
     }
+    facets = await getFacets({
+      uuid: null,
+      fromDate: $date,
+    })
   })
 </script>
 
