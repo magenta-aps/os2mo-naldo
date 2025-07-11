@@ -14,7 +14,7 @@ export const actions: Actions = {
     return {
       uuid: params.address,
       address_type: addressType,
-      ...(userKey && { user_key: userKey }),
+      user_key: userKey,
       value: value,
       ...(visibility && { visibility: visibility }),
       validity: { from: startDate, ...(endDate && { to: endDate }) },
