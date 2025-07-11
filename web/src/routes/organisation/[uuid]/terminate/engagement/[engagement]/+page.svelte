@@ -22,8 +22,8 @@
   const svelteForm = form(toDate)
 
   gql`
-    query Engagement($uuid: [UUID!], $fromDate: DateTime!) {
-      engagements(filter: { uuids: $uuid, from_date: $fromDate }) {
+    query Engagement($uuid: [UUID!]) {
+      engagements(filter: { uuids: $uuid, from_date: null, to_date: null }) {
         objects {
           validities {
             validity {
