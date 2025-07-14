@@ -12,16 +12,25 @@
   let isResizing = false
   let drawerStartX = 0
   let drawerElement: HTMLDivElement
+  let drawerContentWrapper: HTMLDivElement
   let resizeHandle: HTMLButtonElement
 
-  // Function to update the height of the resize handle to match the drawer height
+  // Dynamically adjusts the resize handle's height.
+  // - Ensures the handle is always tall enough to span the full drawer.
+  // - If the drawer's content is taller than the visible viewport, the handle matches that height.
+  // - Otherwise, it uses the drawer's visible height.
   const updateResizeHandleHeight = () => {
-    if (drawerElement && resizeHandle) {
-      resizeHandle.style.height = `${drawerElement.scrollHeight}px`
+    if (drawerElement && drawerContentWrapper && resizeHandle) {
+      const visibleHeight = drawerElement.offsetHeight
+      const contentHeight = drawerContentWrapper.offsetHeight
+      const handleHeight = Math.max(visibleHeight, contentHeight)
+      resizeHandle.style.height = `${handleHeight}px`
     }
   }
 
-  // Mouse move handler
+  // Called continuously during mouse movement while resizing.
+  // Calculates the offset and updates the drawer width in real-time,
+  // keeping a minimum width of 240px.
   const moveComponent = (event: MouseEvent) => {
     if (!isResizing) return
     const offsetX = event.clientX - drawerStartX
@@ -42,11 +51,13 @@
   }
 
   onMount(() => {
-    // Set initial height for resize handle and observe size changes
+    // Initial resize handle height setup
     updateResizeHandleHeight()
 
-    if (drawerElement) {
-      new ResizeObserver(updateResizeHandleHeight).observe(drawerElement)
+    // Automatically re-run height calculation when drawer content grows/shrinks
+    if (drawerContentWrapper) {
+      const observer = new ResizeObserver(updateResizeHandleHeight)
+      observer.observe(drawerContentWrapper)
     }
   })
 </script>
@@ -76,12 +87,12 @@
 
   <div
     bind:this={drawerElement}
-    class="drawer-side fixed h-[calc(100vh-4rem)] overflow-x-hidden overflow-y-auto"
-    style="width: {`${$drawerWidth}px`}"
+    class="drawer-side relative overflow-x-hidden overflow-y-auto"
+    style="height: calc(100vh - 4rem);width: {`${$drawerWidth}px`}"
   >
     <label for="drawer" class="drawer-overlay" />
     <ul class="bg-base-100 w-full h-fit">
-      <div>
+      <div bind:this={drawerContentWrapper}>
         <DrawerContent />
       </div>
     </ul>
