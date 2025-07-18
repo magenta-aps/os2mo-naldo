@@ -45,17 +45,20 @@
     "daisyui": "^4.12.10",
     "date-fns": "^2.30.0",
     "date-fns-tz": "^2.0.1",
-    "graphql": "^16.10.0",
     "gql-query-builder": "^3.8.0",
+    "graphql": "^16.10.0",
     "graphql-request": "^7.1.2",
     "json2csv": "^6.0.0-alpha.2",
     "keycloak-js": "^26.0.7",
+    "moment": "^2.30.1",
     "prettier": "<3.0.0",
     "prettier-plugin-svelte": "<3.0.0",
     "svelte-forms": "^2.3.1",
     "svelte-i18n": "^4.0.0",
     "svelte-select": "^5.8.3",
     "svelte2tsx": "^0.7.21",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "vis-data": "^8.0.1",
+    "vis-timeline": "^8.5.0"
   }
 }

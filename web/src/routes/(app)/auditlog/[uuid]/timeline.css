@@ -1,0 +1,177 @@
+/* =========================================
+   1. GLOBAL FONT & RESET
+   ========================================= */
+.vis-timeline * {
+  font-family: Verdana, sans-serif !important;
+}
+
+/* Current Time Bar (The vertical line) */
+.vis-current-time {
+  background-color: #00244e;
+}
+
+/* =========================================
+   2. ITEMS (The Timeline Blocks)
+   ========================================= */
+.vis-item {
+  background-color: #d1e4ff; /* Light Blue Background */
+  color: #00244e; /* Dark Blue Text */
+  border-radius: 0.25rem;
+  border: 0;
+  font-size: 0.8rem;
+  border-color: #cbd5e1; /* Default border color if borders are added */
+}
+
+.vis-item.vis-selected {
+  background-color: #b2d0fc; /* Slightly darker when selected */
+  border-radius: 0.25rem;
+}
+
+/* Content Alignment inside items */
+.vis-group.subgroup .vis-item .vis-item-content {
+  padding: 0 0.375rem;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+/* Specific styling for items inside Subgroups */
+.vis-timeline .vis-group.subgroup .vis-item {
+  font-size: 0.7rem !important;
+  padding: 0.1rem 0.25rem !important;
+  border: 1px solid #00244e; /* Add border back for subgroup items */
+}
+
+/* =========================================
+   3. GROUPS & LABELS (The Left Panel)
+   ========================================= */
+
+/* Default Border Colors */
+.vis-timeline .vis-group,
+.vis-timeline .vis-label,
+.vis-timeline .vis-axis {
+  border-color: #cbd5e1;
+}
+
+/* -- BORDER CLEANUP -- */
+/* Remove default group borders */
+.vis-timeline .vis-group {
+  border: 0;
+}
+
+/* Add top border ONLY above user groups (except the first one) */
+.vis-timeline .vis-foreground .vis-group.user-group:not(:first-of-type) {
+  border-top: 1px solid #cbd5e1;
+}
+
+/* Remove borders inside label sets */
+.vis-labelset:first-child .vis-label:first-child {
+  border: 0;
+}
+
+.vis-labelset .vis-label {
+  border: 0;
+  border-top: 1px solid #cbd5e1;
+}
+
+/* -- TEXT & PADDING -- */
+
+/* Main Actor Group */
+.vis-label.user-group .vis-inner {
+  font-size: 0.9rem;
+  padding: 0 0.375rem;
+  display: flex;
+  align-items: center;
+}
+
+/* Attribute Subgroups */
+.vis-timeline .vis-label.subgroup {
+  font-size: 0.7rem !important;
+  padding: 0.1rem 0.25rem !important;
+}
+
+.vis-label.subgroup .vis-inner {
+  font-size: 0.72rem;
+  padding: 0 0.375rem;
+  display: flex;
+  align-items: center;
+}
+
+/* -- NESTING LOGIC (Collapsing/Expanding) -- */
+.vis-group-level-unknown-but-gte1 {
+  border: 0;
+  text-align: left;
+}
+
+.vis-ltr .vis-label.vis-nested-group .vis-inner {
+  padding-left: 0;
+  border: 0;
+}
+
+.vis-label.vis-nested-group.vis-group-level-unknown-but-gte1 {
+  border: 0;
+}
+
+.vis-ltr .vis-label:not(.vis-nesting-group):not(.vis-group-level-0) {
+  padding: 0 0.3125rem;
+}
+
+/* Color for nesting group labels */
+.vis-label.vis-nesting-group,
+.vis-time-axis .vis-text {
+  color: #00244e;
+}
+
+/* Hide default arrow icons */
+.vis-label.vis-nesting-group.expanded::before,
+.vis-label.vis-nesting-group.collapsed::before {
+  content: none;
+}
+
+/* =========================================
+   4. TOOLTIPS
+   ========================================= */
+.vis-tooltip {
+  background: #fff !important;
+  padding: 0.5rem !important;
+  border-radius: 0.25rem !important;
+  font-size: 0.8rem;
+  color: #000 !important;
+}
+
+.vis-tooltip div {
+  font-size: 0.8rem;
+  color: #000 !important;
+}
+
+/* Internal Tooltip classes used in the Svelte Template */
+.tooltip-header {
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.tooltip-attr {
+  font-size: 0.7rem;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.tooltip-new {
+  margin: 0.25rem 0;
+  font-weight: normal;
+}
+
+.tooltip-date {
+  font-family: monospace;
+  margin-top: 0.25rem;
+  border-top: 1px solid #eee;
+  padding-top: 0.25rem;
+  color: #555;
+}
+
+.tooltip-note {
+  font-style: italic;
+  margin-top: 0.25rem;
+  color: #666;
+}
