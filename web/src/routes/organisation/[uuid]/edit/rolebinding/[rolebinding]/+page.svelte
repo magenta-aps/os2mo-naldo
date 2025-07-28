@@ -217,7 +217,7 @@
   {@const itUserStartValue = getITUserITSystemName(
     data.rolebindings.objects[0].validities[0].ituser
   )}
-  {@const roleStartValue = data.rolebindings.objects[0].validities[0].role[0]}
+  {@const rolebinding = data.rolebindings.objects[0].validities[0]}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -235,6 +235,7 @@
           />
           <DateInput
             bind:value={toDate}
+            startValue={rolebinding.validity?.to?.split("T")[0]}
             title={capital($_("date.end_date"))}
             id="to"
             min={$fromDate.value ? $fromDate.value : validities.from}
@@ -276,9 +277,9 @@
               title={capital($_("role", { values: { n: 1 } }))}
               id="it-system-role-uuid"
               startValue={itSystemRoles?.some(
-                (role) => role.uuid === roleStartValue.uuid
+                (role) => role.uuid === rolebinding.role[0].uuid
               )
-                ? roleStartValue
+                ? rolebinding.role[0]
                 : undefined}
               bind:name={$role.value}
               errors={$role.errors}
