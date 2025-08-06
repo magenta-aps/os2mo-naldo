@@ -22,6 +22,7 @@ import {
   GetFacetValiditiesDocument,
   FacetsAndClassesDocument,
   FacetDocument,
+  AuditlogDocument,
 } from "./query.generated"
 
 gql`
@@ -92,6 +93,17 @@ gql`
           uuid
           user_key
         }
+      }
+    }
+  }
+  query Auditlog($uuid: [UUID!]) {
+    registrations(filter: { uuids: $uuid }) {
+      objects {
+        uuid
+        note
+        actor
+        start
+        end
       }
     }
   }
@@ -604,4 +616,11 @@ export const checkSDIdentifier = (name: string, user_key: string) => {
     return name
   }
   return `${name} (${user_key})`
+}
+
+export const getAuditlog = async (uuid: string) => {
+  const res = await graphQLClient().request(AuditlogDocument, {
+    uuid: uuid,
+  })
+  return res.registrations.objects
 }
