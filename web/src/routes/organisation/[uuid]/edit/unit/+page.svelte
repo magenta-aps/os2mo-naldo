@@ -134,7 +134,7 @@
   $: {
     const params = {
       currentDate: $date,
-      orgUuid: parent ? parent.uuid : null,
+      orgUuid: parent?.uuid ?? $page.params.uuid ?? null,
       facetUserKeys: ["org_unit_level", "org_unit_type", "time_planning"],
     }
 
