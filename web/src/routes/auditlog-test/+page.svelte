@@ -8,6 +8,7 @@
   import { getAuditlog } from "$lib/util/helpers"
   import Icon from "@iconify/svelte"
   import keyboardArrowDownRounded from "@iconify/icons-material-symbols/keyboard-arrow-down-rounded"
+  import "./timeline.css"
 
   let container: HTMLDivElement
 
@@ -95,6 +96,18 @@
         content: "phone",
         className: "subgroup",
       },
+      {
+        id: "user-3",
+        content: "User 3",
+        nestedGroups: ["user-3-phone"],
+        showNested: true,
+        className: "user-group",
+      },
+      {
+        id: "user-3-phone",
+        content: "phone",
+        className: "subgroup",
+      },
     ])
 
     const items = new DataSet([
@@ -157,74 +170,3 @@
     bind:this={container}
   />
 </div>
-
-<style>
-  :global(.vis-item) {
-    background-color: #d1e4ff;
-    border-radius: 0.25rem;
-    border: 0;
-    font-size: 0.8rem;
-  }
-
-  :global(.vis-item.vis-selected) {
-    background-color: #b2d0fc;
-    border-radius: 0.25rem;
-  }
-
-  /* Remove all default group borders */
-  :global(.vis-timeline .vis-group) {
-    border: 0;
-  }
-
-  /* Add a line ONLY above top-level groups */
-  :global(.vis-timeline .vis-group.user-group:first-child) {
-    border: 0;
-  }
-  :global(.vis-timeline .vis-group.user-group:not(:first-child)) {
-    border: 0;
-    border-top: 1px solid #bfbfbf;
-  }
-
-  :global(.vis-group-level-unknown-but-gte1) {
-    border: 0;
-    text-align: left;
-  }
-  :global(.vis-ltr .vis-label.vis-nested-group .vis-inner) {
-    padding-left: 0.25rem;
-    border: 0;
-  }
-
-  :global(.vis-labelset:first-child .vis-label:first-child) {
-    border: 0;
-  }
-  :global(.vis-labelset .vis-label) {
-    border: 0;
-    border-top: 1px solid #bfbfbf;
-  }
-  :global(.vis-label.vis-nested-group.vis-group-level-unknown-but-gte1) {
-    border: 0;
-  }
-
-  /* Arrow CSS */
-  :global(.vis-label.vis-nesting-group.expanded)::before,
-  :global(.vis-label.vis-nesting-group.collapsed)::before {
-    content: "";
-    display: inline-block;
-    width: 1rem;
-    height: 1rem;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M12.6 12L8.7 8.1q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l4.6 4.6q.15.15.213.325t.062.375t-.062.375t-.213.325l-4.6 4.6q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7z'/%3E%3C/svg%3E");
-    background-size: contain;
-    background-repeat: no-repeat;
-    transform-origin: center center;
-    will-change: transform;
-    vertical-align: middle;
-  }
-
-  :global(.vis-label.vis-nesting-group.expanded)::before {
-    transform: rotate(90deg); /* points down */
-  }
-
-  :global(.vis-label.vis-nesting-group.collapsed)::before {
-    transform: rotate(0deg); /* points right */
-  }
-</style>
