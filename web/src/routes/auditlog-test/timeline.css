@@ -1,0 +1,82 @@
+.vis-item {
+  background-color: #d1e4ff;
+  border-radius: 0.25rem;
+  border: 0;
+  font-size: 0.8rem;
+}
+
+.vis-timeline .vis-group,
+.vis-timeline .vis-label,
+.vis-timeline .vis-item,
+.vis-timeline .vis-axis {
+  border-color: #cbd5e1;
+}
+
+.vis-item.vis-selected {
+  background-color: #b2d0fc;
+  border-radius: 0.25rem;
+}
+
+/* Remove all default group borders */
+.vis-timeline .vis-group {
+  border: 0;
+}
+
+/* Add a top border ONLY above non-first top-level user groups */
+.vis-timeline .vis-foreground .vis-group.user-group:not(:first-of-type) {
+  border-top: 1px solid #cbd5e1;
+}
+
+/* Remove borders and left-align nested groups */
+.vis-group-level-unknown-but-gte1 {
+  border: 0;
+  text-align: left;
+}
+
+/* Adjust padding and remove borders inside nested group labels */
+.vis-ltr .vis-label.vis-nested-group .vis-inner {
+  padding-left: 0.25rem;
+  border: 0;
+}
+
+.vis-labelset:first-child .vis-label:first-child {
+  border: 0;
+}
+
+.vis-labelset .vis-label {
+  border: 0;
+  border-top: 1px solid #cbd5e1;
+}
+
+.vis-label.vis-nested-group.vis-group-level-unknown-but-gte1 {
+  border: 0;
+}
+
+/* Color for nesting group labels */
+.vis-label.vis-nesting-group,
+.vis-time-axis .vis-text {
+  color: #00244e;
+}
+
+/* Arrow icons for expand/collapse */
+.vis-label.vis-nesting-group.expanded::before,
+.vis-label.vis-nesting-group.collapsed::before {
+  content: "";
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%2300244E' d='M12.6 12L8.7 8.1q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l4.6 4.6q.15.15.213.325t.062.375t-.062.375t-.213.325l-4.6 4.6q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  transform-origin: center center;
+  vertical-align: middle;
+  transition: transform 0.3s ease;
+}
+
+.vis-label.vis-nesting-group.expanded::before {
+  transform: rotate(90deg); /* arrow points down */
+}
+
+.vis-label.vis-nesting-group.collapsed::before {
+  transform: rotate(0deg); /* arrow points right */
+}
