@@ -125,6 +125,13 @@ export const json2csv = (data: any[], selectedQueries: SelectedQuery[]): string 
           if (itemsArray && Array.isArray(itemsArray)) {
             if (itemsArray.length) {
               itemsArray.forEach((item: any) => {
+                // Filter out items that are not in the current org_unit / skip if operation is related_units
+                if (
+                  mainQuery.operation !== "related_units" &&
+                  item.org_unit_uuid !== orgUnit.uuid
+                ) {
+                  return
+                }
                 const row: string[] = [...orgUnitData] // Start each row with orgUnitData
 
                 let currentOffset = startOffset

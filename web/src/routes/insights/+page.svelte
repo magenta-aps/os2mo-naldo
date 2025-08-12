@@ -147,20 +147,33 @@
               {
                 operation: "current",
                 variables: { date: { name: "at", value: $date, type: "DateTime" } },
-                fields: selectedQueries
-                  .map((query) => {
-                    // If mainQuery.operation is not org_units, we insert the operation e.g. `engagements {...}`
-                    if (query.mainQuery && query.mainQuery.operation !== "org_units") {
-                      return {
-                        [`${query.mainQuery.operation}(filter: { from_date: $date, to_date: null })`]:
-                          query.chosenFields.map((field) => field.subString),
+                fields: [
+                  "uuid",
+                  ...selectedQueries
+                    .map((query) => {
+                      // If mainQuery.operation is not org_units, we insert the operation e.g. `engagements {...}`
+                      if (
+                        query.mainQuery &&
+                        query.mainQuery.operation !== "org_units"
+                      ) {
+                        return {
+                          [`${query.mainQuery.operation}(filter: { from_date: $date, to_date: null })`]:
+                            [
+                              ...(query.mainQuery.operation === "related_units"
+                                ? []
+                                : ["org_unit_uuid"]),
+                              ...query.chosenFields.map(
+                                (field) => field.subString ?? ""
+                              ),
+                            ],
+                        }
+                        // If operation === org_units, we just add the fields directly - if !mainQuery -> skip
+                      } else {
+                        return query.chosenFields.map((field) => field.subString ?? "")
                       }
-                      // If operation === org_units, we just add the fields directly - if !mainQuery -> skip
-                    } else {
-                      return query.chosenFields.map((field) => field.subString ?? "")
-                    }
-                  })
-                  .flat(),
+                    })
+                    .flat(),
+                ],
               },
             ],
             page_info: ["next_cursor"],
