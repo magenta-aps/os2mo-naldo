@@ -1,5 +1,10 @@
+.vis-timeline * {
+  font-family: Verdana, sans-serif !important;
+}
+
 .vis-item {
   background-color: #d1e4ff;
+  color: #00244e;
   border-radius: 0.25rem;
   border: 0;
   font-size: 0.8rem;
@@ -35,7 +40,7 @@
 
 /* Adjust padding and remove borders inside nested group labels */
 .vis-ltr .vis-label.vis-nested-group .vis-inner {
-  padding-left: 0.25rem;
+  padding-left: 0;
   border: 0;
 }
 
@@ -52,6 +57,10 @@
   border: 0;
 }
 
+.vis-ltr .vis-label:not(.vis-nesting-group):not(.vis-group-level-0) {
+  padding: 0 0.3125rem;
+}
+
 /* Color for nesting group labels */
 .vis-label.vis-nesting-group,
 .vis-time-axis .vis-text {
@@ -61,22 +70,86 @@
 /* Arrow icons for expand/collapse */
 .vis-label.vis-nesting-group.expanded::before,
 .vis-label.vis-nesting-group.collapsed::before {
-  content: "";
-  display: inline-block;
-  width: 1rem;
-  height: 1rem;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%2300244E' d='M12.6 12L8.7 8.1q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l4.6 4.6q.15.15.213.325t.062.375t-.062.375t-.213.325l-4.6 4.6q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7z'/%3E%3C/svg%3E");
-  background-size: contain;
-  background-repeat: no-repeat;
-  transform-origin: center center;
-  vertical-align: middle;
-  transition: transform 0.3s ease;
+  content: none;
 }
 
-.vis-label.vis-nesting-group.expanded::before {
-  transform: rotate(90deg); /* arrow points down */
+/* .vis-label.vis-nesting-group.expanded::after, */
+/* .vis-label.vis-nesting-group.collapsed::after { */
+/*   content: ""; */
+/*   display: inline-block; */
+/*   width: 1rem; */
+/*   height: 1rem; */
+/*   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%2300244E' d='M12.6 12L8.7 8.1q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l4.6 4.6q.15.15.213.325t.062.375t-.062.375t-.213.325l-4.6 4.6q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7z'/%3E%3C/svg%3E"); */
+/*   background-size: contain; */
+/*   background-repeat: no-repeat; */
+/*   transform-origin: center center; */
+/*   vertical-align: middle; */
+/*   transition: transform 0.3s ease; */
+/* } */
+/* .vis-label.vis-nesting-group.expanded::after { */
+/*   transform: rotate(90deg); /* arrow points down */
+*/
+/* } */
+/**/
+/* .vis-label.vis-nesting-group.collapsed::after { */
+/*   transform: rotate(0deg); /* arrow points right */ */
+/* } */
+
+.vis-timeline .vis-label.subgroup {
+  font-size: 0.7rem !important;
+  padding: 0.1rem 0.25rem !important;
 }
 
-.vis-label.vis-nesting-group.collapsed::before {
-  transform: rotate(0deg); /* arrow points right */
+.vis-timeline .vis-group.subgroup .vis-item {
+  font-size: 0.7rem !important;
+  padding: 0.1rem 0.25rem !important;
+}
+
+/* LEFT PANEL: labels */
+.vis-label.user-group .vis-inner {
+  font-size: 0.9rem;
+  padding: 0 0.375rem;
+  display: flex;
+  align-items: center;
+}
+
+.vis-label.subgroup .vis-inner {
+  font-size: 0.72rem;
+  padding: 0 0.375rem;
+  display: flex;
+  align-items: center;
+}
+
+.vis-group.subgroup .vis-item .vis-item-content {
+  padding: 0 0.375rem;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  white-space: nowrap; /* prevent wrapping that would increase height */
+}
+
+/* Has to be at the bottom */
+.vis-tooltip {
+  background: #fff !important;
+  padding: 0.1rem 0.25rem !important;
+  border-radius: 0.25rem !important;
+  font-size: 0.8rem;
+  color: #000 !important;
+}
+
+.vis-tooltip div {
+  font-size: 0.8rem;
+  color: #000 !important;
+}
+
+/* Keep each top-level block stacked */
+div.vis-tooltip > div > div {
+  display: flex;
+  flex-direction: column; /* stack inner elements if needed */
+  gap: 0; /* no extra space between inner elements */
+}
+
+/* Add space only between top-level blocks */
+div.vis-tooltip > div > div + div {
+  margin-top: 0.5rem; /* adjust spacing between blocks */
 }
