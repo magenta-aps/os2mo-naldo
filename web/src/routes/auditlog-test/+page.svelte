@@ -1,16 +1,71 @@
 <script lang="ts">
   import { onMount } from "svelte"
+  import type { TimelineOptions } from "vis-timeline"
   import { Timeline } from "vis-timeline/peer"
-  import { format, parseISO, subDays, addDays } from "date-fns"
-  import type DataItem from "vis-data/peer"
+  import { parseISO, subDays, addDays } from "date-fns"
   import { DataSet } from "vis-data/peer"
   import "vis-timeline/styles/vis-timeline-graph2d.min.css"
   import { getAuditlog } from "$lib/util/helpers"
-  import Icon from "@iconify/svelte"
-  import keyboardArrowDownRounded from "@iconify/icons-material-symbols/keyboard-arrow-down-rounded"
+  import type { TimelineItem, TimelineGroup } from "./timeline.ts"
   import "./timeline.css"
 
   let container: HTMLDivElement
+  let timeline: Timeline
+
+  let createTimeline = (
+    items: DataSet<TimelineItem>,
+    groups: DataSet<TimelineGroup>
+  ) => {
+    // Convert items to array
+    const itemsArray = items.get()
+
+    // Collect all start/end dates
+    const allDates = itemsArray
+      .flatMap((item) => [item.start, item.end ?? item.start])
+      .map((d) => parseISO(d))
+      .sort((a, b) => a.getTime() - b.getTime())
+    const minDate = allDates[0]
+    const maxDate = allDates[allDates.length - 1]
+
+    const paddedStart = subDays(minDate, 7)
+    const paddedEnd = addDays(maxDate, 7)
+
+    const options: TimelineOptions = {
+      start: paddedStart,
+      end: paddedEnd,
+      min: subDays(minDate, 90),
+      max: addDays(maxDate, 90),
+      zoomMin: 1000 * 60 * 60 * 24 * 7, // 1 week
+      zoomMax: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
+      orientation: "top",
+      groupHeightMode: "fixed", // Tell vis we want fixed group heights
+      type: "range",
+      margin: { axis: 4, item: { horizontal: 6, vertical: 2 } },
+      showCurrentTime: false,
+      tooltip: {
+        followMouse: true,
+        overflowMethod: "flip",
+        delay: 150,
+        template: (item) => `
+          <div>
+            ${item.content ? `<div>${item.content}</div>` : ""}
+            ${
+              item.start || item.end
+                ? `
+              <div>
+                ${item.start ? `<span>Gyldig fra: ${item.start}</span>` : ""}
+                ${item.end ? `<span>Gyldig til: ${item.end}</span>` : ""}
+              </div>
+            `
+                : ""
+            }
+            <div>LOL 123</div>
+          </div>
+        `,
+      },
+    }
+    return new Timeline(container, items, groups, options)
+  }
 
   onMount(async () => {
     const data = await getAuditlog("cc0ad4ee-536f-4d78-afc6-e0f99ead6f93")
@@ -66,7 +121,7 @@
     //     end: "2024-01-07",
     //   },
     // ])
-    const groups = new DataSet([
+    const groups: DataSet<TimelineGroup> = new DataSet([
       {
         id: "user-1",
         content: "User 1",
@@ -99,7 +154,7 @@
       {
         id: "user-3",
         content: "User 3",
-        nestedGroups: ["user-3-phone"],
+        nestedGroups: ["user-3-phone", "user-3-address"],
         showNested: true,
         className: "user-group",
       },
@@ -108,14 +163,19 @@
         content: "phone",
         className: "subgroup",
       },
+      {
+        id: "user-3-address",
+        content: "address",
+        className: "subgroup",
+      },
     ])
 
-    const items = new DataSet([
+    const items: DataSet<TimelineItem> = new DataSet([
       // User 1
       {
         id: 1,
         group: "user-1-name",
-        content: "[changed name]",
+        content: "[CHANGED NAME]",
         start: "2025-08-01",
         end: "2025-08-02",
       },
@@ -131,36 +191,25 @@
         group: "user-2-phone",
         content: "[updated phone]",
         start: "2025-08-05",
-        end: "2025-08-06",
+        end: "2025-08-19",
+      },
+      {
+        id: 4,
+        group: "user-3-phone",
+        content: "[updated phone]",
+        start: "2025-08-05",
+        end: "2025-08-19",
+      },
+      {
+        id: 5,
+        group: "user-3-address",
+        content: "[changed address]",
+        start: "2025-08-05",
+        end: "2025-08-19",
       },
     ])
 
-    // Convert to array
-    const itemsArray = items.get()
-
-    const allDates = itemsArray
-      .flatMap((item) => [item.start, item.end ?? item.start])
-      .map((d) => parseISO(d))
-      .sort((a, b) => a.getTime() - b.getTime())
-
-    const minDate = allDates[0]
-    const maxDate = allDates[allDates.length - 1]
-
-    const paddedStart = subDays(minDate, 7) // start of viewport
-    const paddedEnd = addDays(maxDate, 7) // end of viewport
-
-    const options = {
-      start: paddedStart,
-      end: paddedEnd,
-      min: subDays(minDate, 90), // how far back user can scroll/zoom
-      max: addDays(maxDate, 90), // how far forward user can go
-      zoomMin: 1000 * 60 * 60 * 24 * 7, // min zoom: 1 week
-      zoomMax: 1000 * 60 * 60 * 24 * 365 * 10, // max zoom: 10 years
-      orientation: "top",
-      type: "range",
-    }
-
-    new Timeline(container, items, groups, options)
+    timeline = createTimeline(items, groups)
   })
 </script>
 
