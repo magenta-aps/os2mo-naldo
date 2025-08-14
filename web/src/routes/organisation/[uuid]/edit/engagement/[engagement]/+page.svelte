@@ -12,10 +12,7 @@
   import { graphQLClient } from "$lib/util/http"
   import type { FacetValidities } from "$lib/util/getClasses"
   import type { SubmitFunction } from "./$types"
-  import {
-    EngagementAndFacetDocument,
-    UpdateEngagementDocument,
-  } from "./query.generated"
+  import { EngagementDocument, UpdateEngagementDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
@@ -30,12 +27,7 @@
   import { onMount } from "svelte"
 
   gql`
-    query Engagement(
-      $uuid: [UUID!]
-      $orgUnitUuid: [UUID!]
-      $fromDate: DateTime
-      $toDate: DateTime
-    ) {
+    query Engagement($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
       engagements(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
           validities {
@@ -93,16 +85,6 @@
     uuid: string
     name: string
   }
-  let validities: {
-    from: string | undefined | null
-    to: string | undefined | null
-  } = { from: null, to: null }
-
-  onMount(async () => {
-    validities = $page.params.uuid
-      ? await getValidities($page.params.uuid)
-      : { from: null, to: null }
-  })
 
   const fromDate = field("from", "", [required()])
   const orgUnit = field("org_unit", "", [required()])
@@ -139,9 +121,14 @@
       }
     }
 
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
   let facets: FacetValidities[]
   let abortController: AbortController
-  $: if (startDate) {
+  $: {
     // Abort the previous request if a new one is about to start
     if (abortController) abortController.abort()
     abortController = new AbortController()
@@ -153,6 +140,9 @@
     }
 
     ;(async () => {
+      validities = selectedOrgUnit
+        ? await getValidities(selectedOrgUnit.uuid)
+        : { from: null, to: null }
       try {
         facets = await getClasses(params, abortController.signal)
       } catch (err: any) {
@@ -185,7 +175,7 @@
 <div class="divider p-0 m-0 mb-4 w-full" />
 
 <!-- TODO: Fix formatting :yikes: -->
-{#await graphQLClient().request( EngagementAndFacetDocument, { uuid: $page.params.engagement, orgUnitUuid: $page.params.uuid, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), currentDate: $date } )}
+{#await graphQLClient().request( EngagementDocument, { uuid: $page.params.engagement, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), currentDate: $date } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">

@@ -80,6 +80,11 @@
 
   let startDate: string = $date
   let toDate: string
+  let selectedOrgUnit: {
+    uuid: string
+    name: string
+  }
+
   let validities: {
     from: string | undefined | null
     to: string | undefined | null
@@ -140,6 +145,9 @@
     }
 
     ;(async () => {
+      validities = selectedOrgUnit
+        ? await getValidities(selectedOrgUnit.uuid)
+        : { from: null, to: null }
       try {
         facets = await getClasses(params, abortController.signal)
       } catch (err: any) {
@@ -218,11 +226,11 @@
         </div>
         <Search
           type="org-unit"
-          disabled={true}
           startValue={{
             uuid: findClosestValidity(manager.org_unit, $date).uuid,
             name: findClosestValidity(manager.org_unit, $date).name,
           }}
+          bind:value={selectedOrgUnit}
           required={true}
         />
         <Search
