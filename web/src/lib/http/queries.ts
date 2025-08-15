@@ -113,4 +113,15 @@ gql`
       }
     }
   }
+  query Auditlog($uuid: [UUID!]) {
+    registrations(filter: { uuids: $uuid }) {
+      objects {
+        uuid
+        note
+        actor
+        start
+        end
+      }
+    }
+  }
 `

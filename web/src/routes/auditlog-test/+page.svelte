@@ -5,7 +5,7 @@
   import { parseISO, subDays, addDays } from "date-fns"
   import { DataSet } from "vis-data/peer"
   import "vis-timeline/styles/vis-timeline-graph2d.min.css"
-  import { getAuditlog } from "$lib/util/helpers"
+  import { getAuditlog } from "$lib/http/getAuditlog"
   import type { TimelineItem, TimelineGroup } from "./timeline.ts"
   import "./timeline.css"
 
@@ -80,48 +80,8 @@
     //   }))
     // )
 
-    // const groups = new DataSet(
-    //   data.map((reg, i) => ({
-    //     id: reg.uuid + i,
-    //     content: reg.actor,
-    //   }))
-    // )
-    // const groups = new DataSet([
-    //   { id: "user-1", content: "User 1" },
-    //   { id: "user-2", content: "User 2" },
-    // ])
-    // const items = new DataSet([
-    //   {
-    //     id: 1,
-    //     group: "user-1",
-    //     content: "Login",
-    //     start: "2024-01-01",
-    //     end: "2024-01-01",
-    //     title: "User logged in from 192.168.1.10",
-    //   },
-    //   {
-    //     id: 2,
-    //     group: "user-1",
-    //     content: "Profile update",
-    //     start: "2024-01-10",
-    //     end: "2024-01-15",
-    //   },
-    //   {
-    //     id: 3,
-    //     group: "user-1",
-    //     content: "Profile update",
-    //     start: "2024-01-01",
-    //     end: "2024-01-15",
-    //   },
-    //   {
-    //     id: 4,
-    //     group: "user-2",
-    //     content: "Audit event",
-    //     start: "2024-01-03",
-    //     end: "2024-01-07",
-    //   },
-    // ])
     const groups: DataSet<TimelineGroup> = new DataSet([
+      // User 1
       {
         id: "user-1",
         content: "User 1",
@@ -129,16 +89,10 @@
         showNested: true,
         className: "user-group",
       },
-      {
-        id: "user-1-name",
-        content: "name",
-        className: "subgroup",
-      },
-      {
-        id: "user-1-address",
-        content: "address",
-        className: "subgroup",
-      },
+      { id: "user-1-name", content: "name", className: "subgroup" },
+      { id: "user-1-address", content: "address", className: "subgroup" },
+
+      // User 2
       {
         id: "user-2",
         content: "User 2",
@@ -146,11 +100,9 @@
         showNested: true,
         className: "user-group",
       },
-      {
-        id: "user-2-phone",
-        content: "phone",
-        className: "subgroup",
-      },
+      { id: "user-2-phone", content: "phone", className: "subgroup" },
+
+      // User 3
       {
         id: "user-3",
         content: "User 3",
@@ -158,16 +110,41 @@
         showNested: true,
         className: "user-group",
       },
+      { id: "user-3-phone", content: "phone", className: "subgroup" },
+      { id: "user-3-address", content: "address", className: "subgroup" },
+
+      // User 4
       {
-        id: "user-3-phone",
-        content: "phone",
-        className: "subgroup",
+        id: "user-4",
+        content: "User 4",
+        nestedGroups: ["user-4-email", "user-4-phone"],
+        showNested: true,
+        className: "user-group",
       },
+      { id: "user-4-email", content: "email", className: "subgroup" },
+      { id: "user-4-phone", content: "phone", className: "subgroup" },
+
+      // User 5
       {
-        id: "user-3-address",
-        content: "address",
-        className: "subgroup",
+        id: "user-5",
+        content: "User 5",
+        nestedGroups: ["user-5-address"],
+        showNested: true,
+        className: "user-group",
       },
+      { id: "user-5-address", content: "address", className: "subgroup" },
+
+      // User 6
+      {
+        id: "user-6",
+        content: "User 6",
+        nestedGroups: ["user-6-name", "user-6-phone", "user-6-email"],
+        showNested: true,
+        className: "user-group",
+      },
+      { id: "user-6-name", content: "name", className: "subgroup" },
+      { id: "user-6-phone", content: "phone", className: "subgroup" },
+      { id: "user-6-email", content: "email", className: "subgroup" },
     ])
 
     const items: DataSet<TimelineItem> = new DataSet([
@@ -177,35 +154,87 @@
         group: "user-1-name",
         content: "[CHANGED NAME]",
         start: "2025-08-01",
-        end: "2025-08-02",
+        end: "2025-08-15",
       },
       {
         id: 2,
         group: "user-1-address",
         content: "[changed address]",
         start: "2025-08-03",
-        end: "2025-08-04",
+        end: "2025-08-20",
       },
+
+      // User 2
       {
         id: 3,
         group: "user-2-phone",
         content: "[updated phone]",
         start: "2025-08-05",
-        end: "2025-08-19",
+        end: "2025-09-05",
       },
+
+      // User 3
       {
         id: 4,
         group: "user-3-phone",
         content: "[updated phone]",
         start: "2025-08-05",
-        end: "2025-08-19",
+        end: "2025-09-19",
       },
       {
         id: 5,
         group: "user-3-address",
         content: "[changed address]",
         start: "2025-08-05",
-        end: "2025-08-19",
+        end: "2025-08-25",
+      },
+
+      // User 4
+      {
+        id: 6,
+        group: "user-4-email",
+        content: "[new email]",
+        start: "2025-08-10",
+        end: "2025-08-30",
+      },
+      {
+        id: 7,
+        group: "user-4-phone",
+        content: "[updated phone]",
+        start: "2025-08-12",
+        end: "2025-09-12",
+      },
+
+      // User 5
+      {
+        id: 8,
+        group: "user-5-address",
+        content: "[address change]",
+        start: "2025-08-15",
+        end: "2025-09-10",
+      },
+
+      // User 6
+      {
+        id: 9,
+        group: "user-6-name",
+        content: "[name update]",
+        start: "2025-08-18",
+        end: "2025-09-01",
+      },
+      {
+        id: 10,
+        group: "user-6-phone",
+        content: "[phone update]",
+        start: "2025-08-18",
+        end: "2025-09-15",
+      },
+      {
+        id: 11,
+        group: "user-6-email",
+        content: "[email update]",
+        start: "2025-08-20",
+        end: "2025-09-20",
       },
     ])
 
