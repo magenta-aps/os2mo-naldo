@@ -3277,6 +3277,7 @@ export type EmployeesBoundManagerFilter = {
   employee?: InputMaybe<EmployeeFilter>;
   exclude?: InputMaybe<EmployeeFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  manager_type?: InputMaybe<ClassFilter>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   registration?: InputMaybe<ManagerRegistrationFilter>;
@@ -7426,6 +7427,11 @@ export type ManagerFilter = {
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
+   * Manager_type filter limiting which entries are returned.
+   *
+   */
+  manager_type?: InputMaybe<ClassFilter>;
+  /**
    * Organisation Unit filter limiting which entries are returned.
    *
    */
@@ -9456,6 +9462,7 @@ export type OrgUnitsboundmanagerfilter = {
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   exclude?: InputMaybe<EmployeeFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  manager_type?: InputMaybe<ClassFilter>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   registration?: InputMaybe<ManagerRegistrationFilter>;
   responsibility?: InputMaybe<ClassFilter>;
