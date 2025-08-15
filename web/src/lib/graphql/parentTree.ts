@@ -2,21 +2,6 @@ import { graphQLClient } from "$lib/util/http"
 import { gql } from "graphql-request"
 import { GetParentDocument } from "./query.generated"
 
-gql`
-  query GetParent($uuid: [UUID!], $currentDate: DateTime) {
-    org_units(filter: { uuids: $uuid, from_date: $currentDate }) {
-      objects {
-        current(at: $currentDate) {
-          parent(filter: { from_date: $currentDate }) {
-            name
-            uuid
-          }
-        }
-      }
-    }
-  }
-`
-
 const fetchParent = async (uuid: string, currentDate: string) => {
   const res = await graphQLClient().request(GetParentDocument, {
     uuid: uuid,
