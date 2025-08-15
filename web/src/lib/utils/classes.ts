@@ -2,20 +2,20 @@ import { _ } from "svelte-i18n"
 import { capital } from "$lib/util/translationUtils"
 import { get } from "svelte/store"
 
-export type Facet = {
-  objects: {
-    uuid: any
-    user_key: string
-    classes?: { name: string; uuid: any; user_key: string }[]
-  }[]
-}
-
 // This should replace the `Facet`-type at some point
 export type FacetValidities = {
   validities: {
     uuid: any
     user_key: string
     classes?: { name: string; uuid: any; user_key: string }[]
+  }[]
+}
+
+export type Class = {
+  validities: {
+    uuid: any
+    user_key: string
+    name?: string
   }[]
 }
 
@@ -28,24 +28,6 @@ export const getClassesByFacetUserKey = (
     throw new Error("user_key did not match any of the given facets")
   }
   return foundFacet.validities[0].classes?.sort((a, b) => (a.name > b.name ? 1 : -1))
-}
-
-// `get(_)` for translations since `$_` is a store and doesn't work in .ts files
-export const sortFacets = (facets: FacetValidities[]) => {
-  return facets
-    .map((e) => ({
-      name: capital(get(_)("facets.name." + e.validities[0].user_key)),
-      uuid: e.validities[0].uuid,
-    }))
-    .sort((a, b) => (a.name > b.name ? 1 : -1))
-}
-
-type Class = {
-  validities: {
-    uuid: any
-    user_key: string
-    name?: string
-  }[]
 }
 
 export const getClassUuidByUserKey = (classes: Class[], user_key: string) => {
