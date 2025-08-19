@@ -6,8 +6,6 @@
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import OnboardingFormButtons from "$lib/components/userflow/OnboardingFormButtons.svelte"
-  import { form, field } from "svelte-forms"
-  import { required, pattern } from "svelte-forms/validators"
   import CprLookup from "$lib/components/forms/shared/CPRLookup.svelte"
   import CPRInput from "$lib/components/userflow/CPRInput.svelte"
   import { graphQLClient } from "$lib/util/http"
@@ -38,34 +36,25 @@
       $employeeInfo.lastName = ""
     }
   }
+  const cprRegex = /^\d{6}[- ]?\d{4}$/
 
-  const cprNumber = field("cpr_number", undefined, [
-    required(),
-    pattern(/^\d{6}\d{4}$/),
-  ])
-  const firstName = field("first_name", "", [required()])
-  const lastName = field("last_name", "", [required()])
-  const svelteForm = form(cprNumber, firstName, lastName)
-
-  const validateOnFocusOut = async () => {
-    await svelteForm.validate()
-    employeeInfo.isValid($svelteForm.valid)
-  }
-
-  const validateOnFormSubmit = async () => {
-    await svelteForm.validate()
-    if ($svelteForm.valid) {
-      employeeInfo.isValid(true)
-      step.updateStep("inc")
-    } else {
-      employeeInfo.isValid(false)
-    }
-  }
+  $: cpr = $employeeInfo?.cprNumber?.cpr_no ?? ""
+  $: cprErrors =
+    $employeeInfo.validated === false
+      ? cpr.length === 0
+        ? ["required"]
+        : !cprRegex.test(cpr)
+        ? ["pattern"]
+        : []
+      : []
 </script>
 
 <form
-  on:submit|preventDefault={async () => await validateOnFormSubmit()}
-  on:focusout={async () => await validateOnFocusOut()}
+  on:submit|preventDefault={async () => {
+    if (await employeeInfo.validateForm()) {
+      step.updateStep("inc")
+    }
+  }}
 >
   {#await graphQLClient().request(GetSpConfigDocument)}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -90,8 +79,8 @@
             title={capital($_("cpr_number"))}
             id="cpr-number"
             bind:value={$employeeInfo.cprNumber}
-            bind:cprNumber={$cprNumber.value}
-            errors={$cprNumber.errors}
+            bind:cprNumber={$employeeInfo.cprNumber.cpr_no}
+            errors={cprErrors}
           />
           <!-- If we get a response with empty name property, it means that a fictional CPR-number has been entered. -->
           <!-- Therefore we allow typing a name, rather than making the input read-only. -->
@@ -101,8 +90,9 @@
                 title={capital($_("givenname", { values: { n: 2 } }))}
                 id="first-name"
                 bind:value={$employeeInfo.firstName}
-                bind:cprName={$firstName.value}
-                errors={$firstName.errors}
+                errors={$employeeInfo.validated === false && !$employeeInfo.firstName
+                  ? ["required"]
+                  : []}
                 extra_classes="basis-1/2"
                 required={true}
               />
@@ -110,8 +100,9 @@
                 title={capital($_("surname"))}
                 id="last-name"
                 bind:value={$employeeInfo.lastName}
-                bind:cprName={$lastName.value}
-                errors={$lastName.errors}
+                errors={$employeeInfo.validated === false && !$employeeInfo.lastName
+                  ? ["required"]
+                  : []}
                 extra_classes="basis-1/2"
                 required={true}
               />
@@ -122,8 +113,9 @@
                 title={capital($_("givenname", { values: { n: 2 } }))}
                 id="first-name"
                 bind:value={$employeeInfo.firstName}
-                bind:cprName={$firstName.value}
-                errors={$firstName.errors}
+                errors={$employeeInfo.validated === false && !$employeeInfo.firstName
+                  ? ["required"]
+                  : []}
                 extra_classes="basis-1/2"
                 required={true}
                 readonly
@@ -132,8 +124,9 @@
                 title={capital($_("surname"))}
                 id="last-name"
                 bind:value={$employeeInfo.lastName}
-                bind:cprName={$lastName.value}
-                errors={$lastName.errors}
+                errors={$employeeInfo.validated === false && !$employeeInfo.lastName
+                  ? ["required"]
+                  : []}
                 extra_classes="basis-1/2"
                 required={true}
                 readonly
@@ -146,8 +139,7 @@
             id="cpr-number"
             startValue={$employeeInfo.cprNumber.cpr_no}
             bind:cprObject={$employeeInfo.cprNumber}
-            bind:cprNumber={$cprNumber.value}
-            errors={$cprNumber.errors}
+            errors={cprErrors}
             required={true}
           />
           <div class="flex flex-row gap-6">
@@ -155,8 +147,9 @@
               title={capital($_("givenname", { values: { n: 2 } }))}
               id="first-name"
               bind:value={$employeeInfo.firstName}
-              bind:cprName={$firstName.value}
-              errors={$firstName.errors}
+              errors={$employeeInfo.validated === false && !$employeeInfo.firstName
+                ? ["required"]
+                : []}
               extra_classes="basis-1/2"
               required={true}
             />
@@ -164,8 +157,9 @@
               title={capital($_("surname"))}
               id="last-name"
               bind:value={$employeeInfo.lastName}
-              bind:cprName={$lastName.value}
-              errors={$lastName.errors}
+              errors={$employeeInfo.validated === false && !$employeeInfo.lastName
+                ? ["required"]
+                : []}
               extra_classes="basis-1/2"
               required={true}
             />

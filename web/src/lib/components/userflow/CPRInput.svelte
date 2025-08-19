@@ -26,7 +26,7 @@
     node.type = type
   }
 
-  $: if (value) {
+  $: {
     cprNumber = value
     cprObject = {
       name: "",

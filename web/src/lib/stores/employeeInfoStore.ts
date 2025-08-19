@@ -2,27 +2,40 @@ import { browser } from "$app/environment"
 import { writable } from "svelte/store"
 import { v4 as uuidv4 } from "uuid"
 
-type EmployeeInfo = {
+export type EmployeeInfo = {
   uuid: string
   cprNumber: { name: string; cpr_no: string }
   firstName: string
   lastName: string
   nicknameFirstname: string
   nicknameLastname: string
-  validated: boolean
+  validated?: boolean
 }
 
-const defaultValue: EmployeeInfo = {
+export const createDefaultEmployee = (): EmployeeInfo => ({
   uuid: uuidv4(),
   cprNumber: { name: "", cpr_no: "" },
   firstName: "",
   lastName: "",
   nicknameFirstname: "",
   nicknameLastname: "",
-  validated: false,
+  validated: undefined,
+})
+
+const cprRegex = /^\d{6}\d{4}$/
+
+export const validateEmployee = (employee: EmployeeInfo): boolean => {
+  return (
+    !!employee.firstName &&
+    !!employee.lastName &&
+    !!employee.cprNumber &&
+    cprRegex.test(employee.cprNumber.cpr_no)
+  )
 }
 
-const createEmployeeInfoStore = () => {
+export const employeeInfo = (() => {
+  const defaultValue: EmployeeInfo = createDefaultEmployee()
+
   let initialValue = defaultValue
 
   if (browser) {
@@ -32,18 +45,6 @@ const createEmployeeInfoStore = () => {
 
   const { subscribe, update, set } = writable<EmployeeInfo>(initialValue)
 
-  const reset = () => {
-    if (browser) localStorage.removeItem("employee-info")
-    set(defaultValue)
-  }
-
-  const isValid = (valid: boolean) => {
-    update((employeeStore) => {
-      employeeStore.validated = valid
-      return employeeStore
-    })
-  }
-
   subscribe((value) => {
     if (browser) localStorage.setItem("employee-info", JSON.stringify(value))
   })
@@ -51,9 +52,20 @@ const createEmployeeInfoStore = () => {
   return {
     subscribe,
     set,
-    reset,
-    isValid,
-  }
-}
+    update,
+    reset: () => {
+      if (browser) localStorage.removeItem("employee-info")
+      set(createDefaultEmployee())
+    },
+    validateForm: () => {
+      let isValid = false
+      update((employee) => {
+        const validated = validateEmployee(employee)
+        isValid = validated
 
-export const employeeInfo = createEmployeeInfoStore()
+        return { ...employee, validated }
+      })
+      return isValid
+    },
+  }
+})()
