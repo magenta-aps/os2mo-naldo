@@ -1,10 +1,72 @@
 import { env } from "$env/dynamic/public"
-import type { OpenValidity, Validity } from "$lib/graphql/types"
 import { date } from "$lib/stores/date"
-import { keycloak } from "$lib/util/keycloak"
-import { _, locale } from "svelte-i18n"
-import { capital } from "$lib/util/translationUtils"
+import { keycloak } from "$lib/auth/keycloak"
+import { _ } from "svelte-i18n"
 import { get } from "svelte/store"
+
+export type ITUserITSystemName = {
+  uuid: string
+  user_key: string
+  itsystem: {
+    name: string
+    uuid?: string
+  }
+}
+
+export const formatITUserITSystemName = (itusers: ITUserITSystemName[] | undefined) => {
+  return itusers?.map((ituser) => ({
+    uuid: ituser.uuid,
+    name: `${ituser.itsystem.name}, ${ituser.user_key}`,
+    itsystem: { uuid: ituser.itsystem.uuid },
+  }))
+}
+
+// Used to display both job_function-name and org-name on a single line, for example, in a dropdown select.
+export type EngagementTitleAndUuid = {
+  uuid: string
+  job_function: { name: string }
+  org_unit: { name: string }[]
+}
+
+export const formatEngagementTitlesAndUuid = (
+  engagements: EngagementTitleAndUuid[]
+) => {
+  return engagements.map((engagement) => ({
+    uuid: engagement.uuid,
+    name: `${engagement.job_function.name}, ${engagement.org_unit[0].name}`,
+  }))
+}
+
+export type KleNumberTitleAndUuid = {
+  uuid: string
+  name: string
+  user_key: string
+}
+
+export const formatKleNumberTitleAndUuid = (kles: KleNumberTitleAndUuid[]) => {
+  const KleNumbers = kles.map((kle) => ({
+    uuid: kle.uuid,
+    name: `${kle.user_key} - ${kle.name}`,
+  }))
+  return KleNumbers.sort((a, b) => (a.name > b.name ? 1 : -1))
+}
+
+type ITSystem = {
+  current?: {
+    uuid: string
+    name: string
+  } | null
+}
+
+export const formatITSystemNames = (itsystems: ITSystem[]) => {
+  const ITSystems = itsystems
+    .filter((itsystem) => itsystem.current && itsystem.current !== null)
+    .map((itsystem) => ({
+      uuid: itsystem.current!.uuid,
+      name: itsystem.current!.name,
+    }))
+  return ITSystems.sort((a, b) => (a.name > b.name ? 1 : -1))
+}
 
 // Type used for Multi-select
 export type UnpackedClass = {
@@ -37,4 +99,12 @@ export const checkSDIdentifier = (name: string, user_key: string) => {
     return name
   }
   return `${name} (${user_key})`
+}
+
+export const capital = (str: string) => {
+  return str.replace(/(^|\s)\S/, (l) => l.toLocaleUpperCase())
+}
+
+export const upperCase = (str: string) => {
+  return str.toUpperCase()
 }

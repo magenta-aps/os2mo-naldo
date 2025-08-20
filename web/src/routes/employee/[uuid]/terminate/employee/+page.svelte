@@ -1,13 +1,13 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { success, error } from "$lib/stores/alert"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import { EmployeeDocument, TerminateEmployeeDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { base } from "$app/paths"
@@ -16,7 +16,7 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getMinMaxValidities } from "$lib/util/helpers"
+  import { getMinMaxValidities } from "$lib/utils/validities"
 
   const toDate = field("to", "", [required()])
   const svelteForm = form(toDate)

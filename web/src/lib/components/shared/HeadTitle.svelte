@@ -1,9 +1,9 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { EmployeeDocument, OrgUnitDocument } from "./query.generated"
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
   import AuditlogTable from "$lib/components/tables/AuditlogTable.svelte"
   import DetailTable from "$lib/components/shared/DetailTable.svelte"

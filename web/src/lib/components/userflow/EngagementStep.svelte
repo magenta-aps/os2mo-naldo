@@ -1,23 +1,23 @@
 <script lang="ts">
   import { step } from "$lib/stores/stepStore"
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import { engagementInfo } from "$lib/stores/engagementInfoStore"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
   import OnboardingFormButtons from "$lib/components/userflow/OnboardingFormButtons.svelte"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import { EngagementFacetsDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { date } from "$lib/stores/date"
-  import { getClassesByFacetUserKey } from "$lib/util/getClasses"
+  import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import Search from "$lib/components/search/Search.svelte"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import OnboardingTab from "$lib/components/userflow/OnboardingTab.svelte"
-  import { getValidities } from "$lib/util/helpers"
+  import { getValidities } from "$lib/http/getValidities"
   import { env } from "$lib/env"
 
   gql`
@@ -147,7 +147,7 @@
             errors={engagement.validated === false && !engagement.jobFunction?.uuid
               ? ["required"]
               : []}
-            iterable={getClassesByFacetUserKey(facets, "engagement_job_function")}
+            iterable={filterClassesByFacetUserKey(facets, "engagement_job_function")}
             required={true}
             extra_classes="basis-1/2"
           />
@@ -160,7 +160,7 @@
             errors={engagement.validated === false && !engagement.engagementType?.uuid
               ? ["required"]
               : []}
-            iterable={getClassesByFacetUserKey(facets, "engagement_type")}
+            iterable={filterClassesByFacetUserKey(facets, "engagement_type")}
             required={true}
             extra_classes="basis-1/2"
           />
@@ -168,7 +168,7 @@
             title={capital($_("primary"))}
             id="primary"
             bind:value={engagement.primary}
-            iterable={getClassesByFacetUserKey(facets, "primary_type")}
+            iterable={filterClassesByFacetUserKey(facets, "primary_type")}
             extra_classes="basis-1/2"
             isClearable={true}
           />

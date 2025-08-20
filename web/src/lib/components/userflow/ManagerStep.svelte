@@ -2,22 +2,22 @@
   import { step } from "$lib/stores/stepStore"
   import { managerInfo } from "$lib/stores/managerInfoStore"
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
   import OnboardingFormButtons from "$lib/components/userflow/OnboardingFormButtons.svelte"
   import OnboardingTab from "$lib/components/userflow/OnboardingTab.svelte"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { ManagerFacetsDocument } from "./query.generated"
   import { date } from "$lib/stores/date"
-  import { getClassesByFacetUserKey } from "$lib/util/getClasses"
+  import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import Search from "$lib/components/search/Search.svelte"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import SelectMultiple from "$lib/components/forms/shared/SelectMultiple.svelte"
-  import { getValidities } from "$lib/util/helpers"
+  import { getValidities } from "$lib/http/getValidities"
 
   gql`
     query ManagerFacets($currentDate: DateTime!) {
@@ -131,7 +131,7 @@
             errors={manager.validated === false && !manager.managerType?.uuid
               ? ["required"]
               : []}
-            iterable={getClassesByFacetUserKey(facets, "manager_type")}
+            iterable={filterClassesByFacetUserKey(facets, "manager_type")}
             extra_classes="basis-1/2"
             required={true}
           />
@@ -142,7 +142,7 @@
             errors={manager.validated === false && !manager.managerLevel?.uuid
               ? ["required"]
               : []}
-            iterable={getClassesByFacetUserKey(facets, "manager_level")}
+            iterable={filterClassesByFacetUserKey(facets, "manager_level")}
             extra_classes="basis-1/2"
             required={true}
           />
@@ -155,7 +155,7 @@
           on:clear={() => (manager.responsibilities = [])}
           title={capital($_("manager_responsibility"))}
           id="responsibility"
-          iterable={getClassesByFacetUserKey(facets, "responsibility")}
+          iterable={filterClassesByFacetUserKey(facets, "responsibility")}
           required={true}
         />
       </div>

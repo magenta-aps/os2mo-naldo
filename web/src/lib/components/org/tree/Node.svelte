@@ -2,7 +2,7 @@
   import { _ } from "svelte-i18n"
   import { base } from "$app/paths"
   import { page } from "$app/stores"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { onMount } from "svelte"
   import {
@@ -13,7 +13,7 @@
   } from "./query.generated"
   import Icon from "@iconify/svelte"
   import keyboardArrowDownRounded from "@iconify/icons-material-symbols/keyboard-arrow-down-rounded"
-  import { checkSDIdentifier } from "$lib/util/helpers"
+  import { checkSDIdentifier } from "$lib/utils/helpers"
 
   export let name = ""
   export let user_key = ""

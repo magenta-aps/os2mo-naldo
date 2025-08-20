@@ -1,17 +1,17 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import ValidityTableCell from "$lib/components/shared/ValidityTableCell.svelte"
   import { page } from "$app/stores"
   import { base } from "$app/paths"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import { RelatedUnitsDocument, type RelatedUnitsQuery } from "./query.generated"
   import { gql } from "graphql-request"
   import { date } from "$lib/stores/date"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
-  import { sortData } from "$lib/util/sorting"
+  import { sortData } from "$lib/utils/sorting"
   import { onMount } from "svelte"
-  import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
+  import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { updateGlobalNavigation } from "$lib/stores/navigation"
 
   type RelatedUnits = RelatedUnitsQuery["related_units"]["objects"][0]["validities"]

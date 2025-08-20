@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital, upperCase } from "$lib/util/translationUtils"
+  import { capital, upperCase } from "$lib/utils/helpers"
   import { page } from "$app/stores"
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
   import CopyToClipboard from "$lib/components/shared/Clipboard.svelte"
@@ -10,7 +10,7 @@
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
   import { gql } from "graphql-request"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import { OrgUnitDocument, type OrgUnitQuery } from "./query.generated"
   import { onMount } from "svelte"
   import TableTensesWrapper from "$lib/components/tables/TableTensesWrapper.svelte"
@@ -27,7 +27,7 @@
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Tabs from "$lib/components/shared/Tabs.svelte"
   import { MOConfig } from "$lib/stores/config"
-  import { tenseFilter } from "$lib/util/helpers"
+  import { tenseFilter } from "$lib/utils/tenses"
   import { env } from "$lib/env"
 
   // Tabs

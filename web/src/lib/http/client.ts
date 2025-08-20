@@ -1,5 +1,5 @@
 import { env } from "$lib/env"
-import { keycloak } from "$lib/util/keycloak"
+import { keycloak } from "$lib/auth/keycloak"
 import { GraphQLClient } from "graphql-request"
 
 // Is exported as a function to delay evaluation of till the client is ready

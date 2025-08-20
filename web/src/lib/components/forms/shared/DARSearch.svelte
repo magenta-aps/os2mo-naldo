@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import { env } from "$lib/env"
   import SvelteSelect from "svelte-select"
   import DarItem from "$lib/components/forms/shared/DARItem.svelte"

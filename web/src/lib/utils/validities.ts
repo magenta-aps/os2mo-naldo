@@ -6,6 +6,7 @@ import {
   addSeconds,
   differenceInCalendarDays,
 } from "date-fns"
+import type { OpenValidity, Validity } from "$lib/graphql/types"
 
 export const getMinMaxValidities = (
   validities: { validity: Validity | OpenValidity }[] | undefined | null

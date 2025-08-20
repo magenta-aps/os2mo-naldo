@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
@@ -9,18 +9,19 @@
   import { enhance } from "$app/forms"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import { CreateEngagementDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import type { SubmitFunction } from "./$types"
-  import type { FacetValidities } from "$lib/util/getClasses"
-  import { getClassesByFacetUserKey } from "$lib/util/getClasses"
+  import type { FacetValidities } from "$lib/utils/classes"
+  import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import Search from "$lib/components/search/Search.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
-  import { getClasses, getValidities } from "$lib/util/helpers"
+  import { getClasses } from "$lib/http/getClasses"
+  import { getValidities } from "$lib/http/getValidities"
   import { env } from "$lib/env"
   import { onMount } from "svelte"
 
@@ -168,7 +169,7 @@
             id="job-function"
             bind:name={$jobFunction.value}
             errors={$jobFunction.errors}
-            iterable={getClassesByFacetUserKey(facets, "engagement_job_function")}
+            iterable={filterClassesByFacetUserKey(facets, "engagement_job_function")}
             required={true}
             extra_classes="basis-1/2"
           />
@@ -197,14 +198,14 @@
             id="engagement-type"
             bind:name={$engagementType.value}
             errors={$engagementType.errors}
-            iterable={getClassesByFacetUserKey(facets, "engagement_type")}
+            iterable={filterClassesByFacetUserKey(facets, "engagement_type")}
             required={true}
             extra_classes="basis-1/2"
           />
           <Select
             title={capital($_("primary"))}
             id="primary"
-            iterable={getClassesByFacetUserKey(facets, "primary_type")}
+            iterable={filterClassesByFacetUserKey(facets, "primary_type")}
             extra_classes="basis-1/2"
             isClearable={true}
           />

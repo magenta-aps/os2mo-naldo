@@ -1,7 +1,7 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
-  import { graphQLClient } from "$lib/util/http"
+  import { capital } from "$lib/utils/helpers"
+  import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { GetFileNamesDocument, GetFileDocument } from "./query.generated"
   import Icon from "@iconify/svelte"

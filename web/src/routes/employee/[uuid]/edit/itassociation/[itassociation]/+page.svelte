@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
@@ -10,7 +10,7 @@
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import {
     ItAssociationAndFacetsDocument,
     UpdateItAssociationDocument,
@@ -18,9 +18,13 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import { getClassUuidByUserKey, getClassesByFacetUserKey } from "$lib/util/getClasses"
+  import {
+    filterClassUuidByUserKey,
+    filterClassesByFacetUserKey,
+  } from "$lib/utils/classes"
   import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
-  import { getITUserITSystemName, getValidities } from "$lib/util/helpers"
+  import { formatITUserITSystemName } from "$lib/utils/helpers"
+  import { getValidities } from "$lib/http/getValidities"
   import Search from "$lib/components/search/Search.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
@@ -230,7 +234,7 @@
   {@const itusers = itassociation.person[0].itusers}
   {@const facets = data.facets.objects}
   {@const classes = data.classes.objects}
-  {@const itUserStartValue = getITUserITSystemName(itassociation.it_user)}
+  {@const itUserStartValue = formatITUserITSystemName(itassociation.it_user)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -286,7 +290,7 @@
             startValue={itUserStartValue?.[0]}
             bind:name={$itUser.value}
             errors={$itUser.errors}
-            iterable={getITUserITSystemName(itusers ?? [])}
+            iterable={formatITUserITSystemName(itusers)}
             extra_classes="basis-1/2"
             required={true}
           />
@@ -300,7 +304,7 @@
               : undefined}
             bind:name={$jobFunction.value}
             errors={$jobFunction.errors}
-            iterable={getClassesByFacetUserKey(facets, "engagement_job_function")}
+            iterable={filterClassesByFacetUserKey(facets, "engagement_job_function")}
             extra_classes="basis-1/2"
             required={true}
           />
@@ -310,14 +314,14 @@
             title={capital($_("primary"))}
             id="primary"
             startValue={itassociation.primary?.uuid}
-            value={getClassUuidByUserKey(classes, "primary")}
+            value={filterClassUuidByUserKey(classes, "primary")}
           />
         </div>
         <input
           hidden
           name="non-primary"
           id="non-primary"
-          value={getClassUuidByUserKey(classes, "non-primary")}
+          value={filterClassUuidByUserKey(classes, "non-primary")}
         />
       </div>
     </div>

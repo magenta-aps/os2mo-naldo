@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
@@ -10,16 +10,14 @@
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import { getClassesByFacetUserKey } from "$lib/util/getClasses"
+  import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import { LeaveAndFacetDocument, UpdateLeaveDocument } from "./query.generated"
-  import {
-    getEngagementTitlesAndUuid,
-    getEngagementValidities,
-  } from "$lib/util/helpers"
+  import { formatEngagementTitlesAndUuid } from "$lib/utils/helpers"
+  import { getEngagementValidities } from "$lib/http/getValidities"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Search from "$lib/components/search/Search.svelte"
@@ -199,7 +197,7 @@
   {@const facets = data.facets.objects}
   {@const engagements = leave.person[0].engagements}
   {@const employee = leave.person[0]}
-  {@const engagementStartValue = getEngagementTitlesAndUuid([leave.engagement])[0]}
+  {@const engagementStartValue = formatEngagementTitlesAndUuid([leave.engagement])[0]}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -231,7 +229,7 @@
           id="leave-type-uuid"
           bind:name={$leaveType.value}
           errors={$leaveType.errors}
-          iterable={getClassesByFacetUserKey(facets, "leave_type")}
+          iterable={filterClassesByFacetUserKey(facets, "leave_type")}
           required={true}
         />
         <Search
@@ -250,7 +248,7 @@
           bind:value={selectedEngagement}
           bind:name={$engagement.value}
           errors={$engagement.errors}
-          iterable={getEngagementTitlesAndUuid(engagements)}
+          iterable={formatEngagementTitlesAndUuid(engagements)}
           required={true}
         />
       </div>

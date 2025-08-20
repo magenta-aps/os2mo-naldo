@@ -1,3 +1,8 @@
+import { env } from "$env/dynamic/public"
+import { _ } from "svelte-i18n"
+import { get } from "svelte/store"
+import { capital } from "$lib/utils/helpers"
+
 export type Field = {
   value: string
   subString: string

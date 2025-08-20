@@ -1,4 +1,4 @@
-import type * as Types from './types';
+import type * as Types from '../graphql/types';
 
 import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type GetParentQueryVariables = Types.Exact<{

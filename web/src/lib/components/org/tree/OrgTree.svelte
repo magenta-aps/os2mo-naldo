@@ -1,11 +1,11 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import { page } from "$app/stores"
-  import { graphQLClient } from "$lib/util/http"
-  import { fetchParentTree } from "$lib/util/parentTree"
+  import { graphQLClient } from "$lib/http/client"
+  import { fetchParentTree } from "$lib/http/parentTree"
   import Node from "$lib/components/org/tree/Node.svelte"
-  import type { FacetValidities } from "$lib/util/getClasses"
+  import type { FacetValidities } from "$lib/utils/classes"
   import { success } from "$lib/stores/alert"
   import { date } from "$lib/stores/date"
   import { globalNavigation } from "$lib/stores/navigation"
@@ -18,8 +18,8 @@
     OrgUnitsWithFilteredChildrenDocument,
   } from "./query.generated"
   import { type OrgTreeItem } from "$lib/components/org/tree/orgTree"
-  import { getClasses } from "$lib/util/helpers"
-  import { getClassesByFacetUserKey } from "$lib/util/getClasses"
+  import { getClasses } from "$lib/http/getClasses"
+  import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import Select from "$lib/components/forms/shared/Select.svelte"
   import { onMount } from "svelte"
 
@@ -127,7 +127,7 @@
       facetUserKeys: ["org_unit_hierarchy"],
     })
     hierarchyClasses =
-      getClassesByFacetUserKey(hierarchies, "org_unit_hierarchy")?.flat() ?? []
+      filterClassesByFacetUserKey(hierarchies, "org_unit_hierarchy")?.flat() ?? []
 
     const storedUuid = $orgUnitHierarchyStore
     selectedHierarchy =

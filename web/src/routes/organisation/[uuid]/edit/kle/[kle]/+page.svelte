@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
@@ -10,17 +10,18 @@
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import { KleAndFacetDocument, UpdateKleDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import { getClassesByFacetUserKey } from "$lib/util/getClasses"
+  import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import SelectMultiple from "$lib/components/forms/shared/SelectMultiple.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getKleNumberTitleAndUuid, getMinMaxValidities } from "$lib/util/helpers"
+  import { formatKleNumberTitleAndUuid } from "$lib/utils/helpers"
+  import { getMinMaxValidities } from "$lib/utils/validities"
 
   let toDate: string
   const fromDate = field("from", "", [required()])
@@ -152,7 +153,7 @@
 {:then data}
   {@const kle = data.kles.objects[0].validities[0]}
   {@const facets = data.facets.objects}
-  {@const kleNumbers = getClassesByFacetUserKey(facets, "kle_number")}
+  {@const kleNumbers = filterClassesByFacetUserKey(facets, "kle_number")}
   {@const validities = getMinMaxValidities(data.kles.objects[0].validities[0].org_unit)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
@@ -184,7 +185,7 @@
           startValue={kle.kle_number[0]}
           bind:name={$kleNumber.value}
           errors={$kleNumber.errors}
-          iterable={getKleNumberTitleAndUuid(kleNumbers ? kleNumbers : [])}
+          iterable={formatKleNumberTitleAndUuid(kleNumbers ? kleNumbers : [])}
           required={true}
         />
         <SelectMultiple
@@ -193,7 +194,7 @@
           title={capital($_("kle_aspect"))}
           id="kle-aspects"
           startValue={kle.kle_aspects}
-          iterable={getClassesByFacetUserKey(facets, "kle_aspect")}
+          iterable={filterClassesByFacetUserKey(facets, "kle_aspect")}
           required={true}
         />
       </div>

@@ -1,8 +1,8 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import { success, error } from "$lib/stores/alert"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
@@ -20,13 +20,13 @@
   import type { SubmitFunction } from "./$types"
   import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
   import { date } from "$lib/stores/date"
-  import { getClassUuidByUserKey } from "$lib/util/getClasses"
-  import { getITSystemNames } from "$lib/util/helpers"
+  import { filterClassUuidByUserKey } from "$lib/utils/classes"
+  import { formatITSystemNames } from "$lib/utils/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
-  import { getMinMaxValidities } from "$lib/util/helpers"
+  import { getMinMaxValidities } from "$lib/utils/validities"
   import { MOConfig } from "$lib/stores/config"
   import { env } from "$lib/env"
 
@@ -223,7 +223,7 @@
             bind:name={$itSystem.value}
             errors={$itSystem.errors}
             extra_classes="basis-1/2"
-            iterable={getITSystemNames(itSystems)}
+            iterable={formatITSystemNames(itSystems)}
             required={true}
             disabled={disableForm}
           />
@@ -243,7 +243,7 @@
             title={capital($_("primary"))}
             id="primary"
             startValue={itUser.primary_uuid}
-            value={getClassUuidByUserKey(classes, env.PUBLIC_PRIMARY_CLASS_USER_KEY)}
+            value={filterClassUuidByUserKey(classes, env.PUBLIC_PRIMARY_CLASS_USER_KEY)}
             disabled={disableForm}
           />
         </div>
@@ -251,7 +251,7 @@
           hidden
           name="non-primary"
           id="non-primary"
-          value={getClassUuidByUserKey(classes, "non-primary")}
+          value={filterClassUuidByUserKey(classes, "non-primary")}
         />
         <TextArea
           title={capital($_("notes"))}
