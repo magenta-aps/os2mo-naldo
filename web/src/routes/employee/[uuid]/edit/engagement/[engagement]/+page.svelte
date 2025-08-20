@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
@@ -9,20 +9,22 @@
   import { enhance } from "$app/forms"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import type { SubmitFunction } from "./$types"
   import { EngagementDocument, UpdateEngagementDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import { getClassesByFacetUserKey } from "$lib/util/getClasses"
+  import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import Search from "$lib/components/search/Search.svelte"
-  import type { FacetValidities } from "$lib/util/getClasses"
+  import type { FacetValidities } from "$lib/utils/classes"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getValidities, findClosestValidity, getClasses } from "$lib/util/helpers"
+  import { getValidities } from "$lib/http/getValidities"
+  import { getClasses } from "$lib/http/getClasses"
+  import { findClosestValidity } from "$lib/utils/validities"
   import { env } from "$lib/env"
 
   gql`
@@ -250,7 +252,7 @@
               startValue={engagement.job_function}
               bind:name={$jobFunction.value}
               errors={$jobFunction.errors}
-              iterable={getClassesByFacetUserKey(facets, "engagement_job_function")}
+              iterable={filterClassesByFacetUserKey(facets, "engagement_job_function")}
               extra_classes="basis-1/2"
               required={true}
             />
@@ -282,7 +284,7 @@
               startValue={engagement.engagement_type}
               bind:name={$engagementType.value}
               errors={$engagementType.errors}
-              iterable={getClassesByFacetUserKey(facets, "engagement_type")}
+              iterable={filterClassesByFacetUserKey(facets, "engagement_type")}
               extra_classes="basis-1/2"
               required={true}
             />
@@ -290,7 +292,7 @@
               title={capital($_("primary"))}
               id="primary"
               startValue={engagement.primary ? engagement.primary : undefined}
-              iterable={getClassesByFacetUserKey(facets, "primary_type")}
+              iterable={filterClassesByFacetUserKey(facets, "primary_type")}
               extra_classes="basis-1/2"
               isClearable={true}
             />

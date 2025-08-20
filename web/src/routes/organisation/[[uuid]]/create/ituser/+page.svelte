@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
@@ -11,19 +11,19 @@
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import { ItSystemsClassAndOrgDocument, CreateItUserDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
-  import { getClassUuidByUserKey } from "$lib/util/getClasses"
-  import { getITSystemNames } from "$lib/util/helpers"
+  import { filterClassUuidByUserKey } from "$lib/utils/classes"
+  import { formatITSystemNames } from "$lib/utils/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
-  import { getMinMaxValidities } from "$lib/util/helpers"
+  import { getMinMaxValidities } from "$lib/utils/validities"
   import { env } from "$lib/env"
 
   let toDate: string
@@ -178,7 +178,7 @@
             id="it-system"
             bind:name={$itSystem.value}
             errors={$itSystem.errors}
-            iterable={getITSystemNames(itSystems)}
+            iterable={formatITSystemNames(itSystems)}
             extra_classes="basis-1/2"
             required={true}
           />
@@ -195,14 +195,14 @@
           <Checkbox
             title={capital($_("primary"))}
             id="primary"
-            value={getClassUuidByUserKey(classes, env.PUBLIC_PRIMARY_CLASS_USER_KEY)}
+            value={filterClassUuidByUserKey(classes, env.PUBLIC_PRIMARY_CLASS_USER_KEY)}
           />
         </div>
         <input
           hidden
           name="non-primary"
           id="non-primary"
-          value={getClassUuidByUserKey(classes, "non-primary")}
+          value={filterClassUuidByUserKey(classes, "non-primary")}
         />
         <TextArea title={capital($_("notes"))} id="notes" />
       </div>

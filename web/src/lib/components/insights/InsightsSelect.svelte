@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import SvelteSelect from "svelte-select"
 
   type Operation = { operation: string; filter: string; value: string; n: number }

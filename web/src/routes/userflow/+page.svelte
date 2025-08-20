@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import { step } from "$lib/stores/stepStore"
   import EmployeeStep from "$lib/components/userflow/EmployeeStep.svelte"
   import EngagementStep from "$lib/components/userflow/EngagementStep.svelte"

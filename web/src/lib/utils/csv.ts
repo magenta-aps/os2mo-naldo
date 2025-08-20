@@ -1,7 +1,7 @@
 import { _ } from "svelte-i18n"
-import { capital } from "$lib/util/translationUtils"
+import { capital } from "$lib/utils/helpers"
 import { get } from "svelte/store"
-import { resolveFieldValue, type SelectedQuery, type Field } from "$lib/util/helpers"
+import { resolveFieldValue, type SelectedQuery, type Field } from "$lib/utils/insights"
 
 const SEPARATOR = ";"
 

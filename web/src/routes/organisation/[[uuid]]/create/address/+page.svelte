@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
@@ -10,9 +10,9 @@
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import { FacetsAndOrgDocument, CreateAddressDocument } from "./query.generated"
-  import { getClassesByFacetUserKey } from "$lib/util/getClasses"
+  import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
@@ -20,9 +20,9 @@
   import DarSearch from "$lib/components/forms/shared/DARSearch.svelte"
   import { form, field } from "svelte-forms"
   import { required, email, pattern, url } from "svelte-forms/validators"
-  import { Addresses } from "$lib/util/addresses"
+  import { Addresses } from "$lib/constants/addresses"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getMinMaxValidities } from "$lib/util/helpers"
+  import { getMinMaxValidities } from "$lib/utils/validities"
 
   let toDate: string
   let addressType: { name: string; user_key: string; uuid: string; scope: string }
@@ -217,7 +217,7 @@
           <Select
             title={capital($_("visibility"))}
             id="visibility"
-            iterable={getClassesByFacetUserKey(facets, "visibility")}
+            iterable={filterClassesByFacetUserKey(facets, "visibility")}
             extra_classes="basis-1/2"
             isClearable={true}
           />
@@ -227,7 +227,7 @@
             bind:value={addressType}
             bind:name={$addressTypeField.value}
             errors={$addressTypeField.errors}
-            iterable={getClassesByFacetUserKey(facets, "org_unit_address_type")}
+            iterable={filterClassesByFacetUserKey(facets, "org_unit_address_type")}
             extra_classes="basis-1/2"
             required={true}
           />

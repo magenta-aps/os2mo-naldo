@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
@@ -11,19 +11,19 @@
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import { GetOrgUnitDocument, UpdateOrgUnitDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import type { FacetValidities } from "$lib/util/getClasses"
-  import { getClassesByFacetUserKey } from "$lib/util/getClasses"
+  import type { FacetValidities } from "$lib/utils/classes"
+  import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import Search from "$lib/components/search/Search.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getClasses, getMinMaxValidities } from "$lib/util/helpers"
+  import { getClasses } from "$lib/http/getClasses"
   import { MOConfig } from "$lib/stores/config"
   import { env } from "$lib/env"
 
@@ -259,7 +259,7 @@
               bind:name={$timePlanning.value}
               errors={$timePlanning.errors}
               startValue={orgUnit.time_planning ? orgUnit.time_planning : undefined}
-              iterable={getClassesByFacetUserKey(facets, "time_planning")}
+              iterable={filterClassesByFacetUserKey(facets, "time_planning")}
               isClearable={true}
               required={!env.PUBLIC_OPTIONAL_TIME_PLANNING}
               on:clear={() => ($timePlanning.value = "")}
@@ -272,7 +272,7 @@
                 id="org-level"
                 startValue={orgUnit.org_unit_level ? orgUnit.org_unit_level : undefined}
                 extra_classes="basis-1/2"
-                iterable={getClassesByFacetUserKey(facets, "org_unit_level")}
+                iterable={filterClassesByFacetUserKey(facets, "org_unit_level")}
                 isClearable={true}
               />
             {/if}
@@ -284,7 +284,7 @@
               startValue={orgUnit.unit_type ? orgUnit.unit_type : undefined}
               on:clear={() => ($orgUnitType.value = "")}
               extra_classes="basis-1/2"
-              iterable={getClassesByFacetUserKey(facets, "org_unit_type")}
+              iterable={filterClassesByFacetUserKey(facets, "org_unit_type")}
               isClearable={true}
               required={true}
             />

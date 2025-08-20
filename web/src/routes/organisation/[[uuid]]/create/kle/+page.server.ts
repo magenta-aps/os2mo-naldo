@@ -1,5 +1,5 @@
 import type { KleCreateInput } from "$lib/graphql/types"
-import type { UnpackedClass } from "$lib/util/helpers"
+import type { UnpackedClass } from "$lib/utils/helpers"
 import type { Actions, RequestEvent } from "@sveltejs/kit"
 
 export const actions: Actions = {

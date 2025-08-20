@@ -1,8 +1,8 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import { success, error } from "$lib/stores/alert"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
@@ -14,10 +14,12 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import type { SubmitFunction } from "./$types"
-  import type { FacetValidities } from "$lib/util/getClasses"
-  import { getClassesByFacetUserKey } from "$lib/util/getClasses"
+  import type { FacetValidities } from "$lib/utils/classes"
+  import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import Search from "$lib/components/search/Search.svelte"
-  import { getClasses, getValidities } from "$lib/util/helpers"
+  import { getClasses } from "$lib/http/getClasses"
+  import { getValidities } from "$lib/http/getValidities"
+
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
@@ -215,7 +217,7 @@
           <Select
             title={capital($_("org_unit_level"))}
             id="org-unit-level"
-            iterable={getClassesByFacetUserKey(facets, "org_unit_level")}
+            iterable={filterClassesByFacetUserKey(facets, "org_unit_level")}
             isClearable={true}
           />
         {/if}
@@ -225,7 +227,7 @@
             id="time-planning"
             bind:name={$timePlanning.value}
             errors={$timePlanning.errors}
-            iterable={getClassesByFacetUserKey(facets, "time_planning")}
+            iterable={filterClassesByFacetUserKey(facets, "time_planning")}
             isClearable={true}
             required={!env.PUBLIC_OPTIONAL_TIME_PLANNING}
             on:clear={() => ($timePlanning.value = "")}
@@ -237,7 +239,7 @@
             id="org-unit-type"
             bind:name={$orgUnitType.value}
             errors={$orgUnitType.errors}
-            iterable={getClassesByFacetUserKey(facets, "org_unit_type")}
+            iterable={filterClassesByFacetUserKey(facets, "org_unit_type")}
             extra_classes="basis-1/2"
             isClearable={true}
             required={true}

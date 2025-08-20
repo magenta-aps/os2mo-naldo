@@ -1,8 +1,8 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import SvelteSelect from "svelte-select"
-  import { cprLookup } from "$lib/util/helpers"
+  import { cprLookup } from "$lib/utils/helpers"
   import CprItem from "./CPRItem.svelte"
 
   export let startValue: CprLookupResponse | undefined = undefined

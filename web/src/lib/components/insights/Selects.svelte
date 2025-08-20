@@ -1,9 +1,9 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import InsightsSelect from "$lib/components/insights/InsightsSelect.svelte"
   import InsightsSelectMultiple from "$lib/components/insights/InsightsSelectMultiple.svelte"
-  import type { Field, MainQuery, SelectedQuery } from "$lib/util/helpers"
+  import type { Field, MainQuery, SelectedQuery } from "$lib/utils/insights"
 
   export let mainQueries: MainQuery[]
   export let querySet: SelectedQuery

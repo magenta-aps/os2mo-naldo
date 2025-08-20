@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import { base } from "$app/paths"
   import TenseTabs from "$lib/components/shared/TenseTabs.svelte"
   import ClassTable from "$lib/components/tables/ClassTable.svelte"
@@ -13,7 +13,7 @@
   import { onMount } from "svelte"
   import Icon from "@iconify/svelte"
   import infoOutlineRounded from "@iconify/icons-material-symbols/info-outline-rounded"
-  import { getFacets } from "$lib/util/helpers"
+  import { getFacets } from "$lib/http/getFacets"
 
   let facet: { name: string; uuid: string; user_key?: string }
   let facetUuid: string

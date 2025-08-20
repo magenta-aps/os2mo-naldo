@@ -1,3 +1,10 @@
+import { get } from "svelte/store"
+import { _, locale } from "svelte-i18n"
+import { graphQLClient } from "$lib/http/client"
+import { FacetDocument } from "./query.generated"
+import { capital } from "$lib/utils/helpers"
+import { findClosestValidity } from "$lib/utils/validities"
+
 export const getFacets = async (
   variables: {
     uuid: string | null

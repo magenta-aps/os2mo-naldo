@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import { employeeInfo } from "$lib/stores/employeeInfoStore"
   import { step } from "$lib/stores/stepStore"
   import Error from "$lib/components/alerts/Error.svelte"
@@ -8,7 +8,7 @@
   import OnboardingFormButtons from "$lib/components/userflow/OnboardingFormButtons.svelte"
   import CprLookup from "$lib/components/forms/shared/CPRLookup.svelte"
   import CPRInput from "$lib/components/userflow/CPRInput.svelte"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import { GetSpConfigDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
