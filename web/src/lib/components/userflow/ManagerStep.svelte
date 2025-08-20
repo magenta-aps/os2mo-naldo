@@ -94,7 +94,7 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            startValue={$date}
+            startValue={manager.fromDate ? manager.fromDate : $date}
             bind:value={manager.fromDate}
             errors={manager.validated === false && !manager.fromDate
               ? ["required"]

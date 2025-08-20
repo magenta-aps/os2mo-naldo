@@ -139,7 +139,7 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            startValue={$date}
+            startValue={ituser.fromDate ? ituser.fromDate : $date}
             bind:value={ituser.fromDate}
             errors={ituser.validated === false && !ituser.fromDate ? ["required"] : []}
             title={capital($_("date.start_date"))}
