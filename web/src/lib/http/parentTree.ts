@@ -1,4 +1,4 @@
-import { graphQLClient } from "$lib/util/http"
+import { graphQLClient } from "$lib/http/client"
 import { gql } from "graphql-request"
 import { GetParentDocument } from "./query.generated"
 

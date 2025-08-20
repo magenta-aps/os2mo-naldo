@@ -1,7 +1,7 @@
 <script lang="ts">
   import { step } from "$lib/stores/stepStore"
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import Button from "$lib/components/shared/Button.svelte"
   import { resetUserflowStores } from "$lib/stores/resetStores"
   export let isFirst: boolean = false

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import EmployeeSummary from "$lib/components/userflow/EmployeeSummary.svelte"
   import EngagementSummary from "$lib/components/userflow/EngagementSummary.svelte"
   import ItuserSummary from "$lib/components/userflow/ItuserSummary.svelte"
@@ -22,7 +22,7 @@
   import { ituserInfo } from "$lib/stores/ituserInfoStore"
   import { managerInfo } from "$lib/stores/managerInfoStore"
   import { addressInfo } from "$lib/stores/addressInfoStore"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import { UserFlowCreateDocument } from "./query.generated"
   import { resetUserflowStores } from "$lib/stores/resetStores"
 

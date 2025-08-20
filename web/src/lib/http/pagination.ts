@@ -1,3 +1,5 @@
+import { graphQLClient } from "$lib/http/client"
+
 export const paginateQuery = async (
   query: string,
   variableValues: Record<string, any> = {},

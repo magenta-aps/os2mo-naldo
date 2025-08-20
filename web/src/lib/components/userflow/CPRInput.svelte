@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import Icon from "@iconify/svelte"
   import infoOutlineRounded from "@iconify/icons-material-symbols/info-outline-rounded"
 

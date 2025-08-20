@@ -1,16 +1,16 @@
 <script lang="ts">
   import { step } from "$lib/stores/stepStore"
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import { addressInfo } from "$lib/stores/addressInfoStore"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import { AddressFacetsDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { date } from "$lib/stores/date"
   import { form, field } from "svelte-forms"
   import { required, email, pattern } from "svelte-forms/validators"
-  import { getClassesByFacetUserKey } from "$lib/util/getClasses"
-  import { Addresses } from "$lib/util/addresses"
+  import { filterClassesByFacetUserKey } from "$lib/utils/classes"
+  import { Addresses } from "$lib/constants/addresses"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
@@ -120,7 +120,7 @@
             title={capital($_("visibility"))}
             id="visibility"
             bind:value={address.visibility}
-            iterable={getClassesByFacetUserKey(facets, "visibility")}
+            iterable={filterClassesByFacetUserKey(facets, "visibility")}
             extra_classes="basis-1/2"
             isClearable
           />
@@ -132,7 +132,7 @@
               ? ["required"]
               : []}
             on:change={() => (address.addressValue = { name: "", value: "" })}
-            iterable={getClassesByFacetUserKey(facets, "employee_address_type")}
+            iterable={filterClassesByFacetUserKey(facets, "employee_address_type")}
             extra_classes="basis-1/2"
             required
           />

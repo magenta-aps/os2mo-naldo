@@ -1,5 +1,5 @@
 import { _ } from "svelte-i18n"
-import { capital } from "$lib/util/translationUtils"
+import { capital } from "$lib/utils/helpers"
 import { get } from "svelte/store"
 
 // This should replace the `Facet`-type at some point
@@ -19,7 +19,7 @@ export type Class = {
   }[]
 }
 
-export const getClassesByFacetUserKey = (
+export const filterClassesByFacetUserKey = (
   facets: FacetValidities[],
   user_key: string
 ) => {
@@ -30,7 +30,7 @@ export const getClassesByFacetUserKey = (
   return foundFacet.validities[0].classes?.sort((a, b) => (a.name > b.name ? 1 : -1))
 }
 
-export const getClassUuidByUserKey = (classes: Class[], user_key: string) => {
+export const filterClassUuidByUserKey = (classes: Class[], user_key: string) => {
   // Maybe this isn't the best way? The problem is we don't know the order in which the classes come in, so I guess we need something like this?
   const foundClass = classes.find((cls) => cls.validities[0].user_key === user_key)
   if (!foundClass) {
@@ -39,7 +39,7 @@ export const getClassUuidByUserKey = (classes: Class[], user_key: string) => {
   return foundClass.validities[0].uuid
 }
 
-export const getClassByUserKey = (classes: Class[], user_key: string) => {
+export const filterClassByUserKey = (classes: Class[], user_key: string) => {
   const foundClass = classes.find((cls) => cls.validities[0].user_key === user_key)
   if (!foundClass) {
     throw new Error("user_key did not match any of the given classes")

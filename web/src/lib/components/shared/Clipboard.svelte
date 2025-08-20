@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import { success } from "$lib/stores/alert"
   import Button from "$lib/components/shared/Button.svelte"
   import Icon from "@iconify/svelte"

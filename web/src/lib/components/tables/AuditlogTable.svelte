@@ -1,14 +1,14 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
-  import { graphQLClient } from "$lib/util/http"
+  import { capital } from "$lib/utils/helpers"
+  import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { AuditlogDocument, type AuditlogQuery } from "./query.generated"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
-  import { sortData } from "$lib/util/sorting"
+  import { sortData } from "$lib/utils/sorting"
   import { onMount } from "svelte"
   import { page } from "$app/stores"
-  import { formatDateTime } from "$lib/util/date"
+  import { formatDateTime } from "$lib/utils/date"
 
   type Auditlog = AuditlogQuery["registrations"]["objects"]
   let data: Auditlog

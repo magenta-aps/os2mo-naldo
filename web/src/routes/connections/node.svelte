@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { onMount } from "svelte"
   import { OrgUnitChildrenDocument, type OrgUnitChildrenQuery } from "./query.generated"
@@ -8,7 +8,7 @@
   import keyboardArrowDownRounded from "@iconify/icons-material-symbols/keyboard-arrow-down-rounded"
   import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
   import RadioButton from "$lib/components/forms/shared/RadioButton.svelte"
-  import { checkSDIdentifier } from "$lib/util/helpers"
+  import { checkSDIdentifier } from "$lib/utils/helpers"
 
   type Child = {
     uuid: string
@@ -33,7 +33,9 @@
 
   gql`
     query OrgUnitChildren($uuid: [UUID!], $fromDate: DateTime) {
-      org_units(filter: { parent: { uuids: $uuid, from_date: $fromDate }, from_date: $fromDate }) {
+      org_units(
+        filter: { parent: { uuids: $uuid, from_date: $fromDate }, from_date: $fromDate }
+      ) {
         objects {
           validities {
             name
