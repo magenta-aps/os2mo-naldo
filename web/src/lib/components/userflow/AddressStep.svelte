@@ -100,7 +100,7 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            startValue={$date}
+            startValue={address.fromDate ? address.fromDate : $date}
             bind:value={address.fromDate}
             errors={address.validated === false && !address.fromDate
               ? ["required"]

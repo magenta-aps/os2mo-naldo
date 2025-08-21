@@ -103,7 +103,7 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            startValue={$date}
+            startValue={engagement.fromDate ? engagement.fromDate : $date}
             bind:value={engagement.fromDate}
             errors={engagement.validated === false && !engagement.fromDate
               ? ["required"]
