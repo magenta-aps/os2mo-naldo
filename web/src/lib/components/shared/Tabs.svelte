@@ -4,7 +4,7 @@
   import { createEventDispatcher } from "svelte"
   import { MOConfig } from "$lib/stores/config"
   import { OrgTab, EmployeeTab } from "$lib/stores/tab"
-  import { env } from "$env/dynamic/public"
+  import { env } from "$lib/env"
 
   export let items: { label: string; value: string; n: number }[]
   export let activeItem: string
@@ -19,7 +19,7 @@
     items = items.filter((tab) => tab.value !== EmployeeTab.ITASSOCIATION)
   }
   // checking if not "true", to be explicit where we want it shown
-  if (env.PUBLIC_SHOW_ROLEBINDINGS !== "true") {
+  if (!env.PUBLIC_SHOW_ROLEBINDINGS) {
     items = items.filter((tab) => tab.value !== EmployeeTab.ROLEBINDING)
   }
 </script>

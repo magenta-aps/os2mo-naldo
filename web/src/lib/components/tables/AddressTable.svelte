@@ -17,7 +17,7 @@
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import { formatQueryDates } from "$lib/util/helpers"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
-  import { env } from "$env/dynamic/public"
+  import { env } from "$lib/env"
 
   export let tense: Tense
 
@@ -113,7 +113,7 @@
         >{address.visibility ? address.visibility.name : capital($_("not_set"))}</td
       >
       <ValidityTableCell validity={address.validity} />
-      {#if env.PUBLIC_AUDITLOG === "true"}
+      {#if env.PUBLIC_AUDITLOG}
         <td>
           <a href={`${base}/auditlog/${address.uuid}`}>
             <Icon icon={historyRounded} width="25" height="25" />

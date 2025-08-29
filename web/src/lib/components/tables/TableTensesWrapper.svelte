@@ -8,7 +8,7 @@
   import AssociationTable from "$lib/components/tables/AssociationTable.svelte"
   import EngagementTable from "$lib/components/tables/EngagementTable.svelte"
   import RelatedUnitsTable from "./RelatedUnitsTable.svelte"
-  import { env } from "$env/dynamic/public"
+  import { env } from "$lib/env"
 
   export let headers: Header[]
   export let table: ComponentType<SvelteComponent>
@@ -49,17 +49,20 @@
     }
   }
 
-  if (env.PUBLIC_SHOW_EXTENSION_2 !== "true" && table === EngagementTable) {
+  // TODO: === "false"?
+  if (!env.PUBLIC_SHOW_EXTENSION_2 && table === EngagementTable) {
     headers = headers.filter(
       (header) => header.title !== capital($_("department_code"))
     )
   }
 
-  if (env.PUBLIC_SHOW_EXTENSION_1 !== "true" && table === EngagementTable) {
+  // TODO: === "false"?
+  if (!env.PUBLIC_SHOW_EXTENSION_1 && table === EngagementTable) {
     headers.splice(3, 1)
   }
 
-  if (env.PUBLIC_AUDITLOG !== "true" && table !== RelatedUnitsTable) {
+  // TODO: === "false"?
+  if (!env.PUBLIC_AUDITLOG && table !== RelatedUnitsTable) {
     // If we don't want to show Auditlog-button, remove one of the empty headers. Otherwise the table looks weird
     headers.pop()
   }

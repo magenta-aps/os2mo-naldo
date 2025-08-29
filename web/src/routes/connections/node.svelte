@@ -33,7 +33,9 @@
 
   gql`
     query OrgUnitChildren($uuid: [UUID!], $fromDate: DateTime) {
-      org_units(filter: { parent: { uuids: $uuid, from_date: $fromDate }, from_date: $fromDate }) {
+      org_units(
+        filter: { parent: { uuids: $uuid, from_date: $fromDate }, from_date: $fromDate }
+      ) {
         objects {
           validities {
             name

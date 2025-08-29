@@ -20,7 +20,7 @@
     LazyOrgUnitSearchDocument,
     type LazyOrgUnitSearchQuery,
   } from "./query.generated"
-  import { env } from "$env/dynamic/public"
+  import { env } from "$lib/env"
 
   type Employees = SearchEmployeeQuery["employees"]["objects"][0]["validities"]
   type OrgUnits = SearchOrgUnitQuery["org_units"]["objects"][0]["validities"]
@@ -194,7 +194,7 @@
       case "employee":
         let employeeFilter
         // Check if FF is true, else search "normally"
-        if (env.PUBLIC_SEARCH_INFINITY === "true" && action === "goto") {
+        if (env.PUBLIC_SEARCH_INFINITY && action === "goto") {
           employeeFilter = { from_date: null, to_date: null, query: filterText }
         } else {
           employeeFilter = { from_date: $date, query: filterText }
@@ -211,12 +211,12 @@
           .map((item) => findClosestValidity(item.validities, $date))
           .sort((a, b) => (a.name > b.name ? 1 : -1))
 
-        if (env.PUBLIC_SIMPLE_SEARCH === "true") {
+        if (env.PUBLIC_SIMPLE_SEARCH) {
           return items
         }
 
         let lazyEmployeeFilter
-        if (env.PUBLIC_SEARCH_INFINITY === "true" && action === "goto") {
+        if (env.PUBLIC_SEARCH_INFINITY && action === "goto") {
           lazyEmployeeFilter = {
             from_date: null,
             to_date: null,
@@ -242,7 +242,7 @@
       case "org-unit":
         let orgUnitFilter
         // Check if FF is true, else search "normally"
-        if (env.PUBLIC_SEARCH_INFINITY === "true" && action === "goto") {
+        if (env.PUBLIC_SEARCH_INFINITY && action === "goto") {
           orgUnitFilter = { from_date: null, to_date: null, query: filterText }
         } else {
           orgUnitFilter = { from_date: $date, query: filterText }
@@ -259,12 +259,12 @@
           .map((item) => findClosestValidity(item.validities, $date))
           .sort((a, b) => (a.name > b.name ? 1 : -1))
 
-        if (env.PUBLIC_SIMPLE_SEARCH === "true") {
+        if (env.PUBLIC_SIMPLE_SEARCH) {
           return items
         }
 
         let lazyOrgFilter
-        if (env.PUBLIC_SEARCH_INFINITY === "true" && action === "goto") {
+        if (env.PUBLIC_SEARCH_INFINITY && action === "goto") {
           lazyOrgFilter = {
             from_date: null,
             to_date: null,

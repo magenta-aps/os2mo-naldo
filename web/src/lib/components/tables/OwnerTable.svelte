@@ -22,7 +22,7 @@
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import { formatQueryDates } from "$lib/util/helpers"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
-  import { env } from "$env/dynamic/public"
+  import { env } from "$lib/env"
 
   type Owners =
     | EmployeeOwnerQuery["owners"]["objects"][0]["validities"]
@@ -183,7 +183,7 @@
         {/if}
       </td>
       <ValidityTableCell validity={ownerObj.validity} />
-      {#if env.PUBLIC_AUDITLOG === "true"}
+      {#if env.PUBLIC_AUDITLOG}
         <td>
           <a href={`${base}/auditlog/${ownerObj.uuid}`}>
             <Icon icon={historyRounded} width="25" height="25" />

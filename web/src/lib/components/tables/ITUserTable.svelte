@@ -17,7 +17,7 @@
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import { formatQueryDates } from "$lib/util/helpers"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
-  import { env } from "$env/dynamic/public"
+  import { env } from "$lib/env"
 
   type ITUsers = EmployeeItUsersQuery["itusers"]["objects"][0]["validities"]
   let data: ITUsers
@@ -96,7 +96,7 @@
       <td class="text-sm p-4">{ituser.user_key}</td>
       <td class="text-sm p-4">{ituser.primary ? ituser.primary.name : ""}</td>
       <ValidityTableCell validity={ituser.validity} />
-      {#if env.PUBLIC_AUDITLOG === "true"}
+      {#if env.PUBLIC_AUDITLOG}
         <td>
           <a href={`${base}/auditlog/${ituser.uuid}`}>
             <Icon icon={historyRounded} width="25" height="25" />

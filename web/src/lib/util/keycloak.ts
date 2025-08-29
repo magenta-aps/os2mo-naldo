@@ -1,4 +1,4 @@
-import { env } from "$env/dynamic/public"
+import { env } from "$lib/env"
 import { isAdmin, isAuth } from "$lib/stores/auth"
 import Keycloak from "keycloak-js"
 

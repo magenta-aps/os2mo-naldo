@@ -26,7 +26,7 @@
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { env } from "$env/dynamic/public"
+  import { env } from "$lib/env"
 
   let toDate: string
   let selectedOrgUnit: {
@@ -289,7 +289,7 @@
             required={true}
           />
           <Select
-            title={env.PUBLIC_SHOW_EXTENSION_1 === "true"
+            title={env.PUBLIC_SHOW_EXTENSION_1
               ? capital($_("job_code"))
               : capital($_("job_function", { values: { n: 1 } }))}
             id="job-function"

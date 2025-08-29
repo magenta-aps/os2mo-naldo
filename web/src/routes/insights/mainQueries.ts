@@ -1,4 +1,4 @@
-import { env } from "$env/dynamic/public"
+import { env } from "$lib/env"
 
 export const mainQueries = [
   // {
@@ -35,7 +35,7 @@ export const mainQueries = [
     fields: [
       { value: "subject", subString: "__typename" },
       { value: "name", subString: "person {name}" },
-      ...(env.PUBLIC_SHOW_EXTENSION_1 === "true"
+      ...(env.PUBLIC_SHOW_EXTENSION_1
         ? [
             { value: "job_code", subString: "job_function {name}" },
             { value: "job_function", subString: "extension_1" },

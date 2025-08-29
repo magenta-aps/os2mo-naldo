@@ -18,7 +18,7 @@
   import { formatQueryDates } from "$lib/util/helpers"
   import { updateGlobalNavigation } from "$lib/stores/navigation"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
-  import { env } from "$env/dynamic/public"
+  import { env } from "$lib/env"
 
   export let tense: Tense
 
@@ -128,7 +128,7 @@
         >{itassociation.primary ? itassociation.primary?.name : ""}</td
       >
       <ValidityTableCell validity={itassociation.validity} />
-      {#if env.PUBLIC_AUDITLOG === "true"}
+      {#if env.PUBLIC_AUDITLOG}
         <td>
           <a href={`${base}/auditlog/${itassociation.uuid}`}>
             <Icon icon={historyRounded} width="25" height="25" />

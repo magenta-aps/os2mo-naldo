@@ -21,7 +21,7 @@
   import { getITSystemNames, type UnpackedClass } from "$lib/util/helpers"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
-  import { env } from "$env/dynamic/public"
+  import { env } from "$lib/env"
   import ItuserCheckbox from "$lib/components/userflow/ItuserCheckbox.svelte"
   import OnboardingTab from "$lib/components/userflow/OnboardingTab.svelte"
   import Icon from "@iconify/svelte"
@@ -106,7 +106,7 @@
     }
   }}
 >
-  {#await graphQLClient().request( ItSystemsAndPrimaryDocument, { uuid: $page.params.uuid, primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary", currentDate: $date } )}
+  {#await graphQLClient().request( ItSystemsAndPrimaryDocument, { uuid: $page.params.uuid, primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY, currentDate: $date } )}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
@@ -125,7 +125,7 @@
     {@const classes = data.classes.objects}
     {@const primaryClass = getClassByUserKey(
       classes,
-      env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary"
+      env.PUBLIC_PRIMARY_CLASS_USER_KEY
     )}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <OnboardingTab

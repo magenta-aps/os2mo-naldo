@@ -27,7 +27,7 @@
   import codeRounded from "@iconify/icons-material-symbols/code-rounded"
   import language from "@iconify/icons-material-symbols/language"
   import logout from "@iconify/icons-material-symbols/logout-rounded"
-  import { env } from "$env/dynamic/public"
+  import { env } from "$lib/env"
 
   gql`
     query Version {
@@ -100,7 +100,7 @@ OS2mo-frontend version: ${env.PUBLIC_COMMIT_TAG}`}
         open={isOpen}
       />
 
-      {#if env.PUBLIC_ONBOARDING_LINK === "true"}
+      {#if env.PUBLIC_ONBOARDING_LINK}
         <NavbarButton
           title={capital($_("onboarding"))}
           href="{base}/userflow"
@@ -109,7 +109,7 @@ OS2mo-frontend version: ${env.PUBLIC_COMMIT_TAG}`}
         />
       {/if}
       {#if $isAdmin}
-        {#if env.PUBLIC_SHOW_ADMIN_PANEL !== "false"}
+        {#if env.PUBLIC_SHOW_ADMIN_PANEL}
           <NavbarButton
             title={capital($_("classifications"))}
             href="{base}/admin"
@@ -117,7 +117,7 @@ OS2mo-frontend version: ${env.PUBLIC_COMMIT_TAG}`}
             open={isOpen}
           />
         {/if}
-        {#if env.PUBLIC_SHOW_INSIGHTS !== "false"}
+        {#if env.PUBLIC_SHOW_INSIGHTS}
           <NavbarButton
             title={capital($_("insights"))}
             href="{base}/insights"
@@ -146,7 +146,7 @@ OS2mo-frontend version: ${env.PUBLIC_COMMIT_TAG}`}
         {/each}
       {/if}
 
-      {#if env.PUBLIC_DOCS_LINK !== "false"}
+      {#if env.PUBLIC_DOCS_LINK}
         <NavbarButton
           title={capital($_("documentation"))}
           href="https://rammearkitektur.docs.magenta.dk/os2mo/home/manual.html"

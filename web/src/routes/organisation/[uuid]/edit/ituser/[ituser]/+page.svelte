@@ -27,7 +27,7 @@
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
   import { MOConfig } from "$lib/stores/config"
-  import { env } from "$env/dynamic/public"
+  import { env } from "$lib/env"
 
   let toDate: string
   const fromDate = field("from", "", [required()])
@@ -155,7 +155,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ItUserItSystemsOrgAndPrimaryDocument, { uuid: $page.params.ituser, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary", currentDate: $date } )}
+{#await graphQLClient().request( ItUserItSystemsOrgAndPrimaryDocument, { uuid: $page.params.ituser, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY, currentDate: $date } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -239,10 +239,7 @@
             title={capital($_("primary"))}
             id="primary"
             startValue={itUser.primary?.uuid}
-            value={getClassUuidByUserKey(
-              classes,
-              env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary"
-            )}
+            value={getClassUuidByUserKey(classes, env.PUBLIC_PRIMARY_CLASS_USER_KEY)}
             disabled={disableForm}
           />
         </div>

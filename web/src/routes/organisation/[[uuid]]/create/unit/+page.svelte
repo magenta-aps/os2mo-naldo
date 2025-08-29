@@ -23,7 +23,7 @@
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { MOConfig } from "$lib/stores/config"
-  import { env } from "$env/dynamic/public"
+  import { env } from "$lib/env"
 
   let toDate: string
 
@@ -37,7 +37,7 @@
   $: if ($MOConfig) {
     if (
       $MOConfig.confdb_show_time_planning === "true" &&
-      env.PUBLIC_OPTIONAL_TIME_PLANNING !== "true"
+      !env.PUBLIC_OPTIONAL_TIME_PLANNING
     ) {
       svelteForm = form(fromDate, name, orgUnitType, timePlanning)
     }
@@ -227,7 +227,7 @@
             errors={$timePlanning.errors}
             iterable={getClassesByFacetUserKey(facets, "time_planning")}
             isClearable={true}
-            required={env.PUBLIC_OPTIONAL_TIME_PLANNING !== "true"}
+            required={!env.PUBLIC_OPTIONAL_TIME_PLANNING}
             on:clear={() => ($timePlanning.value = "")}
           />
         {/if}
