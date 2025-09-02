@@ -11,7 +11,7 @@
   import { EmployeeDocument } from "./query.generated"
   import TenseTabs from "$lib/components/shared/TenseTabs.svelte"
   import Button from "$lib/components/shared/Button.svelte"
-  import { env } from "$env/dynamic/public"
+  import { env } from "$lib/env"
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
   import { onMount } from "svelte"
@@ -182,10 +182,9 @@
             sortPath: "user_key",
           },
           {
-            title:
-              env.PUBLIC_SHOW_EXTENSION_1 === "true"
-                ? capital($_("job_code"))
-                : capital($_("job_function", { values: { n: 1 } })),
+            title: env.PUBLIC_SHOW_EXTENSION_1
+              ? capital($_("job_code"))
+              : capital($_("job_function", { values: { n: 1 } })),
             sortPath: "job_function.name",
           },
           {
@@ -245,10 +244,9 @@
             sortPath: "org_unit[0].name",
           },
           {
-            title:
-              env.PUBLIC_SHOW_EXTENSION_1 === "true"
-                ? capital($_("job_code"))
-                : capital($_("job_function", { values: { n: 1 } })),
+            title: env.PUBLIC_SHOW_EXTENSION_1
+              ? capital($_("job_code"))
+              : capital($_("job_function", { values: { n: 1 } })),
             sortPath: "job_function.name",
           },
           { title: capital($_("it_system")), sortPath: "it_user[0].itsystem.name" },

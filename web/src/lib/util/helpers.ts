@@ -1,4 +1,4 @@
-import { env } from "$env/dynamic/public"
+import { env } from "$lib/env"
 import type { OpenValidity, Validity } from "$lib/graphql/types"
 import { date } from "$lib/stores/date"
 import type { Facet } from "$lib/util/getClasses"
@@ -557,13 +557,13 @@ export const resolveFieldValue = (searchObject: any, header: Field) => {
   } else if (header.value === "user_key") {
     return searchObject.user_key ?? ""
   } else if (
-    env.PUBLIC_SHOW_EXTENSION_1 === "true" &&
+    env.PUBLIC_SHOW_EXTENSION_1 &&
     header.value === "job_function" &&
     header.subString === "extension_1"
   ) {
     return searchObject.extension_1 ?? ""
   } else if (
-    env.PUBLIC_SHOW_EXTENSION_1 === "true" &&
+    env.PUBLIC_SHOW_EXTENSION_1 &&
     header.value === "job_code" &&
     searchObject.job_function
   ) {
@@ -596,7 +596,7 @@ export const isUUID = (value: string) => {
 
 export const checkSDIdentifier = (name: string, user_key: string) => {
   if (
-    env.PUBLIC_SHOW_SD_CODE_IN_TREES !== "true" ||
+    !env.PUBLIC_SHOW_SD_CODE_IN_TREES ||
     name === user_key ||
     user_key === "-" ||
     isUUID(user_key)

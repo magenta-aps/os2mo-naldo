@@ -19,7 +19,7 @@
   import { MOConfig } from "$lib/stores/config"
   import { updateGlobalNavigation } from "$lib/stores/navigation"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
-  import { env } from "$env/dynamic/public"
+  import { env } from "$lib/env"
 
   let inheritManager: boolean | undefined
 
@@ -182,7 +182,7 @@
       <td class="text-sm p-4">{manager.manager_type.name}</td>
       <td class="text-sm p-4">{manager.manager_level.name}</td>
       <ValidityTableCell validity={manager.validity} />
-      {#if env.PUBLIC_AUDITLOG === "true"}
+      {#if env.PUBLIC_AUDITLOG}
         <td>
           <a href={`${base}/auditlog/${manager.uuid}`}>
             <Icon icon={historyRounded} width="25" height="25" />

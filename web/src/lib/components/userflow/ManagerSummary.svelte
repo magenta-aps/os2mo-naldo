@@ -2,7 +2,6 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import { managerInfo } from "$lib/stores/managerInfoStore"
-  import { env } from "$env/dynamic/public"
 </script>
 
 <div>

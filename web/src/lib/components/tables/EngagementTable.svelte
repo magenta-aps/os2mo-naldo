@@ -19,7 +19,7 @@
   import { formatQueryDates } from "$lib/util/helpers"
   import { MOConfig } from "$lib/stores/config"
   import { updateGlobalNavigation } from "$lib/stores/navigation"
-  import { env } from "$env/dynamic/public"
+  import { env } from "$lib/env"
 
   let inheritManager: boolean | undefined
 
@@ -165,18 +165,18 @@
           >
         {/if}
       </td>
-      {#if env.PUBLIC_SHOW_EXTENSION_2 === "true"}
+      {#if env.PUBLIC_SHOW_EXTENSION_2}
         <td class="text-sm p-4">
           {engagement.extension_2 ? engagement.extension_2 : ""}
         </td>
       {/if}
       <td class="text-sm p-4">{engagement.user_key}</td>
       <td class="text-sm p-4"
-        >{env.PUBLIC_SHOW_JOB_FUNCTION_USER_KEY === "true"
+        >{env.PUBLIC_SHOW_JOB_FUNCTION_USER_KEY
           ? `${engagement.job_function.user_key} - ${engagement.job_function.name}`
           : engagement.job_function.name}</td
       >
-      {#if env.PUBLIC_SHOW_EXTENSION_1 === "true"}
+      {#if env.PUBLIC_SHOW_EXTENSION_1}
         <td class="text-sm p-4"
           >{engagement.extension_1 ? engagement.extension_1 : ""}</td
         >
@@ -222,7 +222,7 @@
         <td class="text-sm p-4">{engagement.primary ? engagement.primary.name : ""}</td>
       {/if}
       <ValidityTableCell validity={engagement.validity} />
-      {#if env.PUBLIC_AUDITLOG === "true"}
+      {#if env.PUBLIC_AUDITLOG}
         <td>
           <a href={`${base}/auditlog/${engagement.uuid}`}>
             <Icon icon={historyRounded} width="25" height="25" />

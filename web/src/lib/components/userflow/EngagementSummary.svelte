@@ -2,7 +2,7 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import { engagementInfo } from "$lib/stores/engagementInfoStore"
-  import { env } from "$env/dynamic/public"
+  import { env } from "$lib/env"
 </script>
 
 <div>
@@ -29,7 +29,7 @@
           </div>
           <div class="grid grid-cols-2">
             <span>
-              {env.PUBLIC_SHOW_EXTENSION_1 === "true"
+              {env.PUBLIC_SHOW_EXTENSION_1
                 ? capital($_("job_code"))
                 : capital($_("job_function", { values: { n: 1 } }))}:
             </span>

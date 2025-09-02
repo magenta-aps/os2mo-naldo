@@ -28,7 +28,7 @@
   import Tabs from "$lib/components/shared/Tabs.svelte"
   import { MOConfig } from "$lib/stores/config"
   import { tenseFilter } from "$lib/util/helpers"
-  import { env } from "$env/dynamic/public"
+  import { env } from "$lib/env"
 
   // Tabs
   let items = [
@@ -226,10 +226,9 @@
             sortPath: "user_key",
           },
           {
-            title:
-              env.PUBLIC_SHOW_EXTENSION_1 === "true"
-                ? capital($_("job_code"))
-                : capital($_("job_function", { values: { n: 1 } })),
+            title: env.PUBLIC_SHOW_EXTENSION_1
+              ? capital($_("job_code"))
+              : capital($_("job_function", { values: { n: 1 } })),
             sortPath: "job_function.name",
           },
           {

@@ -18,7 +18,7 @@
   import { formatQueryDates } from "$lib/util/helpers"
   import { MOConfig } from "$lib/stores/config"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
-  import { env } from "$env/dynamic/public"
+  import { env } from "$lib/env"
 
   type OrgUnits = OrgUnitQuery["org_units"]["objects"][0]["validities"]
   let data: OrgUnits
@@ -128,7 +128,7 @@
         </td>
       {/if}
       <ValidityTableCell validity={org_unit.validity} />
-      {#if env.PUBLIC_AUDITLOG === "true"}
+      {#if env.PUBLIC_AUDITLOG}
         <td>
           <a href={`${base}/auditlog/${org_unit.uuid}`}>
             <Icon icon={historyRounded} width="25" height="25" />

@@ -2,16 +2,7 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/util/translationUtils"
   import OrgTree from "$lib/components/org/tree/OrgTree.svelte"
-  import { isAuth, isAdmin } from "$lib/stores/auth"
-  import { base } from "$app/paths"
-  import { env } from "$env/dynamic/public"
-  import Icon from "@iconify/svelte"
-  import { logoutKeycloak, keycloak } from "$lib/util/keycloak"
-  import { locale } from "svelte-i18n"
-  import personOutlineRounded from "@iconify/icons-material-symbols/person-outline-rounded"
-  import language from "@iconify/icons-material-symbols/language"
-  import closeRounded from "@iconify/icons-material-symbols/close-rounded"
-  import { MOConfig } from "$lib/stores/config"
+  import { isAuth } from "$lib/stores/auth"
 </script>
 
 <div class="flex flex-col h-full py-2">

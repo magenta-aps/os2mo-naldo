@@ -24,7 +24,7 @@
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
   import { getMinMaxValidities } from "$lib/util/helpers"
-  import { env } from "$env/dynamic/public"
+  import { env } from "$lib/env"
 
   let toDate: string
 
@@ -130,7 +130,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ItSystemsClassAndOrgDocument, { uuid: $page.params.uuid, primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary", currentDate: $date } )}
+{#await graphQLClient().request( ItSystemsClassAndOrgDocument, { uuid: $page.params.uuid, primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY, currentDate: $date } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -195,10 +195,7 @@
           <Checkbox
             title={capital($_("primary"))}
             id="primary"
-            value={getClassUuidByUserKey(
-              classes,
-              env.PUBLIC_PRIMARY_CLASS_USER_KEY || "primary"
-            )}
+            value={getClassUuidByUserKey(classes, env.PUBLIC_PRIMARY_CLASS_USER_KEY)}
           />
         </div>
         <input
