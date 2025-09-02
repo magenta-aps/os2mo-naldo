@@ -1,4 +1,4 @@
-import { env } from "$env/dynamic/public"
+import { env } from "$lib/env"
 import { keycloak } from "$lib/util/keycloak"
 import { GraphQLClient } from "graphql-request"
 

@@ -25,7 +25,7 @@
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getClasses, getMinMaxValidities } from "$lib/util/helpers"
   import { MOConfig } from "$lib/stores/config"
-  import { env } from "$env/dynamic/public"
+  import { env } from "$lib/env"
 
   let toDate: string
   let parent: {
@@ -43,7 +43,7 @@
   $: if ($MOConfig) {
     if (
       $MOConfig.confdb_show_time_planning === "true" &&
-      env.PUBLIC_OPTIONAL_TIME_PLANNING !== "true"
+      !env.PUBLIC_OPTIONAL_TIME_PLANNING
     ) {
       svelteForm = form(fromDate, name, orgUnitType, timePlanning)
     }
@@ -261,7 +261,7 @@
               startValue={orgUnit.time_planning ? orgUnit.time_planning : undefined}
               iterable={getClassesByFacetUserKey(facets, "time_planning")}
               isClearable={true}
-              required={env.PUBLIC_OPTIONAL_TIME_PLANNING !== "true"}
+              required={!env.PUBLIC_OPTIONAL_TIME_PLANNING}
               on:clear={() => ($timePlanning.value = "")}
             />
           {/if}

@@ -26,7 +26,7 @@
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getValidities, findClosestValidity, getClasses } from "$lib/util/helpers"
-  import { env } from "$env/dynamic/public"
+  import { env } from "$lib/env"
   import { onMount } from "svelte"
 
   gql`
@@ -256,7 +256,7 @@
               extra_classes="basis-1/2"
             />
             <Select
-              title={env.PUBLIC_SHOW_EXTENSION_1 === "true"
+              title={env.PUBLIC_SHOW_EXTENSION_1
                 ? capital($_("job_code"))
                 : capital($_("job_function", { values: { n: 1 } }))}
               id="job-function"
@@ -268,9 +268,9 @@
               required={true}
             />
           </div>
-          {#if env.PUBLIC_SHOW_EXTENSION_1 === "true" || env.PUBLIC_SHOW_EXTENSION_2 === "true"}
+          {#if env.PUBLIC_SHOW_EXTENSION_1 || env.PUBLIC_SHOW_EXTENSION_2}
             <div class="flex flex-row gap-6">
-              {#if env.PUBLIC_SHOW_EXTENSION_1 === "true"}
+              {#if env.PUBLIC_SHOW_EXTENSION_1}
                 <Input
                   title={capital($_("job_function", { values: { n: 1 } }))}
                   id="extension-1"
@@ -278,7 +278,7 @@
                   extra_classes="basis-1/2"
                 />
               {/if}
-              {#if env.PUBLIC_SHOW_EXTENSION_2 === "true"}
+              {#if env.PUBLIC_SHOW_EXTENSION_2}
                 <Input
                   title={capital($_("department_code"))}
                   id="extension-2"
