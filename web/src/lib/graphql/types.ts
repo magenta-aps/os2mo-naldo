@@ -180,6 +180,41 @@ export type AccessLogPaged = {
 };
 
 /**
+ * Interface type for all actors, implementing all shared behavior.
+ *
+ */
+export type Actor = {
+  /** Get event listeners owned by this actor. */
+  event_listeners: Array<Listener>;
+  /** Get event namespaces owned by this actor. */
+  event_namespaces: Array<Namespace>;
+  /** UUID of the actor */
+  uuid: Scalars['UUID']['output'];
+};
+
+
+/**
+ * Interface type for all actors, implementing all shared behavior.
+ *
+ */
+export type ActorEvent_ListenersArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<OwnersBoundListenerFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * Interface type for all actors, implementing all shared behavior.
+ *
+ */
+export type ActorEvent_NamespacesArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<OwnersBoundNamespaceFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+/**
  * Address information for either an employee or organisational unit
  *
  */
@@ -4757,6 +4792,40 @@ export type FullEventPaged = {
   page_info: PageInfo;
 };
 
+export enum HardcodedActor {
+  /** The change was made before actors were registered */
+  BeforeActor = 'BEFORE_ACTOR',
+  /** The change was made through the legacy auth system */
+  LegacyAuth = 'LEGACY_AUTH',
+  /**
+   * The change was made by an unknown actor.
+   *
+   * This could either by due to:
+   *
+   * * an invalid or unparsable token
+   * * a token missing an UUID
+   * * by-passing the authentication middleware
+   *
+   * or similar.
+   *
+   * @deprecated Deprecated as of version 43.4.0 in favor of:
+   *
+   * * UNABLE_TO_PARSE_TOKEN: for invalid or unparsable tokens
+   * * MISSING_UUID_ON_TOKEN: for tokens missing an UUID
+   * * NO_AUTH_MIDDLEWARE_UUID: for by-passing the authentication middleware
+   *
+   */
+  LoraUser = 'LORA_USER',
+  /** The change was made by a token missing an UUID */
+  MissingUuidOnToken = 'MISSING_UUID_ON_TOKEN',
+  /** The change was made when auth was disabled */
+  NoAuth = 'NO_AUTH',
+  /** The change was made by-passing the authentication middleware */
+  NoAuthMiddleware = 'NO_AUTH_MIDDLEWARE',
+  /** The change was made by an invalid or unparsable token */
+  UnableToParseToken = 'UNABLE_TO_PARSE_TOKEN'
+}
+
 /** Status on whether a specific subsystem is working */
 export type Health = {
   __typename?: 'Health';
@@ -8010,6 +8079,25 @@ export type Mutation = {
   related_units_update: RelatedUnitResponse;
   /** Create a rolebinding. */
   rolebinding_create: RoleBindingResponse;
+  /**
+   * Deletes a rolebinding.
+   * **Warning**:
+   * This mutator does bitemporal deletion, **not** temporal termination.
+   * Do **not** use this mutator **unless** you **fully understand** its implications.
+   *
+   * Bitemporal deletion and temporal termination are **very** different operations and should **not** be confused.
+   * If you do not know which of the operations you need, you most likely need temporal termination.
+   *
+   * Bitemporal deletion works on the bitemporal time-axis, and should **only** be used by clients that **fully understand** the underlying bitemporal model, including how a bitemporal delete affects the registration history.
+   *
+   * After this call the deleted entity will no longer show up in **any** temporal listing.
+   *
+   * Note:
+   * It is currently the callers responsibility to ensure that references are dealt with before doing bitemporal deletions.
+   * Failure to do so **will** leave dangling references breaking temporal foreign-keys, and potentially breaking invariants in the data.
+   *
+   */
+  rolebinding_delete: RoleBindingResponse;
   /** Refresh rolebindings. */
   rolebinding_refresh: UuidPaged;
   /** Terminate a rolebinding. */
@@ -9079,6 +9167,18 @@ export type MutationRolebinding_CreateArgs = {
  * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
  *
  */
+export type MutationRolebinding_DeleteArgs = {
+  uuid: Scalars['UUID']['input'];
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationRolebinding_RefreshArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   exchange?: InputMaybe<Scalars['String']['input']>;
@@ -9136,6 +9236,19 @@ export type MutationUpload_FileArgs = {
   file: Scalars['Upload']['input'];
   file_store: FileStore;
   force?: Scalars['Boolean']['input'];
+};
+
+/** Information about the API client itself */
+export type Myself = {
+  __typename?: 'Myself';
+  /** The API client as an actor object */
+  actor: Actor;
+  /** Contact email for the API client */
+  email?: Maybe<Scalars['String']['output']>;
+  /** Set of RBAC roles assigned to the client */
+  roles: Array<Scalars['String']['output']>;
+  /** Preferred username for the API client */
+  username?: Maybe<Scalars['String']['output']>;
 };
 
 /**
@@ -10806,6 +10919,17 @@ export type OwnerUpdateInput = {
   validity: RaValidityInput;
 };
 
+export type OwnersBoundListenerFilter = {
+  namespaces?: InputMaybe<NamespaceFilter>;
+  routing_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+export type OwnersBoundNamespaceFilter = {
+  names?: InputMaybe<Array<Scalars['String']['input']>>;
+  public?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
 /**
  * Container for page information.
  *
@@ -10936,6 +11060,15 @@ export type Query = {
   leaves: LeaveResponsePaged;
   /** Get manager roles. */
   managers: ManagerResponsePaged;
+  /**
+   * Get information about the API client itself (i.e. the current caller).
+   *
+   * This collection allows clients to query information about themselves, such
+   * as their configured actor UUID, RBAC roles, login / contact email address,
+   * created event namespaces and listeners, etc.
+   *
+   */
+  me: Myself;
   /**
    * Get the root organisation.
    *
@@ -12055,6 +12188,62 @@ export type RoleRegistrationFilter = {
   start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
+/**
+ * The SpecialActor type is used for special magic-number UUIDs.
+ *
+ * It is returned, if a change was made;
+ * * While auth was disabled.
+ * * Using the legacy auth system.
+ * * Before registrations got actors registered.
+ * or similar
+ *
+ */
+export type SpecialActor = Actor & {
+  __typename?: 'SpecialActor';
+  /** Get event listeners owned by this actor. */
+  event_listeners: Array<Listener>;
+  /** Get event namespaces owned by this actor. */
+  event_namespaces: Array<Namespace>;
+  /** Enum key for the specific case of the special actor */
+  key: HardcodedActor;
+  /** UUID of the actor */
+  uuid: Scalars['UUID']['output'];
+};
+
+
+/**
+ * The SpecialActor type is used for special magic-number UUIDs.
+ *
+ * It is returned, if a change was made;
+ * * While auth was disabled.
+ * * Using the legacy auth system.
+ * * Before registrations got actors registered.
+ * or similar
+ *
+ */
+export type SpecialActorEvent_ListenersArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<OwnersBoundListenerFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * The SpecialActor type is used for special magic-number UUIDs.
+ *
+ * It is returned, if a change was made;
+ * * While auth was disabled.
+ * * Using the legacy auth system.
+ * * Before registrations got actors registered.
+ * or similar
+ *
+ */
+export type SpecialActorEvent_NamespacesArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<OwnersBoundNamespaceFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
 /** Result page in cursor-based pagination. */
 export type UuidPaged = {
   __typename?: 'UUIDPaged';
@@ -12073,6 +12262,50 @@ export type UuidPaged = {
    *
    */
   page_info: PageInfo;
+};
+
+/**
+ * The UnknownActor type is a fallback actor type for when lookup fails.
+ *
+ * It is returned when all attempts at actor translations have failed.
+ *
+ */
+export type UnknownActor = Actor & {
+  __typename?: 'UnknownActor';
+  /** Descriptive error message */
+  error: Scalars['String']['output'];
+  /** Get event listeners owned by this actor. */
+  event_listeners: Array<Listener>;
+  /** Get event namespaces owned by this actor. */
+  event_namespaces: Array<Namespace>;
+  /** UUID of the actor */
+  uuid: Scalars['UUID']['output'];
+};
+
+
+/**
+ * The UnknownActor type is a fallback actor type for when lookup fails.
+ *
+ * It is returned when all attempts at actor translations have failed.
+ *
+ */
+export type UnknownActorEvent_ListenersArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<OwnersBoundListenerFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * The UnknownActor type is a fallback actor type for when lookup fails.
+ *
+ * It is returned when all attempts at actor translations have failed.
+ *
+ */
+export type UnknownActorEvent_NamespacesArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<OwnersBoundNamespaceFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
 };
 
 export type UuidsBoundClassFilter = {
