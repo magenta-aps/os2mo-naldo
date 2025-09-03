@@ -62,6 +62,7 @@
           validities {
             uuid
             user_key
+            org_unit_uuid
             person(filter: { from_date: $fromDate, to_date: $toDate }) {
               uuid
               name
@@ -79,7 +80,8 @@
             engagement_type(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
             }
-            org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
+            org_unit(filter: { from_date: $fromDate, to_date: $toDate })
+              @skip(if: $isOrg) {
               name
               uuid
               validity {
@@ -133,7 +135,7 @@
         if (!tenseFilter(obj, tense)) return false
         // Check if engagement validity is in current org_unit ($page.params.uuid)
         // TODO: Do this with GraphQL, when following issues are resolved (#65031) (#65303)
-        if (isOrg && obj.org_unit[0].uuid !== $page.params.uuid) return false
+        if (isOrg && obj.org_unit_uuid !== $page.params.uuid) return false
         return true
       })
       engagements.push(...filtered)
@@ -159,8 +161,8 @@
           >
         {:else}
           <a
-            href="{base}/organisation/{engagement.org_unit[0].uuid}"
-            on:click={() => updateGlobalNavigation(engagement.org_unit[0].uuid)}
+            href="{base}/organisation/{engagement.org_unit?.[0].uuid}"
+            on:click={() => updateGlobalNavigation(engagement.org_unit?.[0].uuid)}
             >{findClosestValidity(engagement.org_unit, $date).name}</a
           >
         {/if}
