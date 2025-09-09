@@ -236,6 +236,7 @@
             sortPath: "job_function.name",
           },
           { title: capital($_("engagement_type")), sortPath: "engagement_type.name" },
+          { title: capital($_("ituser", { values: { n: 2 } })) },
           { title: capital($_("primary")) },
           { title: capital($_("date.date")), sortPath: "validity.from" },
           { title: "" },

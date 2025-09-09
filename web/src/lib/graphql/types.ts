@@ -3277,6 +3277,7 @@ export type EmployeesBoundManagerFilter = {
   employee?: InputMaybe<EmployeeFilter>;
   exclude?: InputMaybe<EmployeeFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  manager_type?: InputMaybe<ClassFilter>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
   registration?: InputMaybe<ManagerRegistrationFilter>;
@@ -3360,6 +3361,11 @@ export type Engagement = {
    *
    */
   is_primary: Scalars['Boolean']['output'];
+  /**
+   * Connected IT-user.
+   *
+   */
+  itusers: Array<ItUser>;
   /**
    * Describes the position of the employee in the organisation unit
    *
@@ -3489,6 +3495,14 @@ export type EngagementEngagement_TypeArgs = {
 
 
 /** Employee engagement in an organisation unit */
+export type EngagementItusersArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<EngagementBoundItUserFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Employee engagement in an organisation unit */
 export type EngagementJob_FunctionArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<UuidsBoundClassFilter>;
@@ -3533,6 +3547,21 @@ export type EngagementPrimaryArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+export type EngagementBoundItUserFilter = {
+  employee?: InputMaybe<EmployeeFilter>;
+  employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  external_ids?: InputMaybe<Array<Scalars['String']['input']>>;
+  from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  itsystem?: InputMaybe<ItSystemFilter>;
+  itsystem_uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  org_unit?: InputMaybe<OrganisationUnitFilter>;
+  org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  registration?: InputMaybe<ItUserRegistrationFilter>;
+  to_date?: InputMaybe<Scalars['DateTime']['input']>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
 export type EngagementCreateInput = {
@@ -5349,10 +5378,20 @@ export type ItUser = {
   /**
    * UUID of the engagement related to the user.
    * @deprecated Will be removed in a future version of GraphQL.
-   * Use `engagement {uuid}` instead.
-   *
+   * Use `engagements {uuid}` instead.
+   * There can now be multiple engagements associated with an ituser
    */
   engagement_uuid?: Maybe<Scalars['UUID']['output']>;
+  /**
+   * Engagement scoping of the account.
+   *
+   * A person may have multiple IT accounts with each account being relevant for any number of engagement.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  engagements?: Maybe<Array<Engagement>>;
   /** ID of the user account in the external system. */
   external_id?: Maybe<Scalars['String']['output']>;
   /**
@@ -5512,6 +5551,20 @@ export type ItUserEngagementArgs = {
  * It is however also used to hold IT system specific identifiers for correlation purposes.
  *
  */
+export type ItUserEngagementsArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<UuidsBoundEngagementFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * User information related to IT systems.
+ *
+ * This is commonly used to map out IT accounts or IT service accounts.
+ * It is however also used to hold IT system specific identifiers for correlation purposes.
+ *
+ */
 export type ItUserItsystemArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<UuidsBoundItSystemFilter>;
@@ -5575,8 +5628,10 @@ export type ItUserRolebindingsArgs = {
 };
 
 export type ItUserCreateInput = {
-  /** Reference to the engagement of the IT user (if any). */
+  /** Deprecated! Use `engagements` in stead. */
   engagement?: InputMaybe<Scalars['UUID']['input']>;
+  /** Reference to the engagements related to the IT user (if any). */
+  engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** ID of the user account in the external system. */
   external_id?: InputMaybe<Scalars['String']['input']>;
   /** Reference to the IT system for the IT user. */
@@ -5958,8 +6013,10 @@ export type ItUserTerminateInput = {
 };
 
 export type ItUserUpdateInput = {
-  /** Reference to the engagement of the IT user (if any). */
+  /** Deprecated! Use `engagements` in stead. */
   engagement?: InputMaybe<Scalars['UUID']['input']>;
+  /** Reference to the engagements related to the IT user (if any). */
+  engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
   /** ID of the user account in the external system. */
   external_id?: InputMaybe<Scalars['String']['input']>;
   /** Reference to the IT system for the IT user. */
@@ -7425,6 +7482,11 @@ export type ManagerFilter = {
   exclude?: InputMaybe<EmployeeFilter>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * Manager_type filter limiting which entries are returned.
+   *
+   */
+  manager_type?: InputMaybe<ClassFilter>;
   /**
    * Organisation Unit filter limiting which entries are returned.
    *
@@ -9456,6 +9518,7 @@ export type OrgUnitsboundmanagerfilter = {
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   exclude?: InputMaybe<EmployeeFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  manager_type?: InputMaybe<ClassFilter>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   registration?: InputMaybe<ManagerRegistrationFilter>;
   responsibility?: InputMaybe<ClassFilter>;

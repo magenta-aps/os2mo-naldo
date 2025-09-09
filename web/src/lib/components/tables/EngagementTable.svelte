@@ -8,7 +8,12 @@
   import { page } from "$app/stores"
   import { EngagementsDocument, type EngagementsQuery } from "./query.generated"
   import { date } from "$lib/stores/date"
-  import { findClosestValidity, tenseFilter, tenseToValidity } from "$lib/util/helpers"
+  import {
+    findClosestValidity,
+    tenseFilter,
+    tenseToValidity,
+    getITUserITSystemName,
+  } from "$lib/util/helpers"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { sortData } from "$lib/util/sorting"
   import { onMount } from "svelte"
@@ -79,6 +84,15 @@
             extension_2
             engagement_type(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
+            }
+            itusers(filter: { from_date: $fromDate, to_date: $toDate }) {
+              user_key
+              uuid
+              itsystem {
+                user_key
+                name
+                uuid
+              }
             }
             org_unit(filter: { from_date: $fromDate, to_date: $toDate })
               @skip(if: $isOrg) {
@@ -184,6 +198,13 @@
         >
       {/if}
       <td class="text-sm p-4">{engagement.engagement_type.name}</td>
+      <td class="text-sm p-4">
+        {#each getITUserITSystemName(engagement.itusers) as ituser}
+          <li>
+            {ituser.name}
+          </li>
+        {/each}
+      </td>
       {#if !isOrg}
         <td class="text-sm p-4">
           <!-- Make sure engagement.managers is present (needed since adding @skip to query)  -->

@@ -192,6 +192,7 @@
             sortPath: "job_function.name",
           },
           { title: capital($_("engagement_type")), sortPath: "engagement_type.name" },
+          { title: capital($_("ituser", { values: { n: 2 } })) },
           {
             title: capital($_("manager", { values: { n: 1 } })),
           },
@@ -209,6 +210,7 @@
           { title: capital($_("address_type")), sortPath: "address_type.name" },
           { title: capital($_("description")) },
           { title: capital($_("address", { values: { n: 1 } })), sortPath: "name" },
+          { title: capital($_("ituser", { values: { n: 1 } })) },
           // TODO: Make it possible to sort optional fields maybe? visibility and primary for example
           { title: capital($_("visibility")) },
           { title: capital($_("date.date")), sortPath: "validity.from" },
@@ -271,6 +273,7 @@
           headers={[
             { title: capital($_("it_system")), sortPath: "itsystem.name" },
             { title: capital($_("account_name")), sortPath: "user_key" },
+            { title: capital($_("engagement", { values: { n: 1 } })) },
             { title: capital($_("primary")) },
             { title: capital($_("date.date")), sortPath: "validity.from" },
             { title: "" },

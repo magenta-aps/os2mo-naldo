@@ -15,7 +15,7 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
-  import { formatQueryDates } from "$lib/util/helpers"
+  import { formatQueryDates, getEngagementTitlesAndUuid } from "$lib/util/helpers"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
 
@@ -42,6 +42,17 @@
             itsystem {
               name
               uuid
+            }
+            engagements(filter: { from_date: $fromDate, to_date: $toDate }) {
+              org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
+                name
+                user_key
+              }
+              uuid
+              job_function {
+                user_key
+                name
+              }
             }
             validity {
               from
@@ -94,6 +105,13 @@
     >
       <td class="text-sm p-4">{ituser.itsystem.name} </td>
       <td class="text-sm p-4">{ituser.user_key}</td>
+      <td class="text-sm p-4">
+        {#each getEngagementTitlesAndUuid(ituser.engagements ?? []) as engagement}
+          <li>
+            {engagement.name}
+          </li>
+        {/each}
+      </td>
       <td class="text-sm p-4">{ituser.primary ? ituser.primary.name : ""}</td>
       <ValidityTableCell validity={ituser.validity} />
       {#if env.PUBLIC_AUDITLOG}
