@@ -271,12 +271,12 @@ type ITUserITSystemName = {
   user_key: string
   itsystem: {
     name: string
-    uuid?: string
+    uuid: string
   }
 }
 
-export const getITUserITSystemName = (itusers: ITUserITSystemName[] | undefined) => {
-  return itusers?.map((ituser) => ({
+export const getITUserITSystemName = (itusers: ITUserITSystemName[]) => {
+  return itusers.map((ituser) => ({
     uuid: ituser.uuid,
     name: `${ituser.itsystem.name}, ${ituser.user_key}`,
     itsystem: { uuid: ituser.itsystem.uuid },

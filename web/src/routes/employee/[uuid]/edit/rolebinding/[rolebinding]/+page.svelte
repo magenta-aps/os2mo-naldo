@@ -72,6 +72,7 @@
             uuid
             ituser {
               itsystem {
+                uuid
                 name
               }
               uuid
@@ -211,7 +212,7 @@
   {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
   {@const itusers = data.rolebindings.objects[0].current?.ituser[0].person?.[0].itusers}
   {@const itUserStartValue = getITUserITSystemName(
-    data.rolebindings.objects[0].validities[0].ituser
+    data.rolebindings.objects[0].validities[0].ituser ?? []
   )}
   {@const rolebinding = data.rolebindings.objects[0].validities[0]}
 

@@ -75,6 +75,7 @@
             uuid
             ituser {
               itsystem {
+                uuid
                 name
               }
               uuid
