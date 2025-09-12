@@ -6,7 +6,9 @@
   import type { ComponentType, SvelteComponent } from "svelte"
   import { MOConfig } from "$lib/stores/config"
   import AssociationTable from "$lib/components/tables/AssociationTable.svelte"
+  import AddressTable from "$lib/components/tables/AddressTable.svelte"
   import EngagementTable from "$lib/components/tables/EngagementTable.svelte"
+  import ItUserTable from "./ITUserTable.svelte"
   import RelatedUnitsTable from "./RelatedUnitsTable.svelte"
   import { env } from "$lib/env"
 
@@ -62,6 +64,24 @@
   if (!env.PUBLIC_AUDITLOG && table !== RelatedUnitsTable) {
     // If we don't want to show Auditlog-button, remove one of the empty headers. Otherwise the table looks weird
     headers.pop()
+  }
+
+  if (!env.PUBLIC_SHOW_ITUSER_CONNECTIONS) {
+    if (table === EngagementTable) {
+      headers = headers.filter(
+        (header) => header.title !== capital($_("ituser", { values: { n: 2 } }))
+      )
+    }
+    if (table === AddressTable) {
+      headers = headers.filter(
+        (header) => header.title !== capital($_("ituser", { values: { n: 1 } }))
+      )
+    }
+    if (table === ItUserTable) {
+      headers = headers.filter(
+        (header) => header.title !== capital($_("engagement", { values: { n: 1 } }))
+      )
+    }
   }
 </script>
 

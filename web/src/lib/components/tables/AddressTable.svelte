@@ -122,7 +122,7 @@
           : ""}</td
       >
       <td class="text-sm p-4">{address.name}</td>
-      {#if !isOrg}
+      {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS && !isOrg}
         <td class="text-sm p-4">
           {#each getITUserITSystemName(address.ituser) as ituser}
             <li>

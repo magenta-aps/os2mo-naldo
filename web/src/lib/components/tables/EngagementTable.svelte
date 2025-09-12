@@ -200,15 +200,17 @@
         >
       {/if}
       <td class="text-sm p-4">{engagement.engagement_type.name}</td>
-      <td class="text-sm p-4">
-        {#each engagement.itusers as ituser}
-          {#each getITUserITSystemName(ituser.validities) as validity}
-            <li>
-              {validity.name}
-            </li>
+      {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
+        <td class="text-sm p-4">
+          {#each engagement.itusers as ituser}
+            {#each getITUserITSystemName(ituser.validities) as validity}
+              <li>
+                {validity.name}
+              </li>
+            {/each}
           {/each}
-        {/each}
-      </td>
+        </td>
+      {/if}
       {#if !isOrg}
         <td class="text-sm p-4">
           <!-- Make sure engagement.managers is present (needed since adding @skip to query)  -->

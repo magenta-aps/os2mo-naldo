@@ -107,15 +107,17 @@
     >
       <td class="text-sm p-4">{ituser.itsystem.name} </td>
       <td class="text-sm p-4">{ituser.user_key}</td>
-      <td class="text-sm p-4">
-        {#each ituser.engagements as engagement}
-          {#each getEngagementTitlesAndUuid(engagement.validities) as validity}
-            <li>
-              {validity.name}
-            </li>
+      {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
+        <td class="text-sm p-4">
+          {#each ituser.engagements as engagement}
+            {#each getEngagementTitlesAndUuid(engagement.validities) as validity}
+              <li>
+                {validity.name}
+              </li>
+            {/each}
           {/each}
-        {/each}
-      </td>
+        </td>
+      {/if}
       <td class="text-sm p-4">{ituser.primary ? ituser.primary.name : ""}</td>
       <ValidityTableCell validity={ituser.validity} />
       {#if env.PUBLIC_AUDITLOG}
