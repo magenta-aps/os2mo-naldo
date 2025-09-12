@@ -44,14 +44,16 @@
               uuid
             }
             engagements(filter: { from_date: $fromDate, to_date: $toDate }) {
-              org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
-                name
-                user_key
-              }
-              uuid
-              job_function {
-                user_key
-                name
+              validities {
+                org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
+                  name
+                  user_key
+                }
+                uuid
+                job_function {
+                  user_key
+                  name
+                }
               }
             }
             validity {
@@ -106,10 +108,12 @@
       <td class="text-sm p-4">{ituser.itsystem.name} </td>
       <td class="text-sm p-4">{ituser.user_key}</td>
       <td class="text-sm p-4">
-        {#each getEngagementTitlesAndUuid(ituser.engagements ?? []) as engagement}
-          <li>
-            {engagement.name}
-          </li>
+        {#each ituser.engagements as engagement}
+          {#each getEngagementTitlesAndUuid(engagement.validities) as validity}
+            <li>
+              {validity.name}
+            </li>
+          {/each}
         {/each}
       </td>
       <td class="text-sm p-4">{ituser.primary ? ituser.primary.name : ""}</td>

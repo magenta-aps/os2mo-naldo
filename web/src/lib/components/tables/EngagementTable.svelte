@@ -86,12 +86,14 @@
               name
             }
             itusers(filter: { from_date: $fromDate, to_date: $toDate }) {
-              user_key
-              uuid
-              itsystem {
+              validities {
                 user_key
-                name
                 uuid
+                itsystem {
+                  user_key
+                  name
+                  uuid
+                }
               }
             }
             org_unit(filter: { from_date: $fromDate, to_date: $toDate })
@@ -199,10 +201,12 @@
       {/if}
       <td class="text-sm p-4">{engagement.engagement_type.name}</td>
       <td class="text-sm p-4">
-        {#each getITUserITSystemName(engagement.itusers) as ituser}
-          <li>
-            {ituser.name}
-          </li>
+        {#each engagement.itusers as ituser}
+          {#each getITUserITSystemName(ituser.validities) as validity}
+            <li>
+              {validity.name}
+            </li>
+          {/each}
         {/each}
       </td>
       {#if !isOrg}

@@ -311,6 +311,13 @@ export type Address = {
    */
   ituser: Array<ItUser>;
   /**
+   * UUID of the it-user related to the address.
+   * @deprecated Will be removed in a future version of GraphQL.
+   * Use `ituser {uuid}` instead.
+   *
+   */
+  ituser_uuid?: Maybe<Scalars['UUID']['output']>;
+  /**
    * Human readable name of the address.
    *
    * Name is *usually* equal to `value`, but may differ if `value` is not human readable.
@@ -3365,7 +3372,7 @@ export type Engagement = {
    * Connected IT-user.
    *
    */
-  itusers: Array<ItUser>;
+  itusers: Array<ItUserResponse>;
   /**
    * Describes the position of the employee in the organisation unit
    *
@@ -5377,21 +5384,23 @@ export type ItUser = {
   engagement?: Maybe<Array<Engagement>>;
   /**
    * UUID of the engagement related to the user.
-   * @deprecated Will be removed in a future version of GraphQL.
-   * Use `engagements {uuid}` instead.
-   * There can now be multiple engagements associated with an ituser
+   * @deprecated Use `engagement_uuids` instead.
    */
   engagement_uuid?: Maybe<Scalars['UUID']['output']>;
+  /**
+   * UUIDs of the engagements related to the user.
+   * @deprecated Will be removed in a future version of GraphQL.
+   * Use `engagements {uuid}` instead.
+   *
+   */
+  engagement_uuids: Array<Scalars['UUID']['output']>;
   /**
    * Engagement scoping of the account.
    *
    * A person may have multiple IT accounts with each account being relevant for any number of engagement.
    *
-   * **Warning**:
-   * This field will probably become an optional entity instead of a list in the future.
-   *
    */
-  engagements?: Maybe<Array<Engagement>>;
+  engagements: Array<EngagementResponse>;
   /** ID of the user account in the external system. */
   external_id?: Maybe<Scalars['String']['output']>;
   /**
@@ -5628,7 +5637,7 @@ export type ItUserRolebindingsArgs = {
 };
 
 export type ItUserCreateInput = {
-  /** Deprecated! Use `engagements` in stead. */
+  /** Deprecated! Use `engagements` instead. */
   engagement?: InputMaybe<Scalars['UUID']['input']>;
   /** Reference to the engagements related to the IT user (if any). */
   engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
@@ -6013,7 +6022,7 @@ export type ItUserTerminateInput = {
 };
 
 export type ItUserUpdateInput = {
-  /** Deprecated! Use `engagements` in stead. */
+  /** Deprecated! Use `engagements` instead. */
   engagement?: InputMaybe<Scalars['UUID']['input']>;
   /** Reference to the engagements related to the IT user (if any). */
   engagements?: InputMaybe<Array<Scalars['UUID']['input']>>;
