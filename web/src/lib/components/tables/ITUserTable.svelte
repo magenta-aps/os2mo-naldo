@@ -8,7 +8,7 @@
   import { page } from "$app/stores"
   import { EmployeeItUsersDocument, type EmployeeItUsersQuery } from "./query.generated"
   import { date } from "$lib/stores/date"
-  import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
+  import { tenseFilter, tenseToValidity, findClosestValidity } from "$lib/util/helpers"
   import { sortData } from "$lib/util/sorting"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { onMount } from "svelte"
@@ -53,6 +53,10 @@
                 job_function {
                   user_key
                   name
+                }
+                validity {
+                  from
+                  to
                 }
               }
             }
@@ -110,11 +114,11 @@
       {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
         <td class="text-sm p-4">
           {#each ituser.engagements as engagement}
-            {#each getEngagementTitlesAndUuid(engagement.validities) as validity}
-              <li>
-                {validity.name}
-              </li>
-            {/each}
+            {#if engagement.validities && engagement.validities.length}
+              {#each getEngagementTitlesAndUuid( [findClosestValidity(engagement.validities, $date)] ) as nameObj}
+                <div>{nameObj.name}</div>
+              {/each}
+            {/if}
           {/each}
         </td>
       {/if}

@@ -9,6 +9,7 @@
     tenseToValidity,
     tenseFilter,
     getITUserITSystemName,
+    findClosestValidity,
   } from "$lib/util/helpers"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
@@ -64,6 +65,10 @@
                 user_key
                 name
                 uuid
+              }
+              validity {
+                from
+                to
               }
             }
             visibility {
@@ -124,11 +129,13 @@
       <td class="text-sm p-4">{address.name}</td>
       {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS && !isOrg}
         <td class="text-sm p-4">
-          {#each getITUserITSystemName(address.ituser) as ituser}
-            <li>
-              {ituser.name}
-            </li>
-          {/each}
+          {#if address.ituser.length}
+            {#each getITUserITSystemName( [findClosestValidity(address.ituser, $date)] ) as ituser}
+              <li>
+                {ituser.name}
+              </li>
+            {/each}
+          {/if}
         </td>
       {/if}
       <td class="text-sm p-4"

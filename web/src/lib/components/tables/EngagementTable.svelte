@@ -94,6 +94,10 @@
                   name
                   uuid
                 }
+                validity {
+                  from
+                  to
+                }
               }
             }
             org_unit(filter: { from_date: $fromDate, to_date: $toDate })
@@ -203,11 +207,11 @@
       {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
         <td class="text-sm p-4">
           {#each engagement.itusers as ituser}
-            {#each getITUserITSystemName(ituser.validities) as validity}
-              <li>
-                {validity.name}
-              </li>
-            {/each}
+            {#if ituser.validities && ituser.validities.length}
+              {#each getITUserITSystemName( [findClosestValidity(ituser.validities, $date)] ) as nameObj}
+                <div>{nameObj.name}</div>
+              {/each}
+            {/if}
           {/each}
         </td>
       {/if}
