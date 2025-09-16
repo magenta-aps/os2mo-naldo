@@ -87,6 +87,7 @@
               name
               itusers {
                 itsystem {
+                  uuid
                   name
                 }
                 user_key
@@ -103,6 +104,7 @@
             }
             it_user {
               itsystem {
+                uuid
                 name
               }
               uuid
@@ -284,7 +286,7 @@
             startValue={itUserStartValue?.[0]}
             bind:name={$itUser.value}
             errors={$itUser.errors}
-            iterable={getITUserITSystemName(itusers)}
+            iterable={getITUserITSystemName(itusers ?? [])}
             extra_classes="basis-1/2"
             required={true}
           />

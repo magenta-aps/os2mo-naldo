@@ -205,7 +205,9 @@
   </div>
 {:then data}
   {@const validities = getMinMaxValidities(data.employees.objects[0].current?.itusers)}
-  {@const itUsers = getITUserITSystemName(data.employees.objects[0].current?.itusers)}
+  {@const itUsers = getITUserITSystemName(
+    data.employees.objects[0].current?.itusers ?? []
+  )}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">

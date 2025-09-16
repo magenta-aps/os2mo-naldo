@@ -8,14 +8,14 @@
   import { page } from "$app/stores"
   import { EmployeeItUsersDocument, type EmployeeItUsersQuery } from "./query.generated"
   import { date } from "$lib/stores/date"
-  import { tenseFilter, tenseToValidity } from "$lib/util/helpers"
+  import { tenseFilter, tenseToValidity, findClosestValidity } from "$lib/util/helpers"
   import { sortData } from "$lib/util/sorting"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { onMount } from "svelte"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
-  import { formatQueryDates } from "$lib/util/helpers"
+  import { formatQueryDates, getEngagementTitlesAndUuid } from "$lib/util/helpers"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
 
@@ -42,6 +42,23 @@
             itsystem {
               name
               uuid
+            }
+            engagements(filter: { from_date: $fromDate, to_date: $toDate }) {
+              validities {
+                org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
+                  name
+                  user_key
+                }
+                uuid
+                job_function {
+                  user_key
+                  name
+                }
+                validity {
+                  from
+                  to
+                }
+              }
             }
             validity {
               from
@@ -94,6 +111,17 @@
     >
       <td class="text-sm p-4">{ituser.itsystem.name} </td>
       <td class="text-sm p-4">{ituser.user_key}</td>
+      {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
+        <td class="text-sm p-4">
+          {#each ituser.engagements as engagement}
+            {#if engagement.validities && engagement.validities.length}
+              {#each getEngagementTitlesAndUuid( [findClosestValidity(engagement.validities, $date)] ) as nameObj}
+                <div>{nameObj.name}</div>
+              {/each}
+            {/if}
+          {/each}
+        </td>
+      {/if}
       <td class="text-sm p-4">{ituser.primary ? ituser.primary.name : ""}</td>
       <ValidityTableCell validity={ituser.validity} />
       {#if env.PUBLIC_AUDITLOG}

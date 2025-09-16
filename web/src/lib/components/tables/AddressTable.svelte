@@ -5,7 +5,12 @@
   import { base } from "$app/paths"
   import { graphQLClient } from "$lib/util/http"
   import { gql } from "graphql-request"
-  import { tenseToValidity, tenseFilter } from "$lib/util/helpers"
+  import {
+    tenseToValidity,
+    tenseFilter,
+    getITUserITSystemName,
+    findClosestValidity,
+  } from "$lib/util/helpers"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { AddressDocument, type AddressQuery } from "./query.generated"
@@ -52,6 +57,19 @@
             value
             address_type {
               name
+            }
+            ituser(filter: { from_date: $fromDate, to_date: $toDate }) {
+              user_key
+              uuid
+              itsystem {
+                user_key
+                name
+                uuid
+              }
+              validity {
+                from
+                to
+              }
             }
             visibility {
               name
@@ -109,6 +127,17 @@
           : ""}</td
       >
       <td class="text-sm p-4">{address.name}</td>
+      {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS && !isOrg}
+        <td class="text-sm p-4">
+          {#if address.ituser.length}
+            {#each getITUserITSystemName( [findClosestValidity(address.ituser, $date)] ) as ituser}
+              <li>
+                {ituser.name}
+              </li>
+            {/each}
+          {/if}
+        </td>
+      {/if}
       <td class="text-sm p-4"
         >{address.visibility ? address.visibility.name : capital($_("not_set"))}</td
       >
