@@ -51,36 +51,38 @@
     }
   }
 
-  if (!env.PUBLIC_SHOW_EXTENSION_2 && table === EngagementTable) {
-    headers = headers.filter(
-      (header) => header.title !== capital($_("department_code"))
-    )
-  }
-
-  if (!env.PUBLIC_SHOW_EXTENSION_1 && table === EngagementTable) {
-    headers.splice(3, 1)
-  }
-
-  if (!env.PUBLIC_AUDITLOG && table !== RelatedUnitsTable) {
-    // If we don't want to show Auditlog-button, remove one of the empty headers. Otherwise the table looks weird
-    headers.pop()
-  }
-
-  if (!env.PUBLIC_SHOW_ITUSER_CONNECTIONS) {
-    if (table === EngagementTable) {
+  $: {
+    if (!env.PUBLIC_SHOW_EXTENSION_2 && table === EngagementTable) {
       headers = headers.filter(
-        (header) => header.title !== capital($_("ituser", { values: { n: 2 } }))
+        (header) => header.title !== capital($_("department_code"))
       )
     }
-    if (table === AddressTable) {
-      headers = headers.filter(
-        (header) => header.title !== capital($_("ituser", { values: { n: 1 } }))
-      )
+
+    if (!env.PUBLIC_SHOW_EXTENSION_1 && table === EngagementTable) {
+      headers.splice(3, 1)
     }
-    if (table === ItUserTable) {
-      headers = headers.filter(
-        (header) => header.title !== capital($_("engagement", { values: { n: 1 } }))
-      )
+
+    if (!env.PUBLIC_AUDITLOG && table !== RelatedUnitsTable) {
+      // If we don't want to show Auditlog-button, remove one of the empty headers. Otherwise the table looks weird
+      headers.pop()
+    }
+
+    if (!env.PUBLIC_SHOW_ITUSER_CONNECTIONS) {
+      if (table === EngagementTable) {
+        headers = headers.filter(
+          (header) => header.title !== capital($_("ituser", { values: { n: 2 } }))
+        )
+      }
+      if (table === AddressTable) {
+        headers = headers.filter(
+          (header) => header.title !== capital($_("ituser", { values: { n: 1 } }))
+        )
+      }
+      if (table === ItUserTable) {
+        headers = headers.filter(
+          (header) => header.title !== capital($_("engagement", { values: { n: 1 } }))
+        )
+      }
     }
   }
 </script>
