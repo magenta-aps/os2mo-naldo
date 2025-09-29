@@ -130,10 +130,9 @@
       {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS && !isOrg}
         <td class="text-sm p-4">
           {#if address.ituser.length}
+            <!-- getITUserITSystemName returns a list, but should always just be a single ituser -->
             {#each getITUserITSystemName( [findClosestValidity(address.ituser, $date)] ) as ituser}
-              <li>
-                {ituser.name}
-              </li>
+              {ituser.name}
             {/each}
           {/if}
         </td>
