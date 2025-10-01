@@ -14,13 +14,13 @@
   export let name: string | undefined = undefined
   export let iterable: Value[] | undefined = undefined
   // Do this to support built-in search with `searchable`
-  if (iterable) {
-    iterable = iterable.map((object) => ({
-      ...object,
-      label: object.name,
-      value: object.uuid,
-    }))
-  }
+  $: mappedIterable = iterable
+    ? iterable.map((obj) => ({
+        ...obj,
+        label: obj.name,
+        value: obj.uuid,
+      }))
+    : []
   export let required = false
   export let placeholder: string = ""
   export let disabled = false
@@ -87,7 +87,7 @@
       showChevron={true}
       clearable={isClearable}
       {placeholder}
-      items={iterable}
+      items={mappedIterable}
       {searchable}
       clearFilterTextOnBlur={false}
       bind:value
