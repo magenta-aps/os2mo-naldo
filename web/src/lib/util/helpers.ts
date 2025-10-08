@@ -22,6 +22,7 @@ import {
   GetFacetValiditiesDocument,
   FacetsAndClassesDocument,
   FacetDocument,
+  ConfederationsDocument,
 } from "./query.generated"
 
 gql`
@@ -87,6 +88,16 @@ gql`
   }
   query Facet($uuid: [UUID!], $fromDate: DateTime!) {
     facets(filter: { uuids: $uuid, from_date: $fromDate }) {
+      objects {
+        validities {
+          uuid
+          user_key
+        }
+      }
+    }
+  }
+  query Confederations($fromDate: DateTime!) {
+    classes(filter: { facet_user_keys: "confederation", from_date: $fromDate }) {
       objects {
         validities {
           uuid
@@ -206,6 +217,35 @@ export const getFacets = async (
   const items = res.facets.objects.map((facet) => {
     // Doing both the translation and sort in here, means that changing language won't affect the list, until it's rerun
     const closest = findClosestValidity(facet.validities, variables.fromDate)
+    return {
+      uuid: closest.uuid,
+      name: capital(
+        get(_)("facets.name." + closest.user_key, {
+          default: closest.user_key,
+        })
+      ),
+      user_key: closest.user_key,
+    }
+  })
+  return items.sort((a, b) =>
+    a.name.localeCompare(b.name, get(locale) ?? "da", {
+      sensitivity: "base", // Æ/æ = æ, case-insensitive
+    })
+  )
+}
+
+export const getConfederations = async (
+  variables: {
+    fromDate: string
+  },
+  signal?: AbortSignal
+) => {
+  const res = await graphQLClient(signal).request(ConfederationsDocument, variables)
+  console.log(res)
+
+  const items = res.classes.objects.map((cls) => {
+    // Doing both the translation and sort in here, means that changing language won't affect the list, until it's rerun
+    const closest = findClosestValidity(cls.validities, variables.fromDate)
     return {
       uuid: closest.uuid,
       name: capital(

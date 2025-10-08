@@ -19,6 +19,7 @@
   import { required } from "svelte-forms/validators"
   import { onMount } from "svelte"
   import { getFacetValidities, getFacets } from "$lib/util/helpers"
+  import { getConfederations } from "$lib/util/helpers"
   import { facetStore } from "$lib/stores/facetStore"
 
   gql`
@@ -72,6 +73,7 @@
   let toDate: string
   let chosenFacet: { name: string; uuid: string; user_key?: string }
   let facets: { name: string; uuid: string; user_key?: string }[]
+  let confederations: { name: string; uuid: string; user_key?: string }[]
 
   // Logic for updating datepicker intervals
   let validities: {
@@ -86,6 +88,9 @@
     })
     if ($page.params.facet) {
       chosenFacet = facets[0] ?? null
+    }
+    if (chosenFacet.user_key === "trade_union") {
+      confederations = await getConfederations({ fromDate: startDate })
     }
   })
 
@@ -202,6 +207,14 @@
           required={true}
         />
       </div>
+      {#if chosenFacet && chosenFacet.user_key == "trade_union"}
+        <Select
+          title={capital($_("confederation"))}
+          id="parent"
+          iterable={confederations ? confederations : []}
+          required={true}
+        />
+      {/if}
     </div>
   </div>
   <div class="flex py-6 gap-4">
