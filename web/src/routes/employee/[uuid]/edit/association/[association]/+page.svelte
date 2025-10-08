@@ -1,6 +1,7 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
+  import { env } from "$lib/env"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
@@ -43,17 +44,6 @@
   const associationTypeField = field("association_type", "", [required()])
   let svelteForm = form(fromDate, orgUnit, associationTypeField)
 
-  let getDynamicFacet: boolean = false
-  let dynamicFacetUuid: string | undefined
-
-  // Maybe we need to JSON.parse our config, so we avoid doing it here?
-  $: if ($MOConfig) {
-    if (JSON.parse($MOConfig.confdb_association_dynamic_facets)) {
-      getDynamicFacet = true
-      dynamicFacetUuid = JSON.parse($MOConfig.confdb_association_dynamic_facets)
-    }
-  }
-
   const allowSubstitute = (associationTypeUuid: string) => {
     // Check if the selected associationType allows a substitute
     return $MOConfig &&
@@ -67,8 +57,7 @@
       $uuid: [UUID!]
       $fromDate: DateTime
       $toDate: DateTime
-      $getDynamicFacet: Boolean!
-      $dynamicFacetUuid: [UUID!]
+      $getConfederations: Boolean!
       $currentDate: DateTime!
     ) {
       facets(filter: { user_keys: ["association_type", "primary_type"] }) {
@@ -134,12 +123,11 @@
           }
         }
       }
-      ...MedOrg
+      ...Confederations
     }
-
-    fragment MedOrg on Query {
-      classes(filter: { facet: { uuids: $dynamicFacetUuid } })
-        @include(if: $getDynamicFacet) {
+    fragment Confederations on Query {
+      classes(filter: { facet: { user_keys: "confederation" } })
+        @include(if: $getConfederations) {
         objects {
           current(at: $currentDate) {
             top_level_facet {
@@ -234,7 +222,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( AssociationAndFacetsDocument, { uuid: $page.params.association, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), getDynamicFacet: getDynamicFacet, dynamicFacetUuid: dynamicFacetUuid, currentDate: $date } )}
+{#await graphQLClient().request( AssociationAndFacetsDocument, { uuid: $page.params.association, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), getConfederations: env.PUBLIC_ENABLE_CONFEDERATIONS, currentDate: $date } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -341,7 +329,7 @@
             />
           {/if}
         {/if}
-        {#if $MOConfig && JSON.parse($MOConfig.confdb_association_dynamic_facets)}
+        {#if env.PUBLIC_ENABLE_CONFEDERATIONS}
           <SelectGroup
             id="trade-union"
             title={$_("trade_union")}

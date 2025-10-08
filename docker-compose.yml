@@ -27,6 +27,7 @@ services:
       # Department code
       PUBLIC_SHOW_EXTENSION_2: "false"
       PUBLIC_SHOW_ITUSER_CONNECTIONS: "true"
+      PUBLIC_ENABLE_CONFEDERATIONS: "true"
     ports:
       - "127.0.0.1:5173:5173"
       - "127.0.0.1:24678:24678" # hot module reloading
