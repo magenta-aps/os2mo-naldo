@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import OrgTree from "$lib/components/org/tree/OrgTree.svelte"
   import { isAuth } from "$lib/stores/auth"
 </script>

@@ -1,9 +1,9 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import ValidityTableCell from "$lib/components/shared/ValidityTableCell.svelte"
   import { base } from "$app/paths"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { RolebindingsDocument, type RolebindingsQuery } from "./query.generated"
@@ -12,15 +12,15 @@
     tenseFilter,
     tenseToValidity,
     filterTenseToValidity,
-  } from "$lib/util/helpers"
+  } from "$lib/utils/tenses"
   import { onMount } from "svelte"
-  import { sortData } from "$lib/util/sorting"
+  import { sortData } from "$lib/utils/sorting"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import type { RoleBindingFilter } from "$lib/graphql/types"
-  import { formatQueryDates } from "$lib/util/helpers"
+  import { formatQueryDates } from "$lib/utils/validities"
 
   type Rolebinding = RolebindingsQuery["rolebindings"]["objects"][0]["validities"]
   let data: Rolebinding

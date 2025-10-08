@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
@@ -9,23 +9,23 @@
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { success, error } from "$lib/stores/alert"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import { getClassesByFacetUserKey } from "$lib/util/getClasses"
+  import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import {
     CreateLeaveDocument,
     LeaveTypeDocument,
     GetEmployeeDocument,
   } from "./query.generated"
   import {
-    getEngagementTitlesAndUuid,
-    getEngagementValidities,
+    formatEngagementTitlesAndUuid,
     type EngagementTitleAndUuid,
-  } from "$lib/util/helpers"
+  } from "$lib/utils/helpers"
+  import { getEngagementValidities } from "$lib/http/getValidities"
   import Search from "$lib/components/search/Search.svelte"
   import { onMount } from "svelte"
   import { form, field } from "svelte-forms"
@@ -214,7 +214,7 @@
           id="leave-type-uuid"
           bind:name={$leaveType.value}
           errors={$leaveType.errors}
-          iterable={getClassesByFacetUserKey(facets, "leave_type")}
+          iterable={filterClassesByFacetUserKey(facets, "leave_type")}
           required={true}
         />
       {/await}
@@ -276,7 +276,7 @@
             bind:name={$engagement.value}
             bind:value={selectedEngagement}
             errors={$engagement.errors}
-            iterable={getEngagementTitlesAndUuid(engagements)}
+            iterable={formatEngagementTitlesAndUuid(engagements)}
             required={true}
           />
         {/key}

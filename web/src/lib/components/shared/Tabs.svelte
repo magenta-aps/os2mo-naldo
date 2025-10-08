@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import { createEventDispatcher } from "svelte"
   import { MOConfig } from "$lib/stores/config"
   import { OrgTab, EmployeeTab } from "$lib/stores/tab"

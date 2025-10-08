@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
@@ -10,7 +10,7 @@
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
@@ -23,11 +23,8 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import {
-    getITUserITSystemName,
-    getMinMaxValidities,
-    type UnpackedClass,
-  } from "$lib/util/helpers"
+  import { formatITUserITSystemName, type UnpackedClass } from "$lib/utils/helpers"
+  import { getMinMaxValidities } from "$lib/utils/validities"
   import type { RoleBindingCreateInput } from "$lib/graphql/types"
   import Icon from "@iconify/svelte"
   import removeRounded from "@iconify/icons-material-symbols/remove-rounded"
@@ -205,8 +202,8 @@
   </div>
 {:then data}
   {@const validities = getMinMaxValidities(data.employees.objects[0].current?.itusers)}
-  {@const itUsers = getITUserITSystemName(
-    data.employees.objects[0].current?.itusers ?? []
+  {@const itUsers = formatITUserITSystemName(
+    data.employees.objects[0].current?.itusers
   )}
 
   <form method="post" class="mx-6" use:enhance={handler}>

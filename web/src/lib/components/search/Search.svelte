@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import SvelteSelect from "svelte-select"
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
@@ -8,8 +8,8 @@
   import { date } from "$lib/stores/date"
   import { updateGlobalNavigation } from "$lib/stores/navigation"
   import { gql } from "graphql-request"
-  import { graphQLClient } from "$lib/util/http"
-  import { findClosestValidity } from "$lib/util/helpers"
+  import { graphQLClient } from "$lib/http/client"
+  import { findClosestValidity } from "$lib/utils/validities"
   import {
     SearchEmployeeDocument,
     SearchOrgUnitDocument,

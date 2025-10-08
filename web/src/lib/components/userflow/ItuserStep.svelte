@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import { ituserInfo } from "$lib/stores/ituserInfoStore"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
@@ -9,7 +9,7 @@
   import CircleButton from "$lib/components/shared/CircleButton.svelte"
   import OnboardingFormButtons from "$lib/components/userflow/OnboardingFormButtons.svelte"
   import { step } from "$lib/stores/stepStore"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import {
     ItSystemsAndPrimaryDocument,
     GetItSystemRolesDocument,
@@ -17,8 +17,8 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import { getClassByUserKey } from "$lib/util/getClasses"
-  import { getITSystemNames, type UnpackedClass } from "$lib/util/helpers"
+  import { filterClassByUserKey } from "$lib/utils/classes"
+  import { formatITSystemNames, type UnpackedClass } from "$lib/utils/helpers"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
   import { env } from "$lib/env"
@@ -123,7 +123,7 @@
   {:then data}
     {@const itSystems = data.itsystems.objects}
     {@const classes = data.classes.objects}
-    {@const primaryClass = getClassByUserKey(
+    {@const primaryClass = filterClassByUserKey(
       classes,
       env.PUBLIC_PRIMARY_CLASS_USER_KEY
     )}
@@ -163,7 +163,7 @@
             on:change={() => {
               fetchItSystemRoles(ituser.itSystem.uuid)
             }}
-            iterable={getITSystemNames(itSystems)}
+            iterable={formatITSystemNames(itSystems)}
             extra_classes="basis-1/2"
             required={true}
           />
@@ -185,7 +185,7 @@
               if (e.target instanceof HTMLInputElement)
                 ituser.primary = e.target.checked
                   ? primaryClass
-                  : getClassByUserKey(classes, "non-primary")
+                  : filterClassByUserKey(classes, "non-primary")
             }}
           />
         </div>

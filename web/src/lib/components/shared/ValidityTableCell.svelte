@@ -1,7 +1,7 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
-  import { formatDate } from "$lib/util/date"
+  import { capital } from "$lib/utils/helpers"
+  import { formatDate } from "$lib/utils/date"
 
   interface Validity {
     from?: any

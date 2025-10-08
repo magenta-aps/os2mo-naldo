@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import { _ } from "svelte-i18n"
   import SvelteSelect from "svelte-select"
 

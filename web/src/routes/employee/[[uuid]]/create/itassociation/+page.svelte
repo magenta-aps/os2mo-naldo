@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
@@ -10,8 +10,9 @@
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
-  import { graphQLClient } from "$lib/util/http"
-  import { getITUserITSystemName, getValidities } from "$lib/util/helpers"
+  import { graphQLClient } from "$lib/http/client"
+  import { formatITUserITSystemName } from "$lib/utils/helpers"
+  import { getValidities } from "$lib/http/getValidities"
   import {
     FacetClassesAndEmployeeDocument,
     CreateItAssociationDocument,
@@ -19,7 +20,10 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import { getClassUuidByUserKey, getClassesByFacetUserKey } from "$lib/util/getClasses"
+  import {
+    filterClassUuidByUserKey,
+    filterClassesByFacetUserKey,
+  } from "$lib/utils/classes"
   import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
   import Search from "$lib/components/search/Search.svelte"
   import { form, field } from "svelte-forms"
@@ -232,7 +236,7 @@
             id="it-user-uuid"
             bind:name={$itUser.value}
             errors={$itUser.errors}
-            iterable={getITUserITSystemName(itusers ?? [])}
+            iterable={formatITUserITSystemName(itusers ? itusers : [])}
             required={true}
             extra_classes="basis-1/2"
           />
@@ -243,7 +247,7 @@
             id="job-function"
             bind:name={$jobFunction.value}
             errors={$jobFunction.errors}
-            iterable={getClassesByFacetUserKey(facets, "engagement_job_function")}
+            iterable={filterClassesByFacetUserKey(facets, "engagement_job_function")}
             required={true}
             extra_classes="basis-1/2"
           />
@@ -252,13 +256,13 @@
           <Checkbox
             title={capital($_("primary"))}
             id="primary"
-            value={getClassUuidByUserKey(primaryClasses, "primary")}
+            value={filterClassUuidByUserKey(primaryClasses, "primary")}
           />
           <input
             hidden
             name="non-primary"
             id="non-primary"
-            value={getClassUuidByUserKey(primaryClasses, "non-primary")}
+            value={filterClassUuidByUserKey(primaryClasses, "non-primary")}
           />
         </div>
       </div>

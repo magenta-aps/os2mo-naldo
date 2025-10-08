@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
@@ -9,11 +9,11 @@
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import type { UnpackedClass } from "$lib/util/helpers"
+  import type { UnpackedClass } from "$lib/utils/helpers"
   import type { SubmitFunction } from "./$types"
   import {
     UpdateRoleBindingDocument,
@@ -23,7 +23,8 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getITUserITSystemName, getMinMaxValidities } from "$lib/util/helpers"
+  import { formatITUserITSystemName } from "$lib/utils/helpers"
+  import { getMinMaxValidities } from "$lib/utils/validities"
 
   let itUser: {
     uuid: string | null
@@ -211,8 +212,8 @@
 {:then data}
   {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
   {@const itusers = data.rolebindings.objects[0].current?.ituser[0].person?.[0].itusers}
-  {@const itUserStartValue = getITUserITSystemName(
-    data.rolebindings.objects[0].validities[0].ituser ?? []
+  {@const itUserStartValue = formatITUserITSystemName(
+    data.rolebindings.objects[0].validities[0].ituser
   )}
   {@const rolebinding = data.rolebindings.objects[0].validities[0]}
 
@@ -249,7 +250,7 @@
             bind:value={itUser}
             bind:name={$itUserField.value}
             errors={$itUserField.errors}
-            iterable={getITUserITSystemName(itusers ? itusers : [])}
+            iterable={formatITUserITSystemName(itusers ? itusers : [])}
             on:change={() => {
               fetchItSystemRoles(itUser.itsystem.uuid)
               $role.value = ""

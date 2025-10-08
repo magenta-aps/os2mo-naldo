@@ -1,28 +1,30 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
-  import type { FacetValidities } from "$lib/util/getClasses"
+  import type { FacetValidities } from "$lib/utils/classes"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import { ManagerDocument, UpdateManagerDocument } from "./query.generated"
-  import { findClosestValidity } from "$lib/util/helpers"
+  import { findClosestValidity } from "$lib/utils/validities"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import { getClassesByFacetUserKey } from "$lib/util/getClasses"
+  import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import Search from "$lib/components/search/Search.svelte"
   import SelectMultiple from "$lib/components/forms/shared/SelectMultiple.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getClasses, getValidities } from "$lib/util/helpers"
+  import { getClasses } from "$lib/http/getClasses"
+  import { getValidities } from "$lib/http/getValidities"
+
   import { onMount } from "svelte"
 
   gql`
@@ -250,7 +252,7 @@
               startValue={manager.manager_type}
               bind:name={$managerType.value}
               errors={$managerType.errors}
-              iterable={getClassesByFacetUserKey(facets, "manager_type")}
+              iterable={filterClassesByFacetUserKey(facets, "manager_type")}
               extra_classes="basis-1/2"
               required={true}
             />
@@ -260,7 +262,7 @@
               startValue={manager.manager_level}
               bind:name={$managerLevel.value}
               errors={$managerLevel.errors}
-              iterable={getClassesByFacetUserKey(facets, "manager_level")}
+              iterable={filterClassesByFacetUserKey(facets, "manager_level")}
               extra_classes="basis-1/2"
               required={true}
             />
@@ -271,7 +273,7 @@
             title={capital($_("manager_responsibility"))}
             id="responsibility"
             startValue={responsibilities}
-            iterable={getClassesByFacetUserKey(facets, "responsibility")}
+            iterable={filterClassesByFacetUserKey(facets, "responsibility")}
             required={true}
           />
         {/if}

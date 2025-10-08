@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/util/translationUtils"
+  import { capital } from "$lib/utils/helpers"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
@@ -10,7 +10,7 @@
   import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
-  import { graphQLClient } from "$lib/util/http"
+  import { graphQLClient } from "$lib/http/client"
   import {
     FacetAndEmployeeDocument,
     CreateAssociationDocument,
@@ -18,14 +18,14 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import { getClassesByFacetUserKey } from "$lib/util/getClasses"
+  import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import Search from "$lib/components/search/Search.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import SelectGroup from "$lib/components/forms/shared/SelectGroup.svelte"
-  import { getMinMaxValidities, getValidities } from "$lib/util/helpers"
+  import { getValidities } from "$lib/http/getValidities"
   import { MOConfig } from "$lib/stores/config"
 
   let toDate: string
@@ -256,14 +256,14 @@
             bind:value={associationType}
             bind:name={$associationTypeField.value}
             errors={$associationTypeField.errors}
-            iterable={getClassesByFacetUserKey(facets, "association_type")}
+            iterable={filterClassesByFacetUserKey(facets, "association_type")}
             required={true}
             extra_classes="basis-1/2"
           />
           <Select
             title={capital($_("primary"))}
             id="primary"
-            iterable={getClassesByFacetUserKey(facets, "primary_type")}
+            iterable={filterClassesByFacetUserKey(facets, "primary_type")}
             extra_classes="basis-1/2"
             isClearable={true}
           />
