@@ -26,7 +26,6 @@
   import RelatedUnitsTable from "$lib/components/tables/RelatedUnitsTable.svelte"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Tabs from "$lib/components/shared/Tabs.svelte"
-  import { MOConfig } from "$lib/stores/config"
   import { tenseFilter } from "$lib/utils/tenses"
   import { env } from "$lib/env"
 
@@ -146,9 +145,7 @@
     </div>
     <div class="pb-4">
       <Breadcrumbs {orgUnit} link={true} />
-      {#if $MOConfig && $MOConfig.confdb_show_user_key === "true"}
-        <p class="text-sm">{capital($_("unit_number"))}: {orgUnit.user_key}</p>
-      {/if}
+      <p class="text-sm">{capital($_("unit_number"))}: {orgUnit.user_key}</p>
     </div>
     <Tabs {activeItem} {items} on:tabChange={tabChange} />
     <div class="flex justify-between">

@@ -17,19 +17,9 @@
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import { formatQueryDates } from "$lib/utils/validities"
-  import { MOConfig } from "$lib/stores/config"
   import { updateGlobalNavigation } from "$lib/stores/navigation"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
-
-  let inheritManager: boolean | undefined
-
-  // FIX: On reload, this doesn't work
-  $: if ($MOConfig) {
-    if ($MOConfig.confdb_inherit_manager === "false") {
-      inheritManager = false
-    }
-  }
 
   export let tense: Tense
 
@@ -37,11 +27,6 @@
   const isOrg = $page.route.id?.startsWith("/organisation")
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
-  // Don't set inherit flag if employee, to avoid:
-  // "The inherit flag requires an organizational unit filter"
-  if (!isOrg) {
-    inheritManager = false
-  }
 
   type Managers = ManagersQuery["managers"]["objects"][0]["validities"]
   let data: Managers
@@ -111,7 +96,9 @@
     const res = await graphQLClient().request(ManagersDocument, {
       org_unit: org_unit,
       employee: employee,
-      inherit: inheritManager,
+      // Don't set inherit flag if employee, to avoid:
+      // "The inherit flag requires an organizational unit filter"
+      inherit: !isOrg ? false : env.PUBLIC_INHERIT_MANAGER,
       ...tenseToValidity(tense, $date),
     })
     const managers: Managers = []
