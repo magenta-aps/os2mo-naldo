@@ -25,7 +25,6 @@
   import { formatITSystemNames } from "$lib/utils/helpers"
   import { getPrimaryClasses } from "$lib/http/getClasses"
   import { getPersonValidities } from "$lib/http/getValidities"
-  import { MOConfig } from "$lib/stores/config"
   import { normalizeITUser } from "$lib/utils/normalizeForm"
 
   gql`
@@ -214,8 +213,7 @@
   This might be the wanted behaviour, as the note is always updated? -->
   {@const note = notes[notes.length - 1].note}
   {@const itSystems = data.itsystems.objects}
-  {@const disableForm =
-    $MOConfig?.confdb_it_system_entry_edit_fields_disabled === "true" ? true : false}
+  {@const disableForm = env.PUBLIC_DISABLE_IT_USER_EDIT_FORM}
   {#if !initialITUser}
     {@html (() => {
       initialITUser = normalizeITUser(itUser, note)

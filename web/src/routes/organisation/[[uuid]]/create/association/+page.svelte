@@ -24,7 +24,6 @@
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
-  import { MOConfig } from "$lib/stores/config"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import SelectGroup from "$lib/components/forms/shared/SelectGroup.svelte"
 
@@ -97,10 +96,7 @@
 
   const allowSubstitute = (associationTypeUuid: string) => {
     // Check if the selected associationType allows a substitute
-    return $MOConfig &&
-      JSON.parse($MOConfig.confdb_substitute_roles).includes(associationTypeUuid)
-      ? true
-      : false
+    return env.PUBLIC_SUBSTITUTE_ROLES.includes(associationTypeUuid) ? true : false
   }
 
   const handler: SubmitFunction =

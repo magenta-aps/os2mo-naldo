@@ -1,14 +1,13 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
+  import { env } from "$lib/env"
   import type {
     LazyEmployeeSearchQuery,
     LazyOrgUnitSearchQuery,
     SearchEmployeeQuery,
     SearchOrgUnitQuery,
   } from "./query.generated"
-  import { MOConfig } from "$lib/stores/config"
-
   type Employee = SearchEmployeeQuery["employees"]["objects"][0]["validities"][0]
   type OrgUnit = SearchOrgUnitQuery["org_units"]["objects"][0]["validities"][0]
   type LazyEmployee = NonNullable<
@@ -51,7 +50,7 @@
   <div class="text-ellipsis">
     <div class="inline-block text-secondary">
       {item.name}
-      {#if type === "employee" && $MOConfig && $MOConfig.confdb_show_employee_birthday_in_search === "true"}{returnCPR(
+      {#if type === "employee" && env.PUBLIC_SHOW_EMPLOYEE_BIRTHDAY_IN_SEARCH}{returnCPR(
           item
         )}{/if}
     </div>

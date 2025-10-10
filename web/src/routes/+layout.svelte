@@ -10,44 +10,15 @@
   import { initKeycloak } from "$lib/auth/keycloak"
   import Favicon from "$lib/assets/favicon.png"
   import Drawer from "$lib/components/Drawer.svelte"
-  import { MOConfig, formatConfig } from "$lib/stores/config"
   import { gql } from "graphql-request"
   import { GetConfigDocument } from "./query.generated"
   import { graphQLClient } from "$lib/http/client"
   import { error } from "$lib/stores/alert"
   import SearchBar from "$lib/components/navbar/SearchBar.svelte"
 
-  gql`
-    query GetConfig {
-      configuration {
-        objects {
-          key
-          jsonified_value
-        }
-      }
-    }
-  `
-
-  const getConfig = async () => {
-    try {
-      const config = await graphQLClient().request(GetConfigDocument)
-      return formatConfig(config)
-    } catch (err) {
-      $error = { message: err }
-      return null
-    }
-  }
-
   onMount(async () => {
     await initKeycloak()
   })
-
-  // Makes sure keycloak has had a chance to load before fetching the config
-  $: if ($isAuth) {
-    ;(async () => {
-      $MOConfig = await getConfig()
-    })()
-  }
 </script>
 
 <svelte:head>

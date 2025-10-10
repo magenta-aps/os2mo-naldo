@@ -6,8 +6,23 @@ const bool = (value: string | undefined, defaultValue = false): boolean => {
   return defaultValue
 }
 
+const json = <T>(value: string | undefined, defaultValue: T): T => {
+  if (!value) return defaultValue
+  try {
+    return JSON.parse(value) as T
+  } catch (err) {
+    console.error(`Invalid JSON in env var:`, value)
+    return defaultValue
+  }
+}
+
 export const env = {
-  // strings
+  // lists
+  PUBLIC_NAVLINKS: json<{ href: string; text: string }[]>(
+    dynamicEnv["PUBLIC_NAVLINKS"],
+    []
+  ),
+  PUBLIC_SUBSTITUTE_ROLES: json<string[]>(dynamicEnv["PUBLIC_SUBSTITUTE_ROLES"], []), // strings
   PUBLIC_BASE_URL: dynamicEnv["PUBLIC_BASE_URL"] ?? "http://localhost:5000",
   PUBLIC_PRIMARY_CLASS_USER_KEY:
     dynamicEnv["PUBLIC_PRIMARY_CLASS_USER_KEY"] ?? "primary",
@@ -16,10 +31,25 @@ export const env = {
   // booleans
   PUBLIC_DAR_ACCESS_ADDRESSES: bool(dynamicEnv["PUBLIC_DAR_ACCESS_ADDRESSES"], true),
   PUBLIC_DOCS_LINK: bool(dynamicEnv["PUBLIC_DOCS_LINK"], true),
+  PUBLIC_INHERIT_MANAGER: bool(dynamicEnv["PUBLIC_INHERIT_MANAGER"], true),
+  // Consider default false cpr_number maybe?
+  PUBLIC_SHOW_CPR_NUMBER: bool(dynamicEnv["PUBLIC_SHOW_CPR_NUMBER"], true),
+  PUBLIC_SHOW_ORG_UNIT_LEVEL: bool(dynamicEnv["PUBLIC_SHOW_ORG_UNIT_LEVEL"], true),
+
+  PUBLIC_SHOW_TIME_PLANNING: bool(dynamicEnv["PUBLIC_SHOW_TIME_PLANNING"]),
+  PUBLIC_SHOW_KLE: bool(dynamicEnv["PUBLIC_SHOW_KLE"]),
+  PUBLIC_SHOW_PRIMARY_ENGAGEMENT: bool(dynamicEnv["PUBLIC_SHOW_PRIMARY_ENGAGEMENT"]),
+  PUBLIC_SHOW_PRIMARY_ASSOCIATION: bool(dynamicEnv["PUBLIC_SHOW_PRIMARY_ASSOCIATION"]),
+  PUBLIC_SHOW_IT_ASSOCIATIONS_TAB: bool(dynamicEnv["PUBLIC_SHOW_IT_ASSOCIATIONS_TAB"]),
+  PUBLIC_DISABLE_IT_USER_EDIT_FORM: bool(
+    dynamicEnv["PUBLIC_DISABLE_IT_USER_EDIT_FORM"]
+  ),
+  PUBLIC_SHOW_EMPLOYEE_BIRTHDAY_IN_SEARCH: bool(
+    dynamicEnv["PUBLIC_SHOW_EMPLOYEE_BIRTHDAY_IN_SEARCH"]
+  ),
   PUBLIC_SHOW_ADMIN_PANEL: bool(dynamicEnv["PUBLIC_SHOW_ADMIN_PANEL"]),
   PUBLIC_SHOW_INSIGHTS: bool(dynamicEnv["PUBLIC_SHOW_INSIGHTS"]),
   PUBLIC_AUDITLOG: bool(dynamicEnv["PUBLIC_AUDITLOG"]),
-  PUBLIC_OPTIONAL_TIME_PLANNING: bool(dynamicEnv["PUBLIC_OPTIONAL_TIME_PLANNING"]),
   PUBLIC_SHOW_ROLEBINDINGS: bool(dynamicEnv["PUBLIC_SHOW_ROLEBINDINGS"]),
   PUBLIC_SEARCH_INFINITY: bool(dynamicEnv["PUBLIC_SEARCH_INFINITY"]),
   PUBLIC_ONBOARDING_LINK: bool(dynamicEnv["PUBLIC_ONBOARDING_LINK"]),

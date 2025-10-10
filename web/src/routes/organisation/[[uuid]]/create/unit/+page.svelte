@@ -2,6 +2,7 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
   import { success, error } from "$lib/stores/alert"
+  import { env } from "$lib/env"
   import { graphQLClient } from "$lib/http/client"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
@@ -19,31 +20,17 @@
   import Search from "$lib/components/search/Search.svelte"
   import { getClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
-
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { MOConfig } from "$lib/stores/config"
-  import { env } from "$lib/env"
 
   let toDate: string
 
   const fromDate = field("from", "", [required()])
   const name = field("name", "", [required()])
   const orgUnitType = field("org_unit_type", "", [required()])
-  const timePlanning = field("time_planning", "", [required()])
   let svelteForm = form(fromDate, name, orgUnitType)
-
-  // This is needed, since `timePlanning` is required, but only used by some.
-  $: if ($MOConfig) {
-    if (
-      $MOConfig.confdb_show_time_planning === "true" &&
-      !env.PUBLIC_OPTIONAL_TIME_PLANNING
-    ) {
-      svelteForm = form(fromDate, name, orgUnitType, timePlanning)
-    }
-  }
 
   let parent: {
     uuid: string
@@ -213,7 +200,7 @@
         errors={$name.errors}
       />
       {#if facets}
-        {#if $MOConfig && $MOConfig.confdb_show_level === "true"}
+        {#if env.PUBLIC_SHOW_ORG_UNIT_LEVEL}
           <Select
             title={capital($_("org_unit_level"))}
             id="org-unit-level"
@@ -221,16 +208,12 @@
             isClearable={true}
           />
         {/if}
-        {#if $MOConfig && $MOConfig.confdb_show_time_planning === "true"}
+        {#if env.PUBLIC_SHOW_TIME_PLANNING}
           <Select
             title={capital($_("time_planning"))}
             id="time-planning"
-            bind:name={$timePlanning.value}
-            errors={$timePlanning.errors}
             iterable={filterClassesByFacetUserKey(facets, "time_planning")}
             isClearable={true}
-            required={!env.PUBLIC_OPTIONAL_TIME_PLANNING}
-            on:clear={() => ($timePlanning.value = "")}
           />
         {/if}
         <div class="flex flex-row gap-6">

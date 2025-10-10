@@ -17,7 +17,6 @@
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import { formatQueryDates } from "$lib/utils/validities"
-  import { MOConfig } from "$lib/stores/config"
   import { updateGlobalNavigation } from "$lib/stores/navigation"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
@@ -158,7 +157,7 @@
           >{association.trade_union ? association.trade_union?.name : ""}</td
         >
       {/if}
-      {#if $MOConfig && $MOConfig.confdb_show_primary_association === "true"}
+      {#if env.PUBLIC_SHOW_PRIMARY_ASSOCIATION}
         <td class="text-sm p-4"
           >{association.primary ? association.primary?.name : ""}</td
         >
