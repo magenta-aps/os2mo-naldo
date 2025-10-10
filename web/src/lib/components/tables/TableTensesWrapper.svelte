@@ -50,7 +50,7 @@
       headers = headers.filter((header) => header.title !== capital($_("trade_union")))
     }
 
-    if (!env.PUBLIC_SHOW_EXTENSION_2 && table === EngagementTable) {
+    if (!env.PUBLIC_SHOW_EXTENSION_4 && table === EngagementTable) {
       headers = headers.filter(
         (header) => header.title !== capital($_("department_code"))
       )

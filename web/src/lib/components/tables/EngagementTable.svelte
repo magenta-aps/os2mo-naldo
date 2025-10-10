@@ -78,7 +78,7 @@
               user_key
             }
             extension_1
-            extension_2
+            extension_4
             engagement_type(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
             }
@@ -184,9 +184,9 @@
           >
         {/if}
       </td>
-      {#if env.PUBLIC_SHOW_EXTENSION_2}
+      {#if env.PUBLIC_SHOW_EXTENSION_4}
         <td class="text-sm p-4">
-          {engagement.extension_2 ? engagement.extension_2 : ""}
+          {engagement.extension_4 ? engagement.extension_4 : ""}
         </td>
       {/if}
       <td class="text-sm p-4">{engagement.user_key}</td>

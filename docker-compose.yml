@@ -25,7 +25,7 @@ services:
       # Changes job_function to job_code and instead populates job_function with extension_1  
       PUBLIC_SHOW_EXTENSION_1: "false"
       # Department code
-      PUBLIC_SHOW_EXTENSION_2: "false"
+      PUBLIC_SHOW_EXTENSION_4: "false"
       PUBLIC_SHOW_ITUSER_CONNECTIONS: "true"
       PUBLIC_ENABLE_CONFEDERATIONS: "true"
     ports:
