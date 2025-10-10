@@ -2643,6 +2643,7 @@ export type DarAddress = ResolvedAddress & {
   road_code: Scalars['Int']['output'];
   road_name: Scalars['String']['output'];
   streetmap_href?: Maybe<Scalars['String']['output']>;
+  supplementary_city?: Maybe<Scalars['String']['output']>;
   value: Scalars['String']['output'];
   zip_code: Scalars['String']['output'];
   zip_code_name: Scalars['String']['output'];

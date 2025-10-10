@@ -12,7 +12,7 @@ export const actions: Actions = {
     const engagementType = data.get("engagement-type")
     const jobFunction = data.get("job-function")
     const extension_1 = data.get("extension-1") as string
-    const extension_2 = data.get("extension-2") as string
+    const extension_4 = data.get("extension-4") as string
     const primary = data.get("primary")
     const startDate = data.get("from")
     const endDate = data.get("to")
@@ -24,7 +24,7 @@ export const actions: Actions = {
       engagement_type: engagementType,
       job_function: jobFunction,
       ...(extension_1 && { extension_1: extension_1 }),
-      ...(extension_2 && { extension_2: extension_2 }),
+      ...(extension_4 && { extension_4: extension_4 }),
       ...(primary && { primary: primary }),
       validity: { from: startDate, ...(endDate && { to: endDate }) },
     }
