@@ -1,6 +1,7 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
+  import { env } from "$lib/env"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
@@ -8,7 +9,6 @@
   import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
-  import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
@@ -24,8 +24,6 @@
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getClasses } from "$lib/http/getClasses"
-  import { MOConfig } from "$lib/stores/config"
-  import { env } from "$lib/env"
 
   let toDate: string
   let parent: {
@@ -36,18 +34,7 @@
   const fromDate = field("from", "", [required()])
   const name = field("name", "", [required()])
   const orgUnitType = field("org_unit_type", "", [required()])
-  const timePlanning = field("time_planning", "", [required()])
   let svelteForm = form(fromDate, name, orgUnitType)
-
-  // This is needed, since `timePlanning` is required, but only used by some.
-  $: if ($MOConfig) {
-    if (
-      $MOConfig.confdb_show_time_planning === "true" &&
-      !env.PUBLIC_OPTIONAL_TIME_PLANNING
-    ) {
-      svelteForm = form(fromDate, name, orgUnitType, timePlanning)
-    }
-  }
 
   gql`
     query GetOrgUnit($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
@@ -252,21 +239,17 @@
           required={true}
         />
         {#if facets}
-          {#if $MOConfig && $MOConfig.confdb_show_time_planning === "true"}
+          {#if env.PUBLIC_SHOW_TIME_PLANNING}
             <Select
               title={capital($_("time_planning"))}
               id="time-planning"
-              bind:name={$timePlanning.value}
-              errors={$timePlanning.errors}
               startValue={orgUnit.time_planning ? orgUnit.time_planning : undefined}
               iterable={filterClassesByFacetUserKey(facets, "time_planning")}
               isClearable={true}
-              required={!env.PUBLIC_OPTIONAL_TIME_PLANNING}
-              on:clear={() => ($timePlanning.value = "")}
             />
           {/if}
           <div class="flex flex-row gap-6">
-            {#if $MOConfig && $MOConfig.confdb_show_level === "true"}
+            {#if env.PUBLIC_SHOW_ORG_UNIT_LEVEL}
               <Select
                 title={capital($_("org_unit_level"))}
                 id="org-level"

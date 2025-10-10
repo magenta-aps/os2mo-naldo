@@ -23,14 +23,6 @@
   import { updateGlobalNavigation } from "$lib/stores/navigation"
   import { env } from "$lib/env"
 
-  let inheritManager: boolean | undefined
-
-  $: if ($MOConfig) {
-    if ($MOConfig.confdb_inherit_manager === "false") {
-      inheritManager = false
-    }
-  }
-
   type Engagements = EngagementsQuery["engagements"]["objects"][0]["validities"]
   let data: Engagements
 
@@ -139,7 +131,7 @@
     const res = await graphQLClient().request(EngagementsDocument, {
       org_unit: org_unit,
       employee: employee,
-      inherit: inheritManager,
+      inherit: env.PUBLIC_INHERIT_MANAGER,
       isOrg: isOrg,
       ...tenseToValidity(tense, $date),
     })
@@ -248,7 +240,7 @@
           {/if}
         </td>
       {/if}
-      {#if $MOConfig && $MOConfig.confdb_show_primary_engagement === "true"}
+      {#if env.PUBLIC_SHOW_PRIMARY_ENGAGEMENT}
         <td class="text-sm p-4">{engagement.primary ? engagement.primary.name : ""}</td>
       {/if}
       <ValidityTableCell validity={engagement.validity} />

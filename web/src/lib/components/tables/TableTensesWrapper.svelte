@@ -1,16 +1,16 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
+  import { env } from "$lib/env"
   import DetailTable from "$lib/components/shared/DetailTable.svelte"
   import { tenses } from "$lib/stores/tenses"
   import type { ComponentType, SvelteComponent } from "svelte"
-  import { MOConfig } from "$lib/stores/config"
   import AssociationTable from "$lib/components/tables/AssociationTable.svelte"
   import AddressTable from "$lib/components/tables/AddressTable.svelte"
   import EngagementTable from "$lib/components/tables/EngagementTable.svelte"
-  import ItUserTable from "./ITUserTable.svelte"
-  import RelatedUnitsTable from "./RelatedUnitsTable.svelte"
-  import { env } from "$lib/env"
+  import ItUserTable from "$lib/components/tables/ITUserTable.svelte"
+  import OrgUnitTable from "$lib/components/tables/EngagementTable.svelte"
+  import RelatedUnitsTable from "$lib/components/tables/RelatedUnitsTable.svelte"
 
   export let headers: Header[]
   export let table: ComponentType<SvelteComponent>
@@ -18,40 +18,27 @@
   // Specific for admin interface
   export let facetUuid: string | undefined = undefined
 
-  // Filter out all the tabs that are dependent on environment variables
-  $: if ($MOConfig) {
-    if ($MOConfig.confdb_show_level === "false") {
-      headers = headers.filter(
-        (header) => header.title !== capital($_("org_unit_level"))
-      )
-    }
-    if ($MOConfig.confdb_show_time_planning === "false") {
+  $: {
+    if (!env.PUBLIC_SHOW_TIME_PLANNING && table === OrgUnitTable) {
       headers = headers.filter(
         (header) => header.title !== capital($_("time_planning"))
       )
     }
 
-    if (
-      $MOConfig.confdb_show_primary_engagement === "false" &&
-      table == EngagementTable
-    ) {
-      headers = headers.filter((header) => header.title !== capital($_("primary")))
+    if (!env.PUBLIC_SHOW_ORG_UNIT_LEVEL && table === OrgUnitTable) {
+      headers = headers.filter(
+        (header) => header.title !== capital($_("org_unit_level"))
+      )
     }
-    if (
-      $MOConfig.confdb_show_primary_association === "false" &&
-      table == AssociationTable
-    ) {
-      headers = headers.filter((header) => header.title !== capital($_("primary")))
-    }
-    if (
-      !JSON.parse($MOConfig.confdb_association_dynamic_facets) &&
-      table == AssociationTable
-    ) {
-      headers = headers.filter((header) => header.title !== capital($_("trade_union")))
-    }
-  }
 
-  $: {
+    if (!env.PUBLIC_SHOW_PRIMARY_ENGAGEMENT && table == EngagementTable) {
+      headers = headers.filter((header) => header.title !== capital($_("primary")))
+    }
+
+    if (!env.PUBLIC_SHOW_PRIMARY_ASSOCIATION && table == AssociationTable) {
+      headers = headers.filter((header) => header.title !== capital($_("primary")))
+    }
+
     if (!env.PUBLIC_SHOW_EXTENSION_2 && table === EngagementTable) {
       headers = headers.filter(
         (header) => header.title !== capital($_("department_code"))

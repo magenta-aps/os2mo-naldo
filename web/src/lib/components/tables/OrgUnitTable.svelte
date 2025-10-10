@@ -16,7 +16,6 @@
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import { formatQueryDates } from "$lib/utils/validities"
-  import { MOConfig } from "$lib/stores/config"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
 
@@ -101,7 +100,7 @@
       <td class="text-sm p-4"
         >{org_unit.unit_type ? org_unit.unit_type.name : capital($_("not_set"))}</td
       >
-      {#if $MOConfig && $MOConfig.confdb_show_level === "true"}
+      {#if env.PUBLIC_SHOW_ORG_UNIT_LEVEL}
         <td class="text-sm p-4"
           >{org_unit.org_unit_level
             ? org_unit.org_unit_level.name
@@ -120,7 +119,7 @@
           )}
         {/if}
       </td>
-      {#if $MOConfig && $MOConfig.confdb_show_time_planning === "true"}
+      {#if env.PUBLIC_SHOW_TIME_PLANNING}
         <td class="text-sm p-4">
           {org_unit.time_planning
             ? org_unit.time_planning.name

@@ -9,7 +9,6 @@
   import Select from "$lib/components/forms/shared/Select.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
-  import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { page } from "$app/stores"
   import { gql } from "graphql-request"
@@ -27,7 +26,6 @@
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
   import { getMinMaxValidities } from "$lib/utils/validities"
-  import { MOConfig } from "$lib/stores/config"
   import { env } from "$lib/env"
 
   let toDate: string
@@ -185,8 +183,7 @@
   {@const classes = data.classes.objects}
   {@const itSystems = data.itsystems.objects}
   {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
-  {@const disableForm =
-    $MOConfig?.confdb_it_system_entry_edit_fields_disabled === "true" ? true : false}
+  {@const disableForm = env.PUBLIC_DISABLE_IT_USER_EDIT_FORM}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">

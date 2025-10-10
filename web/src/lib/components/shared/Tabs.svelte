@@ -12,10 +12,10 @@
 
   let dispatch = createEventDispatcher()
 
-  if ($MOConfig && $MOConfig.confdb_show_kle === "false") {
+  if (!env.PUBLIC_SHOW_KLE) {
     items = items.filter((tab) => tab.value !== OrgTab.KLE)
   }
-  if ($MOConfig && $MOConfig.show_it_associations_tab === "false") {
+  if (!env.PUBLIC_SHOW_IT_ASSOCIATIONS_TAB) {
     items = items.filter((tab) => tab.value !== EmployeeTab.ITASSOCIATION)
   }
   // checking if not "true", to be explicit where we want it shown

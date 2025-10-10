@@ -158,7 +158,7 @@
           >{association.trade_union ? association.trade_union?.name : ""}</td
         >
       {/if}
-      {#if $MOConfig && $MOConfig.confdb_show_primary_association === "true"}
+      {#if env.PUBLIC_SHOW_PRIMARY_ASSOCIATION}
         <td class="text-sm p-4"
           >{association.primary ? association.primary?.name : ""}</td
         >
