@@ -64,7 +64,7 @@
               }
             }
             extension_1
-            extension_2
+            extension_4
           }
         }
       }
@@ -260,7 +260,7 @@
               required={true}
             />
           </div>
-          {#if env.PUBLIC_SHOW_EXTENSION_1 || env.PUBLIC_SHOW_EXTENSION_2}
+          {#if env.PUBLIC_SHOW_EXTENSION_1 || env.PUBLIC_SHOW_EXTENSION_4}
             <div class="flex flex-row gap-6">
               {#if env.PUBLIC_SHOW_EXTENSION_1}
                 <Input
@@ -270,11 +270,11 @@
                   extra_classes="basis-1/2"
                 />
               {/if}
-              {#if env.PUBLIC_SHOW_EXTENSION_2}
+              {#if env.PUBLIC_SHOW_EXTENSION_4}
                 <Input
                   title={capital($_("department_code"))}
-                  id="extension-2"
-                  startValue={engagement.extension_2}
+                  id="extension-4"
+                  startValue={engagement.extension_4}
                   extra_classes="basis-1/2"
                 />
               {/if}
