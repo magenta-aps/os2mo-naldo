@@ -26,6 +26,8 @@
   import { getClasses } from "$lib/http/getClasses"
   import { findClosestValidity } from "$lib/utils/validities"
   import { env } from "$lib/env"
+  import { writable } from "svelte/store"
+  import { isNoopToDateEdit, makeGraphQLError } from "$lib/components/alerts/noop"
 
   gql`
     query Engagement($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
@@ -75,6 +77,7 @@
       }
     }
   `
+  const originalEngagement = writable()
 
   let startDate: string = $date
   let toDate: string
@@ -96,6 +99,41 @@
       await svelteForm.validate()
       if (!$svelteForm.valid) return
       if (result.type !== "success" || !result.data) return
+      // This is not the frontends responsibility
+      // This is not the frontends responsibility
+      // This is not the frontends responsibility
+      // This is not the frontends responsibility
+      // This is not the frontends responsibility
+      // This is not the frontends responsibility
+      // This is not the frontends responsibility
+      // This is not the frontends responsibility
+      const original = $originalEngagement
+
+      const originalTo = original.validity.to?.split("T")[0]
+      const newTo = result.data.validity.to
+
+      const keysToCompare = ["validity", "job_function", "engagement_type", "org_unit"]
+
+      if (isNoopToDateEdit($originalEngagement, result.data, keysToCompare)) {
+        $error = makeGraphQLError(
+          "V_NO_EFFECT_CHANGE",
+          "This change would have no effect — the engagement would consolidate away.",
+          { validity_change: "noop" },
+          result.data,
+          "mutation UpdateEngagement(...) {...}"
+        )
+        return
+      }
+      // return
+      // This is not the frontends responsibility
+      // This is not the frontends responsibility
+      // This is not the frontends responsibility
+      // This is not the frontends responsibility
+      // This is not the frontends responsibility
+      // This is not the frontends responsibility
+      // This is not the frontends responsibility
+      // This is not the frontends responsibility
+      // This is not the frontends responsibility
 
       try {
         const mutation = await graphQLClient().request(UpdateEngagementDocument, {
@@ -197,6 +235,11 @@
   </div>
 {:then data}
   {@const engagement = data.engagements.objects[0].validities[0]}
+  {@html (() => {
+    originalEngagement.set(engagement)
+    return ""
+  })()}
+  {@const to = engagement.validity.to.split("T")[0]}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">

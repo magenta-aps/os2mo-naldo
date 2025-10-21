@@ -152,7 +152,6 @@
           title={capital($_("date.end_date"))}
           id="to"
           min={$fromDate.value ? $fromDate.value : validities.from}
-          max={validities.to}
         />
       </div>
       <Search
