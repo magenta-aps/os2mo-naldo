@@ -39,6 +39,7 @@
 	"documentation": "documentation",
 	"download_as_csv": "download as csv",
 	"edit_item": "edit {item}",
+	"edit_tooltip": "You can only set an earlier end date if other fields have been edited. If you are trying to terminate, please use the 'Terminate'-function instead.",
 	"employee": "{n, plural, =0 {the employee} one {employee} other {employees}}",
 	"empty_breadcrumbs": "will be placed in the root",
 	"engagement": "{n, plural, =0 {the employment} one {employment} other {employments}}",

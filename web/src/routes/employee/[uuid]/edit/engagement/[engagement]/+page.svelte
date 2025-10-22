@@ -26,6 +26,7 @@
   import { getClasses } from "$lib/http/getClasses"
   import { findClosestValidity } from "$lib/utils/validities"
   import { env } from "$lib/env"
+  import { normalizeEngagement } from "$lib/utils/normalizeForm"
 
   gql`
     query Engagement($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
@@ -87,7 +88,16 @@
   const orgUnit = field("org_unit", "", [required()])
   const jobFunction = field("job_function", "", [required()])
   const engagementType = field("engagement_type", "", [required()])
-  const svelteForm = form(fromDate, orgUnit, jobFunction, engagementType)
+  const userKey = field("user_key", "", [])
+  const primary = field("primary", "", [])
+  const svelteForm = form(
+    fromDate,
+    orgUnit,
+    jobFunction,
+    engagementType,
+    userKey,
+    primary
+  )
 
   const handler: SubmitFunction =
     () =>
@@ -152,6 +162,24 @@
       }
     })()
   }
+
+  let initialEngagement: any = null
+  let hasChanges = false
+  $: if (initialEngagement) {
+    // Check if any of the user-editable fields have changed compared to the original values.
+    const editableChanged =
+      selectedOrgUnit?.uuid !== initialEngagement.org_unit ||
+      $jobFunction.value !== initialEngagement.job_function ||
+      $engagementType.value !== initialEngagement.engagement_type ||
+      $userKey.value !== initialEngagement.user_key ||
+      $primary.value !== initialEngagement.primary
+
+    const toDateExtended =
+      toDate === ""
+        ? initialEngagement.to !== null
+        : toDate > (initialEngagement.to ?? null)
+    hasChanges = editableChanged || toDateExtended
+  }
 </script>
 
 <title
@@ -197,6 +225,12 @@
   </div>
 {:then data}
   {@const engagement = data.engagements.objects[0].validities[0]}
+  {#if !initialEngagement}
+    {@html (() => {
+      initialEngagement = normalizeEngagement(engagement)
+      return ""
+    })()}
+  {/if}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -241,6 +275,7 @@
             <Input
               title="ID"
               id="user-key"
+              bind:value={$userKey.value}
               startValue={engagement.user_key}
               extra_classes="basis-1/2"
             />
@@ -291,9 +326,11 @@
             <Select
               title={capital($_("primary"))}
               id="primary"
+              bind:name={$primary.value}
               startValue={engagement.primary ? engagement.primary : undefined}
               iterable={filterClassesByFacetUserKey(facets, "primary_type")}
               extra_classes="basis-1/2"
+              on:clear={() => ($primary.value = "")}
               isClearable={true}
             />
           </div>
@@ -308,6 +345,8 @@
             values: { item: $_("engagement", { values: { n: 1 } }) },
           })
         )}
+        disabled={!hasChanges}
+        info={hasChanges ? undefined : $_("edit_tooltip")}
       />
       <Button
         type="button"
