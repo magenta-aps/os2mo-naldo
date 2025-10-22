@@ -153,7 +153,7 @@
       <td class="text-sm p-4"
         >{association.substitute[0] ? association.substitute[0].name : ""}</td
       >
-      {#if $MOConfig && JSON.parse($MOConfig.confdb_association_dynamic_facets)}
+      {#if env.PUBLIC_ENABLE_CONFEDERATIONS}
         <td class="text-sm p-4"
           >{association.trade_union ? association.trade_union?.name : ""}</td
         >
