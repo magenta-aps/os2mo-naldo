@@ -8,3 +8,14 @@ export const normalizeEngagement = (e) => {
     primary: e.primary?.name ?? "",
   }
 }
+
+export const normalizeAddress = (a) => {
+  return {
+    to: a.validity?.to?.split("T")[0] ?? null,
+    address_type: a.address_type?.name ?? null,
+    value: a.name ?? null,
+    // Support the case where user_key defaults to the value when created
+    user_key: a.user_key == a.name ? "" : a.user_key,
+    visibility: a.visibility?.name ?? "",
+  }
+}
