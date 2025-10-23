@@ -8,7 +8,6 @@
   import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
-  import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
@@ -27,16 +26,38 @@
   import { getMinMaxValidities, findClosestValidity } from "$lib/utils/validities"
   import { MOConfig } from "$lib/stores/config"
   import SelectGroup from "$lib/components/forms/shared/SelectGroup.svelte"
+  import { normalizeAssociation } from "$lib/utils/normalizeForm"
 
+  let startDate: string = $date
   let toDate: string
+  let selectedPerson: {
+    uuid: string
+    name: string
+  }
+  let selectedOrgUnit: {
+    uuid: string
+    name: string
+  }
 
   let associationType: { name: string; user_key: string; uuid: string }
   $: associationTypeUuid = associationType?.uuid
 
   const fromDate = field("from", "", [required()])
-  const employee = field("employee", "", [required()])
+  const person = field("person", "", [required()])
+  const orgUnit = field("org_unit", "", [required()])
   const associationTypeField = field("association_type", "", [required()])
-  let svelteForm = form(fromDate, employee, associationTypeField)
+  const primary = field("primary", "", [])
+  const substitute = field("substitute", "", [])
+  const tradeUnion = field("trade_union", "", [])
+  let svelteForm = form(
+    fromDate,
+    person,
+    orgUnit,
+    associationTypeField,
+    primary,
+    substitute,
+    tradeUnion
+  )
 
   const allowSubstitute = (associationTypeUuid: string) => {
     // Check if the selected associationType allows a substitute
@@ -74,6 +95,14 @@
             person(filter: { from_date: $fromDate, to_date: $toDate }) {
               uuid
               name
+            }
+            org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
+              uuid
+              name
+              validity {
+                from
+                to
+              }
             }
             association_type {
               uuid
@@ -174,6 +203,25 @@
         }
       }
     }
+
+  let initialAssociation: any = null
+  let hasChanges = false
+  $: if (initialAssociation) {
+    // Check if any of the user-editable fields have changed compared to the original values.
+    const editableChanged =
+      selectedPerson?.uuid !== initialAssociation.person ||
+      selectedOrgUnit?.uuid !== initialAssociation.org_unit ||
+      $associationTypeField.value !== initialAssociation.association_type ||
+      $primary.value !== initialAssociation.primary ||
+      $substitute.value !== initialAssociation.substitute ||
+      $tradeUnion.value !== initialAssociation.trade_union
+
+    const toDateExtended =
+      toDate === ""
+        ? initialAssociation.to !== null
+        : toDate > (initialAssociation.to ?? null)
+    hasChanges = editableChanged || toDateExtended
+  }
 </script>
 
 {#await graphQLClient().request( AssociationAndFacetDocument, { uuid: $page.params.association, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), getConfederations: env.PUBLIC_ENABLE_CONFEDERATIONS, currentDate: $date } )}
@@ -199,6 +247,12 @@
     data.associations.objects[0].validities[0].org_unit
   )}
   {@const topLevelFacets = data.classes?.objects}
+  {#if !initialAssociation}
+    {@html (() => {
+      initialAssociation = normalizeAssociation(association)
+      return ""
+    })()}
+  {/if}
 
   <title
     >{capital(
@@ -225,8 +279,8 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            startValue={$date}
-            bind:value={$fromDate.value}
+            bind:value={startDate}
+            bind:validationValue={$fromDate.value}
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
@@ -245,16 +299,27 @@
             max={validities.to}
           />
         </div>
-        <!-- TODO: make optional when GraphQL agrees -->
+        <Search
+          type="org-unit"
+          startValue={{
+            uuid: findClosestValidity(association.org_unit, $date).uuid,
+            name: findClosestValidity(association.org_unit, $date).name,
+          }}
+          bind:value={selectedOrgUnit}
+          bind:name={$orgUnit.value}
+          disabled
+          required={true}
+        />
         <Search
           type="employee"
           startValue={{
             uuid: findClosestValidity(association.person, $date).uuid,
             name: findClosestValidity(association.person, $date).name,
           }}
-          bind:name={$employee.value}
-          errors={$employee.errors}
-          on:clear={() => ($employee.value = "")}
+          bind:value={selectedPerson}
+          bind:name={$person.value}
+          errors={$person.errors}
+          on:clear={() => ($person.value = "")}
           required={true}
         />
         <div class="flex flex-row gap-6">
@@ -264,8 +329,8 @@
             startValue={association.association_type
               ? association.association_type
               : undefined}
-            bind:name={$associationTypeField.value}
             bind:value={associationType}
+            bind:name={$associationTypeField.value}
             errors={$associationTypeField.errors}
             iterable={filterClassesByFacetUserKey(facets, "association_type")}
             extra_classes="basis-1/2"
@@ -275,8 +340,10 @@
             title={capital($_("primary"))}
             id="primary"
             startValue={association.primary ? association.primary : undefined}
+            bind:name={$primary.value}
             iterable={filterClassesByFacetUserKey(facets, "primary_type")}
             extra_classes="basis-1/2"
+            on:clear={() => ($primary.value = "")}
             isClearable={true}
           />
         </div>
@@ -291,6 +358,8 @@
                     name: findClosestValidity(association.substitute, $date).name,
                   }
                 : undefined}
+              bind:name={$substitute.value}
+              on:clear={() => ($substitute.value = "")}
               type="employee"
             />
           {/if}
@@ -299,8 +368,11 @@
           <SelectGroup
             id="trade-union"
             title={$_("trade_union")}
+            bind:name={$tradeUnion.value}
             iterable={topLevelFacets}
             startValue={association.trade_union ? association.trade_union : undefined}
+            on:clear={() => ($tradeUnion.value = "")}
+            isClearable={true}
           />
         {/if}
       </div>
@@ -313,6 +385,8 @@
             values: { item: $_("association", { values: { n: 1 } }) },
           })
         )}
+        disabled={!hasChanges}
+        info={hasChanges ? undefined : $_("edit_tooltip")}
       />
       <Button
         type="button"
