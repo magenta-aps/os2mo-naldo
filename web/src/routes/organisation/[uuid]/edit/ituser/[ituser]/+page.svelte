@@ -9,7 +9,6 @@
   import Select from "$lib/components/forms/shared/Select.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
-  import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { page } from "$app/stores"
   import { gql } from "graphql-request"
@@ -18,10 +17,11 @@
     UpdateItUserDocument,
   } from "./query.generated"
   import type { SubmitFunction } from "./$types"
-  import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
   import { date } from "$lib/stores/date"
-  import { filterClassUuidByUserKey } from "$lib/utils/classes"
+  import type { FacetValidities } from "$lib/utils/classes"
+  import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import { formatITSystemNames } from "$lib/utils/helpers"
+  import { getPrimaryClasses } from "$lib/http/getClasses"
   import { getMinMaxValidities } from "$lib/utils/validities"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
@@ -29,19 +29,23 @@
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
   import { MOConfig } from "$lib/stores/config"
   import { env } from "$lib/env"
+  import { normalizeITUser } from "$lib/utils/normalizeForm"
 
+  let startDate: string = $date
   let toDate: string
+
   const fromDate = field("from", "", [required()])
   const itSystem = field("it_system", "", [required()])
   const accountName = field("account_name", "", [required()])
-  const svelteForm = form(fromDate, itSystem, accountName)
+  const primary = field("primary", "", [])
+  const noteField = field("note", "", [])
+  const svelteForm = form(fromDate, itSystem, accountName, primary, noteField)
 
   gql`
     query ITUserItSystemsOrgAndPrimary(
       $uuid: [UUID!]
       $fromDate: DateTime
       $toDate: DateTime
-      $primaryClass: String!
       $currentDate: DateTime!
     ) {
       itusers(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
@@ -49,6 +53,8 @@
           validities {
             user_key
             primary {
+              name
+              user_key
               uuid
             }
             itsystem {
@@ -78,16 +84,6 @@
           current(at: $currentDate) {
             name
             uuid
-          }
-        }
-      }
-      classes(
-        filter: { user_keys: [$primaryClass, "non-primary"], from_date: $currentDate }
-      ) {
-        objects {
-          validities {
-            uuid
-            user_key
           }
         }
       }
@@ -134,6 +130,45 @@
         }
       }
     }
+
+  let facets: FacetValidities[]
+  let abortController: AbortController
+  $: {
+    // Abort the previous request if a new one is about to start
+    if (abortController) abortController.abort()
+    abortController = new AbortController()
+
+    // Make sure `currentDate` isn't sent if startDate is null.
+    const params = {
+      fromDate: startDate,
+      primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY,
+    }
+
+    ;(async () => {
+      try {
+        facets = await getPrimaryClasses(params, abortController.signal)
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          console.error("Request failed:", err)
+        }
+      }
+    })()
+  }
+
+  let initialITUser: any = null
+  let hasChanges = false
+  $: if (initialITUser) {
+    // Check if any of the user-editable fields have changed compared to the original values.
+    const editableChanged =
+      $itSystem.value !== initialITUser.itsystem ||
+      $accountName.value !== initialITUser.user_key ||
+      $primary.value !== initialITUser.primary ||
+      $noteField.value !== initialITUser.note
+
+    const toDateExtended =
+      toDate === "" ? initialITUser.to !== null : toDate > (initialITUser.to ?? null)
+    hasChanges = editableChanged || toDateExtended
+  }
 </script>
 
 <title
@@ -156,7 +191,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ItUserItSystemsOrgAndPrimaryDocument, { uuid: $page.params.ituser, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY, currentDate: $date } )}
+{#await graphQLClient().request( ItUserItSystemsOrgAndPrimaryDocument, { uuid: $page.params.ituser, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), currentDate: $date } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -182,18 +217,23 @@
   figure out a way to always pair notes with the correct ITUser. 
   This might be the wanted behaviour, as the note is always updated? -->
   {@const note = notes[notes.length - 1].note}
-  {@const classes = data.classes.objects}
   {@const itSystems = data.itsystems.objects}
   {@const disableForm =
     $MOConfig?.confdb_it_system_entry_edit_fields_disabled === "true" ? true : false}
+  {#if !initialITUser}
+    {@html (() => {
+      initialITUser = normalizeITUser(itUser, note)
+      return ""
+    })()}
+  {/if}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            startValue={$date}
-            bind:value={$fromDate.value}
+            bind:value={startDate}
+            bind:validationValue={$fromDate.value}
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
@@ -235,25 +275,22 @@
             disabled={disableForm}
           />
         </div>
-        <div class="flex">
-          <Checkbox
+        {#if facets}
+          <Select
             title={capital($_("primary"))}
             id="primary"
-            startValue={itUser.primary?.uuid}
-            value={filterClassUuidByUserKey(classes, env.PUBLIC_PRIMARY_CLASS_USER_KEY)}
+            bind:name={$primary.value}
+            iterable={filterClassesByFacetUserKey(facets, "primary_type")}
+            on:clear={() => ($primary.value = "")}
+            isClearable={true}
             disabled={disableForm}
           />
-        </div>
-        <input
-          hidden
-          name="non-primary"
-          id="non-primary"
-          value={filterClassUuidByUserKey(classes, "non-primary")}
-        />
+        {/if}
         <TextArea
           title={capital($_("notes"))}
           id="notes"
           startValue={note}
+          bind:value={$noteField.value}
           disabled={disableForm}
         />
       </div>
@@ -266,7 +303,8 @@
             values: { item: $_("ituser", { values: { n: 1 } }) },
           })
         )}
-        disabled={disableForm}
+        disabled={disableForm || !hasChanges}
+        info={hasChanges ? undefined : $_("edit_tooltip")}
       />
       <Button
         type="button"

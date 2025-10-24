@@ -84,4 +84,21 @@ gql`
       }
     }
   }
+  query GetPrimaryClasses($primaryClass: String!, $fromDate: DateTime!) {
+    facets(filter: { user_keys: ["primary_type"] }) {
+      objects {
+        validities {
+          classes(
+            filter: { user_keys: [$primaryClass, "non-primary"], from_date: $fromDate }
+          ) {
+            name
+            uuid
+            user_key
+          }
+          uuid
+          user_key
+        }
+      }
+    }
+  }
 `
