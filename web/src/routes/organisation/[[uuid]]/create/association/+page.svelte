@@ -13,6 +13,7 @@
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
   import { FacetAndOrgDocument, CreateAssociationDocument } from "./query.generated"
+  import type { FacetValidities } from "$lib/utils/classes"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
@@ -21,11 +22,13 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getMinMaxValidities } from "$lib/utils/validities"
+  import { getValidities } from "$lib/http/getValidities"
+  import { getClasses } from "$lib/http/getClasses"
   import { MOConfig } from "$lib/stores/config"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import SelectGroup from "$lib/components/forms/shared/SelectGroup.svelte"
 
+  let startDate: string = $date
   let toDate: string
   let selectedOrgUnit: {
     uuid: string
@@ -53,19 +56,6 @@
       $getConfederations: Boolean!
       $currentDate: DateTime!
     ) {
-      facets(filter: { user_keys: ["association_type", "primary_type"] }) {
-        objects {
-          validities {
-            uuid
-            user_key
-            classes(filter: { from_date: $currentDate }) {
-              name
-              uuid
-              user_key
-            }
-          }
-        }
-      }
       org_units(filter: { uuids: $uuid, from_date: null, to_date: null }) {
         objects {
           current {
@@ -142,6 +132,40 @@
         }
       }
     }
+
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  let facets: FacetValidities[]
+  let abortController: AbortController
+  $: {
+    // Abort the previous request if a new one is about to start
+    if (abortController) abortController.abort()
+    abortController = new AbortController()
+
+    // Make sure `currentDate` isn't sent if startDate is null.
+    const params = {
+      currentDate: startDate,
+      orgUuid: selectedOrgUnit?.uuid,
+      facetUserKeys: ["association_type", "primary_type"],
+    }
+
+    ;(async () => {
+      validities = selectedOrgUnit
+        ? await getValidities(selectedOrgUnit.uuid)
+        : { from: null, to: null }
+      try {
+        facets = await getClasses(params, abortController.signal)
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          console.error("Request failed:", err)
+        }
+      }
+    })()
+  }
 </script>
 
 <title
@@ -181,9 +205,7 @@
     </div>
   </div>
 {:then data}
-  {@const facets = data.facets.objects}
   {@const orgUnit = data.org_units.objects[0].current}
-  {@const validities = getMinMaxValidities(data.org_units.objects[0].validities)}
   {@const topLevelFacets = data.classes?.objects}
 
   <form method="post" class="mx-6" use:enhance={handler}>
@@ -191,8 +213,8 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            startValue={$date}
-            bind:value={$fromDate.value}
+            bind:value={startDate}
+            bind:validationValue={$fromDate.value}
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
@@ -227,36 +249,42 @@
           on:clear={() => ($employee.value = "")}
           required
         />
-        <div class="flex flex-row gap-6">
-          <Select
-            title={capital($_("association_type"))}
-            id="association-type"
-            bind:value={associationType}
-            bind:name={$associationTypeField.value}
-            errors={$associationTypeField.errors}
-            iterable={filterClassesByFacetUserKey(facets, "association_type")}
-            extra_classes="basis-1/2"
-            required={true}
-          />
-          <Select
-            title={capital($_("primary"))}
-            id="primary"
-            iterable={filterClassesByFacetUserKey(facets, "primary_type")}
-            extra_classes="basis-1/2"
-            isClearable={true}
-          />
-        </div>
-        {#if associationType}
-          {#if allowSubstitute(associationTypeUuid)}
-            <Search id="substitute" title={capital($_("substitute"))} type="employee" />
+        {#if facets}
+          <div class="flex flex-row gap-6">
+            <Select
+              title={capital($_("association_type"))}
+              id="association-type"
+              bind:value={associationType}
+              bind:name={$associationTypeField.value}
+              errors={$associationTypeField.errors}
+              iterable={filterClassesByFacetUserKey(facets, "association_type")}
+              extra_classes="basis-1/2"
+              required={true}
+            />
+            <Select
+              title={capital($_("primary"))}
+              id="primary"
+              iterable={filterClassesByFacetUserKey(facets, "primary_type")}
+              extra_classes="basis-1/2"
+              isClearable={true}
+            />
+          </div>
+          {#if associationType}
+            {#if allowSubstitute(associationTypeUuid)}
+              <Search
+                id="substitute"
+                title={capital($_("substitute"))}
+                type="employee"
+              />
+            {/if}
           {/if}
-        {/if}
-        {#if env.PUBLIC_ENABLE_CONFEDERATIONS}
-          <SelectGroup
-            id="trade-union"
-            title={$_("trade_union")}
-            iterable={topLevelFacets}
-          />
+          {#if env.PUBLIC_ENABLE_CONFEDERATIONS}
+            <SelectGroup
+              id="trade-union"
+              title={$_("trade_union")}
+              iterable={topLevelFacets}
+            />
+          {/if}
         {/if}
       </div>
     </div>

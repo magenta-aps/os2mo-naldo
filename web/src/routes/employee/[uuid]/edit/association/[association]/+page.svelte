@@ -15,6 +15,7 @@
     AssociationAndFacetsDocument,
     UpdateAssociationDocument,
   } from "./query.generated"
+  import type { FacetValidities } from "$lib/utils/classes"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
@@ -25,6 +26,8 @@
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getValidities } from "$lib/http/getValidities"
+  import { getClasses } from "$lib/http/getClasses"
+  import { getPrimaryClasses } from "$lib/http/getClasses"
   import { findClosestValidity } from "$lib/utils/validities"
   import { MOConfig } from "$lib/stores/config"
   import SelectGroup from "$lib/components/forms/shared/SelectGroup.svelte"
@@ -77,19 +80,6 @@
       $getConfederations: Boolean!
       $currentDate: DateTime!
     ) {
-      facets(filter: { user_keys: ["association_type", "primary_type"] }) {
-        objects {
-          validities {
-            uuid
-            user_key
-            classes(filter: { from_date: $currentDate }) {
-              uuid
-              user_key
-              name
-            }
-          }
-        }
-      }
       associations(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
           validities {
@@ -173,20 +163,6 @@
     }
   `
 
-  // Logic for updating datepicker intervals
-  let validities: {
-    from: string | undefined | null
-    to: string | undefined | null
-  } = { from: null, to: null }
-
-  $: if (selectedOrgUnit) {
-    ;(async () => {
-      validities = await getValidities(selectedOrgUnit.uuid)
-    })()
-  } else {
-    validities = { from: null, to: null }
-  }
-
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
@@ -217,6 +193,40 @@
         }
       }
     }
+
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  let facets: FacetValidities[]
+  let abortController: AbortController
+  $: {
+    // Abort the previous request if a new one is about to start
+    if (abortController) abortController.abort()
+    abortController = new AbortController()
+
+    // Make sure `currentDate` isn't sent if startDate is null.
+    const params = {
+      currentDate: startDate,
+      orgUuid: selectedOrgUnit?.uuid,
+      facetUserKeys: ["association_type", "primary_type"],
+    }
+
+    ;(async () => {
+      validities = selectedOrgUnit
+        ? await getValidities(selectedOrgUnit.uuid)
+        : { from: null, to: null }
+      try {
+        facets = await getClasses(params, abortController.signal)
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          console.error("Request failed:", err)
+        }
+      }
+    })()
+  }
 
   let initialAssociation: any = null
   let hasChanges = false
@@ -276,7 +286,6 @@
   </div>
 {:then data}
   {@const association = data.associations.objects[0].validities[0]}
-  {@const facets = data.facets.objects}
   {@const topLevelFacets = data.classes?.objects}
   {#if !initialAssociation}
     {@html (() => {
@@ -335,58 +344,60 @@
           required={true}
         />
         <Breadcrumbs orgUnit={selectedOrgUnit} />
-        <div class="flex flex-row gap-6">
-          <Select
-            title={capital($_("association_type"))}
-            id="association-type"
-            startValue={association.association_type
-              ? association.association_type
-              : undefined}
-            bind:value={associationType}
-            bind:name={$associationTypeField.value}
-            errors={$associationTypeField.errors}
-            iterable={filterClassesByFacetUserKey(facets, "association_type")}
-            extra_classes="basis-1/2"
-            required={true}
-          />
-          <Select
-            title={capital($_("primary"))}
-            id="primary"
-            startValue={association.primary ? association.primary : undefined}
-            bind:name={$primary.value}
-            iterable={filterClassesByFacetUserKey(facets, "primary_type")}
-            extra_classes="basis-1/2"
-            on:clear={() => ($primary.value = "")}
-            isClearable={true}
-          />
-        </div>
-        {#if associationType}
-          {#if allowSubstitute(associationTypeUuid)}
-            <Search
-              id="substitute"
-              title={capital($_("substitute"))}
-              startValue={association.substitute.length
-                ? {
-                    uuid: findClosestValidity(association.substitute, $date).uuid,
-                    name: findClosestValidity(association.substitute, $date).name,
-                  }
+        {#if facets}
+          <div class="flex flex-row gap-6">
+            <Select
+              title={capital($_("association_type"))}
+              id="association-type"
+              startValue={association.association_type
+                ? association.association_type
                 : undefined}
-              bind:name={$substitute.value}
-              on:clear={() => ($substitute.value = "")}
-              type="employee"
+              bind:value={associationType}
+              bind:name={$associationTypeField.value}
+              errors={$associationTypeField.errors}
+              iterable={filterClassesByFacetUserKey(facets, "association_type")}
+              extra_classes="basis-1/2"
+              required={true}
+            />
+            <Select
+              title={capital($_("primary"))}
+              id="primary"
+              startValue={association.primary ? association.primary : undefined}
+              bind:name={$primary.value}
+              iterable={filterClassesByFacetUserKey(facets, "primary_type")}
+              extra_classes="basis-1/2"
+              on:clear={() => ($primary.value = "")}
+              isClearable={true}
+            />
+          </div>
+          {#if associationType}
+            {#if allowSubstitute(associationTypeUuid)}
+              <Search
+                id="substitute"
+                title={capital($_("substitute"))}
+                startValue={association.substitute.length
+                  ? {
+                      uuid: findClosestValidity(association.substitute, $date).uuid,
+                      name: findClosestValidity(association.substitute, $date).name,
+                    }
+                  : undefined}
+                bind:name={$substitute.value}
+                on:clear={() => ($substitute.value = "")}
+                type="employee"
+              />
+            {/if}
+          {/if}
+          {#if env.PUBLIC_ENABLE_CONFEDERATIONS}
+            <SelectGroup
+              id="trade-union"
+              title={$_("trade_union")}
+              bind:name={$tradeUnion.value}
+              iterable={topLevelFacets}
+              startValue={association.trade_union ? association.trade_union : undefined}
+              on:clear={() => ($tradeUnion.value = "")}
+              isClearable={true}
             />
           {/if}
-        {/if}
-        {#if env.PUBLIC_ENABLE_CONFEDERATIONS}
-          <SelectGroup
-            id="trade-union"
-            title={$_("trade_union")}
-            bind:name={$tradeUnion.value}
-            iterable={topLevelFacets}
-            startValue={association.trade_union ? association.trade_union : undefined}
-            on:clear={() => ($tradeUnion.value = "")}
-            isClearable={true}
-          />
         {/if}
       </div>
     </div>
