@@ -30,6 +30,7 @@
   import { findClosestValidity } from "$lib/utils/validities"
   import { MOConfig } from "$lib/stores/config"
   import SelectGroup from "$lib/components/forms/shared/SelectGroup.svelte"
+  import { normalizeAssociation } from "$lib/utils/normalizeForm"
 
   gql`
     query AssociationAndFacets(
@@ -128,6 +129,10 @@
     uuid: string
     name: string
   }
+  let selectedPerson: {
+    uuid: string
+    name: string
+  }
 
   let associationType: { name: string; user_key: string; uuid: string }
   $: associationTypeUuid = associationType?.uuid
@@ -135,7 +140,17 @@
   const fromDate = field("from", "", [required()])
   const orgUnit = field("org_unit", "", [required()])
   const associationTypeField = field("association_type", "", [required()])
-  let svelteForm = form(fromDate, orgUnit, associationTypeField)
+  const primary = field("primary", "", [])
+  const substitute = field("substitute", "", [])
+  const tradeUnion = field("trade_union", "", [])
+  let svelteForm = form(
+    fromDate,
+    orgUnit,
+    associationTypeField,
+    primary,
+    substitute,
+    tradeUnion
+  )
 
   const allowSubstitute = (associationTypeUuid: string) => {
     // Check if the selected associationType allows a substitute
@@ -209,6 +224,25 @@
       }
     })()
   }
+
+  let initialAssociation: any = null
+  let hasChanges = false
+  $: if (initialAssociation) {
+    // Check if any of the user-editable fields have changed compared to the original values.
+    const editableChanged =
+      selectedPerson?.uuid !== initialAssociation.person ||
+      selectedOrgUnit?.uuid !== initialAssociation.org_unit ||
+      $associationTypeField.value !== initialAssociation.association_type ||
+      $primary.value !== initialAssociation.primary ||
+      $substitute.value !== initialAssociation.substitute ||
+      $tradeUnion.value !== initialAssociation.trade_union
+
+    const toDateExtended =
+      toDate === ""
+        ? initialAssociation.to !== null
+        : toDate > (initialAssociation.to ?? null)
+    hasChanges = editableChanged || toDateExtended
+  }
 </script>
 
 <title
@@ -250,6 +284,12 @@
 {:then data}
   {@const association = data.associations.objects[0].validities[0]}
   {@const topLevelFacets = data.classes?.objects}
+  {#if !initialAssociation}
+    {@html (() => {
+      initialAssociation = normalizeAssociation(association)
+      return ""
+    })()}
+  {/if}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -283,6 +323,7 @@
             uuid: findClosestValidity(association.person, startDate).uuid,
             name: findClosestValidity(association.person, startDate).name,
           }}
+          bind:value={selectedPerson}
           disabled
           required={true}
         />
@@ -317,9 +358,11 @@
             <Select
               title={capital($_("primary"))}
               id="primary"
+              bind:name={$primary.value}
               startValue={association.primary ? association.primary : undefined}
               iterable={filterClassesByFacetUserKey(facets, "primary_type")}
               extra_classes="basis-1/2"
+              on:clear={() => ($primary.value = "")}
               isClearable={true}
             />
           </div>
@@ -335,6 +378,8 @@
                     }
                   : undefined}
                 type="employee"
+                bind:name={$substitute.value}
+                on:clear={() => ($substitute.value = "")}
               />
             {/if}
           {/if}
@@ -342,8 +387,11 @@
             <SelectGroup
               id="trade-union"
               title={$_("trade_union")}
+              bind:name={$tradeUnion.value}
               iterable={topLevelFacets}
               startValue={association.trade_union ? association.trade_union : undefined}
+              on:clear={() => ($substitute.value = "")}
+              isClearable={true}
             />
           {/if}
         {/if}
@@ -357,6 +405,8 @@
             values: { item: $_("association", { values: { n: 1 } }) },
           })
         )}
+        disabled={!hasChanges}
+        info={hasChanges ? undefined : $_("edit_tooltip")}
       />
       <Button
         type="button"

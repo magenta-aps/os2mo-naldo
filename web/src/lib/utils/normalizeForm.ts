@@ -8,3 +8,15 @@ export const normalizeEngagement = (e: any) => {
     primary: e.primary?.name ?? "",
   }
 }
+
+export const normalizeAssociation = (a: any) => {
+  return {
+    to: a.validity?.to?.split("T")[0] ?? null,
+    person: a.person?.[0]?.uuid ?? null,
+    org_unit: a.org_unit?.[0]?.uuid ?? null,
+    association_type: a.association_type?.name ?? null,
+    primary: a.primary?.name ?? "",
+    substitute: a.substitute?.name ?? "",
+    trade_union: a.trade_union?.name ?? "",
+  }
+}

@@ -29,6 +29,7 @@
   import { findClosestValidity } from "$lib/utils/validities"
   import { MOConfig } from "$lib/stores/config"
   import SelectGroup from "$lib/components/forms/shared/SelectGroup.svelte"
+  import { normalizeAssociation } from "$lib/utils/normalizeForm"
 
   gql`
     query AssociationAndFacet(
@@ -45,6 +46,14 @@
             person(filter: { from_date: $fromDate, to_date: $toDate }) {
               uuid
               name
+            }
+            org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
+              uuid
+              name
+              validity {
+                from
+                to
+              }
             }
             association_type {
               uuid
@@ -72,14 +81,6 @@
             validity {
               from
               to
-            }
-            org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
-              uuid
-              name
-              validity {
-                from
-                to
-              }
             }
           }
         }
@@ -123,14 +124,28 @@
     uuid: string
     name: string
   }
+  let selectedPerson: {
+    uuid: string
+    name: string
+  }
 
   let associationType: { name: string; user_key: string; uuid: string }
   $: associationTypeUuid = associationType?.uuid
 
   const fromDate = field("from", "", [required()])
-  const employee = field("employee", "", [required()])
+  const person = field("person", "", [required()])
   const associationTypeField = field("association_type", "", [required()])
-  let svelteForm = form(fromDate, employee, associationTypeField)
+  const primary = field("primary", "", [])
+  const substitute = field("substitute", "", [])
+  const tradeUnion = field("trade_union", "", [])
+  let svelteForm = form(
+    fromDate,
+    person,
+    associationTypeField,
+    primary,
+    substitute,
+    tradeUnion
+  )
 
   const allowSubstitute = (associationTypeUuid: string) => {
     // Check if the selected associationType allows a substitute
@@ -204,6 +219,25 @@
       }
     })()
   }
+
+  let initialAssociation: any = null
+  let hasChanges = false
+  $: if (initialAssociation) {
+    // Check if any of the user-editable fields have changed compared to the original values.
+    const editableChanged =
+      selectedPerson?.uuid !== initialAssociation.person ||
+      selectedOrgUnit?.uuid !== initialAssociation.org_unit ||
+      $associationTypeField.value !== initialAssociation.association_type ||
+      $primary.value !== initialAssociation.primary ||
+      $substitute.value !== initialAssociation.substitute ||
+      $tradeUnion.value !== initialAssociation.trade_union
+
+    const toDateExtended =
+      toDate === ""
+        ? initialAssociation.to !== null
+        : toDate > (initialAssociation.to ?? null)
+    hasChanges = editableChanged || toDateExtended
+  }
 </script>
 
 {#await graphQLClient().request( AssociationAndFacetDocument, { uuid: $page.params.association, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), getConfederations: env.PUBLIC_ENABLE_CONFEDERATIONS, currentDate: $date } )}
@@ -225,6 +259,12 @@
 {:then data}
   {@const association = data.associations.objects[0].validities[0]}
   {@const topLevelFacets = data.classes?.objects}
+  {#if !initialAssociation}
+    {@html (() => {
+      initialAssociation = normalizeAssociation(association)
+      return ""
+    })()}
+  {/if}
 
   <title
     >{capital(
@@ -288,9 +328,10 @@
             uuid: findClosestValidity(association.person, startDate).uuid,
             name: findClosestValidity(association.person, startDate).name,
           }}
-          bind:name={$employee.value}
-          errors={$employee.errors}
-          on:clear={() => ($employee.value = "")}
+          bind:value={selectedPerson}
+          bind:name={$person.value}
+          errors={$person.errors}
+          on:clear={() => ($person.value = "")}
           required={true}
         />
         {#if facets}
@@ -312,8 +353,10 @@
               title={capital($_("primary"))}
               id="primary"
               startValue={association.primary ? association.primary : undefined}
+              bind:name={$primary.value}
               iterable={filterClassesByFacetUserKey(facets, "primary_type")}
               extra_classes="basis-1/2"
+              on:clear={() => ($primary.value = "")}
               isClearable={true}
             />
           </div>
@@ -328,7 +371,9 @@
                       name: findClosestValidity(association.substitute, startDate).name,
                     }
                   : undefined}
+                bind:name={$substitute.value}
                 type="employee"
+                on:clear={() => ($substitute.value = "")}
               />
             {/if}
           {/if}
@@ -336,8 +381,11 @@
             <SelectGroup
               id="trade-union"
               title={$_("trade_union")}
+              bind:name={$tradeUnion.value}
               iterable={topLevelFacets}
               startValue={association.trade_union ? association.trade_union : undefined}
+              on:clear={() => ($tradeUnion.value = "")}
+              isClearable={true}
             />
           {/if}
         {/if}
@@ -351,6 +399,8 @@
             values: { item: $_("association", { values: { n: 1 } }) },
           })
         )}
+        disabled={!hasChanges}
+        info={hasChanges ? undefined : $_("edit_tooltip")}
       />
       <Button
         type="button"
