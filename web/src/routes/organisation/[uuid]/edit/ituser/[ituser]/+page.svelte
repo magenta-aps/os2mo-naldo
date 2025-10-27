@@ -26,6 +26,7 @@
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
   import { MOConfig } from "$lib/stores/config"
+  import { normalizeITUser } from "$lib/utils/normalizeForm"
 
   gql`
     query ITUserAndItSystems(
@@ -86,7 +87,9 @@
   const fromDate = field("from", "", [required()])
   const itSystem = field("it_system", "", [required()])
   const accountName = field("account_name", "", [required()])
-  const svelteForm = form(fromDate, itSystem, accountName)
+  const primary = field("primary", "", [])
+  const noteField = field("note", "", [])
+  const svelteForm = form(fromDate, itSystem, accountName, primary, noteField)
 
   const handler: SubmitFunction =
     () =>
@@ -151,6 +154,21 @@
       }
     })()
   }
+
+  let initialITUser: any = null
+  let hasChanges = false
+  $: if (initialITUser) {
+    // Check if any of the user-editable fields have changed compared to the original values.
+    const editableChanged =
+      $itSystem.value !== initialITUser.itsystem ||
+      $accountName.value !== initialITUser.user_key ||
+      $primary.value !== initialITUser.primary ||
+      $noteField.value !== initialITUser.note
+
+    const toDateExtended =
+      toDate === "" ? initialITUser.to !== null : toDate > (initialITUser.to ?? null)
+    hasChanges = editableChanged || toDateExtended
+  }
 </script>
 
 <title
@@ -199,6 +217,12 @@
   {@const itSystems = data.itsystems.objects}
   {@const disableForm =
     $MOConfig?.confdb_it_system_entry_edit_fields_disabled === "true" ? true : false}
+  {#if !initialITUser}
+    {@html (() => {
+      initialITUser = normalizeITUser(itUser, note)
+      return ""
+    })()}
+  {/if}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -252,8 +276,10 @@
           <Select
             title={capital($_("primary"))}
             id="primary"
+            bind:name={$primary.value}
             startValue={itUser.primary ? itUser.primary : undefined}
             iterable={filterClassesByFacetUserKey(facets, "primary_type")}
+            on:clear={() => ($primary.value = "")}
             isClearable={true}
             disabled={disableForm}
           />
@@ -262,6 +288,7 @@
           title={capital($_("notes"))}
           id="notes"
           startValue={note}
+          bind:value={$noteField.value}
           disabled={disableForm}
         />
       </div>
@@ -274,7 +301,8 @@
             values: { item: $_("ituser", { values: { n: 1 } }) },
           })
         )}
-        disabled={disableForm}
+        disabled={disableForm || !hasChanges}
+        info={hasChanges ? undefined : $_("edit_tooltip")}
       />
       <Button
         type="button"
