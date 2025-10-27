@@ -20,3 +20,13 @@ export const normalizeAssociation = (a: any) => {
     trade_union: a.trade_union?.name ?? "",
   }
 }
+
+export const normalizeITUser = (i: any, note: string | null | undefined) => {
+  return {
+    to: i.validity?.to?.split("T")[0] ?? null,
+    itsystem: i.itsystem?.name ?? null,
+    user_key: i.user_key ?? "",
+    primary: i.primary?.name ?? "",
+    note: note ?? "",
+  }
+}
