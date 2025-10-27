@@ -81,6 +81,7 @@ gql`
             name
             uuid
             user_key
+            scope
           }
         }
       }

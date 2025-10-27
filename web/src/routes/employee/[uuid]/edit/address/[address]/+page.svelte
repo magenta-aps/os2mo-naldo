@@ -7,7 +7,6 @@
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
-  import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
@@ -16,46 +15,18 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
+  import type { FacetValidities } from "$lib/utils/classes"
   import type { SubmitFunction } from "./$types"
+  import { getPersonValidities } from "$lib/http/getValidities"
+  import { getClasses } from "$lib/http/getClasses"
   import DarSearch from "$lib/components/forms/shared/DARSearch.svelte"
   import { Addresses } from "$lib/constants/addresses"
   import { form, field } from "svelte-forms"
   import { required, email, pattern } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getMinMaxValidities } from "$lib/utils/validities"
-
-  let toDate: string
-  let addressType: { name: string; user_key: string; uuid: string; scope: string }
-  $: addressTypeUuid = addressType?.uuid
-
-  // update the field depending on address-type
-  const fromDate = field("from", "", [required()])
-  const addressTypeField = field("address_type", "", [required()])
-  let addressField = field("", "")
-  $: svelteForm = form(fromDate, addressTypeField, addressField)
 
   gql`
-    query AddressAndFacets(
-      $uuid: [UUID!]
-      $fromDate: DateTime
-      $toDate: DateTime
-      $employee_uuid: [UUID!]
-      $currentDate: DateTime
-    ) {
-      facets(filter: { user_keys: ["employee_address_type", "visibility"] }) {
-        objects {
-          validities {
-            uuid
-            user_key
-            classes(filter: { from_date: $currentDate }) {
-              uuid
-              user_key
-              name
-              scope
-            }
-          }
-        }
-      }
+    query AddressAndFacets($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
       addresses(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
           validities {
@@ -81,16 +52,6 @@
           }
         }
       }
-      employees(filter: { uuids: $employee_uuid, from_date: null, to_date: null }) {
-        objects {
-          validities {
-            validity {
-              from
-              to
-            }
-          }
-        }
-      }
     }
 
     mutation UpdateAddress($input: AddressUpdateInput!, $date: DateTime!) {
@@ -103,6 +64,17 @@
       }
     }
   `
+
+  let startDate: string = $date
+  let toDate: string
+  let addressType: { name: string; user_key: string; uuid: string; scope: string }
+  $: addressTypeUuid = addressType?.uuid
+
+  // update the field depending on address-type
+  const fromDate = field("from", "", [required()])
+  const addressTypeField = field("address_type", "", [required()])
+  let addressField = field("", "")
+  $: svelteForm = form(fromDate, addressTypeField, addressField)
 
   $: switch (addressType?.name) {
     case Addresses.EMAIL:
@@ -151,6 +123,40 @@
         }
       }
     }
+
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  let facets: FacetValidities[]
+  let abortController: AbortController
+  $: {
+    // Abort the previous request if a new one is about to start
+    if (abortController) abortController.abort()
+    abortController = new AbortController()
+
+    // Make sure `currentDate` isn't sent if startDate is null.
+    const params = {
+      currentDate: startDate,
+      orgUuid: null,
+      facetUserKeys: ["employee_address_type", "visibility"],
+    }
+
+    ;(async () => {
+      validities = $page.params.uuid
+        ? await getPersonValidities($page.params.uuid)
+        : { from: null, to: null }
+      try {
+        facets = await getClasses(params, abortController.signal)
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          console.error("Request failed:", err)
+        }
+      }
+    })()
+  }
 </script>
 
 <title
@@ -173,7 +179,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( AddressAndFacetsDocument, { uuid: $page.params.address, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), employee_uuid: $page.params.uuid, currentDate: $date } )}
+{#await graphQLClient().request( AddressAndFacetsDocument, { uuid: $page.params.address, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to") } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -186,21 +192,20 @@
           <Skeleton extra_classes="basis-1/2" />
         </div>
         <Skeleton />
+        <Skeleton />
       </div>
     </div>
   </div>
 {:then data}
   {@const address = data.addresses.objects[0].validities[0]}
-  {@const facets = data.facets.objects}
-  {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            startValue={$date}
-            bind:value={$fromDate.value}
+            bind:value={startDate}
+            bind:validationValue={$fromDate.value}
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
@@ -217,33 +222,34 @@
             max={validities.to}
           />
         </div>
-        <div class="flex flex-row gap-6">
-          <Select
-            title={capital($_("visibility"))}
-            id="visibility"
-            startValue={address.visibility ? address.visibility : undefined}
-            iterable={filterClassesByFacetUserKey(facets, "visibility")}
-            extra_classes="basis-1/2"
-          />
-          <Select
-            title={capital($_("address_type"))}
-            id="address-type"
-            startValue={address.address_type ? address.address_type : undefined}
-            bind:value={addressType}
-            bind:name={$addressTypeField.value}
-            errors={$addressTypeField.errors}
-            iterable={filterClassesByFacetUserKey(facets, "employee_address_type")}
-            extra_classes="basis-1/2"
-            required={true}
-          />
-          <input hidden name="address-type-uuid" bind:value={addressTypeUuid} />
-        </div>
+        {#if facets}
+          <div class="flex flex-row gap-6">
+            <Select
+              title={capital($_("visibility"))}
+              id="visibility"
+              startValue={address.visibility ? address.visibility : undefined}
+              iterable={filterClassesByFacetUserKey(facets, "visibility")}
+              extra_classes="basis-1/2"
+            />
+            <Select
+              title={capital($_("address_type"))}
+              id="address-type"
+              startValue={address.address_type ? address.address_type : undefined}
+              bind:value={addressType}
+              bind:name={$addressTypeField.value}
+              errors={$addressTypeField.errors}
+              iterable={filterClassesByFacetUserKey(facets, "employee_address_type")}
+              extra_classes="basis-1/2"
+              required={true}
+            />
+            <input hidden name="address-type-uuid" bind:value={addressTypeUuid} />
+          </div>
+        {/if}
         <Input
           startValue={address.user_key !== address.value ? address.user_key : undefined}
           title={capital($_("description"))}
           id="user-key"
         />
-        <!-- FIXME: Translate address_types -->
         {#if addressType}
           {#if addressType.scope === "DAR"}
             <DarSearch
@@ -261,7 +267,7 @@
           {:else}
             <Input
               startValue={address.name}
-              bind:value={$addressField.value}
+              bind:name={$addressField.value}
               errors={$addressField.errors}
               title={addressType.name}
               id="value"

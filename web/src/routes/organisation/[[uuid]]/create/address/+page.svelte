@@ -7,11 +7,10 @@
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
-  import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
-  import { FacetsAndOrgDocument, CreateAddressDocument } from "./query.generated"
+  import { CreateAddressDocument } from "./query.generated"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
@@ -21,47 +20,11 @@
   import { form, field } from "svelte-forms"
   import { required, email, pattern, url } from "svelte-forms/validators"
   import { Addresses } from "$lib/constants/addresses"
-  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getMinMaxValidities } from "$lib/utils/validities"
-
-  let toDate: string
-  let addressType: { name: string; user_key: string; uuid: string; scope: string }
-  $: addressTypeUuid = addressType?.uuid
-
-  // update the field depending on address-type
-  const fromDate = field("from", "", [required()])
-  const addressTypeField = field("address_type", "", [required()])
-  let addressField = field("", "")
-  $: svelteForm = form(fromDate, addressTypeField, addressField)
+  import type { FacetValidities } from "$lib/utils/classes"
+  import { getClasses } from "$lib/http/getClasses"
+  import { getValidities } from "$lib/http/getValidities"
 
   gql`
-    query FacetsAndOrg($uuid: [UUID!], $currentDate: DateTime!) {
-      facets(filter: { user_keys: ["org_unit_address_type", "visibility"] }) {
-        objects {
-          validities {
-            uuid
-            user_key
-            classes(filter: { from_date: $currentDate }) {
-              name
-              uuid
-              user_key
-              scope
-            }
-          }
-        }
-      }
-      org_units(filter: { uuids: $uuid, from_date: null, to_date: null }) {
-        objects {
-          validities {
-            validity {
-              from
-              to
-            }
-          }
-        }
-      }
-    }
-
     mutation CreateAddress($input: AddressCreateInput!, $date: DateTime!) {
       address_create(input: $input) {
         uuid
@@ -73,6 +36,17 @@
       }
     }
   `
+
+  let startDate: string = $date
+  let toDate: string
+  let addressType: { name: string; user_key: string; uuid: string; scope: string }
+  $: addressTypeUuid = addressType?.uuid
+
+  // update the field depending on address-type
+  const fromDate = field("from", "", [required()])
+  const addressTypeField = field("address_type", "", [required()])
+  let addressField = field("", "")
+  $: svelteForm = form(fromDate, addressTypeField, addressField)
 
   $: switch (addressType?.name) {
     case Addresses.AFDELINGSKODE:
@@ -150,6 +124,40 @@
         }
       }
     }
+
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  let facets: FacetValidities[]
+  let abortController: AbortController
+  $: {
+    // Abort the previous request if a new one is about to start
+    if (abortController) abortController.abort()
+    abortController = new AbortController()
+
+    // Make sure `currentDate` isn't sent if startDate is null.
+    const params = {
+      currentDate: startDate,
+      orgUuid: $page.params.uuid,
+      facetUserKeys: ["org_unit_address_type", "visibility"],
+    }
+
+    ;(async () => {
+      validities = $page.params.uuid
+        ? await getValidities($page.params.uuid)
+        : { from: null, to: null }
+      try {
+        facets = await getClasses(params, abortController.signal)
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          console.error("Request failed:", err)
+        }
+      }
+    })()
+  }
 </script>
 
 <title
@@ -172,47 +180,29 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( FacetsAndOrgDocument, { uuid: $page.params.uuid, currentDate: $date } )}
-  <div class="mx-6">
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
-      <div class="p-8">
-        <div class="flex flex-row gap-6">
-          <Skeleton extra_classes="basis-1/2" />
-          <Skeleton extra_classes="basis-1/2" />
-        </div>
-        <div class="flex flex-row gap-6">
-          <Skeleton extra_classes="basis-1/2" />
-          <Skeleton extra_classes="basis-1/2" />
-        </div>
+<form method="post" class="mx-6" use:enhance={handler}>
+  <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+    <div class="p-8">
+      <div class="flex flex-row gap-6">
+        <DateInput
+          bind:value={startDate}
+          bind:validationValue={$fromDate.value}
+          errors={$fromDate.errors}
+          title={capital($_("date.start_date"))}
+          id="from"
+          min={validities.from}
+          max={toDate ? toDate : validities.to}
+          required={true}
+        />
+        <DateInput
+          bind:value={toDate}
+          title={capital($_("date.end_date"))}
+          id="to"
+          min={$fromDate.value ? $fromDate.value : validities.from}
+          max={validities.to}
+        />
       </div>
-    </div>
-  </div>
-{:then data}
-  {@const facets = data.facets.objects}
-  {@const validities = getMinMaxValidities(data.org_units.objects[0].validities)}
-
-  <form method="post" class="mx-6" use:enhance={handler}>
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
-      <div class="p-8">
-        <div class="flex flex-row gap-6">
-          <DateInput
-            startValue={$date}
-            bind:value={$fromDate.value}
-            errors={$fromDate.errors}
-            title={capital($_("date.start_date"))}
-            id="from"
-            min={validities.from}
-            max={toDate ? toDate : validities.to}
-            required={true}
-          />
-          <DateInput
-            bind:value={toDate}
-            title={capital($_("date.end_date"))}
-            id="to"
-            min={$fromDate.value ? $fromDate.value : validities.from}
-            max={validities.to}
-          />
-        </div>
+      {#if facets}
         <div class="flex flex-row gap-6">
           <Select
             title={capital($_("visibility"))}
@@ -233,44 +223,44 @@
           />
           <input hidden name="address-type-uuid" bind:value={addressTypeUuid} />
         </div>
-        <Input title={capital($_("description"))} id="user-key" />
-        {#if addressType}
-          {#if addressType.scope === "DAR"}
-            <DarSearch
-              title={addressType.name}
-              id="value"
-              bind:darName={$addressField.value}
-              errors={$addressField.errors}
-              required={true}
-            />
-          {:else}
-            <Input
-              title={addressType.name}
-              id="value"
-              bind:value={$addressField.value}
-              errors={$addressField.errors}
-              required={true}
-            />
-          {/if}
+      {/if}
+      <Input title={capital($_("description"))} id="user-key" />
+      {#if addressType}
+        {#if addressType.scope === "DAR"}
+          <DarSearch
+            title={addressType.name}
+            id="value"
+            bind:darName={$addressField.value}
+            errors={$addressField.errors}
+            required={true}
+          />
+        {:else}
+          <Input
+            title={addressType.name}
+            id="value"
+            bind:name={$addressField.value}
+            errors={$addressField.errors}
+            required={true}
+          />
         {/if}
-      </div>
+      {/if}
     </div>
-    <div class="flex py-6 gap-4">
-      <Button
-        type="submit"
-        title={capital(
-          $_("create_item", {
-            values: { item: $_("address", { values: { n: 1 } }) },
-          })
-        )}
-      />
-      <Button
-        type="button"
-        title={capital($_("cancel"))}
-        outline={true}
-        href="{base}/organisation/{$page.params.uuid}"
-      />
-    </div>
-    <Error />
-  </form>
-{/await}
+  </div>
+  <div class="flex py-6 gap-4">
+    <Button
+      type="submit"
+      title={capital(
+        $_("create_item", {
+          values: { item: $_("address", { values: { n: 1 } }) },
+        })
+      )}
+    />
+    <Button
+      type="button"
+      title={capital($_("cancel"))}
+      outline={true}
+      href="{base}/organisation/{$page.params.uuid}"
+    />
+  </div>
+  <Error />
+</form>
