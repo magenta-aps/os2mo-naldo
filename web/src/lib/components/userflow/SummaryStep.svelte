@@ -109,10 +109,7 @@
         itsystem: ituser.itSystem.uuid,
         user_key: ituser.userkey,
         note: ituser.notes,
-        primary:
-          ituser.primary?.uuid && ituser.primary.uuid !== ""
-            ? ituser.primary.uuid
-            : null,
+        primary: ituser.primary?.uuid || null,
         validity: {
           from: ituser.fromDate,
           to: ituser.toDate || null,
