@@ -26,6 +26,18 @@ gql`
       }
     }
   }
+  query GetPersonValidities($uuid: [UUID!]) {
+    employees(filter: { uuids: $uuid, from_date: null, to_date: null }) {
+      objects {
+        validities {
+          validity {
+            from
+            to
+          }
+        }
+      }
+    }
+  }
   query GetEngagementValidities($uuid: [UUID!]) {
     engagements(filter: { uuids: $uuid, from_date: null, to_date: null }) {
       objects {
@@ -78,6 +90,23 @@ gql`
     facets(filter: { uuids: $uuid, from_date: $fromDate }) {
       objects {
         validities {
+          uuid
+          user_key
+        }
+      }
+    }
+  }
+  query GetPrimaryClasses($primaryClass: String!, $fromDate: DateTime!) {
+    facets(filter: { user_keys: ["primary_type"] }) {
+      objects {
+        validities {
+          classes(
+            filter: { user_keys: [$primaryClass, "non-primary"], from_date: $fromDate }
+          ) {
+            name
+            uuid
+            user_key
+          }
           uuid
           user_key
         }

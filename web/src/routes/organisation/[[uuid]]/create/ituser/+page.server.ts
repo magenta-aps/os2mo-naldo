@@ -15,7 +15,7 @@ export const actions: Actions = {
       org_unit: params.uuid,
       itsystem: itSystem,
       user_key: accountName,
-      primary: primary,
+      ...(primary && { primary: primary }),
       ...(notes && { note: notes }),
       validity: { from: startDate, ...(endDate && { to: endDate }) },
     }

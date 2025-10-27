@@ -16,7 +16,7 @@ export const actions: Actions = {
     const itUserUuid = uuidv4()
     const itSystem = data.get("it-system")
     const accountName = data.get("account-name") as string
-    const primary = data.get("primary") ? data.get("primary") : data.get("non-primary")
+    const primary = data.get("primary")
     const notes = data.get("notes") as string
     const startDate = data.get("from")
     const endDate = data.get("to")
@@ -29,7 +29,7 @@ export const actions: Actions = {
         person: params.uuid,
         itsystem: itSystem,
         user_key: accountName,
-        primary: primary,
+        ...(primary && { primary: primary }),
         ...(notes && { note: notes }),
         validity: { from: startDate, ...(endDate && { to: endDate }) },
       },

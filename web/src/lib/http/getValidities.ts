@@ -1,6 +1,7 @@
 import { graphQLClient } from "$lib/http/client"
 import {
   GetOrgUnitValiditiesDocument,
+  GetPersonValiditiesDocument,
   GetEngagementValiditiesDocument,
   GetFacetValiditiesDocument,
 } from "./query.generated"
@@ -11,6 +12,12 @@ export const getValidities = async (uuid: string) => {
     uuid: uuid,
   })
   return getMinMaxValidities(res.org_units.objects[0].validities)
+}
+export const getPersonValidities = async (uuid: string) => {
+  const res = await graphQLClient().request(GetPersonValiditiesDocument, {
+    uuid: uuid,
+  })
+  return getMinMaxValidities(res.employees.objects[0].validities)
 }
 export const getEngagementValidities = async (uuid: string) => {
   const res = await graphQLClient().request(GetEngagementValiditiesDocument, {
