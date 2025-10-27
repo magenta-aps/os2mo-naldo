@@ -10,7 +10,7 @@ export type ItuserInfo = {
   itSystem: { uuid: string; name: string }
   userkey: string
   notes: string
-  primary: { uuid: string; name?: string; user_key: string }
+  primary: { uuid: string; name: string; userkey: string }
   rolebindings: RolebindingInfo[]
   validated?: boolean
 }
@@ -22,7 +22,7 @@ export const createDefaultItuser = (): ItuserInfo => ({
   itSystem: { uuid: "", name: "" },
   userkey: "",
   notes: "",
-  primary: { uuid: "", name: "", user_key: "" },
+  primary: { uuid: "", name: "", userkey: "" },
   rolebindings: [],
   validated: undefined,
 })

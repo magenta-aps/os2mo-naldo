@@ -1,6 +1,7 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
+  import { env } from "$lib/env"
   import { ituserInfo } from "$lib/stores/ituserInfoStore"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
@@ -10,43 +11,29 @@
   import OnboardingFormButtons from "$lib/components/userflow/OnboardingFormButtons.svelte"
   import { step } from "$lib/stores/stepStore"
   import { graphQLClient } from "$lib/http/client"
-  import {
-    ItSystemsAndPrimaryDocument,
-    GetItSystemRolesDocument,
-  } from "./query.generated"
+  import { ItSystemsDocument, GetItSystemRolesDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import { filterClassByUserKey } from "$lib/utils/classes"
+  import type { FacetValidities } from "$lib/utils/classes"
+  import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import { formatITSystemNames, type UnpackedClass } from "$lib/utils/helpers"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
-  import { env } from "$lib/env"
-  import ItuserCheckbox from "$lib/components/userflow/ItuserCheckbox.svelte"
+  import { getPrimaryClasses } from "$lib/http/getClasses"
+  import { getPersonValidities } from "$lib/http/getValidities"
   import OnboardingTab from "$lib/components/userflow/OnboardingTab.svelte"
-  import Icon from "@iconify/svelte"
   import removeRounded from "@iconify/icons-material-symbols/remove-rounded"
   import addRounded from "@iconify/icons-material-symbols/add-rounded"
   import { onMount } from "svelte"
 
   gql`
-    query ItSystemsAndPrimary($primaryClass: String!, $currentDate: DateTime!) {
+    query ItSystems($currentDate: DateTime!) {
       itsystems {
         objects {
           current(at: $currentDate) {
             name
             uuid
-          }
-        }
-      }
-      classes(
-        filter: { user_keys: [$primaryClass, "non-primary"], from_date: $currentDate }
-      ) {
-        objects {
-          validities {
-            uuid
-            user_key
-            name
           }
         }
       }
@@ -97,6 +84,39 @@
     lastFetched = ituser.itSystem?.uuid
     fetchItSystemRoles(ituser.itSystem.uuid)
   }
+
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  let facets: FacetValidities[]
+  let abortController: AbortController
+  $: {
+    // Abort the previous request if a new one is about to start
+    if (abortController) abortController.abort()
+    abortController = new AbortController()
+
+    // Make sure `currentDate` isn't sent if startDate is null.
+    const params = {
+      fromDate: ituser.fromDate,
+      primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY,
+    }
+
+    ;(async () => {
+      validities = $page.params.uuid
+        ? await getPersonValidities($page.params.uuid)
+        : { from: null, to: null }
+      try {
+        facets = await getPrimaryClasses(params, abortController.signal)
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          console.error("Request failed:", err)
+        }
+      }
+    })()
+  }
 </script>
 
 <form
@@ -106,7 +126,7 @@
     }
   }}
 >
-  {#await graphQLClient().request( ItSystemsAndPrimaryDocument, { uuid: $page.params.uuid, primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY, currentDate: $date } )}
+  {#await graphQLClient().request( ItSystemsDocument, { uuid: $page.params.uuid, currentDate: $date } )}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
@@ -118,15 +138,11 @@
           <Skeleton extra_classes="basis-1/2" />
         </div>
         <Skeleton />
+        <Skeleton />
       </div>
     </div>
   {:then data}
     {@const itSystems = data.itsystems.objects}
-    {@const classes = data.classes.objects}
-    {@const primaryClass = filterClassByUserKey(
-      classes,
-      env.PUBLIC_PRIMARY_CLASS_USER_KEY
-    )}
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <OnboardingTab
         items={$ituserInfo}
@@ -176,19 +192,15 @@
             required={true}
           />
         </div>
-        <div class="flex">
-          <ItuserCheckbox
-            id="primary"
+        {#if facets}
+          <Select
             title={capital($_("primary"))}
-            checked={ituser.primary.uuid === primaryClass.uuid}
-            on:change={(e) => {
-              if (e.target instanceof HTMLInputElement)
-                ituser.primary = e.target.checked
-                  ? primaryClass
-                  : filterClassByUserKey(classes, "non-primary")
-            }}
+            id="primary"
+            bind:value={ituser.primary}
+            iterable={filterClassesByFacetUserKey(facets, "primary_type")}
+            isClearable={true}
           />
-        </div>
+        {/if}
         <TextArea title={capital($_("notes"))} id="notes" bind:value={ituser.notes} />
         <div class="divider p-0 m-0 mb-4 w-full" />
         <h4>{capital($_("rolebinding", { values: { n: 2 } }))}</h4>
