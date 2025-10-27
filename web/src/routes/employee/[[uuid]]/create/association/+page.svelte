@@ -20,35 +20,16 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
+  import type { FacetValidities } from "$lib/utils/classes"
   import Search from "$lib/components/search/Search.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import SelectGroup from "$lib/components/forms/shared/SelectGroup.svelte"
+  import { getClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
   import { MOConfig } from "$lib/stores/config"
-
-  let toDate: string
-  let selectedOrgUnit: {
-    uuid: string
-    name: string
-  }
-  let associationType: { name: string; user_key: string; uuid: string }
-  $: associationTypeUuid = associationType?.uuid
-
-  const fromDate = field("from", "", [required()])
-  const orgUnit = field("org_unit", "", [required()])
-  const associationTypeField = field("association_type", "", [required()])
-  let svelteForm = form(fromDate, orgUnit, associationTypeField)
-
-  const allowSubstitute = (associationTypeUuid: string) => {
-    // Check if the selected associationType allows a substitute
-    return $MOConfig &&
-      JSON.parse($MOConfig.confdb_substitute_roles).includes(associationTypeUuid)
-      ? true
-      : false
-  }
 
   gql`
     query FacetAndEmployee(
@@ -109,18 +90,27 @@
       }
     }
   `
-  // Logic for updating datepicker intervals
-  let validities: {
-    from: string | undefined | null
-    to: string | undefined | null
-  } = { from: null, to: null }
 
-  $: if (selectedOrgUnit) {
-    ;(async () => {
-      validities = await getValidities(selectedOrgUnit.uuid)
-    })()
-  } else {
-    validities = { from: null, to: null }
+  let startDate: string = $date
+  let toDate: string
+  let selectedOrgUnit: {
+    uuid: string
+    name: string
+  }
+  let associationType: { name: string; user_key: string; uuid: string }
+  $: associationTypeUuid = associationType?.uuid
+
+  const fromDate = field("from", "", [required()])
+  const orgUnit = field("org_unit", "", [required()])
+  const associationTypeField = field("association_type", "", [required()])
+  let svelteForm = form(fromDate, orgUnit, associationTypeField)
+
+  const allowSubstitute = (associationTypeUuid: string) => {
+    // Check if the selected associationType allows a substitute
+    return $MOConfig &&
+      JSON.parse($MOConfig.confdb_substitute_roles).includes(associationTypeUuid)
+      ? true
+      : false
   }
 
   const handler: SubmitFunction =
@@ -153,6 +143,39 @@
         }
       }
     }
+
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  let facets: FacetValidities[]
+  let abortController: AbortController
+  $: {
+    // Abort the previous request if a new one is about to start
+    if (abortController) abortController.abort()
+    abortController = new AbortController()
+
+    const params = {
+      currentDate: startDate,
+      orgUuid: selectedOrgUnit?.uuid,
+      facetUserKeys: ["association_type", "primary_type"],
+    }
+
+    ;(async () => {
+      validities = selectedOrgUnit
+        ? await getValidities(selectedOrgUnit.uuid)
+        : { from: null, to: null }
+      try {
+        facets = await getClasses(params, abortController.signal)
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          console.error("Request failed:", err)
+        }
+      }
+    })()
+  }
 </script>
 
 <title
@@ -193,7 +216,6 @@
     </div>
   </div>
 {:then data}
-  {@const facets = data.facets.objects}
   {@const employee = data.employees.objects[0].current}
   {@const topLevelFacets = data.classes?.objects}
 
@@ -202,8 +224,8 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            startValue={$date}
-            bind:value={$fromDate.value}
+            bind:value={startDate}
+            bind:validationValue={$fromDate.value}
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
@@ -238,36 +260,42 @@
           required={true}
         />
         <Breadcrumbs orgUnit={selectedOrgUnit} />
-        <div class="flex flex-row gap-6">
-          <Select
-            title={capital($_("association_type"))}
-            id="association-type"
-            bind:value={associationType}
-            bind:name={$associationTypeField.value}
-            errors={$associationTypeField.errors}
-            iterable={filterClassesByFacetUserKey(facets, "association_type")}
-            required={true}
-            extra_classes="basis-1/2"
-          />
-          <Select
-            title={capital($_("primary"))}
-            id="primary"
-            iterable={filterClassesByFacetUserKey(facets, "primary_type")}
-            extra_classes="basis-1/2"
-            isClearable={true}
-          />
-        </div>
-        {#if associationType}
-          {#if allowSubstitute(associationTypeUuid)}
-            <Search id="substitute" title={capital($_("substitute"))} type="employee" />
+        {#if facets}
+          <div class="flex flex-row gap-6">
+            <Select
+              title={capital($_("association_type"))}
+              id="association-type"
+              bind:value={associationType}
+              bind:name={$associationTypeField.value}
+              errors={$associationTypeField.errors}
+              iterable={filterClassesByFacetUserKey(facets, "association_type")}
+              required={true}
+              extra_classes="basis-1/2"
+            />
+            <Select
+              title={capital($_("primary"))}
+              id="primary"
+              iterable={filterClassesByFacetUserKey(facets, "primary_type")}
+              extra_classes="basis-1/2"
+              isClearable={true}
+            />
+          </div>
+          {#if associationType}
+            {#if allowSubstitute(associationTypeUuid)}
+              <Search
+                id="substitute"
+                title={capital($_("substitute"))}
+                type="employee"
+              />
+            {/if}
           {/if}
-        {/if}
-        {#if env.PUBLIC_ENABLE_CONFEDERATIONS}
-          <SelectGroup
-            id="trade-union"
-            title={$_("trade_union")}
-            iterable={topLevelFacets ? topLevelFacets : []}
-          />
+          {#if env.PUBLIC_ENABLE_CONFEDERATIONS}
+            <SelectGroup
+              id="trade-union"
+              title={$_("trade_union")}
+              iterable={topLevelFacets ? topLevelFacets : []}
+            />
+          {/if}
         {/if}
       </div>
     </div>
