@@ -21,9 +21,6 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import { getClasses } from "$lib/http/getClasses"
-  import { getValidities } from "$lib/http/getValidities"
-
-  import { onMount } from "svelte"
 
   gql`
     mutation CreateManager($input: ManagerCreateInput!, $date: DateTime!) {
@@ -39,16 +36,6 @@
 
   let startDate: string = $date
   let toDate: string
-  let validities: {
-    from: string | undefined | null
-    to: string | undefined | null
-  } = { from: null, to: null }
-
-  onMount(async () => {
-    validities = $page.params.uuid
-      ? await getValidities($page.params.uuid)
-      : { from: null, to: null }
-  })
 
   const fromDate = field("from", "", [required()])
   const managerType = field("manager_type", "", [required()])
@@ -84,6 +71,12 @@
         $error = { message: err }
       }
     }
+
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
 
   let facets: FacetValidities[]
   let abortController: AbortController

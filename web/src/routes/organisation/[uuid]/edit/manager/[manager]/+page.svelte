@@ -87,17 +87,6 @@
     name: string
   }
 
-  let validities: {
-    from: string | undefined | null
-    to: string | undefined | null
-  } = { from: null, to: null }
-
-  onMount(async () => {
-    validities = $page.params.uuid
-      ? await getValidities($page.params.uuid)
-      : { from: null, to: null }
-  })
-
   const fromDate = field("from", "", [required()])
   const managerType = field("manager_type", "", [required()])
   const managerLevel = field("manager_level", "", [required()])
@@ -133,16 +122,21 @@
       }
     }
 
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
   let facets: FacetValidities[]
   let abortController: AbortController
-  $: if (startDate) {
+  $: {
     // Abort the previous request if a new one is about to start
     if (abortController) abortController.abort()
     abortController = new AbortController()
 
     const params = {
       currentDate: startDate,
-      orgUuid: $page.params.uuid,
+      orgUuid: selectedOrgUnit?.uuid,
       facetUserKeys: ["manager_type", "manager_level", "responsibility"],
     }
 
@@ -229,8 +223,8 @@
         <Search
           type="org-unit"
           startValue={{
-            uuid: findClosestValidity(manager.org_unit, $date).uuid,
-            name: findClosestValidity(manager.org_unit, $date).name,
+            uuid: findClosestValidity(manager.org_unit, startDate).uuid,
+            name: findClosestValidity(manager.org_unit, startDate).name,
           }}
           bind:value={selectedOrgUnit}
           required={true}
@@ -239,8 +233,8 @@
           type="employee"
           startValue={manager.person
             ? {
-                uuid: findClosestValidity(manager.person, $date).uuid,
-                name: findClosestValidity(manager.person, $date).name,
+                uuid: findClosestValidity(manager.person, startDate).uuid,
+                name: findClosestValidity(manager.person, startDate).name,
               }
             : undefined}
         />

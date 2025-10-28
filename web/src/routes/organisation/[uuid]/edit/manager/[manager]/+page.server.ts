@@ -6,7 +6,7 @@ export const actions: Actions = {
   default: async ({ request, params }: RequestEvent): Promise<ManagerUpdateInput> => {
     const data = await request.formData()
     const orgUnitUuid = data.get("org-unit-uuid")
-    const employeeUuid = data.get("employee-uuid")
+    const person = data.get("employee-uuid")
     const managerType = data.get("manager-type")
     const managerLevel = data.get("manager-level")
     // Keeping these lines as documentation for the following one-liner.
@@ -21,10 +21,10 @@ export const actions: Actions = {
 
     return {
       uuid: params.manager,
-      ...(orgUnitUuid && { org_unit: orgUnitUuid }),
-      ...(employeeUuid && { person: employeeUuid }),
-      ...(managerType && { manager_type: managerType }),
-      ...(managerLevel && { manager_level: managerLevel }),
+      person: person,
+      org_unit: orgUnitUuid,
+      manager_type: managerType,
+      manager_level: managerLevel,
       responsibility: responsibilities,
       validity: { from: startDate, ...(endDate && { to: endDate }) },
     }
