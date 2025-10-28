@@ -32,6 +32,10 @@
         objects {
           validities {
             uuid
+            person(filter: { from_date: $fromDate, to_date: $toDate }) {
+              uuid
+              name
+            }
             manager_type(filter: { from_date: $fromDate, to_date: $toDate }) {
               uuid
               name
@@ -227,14 +231,23 @@
         <Search
           type="org-unit"
           startValue={{
-            uuid: findClosestValidity(manager.org_unit, $date).uuid,
-            name: findClosestValidity(manager.org_unit, $date).name,
+            uuid: findClosestValidity(manager.org_unit, startDate).uuid,
+            name: findClosestValidity(manager.org_unit, startDate).name,
           }}
           bind:name={$orgUnit.value}
           errors={$orgUnit.errors}
           on:clear={() => ($orgUnit.value = "")}
           bind:value={selectedOrgUnit}
           required={true}
+        />
+        <Search
+          type="employee"
+          startValue={manager.person
+            ? {
+                uuid: findClosestValidity(manager.person, startDate).uuid,
+                name: findClosestValidity(manager.person, startDate).name,
+              }
+            : undefined}
         />
         <Breadcrumbs orgUnit={selectedOrgUnit} />
         {#if facets}

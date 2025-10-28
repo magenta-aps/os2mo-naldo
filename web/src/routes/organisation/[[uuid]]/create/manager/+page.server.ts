@@ -5,7 +5,7 @@ import type { Actions, RequestEvent } from "@sveltejs/kit"
 export const actions: Actions = {
   default: async ({ request, params }: RequestEvent): Promise<ManagerCreateInput> => {
     const data = await request.formData()
-    const employeeUuid = data.get("employee-uuid")
+    const person = data.get("employee-uuid")
     const managerType = data.get("manager-type")
     const managerLevel = data.get("manager-level")
     // Keeping these lines as documentation for the following one-liner.
@@ -20,7 +20,7 @@ export const actions: Actions = {
 
     return {
       org_unit: params.uuid,
-      ...(employeeUuid && { person: employeeUuid }),
+      person: person,
       manager_type: managerType,
       manager_level: managerLevel,
       responsibility: responsibilities,
