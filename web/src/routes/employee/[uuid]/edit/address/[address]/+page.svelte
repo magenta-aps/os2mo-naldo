@@ -5,6 +5,7 @@
   import Error from "$lib/components/alerts/Error.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
+  import AddressInput from "$lib/components/forms/shared/AddressInput.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
   import { base } from "$app/paths"
@@ -24,6 +25,7 @@
   import { form, field } from "svelte-forms"
   import { required, email, pattern } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
+  import { normalizeAddress } from "$lib/utils/normalizeForm"
 
   gql`
     query AddressAndFacets($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
@@ -73,8 +75,17 @@
   // update the field depending on address-type
   const fromDate = field("from", "", [required()])
   const addressTypeField = field("address_type", "", [required()])
+  const visibility = field("visibility", "", [])
+  const description = field("description", "", [])
+
   let addressField = field("", "")
-  $: svelteForm = form(fromDate, addressTypeField, addressField)
+  $: svelteForm = form(
+    fromDate,
+    addressTypeField,
+    addressField,
+    visibility,
+    description
+  )
 
   $: switch (addressType?.name) {
     case Addresses.EMAIL:
@@ -157,6 +168,21 @@
       }
     })()
   }
+
+  let initialAddress: any = null
+  let hasChanges = false
+  $: if (initialAddress) {
+    // Check if any of the user-editable fields have changed compared to the original values.
+    const editableChanged =
+      $addressTypeField.value !== initialAddress.address_type ||
+      $addressField.value !== initialAddress.value ||
+      $visibility.value !== initialAddress.visibility ||
+      $description.value !== initialAddress.user_key
+
+    const toDateExtended =
+      toDate === "" ? initialAddress.to !== null : toDate > (initialAddress.to ?? null)
+    hasChanges = editableChanged || toDateExtended
+  }
 </script>
 
 <title
@@ -198,6 +224,12 @@
   </div>
 {:then data}
   {@const address = data.addresses.objects[0].validities[0]}
+  {#if !initialAddress}
+    {@html (() => {
+      initialAddress = normalizeAddress(address)
+      return ""
+    })()}
+  {/if}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -227,9 +259,12 @@
             <Select
               title={capital($_("visibility"))}
               id="visibility"
+              bind:name={$visibility.value}
               startValue={address.visibility ? address.visibility : undefined}
               iterable={filterClassesByFacetUserKey(facets, "visibility")}
               extra_classes="basis-1/2"
+              on:clear={() => ($visibility.value = "")}
+              isClearable={true}
             />
             <Select
               title={capital($_("address_type"))}
@@ -246,9 +281,10 @@
           </div>
         {/if}
         <Input
-          startValue={address.user_key !== address.value ? address.user_key : undefined}
+          startValue={address.user_key}
           title={capital($_("description"))}
           id="user-key"
+          bind:value={$description.value}
         />
         {#if addressType}
           {#if addressType.scope === "DAR"}
@@ -265,11 +301,12 @@
               required={true}
             />
           {:else}
-            <Input
-              startValue={address.name}
-              bind:name={$addressField.value}
-              errors={$addressField.errors}
+            <!-- This is not perfectly implemented..-->
+            <AddressInput
               title={addressType.name}
+              startValue={address.name}
+              bind:displayName={$addressField.value}
+              errors={$addressField.errors}
               id="value"
               required={true}
             />
@@ -285,6 +322,8 @@
             values: { item: $_("address", { values: { n: 1 } }) },
           })
         )}
+        disabled={!hasChanges}
+        info={hasChanges ? undefined : $_("edit_tooltip")}
       />
       <Button
         type="button"

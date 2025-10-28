@@ -30,3 +30,13 @@ export const normalizeITUser = (i: any, note: string | null | undefined) => {
     note: note ?? "",
   }
 }
+
+export const normalizeAddress = (a: any) => {
+  return {
+    to: a.validity?.to?.split("T")[0] ?? null,
+    address_type: a.address_type?.name ?? null,
+    value: a.name ?? null,
+    user_key: a.user_key ?? "",
+    visibility: a.visibility?.name ?? "",
+  }
+}
