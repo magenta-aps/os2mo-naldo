@@ -5,7 +5,6 @@
   import Error from "$lib/components/alerts/Error.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
-  import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
@@ -20,6 +19,7 @@
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getPersonValidities } from "$lib/http/getValidities"
   import { findClosestValidity } from "$lib/utils/validities"
+  import { normalizeOwner } from "$lib/utils/normalizeForm"
 
   gql`
     query Owner($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
@@ -108,6 +108,17 @@
         : { from: null, to: null }
     })()
   }
+
+  let initialOwner: any = null
+  let hasChanges = false
+  $: if (initialOwner) {
+    // Check if any of the user-editable fields have changed compared to the original values.
+    const editableChanged = selectedPerson?.uuid !== initialOwner.person
+
+    const toDateExtended =
+      toDate === "" ? initialOwner.to !== null : toDate > (initialOwner.to ?? null)
+    hasChanges = editableChanged || toDateExtended
+  }
 </script>
 
 <title
@@ -144,6 +155,12 @@
   </div>
 {:then data}
   {@const ownerObj = data.owners.objects[0].validities[0]}
+  {#if !initialOwner}
+    {@html (() => {
+      initialOwner = normalizeOwner(ownerObj)
+      return ""
+    })()}
+  {/if}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -190,6 +207,8 @@
             values: { item: $_("owner", { values: { n: 1 } }) },
           })
         )}
+        disabled={!hasChanges}
+        info={hasChanges ? undefined : $_("edit_tooltip")}
       />
       <Button
         type="button"

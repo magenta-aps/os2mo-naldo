@@ -19,6 +19,7 @@
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getValidities } from "$lib/http/getValidities"
   import { findClosestValidity } from "$lib/utils/validities"
+  import { normalizeOwner } from "$lib/utils/normalizeForm"
 
   gql`
     query Owner($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
@@ -54,6 +55,10 @@
   `
   let startDate: string = $date
   let toDate: string
+  let selectedPerson: {
+    uuid: string
+    name: string
+  }
 
   const fromDate = field("from", "", [required()])
   const svelteForm = form(fromDate)
@@ -102,6 +107,17 @@
         : { from: null, to: null }
     })()
   }
+
+  let initialOwner: any = null
+  let hasChanges = false
+  $: if (initialOwner) {
+    // Check if any of the user-editable fields have changed compared to the original values.
+    const editableChanged = selectedPerson?.uuid !== initialOwner.person
+
+    const toDateExtended =
+      toDate === "" ? initialOwner.to !== null : toDate > (initialOwner.to ?? null)
+    hasChanges = editableChanged || toDateExtended
+  }
 </script>
 
 <title
@@ -138,6 +154,12 @@
   </div>
 {:then data}
   {@const ownerObj = data.owners.objects[0].validities[0]}
+  {#if !initialOwner}
+    {@html (() => {
+      initialOwner = normalizeOwner(ownerObj)
+      return ""
+    })()}
+  {/if}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -166,6 +188,7 @@
         </div>
         <Search
           type="employee"
+          bind:value={selectedPerson}
           startValue={ownerObj.owner
             ? {
                 uuid: findClosestValidity(ownerObj.owner, startDate).uuid,
@@ -183,6 +206,8 @@
             values: { item: $_("owner", { values: { n: 1 } }) },
           })
         )}
+        disabled={!hasChanges}
+        info={hasChanges ? undefined : $_("edit_tooltip")}
       />
       <Button
         type="button"
