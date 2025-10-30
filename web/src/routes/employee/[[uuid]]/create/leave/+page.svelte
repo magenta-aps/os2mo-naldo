@@ -4,7 +4,6 @@
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
-  import Input from "$lib/components/forms/shared/Input.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
@@ -16,72 +15,54 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
+  import { findClosestValidity } from "$lib/utils/validities"
   import {
     CreateLeaveDocument,
-    LeaveTypeDocument,
     GetEmployeeDocument,
+    GetEngagementsDocument,
   } from "./query.generated"
   import {
     formatEngagementTitlesAndUuid,
     type EngagementTitleAndUuid,
   } from "$lib/utils/helpers"
+  import type { FacetValidities } from "$lib/utils/classes"
   import { getEngagementValidities } from "$lib/http/getValidities"
+  import { getClasses } from "$lib/http/getClasses"
   import Search from "$lib/components/search/Search.svelte"
-  import { onMount } from "svelte"
+  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
-  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
 
-  let toDate: string
-
-  const fromDate = field("from", "", [required()])
-  const employeeField = field("employee", "", [required()])
-  const leaveType = field("leave_type", "", [required()])
-  const engagement = field("engagement", "", [required()])
-  const svelteForm = form(fromDate, employeeField, leaveType, engagement)
-
-  let employee: {
-    uuid: string
-    name: string
-  }
-  let engagements: EngagementTitleAndUuid[] | undefined
-  let selectedEngagement: {
-    uuid: string
-    name: string
-  }
   gql`
-    query LeaveType($currentDate: DateTime) {
-      facets(filter: { user_keys: ["leave_type"] }) {
+    query GetEmployee($uuid: [UUID!], $fromDate: DateTime) {
+      employees(filter: { uuids: $uuid, from_date: $fromDate }) {
         objects {
           validities {
             uuid
-            user_key
-            classes(filter: { from_date: $currentDate }) {
-              uuid
-              user_key
-              name
+            name
+            validity {
+              from
+              to
             }
           }
         }
       }
     }
 
-    query GetEmployee($uuid: [UUID!], $currentDate: DateTime) {
-      employees(filter: { uuids: $uuid, from_date: null, to_date: null }) {
+    query GetEngagements($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+      engagements(
+        filter: { employees: $uuid, from_date: $fromDate, to_date: $toDate }
+      ) {
         objects {
-          current(at: $currentDate) {
+          validities {
+            org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
+              name
+              user_key
+            }
             uuid
-            name
-            engagements(filter: { from_date: $currentDate }) {
-              org_unit(filter: { from_date: $currentDate }) {
-                name
-                user_key
-              }
-              uuid
-              job_function {
-                user_key
-                name
-              }
+            job_function {
+              user_key
+              name
             }
           }
         }
@@ -100,18 +81,21 @@
     }
   `
 
-  // Logic for updating datepicker intervals
-  let validities: {
-    from: string | undefined | null
-    to: string | undefined | null
-  } = { from: null, to: null }
+  let startDate: string = $date
+  let toDate: string
 
-  $: if (selectedEngagement) {
-    ;(async () => {
-      validities = await getEngagementValidities(selectedEngagement.uuid)
-    })()
-  } else {
-    validities = { from: null, to: null }
+  const fromDate = field("from", "", [required()])
+  const leaveType = field("leave_type", "", [required()])
+  const engagement = field("engagement", "", [required()])
+  const svelteForm = form(fromDate, leaveType, engagement)
+
+  let selectedEngagement: {
+    uuid: string
+    name: string
+  }
+  let selectedPerson: {
+    uuid: string
+    name: string
   }
 
   const handler: SubmitFunction =
@@ -145,18 +129,59 @@
       }
     }
 
-  const updateEngagements = async (employeeUuid: string | undefined | null) => {
-    const res = await graphQLClient().request(GetEmployeeDocument, {
+  const updateEngagements = async (
+    employeeUuid: string | undefined | null,
+    fromDate: string,
+    toDate: string
+  ) => {
+    const res = await graphQLClient().request(GetEngagementsDocument, {
       uuid: employeeUuid,
-      // Maybe this should be `fromdate`?
-      currentDate: $date,
+      fromDate: fromDate,
+      toDate: toDate,
     })
-    engagements = res.employees?.objects[0].current?.engagements
+    return (engagements = res.engagements?.objects.map((e) => e.validities[0]))
   }
 
-  onMount(async () => {
-    await updateEngagements($page.params.uuid)
-  })
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  // This needs to be done by itself, otherwise we end in an infinite loop
+  $: if (selectedEngagement) {
+    ;(async () => {
+      validities = await getEngagementValidities(selectedEngagement.uuid)
+    })()
+  } else {
+    validities = { from: null, to: null }
+  }
+
+  let facets: FacetValidities[]
+  let engagements: EngagementTitleAndUuid[]
+  let abortController: AbortController
+  $: {
+    // Abort the previous request if a new one is about to start
+    if (abortController) abortController.abort()
+    abortController = new AbortController()
+
+    const params = {
+      currentDate: startDate,
+      orgUuid: null,
+      facetUserKeys: ["leave_type"],
+    }
+
+    ;(async () => {
+      try {
+        facets = await getClasses(params, abortController.signal)
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          console.error("Request failed:", err)
+        }
+      }
+      await updateEngagements($page.params.uuid, startDate, toDate)
+    })()
+  }
 </script>
 
 <title
@@ -179,135 +204,110 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-<form method="post" class="mx-6" use:enhance={handler}>
-  <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
-    <div class="p-8">
-      <div class="flex flex-row gap-6">
-        <DateInput
-          startValue={$date}
-          bind:value={$fromDate.value}
-          errors={$fromDate.errors}
-          title={capital($_("date.start_date"))}
-          id="from"
-          min={validities.from}
-          max={toDate ? toDate : validities.to}
-          required={true}
-        />
-        <DateInput
-          bind:value={toDate}
-          title={capital($_("date.end_date"))}
-          id="to"
-          min={$fromDate.value ? $fromDate.value : validities.from}
-          max={validities.to}
-        />
+{#await graphQLClient().request( GetEmployeeDocument, { uuid: $page.params.uuid, fromDate: $date } )}}
+  <div class="mx-6">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+      <div class="p-8">
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+        <Skeleton />
+        <Skeleton />
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
       </div>
-      {#await graphQLClient().request(LeaveTypeDocument, { currentDate: $date })}
-        <Select
-          title={capital($_("leave_type"))}
-          id="leave-type-uuid"
-          required={true}
-        />
-      {:then data}
-        {@const facets = data.facets.objects}
-        <Select
-          title={capital($_("leave_type"))}
-          id="leave-type-uuid"
-          bind:name={$leaveType.value}
-          errors={$leaveType.errors}
-          iterable={filterClassesByFacetUserKey(facets, "leave_type")}
-          required={true}
-        />
-      {/await}
+    </div>
+  </div>
+{:then data}
+  {@const person = data.employees?.objects[0].validities}
 
-      {#if $page.params.uuid}
-        {#await graphQLClient().request( GetEmployeeDocument, { uuid: $page.params.uuid, currentDate: $date } )}
-          <Input
-            title="{capital($_('specify'))} {$_('employee', { values: { n: 1 } })}"
-            id="employee-uuid"
-            disabled
-            placeholder="{capital($_('loading'))} {$_('employee', {
-              values: { n: 1 },
-            })}..."
+  <form method="post" class="mx-6" use:enhance={handler}>
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+      <div class="p-8">
+        <div class="flex flex-row gap-6">
+          <DateInput
+            bind:value={startDate}
+            bind:validationValue={$fromDate.value}
+            errors={$fromDate.errors}
+            title={capital($_("date.start_date"))}
+            id="from"
+            min={validities.from}
+            max={toDate ? toDate : validities.to}
             required={true}
           />
-        {:then employeeData}
-          {@const startValueEmployee = employeeData.employees?.objects[0].current}
-          <Search
-            type="employee"
-            startValue={startValueEmployee
-              ? {
-                  uuid: startValueEmployee.uuid,
-                  name: startValueEmployee.name,
-                }
-              : undefined}
-            bind:value={employee}
-            bind:name={$employeeField.value}
-            errors={$employeeField.errors}
-            on:change={() => updateEngagements(employee.uuid)}
-            on:clear={() => {
-              $employeeField.value = ""
-              $engagement.value = ""
-              engagements = undefined
-            }}
-            required={true}
+          <DateInput
+            bind:value={toDate}
+            title={capital($_("date.end_date"))}
+            id="to"
+            min={$fromDate.value ? $fromDate.value : validities.from}
+            max={validities.to}
           />
-        {/await}
-      {:else}
+        </div>
         <Search
           type="employee"
-          bind:value={employee}
-          bind:name={$employeeField.value}
-          errors={$employeeField.errors}
-          on:change={() => updateEngagements(employee.uuid)}
-          on:clear={() => {
-            $employeeField.value = ""
-            $engagement.value = ""
-            engagements = undefined
+          bind:value={selectedPerson}
+          startValue={{
+            uuid: findClosestValidity(person, startDate).uuid,
+            name: findClosestValidity(person, startDate).name,
           }}
+          disabled
           required={true}
         />
-      {/if}
+        {#if facets}
+          <Select
+            title={capital($_("leave_type"))}
+            id="leave-type-uuid"
+            bind:name={$leaveType.value}
+            errors={$leaveType.errors}
+            iterable={filterClassesByFacetUserKey(facets, "leave_type")}
+            required={true}
+          />
+        {/if}
 
-      {#if engagements && engagements.length}
-        {#key engagements}
+        {#if engagements && engagements.length}
           <Select
             title={capital($_("engagements", { values: { n: 2 } }))}
             id="engagement-uuid"
             bind:name={$engagement.value}
             bind:value={selectedEngagement}
             errors={$engagement.errors}
+            on:clear={() => ($engagement.value = "")}
             iterable={formatEngagementTitlesAndUuid(engagements)}
+            isClearable={true}
             required={true}
           />
-        {/key}
-      {:else}
-        <Select
-          title={capital($_("engagements", { values: { n: 2 } }))}
-          id="engagement-uuid"
-          bind:value={selectedEngagement}
-          bind:name={$engagement.value}
-          errors={$engagement.errors}
-          disabled
-          required={true}
-        />
-      {/if}
+        {:else}
+          <Select
+            title={capital($_("engagements", { values: { n: 2 } }))}
+            id="engagement-uuid"
+            bind:value={selectedEngagement}
+            bind:name={$engagement.value}
+            errors={$engagement.errors}
+            disabled
+            required={true}
+          />
+        {/if}
+      </div>
     </div>
-  </div>
-  <div class="flex py-6 gap-4">
-    <Button
-      type="submit"
-      title={capital(
-        $_("create_item", {
-          values: { item: $_("leave", { values: { n: 1 } }) },
-        })
-      )}
-    />
-    <Button
-      type="button"
-      title={capital($_("cancel"))}
-      outline={true}
-      on:click={() => goto(`${base}/employee/${$page.params.uuid}`)}
-    />
-  </div>
-  <Error />
-</form>
+    <div class="flex py-6 gap-4">
+      <Button
+        type="submit"
+        title={capital(
+          $_("create_item", {
+            values: { item: $_("leave", { values: { n: 1 } }) },
+          })
+        )}
+      />
+      <Button
+        type="button"
+        title={capital($_("cancel"))}
+        outline={true}
+        on:click={() => goto(`${base}/employee/${$page.params.uuid}`)}
+      />
+    </div>
+    <Error />
+  </form>
+{/await}
