@@ -1,6 +1,7 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
+  import { env } from "$lib/env"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
@@ -10,12 +11,11 @@
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import type { RoleBindingCreateInput } from "$lib/graphql/types"
-  import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
   import {
-    ItSystemsClassAndEmployeeDocument,
+    ItSystemsDocument,
     CreateItUserDocument,
     CreateItUserAndRolebindingDocument,
     GetItSystemRolesDocument,
@@ -23,84 +23,25 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
-  import { filterClassUuidByUserKey } from "$lib/utils/classes"
+  import type { FacetValidities } from "$lib/utils/classes"
+  import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import { formatITSystemNames, type UnpackedClass } from "$lib/utils/helpers"
-
+  import { getPrimaryClasses } from "$lib/http/getClasses"
+  import { getPersonValidities } from "$lib/http/getValidities"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
   import removeRounded from "@iconify/icons-material-symbols/remove-rounded"
   import addRounded from "@iconify/icons-material-symbols/add-rounded"
-  import { getMinMaxValidities } from "$lib/utils/validities"
-  import { env } from "$lib/env"
 
-  let toDate: string
-
-  const fromDate = field("from", "", [required()])
-  const itSystemField = field("it_system", "", [required()])
-  const accountName = field("accountName", "", [required()])
-  const svelteForm = form(fromDate, itSystemField, accountName)
-
-  let itSystem: {
-    uuid: string
-    name: string
-  }
-  let itSystemRoles: UnpackedClass | undefined
-
-  let rolebindings: RoleBindingCreateInput[] = [
-    {
-      ituser: "",
-      role: { uuid: "", user_key: "", name: "" },
-      validity: { from: "", to: "" },
-    },
-  ]
-
-  const addRolebinding = () => {
-    rolebindings = [
-      ...rolebindings,
-      {
-        ituser: "",
-        role: { uuid: "", user_key: "", name: "" },
-        validity: { from: "", to: "" },
-      },
-    ]
-  }
-  const removeRolebinding = (index: number) => {
-    rolebindings = rolebindings.filter((_, i) => i !== index)
-  }
   gql`
-    query ItSystemsClassAndEmployee(
-      $uuid: [UUID!]
-      $primaryClass: String!
-      $currentDate: DateTime!
-    ) {
+    query ItSystems($uuid: [UUID!], $currentDate: DateTime!) {
       itsystems {
         objects {
           current(at: $currentDate) {
             name
             uuid
-          }
-        }
-      }
-      classes(
-        filter: { user_keys: [$primaryClass, "non-primary"], from_date: $currentDate }
-      ) {
-        objects {
-          validities {
-            uuid
-            user_key
-          }
-        }
-      }
-      employees(filter: { uuids: $uuid, from_date: null, to_date: null }) {
-        objects {
-          validities {
-            validity {
-              from
-              to
-            }
           }
         }
       }
@@ -153,6 +94,42 @@
       }
     }
   `
+
+  let startDate: string = $date
+  let toDate: string
+
+  const fromDate = field("from", "", [required()])
+  const itSystemField = field("it_system", "", [required()])
+  const accountName = field("accountName", "", [required()])
+  const svelteForm = form(fromDate, itSystemField, accountName)
+
+  let itSystem: {
+    uuid: string
+    name: string
+  }
+  let itSystemRoles: UnpackedClass | undefined
+
+  let rolebindings: RoleBindingCreateInput[] = [
+    {
+      ituser: "",
+      role: { uuid: "", user_key: "", name: "" },
+      validity: { from: "", to: "" },
+    },
+  ]
+
+  const addRolebinding = () => {
+    rolebindings = [
+      ...rolebindings,
+      {
+        ituser: "",
+        role: { uuid: "", user_key: "", name: "" },
+        validity: { from: "", to: "" },
+      },
+    ]
+  }
+  const removeRolebinding = (index: number) => {
+    rolebindings = rolebindings.filter((_, i) => i !== index)
+  }
 
   const handler: SubmitFunction =
     () =>
@@ -223,6 +200,39 @@
       .map((cls) => cls.objects[0])
       .sort((a, b) => (a.name > b.name ? 1 : -1))
   }
+
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  let facets: FacetValidities[]
+  let abortController: AbortController
+  $: {
+    // Abort the previous request if a new one is about to start
+    if (abortController) abortController.abort()
+    abortController = new AbortController()
+
+    // Make sure `currentDate` isn't sent if startDate is null.
+    const params = {
+      fromDate: startDate,
+      primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY,
+    }
+
+    ;(async () => {
+      validities = $page.params.uuid
+        ? await getPersonValidities($page.params.uuid)
+        : { from: null, to: null }
+      try {
+        facets = await getPrimaryClasses(params, abortController.signal)
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          console.error("Request failed:", err)
+        }
+      }
+    })()
+  }
 </script>
 
 <title
@@ -245,7 +255,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ItSystemsClassAndEmployeeDocument, { uuid: $page.params.uuid, primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY, currentDate: $date } )}
+{#await graphQLClient().request( ItSystemsDocument, { uuid: $page.params.uuid, currentDate: $date } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -263,8 +273,6 @@
   </div>
 {:then data}
   {@const itSystems = data.itsystems.objects}
-  {@const classes = data.classes.objects}
-  {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -273,8 +281,8 @@
           <!-- TODO: At some point ITUsers will be linked to engagements, -->
           <!-- when this happens, datepickers needs to use engagement -> org_unit validities -->
           <DateInput
-            startValue={$date}
-            bind:value={$fromDate.value}
+            bind:value={startDate}
+            bind:validationValue={$fromDate.value}
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
@@ -313,19 +321,14 @@
             required={true}
           />
         </div>
-        <div class="flex">
-          <Checkbox
+        {#if facets}
+          <Select
             title={capital($_("primary"))}
             id="primary"
-            value={filterClassUuidByUserKey(classes, env.PUBLIC_PRIMARY_CLASS_USER_KEY)}
+            iterable={filterClassesByFacetUserKey(facets, "primary_type")}
+            isClearable={true}
           />
-        </div>
-        <input
-          hidden
-          name="non-primary"
-          id="non-primary"
-          value={filterClassUuidByUserKey(classes, "non-primary")}
-        />
+        {/if}
         <TextArea title={capital($_("notes"))} id="notes" />
         <div class="divider p-0 m-0 mb-4 w-full" />
         <h4>{capital($_("rolebinding", { values: { n: 2 } }))}</h4>
