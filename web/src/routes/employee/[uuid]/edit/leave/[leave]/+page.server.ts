@@ -11,8 +11,8 @@ export const actions: Actions = {
 
     return {
       uuid: params.leave,
-      ...(leaveTypeUuid && { leave_type: leaveTypeUuid }),
-      ...(engagementUuid && { engagement: engagementUuid }),
+      leave_type: leaveTypeUuid,
+      engagement: engagementUuid,
       validity: { from: startDate, ...(endDate && { to: endDate }) },
     }
   },

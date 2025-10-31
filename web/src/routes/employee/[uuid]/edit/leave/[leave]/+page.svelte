@@ -30,6 +30,7 @@
   import { required } from "svelte-forms/validators"
   import Search from "$lib/components/search/Search.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
+  import { normalizeLeave } from "$lib/utils/normalizeForm"
 
   let startDate: string = $date
   let toDate: string
@@ -214,6 +215,19 @@
       await updateEngagements($page.params.uuid, startDate, toDate)
     })()
   }
+
+  let initialLeave: any = null
+  let hasChanges = false
+  $: if (initialLeave) {
+    // Check if any of the user-editable fields have changed compared to the original values.
+    const editableChanged =
+      $leaveType.value !== initialLeave.leave_type ||
+      selectedEngagement?.uuid !== initialLeave.engagement
+
+    const toDateExtended =
+      toDate === "" ? initialLeave.to !== null : toDate > (initialLeave.to ?? null)
+    hasChanges = editableChanged || toDateExtended
+  }
 </script>
 
 <title
@@ -254,6 +268,12 @@
   {@const leave = data.leaves.objects[0].validities[0]}
   {@const person = leave.person[0]}
   {@const engagementStartValue = formatEngagementTitlesAndUuid([leave.engagement])[0]}
+  {#if !initialLeave}
+    {@html (() => {
+      initialLeave = normalizeLeave(leave)
+      return ""
+    })()}
+  {/if}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -323,6 +343,8 @@
             values: { item: $_("leave", { values: { n: 1 } }) },
           })
         )}
+        disabled={!hasChanges}
+        info={hasChanges ? undefined : $_("edit_tooltip")}
       />
       <Button
         type="button"
