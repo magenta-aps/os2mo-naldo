@@ -1,3 +1,5 @@
+import { formatKleNumberTitleAndUuid } from "$lib/utils/helpers"
+
 export const normalizeEngagement = (e: any) => {
   return {
     to: e.validity?.to?.split("T")[0] ?? null,
@@ -64,5 +66,13 @@ export const normalizeLeave = (l: any) => {
     to: l.validity?.to?.split("T")[0] ?? null,
     leave_type: l.leave_type?.name ?? null,
     engagement: l.engagement?.uuid ?? null,
+  }
+}
+
+export const normalizeKLE = (k: any) => {
+  return {
+    to: k.validity?.to?.split("T")[0] ?? null,
+    kle_number: formatKleNumberTitleAndUuid(k.kle_number)[0].name ?? null,
+    kle_aspect: k.kle_aspects.map((a: any) => a.name),
   }
 }

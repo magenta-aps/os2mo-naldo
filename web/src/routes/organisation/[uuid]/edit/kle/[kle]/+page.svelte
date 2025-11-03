@@ -23,6 +23,7 @@
   import { formatKleNumberTitleAndUuid } from "$lib/utils/helpers"
   import { getClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
+  import { normalizeKLE } from "$lib/utils/normalizeForm"
 
   gql`
     query KLE($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
@@ -136,6 +137,19 @@
       }
     })()
   }
+
+  let initialKLE: any = null
+  let hasChanges = false
+  $: if (initialKLE) {
+    // Check if any of the user-editable fields have changed compared to the original values.
+    const editableChanged =
+      $kleNumber.value !== initialKLE.kle_number ||
+      JSON.stringify($kleAspects.value) !== JSON.stringify(initialKLE.kle_aspect)
+
+    const toDateExtended =
+      toDate === "" ? initialKLE.to !== null : toDate > (initialKLE.to ?? null)
+    hasChanges = editableChanged || toDateExtended
+  }
 </script>
 
 <title
@@ -175,6 +189,12 @@
   </div>
 {:then data}
   {@const kle = data.kles.objects[0].validities[0]}
+  {#if !initialKLE}
+    {@html (() => {
+      initialKLE = normalizeKLE(kle)
+      return ""
+    })()}
+  {/if}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -230,6 +250,8 @@
             values: { item: $_("kle", { values: { n: 1 } }) },
           })
         )}
+        disabled={!hasChanges}
+        info={hasChanges ? undefined : $_("edit_tooltip")}
       />
       <Button
         type="button"
