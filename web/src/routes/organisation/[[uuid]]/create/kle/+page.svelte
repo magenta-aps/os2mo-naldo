@@ -7,55 +7,23 @@
   import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
-  import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
-  import { FacetsAndOrgDocument, CreateKleDocument } from "./query.generated"
+  import { CreateKleDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
+  import type { FacetValidities } from "$lib/utils/classes"
   import SelectMultiple from "$lib/components/forms/shared/SelectMultiple.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
-  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { formatKleNumberTitleAndUuid } from "$lib/utils/helpers"
-  import { getMinMaxValidities } from "$lib/utils/validities"
-
-  let toDate: string
-  const fromDate = field("from", "", [required()])
-  const kleNumber = field("kle_number", "", [required()])
-  const kleAspects = field("kle_aspects", undefined, [required()])
-  const svelteForm = form(fromDate, kleNumber, kleAspects)
+  import { getClasses } from "$lib/http/getClasses"
+  import { getValidities } from "$lib/http/getValidities"
 
   gql`
-    query FacetsAndOrg($uuid: [UUID!]) {
-      facets(filter: { user_keys: ["kle_aspect", "kle_number"] }) {
-        objects {
-          validities {
-            uuid
-            user_key
-            classes(filter: { from_date: null, to_date: null }) {
-              name
-              uuid
-              user_key
-            }
-          }
-        }
-      }
-      org_units(filter: { uuids: $uuid, from_date: null, to_date: null }) {
-        objects {
-          validities {
-            validity {
-              from
-              to
-            }
-          }
-        }
-      }
-    }
-
     mutation CreateKLE($input: KLECreateInput!, $date: DateTime!) {
       kle_create(input: $input) {
         current(at: $date) {
@@ -66,6 +34,14 @@
       }
     }
   `
+
+  let startDate: string = $date
+  let toDate: string
+
+  const fromDate = field("from", "", [required()])
+  const kleNumber = field("kle_number", "", [required()])
+  const kleAspects = field("kle_aspects", undefined, [required()])
+  const svelteForm = form(fromDate, kleNumber, kleAspects)
 
   const handler: SubmitFunction =
     () =>
@@ -96,6 +72,39 @@
         }
       }
     }
+
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  let facets: FacetValidities[]
+  let abortController: AbortController
+  $: if (startDate) {
+    // Abort the previous request if a new one is about to start
+    if (abortController) abortController.abort()
+    abortController = new AbortController()
+
+    const params = {
+      currentDate: startDate,
+      orgUuid: $page.params.uuid,
+      facetUserKeys: ["kle_aspect", "kle_number"],
+    }
+
+    ;(async () => {
+      validities = $page.params.uuid
+        ? await getValidities($page.params.uuid)
+        : { from: null, to: null }
+      try {
+        facets = await getClasses(params, abortController.signal)
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          console.error("Request failed:", err)
+        }
+      }
+    })()
+  }
 </script>
 
 <title
@@ -118,52 +127,37 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request(FacetsAndOrgDocument, { uuid: $page.params.uuid })}
-  <div class="mx-6">
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
-      <div class="p-8">
-        <div class="flex flex-row gap-6">
-          <Skeleton extra_classes="basis-1/2" />
-          <Skeleton extra_classes="basis-1/2" />
-        </div>
-        <Skeleton />
-        <Skeleton />
+<form method="post" class="mx-6" use:enhance={handler}>
+  <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+    <div class="p-8">
+      <div class="flex flex-row gap-6">
+        <DateInput
+          bind:value={startDate}
+          bind:validationValue={$fromDate.value}
+          errors={$fromDate.errors}
+          title={capital($_("date.start_date"))}
+          id="from"
+          min={validities.from}
+          max={toDate ? toDate : validities.to}
+          required={true}
+        />
+        <DateInput
+          bind:value={toDate}
+          title={capital($_("date.end_date"))}
+          id="to"
+          min={$fromDate.value ? $fromDate.value : validities.from}
+          max={validities.to}
+        />
       </div>
-    </div>
-  </div>
-{:then data}
-  {@const facets = data.facets.objects}
-  {@const validities = getMinMaxValidities(data.org_units.objects[0].validities)}
-  {@const kleNumbers = filterClassesByFacetUserKey(facets, "kle_number")}
-
-  <form method="post" class="mx-6" use:enhance={handler}>
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
-      <div class="p-8">
-        <div class="flex flex-row gap-6">
-          <DateInput
-            startValue={$date}
-            bind:value={$fromDate.value}
-            errors={$fromDate.errors}
-            title={capital($_("date.start_date"))}
-            id="from"
-            min={validities.from}
-            max={toDate ? toDate : validities.to}
-            required={true}
-          />
-          <DateInput
-            bind:value={toDate}
-            title={capital($_("date.end_date"))}
-            id="to"
-            min={$fromDate.value ? $fromDate.value : validities.from}
-            max={validities.to}
-          />
-        </div>
+      {#if facets}
         <Select
           title={capital($_("kle_number"))}
           id="kle-number"
           bind:name={$kleNumber.value}
           errors={$kleNumber.errors}
-          iterable={formatKleNumberTitleAndUuid(kleNumbers ? kleNumbers : [])}
+          iterable={formatKleNumberTitleAndUuid(
+            filterClassesByFacetUserKey(facets, "kle_number") ?? []
+          )}
           required={true}
         />
         <SelectMultiple
@@ -175,24 +169,24 @@
           iterable={filterClassesByFacetUserKey(facets, "kle_aspect")}
           required={true}
         />
-      </div>
+      {/if}
     </div>
-    <div class="flex py-6 gap-4">
-      <Button
-        type="submit"
-        title={capital(
-          $_("create_item", {
-            values: { item: $_("kle", { values: { n: 1 } }) },
-          })
-        )}
-      />
-      <Button
-        type="button"
-        title={capital($_("cancel"))}
-        outline={true}
-        href="{base}/organisation/{$page.params.uuid}"
-      />
-    </div>
-    <Error />
-  </form>
-{/await}
+  </div>
+  <div class="flex py-6 gap-4">
+    <Button
+      type="submit"
+      title={capital(
+        $_("create_item", {
+          values: { item: $_("kle", { values: { n: 1 } }) },
+        })
+      )}
+    />
+    <Button
+      type="button"
+      title={capital($_("cancel"))}
+      outline={true}
+      href="{base}/organisation/{$page.params.uuid}"
+    />
+  </div>
+  <Error />
+</form>
