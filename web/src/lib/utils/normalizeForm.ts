@@ -58,3 +58,11 @@ export const normalizeOwner = (o: any) => {
     person: o.owner?.[0]?.uuid ?? undefined,
   }
 }
+
+export const normalizeLeave = (l: any) => {
+  return {
+    to: l.validity?.to?.split("T")[0] ?? null,
+    leave_type: l.leave_type?.name ?? null,
+    engagement: l.engagement?.uuid ?? null,
+  }
+}
