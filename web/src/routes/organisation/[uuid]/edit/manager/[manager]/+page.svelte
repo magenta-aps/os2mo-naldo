@@ -21,11 +21,11 @@
   import SelectMultiple from "$lib/components/forms/shared/SelectMultiple.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
+  import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
-
-  import { onMount } from "svelte"
+  import { normalizeManager } from "$lib/utils/normalizeForm"
 
   gql`
     query Manager($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
@@ -86,23 +86,23 @@
     uuid: string
     name: string
   }
-
-  let validities: {
-    from: string | undefined | null
-    to: string | undefined | null
-  } = { from: null, to: null }
-
-  onMount(async () => {
-    validities = $page.params.uuid
-      ? await getValidities($page.params.uuid)
-      : { from: null, to: null }
-  })
+  let selectedPerson: {
+    uuid: string
+    name: string
+  }
 
   const fromDate = field("from", "", [required()])
+  const orgUnit = field("org_unit", "", [required()])
   const managerType = field("manager_type", "", [required()])
   const managerLevel = field("manager_level", "", [required()])
   const responsibilitiesField = field("responsibilities", undefined, [required()])
-  const svelteForm = form(fromDate, managerType, managerLevel, responsibilitiesField)
+  const svelteForm = form(
+    fromDate,
+    orgUnit,
+    managerType,
+    managerLevel,
+    responsibilitiesField
+  )
 
   const handler: SubmitFunction =
     () =>
@@ -133,16 +133,21 @@
       }
     }
 
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
   let facets: FacetValidities[]
   let abortController: AbortController
-  $: if (startDate) {
+  $: {
     // Abort the previous request if a new one is about to start
     if (abortController) abortController.abort()
     abortController = new AbortController()
 
     const params = {
       currentDate: startDate,
-      orgUuid: $page.params.uuid,
+      orgUuid: selectedOrgUnit?.uuid,
       facetUserKeys: ["manager_type", "manager_level", "responsibility"],
     }
 
@@ -158,6 +163,23 @@
         }
       }
     })()
+  }
+
+  let initialManager: any = null
+  let hasChanges = false
+  $: if (initialManager) {
+    // Check if any of the user-editable fields have changed compared to the original values.
+    const editableChanged =
+      selectedOrgUnit?.uuid !== initialManager.org_unit ||
+      selectedPerson?.uuid !== initialManager.person ||
+      $managerType.value !== initialManager.manager_type ||
+      $managerLevel.value !== initialManager.manager_level ||
+      JSON.stringify($responsibilitiesField.value) !==
+        JSON.stringify(initialManager.responsibility)
+
+    const toDateExtended =
+      toDate === "" ? initialManager.to !== null : toDate > (initialManager.to ?? null)
+    hasChanges = editableChanged || toDateExtended
   }
 </script>
 
@@ -202,6 +224,12 @@
 {:then data}
   {@const manager = data.managers.objects[0].validities[0]}
   {@const responsibilities = manager.responsibilities}
+  {#if !initialManager}
+    {@html (() => {
+      initialManager = normalizeManager(manager)
+      return ""
+    })()}
+  {/if}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -229,18 +257,23 @@
         <Search
           type="org-unit"
           startValue={{
-            uuid: findClosestValidity(manager.org_unit, $date).uuid,
-            name: findClosestValidity(manager.org_unit, $date).name,
+            uuid: findClosestValidity(manager.org_unit, startDate).uuid,
+            name: findClosestValidity(manager.org_unit, startDate).name,
           }}
           bind:value={selectedOrgUnit}
+          bind:name={$orgUnit.value}
+          errors={$orgUnit.errors}
+          on:clear={() => ($orgUnit.value = "")}
           required={true}
         />
+        <Breadcrumbs orgUnit={selectedOrgUnit} />
         <Search
           type="employee"
+          bind:value={selectedPerson}
           startValue={manager.person
             ? {
-                uuid: findClosestValidity(manager.person, $date).uuid,
-                name: findClosestValidity(manager.person, $date).name,
+                uuid: findClosestValidity(manager.person, startDate).uuid,
+                name: findClosestValidity(manager.person, startDate).name,
               }
             : undefined}
         />
@@ -287,6 +320,8 @@
             values: { item: $_("manager", { values: { n: 1 } }) },
           })
         )}
+        disabled={!hasChanges}
+        info={hasChanges ? undefined : $_("edit_tooltip")}
       />
       <Button
         type="button"

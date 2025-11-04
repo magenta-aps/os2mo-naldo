@@ -25,6 +25,7 @@
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
+  import { normalizeManager } from "$lib/utils/normalizeForm"
 
   gql`
     query Manager($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
@@ -32,6 +33,10 @@
         objects {
           validities {
             uuid
+            person(filter: { from_date: $fromDate, to_date: $toDate }) {
+              uuid
+              name
+            }
             manager_type(filter: { from_date: $fromDate, to_date: $toDate }) {
               uuid
               name
@@ -76,6 +81,10 @@
   let startDate: string = $date
   let toDate: string
   let selectedOrgUnit: {
+    uuid: string
+    name: string
+  }
+  let selectedPerson: {
     uuid: string
     name: string
   }
@@ -157,6 +166,23 @@
       }
     })()
   }
+
+  let initialManager: any = null
+  let hasChanges = false
+  $: if (initialManager) {
+    // Check if any of the user-editable fields have changed compared to the original values.
+    const editableChanged =
+      selectedOrgUnit?.uuid !== initialManager.org_unit ||
+      selectedPerson?.uuid !== initialManager.person ||
+      $managerType.value !== initialManager.manager_type ||
+      $managerLevel.value !== initialManager.manager_level ||
+      JSON.stringify($responsibilitiesField.value) !==
+        JSON.stringify(initialManager.responsibility)
+
+    const toDateExtended =
+      toDate === "" ? initialManager.to !== null : toDate > (initialManager.to ?? null)
+    hasChanges = editableChanged || toDateExtended
+  }
 </script>
 
 <title
@@ -200,6 +226,12 @@
 {:then data}
   {@const manager = data.managers.objects[0].validities[0]}
   {@const responsibilities = manager.responsibilities}
+  {#if !initialManager}
+    {@html (() => {
+      initialManager = normalizeManager(manager)
+      return ""
+    })()}
+  {/if}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -227,8 +259,8 @@
         <Search
           type="org-unit"
           startValue={{
-            uuid: findClosestValidity(manager.org_unit, $date).uuid,
-            name: findClosestValidity(manager.org_unit, $date).name,
+            uuid: findClosestValidity(manager.org_unit, startDate).uuid,
+            name: findClosestValidity(manager.org_unit, startDate).name,
           }}
           bind:name={$orgUnit.value}
           errors={$orgUnit.errors}
@@ -237,6 +269,16 @@
           required={true}
         />
         <Breadcrumbs orgUnit={selectedOrgUnit} />
+        <Search
+          type="employee"
+          bind:value={selectedPerson}
+          startValue={manager.person
+            ? {
+                uuid: findClosestValidity(manager.person, startDate).uuid,
+                name: findClosestValidity(manager.person, startDate).name,
+              }
+            : undefined}
+        />
         {#if facets}
           <div class="flex flex-row gap-6">
             <Select
@@ -280,6 +322,8 @@
             values: { item: $_("manager", { values: { n: 1 } }) },
           })
         )}
+        disabled={!hasChanges}
+        info={hasChanges ? undefined : $_("edit_tooltip")}
       />
       <Button
         type="button"

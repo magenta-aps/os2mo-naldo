@@ -40,3 +40,14 @@ export const normalizeAddress = (a: any) => {
     visibility: a.visibility?.name ?? "",
   }
 }
+
+export const normalizeManager = (m: any) => {
+  return {
+    to: m.validity?.to?.split("T")[0] ?? null,
+    person: m.person?.[0]?.uuid ?? null,
+    org_unit: m.org_unit?.[0]?.uuid ?? null,
+    manager_type: m.manager_type?.name ?? null,
+    manager_level: m.manager_level?.name ?? null,
+    responsibility: m.responsibilities.map((r: any) => r.name),
+  }
+}

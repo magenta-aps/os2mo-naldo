@@ -5,6 +5,7 @@ import type { Actions, RequestEvent } from "@sveltejs/kit"
 export const actions: Actions = {
   default: async ({ request, params }: RequestEvent): Promise<ManagerUpdateInput> => {
     const data = await request.formData()
+    const person = data.get("employee-uuid")
     const orgUnitUuid = data.get("org-unit-uuid")
     const managerType = data.get("manager-type")
     const managerLevel = data.get("manager-level")
@@ -20,10 +21,10 @@ export const actions: Actions = {
 
     return {
       uuid: params.manager,
-      person: params.uuid,
-      ...(orgUnitUuid && { org_unit: orgUnitUuid }),
-      ...(managerType && { manager_type: managerType }),
-      ...(managerLevel && { manager_level: managerLevel }),
+      person: person,
+      org_unit: orgUnitUuid,
+      manager_type: managerType,
+      manager_level: managerLevel,
       responsibility: responsibilities,
       validity: { from: startDate, ...(endDate && { to: endDate }) },
     }
