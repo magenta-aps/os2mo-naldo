@@ -51,3 +51,10 @@ export const normalizeManager = (m: any) => {
     responsibility: m.responsibilities.map((r: any) => r.name),
   }
 }
+
+export const normalizeOwner = (o: any) => {
+  return {
+    to: o.validity?.to?.split("T")[0] ?? null,
+    person: o.owner?.[0]?.uuid ?? undefined,
+  }
+}

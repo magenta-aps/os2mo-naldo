@@ -5,7 +5,6 @@
   import Button from "$lib/components/shared/Button.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import { enhance } from "$app/forms"
-  import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
@@ -13,32 +12,13 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import type { SubmitFunction } from "./$types"
-  import { OrgUnitDocument, CreateOwnerDocument } from "./query.generated"
+  import { CreateOwnerDocument } from "./query.generated"
   import Search from "$lib/components/search/Search.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
-  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getMinMaxValidities } from "$lib/utils/validities"
-
-  let toDate: string
-
-  const fromDate = field("from", "", [required()])
-  const svelteForm = form(fromDate)
+  import { getValidities } from "$lib/http/getValidities"
 
   gql`
-    query OrgUnit($uuid: [UUID!]) {
-      org_units(filter: { uuids: $uuid, from_date: null, to_date: null }) {
-        objects {
-          validities {
-            validity {
-              from
-              to
-            }
-          }
-        }
-      }
-    }
-
     mutation CreateOwner($input: OwnerCreateInput!, $date: DateTime!) {
       owner_create(input: $input) {
         current(at: $date) {
@@ -49,6 +29,12 @@
       }
     }
   `
+
+  let startDate: string = $date
+  let toDate: string
+
+  const fromDate = field("from", "", [required()])
+  const svelteForm = form(fromDate)
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
@@ -79,6 +65,20 @@
         }
       }
     }
+
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  $: {
+    ;(async () => {
+      validities = $page.params.uuid
+        ? await getValidities($page.params.uuid)
+        : { from: null, to: null }
+    })()
+  }
 </script>
 
 <title
@@ -101,62 +101,46 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request(OrgUnitDocument, { uuid: $page.params.uuid })}
-  <div class="mx-6">
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
-      <div class="p-8">
-        <div class="flex flex-row gap-6">
-          <Skeleton extra_classes="basis-1/2" />
-          <Skeleton extra_classes="basis-1/2" />
-        </div>
-        <Skeleton />
+<form method="post" class="mx-6" use:enhance={handler}>
+  <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+    <div class="p-8">
+      <div class="flex flex-row gap-6">
+        <DateInput
+          bind:value={startDate}
+          bind:validationValue={$fromDate.value}
+          errors={$fromDate.errors}
+          title={capital($_("date.start_date"))}
+          id="from"
+          min={validities.from}
+          max={toDate ? toDate : validities.to}
+          required={true}
+        />
+        <DateInput
+          bind:value={toDate}
+          title={capital($_("date.end_date"))}
+          id="to"
+          min={$fromDate.value ? $fromDate.value : validities.from}
+          max={validities.to}
+        />
       </div>
+      <Search type="employee" />
     </div>
   </div>
-{:then data}
-  {@const validities = getMinMaxValidities(data.org_units.objects[0].validities)}
-
-  <form method="post" class="mx-6" use:enhance={handler}>
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
-      <div class="p-8">
-        <div class="flex flex-row gap-6">
-          <DateInput
-            startValue={$date}
-            bind:value={$fromDate.value}
-            errors={$fromDate.errors}
-            title={capital($_("date.start_date"))}
-            id="from"
-            min={validities.from}
-            max={toDate ? toDate : validities.to}
-            required={true}
-          />
-          <DateInput
-            bind:value={toDate}
-            title={capital($_("date.end_date"))}
-            id="to"
-            min={$fromDate.value ? $fromDate.value : validities.from}
-            max={validities.to}
-          />
-        </div>
-        <Search type="employee" />
-      </div>
-    </div>
-    <div class="flex py-6 gap-4">
-      <Button
-        type="submit"
-        title={capital(
-          $_("create_item", {
-            values: { item: $_("owner", { values: { n: 1 } }) },
-          })
-        )}
-      />
-      <Button
-        type="button"
-        title={capital($_("cancel"))}
-        outline={true}
-        href="{base}/organisation/{$page.params.uuid}"
-      />
-    </div>
-    <Error />
-  </form>
-{/await}
+  <div class="flex py-6 gap-4">
+    <Button
+      type="submit"
+      title={capital(
+        $_("create_item", {
+          values: { item: $_("owner", { values: { n: 1 } }) },
+        })
+      )}
+    />
+    <Button
+      type="button"
+      title={capital($_("cancel"))}
+      outline={true}
+      href="{base}/organisation/{$page.params.uuid}"
+    />
+  </div>
+  <Error />
+</form>
