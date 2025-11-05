@@ -1,5 +1,15 @@
 import { formatKleNumberTitleAndUuid } from "$lib/utils/helpers"
 
+export const normalizeEmployee = (e: any) => {
+  return {
+    to: e.validity?.to?.split("T")[0] ?? null,
+    first_name: e.given_name ?? null,
+    last_name: e.surname ?? null,
+    nick_first_name: e.nickname_givenname ?? null,
+    nick_last_name: e.nickname_surname ?? null,
+  }
+}
+
 export const normalizeEngagement = (e: any) => {
   return {
     to: e.validity?.to?.split("T")[0] ?? null,
