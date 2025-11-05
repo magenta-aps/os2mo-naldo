@@ -16,8 +16,8 @@ export const actions: Actions = {
       given_name: first_name,
       surname: last_name,
       validity: { from: startDate, ...(endDate && { to: endDate }) },
-      ...(nicknameFirstName && { nickname_given_name: nicknameFirstName }),
-      ...(nicknameLastName && { nickname_surname: nicknameLastName }),
+      nickname_given_name: nicknameFirstName,
+      nickname_surname: nicknameLastName,
     }
   },
 }

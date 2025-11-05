@@ -17,7 +17,6 @@ export const actions: Actions = {
       ...(cprNumber && { cpr_number: cprNumber }),
       ...(nicknameFirstName && { nickname_given_name: nicknameFirstName }),
       ...(nicknameLastName && { nickname_surname: nicknameLastName }),
-      ...(seniority && { seniority: seniority }),
     }
   },
 }
