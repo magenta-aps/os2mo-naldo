@@ -18,11 +18,11 @@ export const actions: Actions = {
     return {
       uuid: params.uuid,
       validity: { from: startDate, ...(endDate && { to: endDate }) },
-      ...(name && { name: name }),
+      name: name,
       parent: parent,
-      ...(orgLevel && { org_unit_level: orgLevel }),
-      ...(timePlanning && { time_planning: timePlanning }),
-      ...(orgType && { org_unit_type: orgType }),
+      org_unit_level: orgLevel,
+      time_planning: timePlanning,
+      org_unit_type: orgType,
     }
   },
 }
