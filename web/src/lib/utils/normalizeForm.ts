@@ -39,7 +39,7 @@ export const normalizeAssociation = (a: any) => {
     org_unit: a.org_unit?.[0]?.uuid ?? null,
     association_type: a.association_type?.name ?? null,
     primary: a.primary?.name ?? "",
-    substitute: a.substitute?.name ?? "",
+    substitute: a.substitute?.[0]?.name ?? "",
     trade_union: a.trade_union?.name ?? "",
   }
 }
