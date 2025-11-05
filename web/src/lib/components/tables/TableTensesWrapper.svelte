@@ -78,7 +78,7 @@
       }
       if (table === ItUserTable) {
         headers = headers.filter(
-          (header) => header.title !== capital($_("engagement", { values: { n: 1 } }))
+          (header) => header.title !== capital($_("engagement", { values: { n: 2 } }))
         )
       }
     }
