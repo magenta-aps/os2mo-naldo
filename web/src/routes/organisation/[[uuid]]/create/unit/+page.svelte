@@ -15,11 +15,11 @@
   import { date } from "$lib/stores/date"
   import type { SubmitFunction } from "./$types"
   import type { FacetValidities } from "$lib/utils/classes"
+  import { findClosestValidity } from "$lib/utils/validities"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import Search from "$lib/components/search/Search.svelte"
   import { getClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
-
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
@@ -27,6 +27,33 @@
   import { MOConfig } from "$lib/stores/config"
   import { env } from "$lib/env"
 
+  gql`
+    query OrgUnit($uuid: [UUID!]) {
+      org_units(filter: { uuids: $uuid, from_date: null, to_date: null }) {
+        objects {
+          validities {
+            name
+            uuid
+            validity {
+              from
+              to
+            }
+          }
+        }
+      }
+    }
+
+    mutation CreateOrgUnit($input: OrganisationUnitCreateInput!, $date: DateTime!) {
+      org_unit_create(input: $input) {
+        current(at: $date) {
+          uuid
+          name
+        }
+      }
+    }
+  `
+
+  let startDate: string = $date
   let toDate: string
 
   const fromDate = field("from", "", [required()])
@@ -49,27 +76,6 @@
     uuid: string
     name: string
   }
-  gql`
-    query OrgUnit($uuid: [UUID!], $currentDate: DateTime!) {
-      org_units(filter: { uuids: $uuid, from_date: null, to_date: null }) {
-        objects {
-          current(at: $currentDate) {
-            name
-            uuid
-          }
-        }
-      }
-    }
-
-    mutation CreateOrgUnit($input: OrganisationUnitCreateInput!, $date: DateTime!) {
-      org_unit_create(input: $input) {
-        current(at: $date) {
-          uuid
-          name
-        }
-      }
-    }
-  `
   // Logic for updating datepicker intervals
   let validities: {
     from: string | undefined | null
@@ -80,7 +86,7 @@
   let abortController: AbortController
   $: {
     const params = {
-      currentDate: $date,
+      currentDate: startDate,
       orgUuid: parent ? parent.uuid : null,
       facetUserKeys: ["org_unit_level", "org_unit_type", "time_planning"],
     }
@@ -160,8 +166,8 @@
     <div class="p-8">
       <div class="flex flex-row gap-6">
         <DateInput
-          startValue={$date}
-          bind:value={$fromDate.value}
+          bind:value={startDate}
+          bind:validationValue={$fromDate.value}
           errors={$fromDate.errors}
           title={capital($_("date.start_date"))}
           id="from"
@@ -178,17 +184,19 @@
         />
       </div>
       {#if $page.params.uuid}
-        {#await graphQLClient().request( OrgUnitDocument, { uuid: $page.params.uuid, currentDate: $date } ) then orgUnitData}
-          {@const orgUnit = orgUnitData.org_units?.objects[0].current}
+        {#await graphQLClient().request( OrgUnitDocument, { uuid: $page.params.uuid } ) then orgUnitData}
+          {@const orgUnit = orgUnitData.org_units?.objects[0].validities}
           <Search
             type="org-unit"
             title="{capital($_('specify'))} {$_('parent')}"
             id="parent-uuid"
             bind:value={parent}
-            startValue={{
-              uuid: orgUnit?.uuid ? orgUnit.uuid : undefined,
-              name: orgUnit?.name ? orgUnit?.name : "",
-            }}
+            startValue={orgUnit
+              ? {
+                  uuid: findClosestValidity(orgUnit, startDate).uuid,
+                  name: findClosestValidity(orgUnit, startDate).name,
+                }
+              : undefined}
           />
         {/await}
       {:else}
@@ -251,12 +259,6 @@
             id="org-unit-number"
             extra_classes="basis-1/2"
           />
-        </div>
-      {:else}
-        <Skeleton />
-        <div class="flex flex-row gap-6">
-          <Skeleton extra_classes="basis-1/2" />
-          <Skeleton extra_classes="basis-1/2" />
         </div>
       {/if}
     </div>
