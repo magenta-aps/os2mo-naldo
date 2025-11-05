@@ -18,6 +18,7 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
+  import { normalizeEmployee } from "$lib/utils/normalizeForm"
 
   gql`
     query Employee($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
@@ -52,7 +53,15 @@
   const fromDate = field("from", "", [required()])
   const firstName = field("first_name", "", [required()])
   const lastName = field("last_name", "", [required()])
-  const svelteForm = form(fromDate, firstName, lastName)
+  const nickNameFirstName = field("nick_name_first_name", "", [])
+  const nickNameLastName = field("nick_name_last_name", "", [])
+  const svelteForm = form(
+    fromDate,
+    firstName,
+    lastName,
+    nickNameFirstName,
+    nickNameLastName
+  )
 
   const handler: SubmitFunction =
     () =>
@@ -98,6 +107,23 @@
         : { from: null, to: null }
     })()
   }
+
+  let initialEmployee: any = null
+  let hasChanges = false
+  $: if (initialEmployee) {
+    // Check if any of the user-editable fields have changed compared to the original values.
+    const editableChanged =
+      $firstName.value !== initialEmployee.first_name ||
+      $lastName.value !== initialEmployee.last_name ||
+      $nickNameFirstName.value !== initialEmployee.nick_first_name ||
+      $nickNameLastName.value !== initialEmployee.nick_last_name
+
+    const toDateExtended =
+      toDate === ""
+        ? initialEmployee.to !== null
+        : toDate > (initialEmployee.to ?? null)
+    hasChanges = editableChanged || toDateExtended
+  }
 </script>
 
 <title
@@ -141,6 +167,12 @@
   </div>
 {:then data}
   {@const employee = data.employees.objects[0].validities[0]}
+  {#if !initialEmployee}
+    {@html (() => {
+      initialEmployee = normalizeEmployee(employee)
+      return ""
+    })()}
+  {/if}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -192,12 +224,14 @@
             title={capital($_("nickname_givenname", { values: { n: 2 } }))}
             id="nickname-first-name"
             startValue={employee?.nickname_givenname}
+            bind:value={$nickNameFirstName.value}
             extra_classes="basis-1/2"
           />
           <Input
             title={capital($_("nickname_surname"))}
             id="nickname-last-name"
             startValue={employee?.nickname_surname}
+            bind:value={$nickNameLastName.value}
             extra_classes="basis-1/2"
           />
         </div>
@@ -211,6 +245,8 @@
             values: { item: $_("employee", { values: { n: 1 } }) },
           })
         )}
+        disabled={!hasChanges}
+        info={hasChanges ? undefined : $_("edit_tooltip")}
       />
       <Button
         type="button"
