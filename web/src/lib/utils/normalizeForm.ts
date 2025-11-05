@@ -10,6 +10,17 @@ export const normalizeEmployee = (e: any) => {
   }
 }
 
+export const normalizeOrganisation = (o: any) => {
+  return {
+    to: o.validity?.to?.split("T")[0] ?? null,
+    name: o.name ?? null,
+    parent: o.parent?.uuid ?? undefined,
+    unit_type: o.unit_type?.name ?? null,
+    org_unit_level: o.org_unit_level?.name ?? "",
+    time_planning: o.time_planning?.name ?? "",
+  }
+}
+
 export const normalizeEngagement = (e: any) => {
   return {
     to: e.validity?.to?.split("T")[0] ?? null,

@@ -26,6 +26,7 @@
   import { getValidities } from "$lib/http/getValidities"
   import { MOConfig } from "$lib/stores/config"
   import { env } from "$lib/env"
+  import { normalizeOrganisation } from "$lib/utils/normalizeForm"
 
   gql`
     query GetOrgUnit($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
@@ -37,10 +38,6 @@
             parent(filter: { from_date: $fromDate, to_date: $toDate }) {
               uuid
               name
-              validity {
-                from
-                to
-              }
             }
             time_planning {
               name
@@ -85,8 +82,9 @@
   const fromDate = field("from", "", [required()])
   const name = field("name", "", [required()])
   const orgUnitType = field("org_unit_type", "", [required()])
+  const orgUnitLevel = field("org_unit_level", "", [])
   const timePlanning = field("time_planning", "", [required()])
-  let svelteForm = form(fromDate, name, orgUnitType)
+  let svelteForm = form(fromDate, name, orgUnitType, orgUnitLevel)
 
   // This is needed, since `timePlanning` is required, but only used by some.
   $: if ($MOConfig) {
@@ -163,6 +161,28 @@
       }
     })()
   }
+
+  let initialOrganisation: any = null
+  let hasChanges = false
+  $: if (initialOrganisation) {
+    // Check if any of the user-editable fields have changed compared to the original values.
+    const editableChanged =
+      $name.value !== initialOrganisation.name ||
+      parent?.uuid !== initialOrganisation.parent ||
+      $orgUnitType.value !== initialOrganisation.unit_type ||
+      ($MOConfig &&
+        $MOConfig.confdb_show_level === "true" &&
+        $orgUnitLevel.value !== initialOrganisation.org_unit_level) ||
+      ($MOConfig &&
+        $MOConfig.confdb_show_time_planning === "true" &&
+        $timePlanning.value !== initialOrganisation.time_planning)
+
+    const toDateExtended =
+      toDate === ""
+        ? initialOrganisation.to !== null
+        : toDate > (initialOrganisation.to ?? null)
+    hasChanges = editableChanged || toDateExtended
+  }
 </script>
 
 <title
@@ -206,6 +226,12 @@
   </div>
 {:then data}
   {@const orgUnit = data.org_units.objects[0].validities[0]}
+  {#if !initialOrganisation}
+    {@html (() => {
+      initialOrganisation = normalizeOrganisation(orgUnit)
+      return ""
+    })()}
+  {/if}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -274,7 +300,9 @@
               <Select
                 title={capital($_("org_unit_level"))}
                 id="org-level"
+                bind:name={$orgUnitLevel.value}
                 startValue={orgUnit.org_unit_level ? orgUnit.org_unit_level : undefined}
+                on:clear={() => ($orgUnitLevel.value = "")}
                 extra_classes="basis-1/2"
                 iterable={filterClassesByFacetUserKey(facets, "org_unit_level")}
                 isClearable={true}
@@ -304,6 +332,8 @@
             values: { item: $_("unit", { values: { n: 1 } }) },
           })
         )}
+        disabled={!hasChanges}
+        info={hasChanges ? undefined : $_("edit_tooltip")}
       />
       <Button
         type="button"
