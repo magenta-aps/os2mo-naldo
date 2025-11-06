@@ -12,7 +12,7 @@
 
 <div class="form-control {noPadding ? '' : 'pb-3'}">
   <label
-    class="label text-sm text-secondary cursor-pointer p-0 break-words {noPadding
+    class="label text-sm text-secondary cursor-pointer p-0 wrap-break-word {noPadding
       ? ''
       : 'pb-1'} gap-4 {disabled ? 'text-gray-400' : ''}"
   >
@@ -22,7 +22,7 @@
       {name}
       {value}
       checked={startValue === value}
-      class="checkbox checkbox-primary {extra_classes} rounded normal-case font-normal text-base text-base-100"
+      class="checkbox checkbox-primary {extra_classes} rounded-sm normal-case font-normal text-base text-base-100"
       {disabled}
     />
     {#if title}

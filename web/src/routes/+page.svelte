@@ -10,7 +10,7 @@
 <div class="grid grid-cols-1 px-4 xl:px-12 pt-10 gap-4 xl:gap-20 overflow-hidden">
   <!-- Main Content with Welcome Message and Image -->
   <div class="flex justify-center w-full">
-    <div class="w-full max-w-screen-lg -ml-[386px]">
+    <div class="w-full max-w-(--breakpoint-lg) -ml-[386px]">
       <!-- Adjust 160px based on the sidebar width -->
       <h1 class="mb-2 text-primary text-center">
         {$_("welcome_message")}

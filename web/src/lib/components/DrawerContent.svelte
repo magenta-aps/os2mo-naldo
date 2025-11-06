@@ -17,7 +17,9 @@
         <OrgTree />
       {:else}
         <div role="status" class="max-w-sm animate-pulse">
-          <div class="h-12 bg-base-100 rounded dark:bg-accent max-w-[360px] mb-2.5" />
+          <div
+            class="h-12 bg-base-100 rounded-sm dark:bg-accent max-w-[360px] mb-2.5"
+          />
         </div>
       {/if}
     </ul>

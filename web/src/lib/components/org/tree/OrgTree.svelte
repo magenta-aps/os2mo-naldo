@@ -159,7 +159,7 @@
 {#key refreshableOrgTree}
   {#await refreshableOrgTree}
     <div role="status" class="max-w-sm animate-pulse">
-      <div class="mb-2.5 h-10 rounded bg-base-100 max-w-4 dark:bg-accent" />
+      <div class="mb-2.5 h-10 rounded-sm bg-base-100 max-w-4 dark:bg-accent" />
       <span class="sr-only">{capital($_("loading"))}...</span>
     </div>
   {:then orgTree}

@@ -57,7 +57,7 @@
   }}
 >
   {#await graphQLClient().request(GetSpConfigDocument)}
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded-sm">
       <div class="p-8">
         <Skeleton />
         <div class="flex flex-row gap-6">
@@ -72,7 +72,7 @@
     </div>
   {:then data}
     {@const SpEnabled = data.configuration.objects[0].jsonified_value === "true"}
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded-sm">
       <div class="p-8">
         {#if SpEnabled}
           <CprLookup

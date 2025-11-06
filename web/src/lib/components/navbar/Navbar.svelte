@@ -167,7 +167,7 @@ OS2mo-frontend version: ${env.PUBLIC_COMMIT_TAG}`}
 
     <div class="divider divider-accent before:h-[.05rem] after:h-[.05rem] p-0 m-0" />
 
-    <ul class="menu flex-grow">
+    <ul class="menu grow">
       <!-- Quick actions -->
       <NavbarButton
         title={$_("navigation.create_employee")}

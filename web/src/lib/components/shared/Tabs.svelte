@@ -26,13 +26,13 @@
 
 <!-- TODO: Handle tabs when screen gets smaller, e.g. as a dropdown? -->
 <div
-  class="whitespace-wrap block xl:tabs tabs-bordered xxl:whitespace-nowrap {extra_classes}"
+  class="whitespace-wrap block xl:tabs tabs-border xxl:whitespace-nowrap w-full flex"
 >
   {#each items as item}
     <a
       href="#{item.value}"
       data-sveltekit-replacestate
-      class="tab text-base hover:no-underline
+      class="tab flex-1 text-center text-base hover:no-underline
       {item.value === activeItem ? 'tab-active text-primary' : 'text-secondary'}"
       on:click={() => dispatch("tabChange", item.value)}
     >
@@ -40,13 +40,3 @@
     </a>
   {/each}
 </div>
-
-<style>
-  .tab.tab-active:not(.tab-disabled):not([disabled]),
-  .tab:is(input:checked) {
-    /* this doesn't do anything, apart from making sure border-color isn't overwritten.. 
-    it could say `border-color:pink` and it would still be primary because of `text-primary` */
-    /* https://github.com/saadeghi/daisyui/issues/2643 */
-    border-color: var(--primary) !important;
-  }
-</style>

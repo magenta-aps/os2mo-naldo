@@ -17,7 +17,7 @@
   }
 </script>
 
-<div class="overflow-x-auto rounded border mb-8">
+<div class="overflow-x-auto rounded-sm border mb-8">
   <table class="border-slate-300 w-full">
     {#if headers}
       <thead class="text-left">

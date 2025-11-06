@@ -24,7 +24,7 @@
 </script>
 
 <div
-  class="navbar bg-gradient-to-r from-primary via-primary to-secondary h-16 px-6 w-full"
+  class="navbar bg-linear-to-r from-primary via-primary to-secondary h-16 px-6 w-full"
 >
   <div class="flex justify-center gap-2 w-full items-center">
     <!-- Toggle -->

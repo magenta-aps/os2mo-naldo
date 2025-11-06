@@ -65,7 +65,7 @@
   }}
 >
   {#await graphQLClient().request(ManagerFacetsDocument, { currentDate: $date })}
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded-sm">
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <Skeleton extra_classes="basis-1/2" />
@@ -82,7 +82,7 @@
   {:then data}
     {@const facets = data.facets.objects}
 
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded-sm">
       <OnboardingTab
         items={$managerInfo}
         label="manager"

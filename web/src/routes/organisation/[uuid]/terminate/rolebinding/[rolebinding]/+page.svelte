@@ -112,7 +112,7 @@
 
 {#await graphQLClient().request( RolebindingDocument, { uuid: $page.params.rolebinding, fromDate: $date } )}
   <div class="mx-6">
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded-sm">
       <div class="p-8">
         <Skeleton />
       </div>
@@ -127,7 +127,7 @@
   )}
 
   <form method="post" class="mx-6" use:enhance={handler}>
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded-sm">
       <div class="p-8">
         <DateInput
           startValue={$date}
