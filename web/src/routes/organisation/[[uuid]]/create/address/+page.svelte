@@ -238,7 +238,7 @@
           <Input
             title={addressType.name}
             id="value"
-            bind:name={$addressField.value}
+            bind:value={$addressField.value}
             errors={$addressField.errors}
             required={true}
           />
