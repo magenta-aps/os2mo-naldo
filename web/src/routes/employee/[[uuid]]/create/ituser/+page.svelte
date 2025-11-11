@@ -36,7 +36,7 @@
   import addRounded from "@iconify/icons-material-symbols/add-rounded"
 
   gql`
-    query ItSystems($uuid: [UUID!], $currentDate: DateTime!) {
+    query ItSystems($currentDate: DateTime!) {
       itsystems {
         objects {
           current(at: $currentDate) {
@@ -255,7 +255,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ItSystemsDocument, { uuid: $page.params.uuid, currentDate: $date } )}
+{#await graphQLClient().request(ItSystemsDocument, { currentDate: $date })}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
