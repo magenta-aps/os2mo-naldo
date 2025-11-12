@@ -1,6 +1,7 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
+  import { env } from "$lib/env"
   import ValidityTableCell from "$lib/components/shared/ValidityTableCell.svelte"
   import { base } from "$app/paths"
   import { graphQLClient } from "$lib/http/client"
@@ -14,6 +15,7 @@
   import { sortData } from "$lib/utils/sorting"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
+  import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
 
   type Classes = ClassQuery["classes"]["objects"][0]["validities"]
   let data: Classes
@@ -103,6 +105,17 @@
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>
       </td>
+      {#if env.PUBLIC_ENABLE_CLASS_TERMINATION}
+        <td>
+          <a
+            href="{base}/{$page.route.id?.split(
+              '/'
+            )[1]}/facet/{cls.facet_uuid}/terminate/class/{cls.uuid}"
+          >
+            <Icon icon={cancelOutlineRounded} width="25" height="25" />
+          </a>
+        </td>
+      {/if}
     </tr>
   {:else}
     <tr class="leading-5 border-t border-slate-300 text-secondary">
