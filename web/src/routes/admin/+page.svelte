@@ -101,6 +101,7 @@
       { title: capital($_("user_key")), sortPath: "user_key" },
       { title: capital($_("date.date")), sortPath: "validity.from" },
       { title: "" },
+      { title: "" },
     ]}
     {facetUuid}
   />
