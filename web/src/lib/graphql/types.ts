@@ -12501,19 +12501,6 @@ export type ValidityInput = {
 export type Version = {
   __typename?: 'Version';
   /**
-   * DIPEX version.
-   *
-   * Contains a [semantic version](https://semver.org/) if configured.
-   * Contains the `null` on development builds of OS2mo.
-   *
-   * Examples:
-   * * `null`
-   * * `4.34.1`
-   * * `4.28.0`
-   *
-   */
-  dipex_version?: Maybe<Scalars['String']['output']>;
-  /**
    * LoRa version. Returns the exact same as `mo_version`.
    * @deprecated MO and LoRa are shipped and versioned together
    */

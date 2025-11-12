@@ -35,6 +35,7 @@
           validities {
             uuid
             name
+            user_key
             parent(filter: { from_date: $fromDate, to_date: $toDate }) {
               uuid
               name
@@ -84,7 +85,8 @@
   const orgUnitType = field("org_unit_type", "", [required()])
   const orgUnitLevel = field("org_unit_level", "", [])
   const timePlanning = field("time_planning", "", [required()])
-  let svelteForm = form(fromDate, name, orgUnitType, orgUnitLevel)
+  const orgUnitNumber = field("org_unit_number", "", [])
+  let svelteForm = form(fromDate, name, orgUnitType, orgUnitLevel, orgUnitNumber)
 
   // This is needed, since `timePlanning` is required, but only used by some.
   $: if ($MOConfig) {
@@ -175,7 +177,8 @@
         $orgUnitLevel.value !== initialOrganisation.org_unit_level) ||
       ($MOConfig &&
         $MOConfig.confdb_show_time_planning === "true" &&
-        $timePlanning.value !== initialOrganisation.time_planning)
+        $timePlanning.value !== initialOrganisation.time_planning) ||
+      $orgUnitNumber.value !== initialOrganisation.user_key
 
     const toDateExtended =
       toDate === ""
@@ -282,6 +285,18 @@
           required={true}
         />
         {#if facets}
+          {#if $MOConfig && $MOConfig.confdb_show_level === "true"}
+            <Select
+              title={capital($_("org_unit_level"))}
+              id="org-level"
+              bind:name={$orgUnitLevel.value}
+              startValue={orgUnit.org_unit_level ? orgUnit.org_unit_level : undefined}
+              on:clear={() => ($orgUnitLevel.value = "")}
+              extra_classes="basis-1/2"
+              iterable={filterClassesByFacetUserKey(facets, "org_unit_level")}
+              isClearable={true}
+            />
+          {/if}
           {#if $MOConfig && $MOConfig.confdb_show_time_planning === "true"}
             <Select
               title={capital($_("time_planning"))}
@@ -296,18 +311,6 @@
             />
           {/if}
           <div class="flex flex-row gap-6">
-            {#if $MOConfig && $MOConfig.confdb_show_level === "true"}
-              <Select
-                title={capital($_("org_unit_level"))}
-                id="org-level"
-                bind:name={$orgUnitLevel.value}
-                startValue={orgUnit.org_unit_level ? orgUnit.org_unit_level : undefined}
-                on:clear={() => ($orgUnitLevel.value = "")}
-                extra_classes="basis-1/2"
-                iterable={filterClassesByFacetUserKey(facets, "org_unit_level")}
-                isClearable={true}
-              />
-            {/if}
             <Select
               title={capital($_("org_unit_type"))}
               id="org-type"
@@ -319,6 +322,14 @@
               iterable={filterClassesByFacetUserKey(facets, "org_unit_type")}
               isClearable={true}
               required={true}
+            />
+            <Input
+              title={capital($_("org_unit_number"))}
+              id="org-unit-number"
+              bind:value={$orgUnitNumber.value}
+              errors={$orgUnitNumber.errors}
+              startValue={orgUnit.user_key}
+              extra_classes="basis-1/2"
             />
           </div>
         {/if}
