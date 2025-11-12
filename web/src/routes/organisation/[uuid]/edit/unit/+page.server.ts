@@ -12,6 +12,7 @@ export const actions: Actions = {
     const orgLevel = data.get("org-level")
     const timePlanning = data.get("time-planning")
     const orgType = data.get("org-type")
+    const orgUnitNumber = data.get("org-unit-number") as string
     const startDate = data.get("from")
     const endDate = data.get("to")
 
@@ -23,6 +24,7 @@ export const actions: Actions = {
       org_unit_level: orgLevel,
       time_planning: timePlanning,
       org_unit_type: orgType,
+      user_key: orgUnitNumber,
     }
   },
 }
