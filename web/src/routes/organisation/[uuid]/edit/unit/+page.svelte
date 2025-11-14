@@ -8,7 +8,6 @@
   import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
-  import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
@@ -24,30 +23,10 @@
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getClasses } from "$lib/http/getClasses"
+  import { getValidities } from "$lib/http/getValidities"
   import { MOConfig } from "$lib/stores/config"
   import { env } from "$lib/env"
-
-  let toDate: string
-  let parent: {
-    uuid: string
-    name: string
-  }
-
-  const fromDate = field("from", "", [required()])
-  const name = field("name", "", [required()])
-  const orgUnitType = field("org_unit_type", "", [required()])
-  const timePlanning = field("time_planning", "", [required()])
-  let svelteForm = form(fromDate, name, orgUnitType)
-
-  // This is needed, since `timePlanning` is required, but only used by some.
-  $: if ($MOConfig) {
-    if (
-      $MOConfig.confdb_show_time_planning === "true" &&
-      !env.PUBLIC_OPTIONAL_TIME_PLANNING
-    ) {
-      svelteForm = form(fromDate, name, orgUnitType, timePlanning)
-    }
-  }
+  import { normalizeOrganisation } from "$lib/utils/normalizeForm"
 
   gql`
     query GetOrgUnit($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
@@ -59,10 +38,6 @@
             parent(filter: { from_date: $fromDate, to_date: $toDate }) {
               uuid
               name
-              validity {
-                from
-                to
-              }
             }
             time_planning {
               name
@@ -97,6 +72,30 @@
     }
   `
 
+  let startDate: string = $date
+  let toDate: string
+  let parent: {
+    uuid: string
+    name: string
+  }
+
+  const fromDate = field("from", "", [required()])
+  const name = field("name", "", [required()])
+  const orgUnitType = field("org_unit_type", "", [required()])
+  const orgUnitLevel = field("org_unit_level", "", [])
+  const timePlanning = field("time_planning", "", [required()])
+  let svelteForm = form(fromDate, name, orgUnitType, orgUnitLevel)
+
+  // This is needed, since `timePlanning` is required, but only used by some.
+  $: if ($MOConfig) {
+    if (
+      $MOConfig.confdb_show_time_planning === "true" &&
+      !env.PUBLIC_OPTIONAL_TIME_PLANNING
+    ) {
+      svelteForm = form(fromDate, name, orgUnitType, timePlanning)
+    }
+  }
+
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
@@ -128,12 +127,18 @@
       }
     }
 
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
   let facets: FacetValidities[]
   let abortController: AbortController
 
   $: {
     const params = {
-      currentDate: $date,
+      currentDate: startDate,
       orgUuid: parent?.uuid ?? $page.params.uuid ?? null,
       facetUserKeys: ["org_unit_level", "org_unit_type", "time_planning"],
     }
@@ -145,6 +150,7 @@
 
     abortController = new AbortController()
     ;(async () => {
+      validities = parent ? await getValidities(parent.uuid) : { from: null, to: null }
       try {
         const result = await getClasses(params, abortController.signal)
         facets = result // Update facets if the request is successful
@@ -154,6 +160,28 @@
         }
       }
     })()
+  }
+
+  let initialOrganisation: any = null
+  let hasChanges = false
+  $: if (initialOrganisation) {
+    // Check if any of the user-editable fields have changed compared to the original values.
+    const editableChanged =
+      $name.value !== initialOrganisation.name ||
+      parent?.uuid !== initialOrganisation.parent ||
+      $orgUnitType.value !== initialOrganisation.unit_type ||
+      ($MOConfig &&
+        $MOConfig.confdb_show_level === "true" &&
+        $orgUnitLevel.value !== initialOrganisation.org_unit_level) ||
+      ($MOConfig &&
+        $MOConfig.confdb_show_time_planning === "true" &&
+        $timePlanning.value !== initialOrganisation.time_planning)
+
+    const toDateExtended =
+      toDate === ""
+        ? initialOrganisation.to !== null
+        : toDate > (initialOrganisation.to ?? null)
+    hasChanges = editableChanged || toDateExtended
   }
 </script>
 
@@ -198,32 +226,34 @@
   </div>
 {:then data}
   {@const orgUnit = data.org_units.objects[0].validities[0]}
-  <!-- TODO: Fix this when: https://redmine.magenta.dk/issues/58621 is done -->
-  <!-- We can't use getMinMaxValidities since `parent` can't be a list, or it'll crash -->
-  {@const minDate = orgUnit.parent?.validity.from.split("T")[0]}
-  {@const maxDate = orgUnit.parent?.validity.to?.split("T")[0]}
+  {#if !initialOrganisation}
+    {@html (() => {
+      initialOrganisation = normalizeOrganisation(orgUnit)
+      return ""
+    })()}
+  {/if}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            startValue={$date}
-            bind:value={$fromDate.value}
+            bind:value={startDate}
+            bind:validationValue={$fromDate.value}
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={minDate}
-            max={toDate ? toDate : maxDate}
+            min={validities.from}
+            max={toDate ? toDate : validities.to}
             required={true}
           />
           <DateInput
             bind:value={toDate}
-            title={capital($_("date.end_date"))}
             startValue={orgUnit.validity.to ? orgUnit.validity.to.split("T")[0] : null}
+            title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value}
-            max={maxDate ? maxDate : null}
+            min={$fromDate.value ? $fromDate.value : validities.from}
+            max={validities.to}
           />
         </div>
         <Search
@@ -270,7 +300,9 @@
               <Select
                 title={capital($_("org_unit_level"))}
                 id="org-level"
+                bind:name={$orgUnitLevel.value}
                 startValue={orgUnit.org_unit_level ? orgUnit.org_unit_level : undefined}
+                on:clear={() => ($orgUnitLevel.value = "")}
                 extra_classes="basis-1/2"
                 iterable={filterClassesByFacetUserKey(facets, "org_unit_level")}
                 isClearable={true}
@@ -300,6 +332,8 @@
             values: { item: $_("unit", { values: { n: 1 } }) },
           })
         )}
+        disabled={!hasChanges}
+        info={hasChanges ? undefined : $_("edit_tooltip")}
       />
       <Button
         type="button"

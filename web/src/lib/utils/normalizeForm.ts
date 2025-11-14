@@ -10,6 +10,17 @@ export const normalizeEmployee = (e: any) => {
   }
 }
 
+export const normalizeOrganisation = (o: any) => {
+  return {
+    to: o.validity?.to?.split("T")[0] ?? null,
+    name: o.name ?? null,
+    parent: o.parent?.uuid ?? undefined,
+    unit_type: o.unit_type?.name ?? null,
+    org_unit_level: o.org_unit_level?.name ?? "",
+    time_planning: o.time_planning?.name ?? "",
+  }
+}
+
 export const normalizeEngagement = (e: any) => {
   return {
     to: e.validity?.to?.split("T")[0] ?? null,
@@ -28,7 +39,7 @@ export const normalizeAssociation = (a: any) => {
     org_unit: a.org_unit?.[0]?.uuid ?? null,
     association_type: a.association_type?.name ?? null,
     primary: a.primary?.name ?? "",
-    substitute: a.substitute?.name ?? "",
+    substitute: a.substitute?.[0]?.name ?? "",
     trade_union: a.trade_union?.name ?? "",
   }
 }
@@ -56,7 +67,7 @@ export const normalizeAddress = (a: any) => {
 export const normalizeManager = (m: any) => {
   return {
     to: m.validity?.to?.split("T")[0] ?? null,
-    person: m.person?.[0]?.uuid ?? null,
+    person: m.person?.[0]?.uuid ?? undefined,
     org_unit: m.org_unit?.[0]?.uuid ?? null,
     manager_type: m.manager_type?.name ?? null,
     manager_level: m.manager_level?.name ?? null,
