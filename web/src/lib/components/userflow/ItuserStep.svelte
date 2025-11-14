@@ -210,7 +210,7 @@
               <Select
                 title={capital($_("role", { values: { n: 1 } }))}
                 id="it-system-role-uuid"
-                bind:value={rolebinding.role}
+                bind:value={ituser.rolebindings[rolebindingIndex].role}
                 iterable={itSystemRoles}
                 errors={rolebinding.validated === false ? ["required"] : []}
               />
