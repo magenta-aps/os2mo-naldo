@@ -8,41 +8,28 @@
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
   import { date } from "$lib/stores/date"
-  import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
   import { UpdateEmployeeDocument, EmployeeDocument } from "./query.generated"
+  import { getPersonValidities } from "$lib/http/getValidities"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getMinMaxValidities } from "$lib/utils/validities"
-
-  let toDate: string
-
-  const fromDate = field("from", "", [required()])
-  const firstName = field("first_name", "", [required()])
-  const lastName = field("last_name", "", [required()])
-  const svelteForm = form(fromDate, firstName, lastName)
+  import { normalizeEmployee } from "$lib/utils/normalizeForm"
 
   gql`
-    query Employee($uuid: [UUID!], $fromDate: DateTime) {
-      employees(filter: { uuids: $uuid, from_date: null, to_date: null }) {
+    query Employee($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+      employees(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
-          current(at: $fromDate) {
+          validities {
             given_name
             surname
             nickname_givenname
             nickname_surname
             cpr_number
-            validity {
-              from
-              to
-            }
-          }
-          validities {
             validity {
               from
               to
@@ -59,6 +46,22 @@
       }
     }
   `
+
+  let startDate: string = $date
+  let toDate: string
+
+  const fromDate = field("from", "", [required()])
+  const firstName = field("first_name", "", [required()])
+  const lastName = field("last_name", "", [required()])
+  const nickNameFirstName = field("nick_name_first_name", "", [])
+  const nickNameLastName = field("nick_name_last_name", "", [])
+  const svelteForm = form(
+    fromDate,
+    firstName,
+    lastName,
+    nickNameFirstName,
+    nickNameLastName
+  )
 
   const handler: SubmitFunction =
     () =>
@@ -90,6 +93,37 @@
         }
       }
     }
+
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+
+  $: {
+    ;(async () => {
+      validities = $page.params.uuid
+        ? await getPersonValidities($page.params.uuid)
+        : { from: null, to: null }
+    })()
+  }
+
+  let initialEmployee: any = null
+  let hasChanges = false
+  $: if (initialEmployee) {
+    // Check if any of the user-editable fields have changed compared to the original values.
+    const editableChanged =
+      $firstName.value !== initialEmployee.first_name ||
+      $lastName.value !== initialEmployee.last_name ||
+      $nickNameFirstName.value !== initialEmployee.nick_first_name ||
+      $nickNameLastName.value !== initialEmployee.nick_last_name
+
+    const toDateExtended =
+      toDate === ""
+        ? initialEmployee.to !== null
+        : toDate > (initialEmployee.to ?? null)
+    hasChanges = editableChanged || toDateExtended
+  }
 </script>
 
 <title
@@ -112,7 +146,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( EmployeeDocument, { uuid: $page.params.uuid, fromDate: $page.url.searchParams.get("from") } )}
+{#await graphQLClient().request( EmployeeDocument, { uuid: $page.params.uuid, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to") } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
@@ -132,16 +166,21 @@
     </div>
   </div>
 {:then data}
-  {@const employee = data.employees.objects[0].current}
-  {@const validities = getMinMaxValidities(data.employees.objects[0].validities)}
+  {@const employee = data.employees.objects[0].validities[0]}
+  {#if !initialEmployee}
+    {@html (() => {
+      initialEmployee = normalizeEmployee(employee)
+      return ""
+    })()}
+  {/if}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            startValue={$date}
-            bind:value={$fromDate.value}
+            bind:value={startDate}
+            bind:validationValue={$fromDate.value}
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
@@ -185,12 +224,14 @@
             title={capital($_("nickname_givenname", { values: { n: 2 } }))}
             id="nickname-first-name"
             startValue={employee?.nickname_givenname}
+            bind:value={$nickNameFirstName.value}
             extra_classes="basis-1/2"
           />
           <Input
             title={capital($_("nickname_surname"))}
             id="nickname-last-name"
             startValue={employee?.nickname_surname}
+            bind:value={$nickNameLastName.value}
             extra_classes="basis-1/2"
           />
         </div>
@@ -204,6 +245,8 @@
             values: { item: $_("employee", { values: { n: 1 } }) },
           })
         )}
+        disabled={!hasChanges}
+        info={hasChanges ? undefined : $_("edit_tooltip")}
       />
       <Button
         type="button"
