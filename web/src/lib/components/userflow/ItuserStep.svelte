@@ -7,6 +7,7 @@
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
+  import ItUserStepSelect from "$lib/components/forms/shared/ItUserStepSelect.svelte"
   import CircleButton from "$lib/components/shared/CircleButton.svelte"
   import OnboardingFormButtons from "$lib/components/userflow/OnboardingFormButtons.svelte"
   import { step } from "$lib/stores/stepStore"
@@ -57,6 +58,7 @@
     }
   `
 
+  let startDate: string = $date
   let selectedTab = 0
 
   let itSystemRoles: UnpackedClass | undefined
@@ -85,14 +87,9 @@
     fetchItSystemRoles(ituser.itSystem.uuid)
   }
 
-  // Logic for updating datepicker intervals
-  let validities: {
-    from: string | undefined | null
-    to: string | undefined | null
-  } = { from: null, to: null }
-
   let facets: FacetValidities[]
   let abortController: AbortController
+
   $: {
     // Abort the previous request if a new one is about to start
     if (abortController) abortController.abort()
@@ -100,14 +97,11 @@
 
     // Make sure `currentDate` isn't sent if startDate is null.
     const params = {
-      fromDate: ituser.fromDate,
+      fromDate: startDate,
       primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY,
     }
 
     ;(async () => {
-      validities = $page.params.uuid
-        ? await getPersonValidities($page.params.uuid)
-        : { from: null, to: null }
       try {
         facets = await getPrimaryClasses(params, abortController.signal)
       } catch (err: any) {
@@ -157,6 +151,7 @@
           <DateInput
             startValue={ituser.fromDate ? ituser.fromDate : $date}
             bind:value={ituser.fromDate}
+            bind:validationValue={startDate}
             errors={ituser.validated === false && !ituser.fromDate ? ["required"] : []}
             title={capital($_("date.start_date"))}
             id="from"
@@ -206,15 +201,15 @@
         <h4>{capital($_("rolebinding", { values: { n: 2 } }))}</h4>
         {#each ituser.rolebindings as rolebinding, rolebindingIndex}
           {#if itSystemRoles && itSystemRoles.length}
-            {#key itSystemRoles}
-              <Select
-                title={capital($_("role", { values: { n: 1 } }))}
-                id="it-system-role-uuid"
-                bind:value={rolebinding.role}
-                iterable={itSystemRoles}
-                errors={rolebinding.validated === false ? ["required"] : []}
-              />
-            {/key}
+            <ItUserStepSelect
+              title={capital($_("role", { values: { n: 1 } }))}
+              id="it-system-role-uuid"
+              bind:value={ituser.rolebindings[rolebindingIndex].role}
+              iterable={itSystemRoles}
+              errors={ituser.rolebindings[rolebindingIndex].validated === false
+                ? ["required"]
+                : []}
+            />
           {:else}
             <Select
               title={capital($_("role", { values: { n: 1 } }))}

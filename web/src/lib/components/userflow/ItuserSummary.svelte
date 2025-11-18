@@ -32,7 +32,7 @@
           </div>
           <div class="grid grid-cols-2">
             <span>{capital($_("primary"))}:</span>
-            <span>{ituser.primary.name || ""}</span>
+            <span>{ituser.primary?.name || ""}</span>
           </div>
           <div class="grid grid-cols-2">
             <span>{capital($_("notes"))}:</span>
@@ -49,7 +49,7 @@
               {#if rolebinding.validated === true}
                 <div class="grid grid-cols-2">
                   <span>{capital($_("role", { values: { n: 1 } }))}:</span>
-                  <span>{rolebinding.role.name}</span>
+                  <span>{rolebinding.role?.name}</span>
                 </div>
               {/if}
             {/each}
