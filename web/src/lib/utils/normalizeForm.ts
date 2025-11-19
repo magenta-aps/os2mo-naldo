@@ -18,6 +18,7 @@ export const normalizeOrganisation = (o: any) => {
     unit_type: o.unit_type?.name ?? null,
     org_unit_level: o.org_unit_level?.name ?? "",
     time_planning: o.time_planning?.name ?? "",
+    user_key: o.user_key ?? "",
   }
 }
 

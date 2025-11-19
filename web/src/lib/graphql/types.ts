@@ -236,8 +236,27 @@ export type Address = {
    * * `"p-nummer"`
    * * `"PhoneEmployee"`
    *
+   * @deprecated Use 'address_type_response' instead. Will be removed in a future version of OS2mo.
    */
   address_type: Class;
+  /**
+   * The address category or type.
+   *
+   * In OS2mo addresses can be of a variety of different types:
+   * * Phone numbers
+   * * Addresses
+   * * Registration numbers
+   * * Card codes
+   *
+   * This field is what encodes the type of an address.
+   *
+   * Examples of user-keys:
+   * * `"EmailUnit"`
+   * * `"p-nummer"`
+   * * `"PhoneEmployee"`
+   *
+   */
+  address_type_response: ClassResponse;
   /**
    * UUID of the address type class.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -279,8 +298,17 @@ export type Address = {
    * Note:
    * This field is **not** mutually exclusive with neither the `employee` nor the `org_unit` field.
    *
+   * @deprecated Use 'engagement_response' instead. Will be removed in a future version of OS2mo.
    */
   engagement?: Maybe<Array<Engagement>>;
+  /**
+   * Connected engagement.
+   *
+   * Note:
+   * This field is **not** mutually exclusive with neither the `employee` nor the `org_unit` field.
+   *
+   */
+  engagement_response?: Maybe<EngagementResponse>;
   /**
    * Optional UUID of an associated engagement.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -308,8 +336,14 @@ export type Address = {
   /**
    * Connected IT-user.
    *
+   * @deprecated Use 'ituser_response' instead. Will be removed in a future version of OS2mo.
    */
   ituser: Array<ItUser>;
+  /**
+   * Connected IT-user.
+   *
+   */
+  ituser_response?: Maybe<ItUserResponse>;
   /**
    * UUID of the it-user related to the address.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -342,8 +376,17 @@ export type Address = {
    * Note:
    * This field is mutually exclusive with the `employee` field.
    *
+   * @deprecated Use 'org_unit_response' instead. Will be removed in a future version of OS2mo.
    */
   org_unit?: Maybe<Array<OrganisationUnit>>;
+  /**
+   * Connected organisation unit.
+   *
+   * Note:
+   * This field is mutually exclusive with the `employee` field.
+   *
+   */
+  org_unit_response?: Maybe<OrganisationUnitResponse>;
   /**
    * UUID of the organisation unit related to the address.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -360,8 +403,20 @@ export type Address = {
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
    *
+   * @deprecated Use 'person_response' instead. Will be removed in a future version of OS2mo.
    */
   person?: Maybe<Array<Employee>>;
+  /**
+   * Connected person.
+   *
+   * Note:
+   * This field is mutually exclusive with the `org_unit` field.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  person_response?: Maybe<EmployeeResponse>;
   resolve: ResolvedAddress;
   /**
    * The object type.
@@ -434,8 +489,29 @@ export type Address = {
    * * `"Internal"` Should be treated carefully but perhaps exposed to an internal intranet.
    * * `"External"`: Can probably be exposed to the internet
    *
+   * @deprecated Use 'visibility_response' instead. Will be removed in a future version of OS2mo.
    */
   visibility?: Maybe<Class>;
+  /**
+   * Determines who can see the address and how it is exported.
+   *
+   * In OS2mo addresses can be of a variety of privacy classes.
+   * For instance OS2mo may contain a list of phone numbers for an employee;
+   * * A private mobile phone number
+   * * An internal work mobile phone number
+   * * A shared external phone number
+   *
+   * This field is what encodes the privacy class of an address.
+   * Thereby stating who should be allowed to see what addresses.
+   *
+   * Examples of user-keys:
+   * * `null`: Undetermined / non-classified.
+   * * `"Secret"`: Should be treated carefully and perhaps not be exported.
+   * * `"Internal"` Should be treated carefully but perhaps exposed to an internal intranet.
+   * * `"External"`: Can probably be exposed to the internet
+   *
+   */
+  visibility_response?: Maybe<ClassResponse>;
   /**
    * UUID of the visibility class of the address.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -12500,19 +12576,6 @@ export type ValidityInput = {
 /** MO and DIPEX versions */
 export type Version = {
   __typename?: 'Version';
-  /**
-   * DIPEX version.
-   *
-   * Contains a [semantic version](https://semver.org/) if configured.
-   * Contains the `null` on development builds of OS2mo.
-   *
-   * Examples:
-   * * `null`
-   * * `4.34.1`
-   * * `4.28.0`
-   *
-   */
-  dipex_version?: Maybe<Scalars['String']['output']>;
   /**
    * LoRa version. Returns the exact same as `mo_version`.
    * @deprecated MO and LoRa are shipped and versioned together
