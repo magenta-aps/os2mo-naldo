@@ -49,6 +49,7 @@
 	"enter_cpr": "enter CPR number",
 	"entire_organisation": "entire organisation",
 	"estimated_time_remaining": "estimated time remaining",
+	"external_id": "external ID",
 	"facet": "{n, plural, =0 {the facet} one {facet} other {facets}}",
 	"facets": {
 		"name": {

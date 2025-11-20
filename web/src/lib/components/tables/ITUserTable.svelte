@@ -45,6 +45,7 @@
               name
               uuid
             }
+            external_id
             engagements(filter: { from_date: $fromDate, to_date: $toDate }) {
               validities {
                 org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
@@ -113,6 +114,7 @@
     >
       <td class="text-sm p-4">{ituser.itsystem.name} </td>
       <td class="text-sm p-4">{ituser.user_key}</td>
+      <td class="text-sm p-4">{ituser.external_id ?? ""}</td>
       {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
         <td class="text-sm p-4">
           {#each ituser.engagements as engagement}
