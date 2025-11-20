@@ -7,6 +7,7 @@
   import { MOConfig } from "$lib/stores/config"
   import AssociationTable from "$lib/components/tables/AssociationTable.svelte"
   import AddressTable from "$lib/components/tables/AddressTable.svelte"
+  import ClassTable from "$lib/components/tables/ClassTable.svelte"
   import EngagementTable from "$lib/components/tables/EngagementTable.svelte"
   import ItUserTable from "./ITUserTable.svelte"
   import RelatedUnitsTable from "./RelatedUnitsTable.svelte"
@@ -81,6 +82,9 @@
           (header) => header.title !== capital($_("engagement", { values: { n: 2 } }))
         )
       }
+    }
+    if (!env.PUBLIC_ENABLE_CLASS_TERMINATION && table === ClassTable) {
+      headers.pop()
     }
   }
 </script>
