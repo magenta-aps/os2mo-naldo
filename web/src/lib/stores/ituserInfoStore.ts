@@ -2,6 +2,7 @@ import { browser } from "$app/environment"
 import { writable, get } from "svelte/store"
 import { v4 as uuidv4 } from "uuid"
 import { date } from "$lib/stores/date"
+import { env } from "$lib/env"
 
 export type ItuserInfo = {
   uuid: string
@@ -20,7 +21,7 @@ export const createDefaultItuser = (): ItuserInfo => ({
   fromDate: get(date),
   toDate: "",
   itSystem: { uuid: "", name: "" },
-  userkey: "",
+  userkey: env.PUBLIC_SKATTESTYRELSEN_USERFLOW ? "nanoq-brugernavn" : "",
   notes: "",
   primary: { uuid: "", name: "", userkey: "" },
   rolebindings: [],
