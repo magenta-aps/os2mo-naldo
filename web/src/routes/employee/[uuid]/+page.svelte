@@ -273,6 +273,7 @@
           headers={[
             { title: capital($_("it_system")), sortPath: "itsystem.name" },
             { title: capital($_("account_name")), sortPath: "user_key" },
+            { title: capital($_("external_id")), sortPath: "external_id" },
             { title: capital($_("engagement", { values: { n: 2 } })) },
             { title: capital($_("primary")) },
             { title: capital($_("date.date")), sortPath: "validity.from" },

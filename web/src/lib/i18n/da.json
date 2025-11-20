@@ -49,6 +49,7 @@
 	"enter_cpr": "indtast CPR nummer",
 	"entire_organisation": "bruttoorganisation",
 	"estimated_time_remaining": "estimeret tid tilbage",
+	"external_id": "eksternt ID",
 	"facet": "{n, plural, =0 {facetten} one {facet} other {facetter}}",
 	"facets": {
 		"name": {
