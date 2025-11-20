@@ -1,4 +1,3 @@
-import { browser } from "$app/environment"
 import { writable, get } from "svelte/store"
 import { v4 as uuidv4 } from "uuid"
 import { date } from "$lib/stores/date"
@@ -55,31 +54,13 @@ export const validateRolebinding = (rb: RolebindingInfo): boolean => {
 export const ituserInfo = (() => {
   const defaultValue: ItuserInfo[] = [createDefaultItuser()]
 
-  let initialValue = defaultValue
-
-  if (browser) {
-    const stored = localStorage.getItem("ituser-info")
-    try {
-      const parsed = stored ? JSON.parse(stored) : null
-      initialValue = Array.isArray(parsed) ? parsed : defaultValue
-    } catch {
-      initialValue = defaultValue
-    }
-  }
-
-  const { subscribe, update, set } = writable<ItuserInfo[]>(initialValue)
-
-  // Save to localStorage on any change
-  subscribe((value) => {
-    if (browser) localStorage.setItem("ituser-info", JSON.stringify(value))
-  })
+  const { subscribe, update, set } = writable<ItuserInfo[]>(defaultValue)
 
   return {
     subscribe,
     set,
     update,
     reset: () => {
-      if (browser) localStorage.removeItem("ituser-info")
       set([createDefaultItuser()])
     },
     addItuser: () => update((itusers) => [...itusers, createDefaultItuser()]),
