@@ -207,9 +207,6 @@
               id="it-system-role-uuid"
               bind:value={ituser.rolebindings[rolebindingIndex].role}
               iterable={itSystemRoles}
-              errors={ituser.rolebindings[rolebindingIndex].validated === false
-                ? ["required"]
-                : []}
             />
           {:else}
             <Select
@@ -219,12 +216,14 @@
               disabled
             />
           {/if}
-          <CircleButton
-            on:click={() => {
-              ituserInfo.removeRolebinding(selectedTab, rolebindingIndex)
-            }}
-            icon={removeRounded}
-          />
+          {#if ituser.rolebindings.length > 1}
+            <CircleButton
+              on:click={() => {
+                ituserInfo.removeRolebinding(selectedTab, rolebindingIndex)
+              }}
+              icon={removeRounded}
+            />
+          {/if}
         {/each}
 
         <CircleButton

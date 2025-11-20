@@ -23,7 +23,7 @@ export const createDefaultItuser = (): ItuserInfo => ({
   userkey: env.PUBLIC_SKATTESTYRELSEN_USERFLOW ? "nanoq-brugernavn" : "",
   notes: "",
   primary: { uuid: "", name: "", userkey: "" },
-  rolebindings: [],
+  rolebindings: [createDefaultRolebinding()],
   validated: undefined,
 })
 
@@ -44,12 +44,7 @@ export const createDefaultRolebinding = (): RolebindingInfo => ({
   // fromDate: get(date),
   // toDate: "",
   role: { uuid: "", name: "", user_key: "" },
-  validated: undefined,
 })
-
-export const validateRolebinding = (rb: RolebindingInfo): boolean => {
-  return !!rb.role?.uuid
-}
 
 export const ituserInfo = (() => {
   const defaultValue: ItuserInfo[] = [createDefaultItuser()]
@@ -87,24 +82,15 @@ export const ituserInfo = (() => {
 
       update((itusers) => {
         const updated = itusers.map((ituser) => {
-          const validatedRolebindings = ituser.rolebindings.map((rb) => ({
-            ...rb,
-            validated: validateRolebinding(rb),
-          }))
-
           const validatedItuser = {
             ...ituser,
             validated: validateItuser(ituser),
-            rolebindings: validatedRolebindings,
           }
 
           return validatedItuser
         })
 
-        isValid = updated.every(
-          (ituser) =>
-            ituser.validated && ituser.rolebindings.every((rb) => rb.validated)
-        )
+        isValid = updated.every((ituser) => ituser.validated)
 
         return updated
       })
