@@ -185,6 +185,7 @@
             title={capital($_("account_name"))}
             id="account-name"
             required={true}
+            disabled={env.PUBLIC_SKATTESTYRELSEN_USERFLOW}
           />
         </div>
         {#if facets}
