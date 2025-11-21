@@ -192,7 +192,7 @@
     </div>
   </div>
 
-  <div class="gap-4 py-6">
+  <div class="flex py-6 gap-4">
     <Button type="submit" title={capital($_("save"))} disabled={!selectedOriginOrg} />
     <Button
       type="button"
