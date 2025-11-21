@@ -1,4 +1,3 @@
-import { browser } from "$app/environment"
 import { writable, get } from "svelte/store"
 import { date } from "$lib/stores/date"
 
@@ -31,30 +30,13 @@ export const validateAddress = (address: AddressInfo): boolean => {
 export const addressInfo = (() => {
   const defaultValue: AddressInfo[] = [createDefaultAddress()]
 
-  let initialValue = defaultValue
-
-  if (browser) {
-    const stored = localStorage.getItem("address-info")
-    try {
-      const parsed = stored ? JSON.parse(stored) : null
-      initialValue = Array.isArray(parsed) ? parsed : defaultValue
-    } catch {
-      initialValue = defaultValue
-    }
-  }
-
-  const { subscribe, update, set } = writable<AddressInfo[]>(initialValue)
-
-  subscribe((value) => {
-    if (browser) localStorage.setItem("address-info", JSON.stringify(value))
-  })
+  const { subscribe, update, set } = writable<AddressInfo[]>(defaultValue)
 
   return {
     subscribe,
     set,
     update,
     reset: () => {
-      if (browser) localStorage.removeItem("address-info")
       set([createDefaultAddress()])
     },
     addAddress: () => update((addresses) => [...addresses, createDefaultAddress()]),

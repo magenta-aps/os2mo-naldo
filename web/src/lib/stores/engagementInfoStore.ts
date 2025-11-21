@@ -1,4 +1,3 @@
-import { browser } from "$app/environment"
 import { writable, get } from "svelte/store"
 import { date } from "$lib/stores/date"
 
@@ -36,30 +35,13 @@ export const validateEngagement = (engagement: EngagementInfo): boolean => {
 export const engagementInfo = (() => {
   const defaultValue: EngagementInfo[] = [createDefaultEngagement()]
 
-  let initialValue = defaultValue
-
-  if (browser) {
-    const stored = localStorage.getItem("engagement-info")
-    try {
-      const parsed = stored ? JSON.parse(stored) : null
-      initialValue = Array.isArray(parsed) ? parsed : defaultValue
-    } catch {
-      initialValue = defaultValue
-    }
-  }
-
-  const { subscribe, update, set } = writable<EngagementInfo[]>(initialValue)
-
-  subscribe((value) => {
-    if (browser) localStorage.setItem("engagement-info", JSON.stringify(value))
-  })
+  const { subscribe, update, set } = writable<EngagementInfo[]>(defaultValue)
 
   return {
     subscribe,
     set,
     update,
     reset: () => {
-      if (browser) localStorage.removeItem("engagement-info")
       set([createDefaultEngagement()])
     },
     addEngagement: () =>

@@ -46,7 +46,7 @@
           </h4>
           <div>
             {#each ituser.rolebindings as rolebinding}
-              {#if rolebinding.validated === true}
+              {#if rolebinding.role?.uuid}
                 <div class="grid grid-cols-2">
                   <span>{capital($_("role", { values: { n: 1 } }))}:</span>
                   <span>{rolebinding.role?.name}</span>

@@ -1,4 +1,3 @@
-import { browser } from "$app/environment"
 import { writable, get } from "svelte/store"
 import { v4 as uuidv4 } from "uuid"
 import { date } from "$lib/stores/date"
@@ -24,7 +23,7 @@ export const createDefaultItuser = (): ItuserInfo => ({
   userkey: env.PUBLIC_SKATTESTYRELSEN_USERFLOW ? "nanoq-brugernavn" : "",
   notes: "",
   primary: { uuid: "", name: "", userkey: "" },
-  rolebindings: [],
+  rolebindings: [createDefaultRolebinding()],
   validated: undefined,
 })
 
@@ -45,41 +44,18 @@ export const createDefaultRolebinding = (): RolebindingInfo => ({
   // fromDate: get(date),
   // toDate: "",
   role: { uuid: "", name: "", user_key: "" },
-  validated: undefined,
 })
-
-export const validateRolebinding = (rb: RolebindingInfo): boolean => {
-  return !!rb.role?.uuid
-}
 
 export const ituserInfo = (() => {
   const defaultValue: ItuserInfo[] = [createDefaultItuser()]
 
-  let initialValue = defaultValue
-
-  if (browser) {
-    const stored = localStorage.getItem("ituser-info")
-    try {
-      const parsed = stored ? JSON.parse(stored) : null
-      initialValue = Array.isArray(parsed) ? parsed : defaultValue
-    } catch {
-      initialValue = defaultValue
-    }
-  }
-
-  const { subscribe, update, set } = writable<ItuserInfo[]>(initialValue)
-
-  // Save to localStorage on any change
-  subscribe((value) => {
-    if (browser) localStorage.setItem("ituser-info", JSON.stringify(value))
-  })
+  const { subscribe, update, set } = writable<ItuserInfo[]>(defaultValue)
 
   return {
     subscribe,
     set,
     update,
     reset: () => {
-      if (browser) localStorage.removeItem("ituser-info")
       set([createDefaultItuser()])
     },
     addItuser: () => update((itusers) => [...itusers, createDefaultItuser()]),
@@ -106,24 +82,15 @@ export const ituserInfo = (() => {
 
       update((itusers) => {
         const updated = itusers.map((ituser) => {
-          const validatedRolebindings = ituser.rolebindings.map((rb) => ({
-            ...rb,
-            validated: validateRolebinding(rb),
-          }))
-
           const validatedItuser = {
             ...ituser,
             validated: validateItuser(ituser),
-            rolebindings: validatedRolebindings,
           }
 
           return validatedItuser
         })
 
-        isValid = updated.every(
-          (ituser) =>
-            ituser.validated && ituser.rolebindings.every((rb) => rb.validated)
-        )
+        isValid = updated.every((ituser) => ituser.validated)
 
         return updated
       })

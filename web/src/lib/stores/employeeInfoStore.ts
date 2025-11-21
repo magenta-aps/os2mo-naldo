@@ -1,4 +1,3 @@
-import { browser } from "$app/environment"
 import { writable } from "svelte/store"
 import { v4 as uuidv4 } from "uuid"
 
@@ -36,25 +35,13 @@ export const validateEmployee = (employee: EmployeeInfo): boolean => {
 export const employeeInfo = (() => {
   const defaultValue: EmployeeInfo = createDefaultEmployee()
 
-  let initialValue = defaultValue
-
-  if (browser) {
-    const storedEmployeeInfo = localStorage.getItem("employee-info")
-    initialValue = storedEmployeeInfo ? JSON.parse(storedEmployeeInfo) : defaultValue
-  }
-
-  const { subscribe, update, set } = writable<EmployeeInfo>(initialValue)
-
-  subscribe((value) => {
-    if (browser) localStorage.setItem("employee-info", JSON.stringify(value))
-  })
+  const { subscribe, update, set } = writable<EmployeeInfo>(defaultValue)
 
   return {
     subscribe,
     set,
     update,
     reset: () => {
-      if (browser) localStorage.removeItem("employee-info")
       set(createDefaultEmployee())
     },
     validateForm: () => {

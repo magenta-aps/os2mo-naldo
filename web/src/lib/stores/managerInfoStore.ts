@@ -1,4 +1,3 @@
-import { browser } from "$app/environment"
 import { writable, get } from "svelte/store"
 import { date } from "$lib/stores/date"
 
@@ -35,30 +34,13 @@ export const validateManager = (manager: ManagerInfo): boolean => {
 export const managerInfo = (() => {
   const defaultValue: ManagerInfo[] = [createDefaultManager()]
 
-  let initialValue = defaultValue
-
-  if (browser) {
-    const stored = localStorage.getItem("manager-info")
-    try {
-      const parsed = stored ? JSON.parse(stored) : null
-      initialValue = Array.isArray(parsed) ? parsed : defaultValue
-    } catch {
-      initialValue = defaultValue
-    }
-  }
-
-  const { subscribe, update, set } = writable<ManagerInfo[]>(initialValue)
-
-  subscribe((value) => {
-    if (browser) localStorage.setItem("manager-info", JSON.stringify(value))
-  })
+  const { subscribe, update, set } = writable<ManagerInfo[]>(defaultValue)
 
   return {
     subscribe,
     set,
     update,
     reset: () => {
-      if (browser) localStorage.removeItem("manager-info")
       set([createDefaultManager()])
     },
     addManager: () => update((managers) => [...managers, createDefaultManager()]),
