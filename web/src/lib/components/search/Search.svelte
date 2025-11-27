@@ -118,10 +118,7 @@
                 }
               }
             }
-            root {
-              name
-            }
-            parent {
+            ancestors {
               name
             }
             validity {

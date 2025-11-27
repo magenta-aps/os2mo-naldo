@@ -55,18 +55,25 @@
         )}{/if}
     </div>
     {#if isLazy(item)}
-      {#if isLazyOrg(item) && item.root?.length}
+      {#if isLazyOrg(item) && item.ancestors?.length}
+        {#if item.ancestors.at(0)?.name}
+          <br />
+          <div class="inline-block text-primary text-sm">
+            {capital($_("parent"))}: {item.ancestors.at(0)?.name}
+          </div>
+        {/if}
+        {#if item.ancestors.at(-2)?.name}
+          <br />
+          <div class="inline-block text-primary text-sm">
+            {capital($_("placering"))}: {item.ancestors.at(-2)?.name}
+          </div>
+        {/if}
         <br />
         <div class="inline-block text-primary text-sm">
-          {capital($_("root"))}: {item.root[0].name}
+          {capital($_("root"))}: {item.ancestors.at(-1)?.name}
         </div>
       {/if}
-      {#if isLazyOrg(item) && item.parent}
-        <br />
-        <div class="inline-block text-primary text-sm">
-          {capital($_("parent"))}: {item.parent.name}
-        </div>
-      {/if}
+
       {#each item.addresses as address}
         <br />
         <div class="inline-block text-primary text-sm">
