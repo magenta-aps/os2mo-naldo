@@ -1,6 +1,7 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
+  import { env } from "$lib/env"
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Button from "$lib/components/shared/Button.svelte"
@@ -9,7 +10,6 @@
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
   import { CreateEmployeeDocument } from "./query.generated"
-  import { MOConfig } from "$lib/stores/config"
   import { gql } from "graphql-request"
   import { form, field } from "svelte-forms"
   import { required, pattern } from "svelte-forms/validators"
@@ -95,7 +95,7 @@
 <form method="post" class="mx-6" use:enhance={handler}>
   <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
     <div class="p-8">
-      {#if $MOConfig && $MOConfig.enable_sp === "true"}
+      {#if env.PUBLIC_ENABLE_SP}
         <CprLookup
           title={capital($_("cpr_number"))}
           id="cpr-number"
