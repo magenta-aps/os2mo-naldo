@@ -27,7 +27,7 @@
     mutation CreateKLE($input: KLECreateInput!, $date: DateTime!) {
       kle_create(input: $input) {
         current(at: $date) {
-          org_unit(filter: {from_date null, to_date: null}) {
+          org_unit(filter: { from_date: null, to_date: null }) {
             name
           }
         }

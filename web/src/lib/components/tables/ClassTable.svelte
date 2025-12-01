@@ -96,7 +96,7 @@
       <ValidityTableCell validity={cls.validity} />
       <td>
         <a
-          href="{base}/{$page.route.id?.split(
+          href="{base}/{$page.url.pathname?.split(
             '/'
           )[1]}/facet/{cls.facet_uuid}/edit/class/{cls.uuid}{formatQueryDates(
             cls.validity
@@ -108,7 +108,7 @@
       {#if env.PUBLIC_ENABLE_CLASS_TERMINATION}
         <td>
           <a
-            href="{base}/{$page.route.id?.split(
+            href="{base}/{$page.url.pathname?.split(
               '/'
             )[1]}/facet/{cls.facet_uuid}/terminate/class/{cls.uuid}"
           >

@@ -27,7 +27,7 @@
   export let tense: Tense
 
   const uuid = $page.params.uuid
-  const isOrg = $page.route.id?.startsWith("/organisation")
+  const isOrg = $page.url.pathname?.startsWith("/organisation")
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
 
@@ -172,7 +172,7 @@
       {/if}
       <td>
         <a
-          href="{base}/{$page.route.id?.split(
+          href="{base}/{$page.url.pathname?.split(
             '/'
           )[1]}/{uuid}/edit/association/{association.uuid}{formatQueryDates(
             association.validity
@@ -183,7 +183,7 @@
       </td>
       <td>
         <a
-          href="{base}/{$page.route.id?.split(
+          href="{base}/{$page.url.pathname?.split(
             '/'
           )[1]}/{uuid}/terminate/association/{association.uuid}"
         >

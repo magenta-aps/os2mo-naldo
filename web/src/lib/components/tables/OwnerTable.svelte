@@ -34,7 +34,7 @@
   export let tense: Tense
 
   const uuid = $page.params.uuid
-  const isOrg = $page.route.id?.startsWith("/organisation")
+  const isOrg = $page.url.pathname?.startsWith("/organisation")
 
   gql`
     query EmployeeOwner($uuids: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
@@ -193,7 +193,7 @@
       {/if}
       <td>
         <a
-          href="{base}/{$page.route.id?.split(
+          href="{base}/{$page.url.pathname?.split(
             '/'
           )[1]}/{uuid}/edit/owner/{ownerObj.uuid}{formatQueryDates(ownerObj.validity)}"
         >
@@ -202,7 +202,7 @@
       </td>
       <td>
         <a
-          href="{base}/{$page.route.id?.split(
+          href="{base}/{$page.url.pathname?.split(
             '/'
           )[1]}/{uuid}/terminate/owner/{ownerObj.uuid}"
         >
