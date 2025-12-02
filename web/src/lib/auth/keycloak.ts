@@ -47,5 +47,7 @@ export const initKeycloak = async () => {
 export const logoutKeycloak = () => {
   isAuth.set(false)
   isAdmin.set(false)
-  keycloak.logout()
+  keycloak.logout({
+    redirectUri: `${window.location.origin}/logged-out`,
+  })
 }

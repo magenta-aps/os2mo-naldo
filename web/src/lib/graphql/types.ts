@@ -1046,8 +1046,19 @@ export type Association = {
    * * `"Leader"`
    * * `"Employee"`
    *
+   * @deprecated Use 'association_type_response' instead. Will be removed in a future version of OS2mo.
    */
   association_type?: Maybe<Class>;
+  /**
+   * The type of connection that the employee has to the organisation unit.
+   *
+   * Examples:
+   * * `"Chairman"`
+   * * `"Leader"`
+   * * `"Employee"`
+   *
+   */
+  association_type_response?: Maybe<ClassResponse>;
   /**
    * UUID of the association type.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -1070,11 +1081,20 @@ export type Association = {
    * The purpose of this field is ill-defined.
    * It is currently mainly used for (trade) union specification.
    *
+   * @deprecated Use 'dynamic_class_response' instead. Will be removed in a future version of OS2mo.
+   */
+  dynamic_class?: Maybe<Class>;
+  /**
+   * List of arbitrary classes.
+   *
+   * The purpose of this field is ill-defined.
+   * It is currently mainly used for (trade) union specification.
+   *
    * @deprecated Will be removed in a future version of GraphQL.
    * Currently no replacement is in place, but specialized fields will probably arive in the future.
    *
    */
-  dynamic_class?: Maybe<Class>;
+  dynamic_class_response?: Maybe<ClassResponse>;
   /**
    * UUID of the dynamically attached class.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -1104,8 +1124,17 @@ export type Association = {
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
    *
+   * @deprecated Use 'it_user_response' instead. Will be removed in a future version of OS2mo.
    */
   it_user: Array<ItUser>;
+  /**
+   * The IT-user utilized by the employee when fulfilling the association responsibilities.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  it_user_response?: Maybe<ItUserResponse>;
   /**
    * UUID of an 'ITUser' model, only defined for 'IT associations.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -1121,8 +1150,19 @@ export type Association = {
    * * `"Office student"`
    * * `"Jurist"`
    *
+   * @deprecated Use 'job_function_response' instead. Will be removed in a future version of OS2mo.
    */
   job_function?: Maybe<Class>;
+  /**
+   * The position held by the employee in the organisation unit.
+   *
+   * Examples of user-keys:
+   * * `"Payroll consultant"`
+   * * `"Office student"`
+   * * `"Jurist"`
+   *
+   */
+  job_function_response?: Maybe<ClassResponse>;
   /**
    * UUID of a job function class, only defined for 'IT associations.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -1136,8 +1176,17 @@ export type Association = {
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
    *
+   * @deprecated Use 'org_unit_response' instead. Will be removed in a future version of OS2mo.
    */
   org_unit: Array<OrganisationUnit>;
+  /**
+   * Associated organisation unit.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  org_unit_response: OrganisationUnitResponse;
   /**
    * UUID of the organisation unit related to the association.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -1151,8 +1200,38 @@ export type Association = {
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
    *
+   * @deprecated Use 'person_response' instead. Will be removed in a future version of OS2mo.
    */
   person: Array<Employee>;
+  /**
+   * Associated person.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  person_response?: Maybe<EmployeeResponse>;
+  /**
+   * Marks which association is primary.
+   *
+   * When exporting data from OS2mo to external systems, that only support a single engagement or associations, this field can be used to export the primary one.
+   * What primarity means is vaguely defined, but usually derived from workload or time-allocation.
+   *
+   * Examples  of user-keys:
+   * * `"primary"`
+   * * `"non-primary"`
+   * * `"explicitly-primary"`
+   *
+   * It is a convention that at most one association for each employee is set as either `primary` or `explicitly-primary`.
+   * This convention is in place as if more associations are primary, the entire purpose of the field breaks down.
+   * In the future this convention may become an invariant.
+   *
+   * Note:
+   * The calculate-primary integration can be used to automatically calculate and update primarity fields.
+   *
+   * @deprecated Use 'primary_response' instead. Will be removed in a future version of OS2mo.
+   */
+  primary?: Maybe<Class>;
   /**
    * Marks which association is primary.
    *
@@ -1172,7 +1251,7 @@ export type Association = {
    * The calculate-primary integration can be used to automatically calculate and update primarity fields.
    *
    */
-  primary?: Maybe<Class>;
+  primary_response?: Maybe<ClassResponse>;
   /**
    * UUID of the primary type of the association.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -1186,8 +1265,17 @@ export type Association = {
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
    *
+   * @deprecated Use 'subsitute_response' instead. Will be removed in a future version of OS2mo.
    */
   substitute: Array<Employee>;
+  /**
+   * Optional substitute if `employee` is unavailable.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  substitute_response?: Maybe<EmployeeResponse>;
   /**
    * UUID of the substitute for the employee in the association.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -1198,8 +1286,14 @@ export type Association = {
   /**
    * Marks associations with a trade union
    *
+   * @deprecated Use 'trade_union_response' instead. Will be removed in a future version of OS2mo.
    */
   trade_union?: Maybe<Class>;
+  /**
+   * Marks associations with a trade union
+   *
+   */
+  trade_union_response?: Maybe<ClassResponse>;
   /**
    * UUID of the attached trade union.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -1746,8 +1840,19 @@ export type Class = {
    *
    * The inverse operation of `parent`.
    *
+   * @deprecated Use 'children_response' instead. Will be removed in a future version of OS2mo.
    */
   children: Array<Class>;
+  /**
+   * Class children.
+   *
+   * Almost always an empty list as class hierarchies are rare.
+   * Currently mostly used to describe (trade) union hierachies.
+   *
+   * The inverse operation of `parent`.
+   *
+   */
+  children_response: ClassResponsePaged;
   /** Description of the class */
   description?: Maybe<Scalars['String']['output']>;
   /**
@@ -1769,8 +1874,19 @@ export type Class = {
    * * `"primary_type"`
    * * `"engagement_job_function"`
    *
+   * @deprecated Use 'facet_response' instead. Will be removed in a future version of OS2mo.
    */
   facet: Facet;
+  /**
+   * Facet this class is defined under.
+   *
+   * Examples of user-keys:
+   * * `"employee_address_type"`
+   * * `"primary_type"`
+   * * `"engagement_job_function"`
+   *
+   */
+  facet_response: FacetResponse;
   /**
    * UUID of the related facet.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -1791,8 +1907,16 @@ export type Class = {
    *
    * This is intended to be used for (IT) roles.
    *
+   * @deprecated Use 'it_system_response' instead. Will be removed in a future version of OS2mo.
    */
   it_system?: Maybe<ItSystem>;
+  /**
+   * The IT-System associated with the class.
+   *
+   * This is intended to be used for (IT) roles.
+   *
+   */
+  it_system_response?: Maybe<ItSystemResponse>;
   /**
    * The IT-System associated with the class.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -1829,8 +1953,19 @@ export type Class = {
    *
    * The inverse operation of `children`.
    *
+   * @deprecated Use 'parent_response' instead. Will be removed in a future version of OS2mo.
    */
   parent?: Maybe<Class>;
+  /**
+   * Parent class.
+   *
+   * Almost always `null` as class hierarchies are rare.
+   * Currently mostly used to describe (trade) union hierachies.
+   *
+   * The inverse operation of `children`.
+   *
+   */
+  parent_response?: Maybe<ClassResponse>;
   /**
    * UUID of the employee related to the address.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -1935,6 +2070,19 @@ export type Class = {
  *
  */
 export type ClassChildrenArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<ParentsBoundClassFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * A value in the facet sample space.
+ *
+ * Classes can also be thought of as the value component of the facet/class key-value setup.
+ *
+ */
+export type ClassChildren_ResponseArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ParentsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
@@ -2761,8 +2909,22 @@ export type Employee = {
    * * Personal phone number
    * * Personal email
    *
+   * @deprecated Use 'addresses_response' instead. Will be removed in a future version of OS2mo.
    */
   addresses: Array<Address>;
+  /**
+   * Addresses for the employee.
+   *
+   * Commonly contain addresses such as, their:
+   * * Work location
+   * * Office number
+   * * Work phone number
+   * * Work email
+   * * Personal phone number
+   * * Personal email
+   *
+   */
+  addresses_response: AddressResponsePaged;
   /**
    * Same as addresses(), but with HACKs to enable validities.
    *
@@ -2777,8 +2939,16 @@ export type Employee = {
    *
    * May be an empty list if the employee is not associated with projects, etc.
    *
+   * @deprecated Use 'associations_response' instead. Will be removed in a future version of OS2mo.
    */
   associations: Array<Association>;
+  /**
+   * Associations for the employee.
+   *
+   * May be an empty list if the employee is not associated with projects, etc.
+   *
+   */
+  associations_response: AssociationResponsePaged;
   /**
    * Same as associations(), but with HACKs to enable validities.
    *
@@ -2800,8 +2970,16 @@ export type Employee = {
    *
    * May be an empty list if the employee is not employeed.
    *
+   * @deprecated Use 'engagements_response' instead. Will be removed in a future version of OS2mo.
    */
   engagements: Array<Engagement>;
+  /**
+   * Engagements for the employee.
+   *
+   * May be an empty list if the employee is not employeed.
+   *
+   */
+  engagements_response: EngagementResponsePaged;
   /**
    * Same as engagements(), but with HACKs to enable validities.
    *
@@ -2823,8 +3001,16 @@ export type Employee = {
    *
    * May be an empty list if the employee does not have any IT-access whatsoever.
    *
+   * @deprecated Use 'itusers_response' instead. Will be removed in a future version of OS2mo.
    */
   itusers: Array<ItUser>;
+  /**
+   * IT accounts for the employee.
+   *
+   * May be an empty list if the employee does not have any IT-access whatsoever.
+   *
+   */
+  itusers_response: ItUserResponsePaged;
   /**
    * Same as itusers(), but with HACKs to enable validities.
    *
@@ -2839,15 +3025,31 @@ export type Employee = {
    *
    * Usually empty as most employees are not on leaves of absence.
    *
+   * @deprecated Use 'leaves_response' instead. Will be removed in a future version of OS2mo.
    */
   leaves: Array<Leave>;
+  /**
+   * Leaves of absence for the employee.
+   *
+   * Usually empty as most employees are not on leaves of absence.
+   *
+   */
+  leaves_response: LeaveResponsePaged;
+  /**
+   * Managerial roles for the employee.
+   *
+   * Usually an empty list as most employees are not managers.
+   *
+   * @deprecated Use 'manager_roles_response' instead. Will be removed in a future version of OS2mo.
+   */
+  manager_roles: Array<Manager>;
   /**
    * Managerial roles for the employee.
    *
    * Usually an empty list as most employees are not managers.
    *
    */
-  manager_roles: Array<Manager>;
+  manager_roles_response: ManagerResponsePaged;
   /** Full name of the employee */
   name: Scalars['String']['output'];
   /** Full nickname of the employee */
@@ -2904,7 +3106,23 @@ export type EmployeeAddressesArgs = {
 
 
 /** Employee/identity specific information */
+export type EmployeeAddresses_ResponseArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<EmployeesBoundAddressFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Employee/identity specific information */
 export type EmployeeAssociationsArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<EmployeesBoundAssociationFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Employee/identity specific information */
+export type EmployeeAssociations_ResponseArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<EmployeesBoundAssociationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
@@ -2920,7 +3138,23 @@ export type EmployeeEngagementsArgs = {
 
 
 /** Employee/identity specific information */
+export type EmployeeEngagements_ResponseArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<EmployeesBoundEngagementFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Employee/identity specific information */
 export type EmployeeItusersArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<EmployeesBoundItUserFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Employee/identity specific information */
+export type EmployeeItusers_ResponseArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<EmployeesBoundItUserFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
@@ -2936,7 +3170,24 @@ export type EmployeeLeavesArgs = {
 
 
 /** Employee/identity specific information */
+export type EmployeeLeaves_ResponseArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<EmployeesBoundLeaveFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Employee/identity specific information */
 export type EmployeeManager_RolesArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<EmployeesBoundManagerFilter>;
+  inherit?: Scalars['Boolean']['input'];
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Employee/identity specific information */
+export type EmployeeManager_Roles_ResponseArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<EmployeesBoundManagerFilter>;
   inherit?: Scalars['Boolean']['input'];
@@ -3398,8 +3649,19 @@ export type Engagement = {
    * * `"Social worker"`
    * * `"Employee (hourly wage)"`
    *
+   * @deprecated Use 'engagement_type_response' instead. Will be removed in a future version of OS2mo.
    */
   engagement_type: Class;
+  /**
+   * Describes the employee's affiliation to an organisation unit
+   *
+   * Examples:
+   * * `"Employed"`
+   * * `"Social worker"`
+   * * `"Employee (hourly wage)"`
+   *
+   */
+  engagement_type_response: ClassResponse;
   /**
    * UUID of the engagement type class.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -3448,8 +3710,25 @@ export type Engagement = {
   /**
    * Connected IT-user.
    *
+   * @deprecated Use 'itusers_response' instead. Will be removed in a future version of OS2mo.
    */
   itusers: Array<ItUserResponse>;
+  /**
+   * Connected IT-user.
+   *
+   */
+  itusers_response: ItUserResponsePaged;
+  /**
+   * Describes the position of the employee in the organisation unit
+   *
+   * Examples:
+   * * `"Payroll consultant"`
+   * * `"Office student"`
+   * * `"Jurist"`
+   *
+   * @deprecated Use 'job_function_response' instead. Will be removed in a future version of OS2mo.
+   */
+  job_function: Class;
   /**
    * Describes the position of the employee in the organisation unit
    *
@@ -3459,7 +3738,7 @@ export type Engagement = {
    * * `"Jurist"`
    *
    */
-  job_function: Class;
+  job_function_response: ClassResponse;
   /**
    * UUID of the job function class.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -3467,8 +3746,13 @@ export type Engagement = {
    *
    */
   job_function_uuid: Scalars['UUID']['output'];
-  /** Related leave */
+  /**
+   * Related leave
+   * @deprecated Use 'leave_response' instead. Will be removed in a future version of OS2mo.
+   */
   leave?: Maybe<Leave>;
+  /** Related leave */
+  leave_response?: Maybe<LeaveResponse>;
   /**
    * UUID of the leave related to the engagement.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -3490,8 +3774,17 @@ export type Engagement = {
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
    *
+   * @deprecated Use 'org_unit_response' instead. Will be removed in a future version of OS2mo.
    */
   org_unit: Array<OrganisationUnit>;
+  /**
+   * The organisation unit where the engagement is being fulfilled.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  org_unit_response: OrganisationUnitResponse;
   /**
    * UUID of the organisation unit related to the engagement.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -3505,8 +3798,38 @@ export type Engagement = {
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
    *
+   * @deprecated Use 'person_response' instead. Will be removed in a future version of OS2mo.
    */
   person: Array<Employee>;
+  /**
+   * The person fulfilling the engagement.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  person_response: EmployeeResponse;
+  /**
+   * Marks which engagement is primary.
+   *
+   * When exporting data from OS2mo to external systems, that only support a single engagement or associations, this field can be used to export the primary one.
+   * What primarity means is vaguely defined, but usually derived from workload or time-allocation.
+   *
+   * Examples  of user-keys:
+   * * `"primary"`
+   * * `"non-primary"`
+   * * `"explicitly-primary"`
+   *
+   * It is a convention that at most one engagement for each employee is set as either `primary` or `explicitly-primary`.
+   * This convention is in place as if more engagements are primary, the entire purpose of the field breaks down.
+   * In the future this convention may become an invariant.
+   *
+   * Note:
+   * The calculate-primary integration can be used to automatically calculate and update primarity fields.
+   *
+   * @deprecated Use 'primary_response' instead. Will be removed in a future version of OS2mo.
+   */
+  primary?: Maybe<Class>;
   /**
    * Marks which engagement is primary.
    *
@@ -3526,7 +3849,7 @@ export type Engagement = {
    * The calculate-primary integration can be used to automatically calculate and update primarity fields.
    *
    */
-  primary?: Maybe<Class>;
+  primary_response?: Maybe<ClassResponse>;
   /**
    * UUID of the primary klasse of the engagement.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -3580,6 +3903,14 @@ export type EngagementEngagement_TypeArgs = {
 
 /** Employee engagement in an organisation unit */
 export type EngagementItusersArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<EngagementBoundItUserFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Employee engagement in an organisation unit */
+export type EngagementItusers_ResponseArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<EngagementBoundItUserFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
@@ -4283,10 +4614,26 @@ export type Facet = {
    *
    * The inverse operation of `parent`.
    *
+   * @deprecated Use 'children_response' instead. Will be removed in a future version of OS2mo.
    */
   children: Array<Facet>;
-  /** Associated classes */
+  /**
+   * Facet children.
+   *
+   * Almost always an empty list as facet hierarchies are rare.
+   * Currently mostly used to describe (trade) union hierachies.
+   *
+   * The inverse operation of `parent`.
+   *
+   */
+  children_response: FacetResponsePaged;
+  /**
+   * Associated classes
+   * @deprecated Use 'classes_response' instead. Will be removed in a future version of OS2mo.
+   */
   classes: Array<Class>;
+  /** Associated classes */
+  classes_responses: ClassResponsePaged;
   /**
    * Description of the facet object.
    *
@@ -4312,8 +4659,19 @@ export type Facet = {
    *
    * The inverse operation of `children`.
    *
+   * @deprecated Use 'parent_response' instead. Will be removed in a future version of OS2mo.
    */
   parent?: Maybe<Facet>;
+  /**
+   * Parent facet.
+   *
+   * Almost always `null` as facet hierarchies are rare.
+   * Currently mostly used to describe (trade) union hierachies.
+   *
+   * The inverse operation of `children`.
+   *
+   */
+  parent_response?: Maybe<FacetResponse>;
   /**
    * UUID of the parent facet.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -4366,7 +4724,23 @@ export type FacetChildrenArgs = {
 
 
 /** The key component of the class/facet choice setup */
+export type FacetChildren_ResponseArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<ParentsBoundFacetFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** The key component of the class/facet choice setup */
 export type FacetClassesArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<FacetsBoundClassFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** The key component of the class/facet choice setup */
+export type FacetClasses_ResponsesArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<FacetsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
@@ -5075,8 +5449,19 @@ export type ItSystem = {
    * * `"AD Write"`
    * * `"SAP Admin"`
    *
+   * @deprecated Use 'roles_response' instead. Will be removed in a future version of OS2mo.
    */
   roles: Array<ClassResponse>;
+  /**
+   * Rolebinding roles related to the IT-system.
+   *
+   * Examples of user-keys:
+   * * `"AD Read"`
+   * * `"AD Write"`
+   * * `"SAP Admin"`
+   *
+   */
+  roles_response: ClassResponsePaged;
   /** The ITSystem type. */
   system_type?: Maybe<Scalars['String']['output']>;
   /**
@@ -5110,6 +5495,14 @@ export type ItSystem = {
 
 /** Systems that IT users are connected to */
 export type ItSystemRolesArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<ItSystemboundclassfilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Systems that IT users are connected to */
+export type ItSystemRoles_ResponseArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ItSystemboundclassfilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
@@ -5427,8 +5820,19 @@ export type ItUser = {
    * * AD GUID
    * * FK-org UUID
    *
+   * @deprecated Use 'addresses_response' instead. Will be removed in a future version of OS2mo.
    */
   addresses: Array<Address>;
+  /**
+   * Addresses connected with the IT-user.
+   *
+   * Commonly contain addresses such as:
+   * * Email
+   * * AD GUID
+   * * FK-org UUID
+   *
+   */
+  addresses_response: AddressResponsePaged;
   /**
    * Employee using the IT account.
    *
@@ -5457,8 +5861,20 @@ export type ItUser = {
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
    *
+   * @deprecated Use 'engagement_response' instead. Will be removed in a future version of OS2mo.
    */
   engagement?: Maybe<Array<Engagement>>;
+  /**
+   * Engagement scoping of the account.
+   *
+   * A person may have multiple IT accounts with each account being relevant for only a single engagement.
+   * This field allows scoping IT accounts such that it is obvious which engagement has given which it-access.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  engagement_response?: Maybe<EngagementResponse>;
   /**
    * UUID of the engagement related to the user.
    * @deprecated Use `engagement_uuids` instead.
@@ -5476,15 +5892,29 @@ export type ItUser = {
    *
    * A person may have multiple IT accounts with each account being relevant for any number of engagement.
    *
+   * @deprecated Use 'engagements_response' instead. Will be removed in a future version of OS2mo.
    */
   engagements: Array<EngagementResponse>;
+  /**
+   * Engagement scoping of the account.
+   *
+   * A person may have multiple IT accounts with each account being relevant for any number of engagement.
+   *
+   */
+  engagements_responses: EngagementResponsePaged;
   /** ID of the user account in the external system. */
   external_id?: Maybe<Scalars['String']['output']>;
   /**
    * ITSystem this account is for.
    *
+   * @deprecated Use 'itsystem_response' instead. Will be removed in a future version of OS2mo.
    */
   itsystem: ItSystem;
+  /**
+   * ITSystem this account is for.
+   *
+   */
+  itsystem_response: ItSystemResponse;
   /**
    * UUID of the ITSystem related to the user.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -5512,8 +5942,22 @@ export type ItUser = {
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
    *
+   * @deprecated Use 'org_unit_response' instead. Will be removed in a future version of OS2mo.
    */
   org_unit?: Maybe<Array<OrganisationUnit>>;
+  /**
+   * Organisation unit using the IT account.
+   *
+   * This is mostly set for service accounts.
+   *
+   * Note:
+   * This field is mutually exclusive with the `org_unit` field.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  org_unit_response?: Maybe<OrganisationUnitResponse>;
   /**
    * UUID of the organisation unit related to the user.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -5530,8 +5974,38 @@ export type ItUser = {
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
    *
+   * @deprecated Use 'person_response' instead. Will be removed in a future version of OS2mo.
    */
   person?: Maybe<Array<Employee>>;
+  /**
+   * Person using the IT account.
+   *
+   * Note:
+   * This field is mutually exclusive with the `org_unit` field.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  person_response?: Maybe<EmployeeResponse>;
+  /**
+   * Marks which IT account is primary.
+   *
+   * When exporting data from OS2mo to external systems, that only support a single IT account, this field can be used to export the primary one.
+   * What primarity means is vaguely defined, but usually derived from workload or time-allocation.
+   *
+   * Examples  of user-keys:
+   * * `"primary"`
+   * * `"non-primary"`
+   * * `"explicitly-primary"`
+   *
+   * It is a convention that at most one IT account for each employee / employee+engagement is set as either `primary` or `explicitly-primary`.
+   * This convention is in place as if more IT accounts are primary, the entire purpose of the field breaks down.
+   * In the future this convention may become an invariant.
+   *
+   * @deprecated Use 'primary_response' instead. Will be removed in a future version of OS2mo.
+   */
+  primary?: Maybe<Class>;
   /**
    * Marks which IT account is primary.
    *
@@ -5548,7 +6022,7 @@ export type ItUser = {
    * In the future this convention may become an invariant.
    *
    */
-  primary?: Maybe<Class>;
+  primary_response?: Maybe<ClassResponse>;
   /**
    * UUID of the primary klasse of the user.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -5556,8 +6030,13 @@ export type ItUser = {
    *
    */
   primary_uuid?: Maybe<Scalars['UUID']['output']>;
-  /** Rolebindings this IT User has in the connected IT system. */
+  /**
+   * Rolebindings this IT User has in the connected IT system.
+   * @deprecated Use 'rolebindings_response' instead. Will be removed in a future version of OS2mo.
+   */
   rolebindings: Array<RoleBinding>;
+  /** Rolebindings this IT User has in the connected IT system. */
+  rolebindings_response: RoleBindingResponsePaged;
   /**
    * The object type.
    *
@@ -5609,6 +6088,20 @@ export type ItUserAddressesArgs = {
  * It is however also used to hold IT system specific identifiers for correlation purposes.
  *
  */
+export type ItUserAddresses_ResponseArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<ItuserBoundAddressFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * User information related to IT systems.
+ *
+ * This is commonly used to map out IT accounts or IT service accounts.
+ * It is however also used to hold IT system specific identifiers for correlation purposes.
+ *
+ */
 export type ItUserEmployeeArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<UuidsBoundEmployeeFilter>;
@@ -5638,6 +6131,20 @@ export type ItUserEngagementArgs = {
  *
  */
 export type ItUserEngagementsArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<UuidsBoundEngagementFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * User information related to IT systems.
+ *
+ * This is commonly used to map out IT accounts or IT service accounts.
+ * It is however also used to hold IT system specific identifiers for correlation purposes.
+ *
+ */
+export type ItUserEngagements_ResponsesArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<UuidsBoundEngagementFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
@@ -5708,6 +6215,20 @@ export type ItUserPrimaryArgs = {
  *
  */
 export type ItUserRolebindingsArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<ItuserBoundRoleBindingFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * User information related to IT systems.
+ *
+ * This is commonly used to map out IT accounts or IT service accounts.
+ * It is however also used to hold IT system specific identifiers for correlation purposes.
+ *
+ */
+export type ItUserRolebindings_ResponseArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ItuserBoundRoleBindingFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
@@ -6222,15 +6743,36 @@ export type Kle = {
    * * `"Executive"`
    * * `"Responsible"`
    *
+   * @deprecated Use 'kle_aspects_response' instead. Will be removed in a future version of OS2mo.
    */
   kle_aspects: Array<Class>;
+  /**
+   * KLE Aspects.
+   *
+   * The KLE aspect describes the kind of relationship the organisation unit has with the responsibility given by the KLE number.
+   *
+   * Examples of user-keys:
+   * * `"Insight"`
+   * * `"Executive"`
+   * * `"Responsible"`
+   *
+   */
+  kle_aspects_response: ClassResponsePaged;
+  /**
+   * The KLE number specifies the responsibility.
+   *
+   * For more details read the `KLE` description.
+   *
+   * @deprecated Use 'kle_number_response' instead. Will be removed in a future version of OS2mo.
+   */
+  kle_number: Array<Class>;
   /**
    * The KLE number specifies the responsibility.
    *
    * For more details read the `KLE` description.
    *
    */
-  kle_number: Array<Class>;
+  kle_number_response: ClassResponse;
   /**
    * UUID of the KLE number.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -6241,8 +6783,14 @@ export type Kle = {
   /**
    * The organisation unit the responsibility is mapped to.
    *
+   * @deprecated Use 'org_unit_response' instead. Will be removed in a future version of OS2mo.
    */
   org_unit: Array<OrganisationUnit>;
+  /**
+   * The organisation unit the responsibility is mapped to.
+   *
+   */
+  org_unit_response?: Maybe<OrganisationUnitResponse>;
   /**
    * UUID of the organisation unit related to the KLE.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -6314,6 +6862,47 @@ export type Kle = {
  *
  */
 export type KleKle_AspectsArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * KLE responsibility mapping.
+ *
+ * KLE stands for "Kommunernes Landsforenings Emnesystematik" which is a municipality taxonomy for mapping out municipality tasks.
+ *
+ * In OS2mo KLE responsibilities can be mapped to organisation units to signify that a given organisational unit operates within certain municipality tasks.
+ * Adding KLE responsibilities to organisational units can help out with regards to GDPR by identifying which organisational units operate with sensitive tasks.
+ *
+ * The KLE numbers themselves are dot seperated structured numbers alike this:
+ * * `"00.75.00"`: General data exchanges
+ * * `"21.02.05"`: Library study cafes
+ * * `"32.15.08"`: Alimony
+ *
+ * The first number specifies the main-group, such as:
+ * * `"00"`: Municipality operations (Kommunens styrelse)
+ * * `"21"`: Libraries
+ * * `"31"`: Monetary benefits
+ *
+ * The second number specifies the group, such as (for libraries):
+ * * `"02"`: On-site usage
+ * * `"05"`: AV Materials
+ * * `"20"`: Online services
+ *
+ * The third and final number specifies the topic, such as (for library on-site usage):
+ * * `"00"`: General usage
+ * * `"05"`: Study cafes
+ * * `"10"`: Study centers
+ *
+ * Some KLE ranges are pre-reserved by The National Association of Municipalities (Kommunernes Landsforenings), however outside of these pre-reserved ranges municipalies are allowed to add their own local numbers.
+ * Specifically no main-groups can be added, only groups and topics, both above 79.
+ *
+ * For more details see: https://www.kle-online.dk
+ *
+ */
+export type KleKle_Aspects_ResponseArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
@@ -6757,8 +7346,14 @@ export type Leave = {
   /**
    * The engagement the employee is absent from.
    *
+   * @deprecated Use 'engagement_response' instead. Will be removed in a future version of OS2mo.
    */
   engagement: Engagement;
+  /**
+   * The engagement the employee is absent from.
+   *
+   */
+  engagement_response: EngagementResponse;
   /**
    * UUID of the KLE number.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -6775,8 +7370,20 @@ export type Leave = {
    * * `"Furlough"`
    * * `"Garden Leave"`
    *
+   * @deprecated Use 'leave_type_response' instead. Will be removed in a future version of OS2mo.
    */
   leave_type: Class;
+  /**
+   * The kind of leave of absence.
+   *
+   * Examples:
+   * * `"Maternity leave"`
+   * * `"Parental leave"`
+   * * `"Furlough"`
+   * * `"Garden Leave"`
+   *
+   */
+  leave_type_response: ClassResponse;
   /**
    * UUID of the KLE number.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -6790,8 +7397,17 @@ export type Leave = {
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
    *
+   * @deprecated Use 'person_response' instead. Will be removed in a future version of OS2mo.
    */
   person: Array<Employee>;
+  /**
+   * The absent person.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  person_response: EmployeeResponse;
   /**
    * The object type.
    *
@@ -7367,8 +7983,19 @@ export type Manager = {
    * * `"Level 2"`
    * * `"Level 3"`
    *
+   * @deprecated Use 'manager_level_response' instead. Will be removed in a future version of OS2mo.
    */
   manager_level: Class;
+  /**
+   * Hierarchical level of the manager.
+   *
+   * Examples:
+   * * `"Level 1"`
+   * * `"Level 2"`
+   * * `"Level 3"`
+   *
+   */
+  manager_level_response?: Maybe<ClassResponse>;
   /**
    * UUID of the manager level.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -7384,8 +8011,19 @@ export type Manager = {
    * * `"Area manager"`
    * * `"Center manager"`
    *
+   * @deprecated Use 'manager_type_response' instead. Will be removed in a future version of OS2mo.
    */
   manager_type: Class;
+  /**
+   * Title of the manager.
+   *
+   * Examples:
+   * * `"Director"`
+   * * `"Area manager"`
+   * * `"Center manager"`
+   *
+   */
+  manager_type_response?: Maybe<ClassResponse>;
   /**
    * UUID of the manager type.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -7399,8 +8037,17 @@ export type Manager = {
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
    *
+   * @deprecated Use 'org_unit_response' instead. Will be removed in a future version of OS2mo.
    */
   org_unit: Array<OrganisationUnit>;
+  /**
+   * Organisation unit being managed.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  org_unit_response: OrganisationUnitResponse;
   /**
    * UUID of the organisation unit related to the manager.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -7416,8 +8063,30 @@ export type Manager = {
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
    *
+   * @deprecated Use 'person_response' instead. Will be removed in a future version of OS2mo.
    */
   person?: Maybe<Array<Employee>>;
+  /**
+   * Person fulfilling the managerial position.
+   *
+   * May be empty in which case the managerial position is unfilfilled (vacant).
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  person_response?: Maybe<EmployeeResponse>;
+  /**
+   * Responsibilities that the manager takes care of.
+   *
+   * Examples:
+   * * `["Responsible for buildings and areas"]`
+   * * `["Responsible for buildings and areas", "Staff: Sick leave"]`
+   * * `[]`
+   *
+   * @deprecated Use 'responsibilities_response' instead. Will be removed in a future version of OS2mo.
+   */
+  responsibilities: Array<Class>;
   /**
    * Responsibilities that the manager takes care of.
    *
@@ -7427,7 +8096,7 @@ export type Manager = {
    * * `[]`
    *
    */
-  responsibilities: Array<Class>;
+  responsibilities_response: ClassResponsePaged;
   /**
    * List of UUID's of the responsibilities.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -7514,6 +8183,17 @@ export type ManagerPersonArgs = {
  *
  */
 export type ManagerResponsibilitiesArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<UuidsBoundClassFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/**
+ * Managers of organisation units and their connected identities.
+ *
+ */
+export type ManagerResponsibilities_ResponseArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<UuidsBoundClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
@@ -8200,6 +8880,8 @@ export type Mutation = {
   manager_update: ManagerResponse;
   /** Creates a list of managers. */
   managers_create: Array<ManagerResponse>;
+  /** Terminates a list of managers. */
+  managers_terminate: Array<ManagerResponse>;
   /**
    * Creates the root-organisation.
    * @deprecated The root organisation concept will be removed in a future version of OS2mo.
@@ -9156,6 +9838,18 @@ export type MutationManagers_CreateArgs = {
  * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
  *
  */
+export type MutationManagers_TerminateArgs = {
+  input: Array<ManagerTerminateInput>;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationOrg_CreateArgs = {
   input: OrganisationCreate;
 };
@@ -9710,8 +10404,19 @@ export type OrganisationUnit = {
    * * Contact phone number
    * * Contact email
    *
+   * @deprecated Use 'address_response' instead. Will be removed in a future version of OS2mo.
    */
   addresses: Array<Address>;
+  /**
+   * Addresses for the organisation unit.
+   *
+   * Commonly contain addresses such as, their:
+   * * Location
+   * * Contact phone number
+   * * Contact email
+   *
+   */
+  addresses_response: AddressResponsePaged;
   /**
    * Same as addresses(), but with HACKs to enable validities.
    *
@@ -9744,8 +10449,17 @@ export type OrganisationUnit = {
    * May be an empty list if the organistion unit is purely hierarchical.
    * This situation may occur especially in the middle or the organisation tree.
    *
+   * @deprecated Use 'associations_response' instead. Will be removed in a future version of OS2mo.
    */
   associations: Array<Association>;
+  /**
+   * Associations for the organistion unit.
+   *
+   * May be an empty list if the organistion unit is purely hierarchical.
+   * This situation may occur especially in the middle or the organisation tree.
+   *
+   */
+  associations_response: AssociationResponsePaged;
   /**
    * Same as associations(), but with HACKs to enable validities.
    *
@@ -9760,8 +10474,23 @@ export type OrganisationUnit = {
   /**
    * The immediate descendants in the organisation tree
    *
+   * @deprecated Use 'children_response' instead. Will be removed in a future version of OS2mo.
    */
   children: Array<OrganisationUnit>;
+  /**
+   * The immediate descendants in the organisation tree
+   *
+   */
+  children_response: OrganisationUnitResponsePaged;
+  /**
+   * Engagements for the organistion unit.
+   *
+   * May be an empty list if the organistion unit does not have any people employeed.
+   * This situation may occur especially in the middle or the organisation tree.
+   *
+   * @deprecated Use 'engagements_response' instead. Will be removed in a future version of OS2mo.
+   */
+  engagements: Array<Engagement>;
   /**
    * Engagements for the organistion unit.
    *
@@ -9769,7 +10498,7 @@ export type OrganisationUnit = {
    * This situation may occur especially in the middle or the organisation tree.
    *
    */
-  engagements: Array<Engagement>;
+  engagements_response: EngagementResponsePaged;
   /** Returns whether the organisation unit has children. */
   has_children: Scalars['Boolean']['output'];
   /**
@@ -9778,8 +10507,17 @@ export type OrganisationUnit = {
    * May be an empty list if the organistion unit does not have any IT (service) accounts whatsoever.
    * This situation may occur especially in the middle or the organisation tree.
    *
+   * @deprecated Use 'itusers_response' instead. Will be removed in a future version of OS2mo.
    */
   itusers: Array<ItUser>;
+  /**
+   * IT (service) accounts.
+   *
+   * May be an empty list if the organistion unit does not have any IT (service) accounts whatsoever.
+   * This situation may occur especially in the middle or the organisation tree.
+   *
+   */
+  itusers_response: ItUserResponsePaged;
   /**
    * Same as itusers(), but with HACKs to enable validities.
    *
@@ -9794,13 +10532,36 @@ export type OrganisationUnit = {
    *
    * Can help out with regards to GDPR by identifying which organisational units operate with sensitive tasks.
    *
+   * @deprecated Use 'kles_response' instead. Will be removed in a future version of OS2mo.
    */
   kles: Array<Kle>;
+  /**
+   * KLE responsibilities for the organisation unit.
+   *
+   * Can help out with regards to GDPR by identifying which organisational units operate with sensitive tasks.
+   *
+   */
+  kles_response: KleResponsePaged;
+  /**
+   * Connection to employees leaves of absence relevant for the organisation unit.
+   *
+   * @deprecated Use 'leaves_response' instead. Will be removed in a future version of OS2mo.
+   */
+  leaves: Array<Leave>;
   /**
    * Connection to employees leaves of absence relevant for the organisation unit.
    *
    */
-  leaves: Array<Leave>;
+  leaves_response: LeaveResponsePaged;
+  /**
+   * Managerial roles for the organisation unit.
+   *
+   * May be empty in which case managers are usually inherited from parents.
+   * See the `inherit`-flag for details.
+   *
+   * @deprecated Use 'managers_response' instead. Will be removed in a future version of OS2mo.
+   */
+  managers: Array<Manager>;
   /**
    * Managerial roles for the organisation unit.
    *
@@ -9808,7 +10569,7 @@ export type OrganisationUnit = {
    * See the `inherit`-flag for details.
    *
    */
-  managers: Array<Manager>;
+  managers_response: ManagerResponsePaged;
   /**
    * Human readable name of the organisation unit.
    *
@@ -9842,6 +10603,7 @@ export type OrganisationUnit = {
    * Note:
    * The organisation-gatekeeper integration is one option to keep hierarchy labels up-to-date.
    *
+   * @deprecated Use 'unit_hierarchy_response' instead. Will be removed in a future version of OS2mo.
    */
   org_unit_hierarchy_model?: Maybe<Class>;
   /**
@@ -9852,6 +10614,7 @@ export type OrganisationUnit = {
    * * `"N5"`
    * * `"N7"`
    *
+   * @deprecated Use 'unit_level_response' instead. Will be removed in a future version of OS2mo.
    */
   org_unit_level?: Maybe<Class>;
   /**
@@ -9872,8 +10635,14 @@ export type OrganisationUnit = {
   /**
    * The parent organisation unit in the organisation tree.
    *
+   * @deprecated Use 'parent_response' instead. Will be removed in a future version of OS2mo.
    */
   parent?: Maybe<OrganisationUnit>;
+  /**
+   * The parent organisation unit in the organisation tree.
+   *
+   */
+  parent_response?: Maybe<OrganisationUnitResponse>;
   /**
    * UUID of the parent organisation unit.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -9884,18 +10653,36 @@ export type OrganisationUnit = {
   /**
    * Related units for the organisational unit.
    *
+   * @deprecated Use 'related_units_response' instead. Will be removed in a future version of OS2mo.
    */
   related_units: Array<RelatedUnit>;
+  /**
+   * Related units for the organisational unit.
+   *
+   */
+  related_units_response: RelatedUnitResponsePaged;
+  /**
+   * The top-unit (root) of the organisation unit, in the hierarchy.
+   *
+   * @deprecated Use 'root_response' instead. Will be removed in a future version of OS2mo.
+   */
+  root?: Maybe<Array<OrganisationUnit>>;
   /**
    * The top-unit (root) of the organisation unit, in the hierarchy.
    *
    */
-  root?: Maybe<Array<OrganisationUnit>>;
+  root_response?: Maybe<OrganisationUnitResponse>;
+  /**
+   * Time planning strategy.
+   *
+   * @deprecated Use 'time_planning_response' instead. Will be removed in a future version of OS2mo.
+   */
+  time_planning?: Maybe<Class>;
   /**
    * Time planning strategy.
    *
    */
-  time_planning?: Maybe<Class>;
+  time_planning_response?: Maybe<ClassResponse>;
   /**
    * UUID of the time planning object.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -9913,6 +10700,53 @@ export type OrganisationUnit = {
    *
    */
   type: Scalars['String']['output'];
+  /**
+   * Organisation unit hierarchy.
+   *
+   * Can be used to label an organisational structure to belong to a certain subset of the organisation tree.
+   *
+   * Examples of user-keys:
+   * * `"Line-management"`
+   * * `"Self-owned institution"`
+   * * `"Outside organisation"`
+   * * `"Hidden"`
+   *
+   * Note:
+   * The organisation-gatekeeper integration is one option to keep hierarchy labels up-to-date.
+   *
+   */
+  unit_hierarchy_response?: Maybe<ClassResponse>;
+  /**
+   * Organisation unit level.
+   *
+   * Examples of user-keys:
+   * * `"N1"`
+   * * `"N5"`
+   * * `"N7"`
+   *
+   */
+  unit_level_response?: Maybe<ClassResponse>;
+  /**
+   * Organisation unit type.
+   *
+   * Organisation units can represent a lot of different classes of hierarchical structures.
+   * Sometimes they represent cooperations, governments, NGOs or other true organisation types.
+   * Oftentimes they represent the inner structure of these organisations.
+   * Othertimes they represent project management structures such as project or teams.
+   *
+   * This field is used to distriguish all these different types of organisations.
+   *
+   * Examples of user-keys:
+   * * `"Private Company"`
+   * * `"Educational Institution"`
+   * * `"Activity Center"`
+   * * `"Daycare"`
+   * * `"Team"`
+   * * `"Project"`
+   *
+   * @deprecated Use 'unit_type_response' instead. Will be removed in a future version of OS2mo.
+   */
+  unit_type?: Maybe<Class>;
   /**
    * Organisation unit type.
    *
@@ -9932,7 +10766,7 @@ export type OrganisationUnit = {
    * * `"Project"`
    *
    */
-  unit_type?: Maybe<Class>;
+  unit_type_response?: Maybe<ClassResponse>;
   /**
    * UUID of the organisation unit type.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -9968,7 +10802,23 @@ export type OrganisationUnitAddressesArgs = {
 
 
 /** Organisation unit within the organisation tree */
+export type OrganisationUnitAddresses_ResponseArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<OrgUnitsboundaddressfilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Organisation unit within the organisation tree */
 export type OrganisationUnitAssociationsArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<OrgUnitsboundassociationfilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Organisation unit within the organisation tree */
+export type OrganisationUnitAssociations_ResponseArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<OrgUnitsboundassociationfilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
@@ -9990,7 +10840,23 @@ export type OrganisationUnitChildrenArgs = {
 
 
 /** Organisation unit within the organisation tree */
+export type OrganisationUnitChildren_ResponseArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<ParentBoundOrganisationUnitFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Organisation unit within the organisation tree */
 export type OrganisationUnitEngagementsArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<OrgUnitsboundengagementfilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Organisation unit within the organisation tree */
+export type OrganisationUnitEngagements_ResponseArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<OrgUnitsboundengagementfilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
@@ -10012,7 +10878,23 @@ export type OrganisationUnitItusersArgs = {
 
 
 /** Organisation unit within the organisation tree */
+export type OrganisationUnitItusers_ResponseArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<OrgUnitsboundituserfilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Organisation unit within the organisation tree */
 export type OrganisationUnitKlesArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<OrgUnitsboundklefilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Organisation unit within the organisation tree */
+export type OrganisationUnitKles_ResponseArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<OrgUnitsboundklefilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
@@ -10028,7 +10910,24 @@ export type OrganisationUnitLeavesArgs = {
 
 
 /** Organisation unit within the organisation tree */
+export type OrganisationUnitLeaves_ResponseArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<OrgUnitsboundleavefilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Organisation unit within the organisation tree */
 export type OrganisationUnitManagersArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<OrgUnitsboundmanagerfilter>;
+  inherit?: Scalars['Boolean']['input'];
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Organisation unit within the organisation tree */
+export type OrganisationUnitManagers_ResponseArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<OrgUnitsboundmanagerfilter>;
   inherit?: Scalars['Boolean']['input'];
@@ -10069,6 +10968,14 @@ export type OrganisationUnitParentArgs = {
 
 /** Organisation unit within the organisation tree */
 export type OrganisationUnitRelated_UnitsArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<OrgUnitsboundrelatedunitfilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Organisation unit within the organisation tree */
+export type OrganisationUnitRelated_Units_ResponseArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<OrgUnitsboundrelatedunitfilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
@@ -10630,8 +11537,20 @@ export type Owner = {
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
    *
+   * @deprecated Use 'org_unit_response' instead. Will be removed in a future version of OS2mo.
    */
   org_unit?: Maybe<Array<OrganisationUnit>>;
+  /**
+   * The owned organisation unit.
+   *
+   * Note:
+   * This field is mutually exclusive with the `employee` field.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  org_unit_response?: Maybe<OrganisationUnitResponse>;
   /**
    * UUID of the organisation unit related to the owner.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -10645,10 +11564,19 @@ export type Owner = {
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
    *
+   * @deprecated Use 'owner_response' instead. Will be removed in a future version of OS2mo.
    */
   owner?: Maybe<Array<Employee>>;
   /** Inference priority, if set: `engagement_priority` or `association_priority` */
   owner_inference_priority?: Maybe<OwnerInferencePriority>;
+  /**
+   * Owner of the connected person or organisation unit.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  owner_response?: Maybe<EmployeeResponse>;
   /**
    * UUID of the owner.
    * @deprecated Will be removed in a future version of GraphQL.
@@ -10665,8 +11593,20 @@ export type Owner = {
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
    *
+   * @deprecated Use 'person_response' instead. Will be removed in a future version of OS2mo.
    */
   person?: Maybe<Array<Employee>>;
+  /**
+   * The owned person.
+   *
+   * Note:
+   * This field is mutually exclusive with the `org_unit` field.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  person_response?: Maybe<EmployeeResponse>;
   /**
    *
    * The object type.
@@ -11160,7 +12100,10 @@ export type Query = {
   classes: ClassResponsePaged;
   /** Get configuration variables. */
   configuration: ConfigurationPaged;
-  /** Get employees. */
+  /**
+   * Get employees.
+   * @deprecated Use 'persons' instead. Will be removed in a future version of OS2mo.
+   */
   employees: EmployeeResponsePaged;
   /** Get engagements. */
   engagements: EngagementResponsePaged;
@@ -11230,6 +12173,8 @@ export type Query = {
   org_units: OrganisationUnitResponsePaged;
   /** Get owners. */
   owners: OwnerResponsePaged;
+  /** Get persons. */
+  persons: EmployeeResponsePaged;
   /**
    * Get a list of registrations.
    *
@@ -11413,6 +12358,14 @@ export type QueryOrg_UnitsArgs = {
 export type QueryOwnersArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<OwnerFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Entrypoint for all read-operations */
+export type QueryPersonsArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<EmployeeFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
 };
 
@@ -11623,8 +12576,22 @@ export type RelatedUnit = {
    * Note:
    * The result list should always be of length 2, corresponding to the elements of the bijection.
    *
+   * @deprecated Use 'org_units_response' instead. Will be removed in a future version of OS2mo.
    */
   org_units: Array<OrganisationUnit>;
+  /**
+   * Related organisation units.
+   *
+   * Examples of user-keys:
+   * * `["Administrative", "Payroll"]`
+   * * `["IT-Support", "IT-Support]`
+   * * `["Majora School", "Alias School"]`
+   *
+   * Note:
+   * The result list should always be of length 2, corresponding to the elements of the bijection.
+   *
+   */
+  org_units_response: OrganisationUnitResponsePaged;
   /**
    * The object type.
    *
@@ -11656,6 +12623,14 @@ export type RelatedUnit = {
 
 /** An organisation unit relation mapping */
 export type RelatedUnitOrg_UnitsArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<UuidsBoundOrganisationUnitFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** An organisation unit relation mapping */
+export type RelatedUnitOrg_Units_ResponseArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<UuidsBoundOrganisationUnitFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
@@ -11944,8 +12919,26 @@ export type RoleBinding = {
    * **Warning**:
    * This field will probably become an optional entity instead of a list in the future.
    *
+   * @deprecated Use 'ituser_response' instead. Will be removed in a future version of OS2mo.
    */
   ituser: Array<ItUser>;
+  /**
+   * The IT-user that should be granted this role
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   */
+  ituser_response: ItUserResponse;
+  /**
+   * The organisational unit in which the role is being fulfilled.
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   * @deprecated Use 'org_unit_response' instead. Will be removed in a future version of OS2mo.
+   */
+  org_unit: Array<OrganisationUnit>;
   /**
    * The organisational unit in which the role is being fulfilled.
    *
@@ -11953,7 +12946,21 @@ export type RoleBinding = {
    * This field will probably become an optional entity instead of a list in the future.
    *
    */
-  org_unit: Array<OrganisationUnit>;
+  org_unit_response?: Maybe<OrganisationUnitResponse>;
+  /**
+   * The role that is being fulfilled.
+   *
+   * Examples of user-keys:
+   * * `"AD Read"`
+   * * `"AD Write"`
+   * * `"SAP Admin"`
+   *
+   * **Warning**:
+   * This field will probably become an optional entity instead of a list in the future.
+   *
+   * @deprecated Use 'role_response' instead. Will be removed in a future version of OS2mo.
+   */
+  role: Array<Class>;
   /**
    * The role that is being fulfilled.
    *
@@ -11966,7 +12973,7 @@ export type RoleBinding = {
    * This field will probably become an optional entity instead of a list in the future.
    *
    */
-  role: Array<Class>;
+  role_response: ClassResponse;
   /** Short, unique key. Defaults to object UUID. */
   user_key: Scalars['String']['output'];
   /** UUID of the entity */

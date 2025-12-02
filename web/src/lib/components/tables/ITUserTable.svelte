@@ -137,7 +137,7 @@
       {/if}
       <td>
         <a
-          href="{base}/{$page.route.id?.split(
+          href="{base}/{$page.url.pathname?.split(
             '/'
           )[1]}/{uuid}/edit/ituser/{ituser.uuid}{formatQueryDates(ituser.validity)}"
         >
@@ -146,7 +146,7 @@
       </td>
       <td>
         <a
-          href="{base}/{$page.route.id?.split(
+          href="{base}/{$page.url.pathname?.split(
             '/'
           )[1]}/{uuid}/terminate/ituser/{ituser.uuid}"
         >

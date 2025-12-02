@@ -28,7 +28,7 @@
   export let tense: Tense
 
   const uuid = $page.params.uuid
-  const isOrg = $page.route.id?.startsWith("/organisation")
+  const isOrg = $page.url.pathname?.startsWith("/organisation")
   const filter: RoleBindingFilter = isOrg
     ? { org_unit: { uuids: [uuid] }, ...filterTenseToValidity(tense, $date) }
     : {
@@ -101,7 +101,7 @@
       <ValidityTableCell validity={rolebindingObj.validity} />
       <td>
         <a
-          href="{base}/{$page.route.id?.split(
+          href="{base}/{$page.url.pathname?.split(
             '/'
           )[1]}/{uuid}/edit/rolebinding/{rolebindingObj.uuid}{formatQueryDates(
             rolebindingObj.validity
@@ -112,7 +112,7 @@
       </td>
       <td>
         <a
-          href="{base}/{$page.route.id?.split(
+          href="{base}/{$page.url.pathname?.split(
             '/'
           )[1]}/{uuid}/terminate/rolebinding/{rolebindingObj.uuid}"
         >
