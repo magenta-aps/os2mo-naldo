@@ -4,7 +4,6 @@
   import { base } from "$app/paths"
   import { isAdmin, isAuth } from "$lib/stores/auth"
   import { logoutKeycloak, keycloak } from "$lib/auth/keycloak"
-  import { MOConfig } from "$lib/stores/config"
   import personAddOutlineRounded from "@iconify/icons-material-symbols/person-add-outline-rounded"
   import keyboardArrowDownRounded from "@iconify/icons-material-symbols/keyboard-arrow-down-rounded"
   import Icon from "@iconify/svelte"
@@ -133,9 +132,8 @@ OS2mo-frontend version: ${env.PUBLIC_COMMIT_TAG}`}
         open={isOpen}
       />
 
-      {#if $MOConfig && JSON.parse($MOConfig.navlinks).length}
-        {@const links = JSON.parse($MOConfig.navlinks)}
-        {#each links as link}
+      {#if env.PUBLIC_NAVLINKS.length}
+        {#each env.PUBLIC_NAVLINKS as link}
           <NavbarButton
             title={link.text}
             href={link.href}

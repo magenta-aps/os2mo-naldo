@@ -1,6 +1,7 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital, upperCase } from "$lib/utils/helpers"
+  import { env } from "$lib/env"
   import Tabs from "$lib/components/shared/Tabs.svelte"
   import CopyToClipboard from "$lib/components/shared/Clipboard.svelte"
   import { EmployeeTab, ItTab, activeEmployeeTab, activeItTab } from "$lib/stores/tab"
@@ -11,7 +12,6 @@
   import { EmployeeDocument } from "./query.generated"
   import TenseTabs from "$lib/components/shared/TenseTabs.svelte"
   import Button from "$lib/components/shared/Button.svelte"
-  import { env } from "$lib/env"
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
   import { onMount } from "svelte"
@@ -26,7 +26,6 @@
   import LeaveTable from "$lib/components/tables/LeaveTable.svelte"
   import OwnerTable from "$lib/components/tables/OwnerTable.svelte"
   import RoleBindingTable from "$lib/components/tables/RoleBindingTable.svelte"
-  import { MOConfig } from "$lib/stores/config"
 
   // Tabs
   // "n" used for deciding which translation to use in Tabs
@@ -112,7 +111,7 @@
     {@const item = items.find((item) => item.value === activeItem)?.label || ""}
     <h1 class="mb-4">
       {employee.name}
-      {#if $MOConfig && $MOConfig.confdb_show_cpr_no === "true"}
+      {#if env.PUBLIC_SHOW_CPR_NUMBER}
         <span class="text-slate-600">
           {employee.cpr_number
             ? `(${employee.cpr_number.slice(0, 6)}-${employee.cpr_number.slice(-4)})`
