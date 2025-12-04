@@ -2,22 +2,23 @@
   import { capital } from "$lib/utils/helpers"
   import { _ } from "svelte-i18n"
   import SvelteSelect from "svelte-select"
-
-  type Fields = { value: string; subString: string }
+  // Import the real type to ensure safety
+  import type { Field } from "$lib/utils/insights"
 
   export let title: string | undefined = undefined
   export let id: string
-  export let iterable: Fields[] | [] | undefined = undefined
+  export let iterable: Field[] | [] | undefined = undefined
   export let name: string[] | undefined | null = undefined
   export let required = false
   export let placeholder: string = ""
   export let disabled = false
   export let extra_classes = ""
   export let multiple = true
-  export let value: Fields[] | undefined
+  export let value: Field[] | undefined
   export let errors: string[] = []
 
-  const itemId = "value" // Used by the component to differentiate between items
+  // SvelteSelect uses this to identify the object.
+  const itemId = "label"
 
   const floatingConfig = {
     placement: "bottom-start",
@@ -65,11 +66,11 @@
       }}
     >
       <div slot="item" let:item class="cursor-pointer">
-        {capital($_(item.value, { values: { n: item.n } }))}
+        {capital($_(item.label, { values: { n: 1 } }))}
       </div>
 
       <div slot="selection" let:selection class="cursor-pointer">
-        {capital($_(selection.value, { values: { n: selection.n } }))}
+        {capital($_(selection.label, { values: { n: 1 } }))}
       </div>
     </SvelteSelect>
   </div>
