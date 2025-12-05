@@ -8880,8 +8880,6 @@ export type Mutation = {
   manager_update: ManagerResponse;
   /** Creates a list of managers. */
   managers_create: Array<ManagerResponse>;
-  /** Terminates a list of managers. */
-  managers_terminate: Array<ManagerResponse>;
   /**
    * Creates the root-organisation.
    * @deprecated The root organisation concept will be removed in a future version of OS2mo.
@@ -9828,18 +9826,6 @@ export type MutationManager_UpdateArgs = {
  */
 export type MutationManagers_CreateArgs = {
   input: Array<ManagerCreateInput>;
-};
-
-
-/**
- * Entrypoint for all modification-operations.
- *
- * **Warning**:
- * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
- *
- */
-export type MutationManagers_TerminateArgs = {
-  input: Array<ManagerTerminateInput>;
 };
 
 

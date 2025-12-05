@@ -2,7 +2,6 @@
   import { _ } from "svelte-i18n"
   import "$lib/global.css"
   import SuccessAlert from "$lib/components/alerts/Success.svelte"
-  import { isAuth } from "$lib/stores/auth"
   import ErrorAlert from "$lib/components/alerts/Error.svelte"
   import WarningAlert from "$lib/components/alerts/Warning.svelte"
   import Navbar from "$lib/components/navbar/Navbar.svelte"
@@ -10,10 +9,6 @@
   import { initKeycloak } from "$lib/auth/keycloak"
   import Favicon from "$lib/assets/favicon.png"
   import Drawer from "$lib/components/Drawer.svelte"
-  import { gql } from "graphql-request"
-  import { GetConfigDocument } from "../query.generated"
-  import { graphQLClient } from "$lib/http/client"
-  import { error } from "$lib/stores/alert"
   import SearchBar from "$lib/components/navbar/SearchBar.svelte"
 
   onMount(async () => {
