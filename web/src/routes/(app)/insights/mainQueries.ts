@@ -50,7 +50,7 @@ export const mainQueries: MainQuery[] = [
           let maxBreadcrumbs = 0
           if (data) {
             data.forEach((u) => {
-              if (u.ancestors)
+              if (u && u.ancestors.length)
                 maxBreadcrumbs = Math.max(maxBreadcrumbs, u.ancestors.length)
             })
           }
