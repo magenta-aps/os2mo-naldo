@@ -1,24 +1,14 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/utils/helpers"
   import { env } from "$lib/env"
-  import type {
-    LazyEmployeeSearchQuery,
-    LazyOrgUnitSearchQuery,
-    SearchEmployeeQuery,
-    SearchOrgUnitQuery,
-  } from "./query.generated"
-  type Employee = SearchEmployeeQuery["employees"]["objects"][0]["validities"][0]
-  type OrgUnit = SearchOrgUnitQuery["org_units"]["objects"][0]["validities"][0]
-  type LazyEmployee = NonNullable<
-    LazyEmployeeSearchQuery["employees"]
-  >["objects"][0]["validities"][0]
-  type LazyOrgUnit = NonNullable<
-    LazyOrgUnitSearchQuery["org_units"]
-  >["objects"][0]["validities"][0]
+  import type { EmployeeSearchQuery, OrgUnitSearchQuery } from "./query.generated"
+  type Employee = EmployeeSearchQuery["employees"]["objects"][0]["validities"][0]
+  type OrgUnit = OrgUnitSearchQuery["org_units"]["objects"][0]["validities"][0]
+  import AddressTemplate from "$lib/components/search/AddressTemplate.svelte"
+  import LocationTemplate from "$lib/components/search/LocationTemplate.svelte"
+  import { isUUID } from "$lib/utils/helpers"
 
-  type SearchItem = Employee | OrgUnit | LazyEmployee | LazyOrgUnit
-
+  type SearchItem = Employee | OrgUnit
   export let item: SearchItem
   export let type: string
 
@@ -27,11 +17,11 @@
    * @param obj The object to check.
    * @returns true if the object has the 'addresses' property, false otherwise.
    */
-  const isLazy = (obj: SearchItem): obj is LazyEmployee | LazyOrgUnit => {
-    return "addresses" in obj
+  const isEmployee = (obj: SearchItem, type: string): obj is Employee => {
+    return type === "employee"
   }
-  const isLazyOrg = (obj: SearchItem): obj is LazyOrgUnit => {
-    return "addresses" in obj
+  const isOrgUnit = (obj: SearchItem, type: string): obj is OrgUnit => {
+    return type === "org-unit"
   }
   /**
    * Type guard to check if a given object is of type (Lazy)Employee or (Lazy)OrgUnit.
@@ -54,32 +44,30 @@
           item
         )}{/if}
     </div>
-    {#if isLazy(item)}
-      {#if isLazyOrg(item) && item.root?.length}
-        <br />
-        <div class="inline-block text-primary text-sm">
-          {capital($_("root"))}: {item.root[0].name}
-        </div>
-      {/if}
-      {#if isLazyOrg(item) && item.parent}
-        <br />
-        <div class="inline-block text-primary text-sm">
-          {capital($_("parent"))}: {item.parent.name}
-        </div>
-      {/if}
-      {#each item.addresses as address}
-        <br />
-        <div class="inline-block text-primary text-sm">
-          {#if address.resolve.__typename === "DARAddress"}
-            {address.address_type.name}: {address.resolve.name}
-          {:else if address.resolve.__typename === "DefaultAddress"}
-            {address.address_type.name}: {address.resolve.value}
-          {:else if address.resolve.__typename === "MultifieldAddress"}
-            {address.address_type.name}: {address.resolve.value +
-              " " +
-              address.resolve.value2}
+    {#if isEmployee(item, type) && env.PUBLIC_ENABLE_RSD_SEARCH}
+      <!-- Show employee engagement locations (RSD behaviour)-->
+      {#each item.engagements as engagement}
+        <LocationTemplate orgUnit={engagement.org_unit?.[0]} showCurrentName={true} />
+      {/each}
+    {:else if isOrgUnit(item, type)}
+      <!-- Show org_unit locations (General behaviour) -->
+      <LocationTemplate orgUnit={item} showCurrentName={false} />
+    {/if}
+
+    {#if !env.PUBLIC_ENABLE_RSD_SEARCH}
+      {#if isEmployee(item, type)}
+        <!-- Show employee itusers (Non-RSD behaviour) -->
+        {#each item.itusers ?? [] as ituser}
+          {#if !isUUID(ituser.user_key)}
+            <div class="text-sm text-primary">
+              <span>{ituser.user_key}</span>
+            </div>
           {/if}
-        </div>
+        {/each}
+      {/if}
+      <!-- Show addresses (Non-RSD behaviour) -->
+      {#each item.addresses ?? [] as address}
+        <AddressTemplate {address} />
       {/each}
     {/if}
   </div>
