@@ -94,7 +94,7 @@
     // Will return an empty list of "breadcrumbs" if the route isn't under organisation
     // or it doesn't have UUID
     const breadcrumbs =
-      $page.route.id?.startsWith("/organisation") && uuid
+      $page.url.pathname?.startsWith("/organisation") && uuid
         ? (await fetchParentTree(uuid, fromDate)).map((e) => e.uuid).reverse()
         : []
 
