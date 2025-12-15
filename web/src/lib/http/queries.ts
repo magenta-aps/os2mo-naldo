@@ -75,7 +75,11 @@ gql`
           classes(
             filter: {
               from_date: $currentDate
-              owner: { include_none: true, descendant: { uuids: $orgUuid } }
+              owner: {
+                include_none: true
+                descendant: { uuids: $orgUuid, from_date: $currentDate }
+                from_date: $currentDate
+              }
             }
           ) {
             name
