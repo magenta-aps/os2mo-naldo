@@ -136,6 +136,7 @@
 	"leave_type": "orlovstype",
 	"link": "{n, plural, =0 {linket} one {link} other {links}}",
 	"loading": "henter",
+	"location": "placering",
 	"logout": "log ud",
 	"manager": "{n, plural, =0 {lederen} one {leder} other {ledere}}",
 	"manager_email": "leder email",

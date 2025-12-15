@@ -11,27 +11,17 @@
   import { graphQLClient } from "$lib/http/client"
   import { findClosestValidity } from "$lib/utils/validities"
   import {
-    SearchEmployeeDocument,
-    SearchOrgUnitDocument,
-    type SearchEmployeeQuery,
-    type SearchOrgUnitQuery,
-    LazyEmployeeSearchDocument,
-    type LazyEmployeeSearchQuery,
-    LazyOrgUnitSearchDocument,
-    type LazyOrgUnitSearchQuery,
+    EmployeeSearchDocument,
+    OrgUnitSearchDocument,
+    type EmployeeSearchQuery,
+    type OrgUnitSearchQuery,
   } from "./query.generated"
   import { env } from "$lib/env"
 
-  type Employees = SearchEmployeeQuery["employees"]["objects"][0]["validities"]
-  type OrgUnits = SearchOrgUnitQuery["org_units"]["objects"][0]["validities"]
-  type LazyEmployees = NonNullable<
-    LazyEmployeeSearchQuery["employees"]
-  >["objects"][0]["validities"]
-  type LazyOrgUnits = NonNullable<
-    LazyOrgUnitSearchQuery["org_units"]
-  >["objects"][0]["validities"]
+  type Employees = EmployeeSearchQuery["employees"]["objects"][0]["validities"]
+  type OrgUnits = OrgUnitSearchQuery["org_units"]["objects"][0]["validities"]
 
-  type SearchItems = Employees | OrgUnits | LazyEmployees | LazyOrgUnits
+  type SearchItems = Employees | OrgUnits
   type SearchItem = SearchItems[0]
 
   // { name: string; uuid: string } allows us to use `<Search>` in forms, without using validity, since it's not needed.
@@ -61,112 +51,85 @@
   let items: SearchItems
 
   gql`
-    query SearchEmployee($filter: EmployeeFilter!, $limit: int) {
-      employees(filter: $filter, limit: $limit) {
-        objects {
-          validities {
-            uuid
-            name
-            cpr_number
-            validity {
-              from
-              to
-            }
-          }
-        }
-      }
-    }
-
-    query SearchOrgUnit($filter: OrganisationUnitFilter!, $limit: int) {
-      org_units(filter: $filter, limit: $limit) {
-        objects {
-          validities {
-            uuid
-            name
-            validity {
-              from
-              to
-            }
-          }
-        }
-      }
-    }
-
-    query LazyOrgUnitSearch($orgUnitFilter: OrganisationUnitFilter!) {
-      org_units(filter: $orgUnitFilter) {
+    query OrgUnitSearch(
+      $orgUnitFilter: OrganisationUnitFilter!
+      $defaultSearch: Boolean = true
+      $limit: int
+    ) {
+      org_units(filter: $orgUnitFilter, limit: $limit) {
         objects {
           validities {
             name
             uuid
-            addresses {
-              address_type {
-                name
-              }
-              resolve {
-                ... on DefaultAddress {
-                  __typename
-                  value
-                }
-                ... on DARAddress {
-                  __typename
-                  name
-                }
-                ... on MultifieldAddress {
-                  __typename
-                  value
-                  value2
-                }
-              }
-            }
-            root {
-              name
-            }
-            parent {
+            ancestors {
               name
             }
             validity {
               from
               to
             }
+            addresses @include(if: $defaultSearch) {
+              ...AddressDetails
+            }
           }
         }
       }
     }
 
-    query LazyEmployeeSearch($employeeFilter: EmployeeFilter!) {
-      employees(filter: $employeeFilter) {
+    query EmployeeSearch(
+      $employeeFilter: EmployeeFilter!
+      $defaultSearch: Boolean = true
+      $limit: int
+    ) {
+      employees(filter: $employeeFilter, limit: $limit) {
         objects {
           validities {
             name
             uuid
             cpr_number
-            addresses {
-              address_type {
-                name
-              }
-              resolve {
-                ... on DefaultAddress {
-                  __typename
-                  value
-                }
-                ... on DARAddress {
-                  __typename
-                  name
-                }
-                ... on MultifieldAddress {
-                  __typename
-                  value
-                  value2
-                }
-              }
+            validity {
+              from
+              to
             }
-            itusers {
+            itusers @include(if: $defaultSearch) {
               user_key
             }
-            validity {
-              from
-              to
+            addresses @include(if: $defaultSearch) {
+              ...AddressDetails
             }
+            ...RsdSearch @skip(if: $defaultSearch)
+          }
+        }
+      }
+    }
+
+    fragment AddressDetails on Address {
+      address_type {
+        name
+      }
+      resolve {
+        ... on DefaultAddress {
+          __typename
+          value
+        }
+        ... on DARAddress {
+          __typename
+          name
+        }
+        ... on MultifieldAddress {
+          __typename
+          value
+          value2
+        }
+      }
+    }
+
+    fragment RsdSearch on Employee {
+      engagements {
+        org_unit {
+          name
+          ancestors {
+            name
           }
         }
       }
@@ -184,52 +147,27 @@
     }
     abortController = new AbortController()
 
-    let res:
-      | SearchEmployeeQuery
-      | SearchOrgUnitQuery
-      | LazyEmployeeSearchQuery
-      | LazyOrgUnitSearchQuery
+    let res: EmployeeSearchQuery | OrgUnitSearchQuery
 
     switch (type) {
       case "employee":
         let employeeFilter
-        // Check if FF is true, else search "normally"
         if (env.PUBLIC_SEARCH_INFINITY && action === "goto") {
-          employeeFilter = { from_date: null, to_date: null, query: filterText }
+          employeeFilter = {
+            from_date: null,
+            to_date: null,
+            query: filterText,
+          }
         } else {
           employeeFilter = { from_date: $date, query: filterText }
         }
+
         res = await graphQLClient(abortController.signal).request(
-          SearchEmployeeDocument,
+          EmployeeSearchDocument,
           {
-            filter: employeeFilter,
+            employeeFilter: employeeFilter,
+            defaultSearch: !env.PUBLIC_ENABLE_RSD_SEARCH,
             limit: 15,
-          }
-        )
-
-        items = res.employees.objects
-          .map((item) => findClosestValidity(item.validities, $date))
-          .sort((a, b) => (a.name > b.name ? 1 : -1))
-
-        if (env.PUBLIC_SIMPLE_SEARCH) {
-          return items
-        }
-
-        let lazyEmployeeFilter
-        if (env.PUBLIC_SEARCH_INFINITY && action === "goto") {
-          lazyEmployeeFilter = {
-            from_date: null,
-            to_date: null,
-            uuids: items.map((e) => e.uuid),
-          }
-        } else {
-          lazyEmployeeFilter = { from_date: $date, uuids: items.map((e) => e.uuid) }
-        }
-
-        res = await graphQLClient(abortController.signal).request(
-          LazyEmployeeSearchDocument,
-          {
-            employeeFilter: lazyEmployeeFilter,
           }
         )
 
@@ -241,43 +179,21 @@
 
       case "org-unit":
         let orgUnitFilter
-        // Check if FF is true, else search "normally"
         if (env.PUBLIC_SEARCH_INFINITY && action === "goto") {
-          orgUnitFilter = { from_date: null, to_date: null, query: filterText }
+          orgUnitFilter = {
+            from_date: null,
+            to_date: null,
+            query: filterText,
+          }
         } else {
           orgUnitFilter = { from_date: $date, query: filterText }
         }
+
         res = await graphQLClient(abortController.signal).request(
-          SearchOrgUnitDocument,
+          OrgUnitSearchDocument,
           {
-            filter: orgUnitFilter,
+            orgUnitFilter: orgUnitFilter,
             limit: 15,
-          }
-        )
-
-        items = res.org_units.objects
-          .map((item) => findClosestValidity(item.validities, $date))
-          .sort((a, b) => (a.name > b.name ? 1 : -1))
-
-        if (env.PUBLIC_SIMPLE_SEARCH) {
-          return items
-        }
-
-        let lazyOrgFilter
-        if (env.PUBLIC_SEARCH_INFINITY && action === "goto") {
-          lazyOrgFilter = {
-            from_date: null,
-            to_date: null,
-            uuids: items.map((e) => e.uuid),
-          }
-        } else {
-          lazyOrgFilter = { from_date: $date, uuids: items.map((e) => e.uuid) }
-        }
-
-        res = await graphQLClient(abortController.signal).request(
-          LazyOrgUnitSearchDocument,
-          {
-            orgUnitFilter: lazyOrgFilter,
           }
         )
 

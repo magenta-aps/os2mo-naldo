@@ -136,6 +136,7 @@
 	"leave_type": "leave type",
 	"link": "{n, plural, =0 {the link} one {link} other {links}}",
 	"loading": "loading",
+	"location": "location",
 	"logout": "logout",
 	"manager": "{n, plural, =0 {the manager} one {manager} other {managers}}",
 	"manager_email": "manager email",
