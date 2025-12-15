@@ -7909,6 +7909,21 @@ export type ListenerFilter = {
    */
   routing_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   /**
+   * Listener filter limiting which entries are returned.
+   *
+   * | `user_keys`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /**
    * UUID filter limiting which entries are returned.
    *
    * | `uuids`      | Elements returned                            |
@@ -9006,6 +9021,7 @@ export type MutationAddress_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<AddressFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  listener?: InputMaybe<Scalars['UUID']['input']>;
   owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
@@ -9071,6 +9087,7 @@ export type MutationAssociation_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<AssociationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  listener?: InputMaybe<Scalars['UUID']['input']>;
   owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
@@ -9136,6 +9153,7 @@ export type MutationClass_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<ClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  listener?: InputMaybe<Scalars['UUID']['input']>;
   owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
@@ -9201,6 +9219,7 @@ export type MutationEmployee_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<EmployeeFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  listener?: InputMaybe<Scalars['UUID']['input']>;
   owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
@@ -9266,6 +9285,7 @@ export type MutationEngagement_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<EngagementFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  listener?: InputMaybe<Scalars['UUID']['input']>;
   owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
@@ -9451,6 +9471,7 @@ export type MutationFacet_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<FacetFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  listener?: InputMaybe<Scalars['UUID']['input']>;
   owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
@@ -9552,6 +9573,7 @@ export type MutationItsystem_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<ItSystemFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  listener?: InputMaybe<Scalars['UUID']['input']>;
   owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
@@ -9617,6 +9639,7 @@ export type MutationItuser_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<ItUserFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  listener?: InputMaybe<Scalars['UUID']['input']>;
   owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
@@ -9682,6 +9705,7 @@ export type MutationKle_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<KleFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  listener?: InputMaybe<Scalars['UUID']['input']>;
   owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
@@ -9735,6 +9759,7 @@ export type MutationLeave_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<LeaveFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  listener?: InputMaybe<Scalars['UUID']['input']>;
   owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
@@ -9788,6 +9813,7 @@ export type MutationManager_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<ManagerFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  listener?: InputMaybe<Scalars['UUID']['input']>;
   owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
@@ -9865,6 +9891,7 @@ export type MutationOrg_Unit_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<OrganisationUnitFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  listener?: InputMaybe<Scalars['UUID']['input']>;
   owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
@@ -9918,6 +9945,7 @@ export type MutationOwner_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<OwnerFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  listener?: InputMaybe<Scalars['UUID']['input']>;
   owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
@@ -9959,6 +9987,7 @@ export type MutationRelated_Unit_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<RelatedUnitFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  listener?: InputMaybe<Scalars['UUID']['input']>;
   owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
@@ -10012,6 +10041,7 @@ export type MutationRolebinding_RefreshArgs = {
   exchange?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<RoleBindingFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+  listener?: InputMaybe<Scalars['UUID']['input']>;
   owner?: InputMaybe<Scalars['UUID']['input']>;
   queue?: InputMaybe<Scalars['String']['input']>;
 };
@@ -10186,6 +10216,7 @@ export type NamespacePaged = {
 export type NamespacesBoundListenerFilter = {
   owners?: InputMaybe<Array<Scalars['UUID']['input']>>;
   routing_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
@@ -11997,6 +12028,7 @@ export type OwnerUpdateInput = {
 export type OwnersBoundListenerFilter = {
   namespaces?: InputMaybe<NamespaceFilter>;
   routing_keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  user_keys?: InputMaybe<Array<Scalars['String']['input']>>;
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
