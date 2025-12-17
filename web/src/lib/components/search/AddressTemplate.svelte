@@ -6,9 +6,7 @@
 
 <div class="text-primary text-sm">
   <span>
-    {#if address.resolve.__typename === "DARAddress"}
-      {address.address_type.name}: {address.resolve.name}
-    {:else if address.resolve.__typename === "DefaultAddress"}
+    {#if address.resolve.__typename === "DefaultAddress"}
       {address.address_type.name}: {address.resolve.value}
     {:else if address.resolve.__typename === "MultifieldAddress"}
       {address.address_type.name}: {address.resolve.value} {address.resolve.value2}

@@ -2777,82 +2777,6 @@ export type ClassUpdateInput = {
   validity: ValidityInput;
 };
 
-/** A configuration setting. */
-export type Configuration = {
-  __typename?: 'Configuration';
-  /**
-   * JSONified settings value.
-   *
-   * Examples:
-   * * `"true"`
-   * * `"\"\""`
-   * * `"null"`
-   * * `"[]"`
-   *
-   */
-  jsonified_value: Scalars['String']['output'];
-  /**
-   * The unique settings identifier.
-   *
-   * Examples:
-   * * `commit_tag`
-   * * `environment`
-   * * `confdb_show_roles`
-   *
-   */
-  key: Scalars['String']['output'];
-  /**
-   * Stringified settings value.
-   *
-   * Examples:
-   * * `"True"`
-   * * `""`
-   * * `"None"`
-   * * `"[]"`
-   *
-   */
-  stringified_value: Scalars['String']['output'];
-};
-
-/** Configuration filter. */
-export type ConfigurationFilter = {
-  /**
-   * Key filter limiting which entries are returned.
-   *
-   * | `identifiers`      | Elements returned                            |
-   * |--------------|----------------------------------------------|
-   * | not provided | All                                          |
-   * | `null`       | All                                          |
-   * | `[]`         | None                                         |
-   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
-   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
-   *
-   * `*`: Elements returned depends on which elements were found.
-   *
-   */
-  identifiers?: InputMaybe<Array<Scalars['String']['input']>>;
-};
-
-/** Result page in cursor-based pagination. */
-export type ConfigurationPaged = {
-  __typename?: 'ConfigurationPaged';
-  /**
-   * List of results.
-   *
-   * The number of elements is defined by the `limit` argument.
-   *
-   */
-  objects: Array<Configuration>;
-  /**
-   * Container for page information.
-   *
-   * Contains the cursors necessary to fetch other pages.
-   * Contains information on when to stop iteration.
-   *
-   */
-  page_info: PageInfo;
-};
-
 export type DarAddress = ResolvedAddress & {
   __typename?: 'DARAddress';
   description: Scalars['String']['output'];
@@ -12116,8 +12040,6 @@ export type Query = {
   associations: AssociationResponsePaged;
   /** Get classes. */
   classes: ClassResponsePaged;
-  /** Get configuration variables. */
-  configuration: ConfigurationPaged;
   /**
    * Get employees.
    * @deprecated Use 'persons' instead. Will be removed in a future version of OS2mo.
@@ -12241,14 +12163,6 @@ export type QueryAssociationsArgs = {
 export type QueryClassesArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ClassFilter>;
-  limit?: InputMaybe<Scalars['int']['input']>;
-};
-
-
-/** Entrypoint for all read-operations */
-export type QueryConfigurationArgs = {
-  cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  filter?: InputMaybe<ConfigurationFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
 };
 
