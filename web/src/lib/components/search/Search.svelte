@@ -112,10 +112,6 @@
           __typename
           value
         }
-        ... on DARAddress {
-          __typename
-          name
-        }
         ... on MultifieldAddress {
           __typename
           value
