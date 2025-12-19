@@ -5,5 +5,6 @@ export const formatDate = (date: string): string => {
 }
 
 export const formatDateTime = (date: string): string => {
+  if (!date) return ""
   return formatInTimeZone(date, "Europe/Copenhagen", "dd-MM-yyyy, HH:mm:ss")
 }

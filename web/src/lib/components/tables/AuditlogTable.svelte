@@ -7,6 +7,7 @@
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { sortData } from "$lib/utils/sorting"
   import { onMount } from "svelte"
+  import { base } from "$app/paths"
   import { page } from "$app/stores"
   import { formatDateTime } from "$lib/utils/date"
 
@@ -23,7 +24,11 @@
           model
           start
           end
-          actor
+          actor_object {
+            __typename
+            display_name
+            uuid
+          }
         }
       }
     }
@@ -61,10 +66,15 @@
       class="{i % 2 === 0 ? '' : 'bg-slate-100'} 
         leading-5 border-t border-slate-300 text-secondary"
     >
-      <td class="text-sm p-4">{formatDateTime(auditlog.start)}</td>
-      <td class="text-sm p-4">{auditlog.actor}</td>
+      <td class="text-sm p-4">
+        <!-- TODO: Add link for employee, when actor_objects can be differentiated by person/integration -->
+        {auditlog.actor_object.display_name}
+      </td>
+
       <td class="text-sm p-4">{auditlog.registration_id}</td>
       <td class="text-sm p-4">{auditlog.note}</td>
+      <td class="text-sm p-4">{formatDateTime(auditlog.start)}</td>
+      <td class="text-sm p-4">{formatDateTime(auditlog.end)}</td>
     </tr>
   {:else}
     <tr class="leading-5 border-t border-slate-300 text-secondary">
