@@ -251,31 +251,26 @@ export const mainQueries: MainQuery[] = [
         getValues: (row) => [row.user_key ?? ""],
       },
       {
+        label: "rolebinding",
+        query:
+          "rolebindings(filter: { from_date: $date }) { role(filter: { from_date: $date }){ name }}",
+        getHeaders: () => [t("rolebinding", { values: { n: 2 } })],
+        getValues: (row) => {
+          // row.rolebindings is an array of objects.
+          // each object has a 'role' array.
+          // We flatten everything to get a list of role names.
+          const roles = row.rolebindings
+            ?.flatMap((rb: any) => rb.role?.map((r: any) => r.name))
+            .filter(Boolean)
+            .join(", ")
+          return [roles ?? ""]
+        },
+      },
+      {
         label: "primary",
         query: "primary { name }",
         getHeaders: () => [t("primary")],
         getValues: (row) => [row.primary?.name ?? ""],
-      },
-      validityField,
-    ],
-  },
-  {
-    operation: "rolebindings",
-    filter: "RoleBindingFilter",
-    label: "rolebinding",
-    fields: [
-      subjectField,
-      {
-        label: "ituser",
-        query: "ituser { user_key }",
-        getHeaders: () => [t("ituser")],
-        getValues: (row) => [row.ituser?.[0]?.user_key ?? ""],
-      },
-      {
-        label: "role",
-        query: "role { name }",
-        getHeaders: () => [t("role")],
-        getValues: (row) => [row.role?.[0]?.name ?? ""],
       },
       validityField,
     ],
