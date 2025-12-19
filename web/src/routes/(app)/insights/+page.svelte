@@ -11,7 +11,6 @@
   import { graphQLClient } from "$lib/http/client"
   import { date } from "$lib/stores/date"
   import Search from "$lib/components/search/Search.svelte"
-  import type { SelectedQuery } from "$lib/utils/insights"
   import { downloadHandler } from "$lib/utils/csv"
   import Icon from "@iconify/svelte"
   import homeOutlineRounded from "@iconify/icons-material-symbols/home-outline-rounded"
@@ -21,6 +20,8 @@
   import addRounded from "@iconify/icons-material-symbols/add-rounded"
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
   import { mainQueries } from "./mainQueries"
+  import type { Field } from "$lib/utils/insights"
+  import type { SelectedQuery } from "$lib/utils/insights"
   import { onDestroy } from "svelte"
   import { gql } from "graphql-request"
   import { GetOrgUnitCountDocument } from "./query.generated"
@@ -40,48 +41,28 @@
 
   // This is used to cancel ongoing request and break out of the loop, when navigating away from the page.
   onDestroy(() => {
-    if (controller) {
-      controller.abort()
-    }
+    if (controller) controller.abort()
   })
 
-  let selectedQueries: SelectedQuery[] = [
-    {
-      mainQuery: undefined,
-      chosenFields: [],
-    },
-  ]
+  let selectedQueries: SelectedQuery[] = [{ mainQuery: undefined, chosenFields: [] }]
 
   const addNewSelect = () => {
-    selectedQueries = [
-      ...selectedQueries,
-      {
-        mainQuery: undefined,
-        chosenFields: [],
-      },
-    ]
+    selectedQueries = [...selectedQueries, { mainQuery: undefined, chosenFields: [] }]
   }
 
   const removeSelect = (index: number) => {
     selectedQueries = selectedQueries.filter((_, i) => i !== index)
     removed++
   }
-  const estimateTimeRemaining = (
-    totalCount: number,
-    requestCount: number,
-    startTime: number
-  ) => {
-    const elapsedTime = (Date.now() - startTime) / 1000 // Elapsed time in seconds
-    const averageTimePerRequest = elapsedTime / requestCount // Average time per request
-    const remainingRequests = totalCount - requestCount
 
-    const estimatedSecondsRemaining = Math.round(
-      averageTimePerRequest * remainingRequests
-    )
-    const minutes = Math.floor(estimatedSecondsRemaining / 60)
-    const seconds = estimatedSecondsRemaining % 60
-
-    return `${minutes}m ${seconds}s`
+  const estimateTimeRemaining = (total: number, current: number, start: number) => {
+    if (current === 0) return "..."
+    const elapsed = (Date.now() - start) / 1000
+    const rate = elapsed / current
+    const remaining = Math.round(rate * (total - current))
+    const m = Math.floor(remaining / 60)
+    const s = remaining % 60
+    return `${m}m ${s}s`
   }
 
   const fetchTotalCount = async (filter: any) => {
@@ -106,12 +87,14 @@
   const updateQuery = async () => {
     if (!selectedQueries) return
     loading = true
-    // Reset estimate variables. This is mainly for the case where we start a 2nd download.
+
+    // Reset Stats
     startTime = Date.now()
     estimatedTime = `${capital($_("calculating"))}...`
     requestCount = 0
     totalCount = 0
-    let filterValue = includeChildren
+
+    const filterValue = includeChildren
       ? {
           ancestor: { uuids: orgUnit?.uuid, from_date: $date, to_date: null },
           from_date: $date,
@@ -121,26 +104,55 @@
 
     if (includeChildren) {
       totalCount = await fetchTotalCount(filterValue)
-      startTime = Date.now()
+      startTime = Date.now() // Reset start time after count fetch for better accuracy
       estimatedTime = estimateTimeRemaining(totalCount, requestCount, startTime)
     }
+
+    const queryFields = selectedQueries
+      .map((q) => {
+        if (!q.mainQuery) return []
+
+        // The field fragment is now pre-calculated in mainQueries.ts (e.g., "job_function { name }")
+        const fieldStrings = q.chosenFields.map((f: Field) => f.query)
+
+        // Case 1: Root Level (Org Units)
+        if (q.mainQuery.operation === "org_units") {
+          return fieldStrings
+        }
+
+        // Case 2: Special Nested "itusers"
+        if (q.mainQuery.operation === "itusers") {
+          return {
+            [`it: engagements(filter: { from_date: $date })`]: [
+              {
+                [`itusers(filter: { from_date: $date })`]: [
+                  {
+                    current: fieldStrings,
+                  },
+                ],
+              },
+            ],
+          }
+        }
+
+        // Case 3: Standard subqueries (Engagements, Associations, etc)
+        return {
+          [`${q.mainQuery.operation}(filter: { from_date: $date, to_date: null })`]: [
+            // Always fetch the link back to parent UUID for the CSV filter logic
+            ...(q.mainQuery.operation === "related_units" ? [] : ["org_unit_uuid"]),
+            ...fieldStrings,
+          ],
+        }
+      })
+      .flat()
 
     const gqlQuery = query([
       {
         operation: "page: org_units",
         variables: {
-          filter: {
-            value: filterValue,
-            type: "OrganisationUnitFilter",
-          },
-          limit: {
-            value: null,
-            type: "int",
-          },
-          cursor: {
-            value: null,
-            type: "Cursor",
-          },
+          filter: { value: filterValue, type: "OrganisationUnitFilter" },
+          limit: { value: null, type: "int" },
+          cursor: { value: null, type: "Cursor" },
         },
         fields: [
           {
@@ -148,33 +160,7 @@
               {
                 operation: "current",
                 variables: { date: { name: "at", value: $date, type: "DateTime" } },
-                fields: [
-                  "uuid",
-                  ...selectedQueries
-                    .map((query) => {
-                      // If mainQuery.operation is not org_units, we insert the operation e.g. `engagements {...}`
-                      if (
-                        query.mainQuery &&
-                        query.mainQuery.operation !== "org_units"
-                      ) {
-                        return {
-                          [`${query.mainQuery.operation}(filter: { from_date: $date, to_date: null })`]:
-                            [
-                              ...(query.mainQuery.operation === "related_units"
-                                ? []
-                                : ["org_unit_uuid"]),
-                              ...query.chosenFields.map(
-                                (field) => field.subString ?? ""
-                              ),
-                            ],
-                        }
-                        // If operation === org_units, we just add the fields directly - if !mainQuery -> skip
-                      } else {
-                        return query.chosenFields.map((field) => field.subString ?? "")
-                      }
-                    })
-                    .flat(),
-                ],
+                fields: ["uuid", ...queryFields],
               },
             ],
             page_info: ["next_cursor"],
@@ -182,71 +168,55 @@
         ],
       },
     ])
-    data = await getData(gqlQuery)
+    try {
+      data = await getData(gqlQuery)
+    } catch (e: any) {
+      throw e
+    }
     loading = false
   }
 
-  const getData = async (generatedQuery: {
-    query: string
-    variables: { filter: object }
-  }) => {
+  const getData = async (generatedQuery: any) => {
     if (!selectedQueries || !generatedQuery) return
 
-    if (controller) {
-      controller.abort()
-    }
+    if (controller) controller.abort()
     controller = new AbortController()
-    const abortSignal = controller.signal
 
     const res = await paginateQuery(
       generatedQuery.query,
       generatedQuery.variables,
-      // Limit
-      1,
-      (currentRequestCount) => {
-        requestCount = currentRequestCount
+      1, // Limit
+      (count) => {
+        requestCount = count
       },
-      abortSignal
+      controller.signal
     )
-
-    if (abortSignal.aborted) {
+    if (controller.signal.aborted) {
       throw new Error("CSV download was aborted")
     }
-
-    const results = []
-    for (const outer of res) {
-      results.push(outer.current)
-    }
-    return results
+    return res.map((r: any) => r.current)
   }
 
   const clearFilter = () => {
     data = null
     orgUnit = undefined
-    selectedQueries = [
-      {
-        mainQuery: undefined,
-        chosenFields: [],
-      },
-    ]
+    selectedQueries = [{ mainQuery: undefined, chosenFields: [] }]
     removed++
   }
+
   const handleDownloadClick = async (event: MouseEvent): Promise<void> => {
     try {
       await debounce(updateQuery)
+      // New downloadHandler (browser-safe) automatically handles the CSV generation
       downloadHandler(event, data, selectedQueries, filename)
     } catch (warn) {
-      // Catch if the csv download is aborted
       console.log(warn)
       $warning = { message: capital($_("csv_warning")) }
     }
   }
 
-  const updateEstimatedTime = () => {
-    estimatedTime = estimateTimeRemaining(totalCount, requestCount, startTime)
-  }
   $: if (requestCount) {
-    updateEstimatedTime()
+    estimatedTime = estimateTimeRemaining(totalCount, requestCount, startTime)
   }
 </script>
 
@@ -255,6 +225,7 @@
 <div class="px-12 pt-6">
   <h1 class="mb-4">{capital($_("insights"))}</h1>
 </div>
+
 <div class="px-12 pt-6">
   <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded p-6 mb-4">
     <div>
@@ -264,6 +235,7 @@
         bind:value={orgUnit}
         required={true}
       />
+
       <div class="form-control pb-3">
         <div class="pb-1 text-secondary">
           <label for="includeChildren" class="text-sm text-secondary pb-1">
@@ -284,7 +256,6 @@
               class="toggle bg-secondary hover:bg-secondary"
               bind:checked={includeChildren}
             />
-
             <button
               on:click={() => {
                 includeChildren = true
@@ -296,9 +267,11 @@
           </div>
         </div>
       </div>
+
       {#key removed}
         {#each selectedQueries as querySet, index}
           <Selects {mainQueries} {querySet} {index} bind:data={selectedQueries} />
+
           {#if selectedQueries.length > 1}
             <CircleButton
               on:click={() => removeSelect(index)}
@@ -306,6 +279,7 @@
               extraClasses="mb-4"
             />
           {/if}
+
           {#if index === selectedQueries.length - 1}
             <CircleButton
               on:click={() => addNewSelect()}
@@ -318,27 +292,25 @@
         {/each}
       {/key}
     </div>
-    <Button type="button" title={capital($_("clear"))} on:click={() => clearFilter()} />
+
+    <Button type="button" title={capital($_("clear"))} on:click={clearFilter} />
     <div class="divider p-0 m-0 my-2 w-full" />
+
     <Input
       title={capital($_("filename"))}
       id="filename"
       bind:value={filename}
       placeholder={$_("default_filename")}
     />
+
     <Button
       type="button"
       title={capital($_("download_as_csv"))}
       on:click={handleDownloadClick}
-      disabled={selectedQueries.some(
-        (selectedQuery) =>
-          selectedQuery.mainQuery === null || selectedQuery.mainQuery === undefined
-      ) ||
-        selectedQueries[selectedQueries.length - 1].mainQuery === null ||
-        !orgUnit ||
-        loading}
+      disabled={selectedQueries.some((q) => !q.mainQuery) || !orgUnit || loading}
       spinner={loading}
     />
+
     {#if loading && estimatedTime}
       <div class="normal-case font-normal text-base text-base-100">
         <p>{`${capital($_("estimated_time_remaining"))}: ${estimatedTime}`}</p>

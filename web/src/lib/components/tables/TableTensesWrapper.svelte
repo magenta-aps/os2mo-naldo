@@ -10,6 +10,7 @@
   import ClassTable from "$lib/components/tables/ClassTable.svelte"
   import EngagementTable from "$lib/components/tables/EngagementTable.svelte"
   import ItUserTable from "$lib/components/tables/ITUserTable.svelte"
+  import OrgITUserTable from "$lib/components/tables/OrgITUserTable.svelte"
   import OrgUnitTable from "$lib/components/tables/OrgUnitTable.svelte"
   import RelatedUnitsTable from "$lib/components/tables/RelatedUnitsTable.svelte"
 
@@ -70,7 +71,7 @@
           (header) => header.title !== capital($_("ituser", { values: { n: 1 } }))
         )
       }
-      if (table === ItUserTable) {
+      if (table === ItUserTable || table === OrgITUserTable) {
         headers = headers.filter(
           (header) => header.title !== capital($_("engagement", { values: { n: 2 } }))
         )

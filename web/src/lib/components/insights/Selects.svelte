@@ -21,8 +21,8 @@
   title={capital($_("subject"))}
   id={`main-query-${index}`}
   iterable={mainQueries.sort((a, b) =>
-    $_(a.value, { values: { n: a.n } }).toLowerCase() >
-    $_(b.value, { values: { n: b.n } }).toLowerCase()
+    $_(a.label, { values: { n: 2 } }).toLowerCase() >
+    $_(b.label, { values: { n: 2 } }).toLowerCase()
       ? 1
       : -1
   )}

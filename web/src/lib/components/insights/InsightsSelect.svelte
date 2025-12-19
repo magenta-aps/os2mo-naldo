@@ -2,24 +2,24 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
   import SvelteSelect from "svelte-select"
-
-  type Operation = { operation: string; filter: string; value: string; n: number }
+  import type { MainQuery } from "$lib/utils/insights"
 
   export let title: string | undefined = undefined
   export let id: string
-  export let iterable: Operation[]
+  export let iterable: MainQuery[]
 
   export let required = false
   export let placeholder: string = ""
   export let disabled = false
-  export let startValue: Operation | undefined = undefined
-  export let value: Operation | undefined = startValue || undefined
+  export let startValue: MainQuery | undefined = undefined
+  export let value: MainQuery | undefined = startValue || undefined
   export let isClearable: boolean = false
   export let extra_classes = ""
   export let errors: string[] = []
   export let searchable: boolean = false
 
-  const itemId = "value" // Used by the component to differentiate between items
+  // SvelteSelect uses this to identify the object.
+  const itemId = "label"
 
   const floatingConfig = {
     placement: "bottom-start",
@@ -63,16 +63,16 @@
       on:clear
     >
       <div slot="item" let:item class="cursor-pointer">
-        {capital($_(item.value, { values: { n: item.n } }))}
+        {capital($_(item.label, { values: { n: item.n } }))}
       </div>
 
       <div slot="selection" let:selection class="cursor-pointer">
-        {capital($_(selection.value, { values: { n: selection.n } }))}
+        {capital($_(selection.label, { values: { n: selection.n } }))}
       </div>
     </SvelteSelect>
   </div>
   {#if value}
-    <input hidden {id} name={id} bind:value={value.value} />
+    <input hidden {id} name={id} bind:value={value.label} />
   {/if}
   {#each errors as error}
     {#if error === "required"}
