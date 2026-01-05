@@ -84,13 +84,11 @@
       </td>
       <td class="text-sm p-4">{employee.nickname}</td>
       <ValidityTableCell validity={employee.validity} />
-      {#if env.PUBLIC_AUDITLOG}
-        <td>
-          <a href={`${base}/auditlog/${employee.uuid}`}>
-            <Icon icon={historyRounded} width="25" height="25" />
-          </a>
-        </td>
-      {/if}
+      <td>
+        <a href={`${base}/auditlog/${employee.uuid}`}>
+          <Icon icon={historyRounded} width="25" height="25" />
+        </a>
+      </td>
       <td>
         <a href="{base}/employee/{uuid}/edit{formatQueryDates(employee.validity)}">
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />

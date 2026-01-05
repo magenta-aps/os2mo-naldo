@@ -170,13 +170,11 @@
       <td class="text-sm p-4">{manager.manager_type.name}</td>
       <td class="text-sm p-4">{manager.manager_level.name}</td>
       <ValidityTableCell validity={manager.validity} />
-      {#if env.PUBLIC_AUDITLOG}
-        <td>
-          <a href={`${base}/auditlog/${manager.uuid}`}>
-            <Icon icon={historyRounded} width="25" height="25" />
-          </a>
-        </td>
-      {/if}
+      <td>
+        <a href={`${base}/auditlog/${manager.uuid}`}>
+          <Icon icon={historyRounded} width="25" height="25" />
+        </a>
+      </td>
       <td>
         <a
           href="{base}/{$page.url.pathname?.split(

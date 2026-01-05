@@ -163,13 +163,11 @@
         >
       {/if}
       <ValidityTableCell validity={association.validity} />
-      {#if env.PUBLIC_AUDITLOG}
-        <td>
-          <a href={`${base}/auditlog/${association.uuid}`}>
-            <Icon icon={historyRounded} width="25" height="25" />
-          </a>
-        </td>
-      {/if}
+      <td>
+        <a href={`${base}/auditlog/${association.uuid}`}>
+          <Icon icon={historyRounded} width="25" height="25" />
+        </a>
+      </td>
       <td>
         <a
           href="{base}/{$page.url.pathname?.split(

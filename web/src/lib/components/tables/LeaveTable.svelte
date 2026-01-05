@@ -108,13 +108,11 @@
         ).name}
       </td>
       <ValidityTableCell validity={leave.validity} />
-      {#if env.PUBLIC_AUDITLOG}
-        <td>
-          <a href={`${base}/auditlog/${leave.uuid}`}>
-            <Icon icon={historyRounded} width="25" height="25" />
-          </a>
-        </td>
-      {/if}
+      <td>
+        <a href={`${base}/auditlog/${leave.uuid}`}>
+          <Icon icon={historyRounded} width="25" height="25" />
+        </a>
+      </td>
       <td>
         <a
           href="{base}/employee/{uuid}/edit/leave/{leave.uuid}{formatQueryDates(

@@ -97,13 +97,11 @@
         • {`${kle.kle_number[0].user_key} - ${kle.kle_number[0].name}`}
       </td>
       <ValidityTableCell validity={kle.validity} />
-      {#if env.PUBLIC_AUDITLOG}
-        <td>
-          <a href={`${base}/auditlog/${kle.uuid}`}>
-            <Icon icon={historyRounded} width="25" height="25" />
-          </a>
-        </td>
-      {/if}
+      <td>
+        <a href={`${base}/auditlog/${kle.uuid}`}>
+          <Icon icon={historyRounded} width="25" height="25" />
+        </a>
+      </td>
       <td>
         <a
           href="{base}/organisation/{$page.params

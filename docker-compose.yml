@@ -9,7 +9,6 @@ services:
       PUBLIC_DAR_ACCESS_ADDRESSES: "true"
       PUBLIC_SHOW_ADMIN_PANEL: "true"
       PUBLIC_SHOW_INSIGHTS: "true"
-      PUBLIC_AUDITLOG: "true"
       PUBLIC_NAVLINKS: ' 
         [
           {
