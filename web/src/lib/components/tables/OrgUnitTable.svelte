@@ -127,13 +127,11 @@
         </td>
       {/if}
       <ValidityTableCell validity={org_unit.validity} />
-      {#if env.PUBLIC_AUDITLOG}
-        <td>
-          <a href={`${base}/auditlog/${org_unit.uuid}`}>
-            <Icon icon={historyRounded} width="25" height="25" />
-          </a>
-        </td>
-      {/if}
+      <td>
+        <a href={`${base}/auditlog/${org_unit.uuid}`}>
+          <Icon icon={historyRounded} width="25" height="25" />
+        </a>
+      </td>
       <td>
         <a
           href="{base}/organisation/{$page.params.uuid}/edit/unit{formatQueryDates(

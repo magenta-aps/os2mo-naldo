@@ -129,13 +129,11 @@
         >{itassociation.primary ? itassociation.primary?.name : ""}</td
       >
       <ValidityTableCell validity={itassociation.validity} />
-      {#if env.PUBLIC_AUDITLOG}
-        <td>
-          <a href={`${base}/auditlog/${itassociation.uuid}`}>
-            <Icon icon={historyRounded} width="25" height="25" />
-          </a>
-        </td>
-      {/if}
+      <td>
+        <a href={`${base}/auditlog/${itassociation.uuid}`}>
+          <Icon icon={historyRounded} width="25" height="25" />
+        </a>
+      </td>
       <td>
         <a
           href="{base}/employee/{uuid}/edit/itassociation/{itassociation.uuid}{formatQueryDates(

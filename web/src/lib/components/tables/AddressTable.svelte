@@ -137,13 +137,11 @@
         >{address.visibility ? address.visibility.name : capital($_("not_set"))}</td
       >
       <ValidityTableCell validity={address.validity} />
-      {#if env.PUBLIC_AUDITLOG}
-        <td>
-          <a href={`${base}/auditlog/${address.uuid}`}>
-            <Icon icon={historyRounded} width="25" height="25" />
-          </a>
-        </td>
-      {/if}
+      <td>
+        <a href={`${base}/auditlog/${address.uuid}`}>
+          <Icon icon={historyRounded} width="25" height="25" />
+        </a>
+      </td>
       <td>
         <a
           href="{base}/{$page.url.pathname?.split(

@@ -55,11 +55,6 @@
       )
     }
 
-    if (!env.PUBLIC_AUDITLOG && table !== RelatedUnitsTable) {
-      // If we don't want to show Auditlog-button, remove one of the empty headers. Otherwise the table looks weird
-      headers.pop()
-    }
-
     if (!env.PUBLIC_SHOW_ITUSER_CONNECTIONS) {
       if (table === EngagementTable) {
         headers = headers.filter(
