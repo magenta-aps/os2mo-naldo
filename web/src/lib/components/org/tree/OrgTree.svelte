@@ -5,7 +5,6 @@
   import { graphQLClient } from "$lib/http/client"
   import { fetchParentTree } from "$lib/http/parentTree"
   import Node from "$lib/components/org/tree/Node.svelte"
-  import type { FacetValidities } from "$lib/utils/classes"
   import { success } from "$lib/stores/alert"
   import { date } from "$lib/stores/date"
   import { globalNavigation } from "$lib/stores/navigation"
@@ -21,7 +20,6 @@
   import { getClasses } from "$lib/http/getClasses"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import Select from "$lib/components/forms/shared/Select.svelte"
-  import { onMount } from "svelte"
 
   gql`
     query OrgUnitsWithChildren($fromDate: DateTime) {
@@ -72,18 +70,19 @@
   const fetchOrgTree = async (
     fromDate: string,
     childUuid?: string | null,
-    orgUnitHierarchyUuid?: string | null
+    orgUnitHierarchyUuid?: string | null,
+    signal?: AbortSignal
   ) => {
     // Breadcrumbs
     let res: OrgUnitsWithChildrenQuery | OrgUnitsWithFilteredChildrenQuery
 
     if (orgUnitHierarchyUuid) {
-      res = await graphQLClient().request(OrgUnitsWithFilteredChildrenDocument, {
+      res = await graphQLClient(signal).request(OrgUnitsWithFilteredChildrenDocument, {
         fromDate: fromDate,
         orgUnitHierarchies: orgUnitHierarchyUuid,
       })
     } else {
-      res = await graphQLClient().request(OrgUnitsWithChildrenDocument, {
+      res = await graphQLClient(signal).request(OrgUnitsWithChildrenDocument, {
         fromDate: fromDate,
       })
     }
@@ -115,44 +114,96 @@
     user_key: null,
   }
 
-  let hierarchies: FacetValidities[]
+  // --- STATE ---
+  let hierarchyClasses: any[] = []
   let selectedHierarchy = brutto
-  let hierarchyClasses: any = []
-  let refreshableOrgTree: Promise<OrgTreeItem[]>
+  let refreshableOrgTree: Promise<OrgTreeItem[]> = Promise.resolve([]) // Start empty
 
-  onMount(async () => {
-    hierarchies = await getClasses({
-      currentDate: $date,
-      orgUuid: null,
-      facetUserKeys: ["org_unit_hierarchy"],
-    })
-    hierarchyClasses =
-      filterClassesByFacetUserKey(hierarchies, "org_unit_hierarchy")?.flat() ?? []
+  // --- INTERNAL TRACKING ---
+  let cachedDate: string | null = null
+  let lastFetchSignature = ""
+  let abortController: AbortController
 
-    const storedUuid = $orgUnitHierarchyStore
-    selectedHierarchy =
-      [brutto, ...hierarchyClasses].find((h) => h.uuid === storedUuid) ?? brutto
-
-    orgUnitHierarchyStore.set(selectedHierarchy.uuid)
-    refreshableOrgTree = fetchOrgTree($date, null, $orgUnitHierarchyStore)
-  })
-
-  $: if ($success?.type === "organisation") {
-    refreshableOrgTree = fetchOrgTree($date, $success.uuid, selectedHierarchy.uuid)
+  // Only runs when Date changes.
+  $: if ($date && $date !== cachedDate) {
+    ;(async () => {
+      try {
+        const res = await getClasses({
+          currentDate: $date,
+          orgUuid: null,
+          facetUserKeys: ["org_unit_hierarchy"],
+        })
+        hierarchyClasses =
+          filterClassesByFacetUserKey(res, "org_unit_hierarchy")?.flat() ?? []
+        cachedDate = $date
+      } catch (e) {
+        console.error(e)
+      }
+    })()
   }
 
-  $: if ($globalNavigation || $date) {
-    refreshableOrgTree = fetchOrgTree($date, $globalNavigation, selectedHierarchy.uuid)
+  // We calculate the target UUID here.
+  $: calculatedTarget =
+    $success?.type === "organisation" && $success.uuid
+      ? $success.uuid
+      : $globalNavigation
+
+  // We calculate the hierarchy object based on the store.
+  // If the store is invalid, this safely falls back to 'brutto'.
+  // We DO NOT write to the store here (prevents loops).
+  $: validHierarchy =
+    [brutto, ...hierarchyClasses].find((h) => h.uuid === $orgUnitHierarchyStore) ??
+    brutto
+
+  // Visual Sync: Update the UI dropdown to match our validated logic
+  $: if (selectedHierarchy?.uuid !== validHierarchy.uuid) {
+    selectedHierarchy = validHierarchy
+  }
+
+  // This is the ONLY place that fetches the tree.
+  // It watches our "Cleaned" variables: 'calculatedTarget' and 'validHierarchy'.
+  $: {
+    // Create a signature of the "Effective" request
+    const signature = JSON.stringify({
+      d: $date,
+      t: calculatedTarget,
+      h: validHierarchy.uuid,
+    })
+
+    // This is the guard, to avoid multiple fetches.
+    if (signature !== lastFetchSignature && $date) {
+      lastFetchSignature = signature
+
+      // Cancel previous
+      if (abortController) abortController.abort()
+      abortController = new AbortController()
+
+      // Fetch
+      refreshableOrgTree = fetchOrgTree(
+        $date,
+        calculatedTarget,
+        validHierarchy.uuid,
+        abortController.signal
+      )
+    }
+  }
+
+  const handleUserChange = (e: CustomEvent) => {
+    const newUuid = e.detail?.uuid ?? null
+
+    // LOOP PROTECTION: Only update store if it's ACTUALLY different
+    if ($orgUnitHierarchyStore !== newUuid) {
+      orgUnitHierarchyStore.set(newUuid)
+    }
   }
 </script>
 
-{#if hierarchyClasses && hierarchyClasses.length}
+{#if hierarchyClasses.length}
   <Select
     id="org-unit-hierarchy"
-    bind:value={selectedHierarchy}
-    startValue={brutto}
+    value={selectedHierarchy}
     iterable={[brutto, ...hierarchyClasses]}
-    on:change={() => orgUnitHierarchyStore.set(selectedHierarchy?.uuid)}
+    on:change={handleUserChange}
   />
 {/if}
 
