@@ -5,7 +5,6 @@
   import { graphQLClient } from "$lib/http/client"
   import { fetchParentTree } from "$lib/http/parentTree"
   import Node from "$lib/components/org/tree/Node.svelte"
-  import type { FacetValidities } from "$lib/utils/classes"
   import { success } from "$lib/stores/alert"
   import { date } from "$lib/stores/date"
   import { globalNavigation } from "$lib/stores/navigation"
@@ -21,7 +20,6 @@
   import { getClasses } from "$lib/http/getClasses"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import Select from "$lib/components/forms/shared/Select.svelte"
-  import { onMount } from "svelte"
 
   gql`
     query OrgUnitsWithChildren($fromDate: DateTime) {
@@ -115,34 +113,39 @@
     user_key: null,
   }
 
-  let hierarchies: FacetValidities[]
-  let selectedHierarchy = brutto
+  let selectedHierarchy: {
+    uuid: string | null
+    name: string
+    user_key: string | null
+  } = brutto
   let hierarchyClasses: any = []
   let refreshableOrgTree: Promise<OrgTreeItem[]>
 
-  onMount(async () => {
-    hierarchies = await getClasses({
-      currentDate: $date,
-      orgUuid: null,
-      facetUserKeys: ["org_unit_hierarchy"],
-    })
-    hierarchyClasses =
-      filterClassesByFacetUserKey(hierarchies, "org_unit_hierarchy")?.flat() ?? []
+  $: if ($date) {
+    refreshableOrgTree = (async () => {
+      const hierarchyResponse = await getClasses({
+        currentDate: $date,
+        orgUuid: null,
+        facetUserKeys: ["org_unit_hierarchy"],
+      })
 
-    const storedUuid = $orgUnitHierarchyStore
-    selectedHierarchy =
-      [brutto, ...hierarchyClasses].find((h) => h.uuid === storedUuid) ?? brutto
+      // Create local variables to avoid infinte reactive loop
+      const localClasses =
+        filterClassesByFacetUserKey(hierarchyResponse, "org_unit_hierarchy")?.flat() ??
+        []
 
-    orgUnitHierarchyStore.set(selectedHierarchy.uuid)
-    refreshableOrgTree = fetchOrgTree($date, null, $orgUnitHierarchyStore)
-  })
+      const storedUuid = $orgUnitHierarchyStore
+      const localSelection =
+        [brutto, ...localClasses].find((h) => h.uuid === storedUuid) ?? brutto
 
-  $: if ($success?.type === "organisation") {
-    refreshableOrgTree = fetchOrgTree($date, $success.uuid, selectedHierarchy.uuid)
-  }
+      hierarchyClasses = localClasses
+      selectedHierarchy = localSelection
 
-  $: if ($globalNavigation || $date) {
-    refreshableOrgTree = fetchOrgTree($date, $globalNavigation, selectedHierarchy.uuid)
+      const targetUuid =
+        $success?.type === "organisation" ? $success.uuid : $globalNavigation
+
+      return await fetchOrgTree($date, targetUuid, localSelection?.uuid)
+    })()
   }
 </script>
 
