@@ -32,23 +32,27 @@
   const filter: RoleBindingFilter = isOrg
     ? { org_unit: { uuids: [uuid] }, ...filterTenseToValidity(tense, $date) }
     : {
-        ituser: { employee: { uuids: [uuid] } },
+        ituser: { employee: { uuids: [uuid] }, ...filterTenseToValidity(tense, $date) },
         ...filterTenseToValidity(tense, $date),
       }
 
   gql`
-    query Rolebindings($filter: RoleBindingFilter!) {
+    query Rolebindings(
+      $filter: RoleBindingFilter!
+      $fromDate: DateTime
+      $toDate: DateTime
+    ) {
       rolebindings(filter: $filter) {
         objects {
           validities {
             uuid
-            ituser {
+            ituser(filter: { from_date: $fromDate, to_date: $toDate }) {
               user_key
               itsystem {
                 name
               }
             }
-            role {
+            role(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
             }
             validity {
@@ -69,6 +73,7 @@
   onMount(async () => {
     const res = await graphQLClient().request(RolebindingsDocument, {
       filter: filter,
+      ...tenseToValidity(tense, $date),
     })
 
     const rolebindings: Rolebinding = []
