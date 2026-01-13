@@ -6,6 +6,7 @@
   import { base } from "$app/paths"
   import Icon from "@iconify/svelte"
   import checkCircleOutlineRounded from "@iconify/icons-material-symbols/check-circle-outline-rounded"
+  import { updateGlobalNavigation } from "$lib/stores/navigation"
 
   const startTimeout = () => {
     setTimeout(
@@ -22,7 +23,10 @@
     ) {
       setTimeout(() => {
         if ($success.uuid) {
-          setTimeout(() => goto(`${base}/${$success.type}/${$success.uuid}`), 200)
+          setTimeout(() => {
+            goto(`${base}/${$success.type}/${$success.uuid}`)
+            updateGlobalNavigation($success.uuid)
+          }, 200)
         } else if ($success.type == "admin") {
           setTimeout(() => goto(`${base}/${$success.type}`), 200)
         } else {

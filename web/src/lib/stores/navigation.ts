@@ -2,9 +2,9 @@ import { writable, get } from "svelte/store"
 
 const globalNavigation = writable("")
 
-const updateGlobalNavigation = (uuid: string) => {
+const updateGlobalNavigation = (uuid: string | null | undefined) => {
   const current = get(globalNavigation)
-  if (current !== uuid) {
+  if (uuid && current !== uuid) {
     globalNavigation.set(uuid)
   }
 }
