@@ -55,6 +55,7 @@
 		"name": {
 			"address_property": "adresseegenskab",
 			"association_type": "tilknytningsrolle",
+			"confederation": "hovedorganisation",
 			"employee_address_type": "adressetyper for medarbejdere",
 			"engagement_job_function": "stillingsbetegnelse",
 			"engagement_type": "engagementstype",
@@ -64,10 +65,6 @@
 			"manager_address_type": "adressetyper for ledere",
 			"manager_level": "lederniveau",
 			"manager_type": "ledertype",
-			"medarbejder_organisation": "medarbejder organisation",
-			"medarbejder_under_organisation": "medarbejder underorganisation",
-			"medarbejder_organisation3": "medarbejder organisation3",
-			"medarbejder_under_organisation3": "medarbejder underorganisation3",
 			"org_unit_address_type": "adressetyper for enheder",
 			"org_unit_hierarchy": "organisationshierarki",
 			"org_unit_level": "enhedsniveau",
@@ -77,11 +74,13 @@
 			"role": "rolle",
 			"role_type": "rolletype",
 			"time_planning": "tidsregistrering",
+			"trade_union": "faglig organisation",
 			"visibility": "synlighed"
 		},
 		"description": {
 			"address_property": "adresseegenskab",
 			"association_type": "En Tilknytningsrolle definerer et forhold eller en relation mellem en person og en enhed. Der er modsat Engagementet ikke tale om en ansættelse, men fx om en funktion, som en person udfylder i forbindelse med et midlertidigt projekt i en anden organisationsenhed, eller i egenskab af sin rolle som fagforeningsrepræsentant, fx Arbejdsmiljørepræsentant eller Ledelsesrepræsentant.",
+			"confederation": "Denne beskrivelse er ikke blevet oversat endnu.",
 			"employee_address_type": "Repræsenterer beskrivelse af de forskellige kontaktformer, der er tilgængelige for medarbejdere.",
 			"engagement_job_function": "Er en overenskomstmæssig eller funktionsbeskrivende titel, der beskriver en ansættelse.",
 			"engagement_type": "Beskriver et forhold eller en relation mellem en person og en organisationsenhed. Engagementstype kan også bruges til at beskrive den rolle, en person har i en organisation, fx en ansættelsestype.",
@@ -91,10 +90,6 @@
 			"manager_address_type": "Repræsenterer beskrivelse af de forskellige kontaktformer, der er tilgængelige for ledere.",
 			"manager_level": "Et lederniveau beskriver, hvilket niveau en leder befinder sig på i ledelseshierarkiet.",
 			"manager_type": "Ledertype beskriver lederens funktion i organisationen.",
-			"medarbejder_organisation": "medarbejder organisation",
-			"medarbejder_under_organisation": "medarbejder underorganisation",
-			"medarbejder_organisation3": "medarbejder organisation3",
-			"medarbejder_under_organisation3": "medarbejder underorganisation3",
 			"org_unit_address_type": "Repræsenterer beskrivelse af de forskellige kontaktformer, der er tilgængelige for organisationsenheder",
 			"org_unit_hierarchy": "Benyttes til at benævne et organisationshierarki, fx. Linjeorganisation, Sikkerhedsorganisation, Lønorganisation, m.fl.",
 			"org_unit_level": "Et enhedsniveau beskriver, hvilket niveau en enhed befinder sig på i organisationshierarkiet.",
@@ -104,6 +99,7 @@
 			"role": "En Rolle angiver, hvilke rettigheder, en MO-bruger kan have i MO. Man bør ikke ændre i dem her. Hvis man vil have udvidet sine roller, kontakt da support@magenta.dk.",
 			"role_type": "Benyttes ikke pt. i MO, men findes. En Rolletype definerer et forhold mellem en person og en organisatorisk enhed. Der er tale om en funktion, som hverken er et Engagement eller en Tilknytning og som har behov for udspecificering afhængigt af den enkelte organisations behov.",
 			"time_planning": "Tidsregistrering benyttes pt. kun af organisationer, der benytter lønsystemet SD-Løn. Der bør ikke ændres eller tilføjes noget uden forudgående aftale, jf. support@magenta.dk.",
+			"trade_union": "Denne beskrivelse er ikke blevet oversat endnu.",
 			"visibility": "Angiver, hvorvidt en adresse skal beholdes internt i MO, må udstilles internt til egne systemer, fx et intranet, eller om den må udstilles offentligt, fx på internettet. Bemærk, at de integrationer, som henter data fra MO og udstiller dem i andre systemer, skal have indlejret denne semantik, før de overholder den. Ændringer til eksisterende synligheder og tilføjelser af nye bør aftales, jf. support@magenta.dk."
 		}
 	},
