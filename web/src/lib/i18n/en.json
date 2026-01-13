@@ -55,6 +55,7 @@
 		"name": {
 			"address_property": "address property",
 			"association_type": "association type",
+			"confederation": "confederation",
 			"employee_address_type": "address types for employees",
 			"engagement_job_function": "job title",
 			"engagement_type": "engagement type",
@@ -64,10 +65,6 @@
 			"manager_address_type": "address types for managers",
 			"manager_level": "manager level",
 			"manager_type": "manager type",
-			"medarbejder_organisation": "medarbejder organisation",
-			"medarbejder_under_organisation": "medarbejder underorganisation",
-			"medarbejder_organisation3": "medarbejder organisation3",
-			"medarbejder_under_organisation3": "medarbejder underorganisation3",
 			"org_unit_address_type": "address types for units",
 			"org_unit_hierarchy": "org unit hierarchy",
 			"org_unit_level": "org unit level",
@@ -77,11 +74,13 @@
 			"role": "role",
 			"role_type": "role type",
 			"time_planning": "time planning",
+			"trade_union": "trade union",
 			"visibility": "visibility"
 		},
 		"description": {
 			"address_property": "This description hasn't been translated yet.",
 			"association_type": "An affiliation type defines a relationship or connection between a person and a unit. Unlike Engagement, it does not involve employment, but rather a function that a person fulfills in connection with a temporary project in another organizational unit, or in their capacity as a union representative, such as a Health and Safety Representative or a Management Representative.",
+			"confederation": "This description hasn't been translated yet.",
 			"employee_address_type": "Represents the description of the various contact forms available for employees.",
 			"engagement_job_function": "A job title is a contractual or functional title that describes an employment.",
 			"engagement_type": "Describes a relationship or connection between a person and an organizational unit. Engagement type can also be used to describe the role a person has in an organization, such as a type of employment.",
@@ -91,10 +90,6 @@
 			"manager_address_type": "Represents the description of the various contact forms available for managers.",
 			"manager_level": "A manager level describes the level at which a manager is positioned within the management hierarchy.",
 			"manager_type": "Manager type describes the function of the manager within the organization.",
-			"medarbejder_organisation": "This description hasn't been translated yet.",
-			"medarbejder_under_organisation": "This description hasn't been translated yet.",
-			"medarbejder_organisation3": "This description hasn't been translated yet.",
-			"medarbejder_under_organisation3": "This description hasn't been translated yet.",
 			"org_unit_address_type": "Represents the description of the various contact forms available for organizational units.",
 			"org_unit_hierarchy": "This description hasn't been translated yet.",
 			"org_unit_level": "An org unit level describes the level at which an org unit is positioned within the organizational hierarchy.",
@@ -104,6 +99,7 @@
 			"role": "A Role indicates the rights an MO user can have in MO. These should not be changed. If you want to expand your roles, please contact support@magenta.dk.",
 			"role_type": "Not currently used in MO, but exists. A role type defines a relationship between a person and an organizational unit. It is a function that is neither an Engagement nor an Affiliation and needs specification depending on the individual organization’s needs.",
 			"time_planning": "Time registration is currently used only by organizations that use the SD Payroll system. Nothing should be changed or added without prior agreement, see support@magenta.dk.",
+			"trade_union": "This description hasn't been translated yet.",
 			"visibility": "Indicates whether an address should be kept internal within MO, can be displayed internally to own systems, such as an intranet, or can be displayed publicly, such as on the internet. Note that the integrations that retrieve data from MO and display it in other systems must embed this semantics to comply with it. Changes to existing visibilities and additions of new ones should be agreed upon, see support@magenta.dk."
 		}
 	},
