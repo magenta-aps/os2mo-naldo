@@ -7,29 +7,57 @@
   import Button from "$lib/components/shared/Button.svelte"
   import CircleButton from "$lib/components/shared/CircleButton.svelte"
   import { enhance } from "$app/forms"
-  import { goto } from "$app/navigation"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
+  import type { FacetValidities } from "$lib/utils/classes"
   import type { SubmitFunction } from "./$types"
-  import {
-    CreateRoleBindingDocument,
-    ItUserAndFacetDocument,
-    GetItSystemRolesDocument,
-  } from "./query.generated"
+  import { CreateRoleBindingDocument, ItUsersDocument } from "./query.generated"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
-  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
+  import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import { formatITUserITSystemName, type UnpackedClass } from "$lib/utils/helpers"
-  import { getMinMaxValidities } from "$lib/utils/validities"
+  import { getItuserValidities } from "$lib/http/getValidities"
+  import { getRoleClasses } from "$lib/http/getClasses"
   import type { RoleBindingCreateInput } from "$lib/graphql/types"
-  import Icon from "@iconify/svelte"
   import removeRounded from "@iconify/icons-material-symbols/remove-rounded"
   import addRounded from "@iconify/icons-material-symbols/add-rounded"
 
+  gql`
+    query ItUsers($uuid: [UUID!]!, $fromDate: DateTime!) {
+      employees(filter: { uuids: $uuid }) {
+        objects {
+          validities {
+            itusers(filter: { from_date: $fromDate }) {
+              user_key
+              uuid
+              itsystem(filter: { from_date: $fromDate }) {
+                uuid
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+
+    mutation CreateRoleBinding($input: [RoleBindingCreateInput!]!, $date: DateTime!) {
+      rolebindings_create(input: $input) {
+        current(at: $date) {
+          ituser(filter: { from_date: $date }) {
+            person {
+              name
+            }
+          }
+        }
+      }
+    }
+  `
+
+  let startDate: string = $date
   let toDate: string
 
   let itUser: {
@@ -39,67 +67,12 @@
       uuid: string
     }
   }
-  let itSystemRoles: UnpackedClass | undefined
+  let itUserOptions: any[] = []
 
   const fromDate = field("from", "", [required()])
+  const itUserField = field("it_user", "", [required()])
   const roleField = field("role", "", [required()])
-  const svelteForm = form(fromDate, roleField)
-
-  gql`
-    query ITUserAndFacet($uuid: [UUID!]) {
-      employees(filter: { uuids: $uuid, from_date: null, to_date: null }) {
-        objects {
-          current {
-            itusers {
-              itsystem {
-                name
-                user_key
-                uuid
-              }
-              uuid
-              user_key
-              validity {
-                from
-                to
-              }
-            }
-          }
-          validities {
-            validity {
-              from
-              to
-            }
-          }
-        }
-      }
-    }
-
-    query GetITSystemRoles($itSystemUuid: [UUID!]) {
-      classes(
-        filter: { facet: { user_keys: "role" }, it_system: { uuids: $itSystemUuid } }
-      ) {
-        objects {
-          objects {
-            uuid
-            user_key
-            name
-          }
-        }
-      }
-    }
-
-    mutation CreateRoleBinding($input: [RoleBindingCreateInput!]!, $date: DateTime!) {
-      rolebindings_create(input: $input) {
-        current(at: $date) {
-          ituser {
-            person {
-              name
-            }
-          }
-        }
-      }
-    }
-  `
+  const svelteForm = form(fromDate, itUserField, roleField)
 
   const handler: SubmitFunction =
     () =>
@@ -133,15 +106,6 @@
       }
     }
 
-  const fetchItSystemRoles = async (itSystemUuid: string | undefined | null) => {
-    const res = await graphQLClient().request(GetItSystemRolesDocument, {
-      itSystemUuid: itSystemUuid,
-    })
-    itSystemRoles = res.classes?.objects
-      .map((cls) => cls.objects[0])
-      .sort((a, b) => (a.name > b.name ? 1 : -1))
-  }
-
   let rolebindings: RoleBindingCreateInput[] = [
     {
       ituser: "",
@@ -162,6 +126,56 @@
   }
   const removeRolebinding = (index: number) => {
     rolebindings = rolebindings.filter((_, i) => i !== index)
+  }
+
+  // Logic for updating datepicker intervals
+  let validities: {
+    from: string | undefined | null
+    to: string | undefined | null
+  } = { from: null, to: null }
+  $: {
+    ;(async () => {
+      if ($page.params.uuid && startDate) {
+        const itUserResponse = await graphQLClient().request(ItUsersDocument, {
+          uuid: $page.params.uuid,
+          fromDate: startDate,
+        })
+        itUserOptions =
+          formatITUserITSystemName(
+            itUserResponse.employees.objects[0]?.validities?.flatMap(
+              (v) => v.itusers ?? []
+            )
+          ) ?? []
+      }
+    })()
+  }
+  let facets: FacetValidities[]
+  let abortController: AbortController
+  $: {
+    // Abort the previous request if a new one is about to start
+    if (abortController) abortController.abort()
+    abortController = new AbortController()
+
+    // Make sure `currentDate` isn't sent if startDate is null.
+    const params = {
+      fromDate: startDate,
+      itSystem: itUser?.itsystem.uuid,
+    }
+
+    ;(async () => {
+      validities = itUser?.uuid
+        ? await getItuserValidities(itUser?.uuid)
+        : { from: null, to: null }
+      if (itUser?.uuid) {
+        try {
+          facets = await getRoleClasses(params, abortController.signal)
+        } catch (err: any) {
+          if (err.name !== "AbortError") {
+            console.error("Request failed:", err)
+          }
+        }
+      }
+    })()
   }
 </script>
 
@@ -184,122 +198,98 @@
 </div>
 
 <div class="divider p-0 m-0 mb-4 w-full" />
-
-{#await graphQLClient().request(ItUserAndFacetDocument, { uuid: $page.params.uuid })}
-  <div class="mx-6">
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
-      <div class="p-8">
-        <div class="flex flex-row gap-6">
-          <Skeleton extra_classes="basis-1/2" />
-          <Skeleton extra_classes="basis-1/2" />
-        </div>
-        <div class="flex flex-row gap-6">
-          <Skeleton extra_classes="basis-1/2" />
-          <Skeleton extra_classes="basis-1/2" />
-        </div>
-      </div>
-    </div>
-  </div>
-{:then data}
-  {@const validities = getMinMaxValidities(data.employees.objects[0].current?.itusers)}
-  {@const itUsers = formatITUserITSystemName(
-    data.employees.objects[0].current?.itusers
-  )}
-
-  <form method="post" class="mx-6" use:enhance={handler}>
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
-      <div class="p-8">
-        <div class="flex flex-row gap-6">
-          <DateInput
-            startValue={$date}
-            bind:value={$fromDate.value}
-            errors={$fromDate.errors}
-            title={capital($_("date.start_date"))}
-            id="from"
-            min={validities.from}
-            max={toDate ? toDate : validities.to}
-            required={true}
-          />
-          <DateInput
-            bind:value={toDate}
-            title={capital($_("date.end_date"))}
-            id="to"
-            min={$fromDate.value ? $fromDate.value : validities.from}
-            max={validities.to}
-          />
-        </div>
-        <Select
-          title={capital($_("ituser", { values: { n: 1 } }))}
-          id="it-user-uuid"
-          bind:value={itUser}
-          iterable={itUsers}
-          on:change={() => {
-            fetchItSystemRoles(itUser.itsystem.uuid)
-          }}
+<form method="post" class="mx-6" use:enhance={handler}>
+  <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+    <div class="p-8">
+      <div class="flex flex-row gap-6">
+        <DateInput
+          bind:value={startDate}
+          bind:validationValue={$fromDate.value}
+          errors={$fromDate.errors}
+          title={capital($_("date.start_date"))}
+          id="from"
+          min={validities.from}
+          max={toDate ? toDate : validities.to}
           required={true}
-          extra_classes="basis-1/2"
         />
-        {#each rolebindings as rolebinding, index}
-          {#if itSystemRoles && itSystemRoles.length}
-            {#key itSystemRoles}
-              <Select
-                title={capital($_("role", { values: { n: 1 } }))}
-                id="role-uuid"
-                bind:value={rolebinding.role}
-                bind:name={$roleField.value}
-                errors={$roleField.errors}
-                iterable={itSystemRoles}
-                extra_classes="basis-1/2"
-                required
-              />
-            {/key}
-          {:else}
+        <DateInput
+          bind:value={toDate}
+          title={capital($_("date.end_date"))}
+          id="to"
+          min={$fromDate.value ? $fromDate.value : validities.from}
+          max={validities.to}
+        />
+      </div>
+      <Select
+        title={capital($_("ituser", { values: { n: 1 } }))}
+        id="it-user-uuid"
+        bind:value={itUser}
+        bind:name={$itUserField.value}
+        errors={$itUserField.errors}
+        iterable={itUserOptions}
+        required={true}
+        extra_classes="basis-1/2"
+      />
+      {#each rolebindings as rolebinding, index}
+        {#if facets && filterClassesByFacetUserKey(facets, "role")?.length}
+          {#key facets}
             <Select
               title={capital($_("role", { values: { n: 1 } }))}
               id="role-uuid"
+              bind:value={rolebinding.role}
               bind:name={$roleField.value}
               errors={$roleField.errors}
+              iterable={filterClassesByFacetUserKey(facets, "role")}
               extra_classes="basis-1/2"
               required
-              disabled
             />
-          {/if}
-          {#if rolebindings.length > 1}
-            <CircleButton
-              on:click={() => {
-                removeRolebinding(index)
-              }}
-              icon={removeRounded}
-            />
-          {/if}
-          {#if index === rolebindings.length - 1}
-            <CircleButton
-              on:click={() => addRolebinding()}
-              icon={addRounded}
-              extraClasses="mb-4"
-            />
-          {:else}
-            <div class="divider p-0 m-0 my-2 w-full" />
-          {/if}
-        {/each}
-      </div>
+          {/key}
+        {:else}
+          <Select
+            title={capital($_("role", { values: { n: 1 } }))}
+            id="role-uuid"
+            bind:name={$roleField.value}
+            errors={$roleField.errors}
+            extra_classes="basis-1/2"
+            required
+            disabled
+          />
+        {/if}
+        {#if rolebindings.length > 1}
+          <CircleButton
+            on:click={() => {
+              removeRolebinding(index)
+            }}
+            icon={removeRounded}
+          />
+        {/if}
+        {#if index === rolebindings.length - 1}
+          <CircleButton
+            on:click={() => addRolebinding()}
+            icon={addRounded}
+            extraClasses="mb-4"
+          />
+        {:else}
+          <div class="divider p-0 m-0 my-2 w-full" />
+        {/if}
+      {/each}
     </div>
-    <div class="flex py-6 gap-4">
-      <Button
-        type="submit"
-        title={capital(
-          $_("create_item", {
-            values: { item: $_("rolebinding", { values: { n: 1 } }) },
-          })
-        )}
-      />
-      <Button
-        type="button"
-        title={capital($_("cancel"))}
-        outline={true}
-        href="{base}/employee/{$page.params.uuid}"
-      />
-    </div>
-    <Error />
-  </form>
-{/await}
+  </div>
+  <div class="flex py-6 gap-4">
+    <Button
+      type="submit"
+      title={capital(
+        $_("create_item", {
+          values: { item: $_("rolebinding", { values: { n: 1 } }) },
+        })
+      )}
+    />
+    <Button
+      type="button"
+      title={capital($_("cancel"))}
+      outline={true}
+      href="{base}/employee/{$page.params.uuid}"
+    />
+  </div>
+  <Error />
+</form>
