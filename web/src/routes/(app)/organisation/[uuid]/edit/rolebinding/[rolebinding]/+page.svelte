@@ -22,6 +22,7 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
+  import { normalizeRolebinding } from "$lib/utils/normalizeForm"
 
   gql`
     query Rolebinding($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
@@ -146,6 +147,19 @@
       }
     })()
   }
+
+  let initialRolebinding: any = null
+  let hasChanges = false
+  $: if (initialRolebinding) {
+    // Check if any of the user-editable fields have changed compared to the original values.
+    const editableChanged = $role.value !== initialRolebinding.role
+
+    const toDateExtended =
+      toDate === ""
+        ? initialRolebinding.to !== null
+        : toDate > (initialRolebinding.to ?? null)
+    hasChanges = editableChanged || toDateExtended
+  }
 </script>
 
 <title
@@ -186,6 +200,12 @@
 {:then data}
   {@const rolebinding = data.rolebindings.objects[0].validities[0]}
   {@const ituser = formatITUserITSystemName(rolebinding.ituser)}
+  {#if !initialRolebinding}
+    {@html (() => {
+      initialRolebinding = normalizeRolebinding(rolebinding)
+      return ""
+    })()}
+  {/if}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
@@ -247,6 +267,8 @@
             values: { item: $_("rolebinding", { values: { n: 1 } }) },
           })
         )}
+        disabled={!hasChanges}
+        info={hasChanges ? undefined : $_("edit_tooltip")}
       />
       <Button
         type="button"

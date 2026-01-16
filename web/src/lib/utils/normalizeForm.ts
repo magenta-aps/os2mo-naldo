@@ -98,3 +98,10 @@ export const normalizeKLE = (k: any) => {
     kle_aspect: k.kle_aspects.map((a: any) => a.name),
   }
 }
+
+export const normalizeRolebinding = (r: any) => {
+  return {
+    to: r.validity?.to?.split("T")[0] ?? null,
+    role: r.role?.[0]?.name ?? undefined,
+  }
+}
