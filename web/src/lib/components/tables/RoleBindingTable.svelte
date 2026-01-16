@@ -30,7 +30,10 @@
   const uuid = $page.params.uuid
   const isOrg = $page.url.pathname?.startsWith("/organisation")
   const filter: RoleBindingFilter = isOrg
-    ? { org_unit: { uuids: [uuid] }, ...filterTenseToValidity(tense, $date) }
+    ? {
+        ituser: { org_unit: { uuids: [uuid] }, ...filterTenseToValidity(tense, $date) },
+        ...filterTenseToValidity(tense, $date),
+      }
     : {
         ituser: { employee: { uuids: [uuid] }, ...filterTenseToValidity(tense, $date) },
         ...filterTenseToValidity(tense, $date),
