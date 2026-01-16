@@ -20,6 +20,7 @@
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import type { RoleBindingFilter } from "$lib/graphql/types"
+  import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { formatQueryDates } from "$lib/utils/validities"
 
   type Rolebinding = RolebindingsQuery["rolebindings"]["objects"][0]["validities"]
@@ -30,7 +31,10 @@
   const uuid = $page.params.uuid
   const isOrg = $page.url.pathname?.startsWith("/organisation")
   const filter: RoleBindingFilter = isOrg
-    ? { org_unit: { uuids: [uuid] }, ...filterTenseToValidity(tense, $date) }
+    ? {
+        ituser: { org_unit: { uuids: [uuid] }, ...filterTenseToValidity(tense, $date) },
+        ...filterTenseToValidity(tense, $date),
+      }
     : {
         ituser: { employee: { uuids: [uuid] }, ...filterTenseToValidity(tense, $date) },
         ...filterTenseToValidity(tense, $date),
@@ -104,6 +108,11 @@
       <td class="text-sm p-4">{rolebindingObj.ituser[0].itsystem.name}</td>
       <td class="text-sm p-4">{rolebindingObj.role[0].name}</td>
       <ValidityTableCell validity={rolebindingObj.validity} />
+      <td>
+        <a href={`${base}/auditlog/${rolebindingObj.uuid}`}>
+          <Icon icon={historyRounded} width="25" height="25" />
+        </a>
+      </td>
       <td>
         <a
           href="{base}/{$page.url.pathname?.split(
