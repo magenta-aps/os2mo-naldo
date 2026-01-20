@@ -105,7 +105,7 @@
   {/if}
   {#each errors as error}
     {#if error === "required"}
-      <span class="label-text-alt text-error block"
+      <span class="text-xs text-error"
         >{$_("validation.is_required", { values: { field: title } })}</span
       >
     {/if}
