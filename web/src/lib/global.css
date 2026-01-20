@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .text-primary {
+    color: #1053ab;
+  }
+  .text-secondary {
+    color: #00244e;
+  }
+  .bg-accent {
+    background-color: #d1e4ff;
+  }
+  .border-primary {
+    border-color: #1053ab;
+  }
+}
+
 @layer base {
   html {
     font-family: Verdana, sans-serif;
