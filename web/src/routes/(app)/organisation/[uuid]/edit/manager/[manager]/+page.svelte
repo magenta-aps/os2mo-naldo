@@ -205,7 +205,7 @@
 
 {#await graphQLClient().request( ManagerDocument, { uuid: $page.params.manager, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to") } )}
   <div class="mx-6">
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded-sm">
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <Skeleton extra_classes="basis-1/2" />
@@ -232,7 +232,7 @@
   {/if}
 
   <form method="post" class="mx-6" use:enhance={handler}>
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded-sm">
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput

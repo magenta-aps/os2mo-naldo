@@ -99,7 +99,7 @@
 <div class="divider p-0 m-0 mb-4 w-full" />
 {#await graphQLClient().request(OrgUnitDocument, { uuid: $page.params.uuid })}
   <div class="mx-6">
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded-sm">
       <div class="p-8">
         <Skeleton />
       </div>
@@ -109,7 +109,7 @@
   {@const validities = getMinMaxValidities(data.org_units.objects[0].validities)}
 
   <form method="post" class="mx-6" use:enhance={handler}>
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded-sm">
       <div class="p-8">
         <!-- Ideally we would use validities from 'parent' if it's present, but since parent can't be a list of validities, we can't get min/max -->
         <DateInput

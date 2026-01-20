@@ -145,7 +145,7 @@
 <div class="p-0 m-0 mb-4 w-full divider" />
 
 <form method="post" class="mx-6" use:enhance={handler}>
-  <div class="rounded min-w-fit bg-slate-100">
+  <div class="rounded-sm min-w-fit bg-slate-100">
     <div class="p-8">
       <div class="flex flex-row gap-6 w-1/2">
         <DateInput
@@ -163,7 +163,7 @@
           <p>{capital($_("loading"))}</p>
         {:then orgTree}
           <div class="w-1/2 overflow-y-auto max-h-[60vh]">
-            <ul class="py-4 menu bg-base-100 text-base-content">
+            <ul class="py-4 w-full menu bg-base-100 text-base-content">
               {#each orgTree as child}
                 <div on:change={handleRadioChange} class="">
                   <Node {...child} type="radio" {selectedOriginOrg} />
@@ -174,7 +174,7 @@
         {/await}
         {#await refreshableOrgTree then orgTree}
           <div class="w-1/2 overflow-y-auto max-h-[60vh]">
-            <ul class="py-4 menu bg-base-100 text-base-content">
+            <ul class="py-4 w-full menu bg-base-100 text-base-content">
               {#each orgTree as child}
                 <div class="">
                   <Node
