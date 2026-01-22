@@ -835,6 +835,7 @@ export type AddressRegistrationFilter = {
 };
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -855,6 +856,7 @@ export type AddressRegistrationFilter = {
 export type AddressResponse = {
   __typename?: 'AddressResponse';
   /**
+   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -867,6 +869,7 @@ export type AddressResponse = {
    */
   current?: Maybe<Address>;
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -884,6 +887,7 @@ export type AddressResponse = {
    */
   objects: Array<Address>;
   /**
+   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -904,6 +908,7 @@ export type AddressResponse = {
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -920,6 +925,7 @@ export type AddressResponse = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -944,6 +950,7 @@ export type AddressResponseCurrentArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -969,6 +976,7 @@ export type AddressResponseObjectsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -994,6 +1002,7 @@ export type AddressResponseRegistrationsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -1663,6 +1672,7 @@ export type AssociationRegistrationFilter = {
 };
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -1683,6 +1693,7 @@ export type AssociationRegistrationFilter = {
 export type AssociationResponse = {
   __typename?: 'AssociationResponse';
   /**
+   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -1695,6 +1706,7 @@ export type AssociationResponse = {
    */
   current?: Maybe<Association>;
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -1712,6 +1724,7 @@ export type AssociationResponse = {
    */
   objects: Array<Association>;
   /**
+   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -1732,6 +1745,7 @@ export type AssociationResponse = {
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -1748,6 +1762,7 @@ export type AssociationResponse = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -1772,6 +1787,7 @@ export type AssociationResponseCurrentArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -1797,6 +1813,7 @@ export type AssociationResponseObjectsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -1822,6 +1839,7 @@ export type AssociationResponseRegistrationsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -2652,6 +2670,7 @@ export type ClassRegistrationFilter = {
 };
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -2672,6 +2691,7 @@ export type ClassRegistrationFilter = {
 export type ClassResponse = {
   __typename?: 'ClassResponse';
   /**
+   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -2684,6 +2704,7 @@ export type ClassResponse = {
    */
   current?: Maybe<Class>;
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -2701,6 +2722,7 @@ export type ClassResponse = {
    */
   objects: Array<Class>;
   /**
+   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -2721,6 +2743,7 @@ export type ClassResponse = {
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -2737,6 +2760,7 @@ export type ClassResponse = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -2761,6 +2785,7 @@ export type ClassResponseCurrentArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -2786,6 +2811,7 @@ export type ClassResponseObjectsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -2811,6 +2837,7 @@ export type ClassResponseRegistrationsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -3324,6 +3351,7 @@ export type EmployeeRegistrationFilter = {
 };
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -3344,6 +3372,7 @@ export type EmployeeRegistrationFilter = {
 export type EmployeeResponse = {
   __typename?: 'EmployeeResponse';
   /**
+   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -3356,6 +3385,7 @@ export type EmployeeResponse = {
    */
   current?: Maybe<Employee>;
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -3373,6 +3403,7 @@ export type EmployeeResponse = {
    */
   objects: Array<Employee>;
   /**
+   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -3393,6 +3424,7 @@ export type EmployeeResponse = {
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -3409,6 +3441,7 @@ export type EmployeeResponse = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -3433,6 +3466,7 @@ export type EmployeeResponseCurrentArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -3458,6 +3492,7 @@ export type EmployeeResponseObjectsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -3483,6 +3518,7 @@ export type EmployeeResponseRegistrationsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -4263,6 +4299,7 @@ export type EngagementRegistrationFilter = {
 };
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -4283,6 +4320,7 @@ export type EngagementRegistrationFilter = {
 export type EngagementResponse = {
   __typename?: 'EngagementResponse';
   /**
+   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -4295,6 +4333,7 @@ export type EngagementResponse = {
    */
   current?: Maybe<Engagement>;
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -4312,6 +4351,7 @@ export type EngagementResponse = {
    */
   objects: Array<Engagement>;
   /**
+   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -4332,6 +4372,7 @@ export type EngagementResponse = {
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -4348,6 +4389,7 @@ export type EngagementResponse = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -4372,6 +4414,7 @@ export type EngagementResponseCurrentArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -4397,6 +4440,7 @@ export type EngagementResponseObjectsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -4422,6 +4466,7 @@ export type EngagementResponseRegistrationsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -4936,6 +4981,7 @@ export type FacetRegistrationFilter = {
 };
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -4956,6 +5002,7 @@ export type FacetRegistrationFilter = {
 export type FacetResponse = {
   __typename?: 'FacetResponse';
   /**
+   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -4968,6 +5015,7 @@ export type FacetResponse = {
    */
   current?: Maybe<Facet>;
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -4985,6 +5033,7 @@ export type FacetResponse = {
    */
   objects: Array<Facet>;
   /**
+   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -5005,6 +5054,7 @@ export type FacetResponse = {
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -5021,6 +5071,7 @@ export type FacetResponse = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -5045,6 +5096,7 @@ export type FacetResponseCurrentArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -5070,6 +5122,7 @@ export type FacetResponseObjectsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -5095,6 +5148,7 @@ export type FacetResponseRegistrationsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -5669,6 +5723,7 @@ export type ItSystemRegistrationFilter = {
 };
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -5689,6 +5744,7 @@ export type ItSystemRegistrationFilter = {
 export type ItSystemResponse = {
   __typename?: 'ITSystemResponse';
   /**
+   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -5701,6 +5757,7 @@ export type ItSystemResponse = {
    */
   current?: Maybe<ItSystem>;
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -5718,6 +5775,7 @@ export type ItSystemResponse = {
    */
   objects: Array<ItSystem>;
   /**
+   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -5738,6 +5796,7 @@ export type ItSystemResponse = {
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -5754,6 +5813,7 @@ export type ItSystemResponse = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -5778,6 +5838,7 @@ export type ItSystemResponseCurrentArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -5803,6 +5864,7 @@ export type ItSystemResponseObjectsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -5828,6 +5890,7 @@ export type ItSystemResponseRegistrationsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -6533,6 +6596,7 @@ export type ItUserRegistrationFilter = {
 };
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -6553,6 +6617,7 @@ export type ItUserRegistrationFilter = {
 export type ItUserResponse = {
   __typename?: 'ITUserResponse';
   /**
+   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -6565,6 +6630,7 @@ export type ItUserResponse = {
    */
   current?: Maybe<ItUser>;
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -6582,6 +6648,7 @@ export type ItUserResponse = {
    */
   objects: Array<ItUser>;
   /**
+   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -6602,6 +6669,7 @@ export type ItUserResponse = {
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -6618,6 +6686,7 @@ export type ItUserResponse = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -6642,6 +6711,7 @@ export type ItUserResponseCurrentArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -6667,6 +6737,7 @@ export type ItUserResponseObjectsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -6692,6 +6763,7 @@ export type ItUserResponseRegistrationsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -7242,6 +7314,7 @@ export type KleRegistrationFilter = {
 };
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -7262,6 +7335,7 @@ export type KleRegistrationFilter = {
 export type KleResponse = {
   __typename?: 'KLEResponse';
   /**
+   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -7274,6 +7348,7 @@ export type KleResponse = {
    */
   current?: Maybe<Kle>;
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -7291,6 +7366,7 @@ export type KleResponse = {
    */
   objects: Array<Kle>;
   /**
+   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -7311,6 +7387,7 @@ export type KleResponse = {
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -7327,6 +7404,7 @@ export type KleResponse = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -7351,6 +7429,7 @@ export type KleResponseCurrentArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -7376,6 +7455,7 @@ export type KleResponseObjectsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -7401,6 +7481,7 @@ export type KleResponseRegistrationsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -7780,6 +7861,7 @@ export type LeaveRegistrationFilter = {
 };
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -7800,6 +7882,7 @@ export type LeaveRegistrationFilter = {
 export type LeaveResponse = {
   __typename?: 'LeaveResponse';
   /**
+   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -7812,6 +7895,7 @@ export type LeaveResponse = {
    */
   current?: Maybe<Leave>;
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -7829,6 +7913,7 @@ export type LeaveResponse = {
    */
   objects: Array<Leave>;
   /**
+   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -7849,6 +7934,7 @@ export type LeaveResponse = {
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -7865,6 +7951,7 @@ export type LeaveResponse = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -7889,6 +7976,7 @@ export type LeaveResponseCurrentArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -7914,6 +8002,7 @@ export type LeaveResponseObjectsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -7939,6 +8028,7 @@ export type LeaveResponseRegistrationsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -8567,6 +8657,7 @@ export type ManagerRegistrationFilter = {
 };
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -8587,6 +8678,7 @@ export type ManagerRegistrationFilter = {
 export type ManagerResponse = {
   __typename?: 'ManagerResponse';
   /**
+   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -8599,6 +8691,7 @@ export type ManagerResponse = {
    */
   current?: Maybe<Manager>;
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -8616,6 +8709,7 @@ export type ManagerResponse = {
    */
   objects: Array<Manager>;
   /**
+   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -8636,6 +8730,7 @@ export type ManagerResponse = {
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -8652,6 +8747,7 @@ export type ManagerResponse = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -8676,6 +8772,7 @@ export type ManagerResponseCurrentArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -8701,6 +8798,7 @@ export type ManagerResponseObjectsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -8726,6 +8824,7 @@ export type ManagerResponseRegistrationsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -11542,6 +11641,7 @@ export type OrganisationUnitRegistrationFilter = {
 };
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -11562,6 +11662,7 @@ export type OrganisationUnitRegistrationFilter = {
 export type OrganisationUnitResponse = {
   __typename?: 'OrganisationUnitResponse';
   /**
+   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -11574,6 +11675,7 @@ export type OrganisationUnitResponse = {
    */
   current?: Maybe<OrganisationUnit>;
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -11591,6 +11693,7 @@ export type OrganisationUnitResponse = {
    */
   objects: Array<OrganisationUnit>;
   /**
+   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -11611,6 +11714,7 @@ export type OrganisationUnitResponse = {
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -11627,6 +11731,7 @@ export type OrganisationUnitResponse = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -11651,6 +11756,7 @@ export type OrganisationUnitResponseCurrentArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -11676,6 +11782,7 @@ export type OrganisationUnitResponseObjectsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -11701,6 +11808,7 @@ export type OrganisationUnitResponseRegistrationsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -12051,6 +12159,7 @@ export enum OwnerInferencePriority {
 }
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -12071,6 +12180,7 @@ export enum OwnerInferencePriority {
 export type OwnerResponse = {
   __typename?: 'OwnerResponse';
   /**
+   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -12083,6 +12193,7 @@ export type OwnerResponse = {
    */
   current?: Maybe<Owner>;
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -12100,6 +12211,7 @@ export type OwnerResponse = {
    */
   objects: Array<Owner>;
   /**
+   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -12120,6 +12232,7 @@ export type OwnerResponse = {
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -12136,6 +12249,7 @@ export type OwnerResponse = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -12160,6 +12274,7 @@ export type OwnerResponseCurrentArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -12185,6 +12300,7 @@ export type OwnerResponseObjectsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -12210,6 +12326,7 @@ export type OwnerResponseRegistrationsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -12975,6 +13092,7 @@ export type RelatedUnitFilter = {
 };
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -12995,6 +13113,7 @@ export type RelatedUnitFilter = {
 export type RelatedUnitResponse = {
   __typename?: 'RelatedUnitResponse';
   /**
+   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -13007,6 +13126,7 @@ export type RelatedUnitResponse = {
    */
   current?: Maybe<RelatedUnit>;
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -13024,6 +13144,7 @@ export type RelatedUnitResponse = {
    */
   objects: Array<RelatedUnit>;
   /**
+   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -13044,6 +13165,7 @@ export type RelatedUnitResponse = {
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -13060,6 +13182,7 @@ export type RelatedUnitResponse = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -13084,6 +13207,7 @@ export type RelatedUnitResponseCurrentArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -13109,6 +13233,7 @@ export type RelatedUnitResponseObjectsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -13134,6 +13259,7 @@ export type RelatedUnitResponseRegistrationsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -13390,6 +13516,7 @@ export type RoleBindingFilter = {
 };
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -13410,6 +13537,7 @@ export type RoleBindingFilter = {
 export type RoleBindingResponse = {
   __typename?: 'RoleBindingResponse';
   /**
+   *
    * Actual / current state entrypoint.
    *
    * Returns the state of the object at current validity and current assertion time.
@@ -13422,6 +13550,7 @@ export type RoleBindingResponse = {
    */
   current?: Maybe<RoleBinding>;
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -13439,6 +13568,7 @@ export type RoleBindingResponse = {
    */
   objects: Array<RoleBinding>;
   /**
+   *
    * Bitemporal state entrypoint.
    *
    * Returns the state of the object at varying validities and varying assertion times.
@@ -13459,6 +13589,7 @@ export type RoleBindingResponse = {
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
+   *
    * Temporal state entrypoint.
    *
    * Returns the state of the object at varying validities and current assertion time.
@@ -13475,6 +13606,7 @@ export type RoleBindingResponse = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -13499,6 +13631,7 @@ export type RoleBindingResponseCurrentArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -13524,6 +13657,7 @@ export type RoleBindingResponseObjectsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -13549,6 +13683,7 @@ export type RoleBindingResponseRegistrationsArgs = {
 
 
 /**
+ *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.

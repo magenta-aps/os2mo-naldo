@@ -50,6 +50,18 @@ gql`
       }
     }
   }
+  query GetItuserValidities($uuid: [UUID!]) {
+    itusers(filter: { uuids: $uuid, from_date: null, to_date: null }) {
+      objects {
+        validities {
+          validity {
+            from
+            to
+          }
+        }
+      }
+    }
+  }
   query GetFacetValidities($uuid: [UUID!]) {
     facets(filter: { uuids: $uuid, from_date: null, to_date: null }) {
       objects {
@@ -108,6 +120,21 @@ gql`
           classes(
             filter: { user_keys: [$primaryClass, "non-primary"], from_date: $fromDate }
           ) {
+            name
+            uuid
+            user_key
+          }
+          uuid
+          user_key
+        }
+      }
+    }
+  }
+  query GetRoleClasses($itSystem: UUID!, $fromDate: DateTime!) {
+    facets(filter: { user_keys: ["role"] }) {
+      objects {
+        validities {
+          classes(filter: { it_system: { uuids: [$itSystem] }, from_date: $fromDate }) {
             name
             uuid
             user_key

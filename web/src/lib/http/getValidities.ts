@@ -4,6 +4,7 @@ import {
   GetPersonValiditiesDocument,
   GetEngagementValiditiesDocument,
   GetFacetValiditiesDocument,
+  GetItuserValiditiesDocument,
 } from "./query.generated"
 import { getMinMaxValidities } from "$lib/utils/validities"
 
@@ -30,4 +31,10 @@ export const getFacetValidities = async (uuid: string, signal?: AbortSignal) => 
     uuid: uuid,
   })
   return getMinMaxValidities(res.facets.objects[0].validities)
+}
+export const getItuserValidities = async (uuid: string) => {
+  const res = await graphQLClient().request(GetItuserValiditiesDocument, {
+    uuid: uuid,
+  })
+  return getMinMaxValidities(res.itusers.objects[0].validities)
 }
