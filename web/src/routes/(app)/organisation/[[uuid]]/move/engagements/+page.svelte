@@ -204,7 +204,7 @@
               >
                 <div class="flex text-secondary">
                   <label
-                    class="label text-sm text-secondary cursor-pointer wrap-break-word gap-4"
+                    class="label flex items-center gap-4 py-2 px-4 rounded-lg w-full text-sm text-secondary cursor-pointer wrap-break-word hover:bg-base-200 transition-all"
                   >
                     <input
                       type="checkbox"
@@ -228,7 +228,7 @@
                 }) as engagement}
                   <div class="flex text-secondary">
                     <label
-                      class="label text-sm text-secondary cursor-pointer wrap-break-word gap-4"
+                      class="label flex items-center gap-4 py-2 px-4 rounded-lg w-full text-sm text-secondary cursor-pointer wrap-break-word hover:bg-base-200 transition-all"
                     >
                       <input
                         type="checkbox"
