@@ -51,3 +51,15 @@
     {/if}
   {/each}
 </div>
+
+<style>
+  @supports selector(::-webkit-calendar-picker-indicator) {
+    .input[type="date"],
+    .input[type="datetime-local"],
+    .input[type="month"],
+    .input[type="week"],
+    .input[type="time"] {
+      padding-right: 2rem;
+    }
+  }
+</style>
