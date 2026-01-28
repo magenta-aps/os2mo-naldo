@@ -67,10 +67,10 @@
   <label for="my-drawer-4" aria-label="close sidebar" class="drawer-overlay" />
   <nav
     class="bg-secondary h-full transition-[width] duration-300 ease-in-out
-           w-14 is-drawer-open:w-64 flex flex-col justify-between overflow-hidden"
+         w-14 is-drawer-open:w-64 flex flex-col justify-between overflow-hidden is-drawer-close:overflow-visible"
     aria-label="Main Navigation"
   >
-    <div class="flex-1 overflow-y-auto overflow-x-hidden w-full">
+    <div class="flex-1 overflow-y-auto is-drawer-close:overflow-visible w-full">
       <ul class="menu p-2 gap-1 text-base-content w-full">
         <li class="mb-4 sticky top-0 bg-secondary z-10">
           <NavbarButton
@@ -161,11 +161,14 @@
           />
         </li>
 
-        <li
-          class="menu-title mt-2 text-xs font-bold uppercase text-accent/50 is-drawer-close:hidden"
+        <div
+          class="divider before:bg-accent/50 after:bg-accent/50 opacity-50 before:h-[0.0625rem] after:h-[0.0625rem] p-0 m-0"
+        />
+        <h2
+          class="menu-title text-xs font-bold uppercase text-accent/50 is-drawer-close:hidden"
         >
           {capital($_("actions"))}
-        </li>
+        </h2>
 
         <li>
           <NavbarButton
@@ -200,11 +203,14 @@
 
     <div class="flex-none w-full bg-secondary">
       <ul class="menu p-2 gap-1 text-base-content w-full">
-        <li
+        <div
+          class="divider before:bg-accent/50 after:bg-accent/50 opacity-50 before:h-[0.0625rem] after:h-[0.0625rem] p-0 m-0"
+        />
+        <h2
           class="menu-title text-xs font-bold uppercase text-accent/50 is-drawer-close:hidden"
         >
           {capital($_("account"))}
-        </li>
+        </h2>
 
         <li>
           <NavbarButton

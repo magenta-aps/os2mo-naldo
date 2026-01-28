@@ -1,5 +1,7 @@
 {
+	"account": "konto",
 	"account_name": "kontonavn",
+	"actions": "handlinger",
 	"address": "{n, plural, =0 {adressen} one {adresse} other {adresser}}",
 	"address_type": "adressetype",
 	"and": "og",
