@@ -809,6 +809,107 @@ export type AddressFilter = {
   visibility?: InputMaybe<ClassFilter>;
 };
 
+export type AddressRegistration = IRegistration & RegistrationBase & {
+  __typename?: 'AddressRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   * Actual / current state entrypoint.
+   *
+   * Returns the state of the object at current validity and current assertion time.
+   *
+   * A single object is returned as only one validity can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint is appropriate to use for actual-state integrations and UIs.
+   *
+   */
+  current?: Maybe<Address>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Address>;
+};
+
+
+export type AddressRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+export type AddressRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
 /** Address registration filter. */
 export type AddressRegistrationFilter = {
   /**
@@ -835,7 +936,6 @@ export type AddressRegistrationFilter = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -901,10 +1001,10 @@ export type AddressResponse = {
    *
    * **Warning**:
    * This entrypoint should **not** be used to implement event-driven integrations.
-   * Such integration should rather utilize the AMQP-based event-system.
+   * Such integration should rather utilize the GraphQL-based event-system.
    *
    */
-  registrations: Array<Registration>;
+  registrations: Array<AddressResponseRegistration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
@@ -925,7 +1025,6 @@ export type AddressResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -950,7 +1049,6 @@ export type AddressResponseCurrentArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -976,7 +1074,6 @@ export type AddressResponseObjectsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -1002,7 +1099,6 @@ export type AddressResponseRegistrationsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -1044,6 +1140,148 @@ export type AddressResponsePaged = {
    *
    */
   page_info: PageInfo;
+};
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type AddressResponseRegistration = RegistrationBase & {
+  __typename?: 'AddressResponseRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  current?: Maybe<Address>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Address>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type AddressResponseRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type AddressResponseRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type AddressTerminateInput = {
@@ -1646,6 +1884,107 @@ export type AssociationFilter = {
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
+export type AssociationRegistration = IRegistration & RegistrationBase & {
+  __typename?: 'AssociationRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   * Actual / current state entrypoint.
+   *
+   * Returns the state of the object at current validity and current assertion time.
+   *
+   * A single object is returned as only one validity can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint is appropriate to use for actual-state integrations and UIs.
+   *
+   */
+  current?: Maybe<Association>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Association>;
+};
+
+
+export type AssociationRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+export type AssociationRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
 /** Association registration filter. */
 export type AssociationRegistrationFilter = {
   /**
@@ -1672,7 +2011,6 @@ export type AssociationRegistrationFilter = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -1738,10 +2076,10 @@ export type AssociationResponse = {
    *
    * **Warning**:
    * This entrypoint should **not** be used to implement event-driven integrations.
-   * Such integration should rather utilize the AMQP-based event-system.
+   * Such integration should rather utilize the GraphQL-based event-system.
    *
    */
-  registrations: Array<Registration>;
+  registrations: Array<AssociationResponseRegistration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
@@ -1762,7 +2100,6 @@ export type AssociationResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -1787,7 +2124,6 @@ export type AssociationResponseCurrentArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -1813,7 +2149,6 @@ export type AssociationResponseObjectsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -1839,7 +2174,6 @@ export type AssociationResponseRegistrationsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -1881,6 +2215,148 @@ export type AssociationResponsePaged = {
    *
    */
   page_info: PageInfo;
+};
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type AssociationResponseRegistration = RegistrationBase & {
+  __typename?: 'AssociationResponseRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  current?: Maybe<Association>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Association>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type AssociationResponseRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type AssociationResponseRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type AssociationTerminateInput = {
@@ -2644,6 +3120,107 @@ export type ClassOwnerFilter = {
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
+export type ClassRegistration = IRegistration & RegistrationBase & {
+  __typename?: 'ClassRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   * Actual / current state entrypoint.
+   *
+   * Returns the state of the object at current validity and current assertion time.
+   *
+   * A single object is returned as only one validity can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint is appropriate to use for actual-state integrations and UIs.
+   *
+   */
+  current?: Maybe<Class>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Class>;
+};
+
+
+export type ClassRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+export type ClassRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
 /** Class registration filter. */
 export type ClassRegistrationFilter = {
   /**
@@ -2670,7 +3247,6 @@ export type ClassRegistrationFilter = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -2736,10 +3312,10 @@ export type ClassResponse = {
    *
    * **Warning**:
    * This entrypoint should **not** be used to implement event-driven integrations.
-   * Such integration should rather utilize the AMQP-based event-system.
+   * Such integration should rather utilize the GraphQL-based event-system.
    *
    */
-  registrations: Array<Registration>;
+  registrations: Array<ClassResponseRegistration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
@@ -2760,7 +3336,6 @@ export type ClassResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -2785,7 +3360,6 @@ export type ClassResponseCurrentArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -2811,7 +3385,6 @@ export type ClassResponseObjectsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -2837,7 +3410,6 @@ export type ClassResponseRegistrationsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -2879,6 +3451,148 @@ export type ClassResponsePaged = {
    *
    */
   page_info: PageInfo;
+};
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type ClassResponseRegistration = RegistrationBase & {
+  __typename?: 'ClassResponseRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  current?: Maybe<Class>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Class>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type ClassResponseRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type ClassResponseRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type ClassTerminateInput = {
@@ -3351,7 +4065,6 @@ export type EmployeeRegistrationFilter = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -3417,10 +4130,10 @@ export type EmployeeResponse = {
    *
    * **Warning**:
    * This entrypoint should **not** be used to implement event-driven integrations.
-   * Such integration should rather utilize the AMQP-based event-system.
+   * Such integration should rather utilize the GraphQL-based event-system.
    *
    */
-  registrations: Array<Registration>;
+  registrations: Array<EmployeeResponseRegistration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
@@ -3441,7 +4154,6 @@ export type EmployeeResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -3466,7 +4178,6 @@ export type EmployeeResponseCurrentArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -3492,7 +4203,6 @@ export type EmployeeResponseObjectsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -3518,7 +4228,6 @@ export type EmployeeResponseRegistrationsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -3560,6 +4269,148 @@ export type EmployeeResponsePaged = {
    *
    */
   page_info: PageInfo;
+};
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type EmployeeResponseRegistration = RegistrationBase & {
+  __typename?: 'EmployeeResponseRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  current?: Maybe<Employee>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Employee>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type EmployeeResponseRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type EmployeeResponseRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type EmployeeTerminateInput = {
@@ -4273,6 +5124,107 @@ export type EngagementFilter = {
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
+export type EngagementRegistration = IRegistration & RegistrationBase & {
+  __typename?: 'EngagementRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   * Actual / current state entrypoint.
+   *
+   * Returns the state of the object at current validity and current assertion time.
+   *
+   * A single object is returned as only one validity can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint is appropriate to use for actual-state integrations and UIs.
+   *
+   */
+  current?: Maybe<Engagement>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Engagement>;
+};
+
+
+export type EngagementRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+export type EngagementRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
 /** Engagement registration filter. */
 export type EngagementRegistrationFilter = {
   /**
@@ -4299,7 +5251,6 @@ export type EngagementRegistrationFilter = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -4365,10 +5316,10 @@ export type EngagementResponse = {
    *
    * **Warning**:
    * This entrypoint should **not** be used to implement event-driven integrations.
-   * Such integration should rather utilize the AMQP-based event-system.
+   * Such integration should rather utilize the GraphQL-based event-system.
    *
    */
-  registrations: Array<Registration>;
+  registrations: Array<EngagementResponseRegistration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
@@ -4389,7 +5340,6 @@ export type EngagementResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -4414,7 +5364,6 @@ export type EngagementResponseCurrentArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -4440,7 +5389,6 @@ export type EngagementResponseObjectsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -4466,7 +5414,6 @@ export type EngagementResponseRegistrationsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -4508,6 +5455,148 @@ export type EngagementResponsePaged = {
    *
    */
   page_info: PageInfo;
+};
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type EngagementResponseRegistration = RegistrationBase & {
+  __typename?: 'EngagementResponseRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  current?: Maybe<Engagement>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Engagement>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type EngagementResponseRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type EngagementResponseRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type EngagementTerminateInput = {
@@ -4955,6 +6044,107 @@ export type FacetFilter = {
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
+export type FacetRegistration = IRegistration & RegistrationBase & {
+  __typename?: 'FacetRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   * Actual / current state entrypoint.
+   *
+   * Returns the state of the object at current validity and current assertion time.
+   *
+   * A single object is returned as only one validity can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint is appropriate to use for actual-state integrations and UIs.
+   *
+   */
+  current?: Maybe<Facet>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Facet>;
+};
+
+
+export type FacetRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+export type FacetRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
 /** Facet registration filter. */
 export type FacetRegistrationFilter = {
   /**
@@ -4981,7 +6171,6 @@ export type FacetRegistrationFilter = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -5047,10 +6236,10 @@ export type FacetResponse = {
    *
    * **Warning**:
    * This entrypoint should **not** be used to implement event-driven integrations.
-   * Such integration should rather utilize the AMQP-based event-system.
+   * Such integration should rather utilize the GraphQL-based event-system.
    *
    */
-  registrations: Array<Registration>;
+  registrations: Array<FacetResponseRegistration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
@@ -5071,7 +6260,6 @@ export type FacetResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -5096,7 +6284,6 @@ export type FacetResponseCurrentArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -5122,7 +6309,6 @@ export type FacetResponseObjectsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -5148,7 +6334,6 @@ export type FacetResponseRegistrationsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -5190,6 +6375,148 @@ export type FacetResponsePaged = {
    *
    */
   page_info: PageInfo;
+};
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type FacetResponseRegistration = RegistrationBase & {
+  __typename?: 'FacetResponseRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  current?: Maybe<Facet>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Facet>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type FacetResponseRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type FacetResponseRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type FacetTerminateInput = {
@@ -5510,6 +6837,102 @@ export type HealthPaged = {
   page_info: PageInfo;
 };
 
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type IRegistration = {
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+};
+
+/** Result page in cursor-based pagination. */
+export type IRegistrationPaged = {
+  __typename?: 'IRegistrationPaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<IRegistration>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
+};
+
 export type ItAssociationCreateInput = {
   /** IT-user UUID */
   it_user: Scalars['UUID']['input'];
@@ -5697,6 +7120,107 @@ export type ItSystemFilter = {
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
+export type ItSystemRegistration = IRegistration & RegistrationBase & {
+  __typename?: 'ITSystemRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   * Actual / current state entrypoint.
+   *
+   * Returns the state of the object at current validity and current assertion time.
+   *
+   * A single object is returned as only one validity can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint is appropriate to use for actual-state integrations and UIs.
+   *
+   */
+  current?: Maybe<ItSystem>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<ItSystem>;
+};
+
+
+export type ItSystemRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+export type ItSystemRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
 /** ITSystem registration filter. */
 export type ItSystemRegistrationFilter = {
   /**
@@ -5723,7 +7247,6 @@ export type ItSystemRegistrationFilter = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -5789,10 +7312,10 @@ export type ItSystemResponse = {
    *
    * **Warning**:
    * This entrypoint should **not** be used to implement event-driven integrations.
-   * Such integration should rather utilize the AMQP-based event-system.
+   * Such integration should rather utilize the GraphQL-based event-system.
    *
    */
-  registrations: Array<Registration>;
+  registrations: Array<ItSystemResponseRegistration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
@@ -5813,7 +7336,6 @@ export type ItSystemResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -5838,7 +7360,6 @@ export type ItSystemResponseCurrentArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -5864,7 +7385,6 @@ export type ItSystemResponseObjectsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -5890,7 +7410,6 @@ export type ItSystemResponseRegistrationsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -5932,6 +7451,148 @@ export type ItSystemResponsePaged = {
    *
    */
   page_info: PageInfo;
+};
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type ItSystemResponseRegistration = RegistrationBase & {
+  __typename?: 'ITSystemResponseRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  current?: Maybe<ItSystem>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<ItSystem>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type ItSystemResponseRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type ItSystemResponseRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type ItSystemTerminateInput = {
@@ -6570,6 +8231,107 @@ export type ItUserFilter = {
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
+export type ItUserRegistration = IRegistration & RegistrationBase & {
+  __typename?: 'ITUserRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   * Actual / current state entrypoint.
+   *
+   * Returns the state of the object at current validity and current assertion time.
+   *
+   * A single object is returned as only one validity can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint is appropriate to use for actual-state integrations and UIs.
+   *
+   */
+  current?: Maybe<ItUser>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<ItUser>;
+};
+
+
+export type ItUserRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+export type ItUserRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
 /** ITUser registration filter. */
 export type ItUserRegistrationFilter = {
   /**
@@ -6596,7 +8358,6 @@ export type ItUserRegistrationFilter = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -6662,10 +8423,10 @@ export type ItUserResponse = {
    *
    * **Warning**:
    * This entrypoint should **not** be used to implement event-driven integrations.
-   * Such integration should rather utilize the AMQP-based event-system.
+   * Such integration should rather utilize the GraphQL-based event-system.
    *
    */
-  registrations: Array<Registration>;
+  registrations: Array<ItUserResponseRegistration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
@@ -6686,7 +8447,6 @@ export type ItUserResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -6711,7 +8471,6 @@ export type ItUserResponseCurrentArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -6737,7 +8496,6 @@ export type ItUserResponseObjectsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -6763,7 +8521,6 @@ export type ItUserResponseRegistrationsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -6805,6 +8562,148 @@ export type ItUserResponsePaged = {
    *
    */
   page_info: PageInfo;
+};
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type ItUserResponseRegistration = RegistrationBase & {
+  __typename?: 'ITUserResponseRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  current?: Maybe<ItUser>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<ItUser>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type ItUserResponseRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type ItUserResponseRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type ItUserTerminateInput = {
@@ -7288,6 +9187,107 @@ export type KleFilter = {
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
+export type KleRegistration = IRegistration & RegistrationBase & {
+  __typename?: 'KLERegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   * Actual / current state entrypoint.
+   *
+   * Returns the state of the object at current validity and current assertion time.
+   *
+   * A single object is returned as only one validity can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint is appropriate to use for actual-state integrations and UIs.
+   *
+   */
+  current?: Maybe<Kle>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Kle>;
+};
+
+
+export type KleRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+export type KleRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
 /** KLE registration filter. */
 export type KleRegistrationFilter = {
   /**
@@ -7314,7 +9314,6 @@ export type KleRegistrationFilter = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -7380,10 +9379,10 @@ export type KleResponse = {
    *
    * **Warning**:
    * This entrypoint should **not** be used to implement event-driven integrations.
-   * Such integration should rather utilize the AMQP-based event-system.
+   * Such integration should rather utilize the GraphQL-based event-system.
    *
    */
-  registrations: Array<Registration>;
+  registrations: Array<KleResponseRegistration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
@@ -7404,7 +9403,6 @@ export type KleResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -7429,7 +9427,6 @@ export type KleResponseCurrentArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -7455,7 +9452,6 @@ export type KleResponseObjectsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -7481,7 +9477,6 @@ export type KleResponseRegistrationsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -7523,6 +9518,148 @@ export type KleResponsePaged = {
    *
    */
   page_info: PageInfo;
+};
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type KleResponseRegistration = RegistrationBase & {
+  __typename?: 'KLEResponseRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  current?: Maybe<Kle>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Kle>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type KleResponseRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type KleResponseRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type KleTerminateInput = {
@@ -7835,6 +9972,107 @@ export type LeaveFilter = {
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
+export type LeaveRegistration = IRegistration & RegistrationBase & {
+  __typename?: 'LeaveRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   * Actual / current state entrypoint.
+   *
+   * Returns the state of the object at current validity and current assertion time.
+   *
+   * A single object is returned as only one validity can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint is appropriate to use for actual-state integrations and UIs.
+   *
+   */
+  current?: Maybe<Leave>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Leave>;
+};
+
+
+export type LeaveRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+export type LeaveRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
 /** Leave registration filter. */
 export type LeaveRegistrationFilter = {
   /**
@@ -7861,7 +10099,6 @@ export type LeaveRegistrationFilter = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -7927,10 +10164,10 @@ export type LeaveResponse = {
    *
    * **Warning**:
    * This entrypoint should **not** be used to implement event-driven integrations.
-   * Such integration should rather utilize the AMQP-based event-system.
+   * Such integration should rather utilize the GraphQL-based event-system.
    *
    */
-  registrations: Array<Registration>;
+  registrations: Array<LeaveResponseRegistration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
@@ -7951,7 +10188,6 @@ export type LeaveResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -7976,7 +10212,6 @@ export type LeaveResponseCurrentArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -8002,7 +10237,6 @@ export type LeaveResponseObjectsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -8028,7 +10262,6 @@ export type LeaveResponseRegistrationsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -8070,6 +10303,148 @@ export type LeaveResponsePaged = {
    *
    */
   page_info: PageInfo;
+};
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type LeaveResponseRegistration = RegistrationBase & {
+  __typename?: 'LeaveResponseRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  current?: Maybe<Leave>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Leave>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type LeaveResponseRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type LeaveResponseRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type LeaveTerminateInput = {
@@ -8631,6 +11006,107 @@ export type ManagerFilter = {
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
+export type ManagerRegistration = IRegistration & RegistrationBase & {
+  __typename?: 'ManagerRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   * Actual / current state entrypoint.
+   *
+   * Returns the state of the object at current validity and current assertion time.
+   *
+   * A single object is returned as only one validity can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint is appropriate to use for actual-state integrations and UIs.
+   *
+   */
+  current?: Maybe<Manager>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Manager>;
+};
+
+
+export type ManagerRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+export type ManagerRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
 /** Manager registration filter. */
 export type ManagerRegistrationFilter = {
   /**
@@ -8657,7 +11133,6 @@ export type ManagerRegistrationFilter = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -8723,10 +11198,10 @@ export type ManagerResponse = {
    *
    * **Warning**:
    * This entrypoint should **not** be used to implement event-driven integrations.
-   * Such integration should rather utilize the AMQP-based event-system.
+   * Such integration should rather utilize the GraphQL-based event-system.
    *
    */
-  registrations: Array<Registration>;
+  registrations: Array<ManagerResponseRegistration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
@@ -8747,7 +11222,6 @@ export type ManagerResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -8772,7 +11246,6 @@ export type ManagerResponseCurrentArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -8798,7 +11271,6 @@ export type ManagerResponseObjectsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -8824,7 +11296,6 @@ export type ManagerResponseRegistrationsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -8866,6 +11337,148 @@ export type ManagerResponsePaged = {
    *
    */
   page_info: PageInfo;
+};
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type ManagerResponseRegistration = RegistrationBase & {
+  __typename?: 'ManagerResponseRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  current?: Maybe<Manager>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Manager>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type ManagerResponseRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type ManagerResponseRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type ManagerTerminateInput = {
@@ -11615,6 +14228,107 @@ export type OrganisationUnitFilter = {
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
+export type OrganisationUnitRegistration = IRegistration & RegistrationBase & {
+  __typename?: 'OrganisationUnitRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   * Actual / current state entrypoint.
+   *
+   * Returns the state of the object at current validity and current assertion time.
+   *
+   * A single object is returned as only one validity can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint is appropriate to use for actual-state integrations and UIs.
+   *
+   */
+  current?: Maybe<OrganisationUnit>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<OrganisationUnit>;
+};
+
+
+export type OrganisationUnitRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+export type OrganisationUnitRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
 /** OrganisationUnit registration filter. */
 export type OrganisationUnitRegistrationFilter = {
   /**
@@ -11641,7 +14355,6 @@ export type OrganisationUnitRegistrationFilter = {
 };
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -11707,10 +14420,10 @@ export type OrganisationUnitResponse = {
    *
    * **Warning**:
    * This entrypoint should **not** be used to implement event-driven integrations.
-   * Such integration should rather utilize the AMQP-based event-system.
+   * Such integration should rather utilize the GraphQL-based event-system.
    *
    */
-  registrations: Array<Registration>;
+  registrations: Array<OrganisationUnitResponseRegistration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
@@ -11731,7 +14444,6 @@ export type OrganisationUnitResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -11756,7 +14468,6 @@ export type OrganisationUnitResponseCurrentArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -11782,7 +14493,6 @@ export type OrganisationUnitResponseObjectsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -11808,7 +14518,6 @@ export type OrganisationUnitResponseRegistrationsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -11850,6 +14559,148 @@ export type OrganisationUnitResponsePaged = {
    *
    */
   page_info: PageInfo;
+};
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type OrganisationUnitResponseRegistration = RegistrationBase & {
+  __typename?: 'OrganisationUnitResponseRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  current?: Maybe<OrganisationUnit>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<OrganisationUnit>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type OrganisationUnitResponseRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type OrganisationUnitResponseRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type OrganisationUnitTerminateInput = {
@@ -12158,8 +15009,108 @@ export enum OwnerInferencePriority {
   Engagement = 'ENGAGEMENT'
 }
 
+export type OwnerRegistration = IRegistration & RegistrationBase & {
+  __typename?: 'OwnerRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   * Actual / current state entrypoint.
+   *
+   * Returns the state of the object at current validity and current assertion time.
+   *
+   * A single object is returned as only one validity can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint is appropriate to use for actual-state integrations and UIs.
+   *
+   */
+  current?: Maybe<Owner>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Owner>;
+};
+
+
+export type OwnerRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+export type OwnerRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -12225,10 +15176,10 @@ export type OwnerResponse = {
    *
    * **Warning**:
    * This entrypoint should **not** be used to implement event-driven integrations.
-   * Such integration should rather utilize the AMQP-based event-system.
+   * Such integration should rather utilize the GraphQL-based event-system.
    *
    */
-  registrations: Array<Registration>;
+  registrations: Array<OwnerResponseRegistration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
@@ -12249,7 +15200,6 @@ export type OwnerResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -12274,7 +15224,6 @@ export type OwnerResponseCurrentArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -12300,7 +15249,6 @@ export type OwnerResponseObjectsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -12326,7 +15274,6 @@ export type OwnerResponseRegistrationsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -12368,6 +15315,148 @@ export type OwnerResponsePaged = {
    *
    */
   page_info: PageInfo;
+};
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type OwnerResponseRegistration = RegistrationBase & {
+  __typename?: 'OwnerResponseRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  current?: Maybe<Owner>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Owner>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type OwnerResponseRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type OwnerResponseRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type OwnerTerminateInput = {
@@ -12474,6 +15563,107 @@ export type ParentsBoundFacetFilter = {
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
+export type PersonRegistration = IRegistration & RegistrationBase & {
+  __typename?: 'PersonRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   * Actual / current state entrypoint.
+   *
+   * Returns the state of the object at current validity and current assertion time.
+   *
+   * A single object is returned as only one validity can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint is appropriate to use for actual-state integrations and UIs.
+   *
+   */
+  current?: Maybe<Employee>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<Employee>;
+};
+
+
+export type PersonRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+export type PersonRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
 /** Entrypoint for all read-operations */
 export type Query = {
   __typename?: 'Query';
@@ -12572,10 +15762,10 @@ export type Query = {
    *
    * **Warning**:
    * This entry should **not** be used to implement event-driven integrations.
-   * Such integration should rather utilize the AMQP-based event-system.
+   * Such integration should rather utilize the GraphQL-based event-system.
    *
    */
-  registrations: RegistrationPaged;
+  registrations: IRegistrationPaged;
   /** Get related organisation units. */
   related_units: RelatedUnitResponsePaged;
   /** Get role-mappings. */
@@ -12789,21 +15979,8 @@ export type RaValidityInput = {
   to?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
-/**
- * Bitemporal container.
- *
- * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
- *
- * Note:
- * Will eventually contain a full temporal axis per bitemporal container.
- *
- * **Warning**:
- * This entry should **not** be used to implement event-driven integrations.
- * Such integration should rather utilize the AMQP-based event-system.
- *
- */
-export type Registration = {
-  __typename?: 'Registration';
+/** Common fields for registrations. */
+export type RegistrationBase = {
   /**
    * UUID of the actor (integration or user) who changed the data.
    *
@@ -12921,26 +16098,6 @@ export type RegistrationFilter = {
    *
    */
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
-};
-
-/** Result page in cursor-based pagination. */
-export type RegistrationPaged = {
-  __typename?: 'RegistrationPaged';
-  /**
-   * List of results.
-   *
-   * The number of elements is defined by the `limit` argument.
-   *
-   */
-  objects: Array<Registration>;
-  /**
-   * Container for page information.
-   *
-   * Contains the cursors necessary to fetch other pages.
-   * Contains information on when to stop iteration.
-   *
-   */
-  page_info: PageInfo;
 };
 
 /** An organisation unit relation mapping */
@@ -13091,8 +16248,108 @@ export type RelatedUnitFilter = {
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
+export type RelatedUnitRegistration = IRegistration & RegistrationBase & {
+  __typename?: 'RelatedUnitRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   * Actual / current state entrypoint.
+   *
+   * Returns the state of the object at current validity and current assertion time.
+   *
+   * A single object is returned as only one validity can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint is appropriate to use for actual-state integrations and UIs.
+   *
+   */
+  current?: Maybe<RelatedUnit>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<RelatedUnit>;
+};
+
+
+export type RelatedUnitRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+export type RelatedUnitRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -13158,10 +16415,10 @@ export type RelatedUnitResponse = {
    *
    * **Warning**:
    * This entrypoint should **not** be used to implement event-driven integrations.
-   * Such integration should rather utilize the AMQP-based event-system.
+   * Such integration should rather utilize the GraphQL-based event-system.
    *
    */
-  registrations: Array<Registration>;
+  registrations: Array<RelatedUnitResponseRegistration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
@@ -13182,7 +16439,6 @@ export type RelatedUnitResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -13207,7 +16463,6 @@ export type RelatedUnitResponseCurrentArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -13233,7 +16488,6 @@ export type RelatedUnitResponseObjectsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -13259,7 +16513,6 @@ export type RelatedUnitResponseRegistrationsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -13301,6 +16554,148 @@ export type RelatedUnitResponsePaged = {
    *
    */
   page_info: PageInfo;
+};
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type RelatedUnitResponseRegistration = RegistrationBase & {
+  __typename?: 'RelatedUnitResponseRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  current?: Maybe<RelatedUnit>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<RelatedUnit>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type RelatedUnitResponseRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type RelatedUnitResponseRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type RelatedUnitsUpdateInput = {
@@ -13515,8 +16910,108 @@ export type RoleBindingFilter = {
   uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
 };
 
+export type RoleBindingRegistration = IRegistration & RegistrationBase & {
+  __typename?: 'RoleBindingRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   * Actual / current state entrypoint.
+   *
+   * Returns the state of the object at current validity and current assertion time.
+   *
+   * A single object is returned as only one validity can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint is appropriate to use for actual-state integrations and UIs.
+   *
+   */
+  current?: Maybe<RoleBinding>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<RoleBinding>;
+};
+
+
+export type RoleBindingRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+export type RoleBindingRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -13582,10 +17077,10 @@ export type RoleBindingResponse = {
    *
    * **Warning**:
    * This entrypoint should **not** be used to implement event-driven integrations.
-   * Such integration should rather utilize the AMQP-based event-system.
+   * Such integration should rather utilize the GraphQL-based event-system.
    *
    */
-  registrations: Array<Registration>;
+  registrations: Array<RoleBindingResponseRegistration>;
   /** UUID of the bitemporal object */
   uuid: Scalars['UUID']['output'];
   /**
@@ -13606,7 +17101,6 @@ export type RoleBindingResponse = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -13631,7 +17125,6 @@ export type RoleBindingResponseCurrentArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -13657,7 +17150,6 @@ export type RoleBindingResponseObjectsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -13683,7 +17175,6 @@ export type RoleBindingResponseRegistrationsArgs = {
 
 
 /**
- *
  * Top-level container for (bi)-temporal and actual state data access.
  *
  * Contains a UUID uniquely denoting the bitemporal object.
@@ -13725,6 +17216,148 @@ export type RoleBindingResponsePaged = {
    *
    */
   page_info: PageInfo;
+};
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type RoleBindingResponseRegistration = RegistrationBase & {
+  __typename?: 'RoleBindingResponseRegistration';
+  /**
+   * UUID of the actor (integration or user) who changed the data.
+   *
+   * Note:
+   * Currently mostly returns `"42c432e8-9c4a-11e6-9f62-873cf34a735f"`.
+   * Will eventually contain for the UUID of the integration or user who mutated data, based on the JWT token.
+   *
+   * @deprecated Use actor_object.
+   */
+  actor: Scalars['UUID']['output'];
+  /**
+   * Object for the actor (integration or user) who changed the data.
+   *
+   */
+  actor_object: Actor;
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  current?: Maybe<RoleBinding>;
+  /**
+   * End of the bitemporal interval.
+   *
+   * `null` indicates the open interval, aka. infinity.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   * * `null`
+   *
+   */
+  end?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * Model of the modified entity.
+   *
+   * Examples:
+   * * `"class"`
+   * * `"employee"`
+   * * `"org_unit"`
+   *
+   */
+  model: Scalars['String']['output'];
+  /** Note associated with the registration. */
+  note?: Maybe<Scalars['String']['output']>;
+  /**
+   * Internal registration ID for the registration.
+   *
+   * @deprecated May be removed in the future once the bitemporal scheme is finished.
+   *
+   */
+  registration_id: Scalars['Int']['output'];
+  /**
+   * Start of the bitemporal interval.
+   *
+   * Examples:
+   * * `"1970-01-01T00:00:00.000000+00:00"`
+   * * `"2019-12-18T12:55:15.348614+00:00"`
+   *
+   */
+  start: Scalars['DateTime']['output'];
+  /**
+   * UUID of the modified entity.
+   *
+   */
+  uuid: Scalars['UUID']['output'];
+  /**
+   *
+   * Temporal state entrypoint.
+   *
+   * Returns the state of the object at varying validities and current assertion time.
+   *
+   * A list of objects are returned as only many different validity intervals can be active at a given assertion time.
+   *
+   * Note:
+   * This the entrypoint should be used for temporal integrations and UIs.
+   * For actual-state integrations, please consider using `current` instead.
+   *
+   */
+  validities: Array<RoleBinding>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type RoleBindingResponseRegistrationCurrentArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Bitemporal container.
+ *
+ * Mostly useful for auditing purposes seeing when data-changes were made and by whom.
+ *
+ * Note:
+ * Will eventually contain a full temporal axis per bitemporal container.
+ *
+ * **Warning**:
+ * This entry should **not** be used to implement event-driven integrations.
+ * Such integration should rather utilize the GraphQL-based event-system.
+ *
+ */
+export type RoleBindingResponseRegistrationValiditiesArgs = {
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type RoleBindingTerminateInput = {

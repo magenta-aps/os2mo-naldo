@@ -347,6 +347,7 @@
             sortPath: "org_units[0].name",
           },
           { title: capital($_("date.date")), sortPath: "validity.from" },
+          { title: "" },
         ]}
       />
     {/if}

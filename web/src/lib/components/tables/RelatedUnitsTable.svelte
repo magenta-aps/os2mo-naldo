@@ -11,6 +11,8 @@
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { sortData } from "$lib/utils/sorting"
   import { onMount } from "svelte"
+  import Icon from "@iconify/svelte"
+  import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { updateGlobalNavigation } from "$lib/stores/navigation"
 
@@ -29,6 +31,7 @@
       ) {
         objects {
           validities {
+            uuid
             org_units(filter: { from_date: $fromDate, to_date: $toDate }) {
               name
               uuid
@@ -67,8 +70,16 @@
     // This allows for cleaner templating and sorting by name
     data = relatedUnits.map((unit) =>
       unit.org_units[0].uuid === $page.params.uuid
-        ? { org_units: [unit.org_units[1]], validity: unit.validity }
-        : { org_units: [unit.org_units[0]], validity: unit.validity }
+        ? {
+            uuid: unit.uuid,
+            org_units: [unit.org_units[1]],
+            validity: unit.validity,
+          }
+        : {
+            uuid: unit.uuid,
+            org_units: [unit.org_units[0]],
+            validity: unit.validity,
+          }
     )
   })
 </script>
@@ -91,6 +102,11 @@
         </a>
       </td>
       <ValidityTableCell validity={related_unit.validity} />
+      <td>
+        <a href={`${base}/auditlog/${related_unit.uuid}`}>
+          <Icon icon={historyRounded} width="25" height="25" />
+        </a>
+      </td>
     </tr>
   {:else}
     <tr class="leading-5 border-t border-slate-300 text-secondary">
