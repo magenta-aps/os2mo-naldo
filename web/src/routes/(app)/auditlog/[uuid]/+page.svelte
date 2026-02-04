@@ -6,7 +6,7 @@
   import { Timeline } from "vis-timeline/peer"
   import { DataSet } from "vis-data/peer"
   import "vis-timeline/styles/vis-timeline-graph2d.min.css"
-  import { format, subDays, addDays } from "date-fns"
+  import { format, subYears, addYears, min, max } from "date-fns"
   import { getAuditlog } from "$lib/http/getAuditlog"
   import {
     transformAuditLog,
@@ -37,8 +37,8 @@
     // We default to showing the last 2 years and the next 1 year.
     // This ensures the timeline looks good even if empty.
     const now = new Date()
-    const defaultZoomStart = subDays(now, 720)
-    const defaultZoomEnd = addDays(now, 360)
+    const defaultZoomStart = subYears(now, 2)
+    const defaultZoomEnd = addYears(now, 1)
 
     // We will expand these boundaries if we find data outside this range.
     let minDate = defaultZoomStart
@@ -87,8 +87,8 @@
         // --- C. Create Time Blocks (The Items) ---
         entries.forEach((entry, i) => {
           // Dynamic Zoom: If data exists 5 years ago, expand the minDate
-          if (entry.start < minDate) minDate = entry.start
-          if (entry.end > maxDate) maxDate = entry.end
+          minDate = min([minDate, entry.start])
+          maxDate = max([maxDate, entry.end])
 
           const translatedValue = capital($_(entry.value))
 
@@ -128,8 +128,8 @@
 
         // Hard Scroll Limits (Calculated + Buffer of 360 days)
         // Prevents user from scrolling into the year 3000
-        min: subDays(minDate, 360),
-        max: addDays(maxDate, 360),
+        min: subYears(minDate, 1),
+        max: addYears(maxDate, 1),
 
         // Interaction Settings
         verticalScroll: true,

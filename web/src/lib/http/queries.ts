@@ -148,21 +148,21 @@ gql`
   query Auditlog($uuid: [UUID!]) {
     registrations(filter: { uuids: $uuid, start: null, end: null }) {
       objects {
-        ... on OrganisationUnitRegistration {
-          actor_object {
-            ... on SpecialActor {
-              display_name
-              uuid
-            }
-            ... on UnknownActor {
-              display_name
-              uuid
-            }
+        actor_object {
+          ... on SpecialActor {
+            display_name
+            uuid
           }
-          uuid
-          start
-          end
-          note
+          ... on UnknownActor {
+            display_name
+            uuid
+          }
+        }
+        uuid
+        start
+        end
+        note
+        ... on OrganisationUnitRegistration {
           validities(start: null, end: null) {
             name
             user_key
@@ -185,20 +185,6 @@ gql`
           }
         }
         ... on AddressRegistration {
-          actor_object {
-            ... on SpecialActor {
-              display_name
-              uuid
-            }
-            ... on UnknownActor {
-              display_name
-              uuid
-            }
-          }
-          uuid
-          start
-          end
-          note
           validities(start: null, end: null) {
             address_type {
               name
@@ -227,20 +213,6 @@ gql`
           }
         }
         ... on AssociationRegistration {
-          actor_object {
-            ... on SpecialActor {
-              display_name
-              uuid
-            }
-            ... on UnknownActor {
-              display_name
-              uuid
-            }
-          }
-          uuid
-          start
-          end
-          note
           validities(start: null, end: null) {
             person {
               name
@@ -268,20 +240,6 @@ gql`
           }
         }
         ... on PersonRegistration {
-          actor_object {
-            ... on SpecialActor {
-              display_name
-              uuid
-            }
-            ... on UnknownActor {
-              display_name
-              uuid
-            }
-          }
-          uuid
-          start
-          end
-          note
           validities(start: null, end: null) {
             given_name
             surname
@@ -294,20 +252,6 @@ gql`
           }
         }
         ... on EngagementRegistration {
-          actor_object {
-            ... on SpecialActor {
-              display_name
-              uuid
-            }
-            ... on UnknownActor {
-              display_name
-              uuid
-            }
-          }
-          uuid
-          start
-          end
-          note
           validities(start: null, end: null) {
             person {
               name
@@ -333,20 +277,6 @@ gql`
           }
         }
         ... on ITUserRegistration {
-          actor_object {
-            ... on SpecialActor {
-              display_name
-              uuid
-            }
-            ... on UnknownActor {
-              display_name
-              uuid
-            }
-          }
-          uuid
-          start
-          end
-          note
           validities(start: null, end: null) {
             user_key
             itsystem {
@@ -363,20 +293,6 @@ gql`
           }
         }
         ... on KLERegistration {
-          actor_object {
-            ... on SpecialActor {
-              display_name
-              uuid
-            }
-            ... on UnknownActor {
-              display_name
-              uuid
-            }
-          }
-          uuid
-          start
-          end
-          note
           validities(start: null, end: null) {
             kle_aspects {
               name
@@ -391,31 +307,12 @@ gql`
           }
         }
         ... on LeaveRegistration {
-          actor_object {
-            ... on SpecialActor {
-              display_name
-              uuid
-            }
-            ... on UnknownActor {
-              display_name
-              uuid
-            }
-          }
-          uuid
-          start
-          end
-          note
           validities(start: null, end: null) {
             leave_type {
               name
             }
             engagement {
-              org_unit {
-                name
-              }
-              job_function {
-                name
-              }
+              uuid
             }
             validity {
               from
@@ -424,20 +321,6 @@ gql`
           }
         }
         ... on ManagerRegistration {
-          actor_object {
-            ... on SpecialActor {
-              display_name
-              uuid
-            }
-            ... on UnknownActor {
-              display_name
-              uuid
-            }
-          }
-          uuid
-          start
-          end
-          note
           validities(start: null, end: null) {
             manager_person: person {
               name
@@ -461,20 +344,6 @@ gql`
           }
         }
         ... on OwnerRegistration {
-          actor_object {
-            ... on SpecialActor {
-              display_name
-              uuid
-            }
-            ... on UnknownActor {
-              display_name
-              uuid
-            }
-          }
-          uuid
-          start
-          end
-          note
           validities(start: null, end: null) {
             owner {
               name
@@ -486,20 +355,6 @@ gql`
           }
         }
         ... on RoleBindingRegistration {
-          actor_object {
-            ... on SpecialActor {
-              display_name
-              uuid
-            }
-            ... on UnknownActor {
-              display_name
-              uuid
-            }
-          }
-          uuid
-          start
-          end
-          note
           validities(start: null, end: null) {
             role {
               name
@@ -511,20 +366,6 @@ gql`
           }
         }
         ... on RelatedUnitRegistration {
-          actor_object {
-            ... on SpecialActor {
-              display_name
-              uuid
-            }
-            ... on UnknownActor {
-              display_name
-              uuid
-            }
-          }
-          uuid
-          start
-          end
-          note
           validities(start: null, end: null) {
             org_units {
               name

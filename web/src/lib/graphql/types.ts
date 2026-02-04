@@ -895,10 +895,6 @@ export type AddressRegistration = IRegistration & RegistrationBase & {
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
    *
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
-   * Use validities instead.
-   *
    */
   validities: Array<Address>;
 };
@@ -1973,10 +1969,6 @@ export type AssociationRegistration = IRegistration & RegistrationBase & {
    * Note:
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
-   *
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
-   * Use validities instead.
    *
    */
   validities: Array<Association>;
@@ -3213,10 +3205,6 @@ export type ClassRegistration = IRegistration & RegistrationBase & {
    * Note:
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
-   *
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
-   * Use validities instead.
    *
    */
   validities: Array<Class>;
@@ -5222,10 +5210,6 @@ export type EngagementRegistration = IRegistration & RegistrationBase & {
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
    *
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
-   * Use validities instead.
-   *
    */
   validities: Array<Engagement>;
 };
@@ -6145,10 +6129,6 @@ export type FacetRegistration = IRegistration & RegistrationBase & {
    * Note:
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
-   *
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
-   * Use validities instead.
    *
    */
   validities: Array<Facet>;
@@ -7225,10 +7205,6 @@ export type ItSystemRegistration = IRegistration & RegistrationBase & {
    * Note:
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
-   *
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
-   * Use validities instead.
    *
    */
   validities: Array<ItSystem>;
@@ -8341,10 +8317,6 @@ export type ItUserRegistration = IRegistration & RegistrationBase & {
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
    *
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
-   * Use validities instead.
-   *
    */
   validities: Array<ItUser>;
 };
@@ -9301,10 +9273,6 @@ export type KleRegistration = IRegistration & RegistrationBase & {
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
    *
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
-   * Use validities instead.
-   *
    */
   validities: Array<Kle>;
 };
@@ -10089,10 +10057,6 @@ export type LeaveRegistration = IRegistration & RegistrationBase & {
    * Note:
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
-   *
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
-   * Use validities instead.
    *
    */
   validities: Array<Leave>;
@@ -11127,10 +11091,6 @@ export type ManagerRegistration = IRegistration & RegistrationBase & {
    * Note:
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
-   *
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
-   * Use validities instead.
    *
    */
   validities: Array<Manager>;
@@ -14354,10 +14314,6 @@ export type OrganisationUnitRegistration = IRegistration & RegistrationBase & {
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
    *
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
-   * Use validities instead.
-   *
    */
   validities: Array<OrganisationUnit>;
 };
@@ -15139,10 +15095,6 @@ export type OwnerRegistration = IRegistration & RegistrationBase & {
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
    *
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
-   * Use validities instead.
-   *
    */
   validities: Array<Owner>;
 };
@@ -15696,10 +15648,6 @@ export type PersonRegistration = IRegistration & RegistrationBase & {
    * Note:
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
-   *
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
-   * Use validities instead.
    *
    */
   validities: Array<Employee>;
@@ -16386,10 +16334,6 @@ export type RelatedUnitRegistration = IRegistration & RegistrationBase & {
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
    *
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
-   * Use validities instead.
-   *
    */
   validities: Array<RelatedUnit>;
 };
@@ -17051,10 +16995,6 @@ export type RoleBindingRegistration = IRegistration & RegistrationBase & {
    * Note:
    * This the entrypoint should be used for temporal integrations and UIs.
    * For actual-state integrations, please consider using `current` instead.
-   *
-   * @deprecated
-   * Will be removed in a future version of GraphQL.
-   * Use validities instead.
    *
    */
   validities: Array<RoleBinding>;

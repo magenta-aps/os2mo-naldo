@@ -71,7 +71,7 @@ const FAR_FUTURE = new Date("2099-12-31")
 const toDate = (d: any): Date => {
   if (!d) return FAR_FUTURE
   if (d instanceof Date) return d
-  if (typeof d === "string") return parseISO(d.replace(/(\.\d{3})\d+/, "$1"))
+  if (typeof d === "string") return parseISO(d)
   return FAR_FUTURE
 }
 
@@ -101,11 +101,6 @@ const extractValue = (data: any, key?: string): string => {
 
   // 3. Context-Specific Strategies
   // Certain keys require very specific formatting logic.
-
-  // Engagement: Combine Job Function + Org Unit
-  if (key === "engagement") {
-    return `${data.job_function?.name} - ${data.org_unit[0]?.name}`
-  }
 
   // KLE Aspects: Just want the name list
   if (key === "kle_aspects") {
