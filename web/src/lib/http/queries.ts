@@ -167,16 +167,16 @@ gql`
             name
             user_key
             unit_type {
-              name
+              uuid
             }
             org_unit_level {
-              name
+              uuid
             }
             parent {
-              name
+              uuid
             }
             time_planning {
-              name
+              uuid
             }
             validity {
               from
@@ -187,7 +187,7 @@ gql`
         ... on AddressRegistration {
           validities(start: null, end: null) {
             address_type {
-              name
+              uuid
             }
             address: resolve {
               ... on DefaultAddress {
@@ -197,14 +197,10 @@ gql`
               ... on DARAddress {
                 name
               }
-              ... on MultifieldAddress {
-                value
-                value2
-              }
             }
             description: user_key
             visibility {
-              name
+              uuid
             }
             validity {
               from
@@ -215,23 +211,23 @@ gql`
         ... on AssociationRegistration {
           validities(start: null, end: null) {
             person {
-              name
+              uuid
             }
             association_type {
-              name
+              uuid
             }
 
             org_unit {
-              name
+              uuid
             }
             primary {
-              name
+              uuid
             }
             substitute {
-              name
+              uuid
             }
             trade_union {
-              name
+              uuid
             }
             validity {
               from
@@ -254,21 +250,21 @@ gql`
         ... on EngagementRegistration {
           validities(start: null, end: null) {
             person {
-              name
+              uuid
             }
             org_unit {
-              name
+              uuid
             }
             engagement_type {
-              name
+              uuid
             }
             job_function {
-              name
+              uuid
             }
             extension_1
             extension_4
             primary {
-              name
+              uuid
             }
             validity {
               from
@@ -280,11 +276,11 @@ gql`
           validities(start: null, end: null) {
             user_key
             itsystem {
-              name
+              uuid
             }
             external_id
             primary {
-              name
+              uuid
             }
             validity {
               from
@@ -295,10 +291,10 @@ gql`
         ... on KLERegistration {
           validities(start: null, end: null) {
             kle_aspects {
-              name
+              uuid
             }
             kle_number {
-              name
+              uuid
             }
             validity {
               from
@@ -309,7 +305,7 @@ gql`
         ... on LeaveRegistration {
           validities(start: null, end: null) {
             leave_type {
-              name
+              uuid
             }
             engagement {
               uuid
@@ -323,19 +319,19 @@ gql`
         ... on ManagerRegistration {
           validities(start: null, end: null) {
             manager_person: person {
-              name
+              uuid
             }
             manager_level {
-              name
+              uuid
             }
             manager_type {
-              name
+              uuid
             }
             org_unit {
-              name
+              uuid
             }
             responsibilities {
-              name
+              uuid
             }
             validity {
               from
@@ -346,7 +342,7 @@ gql`
         ... on OwnerRegistration {
           validities(start: null, end: null) {
             owner {
-              name
+              uuid
             }
             validity {
               from
@@ -357,7 +353,7 @@ gql`
         ... on RoleBindingRegistration {
           validities(start: null, end: null) {
             role {
-              name
+              uuid
             }
             validity {
               from
@@ -368,7 +364,7 @@ gql`
         ... on RelatedUnitRegistration {
           validities(start: null, end: null) {
             org_units {
-              name
+              uuid
             }
             validity {
               from

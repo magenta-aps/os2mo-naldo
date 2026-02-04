@@ -80,7 +80,7 @@ const toDate = (d: any): Date => {
  * Recursively digs into data objects to find the best human-readable string.
  * It uses the 'key' to decide which strategy to use (Context-Aware).
  */
-const extractValue = (data: any, key?: string): string => {
+const extractValue = (data: any): string => {
   // 1. Safety Checks
   // If data is null/undefined, or an empty primitive string, we explicitly mark it.
   if (data === null || data === undefined) return "not_set"
@@ -89,50 +89,18 @@ const extractValue = (data: any, key?: string): string => {
     return s.length ? s : "not_set"
   }
 
-  // TODO: Check `leave`, `owner`, `rolebinding` and `related_units` when fixed.
-
   // 2. Recursive List Handling
   // If the data is an array (e.g. a list of persons), we map over it.
-  // Crucial: We pass 'key' down so the items inside know their context.
   if (Array.isArray(data)) {
     if (data.length === 0) return "not_set"
-    return data.map((item) => extractValue(item, key)).join(", ")
+    return data.map((item) => extractValue(item)).join(", ")
   }
 
-  // 3. Context-Specific Strategies
-  // Certain keys require very specific formatting logic.
-
-  // KLE Aspects: Just want the name list
-  if (key === "kle_aspects") {
-    return data.map((kle_aspect: any) => kle_aspect.name)
-  }
-
-  // KLE Number: Combine User Key + Name
-  if (key === "kle_number") {
-    return `${data?.user_key} - ${data?.name}`
-  }
-
-  // 4. Generic Object Strategies (Priority Order)
-  // If no specific key matched, we try to guess the best field to show.
-
-  // Priority A: "Display Name" (Best for Actors/Persons)
-  if (data.display_name) return data.display_name
-
-  // Priority B: "Name" (Best for simple types)
-  if (data.name) return data.name
-
-  // Priority C: "Value + Value2" (Complex Addresses)
-  // We check for both to ensure we don't accidentally display partial data.
-  if ("value" in data && "value2" in data) {
-    if (data.value2) {
-      return `${data.value || ""} ${data.value2}`.trim()
-    }
-  }
-
-  // Priority D: "Value" (Simple Addresses)
+  // "name" or "value" (Values of address-objects)
+  if ("name" in data && data.name) return String(data.name)
   if ("value" in data && data.value) return String(data.value)
 
-  // Priority E: UUID Fallback (Last resort)
+  // UUID Fallback (Last resort)
   if (data.uuid) return String(data.uuid)
 
   return "Unknown Data"
@@ -224,7 +192,7 @@ export const transformAuditLog = (rawData: any[]): Registration[] => {
           start: validFrom,
           end: validTo,
           // Extract the human-readable string, passing the key for context
-          value: extractValue(validityBlock[key], key),
+          value: extractValue(validityBlock[key]),
           color: "blue",
         })
       })
