@@ -372,6 +372,21 @@ gql`
             }
           }
         }
+        ... on ClassRegistration {
+          validities(start: null, end: null) {
+            user_key
+            name
+            class_owner: owner
+            scope
+            facet {
+              uuid
+            }
+            class_validity: validity {
+              from
+              to
+            }
+          }
+        }
       }
     }
   }

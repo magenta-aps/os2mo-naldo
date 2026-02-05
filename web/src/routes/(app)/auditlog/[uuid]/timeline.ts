@@ -170,18 +170,23 @@ export const transformAuditLog = (rawData: any[]): Registration[] => {
 
     // --- STEP 1: Collect Raw Data ---
     reg.validities.forEach((validityBlock: any) => {
-      // Determine date range (Handle 'validity' vs 'person_validity' alias)
+      // Determine date range (Handle 'validity' ('person_validity' & 'class_validity' is just aliases)
       const validFrom = toDate(
-        validityBlock.validity?.from || validityBlock.person_validity?.from
+        validityBlock.validity?.from ||
+          validityBlock.person_validity?.from ||
+          validityBlock.class_validity?.from
       )
       const validTo = toDate(
-        validityBlock.validity?.to || validityBlock.person_validity?.to
+        validityBlock.validity?.to ||
+          validityBlock.person_validity?.to ||
+          validityBlock.class_validity?.to
       )
 
       // Iterate over every key in the block (person, address, etc.)
       Object.keys(validityBlock).forEach((key) => {
         // Skip metadata keys, they aren't timeline rows
-        if (key === "validity" || key === "person_validity") return
+        if (key === "validity" || key === "person_validity" || key === "class_validity")
+          return
 
         if (!registration.timelines[key]) {
           registration.timelines[key] = []
