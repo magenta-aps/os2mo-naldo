@@ -45,9 +45,21 @@
   </div>
   {#each errors as error}
     {#if error === "required"}
-      <span class="label-text-alt text-error block"
+      <span class="text-xs text-error"
         >{$_("validation.is_required", { values: { field: title } })}</span
       >
     {/if}
   {/each}
 </div>
+
+<style>
+  @supports selector(::-webkit-calendar-picker-indicator) {
+    .input[type="date"],
+    .input[type="datetime-local"],
+    .input[type="month"],
+    .input[type="week"],
+    .input[type="time"] {
+      padding-right: 2rem;
+    }
+  }
+</style>

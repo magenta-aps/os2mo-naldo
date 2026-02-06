@@ -48,11 +48,13 @@
   ]
 </script>
 
-<div class="tabs tabs-bordered whitespace-nowrap">
+<div
+  class="whitespace-wrap block xl:tabs tabs-border xxl:whitespace-nowrap w-full flex"
+>
   {#each items as item}
     <button
       data-sveltekit-replacestate
-      class="tab text-base hover:no-underline
+      class="tab flex-1 text-center text-base hover:no-underline
         {item.count === $step ? 'tab-active text-primary' : 'text-secondary'}"
       on:click={() => {
         if (item.count === 1) {

@@ -1,6 +1,61 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "daisyui";
+@plugin "daisyui/theme" {
+  name: "corporate";
+  default: true;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: #e8e8e8;
+  --color-base-300: #d1d1d1;
+  --color-base-content: oklch(22.389% 0.031 278.072);
+  --color-primary: #1053ab;
+  --color-primary-content: #ffffff;
+  --color-secondary: #00244e;
+  --color-secondary-content: #ffffff;
+  --color-accent: #d1e4ff;
+  --color-accent-content: #00244e;
+  --color-neutral: oklch(0% 0 0);
+  --color-neutral-content: oklch(100% 0 0);
+  --color-info: oklch(60% 0.126 221.723);
+  --color-info-content: oklch(100% 0 0);
+  --color-success: oklch(62% 0.194 149.214);
+  --color-success-content: oklch(100% 0 0);
+  --color-warning: oklch(85% 0.199 91.936);
+  --color-warning-content: oklch(0% 0 0);
+  --color-error: oklch(70% 0.191 22.216);
+  --color-error-content: oklch(0% 0 0);
+  --radius-selector: 2rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.25rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@theme {
+  --text-underline-offset-5: 5px;
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
 
 @layer base {
   html {
@@ -8,19 +63,19 @@
   }
 
   h1 {
-    @apply text-3xl text-secondary;
+    @apply text-3xl text-primary;
   }
 
   h2 {
-    @apply text-2xl text-secondary;
+    @apply text-2xl text-primary;
   }
 
   h3 {
-    @apply text-xl text-secondary;
+    @apply text-xl text-primary;
   }
 
   h4 {
-    @apply text-lg text-secondary;
+    @apply text-lg text-primary;
   }
 
   a {
@@ -38,16 +93,13 @@
 
 /* svelte-select overrides */
 /* I have no clue why this is needed, but it is and it sucks. */
+/* TODO: maybe h-8 is neeed? */
 .svelte-select {
-  @apply !h-8 !border-slate-300;
+  @apply !h-8 !border-slate-300 !border-1;
 }
 
 .svelte-select.multi {
   @apply !h-auto;
-}
-
-.svelte-select.hover {
-  @apply !border-slate-300;
 }
 
 .svelte-select.focused {
@@ -61,7 +113,6 @@
 .svelte-select > * {
   @apply !cursor-pointer;
 }
-
 .svelte-select input#dar-search {
   @apply !cursor-text;
 }
@@ -73,7 +124,47 @@
 .svelte-select input#cpr-lookup {
   @apply !cursor-text;
 }
-
 .svelte-select.error {
   @apply !border-red-500;
+}
+
+.tabs-sm > .tab {
+  --tab-p: 1rem;
+}
+
+@layer utilities.daisyui.modifier {
+  .tabs-border > .tab {
+    &:before {
+      width: 100%;
+      left: 0;
+    }
+
+    &:first-of-type:before {
+      width: 100%;
+      left: 0;
+    }
+
+    &:last-of-type:before {
+      width: 100%;
+    }
+
+    &:not(
+        :is(
+            .tab-active,
+            [aria-selected="true"],
+            [aria-current="true"],
+            [aria-current="page"],
+            input:checked,
+            label:has(:checked)
+          )
+      ) {
+      &:before {
+        background-color: color-mix(
+          in oklab,
+          currentColor 10%,
+          var(--color-neutral) 5%
+        );
+      }
+    }
+  }
 }

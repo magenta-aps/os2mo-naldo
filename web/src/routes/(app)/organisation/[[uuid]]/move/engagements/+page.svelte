@@ -164,7 +164,7 @@
 <!-- FIXME: handler gives TS-error, because type is `SubmitFunction<Record<string, unknown> | undefined, never>`  -->
 <!-- Instead of `SubmitFunction`. This is ignored by typing it to `any`. -->
 <form method="post" class="mx-6" use:enhance={handler}>
-  <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded">
+  <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded-sm">
     <div class="p-8">
       <div class="flex flex-row gap-6">
         <DateInput
@@ -200,16 +200,16 @@
               >
               <ul
                 id="engagement-list"
-                class="max-h-48 overflow-y-auto bg-base-100 rounded p-1"
+                class="max-h-48 overflow-y-auto bg-base-100 rounded-sm p-1"
               >
                 <div class="flex text-secondary">
                   <label
-                    class="label text-sm text-secondary cursor-pointer break-words gap-4"
+                    class="label flex items-center gap-4 py-2 px-4 rounded-lg w-full text-sm text-secondary cursor-pointer wrap-break-word hover:bg-base-200 transition-all"
                   >
                     <input
                       type="checkbox"
                       on:click={() => toggleSelectAll(engagements)}
-                      class="checkbox checkbox-primary rounded normal-case font-normal text-base text-base-100"
+                      class="checkbox checkbox-primary rounded-sm normal-case font-normal text-base text-base-100"
                       checked={selectedEngagements.length === engagements.length}
                       indeterminate={selectedEngagements.length > 0 &&
                         selectedEngagements.length < engagements.length}
@@ -228,14 +228,14 @@
                 }) as engagement}
                   <div class="flex text-secondary">
                     <label
-                      class="label text-sm text-secondary cursor-pointer break-words gap-4"
+                      class="label flex items-center gap-4 py-2 px-4 rounded-lg w-full text-sm text-secondary cursor-pointer wrap-break-word hover:bg-base-200 transition-all"
                     >
                       <input
                         type="checkbox"
                         name="engagements"
                         bind:group={selectedEngagements}
                         value={engagement.current?.uuid}
-                        class="checkbox checkbox-primary rounded normal-case font-normal text-base text-base-100"
+                        class="checkbox checkbox-primary rounded-sm normal-case font-normal text-base text-base-100"
                       />
                       <span class="label-text text-secondary"
                         >{engagement.current?.person[0].name}</span

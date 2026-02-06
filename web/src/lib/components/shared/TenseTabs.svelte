@@ -4,9 +4,9 @@
   import { tenses } from "$lib/stores/tenses"
 </script>
 
-<div class="tabs p-0 bg-base-100 border-primary border rounded my-5 w-fit">
+<div class="tabs tabs-sm bg-base-100 border-primary border rounded-sm my-5 w-fit">
   <button
-    class="border-primary border-r text-slate-600 hover:text-secondary tab
+    class="border-primary border-r rounded-l-sm text-slate-600 tab
         {$tenses.future ? 'bg-accent text-primary' : ''}"
     on:click={() => {
       $tenses.future = !$tenses.future
@@ -15,7 +15,7 @@
     {capital($_("future"))}
   </button>
   <button
-    class="tab text-slate-600 hover:text-secondary
+    class="tab text-slate-600
         {$tenses.present ? 'bg-accent text-primary' : ''}"
     on:click={() => {
       $tenses.present = !$tenses.present
@@ -24,7 +24,7 @@
     {capital($_("present"))}
   </button>
   <button
-    class="border-primary border-l text-slate-600 hover:text-secondary tab
+    class="border-primary border-l rounded-r-sm text-slate-600 tab
         {$tenses.past ? 'bg-accent text-primary' : ''}"
     on:click={() => {
       $tenses.past = !$tenses.past

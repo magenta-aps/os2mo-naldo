@@ -227,7 +227,7 @@
 </div>
 
 <div class="px-12 pt-6">
-  <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded p-6 mb-4">
+  <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded-sm p-6 mb-4">
     <div>
       <Search
         type="org-unit"
@@ -241,7 +241,7 @@
           <label for="includeChildren" class="text-sm text-secondary pb-1">
             {$_("include_children_text")}
           </label>
-          <div>
+          <div class="flex gap-2 items-center">
             <button
               on:click={() => {
                 includeChildren = false
@@ -253,7 +253,7 @@
             <input
               id="includeChildren"
               type="checkbox"
-              class="toggle bg-secondary hover:bg-secondary"
+              class="toggle"
               bind:checked={includeChildren}
             />
             <button

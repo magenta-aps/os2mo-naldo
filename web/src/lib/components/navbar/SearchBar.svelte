@@ -24,7 +24,7 @@
 </script>
 
 <div
-  class="navbar bg-gradient-to-r from-primary via-primary to-secondary h-16 px-6 w-full"
+  class="navbar bg-linear-to-r from-primary via-primary to-secondary h-16 px-6 w-full"
 >
   <div class="flex justify-center gap-2 w-full items-center">
     <!-- Toggle -->
@@ -36,7 +36,11 @@
     >
       <Icon icon={personOutlineRounded} width="25" height="25" />
     </button>
-    <input type="checkbox" class="toggle" bind:checked={orgChecked} />
+    <input
+      type="checkbox"
+      class="toggle toggle-secondary bg-white"
+      bind:checked={orgChecked}
+    />
 
     <button
       on:click={() => {
