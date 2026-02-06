@@ -1,5 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/utils/helpers"
   import "$lib/global.css"
   import SuccessAlert from "$lib/components/alerts/Success.svelte"
   import ErrorAlert from "$lib/components/alerts/Error.svelte"
@@ -22,12 +23,17 @@
 </svelte:head>
 
 <div class="flex min-h-screen">
-  <Navbar />
-  <div class="flex-col w-full">
-    <SearchBar />
-    <Drawer>
-      <slot />
-    </Drawer>
+  <div class="drawer lg:drawer-open">
+    <input id="my-drawer-4" type="checkbox" class="drawer-toggle" />
+    <div class="drawer-content">
+      <SearchBar />
+      <!-- Page content here -->
+      <Drawer>
+        <slot />
+      </Drawer>
+    </div>
+    <!-- Navbar -->
+    <Navbar />
   </div>
 </div>
 

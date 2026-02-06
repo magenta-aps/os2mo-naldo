@@ -1,5 +1,7 @@
 {
+	"account": "account",
 	"account_name": "account name",
+	"actions": "actions",
 	"address": "{n, plural, =0 {the address} one {address} other {addresses}}",
 	"address_type": "address type",
 	"and": "and",
