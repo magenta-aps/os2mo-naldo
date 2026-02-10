@@ -90,7 +90,8 @@
           minDate = min([minDate, entry.start])
           maxDate = max([maxDate, entry.end])
 
-          const translatedValue = capital($_(entry.value))
+          const translatedValue =
+            entry.value === "not_set" ? capital($_(entry.value)) : entry.value
 
           items.add({
             id: `${rowId}-${i}`,
