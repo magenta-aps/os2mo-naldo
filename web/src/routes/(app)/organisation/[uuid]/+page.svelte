@@ -222,15 +222,23 @@
             title: upperCase($_("id")),
             sortPath: "user_key",
           },
-          {
-            title: env.PUBLIC_SHOW_EXTENSION_1
-              ? capital($_("job_code"))
-              : capital($_("job_function", { values: { n: 1 } })),
-            sortPath: "job_function.name",
-          },
+          // 1. Logic for the "Job Code" column - Only visible in ADD mode
+          ...(env.PUBLIC_EXTENSION_1_MODE === "ADD"
+            ? [
+                {
+                  title: capital($_("job_code")),
+                  sortPath: "job_function.name",
+                },
+              ]
+            : []),
+          // 2. Logic for the "Job Function" column
           {
             title: capital($_("job_function", { values: { n: 1 } })),
-            sortPath: "job_function.name",
+            // In REPLACE or ADD, this column shows extension_1. In OFF, it shows job_function.
+            sortPath:
+              env.PUBLIC_EXTENSION_1_MODE !== "OFF"
+                ? "extension_1"
+                : "job_function.name",
           },
           { title: capital($_("engagement_type")), sortPath: "engagement_type.name" },
           { title: capital($_("ituser", { values: { n: 2 } })) },

@@ -45,10 +45,6 @@
       headers = headers.filter((header) => header.title !== capital($_("trade_union")))
     }
 
-    if (!env.PUBLIC_SHOW_EXTENSION_1 && table === EngagementTable) {
-      headers.splice(3, 1)
-    }
-
     if (!env.PUBLIC_SHOW_EXTENSION_4 && table === EngagementTable) {
       headers = headers.filter(
         (header) => header.title !== capital($_("department_code"))

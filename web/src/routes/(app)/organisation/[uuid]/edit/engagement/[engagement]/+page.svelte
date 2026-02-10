@@ -92,16 +92,19 @@
   const orgUnit = field("org_unit", "", [required()])
   const jobFunction = field("job_function", "", [required()])
   const engagementType = field("engagement_type", "", [required()])
-
   const userKey = field("user_key", "", [])
   const primary = field("primary", "", [])
+  const extension_1 = field("extension_1", "", [])
+  const extension_4 = field("extension_4", "", [])
   const svelteForm = form(
     fromDate,
     orgUnit,
     jobFunction,
     engagementType,
     userKey,
-    primary
+    primary,
+    extension_1,
+    extension_4
   )
 
   const handler: SubmitFunction =
@@ -174,7 +177,9 @@
       $jobFunction.value !== initialEngagement.job_function ||
       $engagementType.value !== initialEngagement.engagement_type ||
       $userKey.value !== initialEngagement.user_key ||
-      $primary.value !== initialEngagement.primary
+      $primary.value !== initialEngagement.primary ||
+      $extension_1.value !== initialEngagement.extension_1 ||
+      $extension_4.value !== initialEngagement.extension_4
 
     const toDateExtended =
       toDate === ""
@@ -282,27 +287,45 @@
               startValue={engagement.user_key}
               extra_classes="basis-1/2"
             />
-            <Select
-              title={env.PUBLIC_SHOW_EXTENSION_1
-                ? capital($_("job_code"))
-                : capital($_("job_function", { values: { n: 1 } }))}
-              id="job-function"
-              startValue={engagement.job_function}
-              bind:name={$jobFunction.value}
-              errors={$jobFunction.errors}
-              iterable={filterClassesByFacetUserKey(facets, "engagement_job_function")}
-              extra_classes="basis-1/2"
-              required={true}
-            />
+
+            {#if env.PUBLIC_EXTENSION_1_MODE === "REPLACE"}
+              <Input
+                title={capital($_("job_function", { values: { n: 1 } }))}
+                id="extension-1"
+                bind:value={$extension_1.value}
+                startValue={engagement.extension_1}
+                extra_classes="basis-1/2"
+              />
+            {:else}
+              <Select
+                title={env.PUBLIC_EXTENSION_1_MODE === "ADD"
+                  ? capital($_("job_code"))
+                  : capital($_("job_function", { values: { n: 1 } }))}
+                id="job-function"
+                startValue={engagement.job_function}
+                bind:name={$jobFunction.value}
+                errors={$jobFunction.errors}
+                iterable={filterClassesByFacetUserKey(
+                  facets,
+                  "engagement_job_function"
+                )}
+                extra_classes="basis-1/2"
+                required={true}
+              />
+            {/if}
           </div>
-          {#if env.PUBLIC_SHOW_EXTENSION_1 || env.PUBLIC_SHOW_EXTENSION_4}
+
+          {#if env.PUBLIC_EXTENSION_1_MODE === "ADD" || env.PUBLIC_SHOW_EXTENSION_4}
             <div class="flex flex-row gap-6">
-              {#if env.PUBLIC_SHOW_EXTENSION_1}
+              {#if env.PUBLIC_EXTENSION_1_MODE === "ADD"}
                 <Input
                   title={capital($_("job_function", { values: { n: 1 } }))}
                   id="extension-1"
                   startValue={engagement.extension_1}
-                  extra_classes="basis-1/2"
+                  bind:value={$extension_1.value}
+                  extra_classes={env.PUBLIC_SHOW_EXTENSION_4
+                    ? "basis-1/2"
+                    : "basis-full"}
                 />
               {/if}
               {#if env.PUBLIC_SHOW_EXTENSION_4}
@@ -310,7 +333,9 @@
                   title={capital($_("department_code"))}
                   id="extension-4"
                   startValue={engagement.extension_4}
-                  extra_classes="basis-1/2"
+                  extra_classes={env.PUBLIC_EXTENSION_1_MODE === "ADD"
+                    ? "basis-1/2"
+                    : "basis-full"}
                 />
               {/if}
             </div>

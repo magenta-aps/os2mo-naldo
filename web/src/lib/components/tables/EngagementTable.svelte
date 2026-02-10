@@ -181,16 +181,21 @@
         </td>
       {/if}
       <td class="text-sm p-4">{engagement.user_key}</td>
-      <td class="text-sm p-4"
-        >{env.PUBLIC_SHOW_JOB_FUNCTION_USER_KEY
-          ? `${engagement.job_function.user_key} - ${engagement.job_function.name}`
-          : engagement.job_function.name}</td
-      >
-      {#if env.PUBLIC_SHOW_EXTENSION_1}
-        <td class="text-sm p-4"
-          >{engagement.extension_1 ? engagement.extension_1 : ""}</td
-        >
+      {#if env.PUBLIC_EXTENSION_1_MODE === "ADD"}
+        <td class="text-sm p-4">
+          {engagement.job_function.name}
+        </td>
       {/if}
+
+      <td class="text-sm p-4">
+        {#if env.PUBLIC_EXTENSION_1_MODE === "REPLACE" || env.PUBLIC_EXTENSION_1_MODE === "ADD"}
+          {engagement.extension_1 ?? ""}
+        {:else}
+          {env.PUBLIC_SHOW_JOB_FUNCTION_USER_KEY
+            ? `${engagement.job_function.user_key} - ${engagement.job_function.name}`
+            : engagement.job_function.name}
+        {/if}
+      </td>
       <td class="text-sm p-4">{engagement.engagement_type.name}</td>
       {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
         <td class="text-sm p-4">

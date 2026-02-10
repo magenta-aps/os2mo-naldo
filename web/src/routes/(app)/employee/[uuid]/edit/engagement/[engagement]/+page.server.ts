@@ -23,8 +23,8 @@ export const actions: Actions = {
       user_key: userKey,
       ...(engagementType && { engagement_type: engagementType }),
       ...(jobFunction && { job_function: jobFunction }),
-      extension_1: extension_1,
-      extension_4: extension_4,
+      ...(extension_1 && { extension_1: extension_1 }),
+      ...(extension_4 && { extension_4: extension_4 }),
       ...(primary && { primary: primary }),
       validity: { from: startDate, ...(endDate && { to: endDate }) },
     }

@@ -40,8 +40,19 @@ services:
       # Specific for regions
       PUBLIC_SHOW_SD_CODE_IN_TREES: "false"
       PUBLIC_SHOW_JOB_FUNCTION_USER_KEY: "false"
-      # Changes job_function to job_code and instead populates job_function with extension_1  
-      PUBLIC_SHOW_EXTENSION_1: "false"
+      # Controls the display and data logic for 'extension_1' and 'job_function'.
+      # Supported states:
+      # "OFF":     Standard behavior. 'extension_1' is hidden. 'job_function' remains 
+      #            as-is with the label "Job Function".
+      #
+      # "REPLACE": Value Replacement. The 'job_function' field displays the value of 
+      #            'extension_1' instead of its own data. The field label remains 
+      #            "Job Function".
+      #
+      # "ADD":     Label and Value Shift. The standard 'job_function' data is moved to 
+      #            a field labeled "Job Code". The 'extension_1' value is then 
+      #            placed into the field now labeled "Job Function".
+      PUBLIC_EXTENSION_1_MODE: "ADD"
       # Department code
       PUBLIC_SHOW_EXTENSION_4: "false"
       PUBLIC_SHOW_ITUSER_CONNECTIONS: "true"

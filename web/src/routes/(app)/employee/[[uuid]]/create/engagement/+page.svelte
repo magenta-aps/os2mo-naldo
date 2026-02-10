@@ -169,7 +169,7 @@
         <div class="flex flex-row gap-6">
           <Input title="ID" id="user-key" extra_classes="basis-1/2" />
           <Select
-            title={env.PUBLIC_SHOW_EXTENSION_1
+            title={env.PUBLIC_EXTENSION_1_MODE === "ADD"
               ? capital($_("job_code"))
               : capital($_("job_function", { values: { n: 1 } }))}
             id="job-function"
@@ -180,9 +180,9 @@
             extra_classes="basis-1/2"
           />
         </div>
-        {#if env.PUBLIC_SHOW_EXTENSION_1 || env.PUBLIC_SHOW_EXTENSION_4}
+        {#if env.PUBLIC_EXTENSION_1_MODE !== "OFF" || env.PUBLIC_SHOW_EXTENSION_4}
           <div class="flex flex-row gap-6">
-            {#if env.PUBLIC_SHOW_EXTENSION_1}
+            {#if env.PUBLIC_EXTENSION_1_MODE !== "OFF"}
               <Input
                 title={capital($_("job_function", { values: { n: 1 } }))}
                 id="extension-1"

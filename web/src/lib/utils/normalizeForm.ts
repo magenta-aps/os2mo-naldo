@@ -30,6 +30,8 @@ export const normalizeEngagement = (e: any) => {
     engagement_type: e.engagement_type?.name ?? null,
     user_key: e.user_key ?? null,
     primary: e.primary?.name ?? "",
+    extension_1: e.extension_1 ?? "",
+    extension_4: e.extension_4 ?? "",
   }
 }
 
