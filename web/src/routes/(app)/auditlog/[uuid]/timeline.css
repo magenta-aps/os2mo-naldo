@@ -20,6 +20,7 @@
   border: 0;
   font-size: 0.8rem;
   border-color: #cbd5e1; /* Default border color if borders are added */
+  cursor: pointer;
 }
 
 .vis-item.vis-selected {

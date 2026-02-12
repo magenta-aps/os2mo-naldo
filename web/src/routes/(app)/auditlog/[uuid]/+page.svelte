@@ -191,6 +191,23 @@
         timeline.setGroups(groups)
         timeline.setItems(items)
         timeline.setOptions(options)
+
+        timeline.off("click") // Clean up previous listeners if any
+        timeline.on("click", (props) => {
+          const id = props.item
+          if (!id) return
+
+          const item = items.get(id) as unknown as TimelineItem
+          if (item && item.tooltipData?.value) {
+            const text = item.tooltipData.value
+            navigator.clipboard.writeText(text).then(() => {
+              // Simple Visual Feedback
+              const original = item.content
+              items.update({ id, content: capital($_("copied")) })
+              setTimeout(() => items.update({ id, content: original }), 1000)
+            })
+          }
+        })
       } finally {
         isLoading = false
       }
