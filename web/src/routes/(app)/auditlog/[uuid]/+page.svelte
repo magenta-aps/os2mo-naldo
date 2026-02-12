@@ -222,7 +222,7 @@
 
 <div class="px-12 pt-6 relative min-h-[500px] overflow-y">
   <div
-    class="visualization bg-slate-100 rounded-md p-4 overflow-y h-full"
+    class="visualization bg-base-200 rounded-md p-4 overflow-y h-full"
     bind:this={container}
   />
   {#if isLoading}

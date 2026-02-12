@@ -5,7 +5,7 @@
 
 <div class="flex items-center cursor-pointer text-ellipsis">
   <div class="text-ellipsis">
-    <div class="inline-block text-secondary">
+    <div class="inline-block text-base-content">
       {slot === "item" ? item.name : item.cpr_no}
     </div>
   </div>

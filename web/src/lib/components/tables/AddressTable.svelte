@@ -107,14 +107,14 @@
 </script>
 
 {#if !data}
-  <tr class="leading-5 border-t border-slate-300 text-secondary">
+  <tr class="leading-5 border-t border-base-300 text-base-content">
     <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
   {#each data as address, i}
     <tr
-      class="{i % 2 === 0 ? '' : 'bg-slate-100'} 
-      leading-5 border-t border-slate-300 text-secondary"
+      class="{i % 2 === 0 ? '' : 'bg-base-200'} 
+      leading-5 border-t border-base-300 text-base-content"
     >
       <td class="text-sm p-4">{address.address_type.name}</td>
       <td class="text-sm p-4"
@@ -156,14 +156,14 @@
           href="{base}/{$page.url.pathname?.split(
             '/'
           )[1]}/{uuid}/terminate/address/{address.uuid}"
-          class="hover:slate-300"
+          class="hover:base-300"
         >
           <Icon icon={cancelOutlineRounded} width="25" height="25" />
         </a>
       </td>
     </tr>
   {:else}
-    <tr class="leading-5 border-t border-slate-300 text-secondary">
+    <tr class="leading-5 border-t border-base-300 text-base-content">
       <td class="text-sm p-4"
         >{capital(
           $_("no_item", { values: { item: $_("address", { values: { n: 2 } }) } })

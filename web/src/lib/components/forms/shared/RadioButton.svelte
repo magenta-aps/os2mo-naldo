@@ -12,9 +12,9 @@
 
 <div class="form-control {noPadding ? '' : 'pb-3'}">
   <label
-    class="label text-sm text-secondary cursor-pointer p-0 wrap-break-word {noPadding
+    class="label text-sm text-base-content cursor-pointer p-0 wrap-break-word {noPadding
       ? ''
-      : 'pb-1'} gap-4 {disabled ? 'text-gray-400' : ''}"
+      : 'pb-1'} gap-4 {disabled ? 'text-base-content/50' : ''}"
   >
     <input
       type="radio"

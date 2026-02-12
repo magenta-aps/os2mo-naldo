@@ -38,7 +38,7 @@
     </button>
     <input
       type="checkbox"
-      class="toggle toggle-secondary bg-white"
+      class="toggle toggle-secondary bg-base-100"
       bind:checked={orgChecked}
     />
 

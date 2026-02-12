@@ -227,7 +227,7 @@
 </div>
 
 <div class="px-12 pt-6">
-  <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded-sm p-6 mb-4">
+  <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm p-6 mb-4">
     <div>
       <Search
         type="org-unit"
@@ -237,8 +237,8 @@
       />
 
       <div class="form-control pb-3">
-        <div class="pb-1 text-secondary">
-          <label for="includeChildren" class="text-sm text-secondary pb-1">
+        <div class="pb-1 text-base-content">
+          <label for="includeChildren" class="text-sm text-base-content pb-1">
             {$_("include_children_text")}
           </label>
           <div class="flex gap-2 items-center">
@@ -246,7 +246,7 @@
               on:click={() => {
                 includeChildren = false
               }}
-              class="text-secondary"
+              class="text-base-content"
             >
               <Icon icon={homeOutlineRounded} width="25" height="25" />
             </button>
@@ -260,7 +260,7 @@
               on:click={() => {
                 includeChildren = true
               }}
-              class="text-secondary"
+              class="text-base-content"
             >
               <Icon icon={homeWorkOutlineRounded} width="25" height="25" />
             </button>
@@ -320,7 +320,7 @@
           })}`}
         </p>
       </div>
-      <p class="text-secondary text-xs">* {capital($_("insights_note"))}</p>
+      <p class="text-base-content text-xs">* {capital($_("insights_note"))}</p>
     {/if}
   </div>
 </div>

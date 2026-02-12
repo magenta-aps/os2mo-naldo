@@ -13,7 +13,7 @@
 
 <td class="text-sm px-4 py-2 whitespace-nowrap">
   <div>
-    <span class="text-slate-600 font-normal inline-block min-w-10"
+    <span class="text-base-content/80 font-normal inline-block min-w-10"
       >{capital($_("date.start"))}</span
     >
     {#if validity.from}
@@ -21,7 +21,7 @@
     {/if}
   </div>
   <div>
-    <span class="text-slate-600 font-normal inline-block min-w-10"
+    <span class="text-base-content/80 font-normal inline-block min-w-10"
       >{capital($_("date.end"))}</span
     >
     {#if validity.to}
