@@ -119,14 +119,14 @@
 </script>
 
 {#if !data}
-  <tr class="p-4 leading-5 border-t border-slate-300 text-secondary">
+  <tr class="p-4 leading-5 border-t border-base-300 text-base-content">
     <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
 {:else}
   {#each data as association, i}
     <tr
-      class="{i % 2 === 0 ? '' : 'bg-slate-100'} 
-      leading-5 border-t border-slate-300 text-secondary"
+      class="{i % 2 === 0 ? '' : 'bg-base-200'} 
+      leading-5 border-t border-base-300 text-base-content"
     >
       <td class="text-sm p-4">
         {#if isOrg}
@@ -190,7 +190,7 @@
       </td>
     </tr>
   {:else}
-    <tr class="leading-5 border-t border-slate-300 text-secondary">
+    <tr class="leading-5 border-t border-base-300 text-base-content">
       <td class="text-sm p-4"
         >{capital(
           $_("no_item", { values: { item: $_("association", { values: { n: 2 } }) } })

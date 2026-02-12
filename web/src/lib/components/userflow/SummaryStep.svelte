@@ -192,7 +192,7 @@
   }
 </script>
 
-<div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded-sm">
+<div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
   <div class="p-8 space-y-5">
     <EmployeeSummary />
     <EngagementSummary />

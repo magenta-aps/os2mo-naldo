@@ -53,7 +53,7 @@
 <div class="pb-3">
   <div class="form-control w-full pb-1">
     {#if title || required}
-      <label for="dar-search" class="text-sm text-secondary pb-1">
+      <label for="dar-search" class="text-sm text-base-content pb-1">
         {title ? title : ""}
         {required ? "*" : ""}
       </label>

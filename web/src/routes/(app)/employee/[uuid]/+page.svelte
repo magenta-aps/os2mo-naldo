@@ -112,7 +112,7 @@
     <h1 class="mb-4">
       {employee.name}
       {#if env.PUBLIC_SHOW_CPR_NUMBER}
-        <span class="text-slate-600">
+        <span>
           {employee.cpr_number
             ? `(${employee.cpr_number.slice(0, 6)}-${employee.cpr_number.slice(-4)})`
             : ""}

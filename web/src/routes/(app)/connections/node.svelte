@@ -109,16 +109,16 @@
 </script>
 
 <li style="padding-left: {indent}px">
-  <div class="flex pl-2 text-secondary">
+  <div class="flex pl-2 text-base-content">
     {#if loading}
       <div class="w-5 h-5 loading loading-spinner" />
     {:else if has_children}
       {#if open}
-        <button class="text-secondary" on:click|preventDefault={toggleOpen}>
+        <button class="text-base-content" on:click|preventDefault={toggleOpen}>
           <Icon icon={keyboardArrowDownRounded} width="20" height="20" rotate={0} />
         </button>
       {:else}
-        <button class="text-secondary" on:click|preventDefault={toggleOpen}>
+        <button class="text-base-content" on:click|preventDefault={toggleOpen}>
           <Icon icon={keyboardArrowDownRounded} width="20" height="20" rotate={3} />
         </button>
       {/if}

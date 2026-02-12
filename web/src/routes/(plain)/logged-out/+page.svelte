@@ -62,7 +62,7 @@
     --accent: #d1e4ff;
     --neutral: #121212;
     --base-100: #ffffff;
-    --slate-300: #f8fafc;
+    --base-300: #f8fafc;
 
     --primary-text: #00244e;
     --secondary-text: #475569;
@@ -80,7 +80,7 @@
     flex-flow: column nowrap;
     align-items: center;
     justify-content: center;
-    background-color: var(--slate-300);
+    background-color: var(--base-300);
     color: var(--secondary);
   }
 

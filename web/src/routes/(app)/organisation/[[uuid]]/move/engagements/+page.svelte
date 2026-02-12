@@ -164,7 +164,7 @@
 <!-- FIXME: handler gives TS-error, because type is `SubmitFunction<Record<string, unknown> | undefined, never>`  -->
 <!-- Instead of `SubmitFunction`. This is ignored by typing it to `any`. -->
 <form method="post" class="mx-6" use:enhance={handler}>
-  <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded-sm">
+  <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
     <div class="p-8">
       <div class="flex flex-row gap-6">
         <DateInput
@@ -191,7 +191,7 @@
           required={true}
         />
       </div>
-      <div class="text-secondary pb-3">
+      <div class="text-base-content pb-3">
         {#if engagements && engagements.length}
           {#key engagements}
             <fieldset>
@@ -202,9 +202,9 @@
                 id="engagement-list"
                 class="max-h-48 overflow-y-auto bg-base-100 rounded-sm p-1"
               >
-                <div class="flex text-secondary">
+                <div class="flex text-base-content">
                   <label
-                    class="label flex items-center gap-4 py-2 px-4 rounded-lg w-full text-sm text-secondary cursor-pointer wrap-break-word hover:bg-base-200 transition-all"
+                    class="label flex items-center gap-4 py-2 px-4 rounded-lg w-full text-sm text-base-content cursor-pointer wrap-break-word hover:bg-base-200 transition-all"
                   >
                     <input
                       type="checkbox"
@@ -214,7 +214,7 @@
                       indeterminate={selectedEngagements.length > 0 &&
                         selectedEngagements.length < engagements.length}
                     />
-                    <span class="label-text text-secondary"
+                    <span class="label-text text-base-content"
                       >{selectedEngagements.length !== engagements.length
                         ? capital($_("select_all"))
                         : capital($_("deselect_all"))}</span
@@ -226,9 +226,9 @@
                   const nameB = b.current?.person[0]?.name?.toLowerCase() || ""
                   return nameA > nameB ? 1 : -1
                 }) as engagement}
-                  <div class="flex text-secondary">
+                  <div class="flex text-base-content">
                     <label
-                      class="label flex items-center gap-4 py-2 px-4 rounded-lg w-full text-sm text-secondary cursor-pointer wrap-break-word hover:bg-base-200 transition-all"
+                      class="label flex items-center gap-4 py-2 px-4 rounded-lg w-full text-sm text-base-content cursor-pointer wrap-break-word hover:bg-base-200 transition-all"
                     >
                       <input
                         type="checkbox"
@@ -237,7 +237,7 @@
                         value={engagement.current?.uuid}
                         class="checkbox checkbox-primary rounded-sm normal-case font-normal text-base text-base-100"
                       />
-                      <span class="label-text text-secondary"
+                      <span class="label-text text-base-content"
                         >{engagement.current?.person[0].name}</span
                       >
                     </label>

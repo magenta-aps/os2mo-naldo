@@ -45,7 +45,7 @@
 <div class="pb-3">
   <div class="form-control w-full pb-1">
     {#if title || required}
-      <label for="cpr-lookup" class="text-sm text-secondary pb-1">
+      <label for="cpr-lookup" class="text-sm text-base-content pb-1">
         {title ? title : ""}
         {required ? "*" : ""}
       </label>

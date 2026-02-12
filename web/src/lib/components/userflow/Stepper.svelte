@@ -55,7 +55,7 @@
     <button
       data-sveltekit-replacestate
       class="tab flex-1 text-center text-base hover:no-underline
-        {item.count === $step ? 'tab-active text-primary' : 'text-secondary'}"
+        {item.count === $step ? 'tab-active text-primary' : 'text-base-content'}"
       on:click={() => {
         if (item.count === 1) {
           step.updateStep(item.count)

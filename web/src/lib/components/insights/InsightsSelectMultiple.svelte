@@ -29,7 +29,7 @@
 <div class="pb-3 {extra_classes}">
   <div class="form-control w-full pb-1">
     {#if title || required}
-      <label for={id} class="text-sm text-secondary pb-1">
+      <label for={id} class="text-sm text-base-content pb-1">
         {title ? title : ""}
         {required ? "*" : ""}
       </label>

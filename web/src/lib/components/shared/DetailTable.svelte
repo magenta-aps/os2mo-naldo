@@ -18,7 +18,7 @@
 </script>
 
 <div class="overflow-x-auto rounded-sm border mb-8">
-  <table class="border-slate-300 w-full">
+  <table class="border-base-300 w-full">
     {#if headers}
       <thead class="text-left">
         {#each headers as header}
@@ -27,7 +27,7 @@
               sortTable(header.sortPath || "")
             }}
             class="{header.sortPath ? 'cursor-pointer' : ''} 
-                px-4 py-3 font-bold leading-4 tracking-wider text-left text-secondary border-slate-300 bg-slate-300"
+                px-4 py-3 font-bold leading-4 tracking-wider text-left text-base-content border-base-300 bg-base-300"
           >
             <div class="flex items-center">
               {header.title}
@@ -60,7 +60,7 @@
         {/each}
       </thead>
     {/if}
-    <tbody class="border-slate-300 min-h-64 text-slate-600">
+    <tbody class="border-base-300 min-h-64">
       <slot />
     </tbody>
   </table>

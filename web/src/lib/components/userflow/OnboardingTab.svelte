@@ -17,9 +17,9 @@
     <button
       class="tab flex gap-2 cursor-pointer [--tab-border-color:transparent]"
       class:tab-active={selectedIndex === i}
-      class:[--tab-bg:bg-slate-100]={selectedIndex === i}
+      class:[--tab-bg:bg-base-200]={selectedIndex === i}
       class:text-error={item.validated === false}
-      class:bg-white={selectedIndex !== i}
+      class:bg-base-100={selectedIndex !== i}
       on:click={(e) => {
         e.preventDefault()
         e.stopPropagation()
@@ -29,7 +29,7 @@
       <span>{capital($_(label, { values: { n: 1 } }))} {i + 1}</span>
       {#if items.length > 1}
         <button
-          class="btn btn-xs btn-circle btn-ghost text-secondary hover:bg-error"
+          class="btn btn-xs btn-circle btn-ghost text-base-content hover:bg-error"
           type="button"
           aria-label={`Remove ${label} ${i + 1}`}
           on:click={async (e) => {

@@ -106,7 +106,7 @@
 
 {#await graphQLClient().request(AddressDocument, { uuid: $page.params.address })}
   <div class="mx-6">
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded-sm">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
       <div class="p-8">
         <Skeleton />
       </div>
@@ -118,7 +118,7 @@
     data.addresses.objects[0].validities[0].person
   )}
   <form method="post" class="mx-6" use:enhance={handler}>
-    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-slate-100 rounded-sm">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
       <div class="p-8">
         <DateInput
           startValue={$date}

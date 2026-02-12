@@ -18,7 +18,7 @@
 
 {#if orgUnit && depth > 0}
   {#if isDeep}
-    <div class="text-xs text-slate-500">
+    <div class="text-xs text-base-content/80">
       {ancestors.at(-1)?.name}
 
       {#if depth >= 3}
@@ -32,12 +32,12 @@
   {/if}
 
   <div class="text-xs">
-    <span class="text-slate-500">
+    <span class="text-base-content/80">
       {ancestors.at(0)?.name}
     </span>
 
     {#if showCurrentName}
-      <span class="text-slate-500">/</span>
+      <span class="text-base-content/80">/</span>
       <span class="text-primary">{orgUnit.name}</span>
     {/if}
   </div>

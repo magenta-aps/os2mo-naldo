@@ -9,7 +9,7 @@
   <h3 class="text-primary">{capital($_("engagement", { values: { n: 2 } }))}</h3>
   {#each $engagementInfo as engagement, index}
     {#if engagement.validated === true}
-      <div class="grid gap-1 pb-2 text-secondary">
+      <div class="grid gap-1 pb-2 text-base-content">
         <h4>
           {capital($_("engagement", { values: { n: 1 } }))}
           {index + 1}

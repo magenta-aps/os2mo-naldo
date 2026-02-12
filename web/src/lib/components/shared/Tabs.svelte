@@ -32,7 +32,7 @@
       href="#{item.value}"
       data-sveltekit-replacestate
       class="tab flex-1 text-center text-base hover:no-underline
-      {item.value === activeItem ? 'tab-active text-primary' : 'text-secondary'}"
+      {item.value === activeItem ? 'tab-active text-primary' : 'text-base-content'}"
       on:click={() => dispatch("tabChange", item.value)}
     >
       {capital($_(item.value, { values: { n: item.n } }))}

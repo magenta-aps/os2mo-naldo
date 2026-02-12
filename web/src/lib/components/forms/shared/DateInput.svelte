@@ -22,7 +22,7 @@
 </script>
 
 <div class="form-control basis-1/2 {noPadding ? '' : 'pb-3'}">
-  <div class="text-secondary {noPadding ? '' : 'pb-1'}">
+  <div class="text-base-content {noPadding ? '' : 'pb-1'}">
     {#if title || required}
       <label for={id} class="text-sm pb-1">
         {title ? title : ""}
@@ -37,7 +37,7 @@
       on:change
       {min}
       {max}
-      class="input input-bordered input-sm rounded text-base text-secondary font-normal w-full cursor-pointer focus:outline-0 {errors.length
+      class="input input-bordered input-sm rounded text-base text-base-content font-normal w-full cursor-pointer focus:outline-0 {errors.length
         ? 'input-error'
         : 'focus:input-primary'}"
       {disabled}

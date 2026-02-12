@@ -38,7 +38,7 @@
 
 <div class="flex items-center cursor-pointer text-ellipsis">
   <div class="text-ellipsis">
-    <div class="inline-block text-secondary">
+    <div class="inline-block text-base-content">
       {item.name}
       {#if type === "employee" && env.PUBLIC_SHOW_EMPLOYEE_BIRTHDAY_IN_SEARCH}{returnCPR(
           item

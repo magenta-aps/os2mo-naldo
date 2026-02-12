@@ -30,14 +30,14 @@
 <!-- I used the conditional for padding - even though it's not directly connected. -->
 {#if orgUnit}
   {#await graphQLClient().request( GetBreadcrumbsDocument, { uuid: orgUnit.uuid, currentDate: $date } )}
-    <div class="text-secondary {link ? 'pb-0' : 'pb-4'}">
+    <div class="text-base-content {link ? 'pb-0' : 'pb-4'}">
       {capital($_("loading"))}...
     </div>
   {:then data}
     {@const parents = data.org_units.objects.length
       ? data.org_units.objects[0].current?.ancestors
       : []}
-    <div class="breadcrumbs text-secondary pt-0 {link ? 'pb-0' : 'pb-4'}">
+    <div class="breadcrumbs text-base-content pt-0 {link ? 'pb-0' : 'pb-4'}">
       <ul>
         {#if parents}
           {#each parents.reverse() as parent}
@@ -59,5 +59,5 @@
     </div>
   {/await}
 {:else if !orgUnit && emptyMessage}
-  <div class="text-secondary {link ? 'pb-0' : 'pb-4'}">{emptyMessage}</div>
+  <div class="text-base-content {link ? 'pb-0' : 'pb-4'}">{emptyMessage}</div>
 {/if}

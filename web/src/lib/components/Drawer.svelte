@@ -78,7 +78,7 @@
     {:else}
       <div class="m-auto justify-center">
         <span
-          class="loading loading-spinner text-secondary h-32 w-32 border-primary mb-6"
+          class="loading loading-spinner text-base-content h-32 w-32 border-primary mb-6"
         />
         <p>{capital($_("authenticating"))}...</p>
       </div>
