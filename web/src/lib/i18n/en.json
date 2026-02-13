@@ -220,6 +220,7 @@
 	"surname": "surname",
 	"terminate_item": "terminate {item}",
 	"time_planning": "time planning",
+	"theme": "theme",
 	"to": "to",
 	"trade_union": "Confederation / Trade Union",
 	"unit": "{n, plural, =0 {the unit} one {unit} other {units}}",

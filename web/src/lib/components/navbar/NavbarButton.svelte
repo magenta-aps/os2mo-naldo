@@ -51,7 +51,9 @@
 {tooltipStateClass}
     is-drawer-close:tooltip is-drawer-close:tooltip-right
     hover:no-underline hover:bg-accent hover:text-base-content transition-all
-    {href && $page.url.pathname === href ? 'bg-accent text-base-content' : 'text-white'}
+    {href && $page.url.pathname === href
+    ? 'bg-accent text-base-content'
+    : 'text-secondary-content'}
   "
   data-tip={tooltip || title}
 >

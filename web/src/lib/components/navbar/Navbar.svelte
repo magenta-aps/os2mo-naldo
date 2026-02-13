@@ -5,6 +5,7 @@
   import { isAdmin, isAuth } from "$lib/stores/auth"
   import { logoutKeycloak, keycloak } from "$lib/auth/keycloak"
   import NavbarButton from "$lib/components/navbar/NavbarButton.svelte"
+  import NavbarThemeToggle from "$lib/components/navbar/NavbarThemeToggle.svelte"
   import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { VersionDocument } from "./query.generated"
@@ -225,6 +226,9 @@
             on:click={changeLanguage}
             icon={language}
           />
+        </li>
+        <li>
+          <NavbarThemeToggle title={capital($_("theme"))} />
         </li>
         <li>
           <NavbarButton
