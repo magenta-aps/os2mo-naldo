@@ -24,11 +24,33 @@
   --depth: 0;
   --noise: 0;
 }
-
 @plugin "daisyui/theme" {
-  name: "business";
-  prefersdark: true; /* Automatically switches based on OS settings */
+  name: "dark";
+  default: false;
+  prefersdark: true;
   color-scheme: "dark";
+  /* "Chill" Primary: A muted, desaturated blue (easier on eyes than neon) */
+  --color-primary: #6b8ec6;
+  --color-primary-content: #001328;
+
+  /* "Chill" Secondary: A very dark slate/navy.
+     Since navbar is 'bg-secondary'. */
+  --color-secondary: #1e2329;
+  --color-secondary-content: #a6adba;
+
+  --color-accent: #343232;
+  --color-accent-content: #a6adba;
+
+  --color-base-100: #0f1115;
+  --color-base-200: #090a0c;
+  --color-base-content: #a6adba;
+
+  --color-neutral: #2a323c;
+
+  --color-info: #6b8ec6;
+  --color-success: #22a048;
+  --color-warning: #d98829;
+  --color-error: #d64545;
 }
 
 @theme {
