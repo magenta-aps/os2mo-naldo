@@ -93,6 +93,8 @@
           const translatedValue =
             entry.value === "not_set" ? capital($_(entry.value)) : entry.value
 
+          const stateClass = entry.isChange ? "changed-item" : "unchanged-item"
+
           items.add({
             id: `${rowId}-${i}`,
             group: rowId, // Connects this block to the sub-row created above
@@ -100,7 +102,7 @@
             start: entry.start,
             end: entry.end,
             type: "range",
-            className: "blue-item", // TODO: Not yet implemented, will be added later
+            className: stateClass,
 
             // Custom data payload for the tooltip (accessed in onMount template)
             tooltipData: {

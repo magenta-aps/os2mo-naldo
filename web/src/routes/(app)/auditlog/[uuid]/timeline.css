@@ -14,18 +14,28 @@
    2. ITEMS (The Timeline Blocks)
    ========================================= */
 .vis-item {
-  background-color: #d1e4ff; /* Light Blue Background */
-  color: #00244e; /* Dark Blue Text */
+  background-color: #f1f5f9; /* Slate-100 (Light Gray) */
+  color: #64748b; /* Slate-500 (Muted Text) */
+  border: 1px solid #e2e8f0; /* Slate-200 (Subtle Border) */
   border-radius: 0.25rem;
-  border: 0;
   font-size: 0.8rem;
-  border-color: #cbd5e1; /* Default border color if borders are added */
   cursor: pointer;
+  opacity: 0.9; /* Slight transparency for history */
 }
 
 .vis-item.vis-selected {
   background-color: #b2d0fc; /* Slightly darker when selected */
   border-radius: 0.25rem;
+}
+
+/* Only applied when we specifically add this class */
+.vis-item.changed-item {
+  background-color: #d1e4ff; /* Your original Blue */
+  color: #00244e; /* Dark Blue Text */
+  border-color: #93c5fd; /* Blue Border */
+  opacity: 1; /* Fully solid */
+  z-index: 10; /* Ensure changes sit on top of history */
+  box-shadow: 0 1px 2px rgba(0, 36, 78, 0.1); /* Slight pop */
 }
 
 /* Content Alignment inside items */

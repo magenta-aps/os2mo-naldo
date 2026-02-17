@@ -1,9 +1,9 @@
 import { parseISO, addDays, isEqual, isAfter, compareAsc } from "date-fns"
 
 // ==========================================
-// VIS-TIMELINE DEFINITIONS
+// VIS-TIMELINE TYPES
 // ==========================================
-// These interfaces define how the visual library (vis-timeline) expects data.
+// These define the structure required by the visualization library.
 
 export interface TimelineGroup {
   id: string | number
@@ -23,7 +23,6 @@ export interface TimelineItem {
   type?: "box" | "point" | "range" | "background"
   className?: string
   style?: string
-  // Custom data we attach for the tooltip popup
   tooltipData?: {
     actor: string
     attribute: string
@@ -34,27 +33,21 @@ export interface TimelineItem {
   }
 }
 
-// ==========================================
-// INTERNAL DATA MODELS
-// ==========================================
-
-// Represents a single block of time for a specific attribute
-export interface TimelineEntry {
+// Represents a single logical period of validity for a specific attribute.
+export interface TimelineInterval {
   start: Date
   end: Date
   value: string
-  color: "blue"
+  isChange: boolean
 }
 
-// Represents one entire "Registration" event from the audit log
 export interface Registration {
   id: string
   objectUuid: string
   registeredAt: Date
   actor: string
   note: string
-  // A map where Key = Attribute Name (e.g. "person") and Value = List of time entries
-  timelines: Record<string, TimelineEntry[]>
+  timelines: Record<string, TimelineInterval[]>
 }
 
 // ==========================================
@@ -64,82 +57,95 @@ export interface Registration {
 const FAR_FUTURE = new Date("2099-12-31")
 
 /**
- * Normalizes incoming dates.
- * If a date is missing, it defaults to the "Far Future" so the timeline bar stays open-ended.
- * It also handles stripping milliseconds if the API returns complex ISO strings.
+ * Normalizes incoming dates to ensure the timeline bar stays open-ended
+ * if a date is missing (defaults to 2099).
  */
-const toDate = (d: any): Date => {
-  if (!d) return FAR_FUTURE
-  if (d instanceof Date) return d
-  if (typeof d === "string") return parseISO(d)
+const normalizeDate = (input: any): Date => {
+  if (!input) return FAR_FUTURE
+  if (input instanceof Date) return input
+  if (typeof input === "string") return parseISO(input)
   return FAR_FUTURE
 }
 
 /**
- * The "Smart" Extractor.
- * Recursively digs into data objects to find the best human-readable string.
- * It uses the 'key' to decide which strategy to use (Context-Aware).
+ * Checks if the 'newInterval' is a subset of any interval in 'history'.
+ * Used to determine if a data point is a "Technical Split" (Gray) or a "Real Change" (Blue).
  */
-const extractValue = (data: any): string => {
-  // 1. Safety Checks
-  // If data is null/undefined, or an empty primitive string, we explicitly mark it.
+const isCoveredByHistory = (
+  newInterval: TimelineInterval,
+  history: TimelineInterval[]
+) => {
+  return history.some((historyItem) => {
+    // Values must match exactly
+    if (historyItem.value !== newInterval.value) return false
+
+    // Range Check: Is the new interval completely inside the history item?
+    // Logic: History Start <= New Start  AND  History End >= New End
+    const isStartInside = historyItem.start.getTime() <= newInterval.start.getTime()
+    const isEndInside = historyItem.end.getTime() >= newInterval.end.getTime()
+
+    return isStartInside && isEndInside
+  })
+}
+
+/**
+ * Recursively digs into data objects to find the best human-readable string.
+ */
+const extractDisplayValue = (data: any): string => {
   if (data === null || data === undefined) return "not_set"
+
   if (typeof data !== "object") {
     const s = String(data).trim()
     return s.length ? s : "not_set"
   }
 
-  // 2. Recursive List Handling
-  // If the data is an array (e.g. a list of persons), we map over it.
+  // Handle Lists
   if (Array.isArray(data)) {
     if (data.length === 0) return "not_set"
-    return data.map((item) => extractValue(item)).join(", ")
+    return data.map((item) => extractDisplayValue(item)).join(", ")
   }
 
-  // "name" or "value" (Values of address-objects)
+  // Handle Objects (Context-Aware)
   if ("name" in data && data.name) return String(data.name)
   if ("value" in data && data.value) return String(data.value)
-
-  // UUID Fallback (Last resort)
   if (data.uuid) return String(data.uuid)
 
   return "Unknown Data"
 }
 
 /**
- * clean up the timeline.
- * If two adjacent entries have the exact same value (e.g. "Active" -> "Active"),
- * we merge them into one long block instead of showing two separate blocks side-by-side.
+ * Merges adjacent intervals if they share the same Value AND Change Status.
+ * This reduces visual clutter on the timeline.
  */
-const consolidateEntries = (entries: TimelineEntry[]): TimelineEntry[] => {
+const consolidateIntervals = (entries: TimelineInterval[]): TimelineInterval[] => {
   if (!entries.length) return []
-
-  // Sort by start date to ensure linear processing
   const sorted = [...entries].sort((a, b) => compareAsc(a.start, b.start))
 
-  const merged: TimelineEntry[] = []
+  const merged: TimelineInterval[] = []
   let current = sorted[0]
 
   for (let i = 1; i < sorted.length; i++) {
     const next = sorted[i]
 
-    // Check if blocks touch each other (Next starts exactly 1 day after Current ends)
-    const isAdjacent = isEqual(next.start, addDays(current.end, 1))
-    // Check if they say the same thing
+    // Check adjacency (Are they right next to each other?)
+    const isAdjacent =
+      isEqual(next.start, addDays(current.end, 1)) ||
+      next.start.getTime() === current.end.getTime()
+
     const isSameValue = current.value === next.value
 
-    if (isSameValue && isAdjacent) {
-      // Merge: Extend the current block to encompass the next one
+    // Strict Check: Don't merge a "Blue" (New) item into a "Gray" (Old) item
+    const isSameStatus = current.isChange === next.isChange
+
+    if (isSameValue && isAdjacent && isSameStatus) {
       if (isAfter(next.end, current.end)) {
         current.end = next.end
       }
     } else {
-      // No merge: Push current to results and start a new block
       merged.push(current)
       current = next
     }
   }
-
   merged.push(current)
   return merged
 }
@@ -151,12 +157,22 @@ const consolidateEntries = (entries: TimelineEntry[]): TimelineEntry[] => {
 export const transformAuditLog = (rawData: any[]): Registration[] => {
   const output: Registration[] = []
 
-  rawData.forEach((reg, index) => {
-    // Skip broken or empty records
+  // Chronological sort is required for the history replay logic to work
+  const sortedData = [...rawData].sort((a, b) => {
+    const dateA = a.start ? new Date(a.start).getTime() : 0
+    const dateB = b.start ? new Date(b.start).getTime() : 0
+    return dateA - dateB
+  })
+
+  // Accumulates ALL valid intervals seen so far.
+  // This allows a new "Split" (subset) to be covered by an "Old" (superset)
+  // even if that superset was from 10 registrations ago.
+  const globalHistory: Record<string, TimelineInterval[]> = {}
+
+  sortedData.forEach((reg, index) => {
     if (!reg || !reg.validities) return
 
     const uniqueGroupId = `registration-${index}`
-    // Use the registration time for sorting, fallback to now if missing
     const regTimestamp = reg.start ? parseISO(reg.start) : new Date()
 
     const registration: Registration = {
@@ -168,45 +184,64 @@ export const transformAuditLog = (rawData: any[]): Registration[] => {
       timelines: {},
     }
 
-    // --- STEP 1: Collect Raw Data ---
+    // Buffer for new items found in THIS registration cycle
+    const currentRegistrationIntervals: Record<string, TimelineInterval[]> = {}
+
+    // Process Validities
     reg.validities.forEach((validityBlock: any) => {
-      // Determine date range (Handle 'validity' ('person_validity' & 'class_validity' is just aliases)
-      const validFrom = toDate(
+      const validFrom = normalizeDate(
         validityBlock.validity?.from ||
           validityBlock.person_validity?.from ||
           validityBlock.class_validity?.from
       )
-      const validTo = toDate(
+      const validTo = normalizeDate(
         validityBlock.validity?.to ||
           validityBlock.person_validity?.to ||
           validityBlock.class_validity?.to
       )
 
-      // Iterate over every key in the block (person, address, etc.)
       Object.keys(validityBlock).forEach((key) => {
-        // Skip metadata keys, they aren't timeline rows
-        if (key === "validity" || key === "person_validity" || key === "class_validity")
-          return
+        // Skip metadata keys
+        if (["validity", "person_validity", "class_validity"].includes(key)) return
 
-        if (!registration.timelines[key]) {
-          registration.timelines[key] = []
-        }
+        const content = extractDisplayValue(validityBlock[key])
 
-        // Add the entry
-        registration.timelines[key].push({
+        // Init buffers
+        if (!currentRegistrationIntervals[key]) currentRegistrationIntervals[key] = []
+        if (!globalHistory[key]) globalHistory[key] = []
+
+        const newInterval: TimelineInterval = {
           start: validFrom,
           end: validTo,
-          // Extract the human-readable string, passing the key for context
-          value: extractValue(validityBlock[key]),
-          color: "blue",
-        })
+          value: content,
+          isChange: false, // Calculated below
+        }
+
+        // Change Detection Logic
+        // If this interval is NOT covered by history, it is a Change (Blue).
+        const isExisting = isCoveredByHistory(newInterval, globalHistory[key])
+        newInterval.isChange = !isExisting
+
+        // Add to Output
+        if (!registration.timelines[key]) registration.timelines[key] = []
+        registration.timelines[key].push(newInterval)
+
+        // Add to Buffer (to be merged into history later)
+        currentRegistrationIntervals[key].push(newInterval)
       })
     })
 
-    // --- STEP 2: Optimize ---
-    // Run the consolidation to merge adjacent identical blocks
+    // Update Global History
+    // We merge the new items into the history so they can "cover" future splits
+    Object.keys(currentRegistrationIntervals).forEach((key) => {
+      const oldHistory = globalHistory[key] || []
+      globalHistory[key] = [...oldHistory, ...currentRegistrationIntervals[key]]
+    })
+
+    // Consolidate Visuals
+    // Merges adjacent blocks to make the timeline look cleaner
     Object.keys(registration.timelines).forEach((key) => {
-      registration.timelines[key] = consolidateEntries(registration.timelines[key])
+      registration.timelines[key] = consolidateIntervals(registration.timelines[key])
     })
 
     output.push(registration)
