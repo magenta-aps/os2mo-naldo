@@ -15,7 +15,7 @@
       <h1 class="mb-2 text-primary text-center">
         {$_("welcome_message")}
       </h1>
-      <h3 class="mb-4 text-secondary text-center font-bold">
+      <h3 class="mb-4 text-base-content text-center font-bold">
         {$_("mo")}
       </h3>
       <img class="mx-auto max-w-xl" src={indexPageImage} alt={$_("welcome_message")} />

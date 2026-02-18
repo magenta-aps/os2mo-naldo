@@ -81,24 +81,27 @@
 <DetailTable {headers}>
   {#if $tenses.future}
     <tr>
-      <th class="px-4 py-3 text-left font-bold text-secondary bg-slate-200" colSpan={15}
-        >{capital($_("future"))}</th
+      <th
+        class="px-4 py-3 text-left font-bold text-base-content bg-base-200"
+        colSpan={15}>{capital($_("future"))}</th
       >
     </tr>
     <svelte:component this={table} tense="future" {facetUuid} />
   {/if}
   {#if $tenses.present}
     <tr>
-      <th class="px-4 py-3 text-left font-bold text-secondary bg-slate-200" colSpan={15}
-        >{capital($_("present"))}</th
+      <th
+        class="px-4 py-3 text-left font-bold text-base-content bg-base-200"
+        colSpan={15}>{capital($_("present"))}</th
       ></tr
     >
     <svelte:component this={table} tense="present" {facetUuid} />
   {/if}
   {#if $tenses.past}
     <tr>
-      <th class="px-4 py-3 text-left font-bold text-secondary bg-slate-200" colSpan={15}
-        >{capital($_("past"))}</th
+      <th
+        class="px-4 py-3 text-left font-bold text-base-content bg-base-200"
+        colSpan={15}>{capital($_("past"))}</th
       >
     </tr>
     <svelte:component this={table} tense="past" {facetUuid} />

@@ -1,30 +1,3 @@
-<!-- <script lang="ts"> -->
-<!--   import { _ } from "svelte-i18n" -->
-<!--   import { page } from "$app/stores" -->
-<!--   import type { IconifyIcon } from "@iconify/types" -->
-<!--   import Icon from "@iconify/svelte" -->
-<!---->
-<!--   export let title: string | undefined = undefined -->
-<!--   export let href: string | undefined = undefined -->
-<!---->
-<!--   export let icon: IconifyIcon | string -->
-<!--   export let width: string = "20" -->
-<!--   export let height: string = "20" -->
-<!---->
-<!--   export let external: boolean = false -->
-<!-- </script> -->
-<!---->
-<!-- <a -->
-<!--   {href} -->
-<!--   class="is-drawer-close:tooltip is-drawer-close:tooltip-right hover:no-underline hover:bg-accent hover:text-secondary -->
-<!-- {$page.url.pathname === href ? 'bg-accent text-secondary' : 'text-white'}" -->
-<!--   data-tip={title} -->
-<!--   target={external ? "_blank" : undefined} -->
-<!--   on:click -->
-<!-- > -->
-<!--   <Icon class="my-1.5 inline-block size-4" {icon} {width} {height} /> -->
-<!--   <span class="is-drawer-close:hidden">{title}</span> -->
-<!-- </a> -->
 <script lang="ts">
   import { page } from "$app/stores"
   import type { IconifyIcon } from "@iconify/types"
@@ -77,8 +50,10 @@
   class="
 {tooltipStateClass}
     is-drawer-close:tooltip is-drawer-close:tooltip-right
-    hover:no-underline hover:bg-accent hover:text-secondary transition-all
-    {href && $page.url.pathname === href ? 'bg-accent text-secondary' : 'text-white'}
+    hover:no-underline hover:bg-accent hover:text-base-content transition-all
+    {href && $page.url.pathname === href
+    ? 'bg-accent text-base-content'
+    : 'text-secondary-content'}
   "
   data-tip={tooltip || title}
 >

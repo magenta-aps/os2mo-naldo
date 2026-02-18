@@ -24,7 +24,7 @@
     {href}
     class="btn btn-sm btn-primary {outline
       ? 'btn-outline'
-      : 'text-base-100'} rounded-sm normal-case font-normal hover:no-underline {extraClasses}"
+      : 'text-primary-content'} rounded-sm normal-case font-normal hover:no-underline {extraClasses}"
   >
     {#if icon}
       <Icon {icon} {width} {height} />
@@ -42,7 +42,7 @@
       {type}
       class="btn btn-sm btn-primary {outline
         ? 'btn-outline'
-        : 'text-base-100'} rounded-sm normal-case font-normal {extraClasses}"
+        : 'text-primary-content'} rounded-sm normal-case font-normal {extraClasses}"
       on:click
       {disabled}
     >

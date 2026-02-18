@@ -211,7 +211,7 @@
 <div class="w-full {extra_classes} {action === 'select' ? 'pb-3' : ''}">
   <div class={action === "select" ? "pb-1" : ""}>
     {#if action === "select"}
-      <label for="autocomplete" class="text-sm text-secondary pb-1">
+      <label for="autocomplete" class="text-sm text-base-content pb-1">
         {title ? title : ""}
         {required ? "*" : ""}
       </label>

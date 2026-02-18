@@ -6,25 +6,15 @@
   prefersdark: false;
   color-scheme: "light";
   --color-base-100: oklch(100% 0 0);
-  --color-base-200: #e8e8e8;
-  --color-base-300: #d1d1d1;
-  --color-base-content: oklch(22.389% 0.031 278.072);
+  --color-base-200: oklch(96.8% 0.007 247.896);
+  --color-base-300: oklch(86.9% 0.022 252.894);
+  --color-base-content: #00244e;
   --color-primary: #1053ab;
   --color-primary-content: #ffffff;
   --color-secondary: #00244e;
   --color-secondary-content: #ffffff;
   --color-accent: #d1e4ff;
   --color-accent-content: #00244e;
-  --color-neutral: oklch(0% 0 0);
-  --color-neutral-content: oklch(100% 0 0);
-  --color-info: oklch(60% 0.126 221.723);
-  --color-info-content: oklch(100% 0 0);
-  --color-success: oklch(62% 0.194 149.214);
-  --color-success-content: oklch(100% 0 0);
-  --color-warning: oklch(85% 0.199 91.936);
-  --color-warning-content: oklch(0% 0 0);
-  --color-error: oklch(70% 0.191 22.216);
-  --color-error-content: oklch(0% 0 0);
   --radius-selector: 2rem;
   --radius-field: 0.5rem;
   --radius-box: 0.25rem;
@@ -33,6 +23,34 @@
   --border: 1px;
   --depth: 0;
   --noise: 0;
+}
+@plugin "daisyui/theme" {
+  name: "dark";
+  default: false;
+  prefersdark: true;
+  color-scheme: "dark";
+  /* "Chill" Primary: A muted, desaturated blue (easier on eyes than neon) */
+  --color-primary: #6b8ec6;
+  --color-primary-content: #001328;
+
+  /* "Chill" Secondary: A very dark slate/navy.
+     Since navbar is 'bg-secondary'. */
+  --color-secondary: #1e2329;
+  --color-secondary-content: #a6adba;
+
+  --color-accent: #343232;
+  --color-accent-content: #a6adba;
+
+  --color-base-100: #0f1115;
+  --color-base-200: #090a0c;
+  --color-base-content: #a6adba;
+
+  --color-neutral: #2a323c;
+
+  --color-info: #6b8ec6;
+  --color-success: #22a048;
+  --color-warning: #d98829;
+  --color-error: #d64545;
 }
 
 @theme {
@@ -53,13 +71,15 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
+    border-color: var(--color-base-300, currentcolor);
   }
-}
 
-@layer base {
   html {
     font-family: Verdana, sans-serif;
+  }
+
+  input:disabled {
+    @apply !bg-base-300 !border-base-300 !cursor-not-allowed;
   }
 
   h1 {
@@ -83,19 +103,38 @@
   }
 
   p {
-    @apply text-base text-secondary;
+    @apply text-base text-base-content;
   }
 }
 
 .menu li > *:not(ul):not(.menu-title):not(details):active {
-  @apply bg-accent text-secondary;
+  @apply bg-accent text-base-content;
 }
 
 /* svelte-select overrides */
 /* I have no clue why this is needed, but it is and it sucks. */
 /* TODO: maybe h-8 is neeed? */
 .svelte-select {
-  @apply !h-8 !border-slate-300 !border-1;
+  @apply !h-8 !border-base-300 !border-1 !bg-base-100;
+  /* FIX: Map internal svelte-select variables to theme */
+  --background: var(--color-base-100);
+  --list-background: var(--color-base-100);
+  --item-color: var(--color-base-content);
+  --input-color: var(--color-base-content);
+  --placeholder-color: color-mix(in oklab, var(--color-base-content) 60%, transparent);
+
+  /* Hover & Active states */
+  --item-hover-bg: var(--color-base-200);
+  --item-active-background: var(--color-primary);
+  --item-is-active-color: var(--color-primary-content);
+
+  /* Clear icons and Chevron colors */
+  --indicator-color: var(--color-base-content);
+  --clear-select-color: var(--color-base-content);
+
+  --multi-item-bg: var(--color-base-200);
+  --multi-item-color: var(--color-base-content);
+  --multi-item-clear-icon-color: var(--color-base-content);
 }
 
 .svelte-select.multi {
@@ -125,7 +164,7 @@
   @apply !cursor-text;
 }
 .svelte-select.error {
-  @apply !border-red-500;
+  @apply !border-error;
 }
 
 .tabs-sm > .tab {

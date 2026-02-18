@@ -171,7 +171,7 @@
       {:else}
         <div class="w-5 h-5" />
       {/if}
-      <p class="text-sm text-secondary wrap-break-word">
+      <p class="text-sm text-base-content wrap-break-word">
         {checkSDIdentifier(name, user_key)}
       </p>
     </div>

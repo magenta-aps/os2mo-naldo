@@ -145,7 +145,7 @@
 <div class="p-0 m-0 mb-4 w-full divider" />
 
 <form method="post" class="mx-6" use:enhance={handler}>
-  <div class="rounded-sm min-w-fit bg-slate-100">
+  <div class="rounded-sm min-w-fit bg-base-200">
     <div class="p-8">
       <div class="flex flex-row gap-6 w-1/2">
         <DateInput
