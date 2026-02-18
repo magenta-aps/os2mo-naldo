@@ -1,7 +1,7 @@
 <script lang="ts">
+  import { page } from "$app/stores"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
-  import { isAuth } from "$lib/stores/auth"
   import DrawerContent from "$lib/components/DrawerContent.svelte"
   import { defaultDrawerWidth, drawerWidth } from "$lib/stores/drawerWidth"
   import { onMount, afterUpdate } from "svelte"
@@ -60,6 +60,7 @@
       observer.observe(drawerContentWrapper)
     }
   })
+  $: authenticated = $page.data.user?.authenticated
 </script>
 
 <svelte:window
@@ -73,7 +74,7 @@
   <label for="drawer" class="drawer-overlay cursor-pointer" aria-hidden="true" />
 
   <div class="drawer-content flex flex-col border-l">
-    {#if $isAuth}
+    {#if authenticated}
       <slot />
     {:else}
       <div class="m-auto justify-center">

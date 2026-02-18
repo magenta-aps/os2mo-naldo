@@ -2,7 +2,6 @@
   import { _ } from "svelte-i18n"
   import "$lib/global.css"
   import { base } from "$app/paths"
-  import { isAdmin, isAuth } from "$lib/stores/auth"
   import { logoutKeycloak, keycloak } from "$lib/auth/keycloak"
   import NavbarButton from "$lib/components/navbar/NavbarButton.svelte"
   import NavbarThemeToggle from "$lib/components/navbar/NavbarThemeToggle.svelte"
@@ -38,26 +37,26 @@
   `
   let moVersion: string | null | undefined = "Loading..."
 
-  $: if ($isAuth) {
-    graphQLClient()
-      .request(VersionDocument)
-      .then((res) => {
-        moVersion = res.version.mo_version
-      })
-      .catch(() => {
-        moVersion = "Error"
-      })
-  }
-
-  $: fullName = (): string => {
-    if (!$isAuth) {
-      return `${capital($_("loading"))}...`
-    }
-    if (keycloak && keycloak.idTokenParsed) {
-      return keycloak.idTokenParsed.preferred_username
-    }
-    return "No Auth"
-  }
+  // $: if ($isAuth) {
+  //   graphQLClient()
+  //     .request(VersionDocument)
+  //     .then((res) => {
+  //       moVersion = res.version.mo_version
+  //     })
+  //     .catch(() => {
+  //       moVersion = "Error"
+  //     })
+  // }
+  //
+  // $: fullName = (): string => {
+  //   if (!$isAuth) {
+  //     return `${capital($_("loading"))}...`
+  //   }
+  //   if (keycloak && keycloak.idTokenParsed) {
+  //     return keycloak.idTokenParsed.preferred_username
+  //   }
+  //   return "No Auth"
+  // }
 
   const changeLanguage = () => {
     locale.set($locale === "da-DA" ? "en-GB" : "da-DA")
@@ -101,26 +100,26 @@
           </li>
         {/if}
 
-        {#if $isAdmin}
-          {#if env.PUBLIC_SHOW_ADMIN_PANEL}
-            <li>
-              <NavbarButton
-                title={capital($_("classifications"))}
-                href="{base}/admin"
-                icon={inventory2OutlineRounded}
-              />
-            </li>
-          {/if}
-          {#if env.PUBLIC_SHOW_INSIGHTS}
-            <li>
-              <NavbarButton
-                title={capital($_("insights"))}
-                href="{base}/insights"
-                icon={searchRounded}
-              />
-            </li>
-          {/if}
-        {/if}
+        <!-- {#if $isAdmin} -->
+        <!--   {#if env.PUBLIC_SHOW_ADMIN_PANEL} -->
+        <!--     <li> -->
+        <!--       <NavbarButton -->
+        <!--         title={capital($_("classifications"))} -->
+        <!--         href="{base}/admin" -->
+        <!--         icon={inventory2OutlineRounded} -->
+        <!--       /> -->
+        <!--     </li> -->
+        <!--   {/if} -->
+        <!--   {#if env.PUBLIC_SHOW_INSIGHTS} -->
+        <!--     <li> -->
+        <!--       <NavbarButton -->
+        <!--         title={capital($_("insights"))} -->
+        <!--         href="{base}/insights" -->
+        <!--         icon={searchRounded} -->
+        <!--       /> -->
+        <!--     </li> -->
+        <!--   {/if} -->
+        <!-- {/if} -->
 
         <li>
           <NavbarButton
@@ -214,11 +213,11 @@
         </h2>
 
         <li>
-          <NavbarButton
-            title={fullName()}
-            drawerId="my-drawer-4"
-            icon={personOutlineRounded}
-          />
+          <!-- <NavbarButton -->
+          <!--   title={fullName()} -->
+          <!--   drawerId="my-drawer-4" -->
+          <!--   icon={personOutlineRounded} -->
+          <!-- /> -->
         </li>
         <li>
           <NavbarButton
