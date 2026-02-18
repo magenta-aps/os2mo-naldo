@@ -212,5 +212,5 @@ export const transformAuditLog = (rawData: any[]): Registration[] => {
     output.push(registration)
   })
 
-  return output
+  return output.reverse()
 }
