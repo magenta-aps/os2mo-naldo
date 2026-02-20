@@ -16,10 +16,18 @@
       $success.timeOutTime ? $success.timeOutTime : 5000
     )
 
+    // TODO: This is complete garbage, change the type to take `redirect` instead of creating the redirect by a type
+    // type SuccessAlert = {
+    //   message: string
+    //   type?: string
+    //   uuid?: string
+    //   redirect?: string
+    // }
     if (
       $success.type == "organisation" ||
       $success.type == "employee" ||
-      $success.type == "admin"
+      $success.type == "class" ||
+      $success.type == "itsystem"
     ) {
       setTimeout(() => {
         if ($success.uuid) {
@@ -27,8 +35,10 @@
             goto(`${base}/${$success.type}/${$success.uuid}`)
             updateGlobalNavigation($success.uuid)
           }, 200)
-        } else if ($success.type == "admin") {
-          setTimeout(() => goto(`${base}/${$success.type}`), 200)
+        } else if ($success.type == "class") {
+          setTimeout(() => goto(`${base}/admin/facet`), 200)
+        } else if ($success.type == "itsystem") {
+          setTimeout(() => goto(`${base}/admin/itsystem`), 200)
         } else {
           setTimeout(() => goto(`${base}/`), 200)
         }

@@ -9,20 +9,15 @@
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
-  import { TerminateClassDocument } from "./query.generated"
+  import { TerminateItSystemDocument } from "./query.generated"
   import { gql } from "graphql-request"
-  import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
-  import { getFacets } from "$lib/http/getFacets"
-  import { facetStore } from "$lib/stores/facetStore"
-  import { onMount } from "svelte"
-  import { getFacetValidities } from "$lib/http/getValidities"
 
   gql`
-    mutation TerminateClass($input: ClassTerminateInput!, $date: DateTime!) {
-      class_terminate(input: $input) {
+    mutation TerminateITSystem($input: ITSystemTerminateInput!, $date: DateTime!) {
+      itsystem_terminate(input: $input) {
         current(at: $date) {
           name
         }
@@ -33,8 +28,6 @@
   const toDate = field("to", "", [required()])
   const svelteForm = form(toDate)
 
-  let facet: { name: string; uuid: string; user_key?: string }
-
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
@@ -43,7 +36,7 @@
       if ($svelteForm.valid) {
         if (result.type === "success" && result.data) {
           try {
-            const mutation = await graphQLClient().request(TerminateClassDocument, {
+            const mutation = await graphQLClient().request(TerminateItSystemDocument, {
               input: result.data,
               date: result.data.to,
             })
@@ -52,14 +45,13 @@
               message: capital(
                 $_("success_terminate_item", {
                   values: {
-                    item: $_("class", { values: { n: 0 } }),
-                    name: mutation.class_terminate.current?.name,
+                    item: $_("itsystem", { values: { n: 0 } }),
+                    name: mutation.itsystem_terminate.current?.name,
                   },
                 })
               ),
-              type: "class",
+              type: "itsystem",
             }
-            facetStore.set(facet)
           } catch (err) {
             $error = { message: err }
           }
@@ -71,24 +63,12 @@
     from: string | undefined | null
     to: string | undefined | null
   } = { from: null, to: null }
-
-  onMount(async () => {
-    validities = await getFacetValidities($page.params.facet ?? null)
-
-    let facets = await getFacets({
-      uuid: $page.params.facet ?? null,
-      fromDate: $date,
-    })
-    if ($page.params.facet) {
-      facet = facets[0] ?? null
-    }
-  })
 </script>
 
 <title
   >{capital(
     $_("terminate_item", {
-      values: { item: $_("class", { values: { n: 1 } }) },
+      values: { item: $_("itsystem", { values: { n: 1 } }) },
     })
   )} | OS2mo</title
 >
@@ -97,7 +77,7 @@
   <h3 class="flex-1">
     {capital(
       $_("terminate_item", {
-        values: { item: $_("class", { values: { n: 1 } }) },
+        values: { item: $_("itsystem", { values: { n: 1 } }) },
       })
     )}
   </h3>
@@ -125,7 +105,7 @@
       type="submit"
       title={capital(
         $_("terminate_item", {
-          values: { item: $_("class", { values: { n: 1 } }) },
+          values: { item: $_("itsystem", { values: { n: 1 } }) },
         })
       )}
     />
@@ -133,7 +113,7 @@
       type="button"
       title={capital($_("cancel"))}
       outline={true}
-      href="{base}/admin/facet"
+      href="{base}/admin/itsystem"
     />
   </div>
   <Error />

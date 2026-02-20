@@ -106,7 +106,7 @@
             <li>
               <NavbarButton
                 title={capital($_("classifications"))}
-                href="{base}/admin"
+                href="{base}/admin/facet/"
                 icon={inventory2OutlineRounded}
               />
             </li>

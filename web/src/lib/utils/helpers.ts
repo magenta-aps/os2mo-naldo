@@ -51,10 +51,11 @@ export const formatKleNumberTitleAndUuid = (kles: KleNumberTitleAndUuid[]) => {
   return KleNumbers.sort((a, b) => (a.name > b.name ? 1 : -1))
 }
 
-type ITSystem = {
+export type ITSystem = {
   current?: {
     uuid: string
     name: string
+    user_key?: string
   } | null
 }
 
@@ -64,6 +65,7 @@ export const formatITSystemNames = (itsystems: ITSystem[]) => {
     .map((itsystem) => ({
       uuid: itsystem.current!.uuid,
       name: itsystem.current!.name,
+      user_key: itsystem.current?.user_key,
     }))
   return ITSystems.sort((a, b) => (a.name > b.name ? 1 : -1))
 }
