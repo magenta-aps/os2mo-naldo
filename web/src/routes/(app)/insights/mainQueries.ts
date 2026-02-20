@@ -241,7 +241,7 @@ export const mainQueries: MainQuery[] = [
       {
         label: "itsystem",
         query: "itsystem { name }",
-        getHeaders: () => [t("itsystem")],
+        getHeaders: () => [t("itsystem", { values: { n: 1 } })],
         getValues: (row) => [row.itsystem?.name ?? ""],
       },
       {
