@@ -6,6 +6,7 @@ export const actions: Actions = {
     const data = await request.formData()
     const name = data.get("name") as string
     const userKey = data.get("user-key") as string
+    const itsystem = data.get("itsystem")
     const startDate = data.get("from")
     const endDate = data.get("to")
 
@@ -15,6 +16,7 @@ export const actions: Actions = {
       facet_uuid: params.facet,
       name: name,
       user_key: userKey,
+      ...(itsystem && { it_system_uuid: itsystem }),
       validity: { from: startDate, ...(endDate && { to: endDate }) },
     }
   },

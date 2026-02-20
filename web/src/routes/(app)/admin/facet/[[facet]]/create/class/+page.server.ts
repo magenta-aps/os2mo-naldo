@@ -7,7 +7,7 @@ export const actions: Actions = {
     const facet = data.get("facet")
     const name = data.get("name") as string
     const userKey = data.get("user-key") as string
-    const itsystem = data.get("itsystem") as string
+    const itsystem = data.get("itsystem")
     const startDate = data.get("from")
     const endDate = data.get("to")
 
