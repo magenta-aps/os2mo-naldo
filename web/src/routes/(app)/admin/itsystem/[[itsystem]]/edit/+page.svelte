@@ -14,24 +14,19 @@
   import { date } from "$lib/stores/date"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import type { SubmitFunction } from "./$types"
-  import { UpdateClassDocument, ClassDocument } from "./query.generated"
+  import { UpdateItSystemDocument, ItSystemDocument } from "./query.generated"
+  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
-  import { getFacetValidities } from "$lib/http/getValidities"
-  import { facetStore } from "$lib/stores/facetStore"
 
   gql`
-    query Class($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
-      classes(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
+    query ITSystem($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+      itsystems(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
           validities {
             uuid
             user_key
             name
-            facet(filter: { from_date: null, to_date: null }) {
-              uuid
-              user_key
-            }
             validity {
               from
               to
@@ -41,8 +36,8 @@
       }
     }
 
-    mutation UpdateClass($input: ClassUpdateInput!, $date: DateTime!) {
-      class_update(input: $input) {
+    mutation UpdateITSystem($input: ITSystemUpdateInput!, $date: DateTime!) {
+      itsystem_update(input: $input) {
         current(at: $date) {
           name
         }
@@ -57,7 +52,7 @@
       if ($svelteForm.valid) {
         if (result.type === "success" && result.data) {
           try {
-            const mutation = await graphQLClient().request(UpdateClassDocument, {
+            const mutation = await graphQLClient().request(UpdateItSystemDocument, {
               input: result.data,
               date: result.data.validity.from,
             })
@@ -65,14 +60,12 @@
               message: capital(
                 $_("success_edit", {
                   values: {
-                    name: mutation.class_update.current?.name,
+                    name: mutation.itsystem_update.current?.name,
                   },
                 })
               ),
-              type: "class",
+              type: "itsystem",
             }
-            // Set facet, so when we redirect to `/admin`, the facet is selected
-            facetStore.set(chosenFacet)
           } catch (err) {
             $error = { message: err }
           }
@@ -81,31 +74,23 @@
     }
 
   let toDate: string
-  let chosenFacet: { name: string; uuid: string; user_key?: string }
 
   const fromDate = field("from", "", [required()])
   const name = field("name", "", [required()])
-  const svelteForm = form(fromDate, name)
+  const userKey = field("user_key", "", [required()])
+  const svelteForm = form(fromDate, name, userKey)
 
   // Logic for updating datepicker intervals
   let validities: {
     from: string | undefined | null
     to: string | undefined | null
   } = { from: null, to: null }
-
-  $: if (chosenFacet) {
-    ;(async () => {
-      validities = await getFacetValidities(chosenFacet.uuid)
-    })()
-  } else {
-    validities = { from: null, to: null }
-  }
 </script>
 
 <title
   >{capital(
     $_("edit_item", {
-      values: { item: $_("class", { values: { n: 1 } }) },
+      values: { item: $_("itsystem", { values: { n: 1 } }) },
     })
   )} | OS2mo</title
 >
@@ -114,7 +99,7 @@
   <h3 class="flex-1">
     {capital(
       $_("edit_item", {
-        values: { item: $_("class", { values: { n: 1 } }) },
+        values: { item: $_("itsystem", { values: { n: 1 } }) },
       })
     )}
   </h3>
@@ -122,12 +107,23 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ClassDocument, { uuid: $page.params.class, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to") } )}
-  <!-- TODO: Should have a skeleton for the loading stage -->
-  {capital($_("loading"))}
+{#await graphQLClient().request( ItSystemDocument, { uuid: $page.params.itsystem, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to") } )}
+  <div class="mx-6">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
+      <div class="p-8">
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+      </div>
+    </div>
+  </div>
 {:then data}
-  {@const cls = data.classes.objects[0].validities[0]}
-  {@const facet = data.classes.objects[0].validities[0].facet}
+  {@const itsystem = data.itsystems.objects[0].validities[0]}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
@@ -145,7 +141,9 @@
           />
           <DateInput
             bind:value={toDate}
-            startValue={cls.validity.to ? cls.validity.to.split("T")[0] : null}
+            startValue={itsystem.validity.to
+              ? itsystem.validity.to.split("T")[0]
+              : null}
             title={capital($_("date.end_date"))}
             id="to"
             min={$fromDate.value ? $fromDate.value : validities.from}
@@ -153,31 +151,26 @@
           />
         </div>
         <div class="flex flex-row gap-6">
-          <Select
-            title={capital($_("facet", { values: { n: 1 } }))}
-            id="facet"
-            bind:value={chosenFacet}
-            startValue={{
-              uuid: facet.uuid,
-              name: capital(
-                $_("facets.name." + facet.user_key, { default: facet.user_key })
-              ),
-            }}
-            required={true}
-            extra_classes="basis-1/2"
-            disabled
-          />
           <Input
             title={capital($_("name"))}
             id="name"
             bind:value={$name.value}
-            startValue={cls.name}
+            startValue={itsystem.name}
+            errors={$name.errors}
+            extra_classes="basis-1/2"
+            required={true}
+          />
+
+          <Input
+            title={capital($_("user_key"))}
+            id="user-key"
+            bind:value={$userKey.value}
+            startValue={itsystem.user_key}
             errors={$name.errors}
             extra_classes="basis-1/2"
             required={true}
           />
         </div>
-        <input id="user-key" name="user-key" value={cls.user_key} hidden />
       </div>
     </div>
     <div class="flex py-6 gap-4">
@@ -185,7 +178,7 @@
         type="submit"
         title={capital(
           $_("edit_item", {
-            values: { item: $_("class", { values: { n: 1 } }) },
+            values: { item: $_("itsystem", { values: { n: 1 } }) },
           })
         )}
       />
@@ -193,7 +186,7 @@
         type="button"
         title={capital($_("cancel"))}
         outline={true}
-        href="{base}/admin/facet"
+        href="{base}/admin/itsystem"
       />
     </div>
     <Error />

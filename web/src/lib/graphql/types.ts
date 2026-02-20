@@ -4524,6 +4524,7 @@ export type EmployeesBoundLeaveFilter = {
 
 export type EmployeesBoundManagerFilter = {
   employee?: InputMaybe<EmployeeFilter>;
+  engagement?: InputMaybe<EngagementFilter>;
   exclude?: InputMaybe<EmployeeFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   manager_type?: InputMaybe<ClassFilter>;
@@ -10636,6 +10637,12 @@ export type Manager = {
   employee_uuid?: Maybe<Scalars['UUID']['output']>;
   /**
    *
+   * Engagement that this manager role is associated with.
+   *
+   */
+  engagement_response?: Maybe<EngagementResponse>;
+  /**
+   *
    * Hierarchical level of the manager.
    *
    * Examples:
@@ -10886,6 +10893,8 @@ export type ManagerResponsibilities_ResponseArgs = {
 };
 
 export type ManagerCreateInput = {
+  /** UUID of the related engagement. */
+  engagement?: InputMaybe<Scalars['UUID']['input']>;
   /** UUID of the managers level. */
   manager_level: Scalars['UUID']['input'];
   /** UUID of the managers type.. */
@@ -10927,6 +10936,11 @@ export type ManagerFilter = {
    * @deprecated Replaced by the 'employee' filter
    */
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Engagement filter limiting which entries are returned.
+   *
+   */
+  engagement?: InputMaybe<EngagementFilter>;
   /**
    * Employee filter for managers to exclude from the result.
    *
@@ -11491,21 +11505,14 @@ export type ManagerTerminateInput = {
 };
 
 export type ManagerUpdateInput = {
-  /** UUID of the managers level to be updated. */
+  engagement?: InputMaybe<Scalars['UUID']['input']>;
   manager_level?: InputMaybe<Scalars['UUID']['input']>;
-  /** UUID of the managers type to be updated. */
   manager_type?: InputMaybe<Scalars['UUID']['input']>;
-  /** UUID of the managers organisation unit to be updated. */
   org_unit?: InputMaybe<Scalars['UUID']['input']>;
-  /** UUID of the manager as person to be updated. */
   person?: InputMaybe<Scalars['UUID']['input']>;
-  /** UUID of the managers responsibilities to be updated. */
   responsibility?: InputMaybe<Array<Scalars['UUID']['input']>>;
-  /** Extra info or uuid. */
   user_key?: InputMaybe<Scalars['String']['input']>;
-  /** UUID of the manager to be updated. */
   uuid: Scalars['UUID']['input'];
-  /** Validity range for the manager to be updated. */
   validity: RaValidityInput;
 };
 
@@ -13242,6 +13249,7 @@ export type OrgUnitsboundleavefilter = {
 export type OrgUnitsboundmanagerfilter = {
   employee?: InputMaybe<EmployeeFilter>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  engagement?: InputMaybe<EngagementFilter>;
   exclude?: InputMaybe<EmployeeFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   manager_type?: InputMaybe<ClassFilter>;

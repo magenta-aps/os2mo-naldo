@@ -2,7 +2,6 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
   import { isAuth } from "$lib/stores/auth"
-  import DrawerContent from "$lib/components/DrawerContent.svelte"
   import { defaultDrawerWidth, drawerWidth } from "$lib/stores/drawerWidth"
   import { onMount, afterUpdate } from "svelte"
   import Icon from "@iconify/svelte"
@@ -93,7 +92,7 @@
     <label for="drawer" class="drawer-overlay" />
     <ul class="bg-base-100 w-full h-fit">
       <div bind:this={drawerContentWrapper}>
-        <DrawerContent />
+        <slot name="sidebar" />
       </div>
     </ul>
 
