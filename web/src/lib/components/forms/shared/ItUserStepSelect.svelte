@@ -66,7 +66,6 @@
       --clear-select-height="1.5rem"
       --clear-select-width="1.5rem"
       --border-radius="0.25rem"
-      --icons-color="#00244E"
       --padding="0 0 0 0.75rem"
       id="select"
       {floatingConfig}

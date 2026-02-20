@@ -48,7 +48,6 @@
       --item-height="auto"
       --item-line-height="auto"
       --border-radius="0.25rem"
-      --icons-color="#00244E"
       --padding="0.75rem 0.75rem"
       {id}
       name={id}

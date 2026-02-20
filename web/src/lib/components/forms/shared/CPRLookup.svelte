@@ -64,7 +64,6 @@
       --clear-select-width="1.5rem"
       --value-container-padding="0rem"
       --border-radius="0.25rem"
-      --icons-color="#00244E"
       --padding="0 0.75rem 0 0.75rem"
       placeholder={capital($_("enter_cpr"))}
       id="cpr-lookup"
