@@ -23,7 +23,7 @@
             <span>{ituser.toDate}</span>
           </div>
           <div class="grid grid-cols-2">
-            <span>{capital($_("itsystem"))}:</span>
+            <span>{capital($_("itsystem", { values: { n: 1 } }))}:</span>
             <span>{ituser.itSystem.name}</span>
           </div>
           <div class="grid grid-cols-2">

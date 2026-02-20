@@ -123,7 +123,7 @@
 	"insights": "indsigt",
 	"insights_note": "bemærk, at hvis det tager lang tid at generere filen, kan man åbne MO i en ny tab og arbejde videre.",
 	"it_system": "IT-system",
-	"itsystem": "IT-system",
+	"itsystem":"{n, plural, =0 {IT-systemet} one {IT-system} other {IT-systemer}}",
 	"itassociation": "{n, plural, =0 {IT-tilknytningen} one {IT-tilknytning} other {IT-tilknytninger}}",
 	"ituser": "{n, plural, =0 {IT-brugeren} one {IT-bruger} other {IT-brugere}}",
 	"job_code": "stillingskode",
