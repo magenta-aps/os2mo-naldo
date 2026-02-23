@@ -14,7 +14,12 @@
   import { date } from "$lib/stores/date"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import type { SubmitFunction } from "./$types"
-  import { UpdateClassDocument, ClassDocument } from "./query.generated"
+  import {
+    GetItSystemsDocument,
+    UpdateClassDocument,
+    ClassDocument,
+  } from "./query.generated"
+  import { formatITSystemNames, type ITSystem } from "$lib/utils/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import { getFacetValidities } from "$lib/http/getValidities"
@@ -28,14 +33,31 @@
             uuid
             user_key
             name
-            facet(filter: { from_date: null, to_date: null }) {
+            facet(filter: { from_date: $fromDate, to_date: $toDate }) {
               uuid
               user_key
+            }
+            it_system(filter: { from_date: $fromDate, to_date: $toDate }) {
+              uuid
+              user_key
+              name
             }
             validity {
               from
               to
             }
+          }
+        }
+      }
+    }
+
+    query GetITSystems($fromDate: DateTime!) {
+      itsystems {
+        objects {
+          current(at: $fromDate) {
+            name
+            uuid
+            user_key
           }
         }
       }
@@ -69,7 +91,7 @@
                   },
                 })
               ),
-              type: "admin",
+              type: "class",
             }
             // Set facet, so when we redirect to `/admin`, the facet is selected
             facetStore.set(chosenFacet)
@@ -80,12 +102,18 @@
       }
     }
 
+  let startDate: string = $date
   let toDate: string
   let chosenFacet: { name: string; uuid: string; user_key?: string }
 
+  let chosenItSystem: { name: string; uuid: string; user_key?: string } | undefined =
+    undefined
+  let itSystems: ITSystem[] | undefined = undefined
+
   const fromDate = field("from", "", [required()])
   const name = field("name", "", [required()])
-  const svelteForm = form(fromDate, name)
+  const userKey = field("user_key", "", [required()])
+  const svelteForm = form(fromDate, name, userKey)
 
   // Logic for updating datepicker intervals
   let validities: {
@@ -99,6 +127,26 @@
     })()
   } else {
     validities = { from: null, to: null }
+  }
+
+  let itSystemController: AbortController
+  $: if (chosenFacet && chosenFacet?.user_key === "role" && !itSystems && startDate) {
+    if (itSystemController) itSystemController.abort()
+    itSystemController = new AbortController()
+    ;(async () => {
+      try {
+        const res = await graphQLClient(itSystemController.signal).request(
+          GetItSystemsDocument,
+          {
+            fromDate: startDate,
+          }
+        )
+        // Map to the format the Select component expects
+        itSystems = res.itsystems.objects
+      } catch (err: any) {
+        if (err.name !== "AbortError") console.error("Failed to fetch IT Systems:", err)
+      }
+    })()
   }
 </script>
 
@@ -134,8 +182,8 @@
       <div class="p-8">
         <div class="flex flex-row gap-6">
           <DateInput
-            startValue={$date}
-            bind:value={$fromDate.value}
+            bind:value={startDate}
+            bind:validationValue={$fromDate.value}
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
@@ -152,21 +200,38 @@
             max={validities.to}
           />
         </div>
-        <div class="flex flex-row gap-6">
+        <Select
+          title={capital($_("facet", { values: { n: 1 } }))}
+          id="facet"
+          bind:value={chosenFacet}
+          startValue={{
+            uuid: facet.uuid,
+            name: capital(
+              $_("facets.name." + facet.user_key, { default: facet.user_key })
+            ),
+            user_key: facet.user_key,
+          }}
+          required={true}
+          extra_classes="basis-1/2"
+          disabled
+        />
+
+        {#if itSystems}
           <Select
-            title={capital($_("facet", { values: { n: 1 } }))}
-            id="facet"
-            bind:value={chosenFacet}
-            startValue={{
-              uuid: facet.uuid,
-              name: capital(
-                $_("facets.name." + facet.user_key, { default: facet.user_key })
-              ),
-            }}
+            title={capital($_("itsystem", { values: { n: 1 } }))}
+            id="itsystem"
+            bind:value={chosenItSystem}
+            startValue={cls.it_system
+              ? {
+                  uuid: cls.it_system.uuid,
+                  name: cls.it_system.name,
+                }
+              : undefined}
+            iterable={formatITSystemNames(itSystems)}
             required={true}
-            extra_classes="basis-1/2"
-            disabled
           />
+        {/if}
+        <div class="flex flex-row gap-6">
           <Input
             title={capital($_("name"))}
             id="name"
@@ -176,8 +241,17 @@
             extra_classes="basis-1/2"
             required={true}
           />
+          <Input
+            title={capital($_("user_key"))}
+            info={$_("user_key_tooltip")}
+            id="user-key"
+            bind:value={$userKey.value}
+            startValue={cls.user_key}
+            errors={$userKey.errors}
+            extra_classes="basis-1/2"
+            required={true}
+          />
         </div>
-        <input id="user-key" name="user-key" value={cls.user_key} hidden />
       </div>
     </div>
     <div class="flex py-6 gap-4">
@@ -193,7 +267,7 @@
         type="button"
         title={capital($_("cancel"))}
         outline={true}
-        href="{base}/admin"
+        href="{base}/admin/facet"
       />
     </div>
     <Error />

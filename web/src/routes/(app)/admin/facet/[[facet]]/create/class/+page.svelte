@@ -14,7 +14,8 @@
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import type { SubmitFunction } from "./$types"
-  import { CreateClassDocument } from "./query.generated"
+  import { GetItSystemsDocument, CreateClassDocument } from "./query.generated"
+  import { formatITSystemNames, type ITSystem } from "$lib/utils/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import { onMount } from "svelte"
@@ -23,6 +24,17 @@
   import { facetStore } from "$lib/stores/facetStore"
 
   gql`
+    query GetITSystems($fromDate: DateTime!) {
+      itsystems {
+        objects {
+          current(at: $fromDate) {
+            name
+            uuid
+            user_key
+          }
+        }
+      }
+    }
     mutation CreateClass($input: ClassCreateInput!, $date: DateTime!) {
       class_create(input: $input) {
         current(at: $date) {
@@ -52,7 +64,7 @@
                   },
                 })
               ),
-              type: "admin",
+              type: "class",
             }
             // Set facet, so when we redirect to `/admin`, the facet is selected
             facetStore.set(chosenFacet)
@@ -73,6 +85,10 @@
   let toDate: string
   let chosenFacet: { name: string; uuid: string; user_key?: string }
   let facets: { name: string; uuid: string; user_key?: string }[]
+
+  let chosenItSystem: { name: string; uuid: string; user_key?: string } | undefined =
+    undefined
+  let itSystems: ITSystem[] | undefined = undefined
 
   // Logic for updating datepicker intervals
   let validities: {
@@ -126,6 +142,26 @@
     })()
   } else {
     validities = { from: null, to: null }
+  }
+
+  let itSystemController: AbortController
+  $: if (chosenFacet && chosenFacet?.user_key === "role" && !itSystems && startDate) {
+    if (itSystemController) itSystemController.abort()
+    itSystemController = new AbortController()
+    ;(async () => {
+      try {
+        const res = await graphQLClient(itSystemController.signal).request(
+          GetItSystemsDocument,
+          {
+            fromDate: startDate,
+          }
+        )
+        // Map to the format the Select component expects
+        itSystems = res.itsystems.objects
+      } catch (err: any) {
+        if (err.name !== "AbortError") console.error("Failed to fetch IT Systems:", err)
+      }
+    })()
   }
 </script>
 
@@ -184,6 +220,15 @@
           required={true}
         />
       {/if}
+      {#if itSystems}
+        <Select
+          title={capital($_("itsystem", { values: { n: 1 } }))}
+          id="itsystem"
+          bind:value={chosenItSystem}
+          iterable={formatITSystemNames(itSystems)}
+          required={true}
+        />
+      {/if}
       <div class="flex flex-row gap-6">
         <Input
           title={capital($_("name"))}
@@ -218,7 +263,7 @@
       type="button"
       title={capital($_("cancel"))}
       outline={true}
-      href="{base}/admin"
+      href="{base}/admin/facet"
     />
   </div>
   <Error />

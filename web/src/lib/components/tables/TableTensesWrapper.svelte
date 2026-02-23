@@ -10,6 +10,7 @@
   import ClassTable from "$lib/components/tables/ClassTable.svelte"
   import EngagementTable from "$lib/components/tables/EngagementTable.svelte"
   import ItUserTable from "$lib/components/tables/ITUserTable.svelte"
+  import ItSystemTable from "$lib/components/tables/ITSystemTable.svelte"
   import OrgITUserTable from "$lib/components/tables/OrgITUserTable.svelte"
   import OrgUnitTable from "$lib/components/tables/OrgUnitTable.svelte"
   import RelatedUnitsTable from "$lib/components/tables/RelatedUnitsTable.svelte"
@@ -72,7 +73,10 @@
         )
       }
     }
-    if (!env.PUBLIC_ENABLE_CLASS_TERMINATION && table === ClassTable) {
+    if (
+      !env.PUBLIC_ENABLE_CLASS_TERMINATION &&
+      (table === ClassTable || table === ItSystemTable)
+    ) {
       headers.pop()
     }
   }
