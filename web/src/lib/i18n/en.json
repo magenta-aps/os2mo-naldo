@@ -179,6 +179,7 @@
 	"organisation_overview": "organisation overview",
 	"owner": "{n, plural, =0 {the owner} one {owner} other {owners}}",
 	"parent": "parent unit",
+	"parent_response": "parent unit",
 	"past": "past",
 	"phone": "phone",
 	"present": "present",
