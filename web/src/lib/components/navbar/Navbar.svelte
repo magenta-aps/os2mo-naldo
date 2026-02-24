@@ -227,11 +227,9 @@
             icon={language}
           />
         </li>
-        {#if env.PUBLIC_ENABLE_THEMING}
-          <li>
-            <NavbarThemeToggle title={capital($_("theme"))} />
-          </li>
-        {/if}
+        <li>
+          <NavbarThemeToggle title={capital($_("theme"))} />
+        </li>
         <li>
           <NavbarButton
             title={capital($_("logout"))}
