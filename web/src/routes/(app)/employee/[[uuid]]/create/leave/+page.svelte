@@ -269,7 +269,7 @@
 
         {#if engagements && engagements.length}
           <Select
-            title={capital($_("engagements", { values: { n: 2 } }))}
+            title={capital($_("engagement", { values: { n: 2 } }))}
             id="engagement-uuid"
             bind:name={$engagement.value}
             bind:value={selectedEngagement}
@@ -281,7 +281,7 @@
           />
         {:else}
           <Select
-            title={capital($_("engagements", { values: { n: 2 } }))}
+            title={capital($_("engagement", { values: { n: 2 } }))}
             id="engagement-uuid"
             bind:value={selectedEngagement}
             bind:name={$engagement.value}
