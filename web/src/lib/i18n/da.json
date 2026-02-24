@@ -179,6 +179,7 @@
 	"organisation_overview": "organisationsoverblik",
 	"owner": "{n, plural, =0 {ejeren} one {ejer} other {ejere}}",
 	"parent": "overenhed",
+	"parent_response": "overenhed",
 	"past": "fortid",
 	"phone": "telefon",
 	"present": "nutid",

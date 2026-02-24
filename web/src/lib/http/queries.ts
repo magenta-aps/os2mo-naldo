@@ -172,7 +172,7 @@ gql`
             org_unit_level {
               uuid
             }
-            parent {
+            parent_response {
               uuid
             }
             time_planning {
