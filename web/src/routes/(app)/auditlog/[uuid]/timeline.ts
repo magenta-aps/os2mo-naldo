@@ -43,7 +43,7 @@ export interface TimelineEntry {
   start: Date
   end: Date
   value: string
-  color: "blue"
+  changed?: boolean
 }
 
 // Represents one entire "Registration" event from the audit log
@@ -196,9 +196,7 @@ export const transformAuditLog = (rawData: any[]): Registration[] => {
         registration.timelines[key].push({
           start: validFrom,
           end: validTo,
-          // Extract the human-readable string, passing the key for context
           value: extractValue(validityBlock[key]),
-          color: "blue",
         })
       })
     })
@@ -211,6 +209,27 @@ export const transformAuditLog = (rawData: any[]): Registration[] => {
 
     output.push(registration)
   })
+
+  // Compare each individual interval against the previous registration.
+  // Only mark an entry as changed if that exact [start, end, value] block didn't exist before.
+  for (let i = 1; i < output.length; i++) {
+    const prev = output[i - 1]
+    const curr = output[i]
+
+    Object.keys(curr.timelines).forEach((key) => {
+      const prevSet = new Set(
+        (prev.timelines[key] || []).map(
+          (e) => `${e.value}|${e.start.getTime()}|${e.end.getTime()}`
+        )
+      )
+
+      curr.timelines[key].forEach((e) => {
+        if (!prevSet.has(`${e.value}|${e.start.getTime()}|${e.end.getTime()}`)) {
+          e.changed = true
+        }
+      })
+    })
+  }
 
   return output.reverse()
 }

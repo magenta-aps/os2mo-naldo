@@ -100,7 +100,7 @@
             start: entry.start,
             end: entry.end,
             type: "range",
-            className: "blue-item", // TODO: Not yet implemented, will be added later
+            className: entry.changed ? "changed-item" : "",
 
             // Custom data payload for the tooltip (accessed in onMount template)
             tooltipData: {

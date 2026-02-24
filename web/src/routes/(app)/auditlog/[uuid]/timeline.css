@@ -29,7 +29,6 @@
 }
 
 /* Uses Accent colors (Light Blue) to highlight changes */
-/* TODO: changed-item will be added */
 .vis-item.changed-item {
   background-color: var(--color-accent);
   color: var(--color-accent-content);
