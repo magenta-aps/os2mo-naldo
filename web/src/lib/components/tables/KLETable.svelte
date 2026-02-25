@@ -97,20 +97,16 @@
         • {`${kle.kle_number[0].user_key} - ${kle.kle_number[0].name}`}
       </td>
       <ValidityTableCell validity={kle.validity} />
-      <td>
+      <td class="flex p-4 gap-2 justify-end">
         <a href={`${base}/auditlog/${kle.uuid}`}>
           <Icon icon={historyRounded} width="25" height="25" />
         </a>
-      </td>
-      <td>
         <a
           href="{base}/organisation/{$page.params
             .uuid}/edit/kle/{kle.uuid}{formatQueryDates(kle.validity)}"
         >
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>
-      </td>
-      <td>
         <a href="{base}/organisation/{$page.params.uuid}/terminate/kle/{kle.uuid}">
           <Icon icon={cancelOutlineRounded} width="25" height="25" />
         </a>

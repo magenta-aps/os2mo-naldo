@@ -16,6 +16,7 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
+  import historyRounded from "@iconify/icons-material-symbols/history-rounded"
 
   type Classes = ClassQuery["classes"]["objects"][0]["validities"]
   let data: Classes
@@ -94,7 +95,10 @@
       <td class="text-sm p-4">{cls.name}</td>
       <td class="text-sm p-4">{cls.user_key}</td>
       <ValidityTableCell validity={cls.validity} />
-      <td>
+      <td class="flex p-4 gap-2 justify-end">
+        <a href={`${base}/auditlog/${cls.uuid}`}>
+          <Icon icon={historyRounded} width="25" height="25" />
+        </a>
         <a
           href="{base}/{$page.url.pathname?.split(
             '/'
@@ -104,9 +108,7 @@
         >
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>
-      </td>
-      {#if env.PUBLIC_ENABLE_CLASS_TERMINATION}
-        <td>
+        {#if env.PUBLIC_ENABLE_CLASS_TERMINATION}
           <a
             href="{base}/{$page.url.pathname?.split(
               '/'
@@ -114,8 +116,8 @@
           >
             <Icon icon={cancelOutlineRounded} width="25" height="25" />
           </a>
-        </td>
-      {/if}
+        {/if}
+      </td>
     </tr>
   {:else}
     <tr class="leading-5 border-t border-base-300 text-base-content">

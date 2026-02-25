@@ -26,7 +26,7 @@
             on:click={() => {
               sortTable(header.sortPath || "")
             }}
-            class="{header.sortPath ? 'cursor-pointer' : ''} 
+            class="{header.sortPath ? 'cursor-pointer' : ''}
                 px-4 py-3 font-bold leading-4 tracking-wider text-left text-base-content border-base-300 bg-base-300"
           >
             <div class="flex items-center">
@@ -58,6 +58,7 @@
             </div>
           </th>
         {/each}
+        <th class="px-4 py-3 bg-base-300" />
       </thead>
     {/if}
     <tbody class="border-base-300 min-h-64">

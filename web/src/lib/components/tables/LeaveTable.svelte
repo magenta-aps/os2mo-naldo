@@ -108,12 +108,10 @@
         ).name}
       </td>
       <ValidityTableCell validity={leave.validity} />
-      <td>
+      <td class="flex p-4 gap-2 justify-end">
         <a href={`${base}/auditlog/${leave.uuid}`}>
           <Icon icon={historyRounded} width="25" height="25" />
         </a>
-      </td>
-      <td>
         <a
           href="{base}/employee/{uuid}/edit/leave/{leave.uuid}{formatQueryDates(
             leave.validity
@@ -121,12 +119,10 @@
         >
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>
-      </td>
-      <td>
         <a href="{base}/employee/{uuid}/terminate/leave/{leave.uuid}">
           <Icon icon={cancelOutlineRounded} width="25" height="25" />
-        </a></td
-      >
+        </a>
+      </td>
     </tr>
   {:else}
     <tr class="leading-5 border-t border-base-300 text-base-content">

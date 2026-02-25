@@ -17,6 +17,7 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
+  import historyRounded from "@iconify/icons-material-symbols/history-rounded"
 
   type ITSystems = ItSystemQuery["itsystems"]["objects"][0]["validities"]
   let data: ITSystems
@@ -78,7 +79,10 @@
       <td class="text-sm p-4">{itsystem.name}</td>
       <td class="text-sm p-4">{itsystem.user_key}</td>
       <ValidityTableCell validity={itsystem.validity} />
-      <td>
+      <td class="flex p-4 gap-2 justify-end">
+        <a href={`${base}/auditlog/${itsystem.uuid}`}>
+          <Icon icon={historyRounded} width="25" height="25" />
+        </a>
         <a
           href="{base}/admin/itsystem/{itsystem.uuid}/edit/{formatQueryDates(
             itsystem.validity
@@ -86,14 +90,12 @@
         >
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>
-      </td>
-      {#if env.PUBLIC_ENABLE_CLASS_TERMINATION}
-        <td>
+        {#if env.PUBLIC_ENABLE_CLASS_TERMINATION}
           <a href="{base}/admin/itsystem/{itsystem.uuid}/terminate">
             <Icon icon={cancelOutlineRounded} width="25" height="25" />
           </a>
-        </td>
-      {/if}
+        {/if}
+      </td>
     </tr>
   {:else}
     <tr class="leading-5 border-t border-base-300 text-base-content">

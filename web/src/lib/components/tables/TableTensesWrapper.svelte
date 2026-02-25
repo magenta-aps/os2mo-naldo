@@ -73,12 +73,6 @@
         )
       }
     }
-    if (
-      !env.PUBLIC_ENABLE_CLASS_TERMINATION &&
-      (table === ClassTable || table === ItSystemTable)
-    ) {
-      headers.pop()
-    }
   }
 </script>
 

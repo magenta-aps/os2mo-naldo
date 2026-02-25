@@ -108,12 +108,10 @@
       <td class="text-sm p-4">{rolebindingObj.ituser[0].itsystem.name}</td>
       <td class="text-sm p-4">{rolebindingObj.role[0].name}</td>
       <ValidityTableCell validity={rolebindingObj.validity} />
-      <td>
+      <td class="flex p-4 gap-2 justify-end">
         <a href={`${base}/auditlog/${rolebindingObj.uuid}`}>
           <Icon icon={historyRounded} width="25" height="25" />
         </a>
-      </td>
-      <td>
         <a
           href="{base}/{$page.url.pathname?.split(
             '/'
@@ -123,8 +121,6 @@
         >
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>
-      </td>
-      <td>
         <a
           href="{base}/{$page.url.pathname?.split(
             '/'
