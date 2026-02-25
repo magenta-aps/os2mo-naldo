@@ -17,6 +17,7 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
+  import historyRounded from "@iconify/icons-material-symbols/history-rounded"
 
   type ITSystems = ItSystemQuery["itsystems"]["objects"][0]["validities"]
   let data: ITSystems
@@ -79,6 +80,9 @@
       <td class="text-sm p-4">{itsystem.user_key}</td>
       <ValidityTableCell validity={itsystem.validity} />
       <td class="flex p-4 gap-2 justify-end">
+        <a href={`${base}/auditlog/${itsystem.uuid}`}>
+          <Icon icon={historyRounded} width="25" height="25" />
+        </a>
         <a
           href="{base}/admin/itsystem/{itsystem.uuid}/edit/{formatQueryDates(
             itsystem.validity

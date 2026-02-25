@@ -272,6 +272,16 @@ gql`
             }
           }
         }
+        ... on ITSystemRegistration {
+          validities(start: null, end: null) {
+            user_key
+            name
+            class_validity: validity {
+              from
+              to
+            }
+          }
+        }
         ... on ITUserRegistration {
           validities(start: null, end: null) {
             user_key
