@@ -184,12 +184,10 @@
         {/if}
       </td>
       <ValidityTableCell validity={ownerObj.validity} />
-      <td>
+      <td class="flex p-4 gap-2 justify-end">
         <a href={`${base}/auditlog/${ownerObj.uuid}`}>
           <Icon icon={historyRounded} width="25" height="25" />
         </a>
-      </td>
-      <td>
         <a
           href="{base}/{$page.url.pathname?.split(
             '/'
@@ -197,8 +195,6 @@
         >
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>
-      </td>
-      <td>
         <a
           href="{base}/{$page.url.pathname?.split(
             '/'

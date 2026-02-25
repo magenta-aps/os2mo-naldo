@@ -78,7 +78,7 @@
       <td class="text-sm p-4">{itsystem.name}</td>
       <td class="text-sm p-4">{itsystem.user_key}</td>
       <ValidityTableCell validity={itsystem.validity} />
-      <td>
+      <td class="flex p-4 gap-2 justify-end">
         <a
           href="{base}/admin/itsystem/{itsystem.uuid}/edit/{formatQueryDates(
             itsystem.validity
@@ -86,14 +86,12 @@
         >
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>
-      </td>
-      {#if env.PUBLIC_ENABLE_CLASS_TERMINATION}
-        <td>
+        {#if env.PUBLIC_ENABLE_CLASS_TERMINATION}
           <a href="{base}/admin/itsystem/{itsystem.uuid}/terminate">
             <Icon icon={cancelOutlineRounded} width="25" height="25" />
           </a>
-        </td>
-      {/if}
+        {/if}
+      </td>
     </tr>
   {:else}
     <tr class="leading-5 border-t border-base-300 text-base-content">

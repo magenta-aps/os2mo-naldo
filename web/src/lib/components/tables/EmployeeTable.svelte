@@ -84,17 +84,13 @@
       </td>
       <td class="text-sm p-4">{employee.nickname}</td>
       <ValidityTableCell validity={employee.validity} />
-      <td>
+      <td class="flex text-sm p-4 gap-2 justify-end">
         <a href={`${base}/auditlog/${employee.uuid}`}>
           <Icon icon={historyRounded} width="25" height="25" />
         </a>
-      </td>
-      <td>
         <a href="{base}/employee/{uuid}/edit{formatQueryDates(employee.validity)}">
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>
-      </td>
-      <td>
         <a href="{base}/employee/{uuid}/terminate/employee">
           <Icon icon={cancelOutlineRounded} width="25" height="25" />
         </a>

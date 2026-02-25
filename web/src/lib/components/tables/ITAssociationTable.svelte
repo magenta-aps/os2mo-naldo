@@ -129,12 +129,10 @@
         >{itassociation.primary ? itassociation.primary?.name : ""}</td
       >
       <ValidityTableCell validity={itassociation.validity} />
-      <td>
+      <td class="flex p-4 gap-2 justify-end">
         <a href={`${base}/auditlog/${itassociation.uuid}`}>
           <Icon icon={historyRounded} width="25" height="25" />
         </a>
-      </td>
-      <td>
         <a
           href="{base}/employee/{uuid}/edit/itassociation/{itassociation.uuid}{formatQueryDates(
             itassociation.validity
@@ -142,8 +140,6 @@
         >
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>
-      </td>
-      <td>
         <a href="{base}/employee/{uuid}/terminate/itassociation/{itassociation.uuid}">
           <Icon icon={cancelOutlineRounded} width="25" height="25" />
         </a>

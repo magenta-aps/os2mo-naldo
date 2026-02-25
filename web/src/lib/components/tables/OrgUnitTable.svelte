@@ -127,12 +127,10 @@
         </td>
       {/if}
       <ValidityTableCell validity={org_unit.validity} />
-      <td>
+      <td class="flex p-4 gap-2 justify-end">
         <a href={`${base}/auditlog/${org_unit.uuid}`}>
           <Icon icon={historyRounded} width="25" height="25" />
         </a>
-      </td>
-      <td>
         <a
           href="{base}/organisation/{$page.params.uuid}/edit/unit{formatQueryDates(
             org_unit.validity
@@ -140,8 +138,6 @@
         >
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>
-      </td>
-      <td>
         <a href="{base}/organisation/{$page.params.uuid}/terminate/unit">
           <Icon icon={cancelOutlineRounded} width="25" height="25" />
         </a>

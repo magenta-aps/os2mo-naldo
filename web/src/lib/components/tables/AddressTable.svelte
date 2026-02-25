@@ -137,12 +137,10 @@
         >{address.visibility ? address.visibility.name : capital($_("not_set"))}</td
       >
       <ValidityTableCell validity={address.validity} />
-      <td>
+      <td class="flex p-4 gap-2 justify-end">
         <a href={`${base}/auditlog/${address.uuid}`}>
           <Icon icon={historyRounded} width="25" height="25" />
         </a>
-      </td>
-      <td>
         <a
           href="{base}/{$page.url.pathname?.split(
             '/'
@@ -150,13 +148,10 @@
         >
           <Icon icon={editSquareOutlineRounded} width="25" height="25" />
         </a>
-      </td>
-      <td>
         <a
           href="{base}/{$page.url.pathname?.split(
             '/'
           )[1]}/{uuid}/terminate/address/{address.uuid}"
-          class="hover:base-300"
         >
           <Icon icon={cancelOutlineRounded} width="25" height="25" />
         </a>

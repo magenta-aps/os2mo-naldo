@@ -102,7 +102,7 @@
         </a>
       </td>
       <ValidityTableCell validity={related_unit.validity} />
-      <td>
+      <td class="flex p-4 gap-2 justify-end">
         <a href={`${base}/auditlog/${related_unit.uuid}`}>
           <Icon icon={historyRounded} width="25" height="25" />
         </a>

@@ -189,9 +189,6 @@
           { title: capital($_("parent")) },
           { title: capital($_("time_planning")), sortPath: "time_planning.name" },
           { title: capital($_("date.date")), sortPath: "validity.from" },
-          { title: "" },
-          { title: "" },
-          { title: "" },
         ]}
       />
     {:else if activeItem === OrgTab.ADDRESS}
@@ -204,9 +201,6 @@
           // TODO: Make it possible to sort optional fields maybe? visibility and primary for example
           { title: capital($_("visibility")) },
           { title: capital($_("date.date")), sortPath: "validity.from" },
-          { title: "" },
-          { title: "" },
-          { title: "" },
         ]}
       />
     {:else if activeItem === OrgTab.ENGAGEMENT}
@@ -236,9 +230,6 @@
           { title: capital($_("ituser", { values: { n: 2 } })) },
           { title: capital($_("primary")) },
           { title: capital($_("date.date")), sortPath: "validity.from" },
-          { title: "" },
-          { title: "" },
-          { title: "" },
         ]}
       />
     {:else if activeItem === OrgTab.ASSOCIATION}
@@ -251,9 +242,6 @@
           { title: capital($_("trade_union")) },
           { title: capital($_("primary")) },
           { title: capital($_("date.date")), sortPath: "validity.from" },
-          { title: "" },
-          { title: "" },
-          { title: "" },
         ]}
       />
     {:else if activeItem === OrgTab.IT}
@@ -273,9 +261,6 @@
             { title: capital($_("engagement", { values: { n: 2 } })) },
             { title: capital($_("primary")) },
             { title: capital($_("date.date")), sortPath: "validity.from" },
-            { title: "" },
-            { title: "" },
-            { title: "" },
           ]}
         />
       {:else if itActiveItem === ItTab.ROLEBINDING}
@@ -295,9 +280,6 @@
               sortPath: "role[0].name",
             },
             { title: capital($_("date.date")), sortPath: "validity.from" },
-            { title: "" },
-            { title: "" },
-            { title: "" },
           ]}
         />
       {/if}
@@ -310,9 +292,6 @@
           { title: capital($_("manager_type")), sortPath: "manager_type.name" },
           { title: capital($_("manager_level")), sortPath: "manager_level.name" },
           { title: capital($_("date.date")), sortPath: "validity.from" },
-          { title: "" },
-          { title: "" },
-          { title: "" },
         ]}
       />
     {:else if activeItem === OrgTab.KLE}
@@ -322,9 +301,6 @@
           { title: capital($_("kle_aspect")), sortPath: "kle_aspects[0].name" },
           { title: capital($_("kle_number")), sortPath: "kle_number.user_key" },
           { title: capital($_("date.date")), sortPath: "validity.from" },
-          { title: "" },
-          { title: "" },
-          { title: "" },
         ]}
       />
     {:else if activeItem === OrgTab.OWNER}
@@ -333,9 +309,6 @@
         headers={[
           { title: capital($_("name")), sortPath: "owner[0].name" },
           { title: capital($_("date.date")), sortPath: "validity.from" },
-          { title: "" },
-          { title: "" },
-          { title: "" },
         ]}
       />
     {:else if activeItem === OrgTab.RELATED_UNIT}
@@ -347,7 +320,6 @@
             sortPath: "org_units[0].name",
           },
           { title: capital($_("date.date")), sortPath: "validity.from" },
-          { title: "" },
         ]}
       />
     {/if}
