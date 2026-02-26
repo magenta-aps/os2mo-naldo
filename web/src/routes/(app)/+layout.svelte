@@ -7,17 +7,18 @@
   import ErrorAlert from "$lib/components/alerts/Error.svelte"
   import WarningAlert from "$lib/components/alerts/Warning.svelte"
   import Navbar from "$lib/components/navbar/Navbar.svelte"
-  import { onMount } from "svelte"
-  import { initKeycloak } from "$lib/auth/keycloak"
   import Favicon from "$lib/assets/favicon.png"
   import Drawer from "$lib/components/Drawer.svelte"
   import SearchBar from "$lib/components/navbar/SearchBar.svelte"
   import DrawerContent from "$lib/components/DrawerContent.svelte"
   import AdminNav from "$lib/components/admin/AdminNav.svelte"
+  import { accessToken, isAdmin } from "$lib/stores/token"
+  import type { LayoutData } from "./$types"
 
-  onMount(async () => {
-    await initKeycloak()
-  })
+  export let data: LayoutData
+
+  $: accessToken.set(data.accessToken)
+  $: isAdmin.set(data.isAdmin)
 </script>
 
 <svelte:head>

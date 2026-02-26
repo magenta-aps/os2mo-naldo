@@ -1,7 +1,4 @@
 <script lang="ts">
-  import { _ } from "svelte-i18n"
-  import { capital } from "$lib/utils/helpers"
-  import { isAuth } from "$lib/stores/auth"
   import { defaultDrawerWidth, drawerWidth } from "$lib/stores/drawerWidth"
   import { onMount, afterUpdate } from "svelte"
   import Icon from "@iconify/svelte"
@@ -72,16 +69,7 @@
   <label for="drawer" class="drawer-overlay cursor-pointer" aria-hidden="true" />
 
   <div class="drawer-content flex flex-col border-l">
-    {#if $isAuth}
-      <slot />
-    {:else}
-      <div class="m-auto justify-center">
-        <span
-          class="loading loading-spinner text-base-content h-32 w-32 border-primary mb-6"
-        />
-        <p>{capital($_("authenticating"))}...</p>
-      </div>
-    {/if}
+    <slot />
   </div>
 
   <div

@@ -2,7 +2,6 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
   import OrgTree from "$lib/components/org/tree/OrgTree.svelte"
-  import { isAuth } from "$lib/stores/auth"
 </script>
 
 <div class="flex flex-col h-full py-2">
@@ -13,15 +12,7 @@
       <h4 class="font-bold text-base-content pb-4">
         {capital($_("organisation_overview"))}
       </h4>
-      {#if $isAuth}
-        <OrgTree />
-      {:else}
-        <div role="status" class="max-w-sm animate-pulse">
-          <div
-            class="h-12 bg-base-100 rounded-sm dark:bg-accent max-w-[360px] mb-2.5"
-          />
-        </div>
-      {/if}
+      <OrgTree />
     </ul>
   </div>
 </div>

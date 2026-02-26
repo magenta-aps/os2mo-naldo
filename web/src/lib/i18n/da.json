@@ -237,6 +237,7 @@
 	"V_DATE_OUTSIDE_ORG_UNIT_RANGE": "Datointerval overskrider den tilknyttede enheds gyldighedsperiode",
 	"V_EXISTING_CPR": "En person med dette CPR-nummer findes allerede",
 	"V_ORG_UNIT_MOVE_TO_CHILD": "Enheden kan ikke flyttes til egen underenhed",
+	"V_TERMINATE_ITUSER_WITH_ROLEBINDINGS": "",
 	"V_TERMINATE_UNIT_WITH_CHILDREN": "Kan ikke terminere enhed med aktive underenheder",
 	"V_TERMINATE_UNIT_WITH_CHILDREN_AND_ROLES": "Kan ikke terminere enhed med aktive underenheder og data",
 	"V_TERMINATE_UNIT_WITH_ROLES": "Kan ikke terminere enhed med aktive data",

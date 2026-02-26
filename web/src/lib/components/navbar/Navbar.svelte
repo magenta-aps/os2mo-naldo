@@ -2,8 +2,9 @@
   import { _ } from "svelte-i18n"
   import "$lib/global.css"
   import { base } from "$app/paths"
-  import { isAdmin, isAuth } from "$lib/stores/auth"
-  import { logoutKeycloak, keycloak } from "$lib/auth/keycloak"
+  import { isAdmin } from "$lib/stores/token"
+  import { signOut } from "@auth/sveltekit/client"
+  import { page } from "$app/stores"
   import NavbarButton from "$lib/components/navbar/NavbarButton.svelte"
   import NavbarThemeToggle from "$lib/components/navbar/NavbarThemeToggle.svelte"
   import { graphQLClient } from "$lib/http/client"
@@ -12,6 +13,7 @@
   import { capital } from "$lib/utils/helpers"
   import { locale } from "svelte-i18n"
   import { env } from "$lib/env"
+  import { onMount } from "svelte"
 
   import chevronRightRounded from "@iconify/icons-material-symbols/chevron-right-rounded"
   import homeOutlineRounded from "@iconify/icons-material-symbols/home-outline-rounded"
@@ -38,7 +40,7 @@
   `
   let moVersion: string | null | undefined = "Loading..."
 
-  $: if ($isAuth) {
+  onMount(() => {
     graphQLClient()
       .request(VersionDocument)
       .then((res) => {
@@ -47,20 +49,21 @@
       .catch(() => {
         moVersion = "Error"
       })
-  }
+  })
 
-  $: fullName = (): string => {
-    if (!$isAuth) {
-      return `${capital($_("loading"))}...`
-    }
-    if (keycloak && keycloak.idTokenParsed) {
-      return keycloak.idTokenParsed.preferred_username
-    }
-    return "No Auth"
-  }
+  $: fullName = $page.data.username ?? "No Auth"
 
   const changeLanguage = () => {
     locale.set($locale === "da-DA" ? "en-GB" : "da-DA")
+  }
+
+  const handleLogout = async () => {
+    await signOut({ redirect: false })
+    const params = new URLSearchParams({
+      post_logout_redirect_uri: `${window.location.origin}/logged-out`,
+      client_id: "mo-frontend",
+    })
+    window.location.href = `${$page.data.keycloakLogoutUrl}?${params}`
   }
 </script>
 
@@ -215,7 +218,7 @@
 
         <li>
           <NavbarButton
-            title={fullName()}
+            title={fullName}
             drawerId="my-drawer-4"
             icon={personOutlineRounded}
           />
@@ -235,7 +238,7 @@
         <li>
           <NavbarButton
             title={capital($_("logout"))}
-            on:click={logoutKeycloak}
+            on:click={handleLogout}
             icon={logout}
           />
         </li>

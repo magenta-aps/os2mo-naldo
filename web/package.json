@@ -37,6 +37,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@auth/sveltekit": "^1.11.1",
     "@aws-crypto/sha256-js": "^5.2.0",
     "@babel/core": "^7.26.9",
     "@sveltejs/adapter-node": "^5.2.12",

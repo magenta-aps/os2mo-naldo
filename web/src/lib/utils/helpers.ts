@@ -1,6 +1,6 @@
 import { env } from "$env/dynamic/public"
 import { date } from "$lib/stores/date"
-import { keycloak } from "$lib/auth/keycloak"
+import { accessToken } from "$lib/stores/token"
 import { _ } from "svelte-i18n"
 import { get } from "svelte/store"
 
@@ -79,7 +79,7 @@ export type UnpackedClass = {
 
 export const cprLookup = async (cpr: string) => {
   const res = await fetch(`${env.PUBLIC_BASE_URL}/service/e/cpr_lookup/?q=${cpr}`, {
-    headers: { Authorization: `Bearer ${keycloak.token}` },
+    headers: { Authorization: `Bearer ${get(accessToken)}` },
   })
   // FIXME: Maybe return empty array, if call fails?
   return [await res.json()]
