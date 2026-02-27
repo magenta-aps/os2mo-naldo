@@ -145,7 +145,7 @@
           max={validities.to}
         />
       </div>
-      <Search type="employee" />
+      <Search type="employee" at={startDate} />
       {#if facets}
         <div class="flex flex-row gap-6">
           <Select

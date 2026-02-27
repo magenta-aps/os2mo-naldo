@@ -256,6 +256,7 @@
         <Search
           title="{capital($_('specify'))} {$_('parent')}"
           type="org-unit"
+          at={startDate}
           startValue={orgUnit.parent
             ? {
                 uuid: orgUnit.parent.uuid,

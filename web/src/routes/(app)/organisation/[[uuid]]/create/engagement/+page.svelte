@@ -154,6 +154,7 @@
       </div>
       <Search
         type="employee"
+        at={startDate}
         bind:name={$employee.value}
         errors={$employee.errors}
         on:clear={() => ($employee.value = "")}

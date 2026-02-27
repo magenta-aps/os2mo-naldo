@@ -38,6 +38,7 @@
   export let extra_classes = ""
   export let disabled = false
   export let errors: string[] = []
+  export let at: string | undefined = undefined
 
   // Custom variable for loading/spinner, since aborting queries makes svelte-select set `loading = true`
   let spinner = false
@@ -155,7 +156,7 @@
             query: filterText,
           }
         } else {
-          employeeFilter = { from_date: $date, query: filterText }
+          employeeFilter = { from_date: at ?? $date, query: filterText }
         }
 
         res = await graphQLClient(abortController.signal).request(
@@ -169,7 +170,7 @@
 
         if (res.employees) {
           return (items = res.employees.objects
-            .map((item) => findClosestValidity(item.validities, $date))
+            .map((item) => findClosestValidity(item.validities, at ?? $date))
             .sort((a, b) => (a.name > b.name ? 1 : -1)))
         }
 
@@ -182,7 +183,7 @@
             query: filterText,
           }
         } else {
-          orgUnitFilter = { from_date: $date, query: filterText }
+          orgUnitFilter = { from_date: at ?? $date, query: filterText }
         }
 
         res = await graphQLClient(abortController.signal).request(
@@ -195,7 +196,7 @@
 
         if (res.org_units) {
           return (items = res.org_units.objects
-            .map((item) => findClosestValidity(item.validities, $date))
+            .map((item) => findClosestValidity(item.validities, at ?? $date))
             .sort((a, b) => (a.name > b.name ? 1 : -1)))
         }
     }

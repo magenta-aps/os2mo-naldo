@@ -259,9 +259,10 @@
         </div>
         <Search
           type="org-unit"
+          at={startDate}
           startValue={{
-            uuid: findClosestValidity(engagement.org_unit, $date).uuid,
-            name: findClosestValidity(engagement.org_unit, $date).name,
+            uuid: findClosestValidity(engagement.org_unit, startDate).uuid,
+            name: findClosestValidity(engagement.org_unit, startDate).name,
           }}
           bind:name={$orgUnit.value}
           errors={$orgUnit.errors}

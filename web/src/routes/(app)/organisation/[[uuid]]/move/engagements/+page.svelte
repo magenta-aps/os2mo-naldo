@@ -56,6 +56,8 @@
       }
     }
   `
+
+  let startDate: string = $date
   // FIXME: `handler: SubmitFunction` gives TS-error:
   // Argument of type 'SubmitFunction' is not assignable to parameter of type 'SubmitFunction<Record<string, unknown> | undefined, never>'.
   // Ignored for now, by removing typing and typing result to `any`.
@@ -85,7 +87,6 @@
       }
     }
 
-  let startDate: string = $date
   // Logic for updating datepicker intervals
   let validities: {
     from: string | undefined | null
@@ -93,7 +94,7 @@
   } = { from: null, to: null }
 
   let abortController: AbortController
-  $: {
+  $: if (startDate) {
     // Abort the previous request if a new one is about to start
     if (abortController) {
       abortController.abort()
@@ -181,6 +182,7 @@
       <div class="flex flex-row gap-6">
         <Search
           type="org-unit"
+          at={startDate}
           bind:value={orgUnit}
           bind:name={$orgUnitField.value}
           errors={$orgUnitField.errors}
@@ -269,6 +271,7 @@
         <Search
           type="org-unit"
           id="org-unit"
+          at={startDate}
           title="{capital($_('move'))} {$_('to')}"
           bind:value={newOrgUnit}
           required

@@ -325,6 +325,7 @@
         />
         <Search
           type="org-unit"
+          at={startDate}
           startValue={{
             uuid: findClosestValidity(association.org_unit, startDate).uuid,
             name: findClosestValidity(association.org_unit, startDate).name,
@@ -367,6 +368,7 @@
               <Search
                 id="substitute"
                 title={capital($_("substitute"))}
+                at={startDate}
                 startValue={association.substitute.length
                   ? {
                       uuid: findClosestValidity(association.substitute, startDate).uuid,
