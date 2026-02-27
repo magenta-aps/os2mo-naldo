@@ -83,8 +83,8 @@
 
   let startDate: string = $date
   let toDate: string
-  let chosenFacet: { name: string; uuid: string; user_key?: string }
-  let facets: { name: string; uuid: string; user_key?: string }[]
+  let chosenFacet: { name: string; uuid: string; user_key: string }
+  let facets: { name: string; uuid: string; user_key: string }[]
 
   let chosenItSystem: { name: string; uuid: string; user_key?: string } | undefined =
     undefined

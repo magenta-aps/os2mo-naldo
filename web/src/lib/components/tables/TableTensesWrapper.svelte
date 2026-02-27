@@ -20,6 +20,7 @@
 
   // Specific for admin interface
   export let facetUuid: string | undefined = undefined
+  export let isRoleFacet: boolean = false
 
   $: {
     if (!env.PUBLIC_SHOW_TIME_PLANNING && table === OrgUnitTable) {
@@ -84,7 +85,7 @@
         colSpan={15}>{capital($_("future"))}</th
       >
     </tr>
-    <svelte:component this={table} tense="future" {facetUuid} />
+    <svelte:component this={table} tense="future" {facetUuid} {isRoleFacet} />
   {/if}
   {#if $tenses.present}
     <tr>
@@ -93,7 +94,7 @@
         colSpan={15}>{capital($_("present"))}</th
       ></tr
     >
-    <svelte:component this={table} tense="present" {facetUuid} />
+    <svelte:component this={table} tense="present" {facetUuid} {isRoleFacet} />
   {/if}
   {#if $tenses.past}
     <tr>
@@ -102,6 +103,6 @@
         colSpan={15}>{capital($_("past"))}</th
       >
     </tr>
-    <svelte:component this={table} tense="past" {facetUuid} />
+    <svelte:component this={table} tense="past" {facetUuid} {isRoleFacet} />
   {/if}
 </DetailTable>

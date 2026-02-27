@@ -40,6 +40,7 @@
       headers={[
         { title: capital($_("name")), sortPath: "name" },
         { title: capital($_("user_key")), sortPath: "user_key" },
+        { title: capital($_("role", { values: { n: 2 } })), sortPath: "user_key" },
         { title: capital($_("date.date")), sortPath: "validity.from" },
       ]}
     />
