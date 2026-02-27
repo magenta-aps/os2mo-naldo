@@ -127,7 +127,7 @@
           max={validities.to}
         />
       </div>
-      <Search type="employee" bind:value={selectedPerson} />
+      <Search type="employee" at={startDate} bind:value={selectedPerson} />
     </div>
   </div>
   <div class="flex py-6 gap-4">

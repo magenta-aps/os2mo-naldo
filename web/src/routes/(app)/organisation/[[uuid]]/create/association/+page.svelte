@@ -239,6 +239,7 @@
         <!-- TODO: make optional when GraphQL agrees -->
         <Search
           type="employee"
+          at={startDate}
           bind:name={$employee.value}
           errors={$employee.errors}
           on:clear={() => ($employee.value = "")}
@@ -270,6 +271,7 @@
                 id="substitute"
                 title={capital($_("substitute"))}
                 type="employee"
+                at={startDate}
               />
             {/if}
           {/if}

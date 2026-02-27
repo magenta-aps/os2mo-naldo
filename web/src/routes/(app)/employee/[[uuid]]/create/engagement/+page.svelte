@@ -157,6 +157,7 @@
       </div>
       <Search
         type="org-unit"
+        at={startDate}
         bind:name={$orgUnit.value}
         errors={$orgUnit.errors}
         on:clear={() => ($orgUnit.value = "")}

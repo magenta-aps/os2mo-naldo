@@ -125,6 +125,7 @@
         <Search
           type="org-unit"
           bind:value={engagement.orgUnit}
+          at={engagement.fromDate}
           errors={engagement.validated === false && !engagement.orgUnit?.uuid
             ? ["required"]
             : []}

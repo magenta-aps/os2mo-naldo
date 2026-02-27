@@ -177,6 +177,7 @@
           {@const orgUnit = orgUnitData.org_units?.objects[0].validities}
           <Search
             type="org-unit"
+            at={startDate}
             title="{capital($_('specify'))} {$_('parent')}"
             id="parent-uuid"
             bind:value={parent}
@@ -191,6 +192,7 @@
       {:else}
         <Search
           type="org-unit"
+          at={startDate}
           title="{capital($_('specify'))} {$_('parent')}"
           id="parent-uuid"
           bind:value={parent}

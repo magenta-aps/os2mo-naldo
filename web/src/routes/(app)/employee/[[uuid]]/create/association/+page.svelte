@@ -249,6 +249,7 @@
         />
         <Search
           type="org-unit"
+          at={startDate}
           bind:name={$orgUnit.value}
           errors={$orgUnit.errors}
           on:clear={() => ($orgUnit.value = "")}
@@ -282,6 +283,7 @@
                 id="substitute"
                 title={capital($_("substitute"))}
                 type="employee"
+                at={startDate}
               />
             {/if}
           {/if}

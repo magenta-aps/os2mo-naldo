@@ -116,6 +116,7 @@
         <Search
           type="org-unit"
           bind:value={manager.orgUnit}
+          at={manager.fromDate}
           on:clear={() => (manager.orgUnit = undefined)}
           errors={manager.validated === false && !manager.orgUnit?.uuid
             ? ["required"]

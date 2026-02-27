@@ -189,6 +189,7 @@
         </div>
         <Search
           type="employee"
+          at={startDate}
           bind:value={selectedPerson}
           startValue={ownerObj.owner
             ? {

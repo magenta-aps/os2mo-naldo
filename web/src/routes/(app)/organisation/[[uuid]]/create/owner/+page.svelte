@@ -123,7 +123,7 @@
           max={validities.to}
         />
       </div>
-      <Search type="employee" />
+      <Search type="employee" at={startDate} />
     </div>
   </div>
   <div class="flex py-6 gap-4">

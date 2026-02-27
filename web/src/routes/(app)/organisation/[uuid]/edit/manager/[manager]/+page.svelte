@@ -256,6 +256,7 @@
         </div>
         <Search
           type="org-unit"
+          at={startDate}
           startValue={{
             uuid: findClosestValidity(manager.org_unit, startDate).uuid,
             name: findClosestValidity(manager.org_unit, startDate).name,
@@ -269,6 +270,7 @@
         <Breadcrumbs orgUnit={selectedOrgUnit} />
         <Search
           type="employee"
+          at={startDate}
           bind:value={selectedPerson}
           startValue={manager.person
             ? {

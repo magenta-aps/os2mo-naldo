@@ -320,6 +320,7 @@
         <!-- TODO: make optional when GraphQL agrees -->
         <Search
           type="employee"
+          at={startDate}
           startValue={{
             uuid: findClosestValidity(association.person, startDate).uuid,
             name: findClosestValidity(association.person, startDate).name,
@@ -361,6 +362,7 @@
               <Search
                 id="substitute"
                 title={capital($_("substitute"))}
+                at={startDate}
                 startValue={association.substitute.length
                   ? {
                       uuid: findClosestValidity(association.substitute, startDate).uuid,

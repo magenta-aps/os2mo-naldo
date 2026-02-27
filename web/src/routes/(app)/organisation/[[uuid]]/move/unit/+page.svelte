@@ -20,6 +20,7 @@
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import { getValidities } from "$lib/http/getValidities"
 
+  let startDate: string = $date
   let toDate: string
   let selectedOrgUnit: {
     uuid: string
@@ -114,7 +115,7 @@
     <div class="p-8">
       <div class="flex flex-row gap-6">
         <DateInput
-          startValue={$date}
+          startValue={startDate}
           bind:value={$fromDate.value}
           errors={$fromDate.errors}
           title={capital($_("date.move_date"))}
@@ -145,6 +146,7 @@
           <Search
             title="{capital($_('specify'))} {$_('unit', { values: { n: 1 } })}"
             type="org-unit"
+            at={startDate}
             startValue={{
               uuid: orgUnit?.uuid ? orgUnit?.uuid : undefined,
               name: orgUnit?.name ? orgUnit?.name : "",
@@ -159,6 +161,7 @@
       {:else}
         <Search
           type="org-unit"
+          at={startDate}
           title="{capital($_('specify'))} {$_('unit', { values: { n: 1 } })}"
           bind:name={$orgUnitField.value}
           on:clear={() => ($orgUnitField.value = "")}
@@ -172,6 +175,7 @@
       <Search
         type="org-unit"
         id="select-parent-org-tree"
+        at={startDate}
         title="{capital($_('specify'))} {$_('new')} {$_('unit', { values: { n: 1 } })}"
         bind:value={parent}
       />
