@@ -168,15 +168,21 @@ gql`
             user_key
             unit_type {
               uuid
+              name
             }
             org_unit_level {
               uuid
+              name
             }
             parent_response {
               uuid
+              current {
+                name
+              }
             }
             time_planning {
               uuid
+              name
             }
             validity {
               from
@@ -188,6 +194,7 @@ gql`
           validities(start: null, end: null) {
             address_type {
               uuid
+              name
             }
             address: resolve {
               ... on DefaultAddress {
@@ -201,6 +208,7 @@ gql`
             description: user_key
             visibility {
               uuid
+              name
             }
             validity {
               from
@@ -212,22 +220,28 @@ gql`
           validities(start: null, end: null) {
             person {
               uuid
+              name
             }
             association_type {
               uuid
+              name
             }
 
             org_unit {
               uuid
+              name
             }
             primary {
               uuid
+              name
             }
             substitute {
               uuid
+              name
             }
             trade_union {
               uuid
+              name
             }
             validity {
               from
@@ -251,20 +265,25 @@ gql`
           validities(start: null, end: null) {
             person {
               uuid
+              name
             }
             org_unit {
               uuid
+              name
             }
             engagement_type {
               uuid
+              name
             }
             job_function {
               uuid
+              name
             }
             extension_1
             extension_4
             primary {
               uuid
+              name
             }
             validity {
               from
@@ -287,10 +306,12 @@ gql`
             user_key
             itsystem {
               uuid
+              name
             }
             external_id
             primary {
               uuid
+              name
             }
             validity {
               from
@@ -302,9 +323,11 @@ gql`
           validities(start: null, end: null) {
             kle_aspects {
               uuid
+              name
             }
             kle_number {
               uuid
+              name
             }
             validity {
               from
@@ -316,9 +339,11 @@ gql`
           validities(start: null, end: null) {
             leave_type {
               uuid
+              name
             }
             engagement {
               uuid
+              user_key
             }
             validity {
               from
@@ -330,18 +355,23 @@ gql`
           validities(start: null, end: null) {
             manager_person: person {
               uuid
+              name
             }
             manager_level {
               uuid
+              name
             }
             manager_type {
               uuid
+              name
             }
             org_unit {
               uuid
+              name
             }
             responsibilities {
               uuid
+              name
             }
             validity {
               from
@@ -353,6 +383,7 @@ gql`
           validities(start: null, end: null) {
             owner {
               uuid
+              name
             }
             validity {
               from
@@ -364,6 +395,7 @@ gql`
           validities(start: null, end: null) {
             role {
               uuid
+              name
             }
             validity {
               from
@@ -375,6 +407,7 @@ gql`
           validities(start: null, end: null) {
             org_units {
               uuid
+              name
             }
             validity {
               from
@@ -390,6 +423,7 @@ gql`
             scope
             facet {
               uuid
+              user_key
             }
             class_validity: validity {
               from
