@@ -149,6 +149,7 @@
 	"move": "move",
 	"move_root": "is moved to the root",
 	"name": "name",
+	"no_current_name": "no current name",
 	"navigation": {
 		"connections": "Connecting organisations",
 		"create_employee": "New employee",

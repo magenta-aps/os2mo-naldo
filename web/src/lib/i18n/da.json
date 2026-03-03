@@ -149,6 +149,7 @@
 	"move": "flyt",
 	"move_root": "flyttes til roden",
 	"name": "navn",
+	"no_current_name": "intet nuværende navn",
 	"navigation": {
 		"connections": "Organisationssammenkobling",
 		"create_employee": "Ny medarbejder",

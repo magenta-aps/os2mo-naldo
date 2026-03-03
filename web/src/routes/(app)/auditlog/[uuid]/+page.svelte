@@ -221,7 +221,9 @@
             <div class="timeline-tooltip">
               <div class="tooltip-header">${d.actor}</div>
               <div class="tooltip-attr">${d.attribute}</div>
-              <div class="tooltip-new">${d.value} (${$_("current_name")})</div>
+              <div class="tooltip-new">${d.value} (${
+            d.uuid && d.uuid === d.value ? $_("no_current_name") : $_("current_name")
+          })</div>
               <div class="tooltip-date">
                 ${startStr} &rarr; ${endStr}
               </div>

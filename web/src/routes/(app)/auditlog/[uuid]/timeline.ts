@@ -99,11 +99,13 @@ const extractValue = (data: any): string => {
     return data.map((item) => extractValue(item)).join(", ")
   }
 
-  // 3. _response shape: { uuid, current: { name } }
-  // If current is null, the referenced object doesn't exist (e.g. root org unit has no parent)
+  // 3. _response shape: { uuid, current: { name }, validities: [...] }
+  // current can be null if there's no active validity (e.g. terminated or future-only entity)
   if ("current" in data) {
-    if (!data.current) return "not_set"
-    return extractValue(data.current)
+    if (data.current) return extractValue(data.current)
+    // No current name — fall back to UUID so the user can use the link to investigate
+    if (data.uuid) return String(data.uuid)
+    return "not_set"
   }
 
   // "name" or "value" (Values of address-objects)
@@ -133,8 +135,8 @@ const extractUuid = (data: any): string | undefined => {
         .join(", ") || undefined
     )
   }
-  // _response shape: if current is null, the reference doesn't exist
-  if ("current" in data && !data.current) return undefined
+  // _response shape: if current is null, the reference doesn't exist (or is inactive)
+  if ("current" in data && !data.current) return data.uuid
   return data.uuid
 }
 
