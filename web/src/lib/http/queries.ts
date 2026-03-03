@@ -431,6 +431,15 @@ gql`
             }
           }
         }
+        ... on FacetRegistration {
+          validities(start: null, end: null) {
+            user_key
+            class_validity: validity {
+              from
+              to
+            }
+          }
+        }
       }
     }
   }
