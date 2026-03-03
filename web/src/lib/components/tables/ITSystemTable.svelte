@@ -14,6 +14,7 @@
   import { ItSystemDocument, type ItSystemQuery } from "./query.generated"
   import { sortKey, sortDirection } from "$lib/stores/sorting"
   import { sortData } from "$lib/utils/sorting"
+  import { findClosestValidity } from "$lib/utils/validities"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
@@ -32,6 +33,13 @@
             name
             user_key
             uuid
+            roles(filter: { from_date: $fromDate, to_date: $toDate }) {
+              validities {
+                name
+                user_key
+                uuid
+              }
+            }
             validity {
               from
               to
@@ -78,6 +86,15 @@
     >
       <td class="text-sm p-4">{itsystem.name}</td>
       <td class="text-sm p-4">{itsystem.user_key}</td>
+      <td class="text-sm p-4">
+        <ul>
+          {#each itsystem.roles as role}
+            <li>
+              • {findClosestValidity(role.validities, $date).name}
+            </li>
+          {/each}
+        </ul>
+      </td>
       <ValidityTableCell validity={itsystem.validity} />
       <td class="flex p-4 gap-2 justify-end">
         <a href={`${base}/auditlog/${itsystem.uuid}`}>

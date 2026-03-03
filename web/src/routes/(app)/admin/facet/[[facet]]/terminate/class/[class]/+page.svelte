@@ -33,7 +33,7 @@
   const toDate = field("to", "", [required()])
   const svelteForm = form(toDate)
 
-  let facet: { name: string; uuid: string; user_key?: string }
+  let facet: { name: string; uuid: string; user_key: string }
 
   const handler: SubmitFunction =
     () =>

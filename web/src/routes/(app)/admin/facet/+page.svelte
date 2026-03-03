@@ -15,9 +15,11 @@
   import infoOutlineRounded from "@iconify/icons-material-symbols/info-outline-rounded"
   import { getFacets } from "$lib/http/getFacets"
 
-  let facet: { name: string; uuid: string; user_key?: string }
+  let facet: { name: string; uuid: string; user_key: string }
   let facetUuid: string
-  let facets: { name: string; uuid: string; user_key?: string }[]
+  let facets: { name: string; uuid: string; user_key: string }[]
+
+  $: isRoleFacet = facet?.user_key === "role"
 
   const updateFacet = () => {
     facetUuid = facet.uuid
@@ -27,7 +29,7 @@
     if ($facetStore.uuid) {
       facet = {
         name: $facetStore.name,
-        user_key: $facetStore.name,
+        user_key: $facetStore.user_key,
         uuid: $facetStore.uuid,
       }
       facetUuid = $facetStore.uuid
@@ -79,9 +81,18 @@
       headers={[
         { title: capital($_("name")), sortPath: "name" },
         { title: capital($_("user_key")), sortPath: "user_key" },
+        ...(isRoleFacet
+          ? [
+              {
+                title: capital($_("itsystem", { values: { n: 1 } })),
+                sortPath: "it_system.name",
+              },
+            ]
+          : []),
         { title: capital($_("date.date")), sortPath: "validity.from" },
       ]}
       {facetUuid}
+      {isRoleFacet}
     />
   </main>
 </div>

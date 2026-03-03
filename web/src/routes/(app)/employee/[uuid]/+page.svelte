@@ -169,30 +169,27 @@
             title: capital($_("unit", { values: { n: 1 } })),
             sortPath: "org_unit[0].name",
           },
-          {
-            title: capital($_("department_code")),
-            sortPath: "sd_code",
-          },
-          {
-            title: upperCase($_("id")),
-            sortPath: "user_key",
-          },
-          {
-            title: env.PUBLIC_SHOW_EXTENSION_1
-              ? capital($_("job_code"))
-              : capital($_("job_function", { values: { n: 1 } })),
-            sortPath: "job_function.name",
-          },
+          ...(env.PUBLIC_SHOW_EXTENSION_4
+            ? [{ title: capital($_("department_code")), sortPath: "sd_code" }]
+            : []),
+          { title: upperCase($_("id")), sortPath: "user_key" },
+          ...(env.PUBLIC_SHOW_EXTENSION_1
+            ? [{ title: capital($_("job_code")), sortPath: "job_function.name" }]
+            : []),
           {
             title: capital($_("job_function", { values: { n: 1 } })),
             sortPath: "job_function.name",
           },
           { title: capital($_("engagement_type")), sortPath: "engagement_type.name" },
-          { title: capital($_("ituser", { values: { n: 2 } })) },
+          ...(env.PUBLIC_SHOW_ITUSER_CONNECTIONS
+            ? [{ title: capital($_("ituser", { values: { n: 2 } })) }]
+            : []),
           {
             title: capital($_("manager", { values: { n: 1 } })),
           },
-          { title: capital($_("primary")) },
+          ...(env.PUBLIC_SHOW_PRIMARY_ENGAGEMENT
+            ? [{ title: capital($_("primary")) }]
+            : []),
           { title: capital($_("date.date")), sortPath: "validity.from" },
         ]}
       />
@@ -203,7 +200,9 @@
           { title: capital($_("address_type")), sortPath: "address_type.name" },
           { title: capital($_("description")) },
           { title: capital($_("address", { values: { n: 1 } })), sortPath: "name" },
-          { title: capital($_("ituser", { values: { n: 1 } })) },
+          ...(env.PUBLIC_SHOW_ITUSER_CONNECTIONS
+            ? [{ title: capital($_("ituser", { values: { n: 1 } })) }]
+            : []),
           // TODO: Make it possible to sort optional fields maybe? visibility and primary for example
           { title: capital($_("visibility")) },
           { title: capital($_("date.date")), sortPath: "validity.from" },
@@ -219,8 +218,12 @@
           },
           { title: capital($_("association_type")), sortPath: "association_type.name" },
           { title: capital($_("substitute")), sortPath: "substitute[0].name" },
-          { title: capital($_("trade_union")) },
-          { title: capital($_("primary")) },
+          ...(env.PUBLIC_ENABLE_CONFEDERATIONS
+            ? [{ title: capital($_("trade_union")) }]
+            : []),
+          ...(env.PUBLIC_SHOW_PRIMARY_ASSOCIATION
+            ? [{ title: capital($_("primary")) }]
+            : []),
           { title: capital($_("date.date")), sortPath: "validity.from" },
         ]}
       />
@@ -258,7 +261,9 @@
             { title: capital($_("it_system")), sortPath: "itsystem.name" },
             { title: capital($_("account_name")), sortPath: "user_key" },
             { title: capital($_("external_id")), sortPath: "external_id" },
-            { title: capital($_("engagement", { values: { n: 2 } })) },
+            ...(env.PUBLIC_SHOW_ITUSER_CONNECTIONS
+              ? [{ title: capital($_("engagement", { values: { n: 2 } })) }]
+              : []),
             { title: capital($_("primary")) },
             { title: capital($_("date.date")), sortPath: "validity.from" },
           ]}
