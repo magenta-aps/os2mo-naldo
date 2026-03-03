@@ -28,6 +28,7 @@ export interface TimelineItem {
     actor: string
     attribute: string
     value: string
+    uuid?: string
     start: Date
     end: Date
     note?: string
@@ -43,6 +44,7 @@ export interface TimelineEntry {
   start: Date
   end: Date
   value: string
+  uuid?: string
   changed?: boolean
 }
 
@@ -96,14 +98,43 @@ const extractValue = (data: any): string => {
     return data.map((item) => extractValue(item)).join(", ")
   }
 
+  // 3. _response shape: { uuid, current: { name } }
+  // If current is null, the referenced object doesn't exist (e.g. root org unit has no parent)
+  if ("current" in data) {
+    if (!data.current) return "not_set"
+    return extractValue(data.current)
+  }
+
   // "name" or "value" (Values of address-objects)
   if ("name" in data && data.name) return String(data.name)
   if ("value" in data && data.value) return String(data.value)
+
+  // user_key fallback (e.g. engagements don't have "name")
+  if ("user_key" in data && data.user_key) return String(data.user_key)
 
   // UUID Fallback (Last resort)
   if (data.uuid) return String(data.uuid)
 
   return "Unknown Data"
+}
+
+/**
+ * Extracts the UUID from a data object.
+ * For arrays, joins UUIDs with commas.
+ */
+const extractUuid = (data: any): string | undefined => {
+  if (data === null || data === undefined || typeof data !== "object") return undefined
+  if (Array.isArray(data)) {
+    return (
+      data
+        .map((item) => extractUuid(item))
+        .filter(Boolean)
+        .join(", ") || undefined
+    )
+  }
+  // _response shape: if current is null, the reference doesn't exist
+  if ("current" in data && !data.current) return undefined
+  return data.uuid
 }
 
 /**
@@ -125,8 +156,11 @@ const consolidateEntries = (entries: TimelineEntry[]): TimelineEntry[] => {
 
     // Check if blocks touch each other (Next starts exactly 1 day after Current ends)
     const isAdjacent = isEqual(next.start, addDays(current.end, 1))
-    // Check if they say the same thing
-    const isSameValue = current.value === next.value
+    // Check if they say the same thing (compare on UUID when available)
+    const isSameValue =
+      current.uuid && next.uuid
+        ? current.uuid === next.uuid
+        : current.value === next.value
 
     if (isSameValue && isAdjacent) {
       // Merge: Extend the current block to encompass the next one
@@ -197,6 +231,7 @@ export const transformAuditLog = (rawData: any[]): Registration[] => {
           start: validFrom,
           end: validTo,
           value: extractValue(validityBlock[key]),
+          uuid: extractUuid(validityBlock[key]),
         })
       })
     })
@@ -211,20 +246,20 @@ export const transformAuditLog = (rawData: any[]): Registration[] => {
   })
 
   // Compare each individual interval against the previous registration.
-  // Only mark an entry as changed if that exact [start, end, value] block didn't exist before.
+  // Only mark an entry as changed if that exact [start, end, compareKey] block didn't exist before.
+  // We compare on UUID when available (stable reference), falling back to value for primitives.
   for (let i = 1; i < output.length; i++) {
     const prev = output[i - 1]
     const curr = output[i]
 
     Object.keys(curr.timelines).forEach((key) => {
-      const prevSet = new Set(
-        (prev.timelines[key] || []).map(
-          (e) => `${e.value}|${e.start.getTime()}|${e.end.getTime()}`
-        )
-      )
+      const compareKey = (e: TimelineEntry) =>
+        `${e.uuid ?? e.value}|${e.start.getTime()}|${e.end.getTime()}`
+
+      const prevSet = new Set((prev.timelines[key] || []).map(compareKey))
 
       curr.timelines[key].forEach((e) => {
-        if (!prevSet.has(`${e.value}|${e.start.getTime()}|${e.end.getTime()}`)) {
+        if (!prevSet.has(compareKey(e))) {
           e.changed = true
         }
       })
