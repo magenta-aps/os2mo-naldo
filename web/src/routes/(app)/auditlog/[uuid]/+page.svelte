@@ -7,9 +7,12 @@
   import { DataSet } from "vis-data/peer"
   import "vis-timeline/styles/vis-timeline-graph2d.min.css"
   import { format, subYears, addYears, min, max } from "date-fns"
+  import { base } from "$app/paths"
   import { getAuditlog } from "$lib/http/getAuditlog"
   import {
     transformAuditLog,
+    FAR_PAST,
+    FAR_FUTURE,
     type Registration,
     type TimelineItem,
     type TimelineGroup,
@@ -19,6 +22,48 @@
   let container: HTMLDivElement
   let timeline: Timeline
   let isLoading = true
+
+  const createTimeline = async (uuid: string) => {
+    isLoading = true
+    try {
+      const rawData = await getAuditlog(uuid)
+
+      // Step A: Logic Layer (Parse JSON -> Objects)
+      const cleanData = transformAuditLog(rawData)
+
+      // Step B: View Layer (Objects -> Vis.js Items)
+      const { items, groups, options } = renderTimeline(cleanData)
+
+      // Step C: Update UI
+      timeline.setGroups(groups)
+      timeline.setItems(items)
+      timeline.setOptions(options)
+
+      timeline.off("click") // Clean up previous listeners if any
+      timeline.on("click", (props) => {
+        if (props.event?.target?.tagName === "A") return
+
+        const id = props.item
+        if (!id) return
+
+        const item = items.get(id) as unknown as TimelineItem
+        if (item && item.tooltipData?.value) {
+          const text = item.tooltipData.uuid || item.tooltipData.value
+          navigator.clipboard.writeText(text).then(() => {
+            // Simple Visual Feedback
+            const original = item.content
+            items.update({ id, content: capital($_("copied")) })
+            setTimeout(() => items.update({ id, content: original }), 1000)
+          })
+        }
+      })
+    } finally {
+      isLoading = false
+    }
+  }
+
+  // Re-fetch and redraw when the UUID param changes
+  $: if (timeline) createTimeline($page.params.uuid)
 
   // ==========================================
   // RENDERER: MAP DATA TO VISUALS
@@ -93,10 +138,14 @@
           const translatedValue =
             entry.value === "not_set" ? capital($_(entry.value)) : entry.value
 
+          const linkIcon = entry.uuid
+            ? ` <a href="${base}/auditlog/${entry.uuid}" data-sveltekit-reload>&#8599;</a>`
+            : ""
+
           items.add({
             id: `${rowId}-${i}`,
             group: rowId, // Connects this block to the sub-row created above
-            content: translatedValue,
+            content: translatedValue + linkIcon,
             start: entry.start,
             end: entry.end,
             type: "range",
@@ -107,6 +156,7 @@
               actor: reg.actor,
               attribute: translatedKey,
               value: translatedValue,
+              uuid: entry.uuid,
               start: entry.start,
               end: entry.end,
               note: reg.note,
@@ -158,62 +208,34 @@
         overflowMethod: "flip",
         template: (item: any) => {
           const d = item.tooltipData
+          const startStr =
+            d.start.getTime() === FAR_PAST.getTime()
+              ? `-${$_("infinity")}`
+              : format(d.start, "dd-MM-yyyy")
           const endStr =
-            d.end.getFullYear() > 2090 ? "Infinity" : format(d.end, "dd-MM-yyyy")
+            d.end.getTime() === FAR_FUTURE.getTime()
+              ? $_("infinity")
+              : format(d.end, "dd-MM-yyyy")
 
           return `
             <div class="timeline-tooltip">
               <div class="tooltip-header">${d.actor}</div>
               <div class="tooltip-attr">${d.attribute}</div>
-              <div class="tooltip-new">${d.value}</div>
+              <div class="tooltip-new">${d.value} (${$_("current_name")})</div>
               <div class="tooltip-date">
-                ${format(d.start, "dd-MM-yyyy")} &rarr; ${endStr}
+                ${startStr} &rarr; ${endStr}
               </div>
+              ${
+                d.uuid && d.uuid !== d.value
+                  ? `<div class="tooltip-uuid">${d.uuid}</div>`
+                  : ""
+              }
               ${d.note ? `<div class="tooltip-note">"${d.note}"</div>` : ""}
             </div>
           `
         },
       },
     })
-
-    // 2. Data Fetching Pipeline
-    const createTimeline = async () => {
-      try {
-        const rawData = await getAuditlog($page.params.uuid)
-
-        // Step A: Logic Layer (Parse JSON -> Objects)
-        const cleanData = transformAuditLog(rawData)
-
-        // Step B: View Layer (Objects -> Vis.js Items)
-        const { items, groups, options } = renderTimeline(cleanData)
-
-        // Step C: Update UI
-        timeline.setGroups(groups)
-        timeline.setItems(items)
-        timeline.setOptions(options)
-
-        timeline.off("click") // Clean up previous listeners if any
-        timeline.on("click", (props) => {
-          const id = props.item
-          if (!id) return
-
-          const item = items.get(id) as unknown as TimelineItem
-          if (item && item.tooltipData?.value) {
-            const text = item.tooltipData.value
-            navigator.clipboard.writeText(text).then(() => {
-              // Simple Visual Feedback
-              const original = item.content
-              items.update({ id, content: capital($_("copied")) })
-              setTimeout(() => items.update({ id, content: original }), 1000)
-            })
-          }
-        })
-      } finally {
-        isLoading = false
-      }
-    }
-
-    createTimeline()
 
     // Cleanup on destroy
     return () => timeline?.destroy()
@@ -226,6 +248,9 @@
     bind:this={container}
   />
   {#if isLoading}
-    <div class="absolute inset-0 flex items-center justify-center">Loading...</div>
+    <div class="absolute inset-0 flex items-center justify-center gap-2">
+      <div class="w-5 h-5 loading loading-spinner" />
+      <p>{capital($_("loading"))}</p>
+    </div>
   {/if}
 </div>
