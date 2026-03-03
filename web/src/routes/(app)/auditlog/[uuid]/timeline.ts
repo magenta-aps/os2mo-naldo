@@ -63,18 +63,19 @@ export interface Registration {
 // HELPER FUNCTIONS
 // ==========================================
 
-const FAR_FUTURE = new Date("2099-12-31")
+export const FAR_PAST = new Date("1900-01-01")
+export const FAR_FUTURE = new Date("2099-12-31")
 
 /**
  * Normalizes incoming dates.
- * If a date is missing, it defaults to the "Far Future" so the timeline bar stays open-ended.
- * It also handles stripping milliseconds if the API returns complex ISO strings.
+ * Null "from" dates default to FAR_PAST (beginning of time).
+ * Null "to" dates default to FAR_FUTURE (end of time / open-ended).
  */
-const toDate = (d: any): Date => {
-  if (!d) return FAR_FUTURE
+const toDate = (d: any, fallback: Date): Date => {
+  if (!d) return fallback
   if (d instanceof Date) return d
   if (typeof d === "string") return parseISO(d)
-  return FAR_FUTURE
+  return fallback
 }
 
 /**
@@ -205,16 +206,16 @@ export const transformAuditLog = (rawData: any[]): Registration[] => {
     // --- STEP 1: Collect Raw Data ---
     reg.validities.forEach((validityBlock: any) => {
       // Determine date range (Handle 'validity' ('person_validity' & 'class_validity' is just aliases)
-      const validFrom = toDate(
-        validityBlock.validity?.from ||
-          validityBlock.person_validity?.from ||
-          validityBlock.class_validity?.from
-      )
-      const validTo = toDate(
-        validityBlock.validity?.to ||
-          validityBlock.person_validity?.to ||
-          validityBlock.class_validity?.to
-      )
+      const rawFrom =
+        validityBlock.validity?.from ??
+        validityBlock.person_validity?.from ??
+        validityBlock.class_validity?.from
+      const rawTo =
+        validityBlock.validity?.to ??
+        validityBlock.person_validity?.to ??
+        validityBlock.class_validity?.to
+      const validFrom = toDate(rawFrom, FAR_PAST)
+      const validTo = toDate(rawTo, FAR_FUTURE)
 
       // Iterate over every key in the block (person, address, etc.)
       Object.keys(validityBlock).forEach((key) => {
