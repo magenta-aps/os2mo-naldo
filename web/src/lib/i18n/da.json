@@ -230,6 +230,7 @@
 	"to": "til",
 	"trade_union": "Hovedorganisation / Faglig organisation",
 	"unit": "{n, plural, =0 {enheden} one {enhed} other {enheder}}",
+	"unit_level": "enhedsniveau",
 	"unit_type": "enhedstype",
 	"unit_number": "enhedsnummer",
 	"userflow": "brugeroprettelsesflow",

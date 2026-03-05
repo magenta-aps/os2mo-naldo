@@ -230,6 +230,7 @@
 	"to": "to",
 	"trade_union": "Confederation / Trade Union",
 	"unit": "{n, plural, =0 {the unit} one {unit} other {units}}",
+	"unit_level": "unit level",
 	"unit_type": "unit type",
 	"unit_number": "unit number",
 	"userflow": "user creation flow",

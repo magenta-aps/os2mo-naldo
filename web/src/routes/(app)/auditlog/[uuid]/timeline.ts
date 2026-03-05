@@ -92,14 +92,19 @@ const extractValue = (data: any): string => {
     return s.length ? s : "not_set"
   }
 
-  // 2. Recursive List Handling
+  // 2. Paged _response: { objects: [...] }
+  if ("objects" in data && Array.isArray(data.objects)) {
+    return extractValue(data.objects)
+  }
+
+  // 3. Recursive List Handling
   // If the data is an array (e.g. a list of persons), we map over it.
   if (Array.isArray(data)) {
     if (data.length === 0) return "not_set"
     return data.map((item) => extractValue(item)).join(", ")
   }
 
-  // 3. _response shape: { uuid, current: { name }, validities: [...] }
+  // 4. _response shape: { uuid, current: { name }, validities: [...] }
   // current can be null if there's no active validity (e.g. terminated or future-only entity)
   if ("current" in data) {
     if (data.current) return extractValue(data.current)
@@ -127,6 +132,10 @@ const extractValue = (data: any): string => {
  */
 const extractUuid = (data: any): string | undefined => {
   if (data === null || data === undefined || typeof data !== "object") return undefined
+  // Paged _response: { objects: [...] }
+  if ("objects" in data && Array.isArray(data.objects)) {
+    return extractUuid(data.objects)
+  }
   if (Array.isArray(data)) {
     return (
       data
@@ -225,12 +234,15 @@ export const transformAuditLog = (rawData: any[]): Registration[] => {
         if (key === "validity" || key === "person_validity" || key === "class_validity")
           return
 
-        if (!registration.timelines[key]) {
-          registration.timelines[key] = []
+        // Strip _response suffix so translation keys stay clean
+        const label = key.replace(/_response$/, "")
+
+        if (!registration.timelines[label]) {
+          registration.timelines[label] = []
         }
 
         // Add the entry
-        registration.timelines[key].push({
+        registration.timelines[label].push({
           start: validFrom,
           end: validTo,
           value: extractValue(validityBlock[key]),
