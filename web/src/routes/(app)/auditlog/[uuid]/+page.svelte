@@ -132,8 +132,8 @@
         // --- C. Create Time Blocks (The Items) ---
         entries.forEach((entry, i) => {
           // Dynamic Zoom: If data exists 5 years ago, expand the minDate
-          minDate = min([minDate, entry.start])
-          maxDate = max([maxDate, entry.end])
+          minDate = min([minDate, entry.start ?? FAR_PAST])
+          maxDate = max([maxDate, entry.end ?? FAR_FUTURE])
 
           const translatedValue =
             entry.value === "not_set" ? capital($_(entry.value)) : entry.value
@@ -146,8 +146,8 @@
             id: `${rowId}-${i}`,
             group: rowId, // Connects this block to the sub-row created above
             content: translatedValue + linkIcon,
-            start: entry.start,
-            end: entry.end,
+            start: entry.start ?? FAR_PAST,
+            end: entry.end ?? FAR_FUTURE,
             type: "range",
             className: entry.changed ? "changed-item" : "",
 
@@ -208,14 +208,10 @@
         overflowMethod: "flip",
         template: (item: any) => {
           const d = item.tooltipData
-          const startStr =
-            d.start.getTime() === FAR_PAST.getTime()
-              ? `-${$_("infinity")}`
-              : format(d.start, "dd-MM-yyyy")
-          const endStr =
-            d.end.getTime() === FAR_FUTURE.getTime()
-              ? $_("infinity")
-              : format(d.end, "dd-MM-yyyy")
+          const startStr = d.start
+            ? format(d.start, "dd-MM-yyyy")
+            : `-${$_("infinity")}`
+          const endStr = d.end ? format(d.end, "dd-MM-yyyy") : $_("infinity")
 
           return `
             <div class="timeline-tooltip">
@@ -224,14 +220,14 @@
               <div class="tooltip-new">${d.value} (${
             d.uuid && d.uuid === d.value ? $_("no_current_name") : $_("current_name")
           })</div>
-              <div class="tooltip-date">
-                ${startStr} &rarr; ${endStr}
-              </div>
               ${
                 d.uuid && d.uuid !== d.value
                   ? `<div class="tooltip-uuid">${d.uuid}</div>`
                   : ""
               }
+              <div class="tooltip-date">
+                ${startStr} &rarr; ${endStr}
+              </div>
               ${d.note ? `<div class="tooltip-note">"${d.note}"</div>` : ""}
             </div>
           `

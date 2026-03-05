@@ -41,8 +41,8 @@ export interface TimelineItem {
 
 // Represents a single block of time for a specific attribute
 export interface TimelineEntry {
-  start: Date
-  end: Date
+  start: Date | null
+  end: Date | null
   value: string
   uuid?: string
   changed?: boolean
@@ -71,11 +71,11 @@ export const FAR_FUTURE = new Date("2099-12-31")
  * Null "from" dates default to FAR_PAST (beginning of time).
  * Null "to" dates default to FAR_FUTURE (end of time / open-ended).
  */
-const toDate = (d: any, fallback: Date): Date => {
-  if (!d) return fallback
+const toDate = (d: any): Date | null => {
+  if (!d) return null
   if (d instanceof Date) return d
   if (typeof d === "string") return parseISO(d)
-  return fallback
+  return null
 }
 
 /**
@@ -158,7 +158,9 @@ const consolidateEntries = (entries: TimelineEntry[]): TimelineEntry[] => {
   if (!entries.length) return []
 
   // Sort by start date to ensure linear processing
-  const sorted = [...entries].sort((a, b) => compareAsc(a.start, b.start))
+  const sorted = [...entries].sort((a, b) =>
+    compareAsc(a.start ?? FAR_PAST, b.start ?? FAR_PAST)
+  )
 
   const merged: TimelineEntry[] = []
   let current = sorted[0]
@@ -167,7 +169,10 @@ const consolidateEntries = (entries: TimelineEntry[]): TimelineEntry[] => {
     const next = sorted[i]
 
     // Check if blocks touch each other (Next starts exactly 1 day after Current ends)
-    const isAdjacent = isEqual(next.start, addDays(current.end, 1))
+    const isAdjacent = isEqual(
+      next.start ?? FAR_PAST,
+      addDays(current.end ?? FAR_FUTURE, 1)
+    )
     // Check if they say the same thing (compare on UUID when available)
     const isSameValue =
       current.uuid && next.uuid
@@ -176,7 +181,7 @@ const consolidateEntries = (entries: TimelineEntry[]): TimelineEntry[] => {
 
     if (isSameValue && isAdjacent) {
       // Merge: Extend the current block to encompass the next one
-      if (isAfter(next.end, current.end)) {
+      if (isAfter(next.end ?? FAR_FUTURE, current.end ?? FAR_FUTURE)) {
         current.end = next.end
       }
     } else {
@@ -225,8 +230,8 @@ export const transformAuditLog = (rawData: any[]): Registration[] => {
         validityBlock.validity?.to ??
         validityBlock.person_validity?.to ??
         validityBlock.class_validity?.to
-      const validFrom = toDate(rawFrom, FAR_PAST)
-      const validTo = toDate(rawTo, FAR_FUTURE)
+      const validFrom = toDate(rawFrom)
+      const validTo = toDate(rawTo)
 
       // Iterate over every key in the block (person, address, etc.)
       Object.keys(validityBlock).forEach((key) => {
@@ -269,7 +274,7 @@ export const transformAuditLog = (rawData: any[]): Registration[] => {
 
     Object.keys(curr.timelines).forEach((key) => {
       const compareKey = (e: TimelineEntry) =>
-        `${e.uuid ?? e.value}|${e.start.getTime()}|${e.end.getTime()}`
+        `${e.uuid ?? e.value}|${e.start?.getTime()}|${e.end?.getTime()}`
 
       const prevSet = new Set((prev.timelines[key] || []).map(compareKey))
 
