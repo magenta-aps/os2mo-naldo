@@ -67,15 +67,15 @@ export const FAR_PAST = new Date("1900-01-01")
 export const FAR_FUTURE = new Date("2099-12-31")
 
 /**
- * Normalizes incoming dates.
- * Null "from" dates default to FAR_PAST (beginning of time).
- * Null "to" dates default to FAR_FUTURE (end of time / open-ended).
+ * Parses a validity block into nullable from/to dates.
+ * Handles the 'person_validity' and 'class_validity' aliases.
  */
-const toDate = (d: any): Date | null => {
-  if (!d) return null
-  if (d instanceof Date) return d
-  if (typeof d === "string") return parseISO(d)
-  return null
+const parseValidity = (block: any): { from: Date | null; to: Date | null } => {
+  const v = block.validity ?? block.person_validity ?? block.class_validity
+  return {
+    from: v?.from ? parseISO(v.from) : null,
+    to: v?.to ? parseISO(v.to) : null,
+  }
 }
 
 /**
@@ -221,17 +221,7 @@ export const transformAuditLog = (rawData: any[]): Registration[] => {
 
     // --- STEP 1: Collect Raw Data ---
     reg.validities.forEach((validityBlock: any) => {
-      // Determine date range (Handle 'validity' ('person_validity' & 'class_validity' is just aliases)
-      const rawFrom =
-        validityBlock.validity?.from ??
-        validityBlock.person_validity?.from ??
-        validityBlock.class_validity?.from
-      const rawTo =
-        validityBlock.validity?.to ??
-        validityBlock.person_validity?.to ??
-        validityBlock.class_validity?.to
-      const validFrom = toDate(rawFrom)
-      const validTo = toDate(rawTo)
+      const { from, to } = parseValidity(validityBlock)
 
       // Iterate over every key in the block (person, address, etc.)
       Object.keys(validityBlock).forEach((key) => {
@@ -248,8 +238,8 @@ export const transformAuditLog = (rawData: any[]): Registration[] => {
 
         // Add the entry
         registration.timelines[label].push({
-          start: validFrom,
-          end: validTo,
+          start: from,
+          end: to,
           value: extractValue(validityBlock[key]),
           uuid: extractUuid(validityBlock[key]),
         })
