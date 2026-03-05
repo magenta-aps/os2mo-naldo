@@ -236,9 +236,7 @@
             sortPath: "org_unit[0].name",
           },
           {
-            title: env.PUBLIC_SHOW_EXTENSION_1
-              ? capital($_("job_code"))
-              : capital($_("job_function", { values: { n: 1 } })),
+            title: capital($_("job_function", { values: { n: 1 } })),
             sortPath: "job_function.name",
           },
           { title: capital($_("it_system")), sortPath: "it_user[0].itsystem.name" },

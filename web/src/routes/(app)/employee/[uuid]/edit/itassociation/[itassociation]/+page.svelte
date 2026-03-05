@@ -51,7 +51,7 @@
       $toDate: DateTime
       $currentDate: DateTime!
     ) {
-      facets(filter: { user_keys: "engagement_job_function" }) {
+      facets(filter: { user_keys: "engagement_job_function_bvn" }) {
         objects {
           validities {
             uuid
@@ -304,7 +304,10 @@
               : undefined}
             bind:name={$jobFunction.value}
             errors={$jobFunction.errors}
-            iterable={filterClassesByFacetUserKey(facets, "engagement_job_function")}
+            iterable={filterClassesByFacetUserKey(
+              facets,
+              "engagement_job_function_bvn"
+            )}
             extra_classes="basis-1/2"
             required={true}
           />
