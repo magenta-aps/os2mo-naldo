@@ -248,5 +248,9 @@
 	},
 	"validity": "validity",
 	"visibility": "visibility",
+	"roles_itsystem_hint": "Roles can be connected to IT systems.",
+	"manage_itsystems": "manage IT systems",
+	"itsystem_roles_hint": "IT systems can be connected to roles.",
+	"manage_roles": "manage roles",
 	"welcome_message": "Welcome to GIR"
 }
