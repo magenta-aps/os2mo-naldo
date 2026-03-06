@@ -63,6 +63,13 @@
       />
     </div>
 
+    {#if isRoleFacet}
+      <p class="text-sm text-base-content/70 pb-2">
+        {$_("roles_itsystem_hint")}
+        <a href="{base}/admin/itsystem">{capital($_("manage_itsystems"))}</a>.
+      </p>
+    {/if}
+
     <div class="flex justify-between">
       <TenseTabs />
       <Button
