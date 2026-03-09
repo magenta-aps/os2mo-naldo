@@ -20,6 +20,7 @@
   import { updateGlobalNavigation } from "$lib/stores/navigation"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
+  import MissingField from "$lib/components/shared/MissingField.svelte"
 
   type Associations = AssociationsQuery["associations"]["objects"][0]["validities"]
   let data: Associations
@@ -109,7 +110,7 @@
         if (!tenseFilter(obj, tense)) return false
         // Check if association validity is in current org_unit ($page.params.uuid)
         // TODO: Do this with GraphQL, when following issues are resolved (#65031) (#65303)
-        if (isOrg && obj.org_unit[0].uuid !== $page.params.uuid) return false
+        if (isOrg && obj.org_unit?.[0]?.uuid !== $page.params.uuid) return false
         return true
       })
       associations.push(...filtered)
@@ -132,20 +133,22 @@
         {#if isOrg}
           <!-- GraphQL and Naldo doesn't allow creating vacant associations, but the old frontend did -->
           <!-- This means that some customers might have them, and therefore we need this check. -->
-          {#if association.person[0]?.name}
+          {#if association.person?.[0]?.name}
             <a href="{base}/employee/{association.person[0].uuid}">
               {findClosestValidity(association.person, $date).name}
             </a>
           {:else}
             {capital($_("vacant"))}
           {/if}
-        {:else}
+        {:else if association.org_unit?.[0]}
           <a
             href="{base}/organisation/{association.org_unit[0].uuid}"
             on:click={() => updateGlobalNavigation(association.org_unit[0].uuid)}
           >
             {findClosestValidity(association.org_unit, $date).name}</a
           >
+        {:else}
+          <MissingField />
         {/if}
       </td>
       <td class="text-sm p-4">{association.association_type?.name}</td>

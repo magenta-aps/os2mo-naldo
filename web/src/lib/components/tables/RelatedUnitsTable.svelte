@@ -15,6 +15,7 @@
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { updateGlobalNavigation } from "$lib/stores/navigation"
+  import MissingField from "$lib/components/shared/MissingField.svelte"
 
   type RelatedUnits = RelatedUnitsQuery["related_units"]["objects"][0]["validities"]
   type RelatedUnit = RelatedUnitsQuery["related_units"]["objects"][0]["validities"]
@@ -69,7 +70,7 @@
     // Filter out the highlighted org_unit, so we only have the actual relation left.
     // This allows for cleaner templating and sorting by name
     data = relatedUnits.map((unit) =>
-      unit.org_units[0].uuid === $page.params.uuid
+      unit.org_units?.[0]?.uuid === $page.params.uuid
         ? {
             uuid: unit.uuid,
             org_units: [unit.org_units[1]],
@@ -77,7 +78,7 @@
           }
         : {
             uuid: unit.uuid,
-            org_units: [unit.org_units[0]],
+            org_units: [unit.org_units?.[0]],
             validity: unit.validity,
           }
     )
@@ -95,11 +96,15 @@
         leading-5 border-t border-base-300 text-base-content"
     >
       <td class="text-sm p-4">
-        <a
-          href="{base}/organisation/{related_unit.org_units[0].uuid}"
-          on:click={() => updateGlobalNavigation(related_unit.org_units[0].uuid)}
-          >{related_unit.org_units[0].name}
-        </a>
+        {#if related_unit.org_units?.[0]}
+          <a
+            href="{base}/organisation/{related_unit.org_units[0].uuid}"
+            on:click={() => updateGlobalNavigation(related_unit.org_units[0].uuid)}
+            >{related_unit.org_units[0].name}
+          </a>
+        {:else}
+          <MissingField />
+        {/if}
       </td>
       <ValidityTableCell validity={related_unit.validity} />
       <td class="flex p-4 gap-2 justify-end">

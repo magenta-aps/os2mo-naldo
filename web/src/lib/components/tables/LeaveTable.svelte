@@ -19,6 +19,7 @@
   import { formatQueryDates } from "$lib/utils/validities"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
+  import MissingField from "$lib/components/shared/MissingField.svelte"
 
   export let tense: Tense
 
@@ -99,13 +100,22 @@
       leading-5 border-t border-base-300 text-base-content"
     >
       <td class="text-sm p-4">
-        {leave.leave_type.name}
+        {#if leave.leave_type?.name}
+          {leave.leave_type.name}
+        {:else}
+          <MissingField />
+        {/if}
       </td>
       <td class="text-sm p-4">
-        {leave.engagement.job_function.name}, {findClosestValidity(
-          leave.engagement.org_unit,
-          $date
-        ).name}
+        {#if leave.engagement}
+          {leave.engagement.job_function?.name ??
+            ""}{#if leave.engagement.org_unit?.length}, {findClosestValidity(
+              leave.engagement.org_unit,
+              $date
+            ).name}{/if}
+        {:else}
+          <MissingField />
+        {/if}
       </td>
       <ValidityTableCell validity={leave.validity} />
       <td class="flex p-4 gap-2 justify-end">

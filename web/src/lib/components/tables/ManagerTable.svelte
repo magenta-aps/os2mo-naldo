@@ -20,6 +20,7 @@
   import { updateGlobalNavigation } from "$lib/stores/navigation"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
+  import MissingField from "$lib/components/shared/MissingField.svelte"
 
   export let tense: Tense
 
@@ -130,7 +131,7 @@
     >
       <td class="text-sm p-4">
         {#if isOrg}
-          {#if manager.person}
+          {#if manager.person?.[0]}
             <a href="{base}/employee/{manager.person[0].uuid}">
               {findClosestValidity(manager.person, $date).name}
             </a>
@@ -138,7 +139,7 @@
             {capital($_("vacant"))}
           {/if}
           <!-- Add (*) if manager-object is inherited -->
-          {#if manager.org_unit?.[0].uuid !== $page.params.uuid}
+          {#if manager.org_unit?.[0] && manager.org_unit[0].uuid !== $page.params.uuid}
             <span
               title={capital(
                 $_("inherited_manager", {
@@ -149,13 +150,15 @@
               )}>(*)</span
             >
           {/if}
-        {:else}
+        {:else if manager.org_unit?.[0]}
           <a
             href="{base}/organisation/{manager.org_unit[0].uuid}"
             on:click={() => updateGlobalNavigation(manager.org_unit[0].uuid)}
           >
             {findClosestValidity(manager.org_unit, $date).name}
           </a>
+        {:else}
+          <MissingField />
         {/if}
       </td>
       <td class="text-sm p-4">
@@ -167,8 +170,20 @@
           {/each}
         </ul>
       </td>
-      <td class="text-sm p-4">{manager.manager_type.name}</td>
-      <td class="text-sm p-4">{manager.manager_level.name}</td>
+      <td class="text-sm p-4">
+        {#if manager.manager_type?.name}
+          {manager.manager_type.name}
+        {:else}
+          <MissingField />
+        {/if}
+      </td>
+      <td class="text-sm p-4">
+        {#if manager.manager_level?.name}
+          {manager.manager_level.name}
+        {:else}
+          <MissingField />
+        {/if}
+      </td>
       <ValidityTableCell validity={manager.validity} />
       <td class="flex p-4 gap-2 justify-end">
         <a href={`${base}/auditlog/${manager.uuid}`}>

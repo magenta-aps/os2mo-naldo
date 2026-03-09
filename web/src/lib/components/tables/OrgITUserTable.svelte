@@ -20,6 +20,7 @@
   import { getEngagementTitlesAndUuid } from "$lib/utils/display"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
+  import MissingField from "$lib/components/shared/MissingField.svelte"
 
   // Note: [number] in this case, does not mean the type `number`
   type EngagementITUser =
@@ -146,7 +147,13 @@
       class="{i % 2 === 0 ? '' : 'bg-base-200'} 
         leading-5 border-t border-base-300 text-base-content"
     >
-      <td class="text-sm p-4">{ituser.itsystem.name} </td>
+      <td class="text-sm p-4">
+        {#if ituser.itsystem?.name}
+          {ituser.itsystem.name}
+        {:else}
+          <MissingField />
+        {/if}
+      </td>
       <td class="text-sm p-4">{ituser.user_key}</td>
       <td class="text-sm p-4">{ituser.external_id ?? ""}</td>
       {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}

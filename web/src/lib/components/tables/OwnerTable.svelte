@@ -24,6 +24,7 @@
   import { formatQueryDates } from "$lib/utils/validities"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
+  import MissingField from "$lib/components/shared/MissingField.svelte"
 
   type Owners =
     | EmployeeOwnerQuery["owners"]["objects"][0]["validities"]
@@ -163,7 +164,7 @@
         leading-5 border-t border-base-300 text-base-content"
     >
       <td class="text-sm p-4">
-        {#if ownerObj.owner}
+        {#if ownerObj.owner?.[0]}
           <a href="{base}/employee/{ownerObj.owner[0].uuid}">
             {findClosestValidity(ownerObj.owner, $date).name}
           </a>
@@ -171,7 +172,7 @@
           {capital($_("vacant"))}
         {/if}
         <!-- Add (*) if owner-object is inherited -->
-        {#if isOrg && ownerObj.org_unit?.[0].uuid !== $page.params.uuid}
+        {#if isOrg && ownerObj.org_unit?.[0] && ownerObj.org_unit[0].uuid !== $page.params.uuid}
           <span
             title={capital(
               $_("inherited_owner", {

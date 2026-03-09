@@ -18,6 +18,7 @@
   import { formatQueryDates } from "$lib/utils/validities"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
+  import MissingField from "$lib/components/shared/MissingField.svelte"
 
   type KLEs = KleQuery["kles"]["objects"][0]["validities"]
   let data: KLEs
@@ -94,7 +95,11 @@
         </ul>
       </td>
       <td class="text-sm p-4">
-        • {`${kle.kle_number[0].user_key} - ${kle.kle_number[0].name}`}
+        {#if kle.kle_number?.[0]}
+          • {`${kle.kle_number[0].user_key} - ${kle.kle_number[0].name}`}
+        {:else}
+          <MissingField />
+        {/if}
       </td>
       <ValidityTableCell validity={kle.validity} />
       <td class="flex p-4 gap-2 justify-end">

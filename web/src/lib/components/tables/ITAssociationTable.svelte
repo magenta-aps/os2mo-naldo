@@ -20,6 +20,7 @@
   import { updateGlobalNavigation } from "$lib/stores/navigation"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
+  import MissingField from "$lib/components/shared/MissingField.svelte"
 
   export let tense: Tense
 
@@ -111,20 +112,38 @@
       leading-5 border-t border-base-300 text-base-content"
     >
       <td class="text-sm p-4">
-        <a
-          href="{base}/organisation/{itassociation.org_unit[0].uuid}"
-          on:click={() => updateGlobalNavigation(itassociation.org_unit[0].uuid)}
-        >
-          {findClosestValidity(itassociation.org_unit, $date).name}
-        </a>
+        {#if itassociation.org_unit?.[0]}
+          <a
+            href="{base}/organisation/{itassociation.org_unit[0].uuid}"
+            on:click={() => updateGlobalNavigation(itassociation.org_unit[0].uuid)}
+          >
+            {findClosestValidity(itassociation.org_unit, $date).name}
+          </a>
+        {:else}
+          <MissingField />
+        {/if}
       </td>
-      <td class="text-sm p-4">{itassociation.job_function?.name}</td>
-      <td class="text-sm p-4"
-        >{findClosestValidity(itassociation.it_user, $date).itsystem.name}</td
-      >
-      <td class="text-sm p-4"
-        >{findClosestValidity(itassociation.it_user, $date).user_key}</td
-      >
+      <td class="text-sm p-4">
+        {#if itassociation.job_function?.name}
+          {itassociation.job_function.name}
+        {:else}
+          <MissingField />
+        {/if}
+      </td>
+      <td class="text-sm p-4">
+        {#if itassociation.it_user?.length}
+          {findClosestValidity(itassociation.it_user, $date).itsystem.name}
+        {:else}
+          <MissingField />
+        {/if}
+      </td>
+      <td class="text-sm p-4">
+        {#if itassociation.it_user?.length}
+          {findClosestValidity(itassociation.it_user, $date).user_key}
+        {:else}
+          <MissingField />
+        {/if}
+      </td>
       <td class="text-sm p-4"
         >{itassociation.primary ? itassociation.primary?.name : ""}</td
       >

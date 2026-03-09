@@ -136,6 +136,7 @@
 	"leave_type": "leave type",
 	"link": "{n, plural, =0 {the link} one {link} other {links}}",
 	"loading": "loading",
+	"missing_data": "missing required field",
 	"location": "location",
 	"logout": "logout",
 	"manager": "{n, plural, =0 {the manager} one {manager} other {managers}}",

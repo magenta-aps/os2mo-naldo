@@ -21,6 +21,7 @@
   import { formatQueryDates } from "$lib/utils/validities"
   import { updateGlobalNavigation } from "$lib/stores/navigation"
   import { env } from "$lib/env"
+  import MissingField from "$lib/components/shared/MissingField.svelte"
 
   type Engagements = EngagementsQuery["engagements"]["objects"][0]["validities"]
   let data: Engagements
@@ -164,15 +165,21 @@
     >
       <td class="text-sm p-4">
         {#if isOrg}
-          <a href="{base}/employee/{engagement.person[0].uuid}"
-            >{findClosestValidity(engagement.person, $date).name}</a
-          >
-        {:else}
+          {#if engagement.person?.[0]}
+            <a href="{base}/employee/{engagement.person[0].uuid}"
+              >{findClosestValidity(engagement.person, $date).name}</a
+            >
+          {:else}
+            <MissingField />
+          {/if}
+        {:else if engagement.org_unit?.[0]}
           <a
             href="{base}/organisation/{engagement.org_unit?.[0].uuid}"
             on:click={() => updateGlobalNavigation(engagement.org_unit?.[0].uuid)}
             >{findClosestValidity(engagement.org_unit, $date).name}</a
           >
+        {:else}
+          <MissingField />
         {/if}
       </td>
       {#if env.PUBLIC_SHOW_EXTENSION_4}
@@ -181,17 +188,27 @@
         </td>
       {/if}
       <td class="text-sm p-4">{engagement.user_key}</td>
-      <td class="text-sm p-4"
-        >{env.PUBLIC_SHOW_JOB_FUNCTION_USER_KEY
-          ? `${engagement.job_function.user_key} - ${engagement.job_function.name}`
-          : engagement.job_function.name}</td
-      >
+      <td class="text-sm p-4">
+        {#if engagement.job_function}
+          {env.PUBLIC_SHOW_JOB_FUNCTION_USER_KEY
+            ? `${engagement.job_function.user_key} - ${engagement.job_function.name}`
+            : engagement.job_function.name}
+        {:else}
+          <MissingField />
+        {/if}
+      </td>
       {#if env.PUBLIC_SHOW_EXTENSION_1}
         <td class="text-sm p-4"
           >{engagement.extension_1 ? engagement.extension_1 : ""}</td
         >
       {/if}
-      <td class="text-sm p-4">{engagement.engagement_type.name}</td>
+      <td class="text-sm p-4">
+        {#if engagement.engagement_type?.name}
+          {engagement.engagement_type.name}
+        {:else}
+          <MissingField />
+        {/if}
+      </td>
       {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
         <td class="text-sm p-4">
           {#each engagement.itusers as ituser}
@@ -213,8 +230,8 @@
               <ul>
                 {#each engagement.managers as manager}
                   <li>
-                    {#if manager.person}
-                      <a href="{base}/employee/{manager.person?.[0].uuid}">
+                    {#if manager.person?.[0]}
+                      <a href="{base}/employee/{manager.person[0].uuid}">
                         • {findClosestValidity(manager.person, $date).name}
                       </a>
                     {:else}
