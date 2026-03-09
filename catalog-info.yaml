@@ -25,4 +25,4 @@ spec:
   owner: user:default/mb
   system: os2mo-core
   consumesApis:
-    - os2mo-graphql-v27
+    - os2mo-graphql-v28

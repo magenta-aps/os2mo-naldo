@@ -28,6 +28,7 @@ export interface TimelineItem {
     actor: string
     attribute: string
     value: string
+    uuid?: string
     start: Date
     end: Date
     note?: string
@@ -40,9 +41,10 @@ export interface TimelineItem {
 
 // Represents a single block of time for a specific attribute
 export interface TimelineEntry {
-  start: Date
-  end: Date
+  start: Date | null
+  end: Date | null
   value: string
+  uuid?: string
   changed?: boolean
 }
 
@@ -61,18 +63,19 @@ export interface Registration {
 // HELPER FUNCTIONS
 // ==========================================
 
-const FAR_FUTURE = new Date("2099-12-31")
+export const FAR_PAST = new Date("1900-01-01")
+export const FAR_FUTURE = new Date("2099-12-31")
 
 /**
- * Normalizes incoming dates.
- * If a date is missing, it defaults to the "Far Future" so the timeline bar stays open-ended.
- * It also handles stripping milliseconds if the API returns complex ISO strings.
+ * Parses a validity block into nullable from/to dates.
+ * Handles the 'person_validity' and 'class_validity' aliases.
  */
-const toDate = (d: any): Date => {
-  if (!d) return FAR_FUTURE
-  if (d instanceof Date) return d
-  if (typeof d === "string") return parseISO(d)
-  return FAR_FUTURE
+const parseValidity = (block: any): { from: Date | null; to: Date | null } => {
+  const v = block.validity ?? block.person_validity ?? block.class_validity
+  return {
+    from: v?.from ? parseISO(v.from) : null,
+    to: v?.to ? parseISO(v.to) : null,
+  }
 }
 
 /**
@@ -89,21 +92,61 @@ const extractValue = (data: any): string => {
     return s.length ? s : "not_set"
   }
 
-  // 2. Recursive List Handling
+  // 2. Paged _response: { objects: [...] }
+  if ("objects" in data && Array.isArray(data.objects)) {
+    return extractValue(data.objects)
+  }
+
+  // 3. Recursive List Handling
   // If the data is an array (e.g. a list of persons), we map over it.
   if (Array.isArray(data)) {
     if (data.length === 0) return "not_set"
     return data.map((item) => extractValue(item)).join(", ")
   }
 
+  // 4. _response shape: { uuid, current: { name }, validities: [...] }
+  // current can be null if there's no active validity (e.g. terminated or future-only entity)
+  if ("current" in data) {
+    if (data.current) return extractValue(data.current)
+    // No current name — fall back to UUID so the user can use the link to investigate
+    if (data.uuid) return String(data.uuid)
+    return "not_set"
+  }
+
   // "name" or "value" (Values of address-objects)
   if ("name" in data && data.name) return String(data.name)
   if ("value" in data && data.value) return String(data.value)
+
+  // user_key fallback (e.g. engagements don't have "name")
+  if ("user_key" in data && data.user_key) return String(data.user_key)
 
   // UUID Fallback (Last resort)
   if (data.uuid) return String(data.uuid)
 
   return "Unknown Data"
+}
+
+/**
+ * Extracts the UUID from a data object.
+ * For arrays, joins UUIDs with commas.
+ */
+const extractUuid = (data: any): string | undefined => {
+  if (data === null || data === undefined || typeof data !== "object") return undefined
+  // Paged _response: { objects: [...] }
+  if ("objects" in data && Array.isArray(data.objects)) {
+    return extractUuid(data.objects)
+  }
+  if (Array.isArray(data)) {
+    return (
+      data
+        .map((item) => extractUuid(item))
+        .filter(Boolean)
+        .join(", ") || undefined
+    )
+  }
+  // _response shape: if current is null, the reference doesn't exist (or is inactive)
+  if ("current" in data && !data.current) return data.uuid
+  return data.uuid
 }
 
 /**
@@ -115,7 +158,9 @@ const consolidateEntries = (entries: TimelineEntry[]): TimelineEntry[] => {
   if (!entries.length) return []
 
   // Sort by start date to ensure linear processing
-  const sorted = [...entries].sort((a, b) => compareAsc(a.start, b.start))
+  const sorted = [...entries].sort((a, b) =>
+    compareAsc(a.start ?? FAR_PAST, b.start ?? FAR_PAST)
+  )
 
   const merged: TimelineEntry[] = []
   let current = sorted[0]
@@ -124,13 +169,19 @@ const consolidateEntries = (entries: TimelineEntry[]): TimelineEntry[] => {
     const next = sorted[i]
 
     // Check if blocks touch each other (Next starts exactly 1 day after Current ends)
-    const isAdjacent = isEqual(next.start, addDays(current.end, 1))
-    // Check if they say the same thing
-    const isSameValue = current.value === next.value
+    const isAdjacent = isEqual(
+      next.start ?? FAR_PAST,
+      addDays(current.end ?? FAR_FUTURE, 1)
+    )
+    // Check if they say the same thing (compare on UUID when available)
+    const isSameValue =
+      current.uuid && next.uuid
+        ? current.uuid === next.uuid
+        : current.value === next.value
 
     if (isSameValue && isAdjacent) {
       // Merge: Extend the current block to encompass the next one
-      if (isAfter(next.end, current.end)) {
+      if (isAfter(next.end ?? FAR_FUTURE, current.end ?? FAR_FUTURE)) {
         current.end = next.end
       }
     } else {
@@ -170,17 +221,7 @@ export const transformAuditLog = (rawData: any[]): Registration[] => {
 
     // --- STEP 1: Collect Raw Data ---
     reg.validities.forEach((validityBlock: any) => {
-      // Determine date range (Handle 'validity' ('person_validity' & 'class_validity' is just aliases)
-      const validFrom = toDate(
-        validityBlock.validity?.from ||
-          validityBlock.person_validity?.from ||
-          validityBlock.class_validity?.from
-      )
-      const validTo = toDate(
-        validityBlock.validity?.to ||
-          validityBlock.person_validity?.to ||
-          validityBlock.class_validity?.to
-      )
+      const { from, to } = parseValidity(validityBlock)
 
       // Iterate over every key in the block (person, address, etc.)
       Object.keys(validityBlock).forEach((key) => {
@@ -188,15 +229,19 @@ export const transformAuditLog = (rawData: any[]): Registration[] => {
         if (key === "validity" || key === "person_validity" || key === "class_validity")
           return
 
-        if (!registration.timelines[key]) {
-          registration.timelines[key] = []
+        // Strip _response suffix so translation keys stay clean
+        const label = key.replace(/_response$/, "")
+
+        if (!registration.timelines[label]) {
+          registration.timelines[label] = []
         }
 
         // Add the entry
-        registration.timelines[key].push({
-          start: validFrom,
-          end: validTo,
+        registration.timelines[label].push({
+          start: from,
+          end: to,
           value: extractValue(validityBlock[key]),
+          uuid: extractUuid(validityBlock[key]),
         })
       })
     })
@@ -211,20 +256,20 @@ export const transformAuditLog = (rawData: any[]): Registration[] => {
   })
 
   // Compare each individual interval against the previous registration.
-  // Only mark an entry as changed if that exact [start, end, value] block didn't exist before.
+  // Only mark an entry as changed if that exact [start, end, compareKey] block didn't exist before.
+  // We compare on UUID when available (stable reference), falling back to value for primitives.
   for (let i = 1; i < output.length; i++) {
     const prev = output[i - 1]
     const curr = output[i]
 
     Object.keys(curr.timelines).forEach((key) => {
-      const prevSet = new Set(
-        (prev.timelines[key] || []).map(
-          (e) => `${e.value}|${e.start.getTime()}|${e.end.getTime()}`
-        )
-      )
+      const compareKey = (e: TimelineEntry) =>
+        `${e.uuid ?? e.value}|${e.start?.getTime()}|${e.end?.getTime()}`
+
+      const prevSet = new Set((prev.timelines[key] || []).map(compareKey))
 
       curr.timelines[key].forEach((e) => {
-        if (!prevSet.has(`${e.value}|${e.start.getTime()}|${e.end.getTime()}`)) {
+        if (!prevSet.has(compareKey(e))) {
           e.changed = true
         }
       })

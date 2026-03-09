@@ -166,17 +166,29 @@ gql`
           validities(start: null, end: null) {
             name
             user_key
-            unit_type {
+            unit_type_response {
               uuid
+              current {
+                name
+              }
             }
-            org_unit_level {
+            unit_level_response {
               uuid
+              current {
+                name
+              }
             }
             parent_response {
               uuid
+              current {
+                name
+              }
             }
-            time_planning {
+            time_planning_response {
               uuid
+              current {
+                name
+              }
             }
             validity {
               from
@@ -186,8 +198,11 @@ gql`
         }
         ... on AddressRegistration {
           validities(start: null, end: null) {
-            address_type {
+            address_type_response {
               uuid
+              current {
+                name
+              }
             }
             address: resolve {
               ... on DefaultAddress {
@@ -199,8 +214,11 @@ gql`
               }
             }
             description: user_key
-            visibility {
+            visibility_response {
               uuid
+              current {
+                name
+              }
             }
             validity {
               from
@@ -210,24 +228,42 @@ gql`
         }
         ... on AssociationRegistration {
           validities(start: null, end: null) {
-            person {
+            association_person: person_response {
               uuid
+              current {
+                name
+              }
             }
-            association_type {
+            association_type_response {
               uuid
+              current {
+                name
+              }
             }
 
-            org_unit {
+            org_unit_response {
               uuid
+              current {
+                name
+              }
             }
-            primary {
+            primary_response {
               uuid
+              current {
+                name
+              }
             }
-            substitute {
+            substitute_response {
               uuid
+              current {
+                name
+              }
             }
-            trade_union {
+            trade_union_response {
               uuid
+              current {
+                name
+              }
             }
             validity {
               from
@@ -249,22 +285,37 @@ gql`
         }
         ... on EngagementRegistration {
           validities(start: null, end: null) {
-            person {
+            person_response {
               uuid
+              current {
+                name
+              }
             }
-            org_unit {
+            org_unit_response {
               uuid
+              current {
+                name
+              }
             }
-            engagement_type {
+            engagement_type_response {
               uuid
+              current {
+                name
+              }
             }
-            job_function {
+            job_function_response {
               uuid
+              current {
+                name
+              }
             }
             extension_1
             extension_4
-            primary {
+            primary_response {
               uuid
+              current {
+                name
+              }
             }
             validity {
               from
@@ -285,12 +336,18 @@ gql`
         ... on ITUserRegistration {
           validities(start: null, end: null) {
             user_key
-            itsystem {
+            itsystem_response {
               uuid
+              current {
+                name
+              }
             }
             external_id
-            primary {
+            primary_response {
               uuid
+              current {
+                name
+              }
             }
             validity {
               from
@@ -300,11 +357,19 @@ gql`
         }
         ... on KLERegistration {
           validities(start: null, end: null) {
-            kle_aspects {
-              uuid
+            kle_aspects_response {
+              objects {
+                uuid
+                current {
+                  name
+                }
+              }
             }
-            kle_number {
+            kle_number_response {
               uuid
+              current {
+                name
+              }
             }
             validity {
               from
@@ -314,11 +379,17 @@ gql`
         }
         ... on LeaveRegistration {
           validities(start: null, end: null) {
-            leave_type {
+            leave_type_response {
               uuid
+              current {
+                name
+              }
             }
-            engagement {
+            engagement_response {
               uuid
+              current {
+                user_key
+              }
             }
             validity {
               from
@@ -328,20 +399,37 @@ gql`
         }
         ... on ManagerRegistration {
           validities(start: null, end: null) {
-            manager_person: person {
+            manager_person: person_response {
               uuid
+              current {
+                name
+              }
             }
-            manager_level {
+            manager_level_response {
               uuid
+              current {
+                name
+              }
             }
-            manager_type {
+            manager_type_response {
               uuid
+              current {
+                name
+              }
             }
-            org_unit {
+            org_unit_response {
               uuid
+              current {
+                name
+              }
             }
-            responsibilities {
-              uuid
+            responsibilities_response {
+              objects {
+                uuid
+                current {
+                  name
+                }
+              }
             }
             validity {
               from
@@ -351,8 +439,11 @@ gql`
         }
         ... on OwnerRegistration {
           validities(start: null, end: null) {
-            owner {
+            owner_response {
               uuid
+              current {
+                name
+              }
             }
             validity {
               from
@@ -362,8 +453,11 @@ gql`
         }
         ... on RoleBindingRegistration {
           validities(start: null, end: null) {
-            role {
+            role_response {
               uuid
+              current {
+                name
+              }
             }
             validity {
               from
@@ -373,8 +467,13 @@ gql`
         }
         ... on RelatedUnitRegistration {
           validities(start: null, end: null) {
-            org_units {
-              uuid
+            org_units_response {
+              objects {
+                uuid
+                current {
+                  name
+                }
+              }
             }
             validity {
               from
@@ -388,9 +487,21 @@ gql`
             name
             class_owner: owner
             scope
-            facet {
+            facet_response {
               uuid
+              current {
+                user_key
+              }
             }
+            class_validity: validity {
+              from
+              to
+            }
+          }
+        }
+        ... on FacetRegistration {
+          validities(start: null, end: null) {
+            user_key
             class_validity: validity {
               from
               to
