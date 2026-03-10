@@ -18,7 +18,6 @@
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getValidities } from "$lib/http/getValidities"
-  import { findClosestValidity } from "$lib/utils/validities"
   import { normalizeOwner } from "$lib/utils/normalizeForm"
 
   gql`
@@ -26,12 +25,10 @@
       owners(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
           validities {
-            owner(filter: { from_date: $fromDate, to_date: $toDate }) {
-              name
+            owner_response {
               uuid
-              validity {
-                from
-                to
+              current(at: $fromDate) {
+                name
               }
             }
             validity {
@@ -190,10 +187,10 @@
           type="employee"
           at={startDate}
           bind:value={selectedPerson}
-          startValue={ownerObj.owner
+          startValue={ownerObj.owner_response
             ? {
-                uuid: findClosestValidity(ownerObj.owner, startDate).uuid,
-                name: findClosestValidity(ownerObj.owner, startDate).name,
+                uuid: ownerObj.owner_response.uuid,
+                name: ownerObj.owner_response.current?.name ?? "",
               }
             : undefined}
         />

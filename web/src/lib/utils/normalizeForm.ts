@@ -25,11 +25,11 @@ export const normalizeOrganisation = (o: any) => {
 export const normalizeEngagement = (e: any) => {
   return {
     to: e.validity?.to?.split("T")[0] ?? null,
-    org_unit: e.org_unit?.[0]?.uuid ?? null,
-    job_function: e.job_function?.name ?? null,
-    engagement_type: e.engagement_type?.name ?? null,
+    org_unit: e.org_unit_response?.uuid ?? null,
+    job_function: e.job_function_response?.current?.name ?? null,
+    engagement_type: e.engagement_type_response?.current?.name ?? null,
     user_key: e.user_key ?? null,
-    primary: e.primary?.name ?? "",
+    primary: e.primary_response?.current?.name ?? "",
   }
 }
 
@@ -68,11 +68,13 @@ export const normalizeAddress = (a: any) => {
 export const normalizeManager = (m: any) => {
   return {
     to: m.validity?.to?.split("T")[0] ?? null,
-    person: m.person?.[0]?.uuid ?? undefined,
-    org_unit: m.org_unit?.[0]?.uuid ?? null,
-    manager_type: m.manager_type?.name ?? null,
-    manager_level: m.manager_level?.name ?? null,
-    responsibility: m.responsibilities.map((r: any) => r.name),
+    person: m.person_response?.uuid ?? undefined,
+    org_unit: m.org_unit_response?.uuid ?? null,
+    manager_type: m.manager_type_response?.current?.name ?? null,
+    manager_level: m.manager_level_response?.current?.name ?? null,
+    responsibility: m.responsibilities_response.objects.map(
+      (r: any) => r.current?.name
+    ),
   }
 }
 

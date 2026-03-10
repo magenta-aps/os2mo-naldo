@@ -56,6 +56,7 @@
       $orgUnitFilter: OrganisationUnitFilter!
       $defaultSearch: Boolean = true
       $limit: int
+      $date: DateTime
     ) {
       org_units(filter: $orgUnitFilter, limit: $limit) {
         objects {
@@ -81,6 +82,7 @@
       $employeeFilter: EmployeeFilter!
       $defaultSearch: Boolean = true
       $limit: int
+      $date: DateTime
     ) {
       employees(filter: $employeeFilter, limit: $limit) {
         objects {
@@ -105,8 +107,11 @@
     }
 
     fragment AddressDetails on Address {
-      address_type {
-        name
+      address_type_response {
+        uuid
+        current(at: $date) {
+          name
+        }
       }
       resolve {
         ... on DefaultAddress {
@@ -123,10 +128,13 @@
 
     fragment RsdSearch on Employee {
       engagements {
-        org_unit {
-          name
-          ancestors {
+        org_unit_response {
+          uuid
+          current(at: $date) {
             name
+            ancestors {
+              name
+            }
           }
         }
       }
@@ -165,6 +173,7 @@
             employeeFilter: employeeFilter,
             defaultSearch: !env.PUBLIC_ENABLE_RSD_SEARCH,
             limit: 15,
+            date: at ?? $date,
           }
         )
 
@@ -191,6 +200,7 @@
           {
             orgUnitFilter: orgUnitFilter,
             limit: 15,
+            date: at ?? $date,
           }
         )
 

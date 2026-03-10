@@ -35,24 +35,32 @@
             uuid
             name
             user_key
-            parent(filter: { from_date: $fromDate, to_date: $toDate }) {
+            parent_response {
               uuid
-              name
+              current(at: $fromDate) {
+                name
+              }
             }
-            time_planning {
-              name
+            time_planning_response {
               uuid
-              user_key
+              current(at: $fromDate) {
+                user_key
+                name
+              }
             }
-            unit_type {
+            unit_type_response {
               uuid
-              user_key
-              name
+              current(at: $fromDate) {
+                user_key
+                name
+              }
             }
-            org_unit_level {
+            unit_level_response {
               uuid
-              user_key
-              name
+              current(at: $fromDate) {
+                user_key
+                name
+              }
             }
             validity {
               from
@@ -257,10 +265,10 @@
           title="{capital($_('specify'))} {$_('parent')}"
           type="org-unit"
           at={startDate}
-          startValue={orgUnit.parent
+          startValue={orgUnit.parent_response
             ? {
-                uuid: orgUnit.parent.uuid,
-                name: orgUnit.parent.name,
+                uuid: orgUnit.parent_response.uuid,
+                name: orgUnit.parent_response.current?.name ?? "",
               }
             : undefined}
           bind:value={parent}
@@ -286,7 +294,13 @@
               id="time-planning"
               bind:name={$timePlanning.value}
               errors={$timePlanning.errors}
-              startValue={orgUnit.time_planning ? orgUnit.time_planning : undefined}
+              startValue={orgUnit.time_planning_response
+                ? {
+                    uuid: orgUnit.time_planning_response.uuid,
+                    name: orgUnit.time_planning_response.current?.name ?? "",
+                    user_key: orgUnit.time_planning_response.current?.user_key ?? "",
+                  }
+                : undefined}
               on:clear={() => ($timePlanning.value = "")}
               iterable={filterClassesByFacetUserKey(facets, "time_planning")}
               isClearable={true}
@@ -299,7 +313,13 @@
                 id="org-level"
                 bind:name={$orgUnitLevel.value}
                 errors={$orgUnitLevel.errors}
-                startValue={orgUnit.org_unit_level ? orgUnit.org_unit_level : undefined}
+                startValue={orgUnit.unit_level_response
+                  ? {
+                      uuid: orgUnit.unit_level_response.uuid,
+                      name: orgUnit.unit_level_response.current?.name ?? "",
+                      user_key: orgUnit.unit_level_response.current?.user_key ?? "",
+                    }
+                  : undefined}
                 on:clear={() => ($orgUnitLevel.value = "")}
                 extra_classes="basis-1/2"
                 iterable={filterClassesByFacetUserKey(facets, "org_unit_level")}
@@ -311,7 +331,13 @@
               id="org-type"
               bind:name={$orgUnitType.value}
               errors={$orgUnitType.errors}
-              startValue={orgUnit.unit_type ? orgUnit.unit_type : undefined}
+              startValue={orgUnit.unit_type_response
+                ? {
+                    uuid: orgUnit.unit_type_response.uuid,
+                    name: orgUnit.unit_type_response.current?.name ?? "",
+                    user_key: orgUnit.unit_type_response.current?.user_key ?? "",
+                  }
+                : undefined}
               on:clear={() => ($orgUnitType.value = "")}
               extra_classes="basis-1/2"
               iterable={filterClassesByFacetUserKey(facets, "org_unit_type")}

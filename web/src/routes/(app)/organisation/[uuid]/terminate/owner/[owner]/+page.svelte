@@ -30,10 +30,12 @@
               from
               to
             }
-            org_unit(filter: { from_date: null, to_date: null }) {
-              validity {
-                from
-                to
+            org_unit_response {
+              validities(start: null, end: null) {
+                validity {
+                  from
+                  to
+                }
               }
             }
           }
@@ -115,7 +117,7 @@
 {:then data}
   {@const ownerValidities = getMinMaxValidities(data.owners.objects[0].validities)}
   {@const validities = getMinMaxValidities(
-    data.owners.objects[0].validities[0].org_unit
+    data.owners.objects[0].validities[0].org_unit_response?.validities
   )}
 
   <form method="post" class="mx-6" use:enhance={handler}>

@@ -20,9 +20,9 @@
     UpdateLeaveDocument,
   } from "./query.generated"
   import {
-    formatEngagementTitlesAndUuid,
+    getEngagementTitlesAndUuid,
     type EngagementTitleAndUuid,
-  } from "$lib/utils/helpers"
+  } from "$lib/utils/display"
   import type { FacetValidities } from "$lib/utils/classes"
   import { getEngagementValidities } from "$lib/http/getValidities"
   import { getClasses } from "$lib/http/getClasses"
@@ -54,46 +54,61 @@
       leaves(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
           validities {
-            engagement {
+            engagement_response {
               uuid
-              validity {
-                from
-                to
-              }
-              uuid
-              org_unit {
-                name
-              }
-              job_function {
-                name
+              current(at: $fromDate) {
+                validity {
+                  from
+                  to
+                }
+                org_unit_response {
+                  uuid
+                  current(at: $fromDate) {
+                    name
+                  }
+                }
+                job_function_response {
+                  uuid
+                  current(at: $fromDate) {
+                    name
+                  }
+                }
               }
             }
-            leave_type {
+            leave_type_response {
               uuid
-              user_key
-              name
+              current(at: $fromDate) {
+                user_key
+                name
+              }
             }
             validity {
               from
               to
             }
-            person {
+            person_response {
               uuid
-              name
-              engagements(filter: { from_date: $fromDate, to_date: $toDate }) {
-                uuid
-                org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
+              current(at: $fromDate) {
+                name
+                engagements(filter: { from_date: $fromDate, to_date: $toDate }) {
                   uuid
-                  name
+                  org_unit_response {
+                    uuid
+                    current(at: $fromDate) {
+                      name
+                    }
+                  }
+                  job_function_response {
+                    uuid
+                    current(at: $fromDate) {
+                      name
+                    }
+                  }
                 }
-                job_function {
-                  uuid
-                  name
+                validity {
+                  from
+                  to
                 }
-              }
-              validity {
-                from
-                to
               }
             }
           }
@@ -107,14 +122,20 @@
       ) {
         objects {
           validities {
-            org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
-              name
-              user_key
+            org_unit_response {
+              uuid
+              current(at: $fromDate) {
+                name
+                user_key
+              }
             }
             uuid
-            job_function {
-              user_key
-              name
+            job_function_response {
+              uuid
+              current(at: $fromDate) {
+                user_key
+                name
+              }
             }
           }
         }
@@ -266,8 +287,17 @@
   </div>
 {:then data}
   {@const leave = data.leaves.objects[0].validities[0]}
-  {@const person = leave.person[0]}
-  {@const engagementStartValue = formatEngagementTitlesAndUuid([leave.engagement])[0]}
+  {@const person = {
+    uuid: leave.person_response.uuid,
+    name: leave.person_response.current?.name ?? "",
+  }}
+  {@const engagementStartValue = getEngagementTitlesAndUuid([
+    {
+      uuid: leave.engagement_response.uuid,
+      job_function_response: leave.engagement_response.current?.job_function_response,
+      org_unit_response: leave.engagement_response.current?.org_unit_response,
+    },
+  ])[0]}
   {#if !initialLeave}
     {@html (() => {
       initialLeave = normalizeLeave(leave)
@@ -311,7 +341,13 @@
         />
         {#if facets}
           <Select
-            startValue={leave.leave_type}
+            startValue={leave.leave_type_response?.current
+              ? {
+                  uuid: leave.leave_type_response.uuid,
+                  name: leave.leave_type_response.current.name,
+                  user_key: leave.leave_type_response.current.user_key,
+                }
+              : undefined}
             title={capital($_("leave_type"))}
             id="leave-type-uuid"
             bind:name={$leaveType.value}
@@ -329,7 +365,7 @@
             bind:value={selectedEngagement}
             bind:name={$engagement.value}
             errors={$engagement.errors}
-            iterable={formatEngagementTitlesAndUuid(engagements)}
+            iterable={getEngagementTitlesAndUuid(engagements)}
             required={true}
           />
         {/if}

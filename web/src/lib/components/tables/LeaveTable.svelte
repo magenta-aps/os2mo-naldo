@@ -7,7 +7,6 @@
   import ValidityTableCell from "$lib/components/shared/ValidityTableCell.svelte"
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
-  import { findClosestValidity } from "$lib/utils/validities"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { onMount } from "svelte"
   import { sortKey, sortDirection } from "$lib/stores/sorting"
@@ -42,19 +41,26 @@
               from
               to
             }
-            leave_type {
-              name
-            }
-            engagement(filter: { from_date: $fromDate, to_date: $toDate }) {
-              org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
+            leave_type_response {
+              uuid
+              current(at: $fromDate) {
                 name
-                validity {
-                  from
-                  to
-                }
               }
-              job_function {
-                name
+            }
+            engagement_response {
+              uuid
+              current(at: $fromDate) {
+                org_unit_response {
+                  uuid
+                  current(at: $fromDate) {
+                    name
+                  }
+                }
+                job_function_response {
+                  current(at: $fromDate) {
+                    name
+                  }
+                }
               }
             }
           }
@@ -99,13 +105,11 @@
       leading-5 border-t border-base-300 text-base-content"
     >
       <td class="text-sm p-4">
-        {leave.leave_type.name}
+        {leave.leave_type_response?.current?.name}
       </td>
       <td class="text-sm p-4">
-        {leave.engagement.job_function.name}, {findClosestValidity(
-          leave.engagement.org_unit,
-          $date
-        ).name}
+        {leave.engagement_response?.current?.job_function_response?.current?.name}, {leave
+          .engagement_response?.current?.org_unit_response?.current?.name}
       </td>
       <ValidityTableCell validity={leave.validity} />
       <td class="flex p-4 gap-2 justify-end">

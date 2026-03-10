@@ -30,10 +30,12 @@
               from
               to
             }
-            person(filter: { from_date: null, to_date: null }) {
-              validity {
-                from
-                to
+            person_response {
+              validities(start: null, end: null) {
+                validity {
+                  from
+                  to
+                }
               }
             }
           }
@@ -113,7 +115,9 @@
   </div>
 {:then data}
   {@const leaveValidities = getMinMaxValidities(data.leaves.objects[0].validities)}
-  {@const validities = getMinMaxValidities(data.leaves.objects[0].validities[0].person)}
+  {@const validities = getMinMaxValidities(
+    data.leaves.objects[0].validities[0].person_response.validities
+  )}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">

@@ -36,15 +36,19 @@
             value
             name
             user_key
-            address_type {
-              name
+            address_type_response {
               uuid
-              user_key
+              current(at: $fromDate) {
+                name
+                user_key
+              }
             }
-            visibility {
-              name
-              user_key
+            visibility_response {
               uuid
+              current(at: $fromDate) {
+                name
+                user_key
+              }
             }
             validity {
               from
@@ -289,7 +293,13 @@
               title={capital($_("visibility"))}
               id="visibility"
               bind:name={$visibility.value}
-              startValue={address.visibility ? address.visibility : undefined}
+              startValue={address.visibility_response
+                ? {
+                    uuid: address.visibility_response.uuid,
+                    name: address.visibility_response.current?.name ?? "",
+                    user_key: address.visibility_response.current?.user_key ?? "",
+                  }
+                : undefined}
               iterable={filterClassesByFacetUserKey(facets, "visibility")}
               extra_classes="basis-1/2"
               on:clear={() => ($visibility.value = "")}
@@ -298,7 +308,13 @@
             <Select
               title={capital($_("address_type"))}
               id="address-type"
-              startValue={address.address_type ? address.address_type : undefined}
+              startValue={address.address_type_response
+                ? {
+                    uuid: address.address_type_response.uuid,
+                    name: address.address_type_response.current?.name ?? "",
+                    user_key: address.address_type_response.current?.user_key ?? "",
+                  }
+                : undefined}
               bind:value={addressType}
               bind:name={$addressTypeField.value}
               errors={$addressTypeField.errors}

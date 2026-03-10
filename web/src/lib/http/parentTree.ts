@@ -9,7 +9,11 @@ const fetchParent = async (uuid: string, currentDate: string) => {
   })
 
   // Empty objects can happen when there's no present org after changing the global time
-  return res.org_units.objects.length ? res.org_units.objects[0].current?.parent : null
+  const parentResponse = res.org_units.objects.length
+    ? res.org_units.objects[0].current?.parent_response
+    : null
+  if (!parentResponse) return null
+  return { name: parentResponse.current?.name ?? "", uuid: parentResponse.uuid }
 }
 
 export const fetchParentTree = async (

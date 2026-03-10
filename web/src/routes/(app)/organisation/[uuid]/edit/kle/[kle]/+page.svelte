@@ -31,24 +31,33 @@
         objects {
           validities {
             uuid
-            kle_aspects {
-              name
-              user_key
-              uuid
+            kle_aspects_response {
+              objects {
+                uuid
+                current(at: $fromDate) {
+                  name
+                  user_key
+                }
+              }
             }
-            kle_number(filter: { from_date: null, to_date: null }) {
-              name
-              user_key
+            kle_number_response {
               uuid
+              current(at: $fromDate) {
+                name
+                user_key
+              }
             }
             validity {
               from
               to
             }
-            org_unit(filter: { from_date: null, to_date: null }) {
-              validity {
-                from
-                to
+            org_unit_response {
+              uuid
+              current(at: $fromDate) {
+                validity {
+                  from
+                  to
+                }
               }
             }
           }
@@ -222,7 +231,13 @@
           <Select
             title={capital($_("kle_number"))}
             id="kle-number"
-            startValue={kle.kle_number[0]}
+            startValue={kle.kle_number_response?.current
+              ? {
+                  uuid: kle.kle_number_response.uuid,
+                  name: kle.kle_number_response.current.name,
+                  user_key: kle.kle_number_response.current.user_key,
+                }
+              : undefined}
             bind:name={$kleNumber.value}
             errors={$kleNumber.errors}
             iterable={formatKleNumberTitleAndUuid(
@@ -235,7 +250,11 @@
             errors={$kleAspects.errors}
             title={capital($_("kle_aspect"))}
             id="kle-aspects"
-            startValue={kle.kle_aspects}
+            startValue={kle.kle_aspects_response?.objects?.map((o) => ({
+              uuid: o.uuid,
+              name: o.current?.name ?? "",
+              user_key: o.current?.user_key ?? "",
+            })) ?? []}
             iterable={filterClassesByFacetUserKey(facets, "kle_aspect")}
             required={true}
           />

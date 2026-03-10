@@ -33,22 +33,29 @@
           validities {
             name
             uuid
-            unit_type {
-              name
-            }
-            org_unit_level {
-              name
-            }
-            parent(filter: { from_date: $fromDate, to_date: $toDate }) {
-              name
+            unit_type_response {
               uuid
-              parent {
+              current(at: $fromDate) {
                 name
               }
             }
-            parent_uuid
-            time_planning {
-              name
+            unit_level_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
+            }
+            parent_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
+            }
+            time_planning_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
             }
             validity {
               from
@@ -98,20 +105,23 @@
     >
       <td class="text-sm p-4">{org_unit.name}</td>
       <td class="text-sm p-4"
-        >{org_unit.unit_type ? org_unit.unit_type.name : capital($_("not_set"))}</td
+        >{org_unit.unit_type_response?.current
+          ? org_unit.unit_type_response.current.name
+          : capital($_("not_set"))}</td
       >
       {#if env.PUBLIC_SHOW_ORG_UNIT_LEVEL}
         <td class="text-sm p-4"
-          >{org_unit.org_unit_level
-            ? org_unit.org_unit_level.name
+          >{org_unit.unit_level_response?.current
+            ? org_unit.unit_level_response.current.name
             : capital($_("not_set"))}</td
         >
       {/if}
       <td class="text-sm p-4">
-        {#if org_unit.parent}
-          <a href="{base}/organisation/{org_unit.parent_uuid}">
-            <!-- Fall back to ugly UUID if the parent doesn't exist today -->
-            {org_unit.parent ? org_unit.parent.name : org_unit.parent_uuid}
+        {#if org_unit.parent_response}
+          <a href="{base}/organisation/{org_unit.parent_response.uuid}">
+            {org_unit.parent_response.current
+              ? org_unit.parent_response.current.name
+              : org_unit.parent_response.uuid}
           </a>
         {:else}
           {capital(
@@ -121,8 +131,8 @@
       </td>
       {#if env.PUBLIC_SHOW_TIME_PLANNING}
         <td class="text-sm p-4">
-          {org_unit.time_planning
-            ? org_unit.time_planning.name
+          {org_unit.time_planning_response?.current
+            ? org_unit.time_planning_response.current.name
             : capital($_("not_set"))}
         </td>
       {/if}

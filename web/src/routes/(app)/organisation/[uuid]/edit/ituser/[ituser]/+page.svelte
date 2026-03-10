@@ -38,15 +38,19 @@
         objects {
           validities {
             user_key
-            primary {
-              name
-              user_key
+            primary_response {
               uuid
+              current(at: $fromDate) {
+                name
+                user_key
+              }
             }
-            itsystem {
-              name
-              user_key
+            itsystem_response {
               uuid
+              current(at: $fromDate) {
+                name
+                user_key
+              }
             }
             validity {
               from
@@ -251,7 +255,12 @@
           <Select
             title={capital($_("it_system"))}
             id="it-system"
-            startValue={itUser.itsystem ? itUser.itsystem : undefined}
+            startValue={itUser.itsystem_response?.current
+              ? {
+                  uuid: itUser.itsystem_response.uuid,
+                  name: itUser.itsystem_response.current.name,
+                }
+              : undefined}
             extra_classes="basis-1/2"
             bind:name={$itSystem.value}
             errors={$itSystem.errors}
@@ -275,7 +284,13 @@
             title={capital($_("primary"))}
             id="primary"
             bind:name={$primary.value}
-            startValue={itUser.primary ? itUser.primary : undefined}
+            startValue={itUser.primary_response?.current
+              ? {
+                  uuid: itUser.primary_response.uuid,
+                  name: itUser.primary_response.current.name,
+                  user_key: itUser.primary_response.current.user_key,
+                }
+              : undefined}
             iterable={filterClassesByFacetUserKey(facets, "primary_type")}
             on:clear={() => ($primary.value = "")}
             isClearable={true}

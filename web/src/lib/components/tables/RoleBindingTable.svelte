@@ -50,14 +50,23 @@
         objects {
           validities {
             uuid
-            ituser(filter: { from_date: $fromDate, to_date: $toDate }) {
-              user_key
-              itsystem {
-                name
+            ituser_response {
+              uuid
+              current(at: $fromDate) {
+                user_key
+                itsystem_response {
+                  uuid
+                  current(at: $fromDate) {
+                    name
+                  }
+                }
               }
             }
-            role(filter: { from_date: $fromDate, to_date: $toDate }) {
-              name
+            role_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
             }
             validity {
               from
@@ -104,9 +113,11 @@
       class="{i % 2 === 0 ? '' : 'bg-base-200'} 
         leading-5 border-t border-base-300 text-base-content"
     >
-      <td class="text-sm p-4">{rolebindingObj.ituser[0].user_key}</td>
-      <td class="text-sm p-4">{rolebindingObj.ituser[0].itsystem.name}</td>
-      <td class="text-sm p-4">{rolebindingObj.role[0].name}</td>
+      <td class="text-sm p-4">{rolebindingObj.ituser_response?.current?.user_key}</td>
+      <td class="text-sm p-4"
+        >{rolebindingObj.ituser_response?.current?.itsystem_response?.current?.name}</td
+      >
+      <td class="text-sm p-4">{rolebindingObj.role_response?.current?.name}</td>
       <ValidityTableCell validity={rolebindingObj.validity} />
       <td class="flex p-4 gap-2 justify-end">
         <a href={`${base}/auditlog/${rolebindingObj.uuid}`}>

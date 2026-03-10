@@ -28,10 +28,14 @@
           validities {
             uuid
             user_key
-            classes(filter: { from_date: $currentDate }) {
-              name
-              uuid
-              user_key
+            classes_responses(filter: { from_date: $currentDate }) {
+              objects {
+                uuid
+                current(at: $currentDate) {
+                  name
+                  user_key
+                }
+              }
             }
           }
         }

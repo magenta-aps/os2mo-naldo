@@ -55,14 +55,19 @@
       ) {
         objects {
           validities {
-            org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
-              name
-              user_key
+            org_unit_response {
+              uuid
+              current(at: $fromDate) {
+                name
+                user_key
+              }
             }
             uuid
-            job_function {
-              user_key
-              name
+            job_function_response {
+              current(at: $fromDate) {
+                user_key
+                name
+              }
             }
           }
         }

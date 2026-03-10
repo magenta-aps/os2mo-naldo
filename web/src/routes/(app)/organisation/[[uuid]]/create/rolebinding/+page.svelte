@@ -34,9 +34,11 @@
             itusers(filter: { from_date: $fromDate }) {
               user_key
               uuid
-              itsystem(filter: { from_date: $fromDate }) {
+              itsystem_response {
                 uuid
-                name
+                current(at: $fromDate) {
+                  name
+                }
               }
             }
           }
@@ -60,7 +62,7 @@
   let itUser: {
     uuid: string
     name: string
-    itsystem: {
+    itsystem_response: {
       uuid: string
     }
   }
@@ -159,7 +161,7 @@
     // Make sure `currentDate` isn't sent if startDate is null.
     const params = {
       fromDate: startDate,
-      itSystem: itUser?.itsystem.uuid,
+      itSystem: itUser?.itsystem_response.uuid,
     }
 
     ;(async () => {

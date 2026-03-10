@@ -51,24 +51,32 @@
             uuid
             user_key
             value
-            address_type {
-              name
+            address_type_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
             }
             ituser(filter: { from_date: $fromDate, to_date: $toDate }) {
               user_key
               uuid
-              itsystem {
-                user_key
-                name
+              itsystem_response {
                 uuid
+                current(at: $fromDate) {
+                  user_key
+                  name
+                }
               }
               validity {
                 from
                 to
               }
             }
-            visibility {
-              name
+            visibility_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
             }
             validity {
               from
@@ -116,7 +124,7 @@
       class="{i % 2 === 0 ? '' : 'bg-base-200'} 
       leading-5 border-t border-base-300 text-base-content"
     >
-      <td class="text-sm p-4">{address.address_type.name}</td>
+      <td class="text-sm p-4">{address.address_type_response?.current?.name}</td>
       <td class="text-sm p-4"
         >{address.user_key !== address.value && address.user_key !== address.uuid
           ? address.user_key
@@ -134,7 +142,9 @@
         </td>
       {/if}
       <td class="text-sm p-4"
-        >{address.visibility ? address.visibility.name : capital($_("not_set"))}</td
+        >{address.visibility_response?.current
+          ? address.visibility_response.current.name
+          : capital($_("not_set"))}</td
       >
       <ValidityTableCell validity={address.validity} />
       <td class="flex p-4 gap-2 justify-end">

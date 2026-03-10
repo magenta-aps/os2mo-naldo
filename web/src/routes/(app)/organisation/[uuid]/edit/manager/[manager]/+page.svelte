@@ -12,7 +12,6 @@
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
   import { ManagerDocument, UpdateManagerDocument } from "./query.generated"
-  import { findClosestValidity } from "$lib/utils/validities"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
@@ -33,35 +32,47 @@
         objects {
           validities {
             uuid
-            person(filter: { from_date: $fromDate, to_date: $toDate }) {
+            person_response {
               uuid
-              name
+              current(at: $fromDate) {
+                name
+              }
             }
-            manager_type(filter: { from_date: $fromDate, to_date: $toDate }) {
+            manager_type_response {
               uuid
-              user_key
-              name
+              current(at: $fromDate) {
+                user_key
+                name
+              }
             }
-            manager_level(filter: { from_date: $fromDate, to_date: $toDate }) {
+            manager_level_response {
               uuid
-              user_key
-              name
+              current(at: $fromDate) {
+                user_key
+                name
+              }
             }
-            responsibilities(filter: { from_date: $fromDate, to_date: $toDate }) {
-              uuid
-              name
-              user_key
+            responsibilities_response {
+              objects {
+                uuid
+                current(at: $fromDate) {
+                  name
+                  user_key
+                }
+              }
             }
             validity {
               from
               to
             }
-            org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
+            org_unit_response {
               uuid
-              name
-              validity {
-                from
-                to
+              current(at: $fromDate) {
+                name
+                validity {
+                  from
+                  to
+                }
               }
             }
           }
@@ -223,7 +234,11 @@
   </div>
 {:then data}
   {@const manager = data.managers.objects[0].validities[0]}
-  {@const responsibilities = manager.responsibilities}
+  {@const responsibilities = manager.responsibilities_response.objects.map((r) => ({
+    uuid: r.uuid,
+    name: r.current?.name ?? "",
+    user_key: r.current?.user_key ?? "",
+  }))}
   {#if !initialManager}
     {@html (() => {
       initialManager = normalizeManager(manager)
@@ -258,8 +273,8 @@
           type="org-unit"
           at={startDate}
           startValue={{
-            uuid: findClosestValidity(manager.org_unit, startDate).uuid,
-            name: findClosestValidity(manager.org_unit, startDate).name,
+            uuid: manager.org_unit_response.uuid,
+            name: manager.org_unit_response.current?.name ?? "",
           }}
           bind:value={selectedOrgUnit}
           bind:name={$orgUnit.value}
@@ -272,10 +287,10 @@
           type="employee"
           at={startDate}
           bind:value={selectedPerson}
-          startValue={manager.person
+          startValue={manager.person_response
             ? {
-                uuid: findClosestValidity(manager.person, startDate).uuid,
-                name: findClosestValidity(manager.person, startDate).name,
+                uuid: manager.person_response.uuid,
+                name: manager.person_response.current?.name ?? "",
               }
             : undefined}
         />
@@ -284,7 +299,11 @@
             <Select
               title={capital($_("manager_type"))}
               id="manager-type"
-              startValue={manager.manager_type}
+              startValue={{
+                uuid: manager.manager_type_response?.uuid,
+                name: manager.manager_type_response?.current?.name ?? "",
+                user_key: manager.manager_type_response?.current?.user_key ?? "",
+              }}
               bind:name={$managerType.value}
               errors={$managerType.errors}
               iterable={filterClassesByFacetUserKey(facets, "manager_type")}
@@ -294,7 +313,11 @@
             <Select
               title={capital($_("manager_level"))}
               id="manager-level"
-              startValue={manager.manager_level}
+              startValue={{
+                uuid: manager.manager_level_response?.uuid,
+                name: manager.manager_level_response?.current?.name ?? "",
+                user_key: manager.manager_level_response?.current?.user_key ?? "",
+              }}
               bind:name={$managerLevel.value}
               errors={$managerLevel.errors}
               iterable={filterClassesByFacetUserKey(facets, "manager_level")}

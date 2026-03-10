@@ -30,9 +30,11 @@
         objects {
           current(at: $currentDate) {
             uuid
-            person {
+            person_response {
               uuid
-              name
+              current(at: $currentDate) {
+                name
+              }
             }
           }
           validities(start: null, end: null) {
@@ -224,8 +226,8 @@
                   </label>
                 </div>
                 {#each engagements.sort((a, b) => {
-                  const nameA = a.current?.person[0]?.name?.toLowerCase() || ""
-                  const nameB = b.current?.person[0]?.name?.toLowerCase() || ""
+                  const nameA = a.current?.person_response?.current?.name?.toLowerCase() || ""
+                  const nameB = b.current?.person_response?.current?.name?.toLowerCase() || ""
                   return nameA > nameB ? 1 : -1
                 }) as engagement}
                   <div class="flex text-base-content">
@@ -240,7 +242,7 @@
                         class="checkbox checkbox-primary rounded-sm normal-case font-normal text-base text-base-100"
                       />
                       <span class="label-text text-base-content"
-                        >{engagement.current?.person[0].name}</span
+                        >{engagement.current?.person_response?.current?.name}</span
                       >
                     </label>
                     {#if selectedEngagements.includes(engagement.current?.uuid)}
