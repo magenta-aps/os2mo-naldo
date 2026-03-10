@@ -7,6 +7,22 @@ const bool = (value: string | undefined, defaultValue = false): boolean => {
   throw new Error(`Invalid boolean env var: "${value}". Must be "true" or "false"`)
 }
 
+type Environment = "dev" | "test" | "prod"
+const VALID_ENVIRONMENTS: Environment[] = ["dev", "test", "prod"]
+
+const environment = (
+  value: string | undefined,
+  defaultValue: Environment = "dev"
+): Environment => {
+  if (!value) return defaultValue
+  if (VALID_ENVIRONMENTS.includes(value as Environment)) return value as Environment
+  throw new Error(
+    `Invalid PUBLIC_ENVIRONMENT: "${value}". Must be one of: ${VALID_ENVIRONMENTS.join(
+      ", "
+    )}`
+  )
+}
+
 const json = <T>(value: string | undefined, defaultValue: T): T => {
   if (!value) return defaultValue
   try {
@@ -65,4 +81,5 @@ export const env = {
   PUBLIC_ENABLE_SP: bool(dynamicEnv["PUBLIC_ENABLE_SP"]),
   PUBLIC_ENABLE_RSD_SEARCH: bool(dynamicEnv["PUBLIC_ENABLE_RSD_SEARCH"]),
   PUBLIC_ENABLE_THEMING: bool(dynamicEnv["PUBLIC_ENABLE_THEMING"]),
+  PUBLIC_ENVIRONMENT: environment(dynamicEnv["PUBLIC_ENVIRONMENT"]),
 }

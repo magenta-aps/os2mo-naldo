@@ -225,6 +225,8 @@
 	"summary": "opsummering",
 	"surname": "efternavn",
 	"terminate_item": "afslut {item}",
+	"environment_warning_dev": "UDVIKLINGSMILJØ",
+	"environment_warning_test": "TESTMILJØ",
 	"theme": "tema",
 	"time_planning": "tidsregistrering",
 	"to": "til",
