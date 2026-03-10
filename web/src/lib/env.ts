@@ -1,9 +1,10 @@
 import { env as dynamicEnv } from "$env/dynamic/public"
 
 const bool = (value: string | undefined, defaultValue = false): boolean => {
+  if (!value) return defaultValue
   if (value === "true") return true
   if (value === "false") return false
-  return defaultValue
+  throw new Error(`Invalid boolean env var: "${value}". Must be "true" or "false"`)
 }
 
 const json = <T>(value: string | undefined, defaultValue: T): T => {
@@ -11,8 +12,7 @@ const json = <T>(value: string | undefined, defaultValue: T): T => {
   try {
     return JSON.parse(value) as T
   } catch (err) {
-    console.error(`Invalid JSON in env var:`, value)
-    return defaultValue
+    throw new Error(`Invalid JSON in env var: "${value}"`)
   }
 }
 
