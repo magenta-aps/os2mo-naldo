@@ -1,0 +1,151 @@
+# Test stack: spins up a clean OS2MO backend for e2e tests.
+# Usage:
+#   docker compose -f docker-compose.test.yml up -d --wait
+#   cd web && yarn test
+#   docker compose -f docker-compose.test.yml down -v
+services:
+  naldo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: prod
+    environment:
+      ORIGIN: http://localhost:4173
+      PUBLIC_BASE_URL: http://localhost:5000
+    ports:
+      - "127.0.0.1:4173:3000"
+    depends_on:
+      mo:
+        condition: service_healthy
+    restart: on-failure
+
+  proxy:
+    image: docker.io/library/caddy:2
+    volumes:
+      - ../os2mo/dev-environment/proxy:/etc/caddy/:ro
+    ports:
+      - "127.0.0.1:5000:80"
+    restart: unless-stopped
+
+  mo:
+    image: magentaaps/os2mo:latest
+    env_file: test.env
+    environment:
+      # Enable the /testing/* endpoints (snapshot, restore, etc.)
+      INSECURE_ENABLE_TESTING_API: "true"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health/ready"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 30s
+    restart: unless-stopped
+    depends_on:
+      mox-db:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+      keycloak-realm-builder:
+        condition: service_completed_successfully
+      fixture-loader:
+        condition: service_completed_successfully
+
+  fixture-loader:
+    image: magentaaps/os2mo-fixture-loader:1.4.0
+    command: ["kolding"]
+    environment:
+      PGHOST: mox-db
+      PGDATABASE: mox
+      PGUSER: mox
+      PGPASSWORD: mox
+    depends_on:
+      mox-db:
+        condition: service_healthy
+    restart: on-failure
+
+  mox-db:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: mox
+      POSTGRES_PASSWORD: mox
+      POSTGRES_USER: mox
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mox"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+    restart: unless-stopped
+
+  msg-broker:
+    image: rabbitmq:3-management
+    hostname: msg-broker
+    restart: unless-stopped
+
+  keycloak:
+    build:
+      context: ../os2mo/keycloak/
+    environment:
+      KC_HOSTNAME_URL: http://localhost:5000/auth
+      KC_HOSTNAME_ADMIN_URL: http://localhost:5000/auth
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB_URL_HOST: keycloak-db
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    restart: unless-stopped
+    volumes:
+      - keycloak-volume:/srv/:ro
+
+  keycloak-realm-builder:
+    image: magentaaps/os2mo-keycloak-realm-builder:7
+    environment:
+      KEYCLOAK_VERSION: 14.0.0
+      POSTGRES_CONNECTION_STRING: postgres://keycloak:keycloak@keycloak-db/keycloak?sslmode=disable
+      KEYCLOAK_ADMIN_USERNAME: "admin"
+      KEYCLOAK_ADMIN_PASSWORD: "admin"
+      KEYCLOAK_URL: "http://keycloak:8080"
+      KEYCLOAK_SSL_REQUIRED_MO: external
+      KEYCLOAK_SSL_REQUIRED_LORA: external
+      KEYCLOAK_LORA_REALM_ENABLED: "true"
+      KEYCLOAK_LORA_CLIENT_SECRET: 158a2075-aa8a-421c-94a4-2df35377014a
+      KEYCLOAK_MO_CLIENT_REDIRECT_URI: '["http://localhost:5000/*", "http://localhost:4173/*"]'
+      KEYCLOAK_MO_CLIENT_WEB_ORIGIN: '["http://localhost:5000", "http://localhost:4173"]'
+      KEYCLOAK_RBAC_ENABLED: "false"
+      KEYCLOAK_REALM_USERS: |
+        [
+          {
+            "enabled": true,
+            "uuid": "0fb62199-cb9e-4083-ba45-2a63bfd142d7",
+            "email": "alvidan@kolding.dk",
+            "username": "alvida",
+            "password": "alvida",
+            "firstname": "Alvida",
+            "lastname": "Nibe",
+            "roles": ["admin", "service_api"]
+          }
+        ]
+    depends_on:
+      keycloak:
+        condition: service_started
+    restart: on-failure
+    volumes:
+      - keycloak-volume:/srv/
+
+  keycloak-db:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  keycloak-volume:

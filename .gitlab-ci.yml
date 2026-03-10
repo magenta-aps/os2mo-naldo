@@ -1,6 +1,7 @@
 stages:
   - lint
   - build
+  - test
   - docs
   - release
   - deploy
@@ -36,6 +37,9 @@ include:
       - gitlab-ci-templates/common/docker-release.v1.yml
       - gitlab-ci-templates/common/config-updater-salt.v1.yml
       - gitlab-ci-templates/common/config-updater-flux.v1.yml
+  - project: "rammearkitektur/os2mo"
+    file:
+      - gitlab-ci-templates/integration-test-meta.v1.yml
 
 # Workflow
 ###########
@@ -72,6 +76,78 @@ SvelteKit build:
     - cd web/
     - yarn
     - yarn build
+
+E2E Tests:
+  image: mcr.microsoft.com/playwright:v1.47.2-jammy
+  stage: test
+  services:
+    # Pull in the full MO stack (Postgres, RabbitMQ, Keycloak, MO, os2mo-init)
+    - !reference [.services:mo-backing, services]
+    - name: magentaaps/os2mo:latest
+      alias: mo
+      variables:
+        DB_HOST: "mox-db"
+        DB_NAME: "mox"
+        DB_USER: "mox"
+        DB_PASSWORD: "mox"
+        KEYCLOAK_SCHEMA: "http"
+        KEYCLOAK_PORT: 8080
+        KEYCLOAK_AUTH_SERVER_URL: "http://keycloak:8080/auth/"
+        KEYCLOAK_VERIFY_AUDIENCE: "false"
+        ENVIRONMENT: "testing"
+        LORA_AUTH: "false"
+        INSECURE_ENABLE_TESTING_API: "true"
+        AMQP_ENABLE: "true"
+        AMQP_URL: "amqp://guest:guest@msg-broker:5672/"
+      entrypoint:
+        - "sh"
+        - "-c"
+        - |
+          while ! ./docker/start.sh; do
+            sleep 1
+          done
+    - name: magentaaps/os2mo-init:5
+      variables:
+        MO_URL: "http://mo:5000"
+        CLIENT_ID: "dipex"
+        CLIENT_SECRET: "603f1c82-d012-4d04-9382-dbe659c533fb"
+        AUTH_SERVER: "http://keycloak:8080/auth"
+        AUTH_REALM: "mo"
+      entrypoint:
+        - "sh"
+        - "-c"
+        - |
+          while ! python -m os2mo_init; do
+            sleep 1
+          done
+          touch /builds/.os2mo-init-finished
+  variables:
+    BASE_URL: "http://mo:5000"
+  before_script:
+    # Wait for backing services (keycloak-integration-builder sentinel)
+    - !reference [.services:mo-backing, before_script]
+    # Wait for os2mo-init to finish
+    - |
+      while [ ! -f /builds/.os2mo-init-finished ]; do
+        echo 'Waiting for os2mo-init...'
+        sleep 1
+      done
+    - cd web/
+    - yarn install --frozen-lockfile
+    - npx playwright install --with-deps chromium
+  script:
+    - yarn test
+  artifacts:
+    when: always
+    paths:
+      - web/playwright-report/
+      - web/test-results/
+    reports:
+      junit: web/test-results/results.xml
+    expire_in: 7 days
+  rules:
+    - <<: *if-merge-request
+    - <<: *if-default-branch-refs
 
 Build Naldo:
   extends:

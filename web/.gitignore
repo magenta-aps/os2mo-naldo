@@ -7,3 +7,9 @@ node_modules
 .env.*
 !.env.example
 *yarn-error.log
+
+# Playwright
+/test-results/
+/playwright-report/
+/e2e/.auth/
+!e2e/.auth/.gitkeep
