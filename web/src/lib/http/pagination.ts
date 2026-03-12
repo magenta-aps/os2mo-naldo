@@ -29,7 +29,7 @@ export const paginateQuery = async (
 
       for (let attempts = 0; attempts <= maxRetries; attempts++) {
         try {
-          const result: any = await graphQLClient().request(query, variables)
+          const result: any = await graphQLClient(abortSignal).request(query, variables)
 
           // Add results to the array
           for (const obj of result.page.objects) {
@@ -40,18 +40,18 @@ export const paginateQuery = async (
         } catch (error: any) {
           console.error("Error encountered during request:", error)
           const errorMessage = error?.response?.errors?.[0]?.message || error.message
+          const isRetryable =
+            error instanceof TypeError ||
+            error.name === "TimeoutError" ||
+            errorMessage?.toLowerCase().includes("signature has expired")
 
-          if (
-            errorMessage &&
-            errorMessage.toLowerCase().includes("signature has expired")
-          ) {
+          if (isRetryable && attempts < maxRetries) {
             console.warn(
-              `Retrying request (${
-                attempts + 1
-              }/${maxRetries}) due to signature expiration.`
+              `Retrying request (${attempts + 1}/${maxRetries}) due to: ${errorMessage}`
             )
-            // 1-second delay on retry
-            await new Promise((resolve) => setTimeout(resolve, 1000))
+            // Exponential backoff: 1s, 2s, 4s, ... capped at 30s
+            const delay = Math.min(1000 * 2 ** attempts, 30000)
+            await new Promise((resolve) => setTimeout(resolve, delay))
           } else {
             console.error("Failed after retries or non-retryable error:", error)
             throw error
