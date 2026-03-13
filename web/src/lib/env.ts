@@ -1,9 +1,26 @@
 import { env as dynamicEnv } from "$env/dynamic/public"
 
 const bool = (value: string | undefined, defaultValue = false): boolean => {
+  if (!value) return defaultValue
   if (value === "true") return true
   if (value === "false") return false
-  return defaultValue
+  throw new Error(`Invalid boolean env var: "${value}". Must be "true" or "false"`)
+}
+
+type Environment = "dev" | "test" | "prod"
+const VALID_ENVIRONMENTS: Environment[] = ["dev", "test", "prod"]
+
+const environment = (
+  value: string | undefined,
+  defaultValue: Environment = "dev"
+): Environment => {
+  if (!value) return defaultValue
+  if (VALID_ENVIRONMENTS.includes(value as Environment)) return value as Environment
+  throw new Error(
+    `Invalid PUBLIC_ENVIRONMENT: "${value}". Must be one of: ${VALID_ENVIRONMENTS.join(
+      ", "
+    )}`
+  )
 }
 
 const json = <T>(value: string | undefined, defaultValue: T): T => {
@@ -11,8 +28,7 @@ const json = <T>(value: string | undefined, defaultValue: T): T => {
   try {
     return JSON.parse(value) as T
   } catch (err) {
-    console.error(`Invalid JSON in env var:`, value)
-    return defaultValue
+    throw new Error(`Invalid JSON in env var: "${value}"`)
   }
 }
 
@@ -65,4 +81,5 @@ export const env = {
   PUBLIC_ENABLE_SP: bool(dynamicEnv["PUBLIC_ENABLE_SP"]),
   PUBLIC_ENABLE_RSD_SEARCH: bool(dynamicEnv["PUBLIC_ENABLE_RSD_SEARCH"]),
   PUBLIC_ENABLE_THEMING: bool(dynamicEnv["PUBLIC_ENABLE_THEMING"]),
+  PUBLIC_ENVIRONMENT: environment(dynamicEnv["PUBLIC_ENVIRONMENT"]),
 }
