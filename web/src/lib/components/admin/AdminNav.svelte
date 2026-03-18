@@ -9,7 +9,7 @@
 
   const adminTabs = [
     {
-      name: "class",
+      name: "classifications",
       path: "/admin/facet",
       icon: categoryIcon,
     },

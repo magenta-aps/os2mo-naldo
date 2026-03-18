@@ -44,9 +44,9 @@
   <main class="flex-1">
     <h1 class="pb-4">
       {capital($_("classifications"))}
-      <!-- <div class="tooltip tooltip-bottom" data-tip={$_("classifications_text")}> -->
-      <!--   <Icon class="align-middle" icon={infoOutlineRounded} width="25" height="25" /> -->
-      <!-- </div> -->
+      <div class="tooltip tooltip-bottom" data-tip={$_("classifications_text")}>
+        <Icon class="align-middle" icon={infoOutlineRounded} width="25" height="25" />
+      </div>
     </h1>
 
     <div class="flex flex-row gap-6">
@@ -69,13 +69,19 @@
         <a href="{base}/admin/itsystem">{capital($_("manage_itsystems"))}</a>.
       </p>
     {/if}
+    {#if facetUuid}
+      <p>{$_("facets.description." + facet.user_key)}</p>
+    {/if}
 
     <div class="flex justify-between">
       <TenseTabs />
       <Button
         title={capital(
           $_("create_item", {
-            values: { item: $_("class", { values: { n: 1 } }), n: 1 },
+            values: {
+              item: $_(facet ? facet.user_key : "class", { values: { n: 1 } }),
+              n: 1,
+            },
           })
         )}
         href="{base}/admin/facet/{facetUuid ? `${facetUuid}/` : ''}create/class"
