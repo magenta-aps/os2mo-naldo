@@ -64,7 +64,7 @@
         return capital($_("insights"))
 
       case Title.ADMIN:
-        return capital($_("classifications"))
+        return capital($_("administration"))
 
       case Title.AUDITLOG:
         return capital($_("auditlog"))

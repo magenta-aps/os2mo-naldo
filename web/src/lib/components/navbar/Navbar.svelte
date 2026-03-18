@@ -105,7 +105,7 @@
           {#if env.PUBLIC_SHOW_ADMIN_PANEL}
             <li>
               <NavbarButton
-                title={capital($_("classifications"))}
+                title={capital($_("administration"))}
                 href="{base}/admin/facet/"
                 icon={inventory2OutlineRounded}
               />
