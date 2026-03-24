@@ -499,6 +499,32 @@ gql`
             }
           }
         }
+        ... on OwnerRegistration {
+          validities(start: null, end: null) {
+            owner_response {
+              uuid
+              current {
+                name
+              }
+            }
+            owner_person: person_response {
+              uuid
+              current {
+                name
+              }
+            }
+            owner_org_unit: org_unit_response {
+              uuid
+              current {
+                name
+              }
+            }
+            validity {
+              from
+              to
+            }
+          }
+        }
         ... on FacetRegistration {
           validities(start: null, end: null) {
             user_key
