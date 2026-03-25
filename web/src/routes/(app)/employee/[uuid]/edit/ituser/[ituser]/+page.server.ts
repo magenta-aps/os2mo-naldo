@@ -9,6 +9,7 @@ export const actions: Actions = {
     const primary = data.get("primary")
     const externalId = data.get("external-id") as string
     const notes = data.get("notes") as string
+    const engagements = data.getAll("engagements") as string[]
     const startDate = data.get("from")
     const endDate = data.get("to")
 
@@ -19,6 +20,7 @@ export const actions: Actions = {
       ...(itSystem && { itsystem: itSystem }),
       external_id: externalId,
       note: notes,
+      engagements: engagements.length ? engagements : [],
       validity: { from: startDate, ...(endDate && { to: endDate }) },
     }
   },
