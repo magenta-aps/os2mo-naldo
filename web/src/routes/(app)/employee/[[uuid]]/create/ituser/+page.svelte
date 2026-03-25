@@ -2,6 +2,7 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
   import { env } from "$lib/env"
+  import SelectMultiple from "$lib/components/forms/shared/SelectMultiple.svelte"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
@@ -16,10 +17,15 @@
   import { graphQLClient } from "$lib/http/client"
   import {
     ItSystemsDocument,
+    GetEngagementsForItUserDocument,
     CreateItUserDocument,
     CreateItUserAndRolebindingDocument,
     GetItSystemRolesDocument,
   } from "./query.generated"
+  import {
+    formatEngagementTitlesAndUuid,
+    type EngagementTitleAndUuid,
+  } from "$lib/utils/helpers"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
@@ -42,6 +48,31 @@
           current(at: $currentDate) {
             name
             uuid
+          }
+        }
+      }
+    }
+    query GetEngagementsForItUser(
+      $uuid: [UUID!]
+      $fromDate: DateTime
+      $toDate: DateTime
+    ) {
+      engagements(
+        filter: { employees: $uuid, from_date: $fromDate, to_date: $toDate }
+      ) {
+        objects {
+          validities {
+            org_unit_response {
+              current(at: $fromDate) {
+                name
+              }
+            }
+            uuid
+            job_function_response {
+              current(at: $fromDate) {
+                name
+              }
+            }
           }
         }
       }
@@ -114,6 +145,23 @@
   const itSystemField = field("it_system", "", [required()])
   const accountName = field("accountName", "", [required()])
   const svelteForm = form(fromDate, itSystemField, accountName)
+
+  let selectedEngagements: { uuid: string; name: string }[] | undefined = undefined
+  let engagements: EngagementTitleAndUuid[] = []
+
+  const updateEngagements = async (
+    employeeUuid: string | undefined | null,
+    fromDate: string,
+    toDate: string
+  ) => {
+    if (!employeeUuid || !env.PUBLIC_SHOW_ITUSER_CONNECTIONS) return
+    const res = await graphQLClient().request(GetEngagementsForItUserDocument, {
+      uuid: employeeUuid,
+      fromDate: fromDate,
+      toDate: toDate,
+    })
+    engagements = res.engagements?.objects.map((e) => e.validities[0]) ?? []
+  }
 
   let itSystem: {
     uuid: string
@@ -245,6 +293,7 @@
           console.error("Request failed:", err)
         }
       }
+      await updateEngagements($page.params.uuid, startDate, toDate)
     })()
   }
 </script>
@@ -287,13 +336,10 @@
   </div>
 {:then data}
   {@const itSystems = data.itsystems.objects}
-
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
       <div class="p-8">
         <div class="flex flex-row gap-6">
-          <!-- TODO: At some point ITUsers will be linked to engagements, -->
-          <!-- when this happens, datepickers needs to use engagement -> org_unit validities -->
           <DateInput
             bind:value={startDate}
             bind:validationValue={$fromDate.value}
@@ -335,6 +381,22 @@
             required={true}
           />
         </div>
+        {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
+          {#if engagements && engagements.length}
+            <SelectMultiple
+              title={capital($_("engagement", { values: { n: 2 } }))}
+              id="engagements"
+              bind:value={selectedEngagements}
+              iterable={formatEngagementTitlesAndUuid(engagements)}
+            />
+          {:else}
+            <SelectMultiple
+              title={capital($_("engagement", { values: { n: 2 } }))}
+              id="engagements"
+              disabled
+            />
+          {/if}
+        {/if}
         {#if facets}
           <Select
             title={capital($_("primary"))}
