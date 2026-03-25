@@ -13,7 +13,11 @@
   import { base } from "$app/paths"
   import { page } from "$app/stores"
   import { gql } from "graphql-request"
-  import { ItUserAndItSystemsDocument, UpdateItUserDocument } from "./query.generated"
+  import {
+    ItUserAndItSystemsDocument,
+    GetEngagementsForItUserEditDocument,
+    UpdateItUserDocument,
+  } from "./query.generated"
   import type { SubmitFunction } from "./$types"
   import { date } from "$lib/stores/date"
   import { form, field } from "svelte-forms"
@@ -22,7 +26,12 @@
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
   import type { FacetValidities } from "$lib/utils/classes"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
-  import { formatITSystemNames } from "$lib/utils/helpers"
+  import {
+    formatITSystemNames,
+    formatEngagementTitlesAndUuid,
+    type EngagementTitleAndUuid,
+  } from "$lib/utils/helpers"
+  import SelectMultiple from "$lib/components/forms/shared/SelectMultiple.svelte"
   import { getPrimaryClasses } from "$lib/http/getClasses"
   import { getPersonValidities } from "$lib/http/getValidities"
   import { normalizeITUser } from "$lib/utils/normalizeForm"
@@ -53,6 +62,21 @@
                 name
               }
             }
+            engagements {
+              validities {
+                uuid
+                job_function_response {
+                  current(at: $fromDate) {
+                    name
+                  }
+                }
+                org_unit_response {
+                  current(at: $fromDate) {
+                    name
+                  }
+                }
+              }
+            }
             validity {
               from
               to
@@ -68,6 +92,32 @@
           current(at: $currentDate) {
             name
             uuid
+          }
+        }
+      }
+    }
+
+    query GetEngagementsForItUserEdit(
+      $uuid: [UUID!]
+      $fromDate: DateTime
+      $toDate: DateTime
+    ) {
+      engagements(
+        filter: { employees: $uuid, from_date: $fromDate, to_date: $toDate }
+      ) {
+        objects {
+          validities {
+            org_unit_response {
+              current(at: $fromDate) {
+                name
+              }
+            }
+            uuid
+            job_function_response {
+              current(at: $fromDate) {
+                name
+              }
+            }
           }
         }
       }
@@ -167,7 +217,25 @@
           console.error("Request failed:", err)
         }
       }
+      await updateEngagements($page.params.uuid, startDate, toDate)
     })()
+  }
+
+  let selectedEngagements: { uuid: string; name: string }[] | undefined = undefined
+  let engagements: EngagementTitleAndUuid[] = []
+
+  const updateEngagements = async (
+    employeeUuid: string | undefined | null,
+    fromDate: string,
+    toDate: string
+  ) => {
+    if (!employeeUuid || !env.PUBLIC_SHOW_ITUSER_CONNECTIONS) return
+    const res = await graphQLClient().request(GetEngagementsForItUserEditDocument, {
+      uuid: employeeUuid,
+      fromDate: fromDate,
+      toDate: toDate,
+    })
+    engagements = res.engagements?.objects.map((e) => e.validities[0]) ?? []
   }
 
   let initialITUser: any = null
@@ -181,9 +249,18 @@
       $externalIdField.value !== initialITUser.external_id ||
       $noteField.value !== initialITUser.note
 
+    // Gate on the flag: when off, the SelectMultiple isn't rendered and selectedEngagements
+    // stays undefined, but initialITUser.engagements is populated from the GraphQL response.
+    // Without this gate, change-detection would falsely report changes and saving could
+    // silently clobber the connection.
+    const engagementsChanged =
+      env.PUBLIC_SHOW_ITUSER_CONNECTIONS &&
+      JSON.stringify((selectedEngagements ?? []).map((e) => e.uuid).sort()) !==
+        JSON.stringify(initialITUser.engagements)
+
     const toDateExtended =
       toDate === "" ? initialITUser.to !== null : toDate > (initialITUser.to ?? null)
-    hasChanges = editableChanged || toDateExtended
+    hasChanges = editableChanged || engagementsChanged || toDateExtended
   }
 </script>
 
@@ -231,6 +308,9 @@
   This might be the wanted behaviour, as the note is always updated? -->
   {@const note = notes[notes.length - 1].note}
   {@const itSystems = data.itsystems.objects}
+  {@const currentEngagements = formatEngagementTitlesAndUuid(
+    itUser.engagements.map((e) => e.validities[0]).filter(Boolean)
+  )}
   {@const disableForm = env.PUBLIC_DISABLE_IT_USER_EDIT_FORM}
   {#if !initialITUser}
     {@html (() => {
@@ -243,8 +323,6 @@
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
       <div class="p-8">
         <div class="flex flex-row gap-6">
-          <!-- TODO: At some point ITUsers will be linked to engagements, -->
-          <!-- when this happens, datepickers needs to use engagement -> org_unit validities -->
           <DateInput
             bind:value={startDate}
             bind:validationValue={$fromDate.value}
@@ -294,6 +372,25 @@
             disabled={disableForm}
           />
         </div>
+        <!-- Canonical edit point for the ITUser↔engagement connection: EngagementUpdateInput has no itusers field. -->
+        {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
+          {#if engagements && engagements.length}
+            <SelectMultiple
+              title={capital($_("engagement", { values: { n: 2 } }))}
+              id="engagements"
+              bind:value={selectedEngagements}
+              startValue={currentEngagements}
+              iterable={formatEngagementTitlesAndUuid(engagements)}
+              disabled={disableForm}
+            />
+          {:else}
+            <SelectMultiple
+              title={capital($_("engagement", { values: { n: 2 } }))}
+              id="engagements"
+              disabled
+            />
+          {/if}
+        {/if}
         {#if facets}
           <Select
             title={capital($_("primary"))}

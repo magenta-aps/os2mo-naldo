@@ -51,6 +51,11 @@ export const normalizeITUser = (i: any, note: string | null | undefined) => {
     primary: i.primary_response?.current?.name ?? "",
     external_id: i.external_id ?? "",
     note: note ?? "",
+    engagements:
+      i.engagements
+        ?.map((e: any) => e.validities[0]?.uuid)
+        .filter(Boolean)
+        .sort() ?? [],
   }
 }
 
@@ -61,6 +66,9 @@ export const normalizeAddress = (a: any) => {
     value: a.name ?? null,
     user_key: a.user_key ?? "",
     visibility: a.visibility_response?.current?.name ?? "",
+    ituser: a.ituser?.[0]?.itsystem_response?.current?.name
+      ? `${a.ituser[0].itsystem_response.current.name}, ${a.ituser[0].user_key}`
+      : "",
   }
 }
 
