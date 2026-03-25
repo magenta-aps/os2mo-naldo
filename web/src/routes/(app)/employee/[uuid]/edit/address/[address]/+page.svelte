@@ -11,7 +11,11 @@
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
-  import { AddressAndFacetsDocument, UpdateAddressDocument } from "./query.generated"
+  import {
+    AddressAndFacetsDocument,
+    GetItUsersForAddressEditDocument,
+    UpdateAddressDocument,
+  } from "./query.generated"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
@@ -26,6 +30,8 @@
   import { required, email, pattern } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { normalizeAddress } from "$lib/utils/normalizeForm"
+  import { formatITUserITSystemName } from "$lib/utils/helpers"
+  import { env } from "$lib/env"
 
   gql`
     query AddressAndFacets($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
@@ -44,6 +50,16 @@
             }
             name
             value
+            ituser(filter: { from_date: $fromDate, to_date: $toDate }) {
+              uuid
+              user_key
+              itsystem_response {
+                uuid
+                current(at: $fromDate) {
+                  name
+                }
+              }
+            }
             visibility_response {
               uuid
               current(at: $fromDate) {
@@ -55,6 +71,33 @@
               from
               to
             }
+          }
+        }
+      }
+    }
+
+    query GetItUsersForAddressEdit(
+      $employee: [UUID!]
+      $fromDate: DateTime
+      $toDate: DateTime
+    ) {
+      itusers(
+        filter: {
+          employee: { uuids: $employee }
+          from_date: $fromDate
+          to_date: $toDate
+        }
+      ) {
+        objects {
+          validities {
+            itsystem_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
+            }
+            user_key
+            uuid
           }
         }
       }
@@ -84,6 +127,7 @@
   const addressTypeField = field("address_type", "", [required()])
   const visibility = field("visibility", "", [])
   const description = field("description", "", [])
+  const ituserField = field("ituser", "", [])
 
   let addressField = field("", "")
   $: svelteForm = form(
@@ -174,18 +218,41 @@
           console.error("Request failed:", err)
         }
       }
+      await updateItUsers($page.params.uuid, startDate, toDate)
     })()
+  }
+
+  let itusers: ReturnType<typeof formatITUserITSystemName> = []
+
+  const updateItUsers = async (
+    employeeUuid: string | undefined | null,
+    fromDate: string,
+    toDate: string
+  ) => {
+    if (!employeeUuid || !env.PUBLIC_SHOW_ITUSER_CONNECTIONS) return
+    const res = await graphQLClient().request(GetItUsersForAddressEditDocument, {
+      employee: employeeUuid,
+      fromDate: fromDate,
+      toDate: toDate,
+    })
+    itusers =
+      formatITUserITSystemName(res.itusers?.objects.map((e) => e.validities[0])) ?? []
   }
 
   let initialAddress: any = null
   let hasChanges = false
   $: if (initialAddress) {
     // Check if any of the user-editable fields have changed compared to the original values.
+    // The ituser comparison is gated on the flag: when off, the Select isn't rendered and
+    // $ituserField.value stays empty, but initialAddress.ituser is populated from the
+    // GraphQL response. Without this gate, change-detection would falsely report changes.
     const editableChanged =
       $addressTypeField.value !== initialAddress.address_type ||
       $addressField.value !== initialAddress.value ||
       $visibility.value !== initialAddress.visibility ||
-      $description.value !== initialAddress.user_key
+      $description.value !== initialAddress.user_key ||
+      (env.PUBLIC_SHOW_ITUSER_CONNECTIONS &&
+        $ituserField.value !== initialAddress.ituser)
 
     const toDateExtended =
       toDate === "" ? initialAddress.to !== null : toDate > (initialAddress.to ?? null)
@@ -232,6 +299,13 @@
   </div>
 {:then data}
   {@const address = data.addresses.objects[0].validities[0]}
+  {@const currentItuser = address.ituser?.length
+    ? {
+        uuid: address.ituser[0].uuid,
+        name: `${address.ituser[0].itsystem_response.current?.name}, ${address.ituser[0].user_key}`,
+        itsystem: { uuid: address.ituser[0].itsystem_response.uuid },
+      }
+    : undefined}
   {#if !initialAddress}
     {@html (() => {
       initialAddress = normalizeAddress(address)
@@ -299,6 +373,26 @@
             />
             <input hidden name="address-type-uuid" bind:value={addressTypeUuid} />
           </div>
+        {/if}
+        <!-- Canonical edit point for the address↔ITUser connection: ITUserUpdateInput has no addresses field. -->
+        {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
+          {#if itusers && itusers.length}
+            <Select
+              title={capital($_("ituser", { values: { n: 1 } }))}
+              id="it-user-uuid"
+              bind:name={$ituserField.value}
+              startValue={currentItuser}
+              iterable={itusers}
+              isClearable={true}
+              on:clear={() => ($ituserField.value = "")}
+            />
+          {:else}
+            <Select
+              title={capital($_("ituser", { values: { n: 1 } }))}
+              id="it-user-uuid"
+              disabled
+            />
+          {/if}
         {/if}
         <Input
           startValue={address.user_key}

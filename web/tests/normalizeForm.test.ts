@@ -122,6 +122,12 @@ describe("normalizeAddress", () => {
       name: "test@example.com",
       user_key: "test@example.com",
       visibility_response: { current: { name: "Offentlig" } },
+      ituser: [
+        {
+          user_key: "bruce",
+          itsystem_response: { current: { name: "Active Directory" } },
+        },
+      ],
     })
     expect(result).toEqual({
       to: "2025-01-01",
@@ -129,8 +135,17 @@ describe("normalizeAddress", () => {
       value: "test@example.com",
       user_key: "test@example.com",
       visibility: "Offentlig",
-      ituser: "",
+      ituser: "Active Directory, bruce",
     })
+  })
+
+  it("returns empty ituser when none linked", () => {
+    const result = normalizeAddress({
+      validity: { to: null },
+      address_type_response: { current: null },
+      visibility_response: { current: null },
+    })
+    expect(result.ituser).toEqual("")
   })
 })
 
