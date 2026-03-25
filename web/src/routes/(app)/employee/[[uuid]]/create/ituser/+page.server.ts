@@ -19,6 +19,11 @@ export const actions: Actions = {
     const primary = data.get("primary")
     const externalId = data.get("external-id") as string
     const notes = data.get("notes") as string
+    const engagements = data.get("engagements")
+      ? (JSON.parse(data.get("engagements") as string) as { uuid: string }[]).map(
+          (v) => v.uuid
+        )
+      : []
     const startDate = data.get("from")
     const endDate = data.get("to")
     // Rolebinding data
@@ -33,6 +38,7 @@ export const actions: Actions = {
         ...(primary && { primary: primary }),
         ...(externalId && { external_id: externalId }),
         ...(notes && { note: notes }),
+        ...(engagements.length && { engagements: engagements }),
         validity: { from: startDate, ...(endDate && { to: endDate }) },
       },
       rolebindingInput: roles.map((role: string) => ({
