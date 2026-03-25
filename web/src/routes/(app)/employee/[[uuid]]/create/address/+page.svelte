@@ -10,7 +10,11 @@
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
-  import { CreateAddressDocument } from "./query.generated"
+  import {
+    CreateAddressDocument,
+    GetItUsersForAddressDocument,
+  } from "./query.generated"
+  import { formatITUserITSystemName } from "$lib/utils/helpers"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
@@ -23,6 +27,7 @@
   import type { FacetValidities } from "$lib/utils/classes"
   import { getClasses } from "$lib/http/getClasses"
   import { getPersonValidities } from "$lib/http/getValidities"
+  import { env } from "$lib/env"
 
   gql`
     mutation CreateAddress($input: AddressCreateInput!, $date: DateTime!) {
@@ -38,11 +43,54 @@
         }
       }
     }
+
+    query GetItUsersForAddress(
+      $employee: [UUID!]
+      $fromDate: DateTime
+      $toDate: DateTime
+    ) {
+      itusers(
+        filter: {
+          employee: { uuids: $employee }
+          from_date: $fromDate
+          to_date: $toDate
+        }
+      ) {
+        objects {
+          validities {
+            itsystem_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
+            }
+            user_key
+            uuid
+          }
+        }
+      }
+    }
   `
 
   let startDate: string = $date
   let toDate: string
   let addressType: { name: string; user_key: string; uuid: string; scope: string }
+  let itusers: ReturnType<typeof formatITUserITSystemName> = []
+
+  const updateItUsers = async (
+    employeeUuid: string | undefined | null,
+    fromDate: string,
+    toDate: string
+  ) => {
+    if (!employeeUuid || !env.PUBLIC_SHOW_ITUSER_CONNECTIONS) return
+    const res = await graphQLClient().request(GetItUsersForAddressDocument, {
+      employee: employeeUuid,
+      fromDate: fromDate,
+      toDate: toDate,
+    })
+    itusers =
+      formatITUserITSystemName(res.itusers?.objects.map((e) => e.validities[0])) ?? []
+  }
   $: addressTypeUuid = addressType?.uuid
 
   // update the field depending on address-type
@@ -131,6 +179,7 @@
           console.error("Request failed:", err)
         }
       }
+      await updateItUsers($page.params.uuid, startDate, toDate)
     })()
   }
 </script>
@@ -198,6 +247,22 @@
           />
           <input hidden name="address-type-uuid" bind:value={addressTypeUuid} />
         </div>
+      {/if}
+      {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
+        {#if itusers && itusers.length}
+          <Select
+            title={capital($_("ituser", { values: { n: 1 } }))}
+            id="it-user-uuid"
+            iterable={itusers}
+            isClearable={true}
+          />
+        {:else}
+          <Select
+            title={capital($_("ituser", { values: { n: 1 } }))}
+            id="it-user-uuid"
+            disabled
+          />
+        {/if}
       {/if}
       <Input title={capital($_("description"))} id="user-key" />
       {#if addressType}
