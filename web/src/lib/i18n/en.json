@@ -177,6 +177,7 @@
 	"of": "of",
 	"onboarding": "onboarding",
 	"org_unit": "{n, plural, =0 {the organisation unit} one {organisation unit} other {organisation units}}",
+	"org_units": "organisation units",
 	"org_unit_level": "unit level",
 	"org_unit_number": "unit number",
 	"org_unit_type": "unit type",

@@ -148,12 +148,17 @@
 /* =========================================
    4. TOOLTIPS
    ========================================= */
+.vis-timeline {
+  overflow: visible !important;
+}
+
 .vis-tooltip {
-  background: var(--color-base-100) !important; /* White */
+  background: var(--color-base-100) !important;
   padding: 0.5rem !important;
   border-radius: 0.25rem !important;
   font-size: 0.8rem;
   color: var(--color-base-content) !important;
+  z-index: 1000 !important;
 }
 
 .vis-tooltip div {

@@ -177,6 +177,7 @@
 	"of": "af",
 	"onboarding": "onboarding",
 	"org_unit": "{n, plural, =0 {organisationsenheden} one {organisationsenhed} other {organisationsenheder}}",
+	"org_units": "organisationsenheder",
 	"org_unit_level": "enhedsniveau",
 	"org_unit_number": "enhedsnummer",
 	"org_unit_type": "enhedstype",

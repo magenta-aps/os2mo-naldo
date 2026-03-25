@@ -229,8 +229,12 @@ export const transformAuditLog = (rawData: any[]): Registration[] => {
         if (key === "validity" || key === "person_validity" || key === "class_validity")
           return
 
-        // Strip _response suffix so translation keys stay clean
-        const label = key.replace(/_response$/, "")
+        // Strip _response suffix and GraphQL alias prefixes so translation keys stay clean
+        // The second replace turns e.g. "owner_person" → "person" and "owner_org_unit" → "org_unit"
+        // while leaving keys like "association_type" or "manager_level" untouched.
+        const label = key
+          .replace(/_response$/, "")
+          .replace(/^(?:association|manager|owner)_(?=person|org_unit)/, "")
 
         if (!registration.timelines[label]) {
           registration.timelines[label] = []
