@@ -218,6 +218,7 @@
             isClearable={true}
           />
         {/if}
+        <Input title={capital($_("external_id"))} id="external-id" />
         <TextArea title={capital($_("notes"))} id="notes" />
       </div>
     </div>
