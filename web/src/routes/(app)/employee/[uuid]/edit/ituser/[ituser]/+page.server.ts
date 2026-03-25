@@ -18,7 +18,7 @@ export const actions: Actions = {
       ...(accountName && { user_key: accountName }),
       ...(itSystem && { itsystem: itSystem }),
       external_id: externalId,
-      ...(notes && { note: notes }),
+      note: notes,
       validity: { from: startDate, ...(endDate && { to: endDate }) },
     }
   },
