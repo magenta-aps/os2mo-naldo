@@ -51,6 +51,7 @@ export const normalizeITUser = (i: any, note: string | null | undefined) => {
     itsystem: i.itsystem?.name ?? null,
     user_key: i.user_key ?? "",
     primary: i.primary?.name ?? "",
+    external_id: i.external_id ?? "",
     note: note ?? "",
   }
 }

@@ -329,6 +329,7 @@
             isClearable={true}
           />
         {/if}
+        <Input title={capital($_("external_id"))} id="external-id" />
         <TextArea title={capital($_("notes"))} id="notes" />
         <div class="divider p-0 m-0 mb-4 w-full" />
         <h4>{capital($_("rolebinding", { values: { n: 2 } }))}</h4>

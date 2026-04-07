@@ -38,6 +38,7 @@
         objects {
           validities {
             user_key
+            external_id
             primary {
               name
               user_key
@@ -87,8 +88,16 @@
   const itSystem = field("it_system", "", [required()])
   const accountName = field("account_name", "", [required()])
   const primary = field("primary", "", [])
+  const externalIdField = field("external_id", "", [])
   const noteField = field("note", "", [])
-  const svelteForm = form(fromDate, itSystem, accountName, primary, noteField)
+  const svelteForm = form(
+    fromDate,
+    itSystem,
+    accountName,
+    primary,
+    externalIdField,
+    noteField
+  )
 
   const handler: SubmitFunction =
     () =>
@@ -162,6 +171,7 @@
       $itSystem.value !== initialITUser.itsystem ||
       $accountName.value !== initialITUser.user_key ||
       $primary.value !== initialITUser.primary ||
+      $externalIdField.value !== initialITUser.external_id ||
       $noteField.value !== initialITUser.note
 
     const toDateExtended =
@@ -282,6 +292,13 @@
             disabled={disableForm}
           />
         {/if}
+        <Input
+          title={capital($_("external_id"))}
+          id="external-id"
+          startValue={itUser.external_id ?? ""}
+          bind:value={$externalIdField.value}
+          disabled={disableForm}
+        />
         <TextArea
           title={capital($_("notes"))}
           id="notes"
