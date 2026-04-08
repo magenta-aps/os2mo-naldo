@@ -10,7 +10,7 @@ export const graphQLClient = (signal?: AbortSignal) => {
       AbortSignal.any([signal, timeout])
     : timeout
 
-  return new GraphQLClient(`${env.PUBLIC_BASE_URL}/graphql/v28`, {
+  return new GraphQLClient(`${env.PUBLIC_BASE_URL}/graphql/v29`, {
     headers: {
       "Content-Type": "application/json",
       Authorization: "Bearer " + keycloak?.token,
