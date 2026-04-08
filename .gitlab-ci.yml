@@ -87,3 +87,11 @@ Build Naldo:
     - .build-docker
   variables:
     BUILD_DOCKER_EXTRA_FLAGS: --build-arg=COMMIT_TAG=${CI_COMMIT_TAG}
+
+Unit tests:
+  image: node:20
+  stage: test
+  script:
+    - cd web/
+    - yarn
+    - yarn test
