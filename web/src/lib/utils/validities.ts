@@ -3,7 +3,6 @@ import {
   isValid,
   parseISO,
   formatISO,
-  addSeconds,
   differenceInCalendarDays,
 } from "date-fns"
 import type { OpenValidity, Validity } from "$lib/graphql/types"
@@ -47,12 +46,7 @@ export const getMinMaxValidities = (
 
 export const formatQueryDates = (validity: Validity | OpenValidity): string => {
   const from = parseISO(validity.from)
-  let to = parseISO(validity.to)
-
-  // TODO: Workaround for sus backend behaviour (https://redmine.magenta.dk/issues/61001)
-  if (to.getTime() === from.getTime()) {
-    to = addSeconds(to, 1)
-  }
+  const to = parseISO(validity.to)
 
   // If date is not valid, set to null (we never return null, it's just to make it clearer than an empty string)
   const formattedFrom = isValid(from)

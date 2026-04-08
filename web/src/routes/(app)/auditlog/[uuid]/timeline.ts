@@ -1,4 +1,4 @@
-import { parseISO, addDays, isEqual, isAfter, compareAsc } from "date-fns"
+import { parseISO, isEqual, isAfter, compareAsc } from "date-fns"
 
 // ==========================================
 // VIS-TIMELINE DEFINITIONS
@@ -168,11 +168,8 @@ const consolidateEntries = (entries: TimelineEntry[]): TimelineEntry[] => {
   for (let i = 1; i < sorted.length; i++) {
     const next = sorted[i]
 
-    // Check if blocks touch each other (Next starts exactly 1 day after Current ends)
-    const isAdjacent = isEqual(
-      next.start ?? FAR_PAST,
-      addDays(current.end ?? FAR_FUTURE, 1)
-    )
+    // Check if blocks touch each other (Next starts exactly where Current ends)
+    const isAdjacent = isEqual(next.start ?? FAR_PAST, current.end ?? FAR_FUTURE)
     // Check if they say the same thing (compare on UUID when available)
     const isSameValue =
       current.uuid && next.uuid
