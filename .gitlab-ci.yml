@@ -15,6 +15,7 @@ variables:
   PRODUCT: os2mo
   COMPONENT: naldo
 
+
 # Conditions
 #############
 # Global Conditions
