@@ -30,10 +30,12 @@
               from
               to
             }
-            org_unit(filter: { from_date: null, to_date: null }) {
-              validity {
-                from
-                to
+            org_unit_response {
+              validities(start: null, end: null) {
+                validity {
+                  from
+                  to
+                }
               }
             }
           }
@@ -44,8 +46,11 @@
     mutation TerminateManager($input: ManagerTerminateInput!, $date: DateTime!) {
       manager_terminate(input: $input) {
         current(at: $date) {
-          person {
-            name
+          person_response {
+            uuid
+            current(at: $date) {
+              name
+            }
           }
         }
       }
@@ -69,7 +74,8 @@
                 $_("success_terminate_item", {
                   values: {
                     item: $_("manager", { values: { n: 0 } }),
-                    name: mutation.manager_terminate.current?.person?.[0].name,
+                    name: mutation.manager_terminate.current?.person_response?.current
+                      ?.name,
                   },
                 })
               ),
@@ -113,7 +119,7 @@
 {:then data}
   {@const managerValidities = getMinMaxValidities(data.managers.objects[0].validities)}
   {@const validities = getMinMaxValidities(
-    data.managers.objects[0].validities[0].org_unit
+    data.managers.objects[0].validities[0].org_unit_response.validities
   )}
 
   <div class="divider p-0 m-0 mb-4 w-full" />

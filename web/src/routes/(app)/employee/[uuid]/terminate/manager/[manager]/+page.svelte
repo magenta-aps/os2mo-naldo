@@ -30,10 +30,12 @@
               from
               to
             }
-            person(filter: { from_date: null, to_date: null }) {
-              validity {
-                from
-                to
+            person_response {
+              validities(start: null, end: null) {
+                validity {
+                  from
+                  to
+                }
               }
             }
           }
@@ -44,8 +46,11 @@
     mutation TerminateManager($input: ManagerTerminateInput!, $date: DateTime!) {
       manager_terminate(input: $input) {
         current(at: $date) {
-          person {
-            name
+          person_response {
+            uuid
+            current(at: $date) {
+              name
+            }
           }
         }
       }
@@ -69,7 +74,8 @@
                 $_("success_terminate_item", {
                   values: {
                     item: $_("manager", { values: { n: 0 } }),
-                    name: mutation.manager_terminate.current?.person?.[0].name,
+                    name: mutation.manager_terminate.current?.person_response?.current
+                      ?.name,
                   },
                 })
               ),
@@ -115,7 +121,7 @@
 {:then data}
   {@const managerValidities = getMinMaxValidities(data.managers.objects[0].validities)}
   {@const validities = getMinMaxValidities(
-    data.managers.objects[0].validities[0].person
+    data.managers.objects[0].validities[0].person_response?.validities
   )}
 
   <form method="post" class="mx-6" use:enhance={handler}>

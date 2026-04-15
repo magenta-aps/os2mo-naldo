@@ -47,20 +47,27 @@
             user_key
             uuid
             external_id
-            itsystem {
-              name
+            itsystem_response {
               uuid
+              current(at: $fromDate) {
+                name
+              }
             }
             engagements(filter: { from_date: $fromDate, to_date: $toDate }) {
               validities {
-                org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
-                  name
-                  user_key
+                org_unit_response {
+                  uuid
+                  current(at: $fromDate) {
+                    name
+                    user_key
+                  }
                 }
                 uuid
-                job_function {
-                  user_key
-                  name
+                job_function_response {
+                  current(at: $fromDate) {
+                    user_key
+                    name
+                  }
                 }
                 validity {
                   from
@@ -72,9 +79,11 @@
               from
               to
             }
-            primary {
+            primary_response {
               uuid
-              name
+              current(at: $fromDate) {
+                name
+              }
             }
           }
         }
@@ -91,17 +100,21 @@
             user_key
             uuid
             external_id
-            itsystem {
-              name
+            itsystem_response {
               uuid
+              current(at: $fromDate) {
+                name
+              }
             }
             validity {
               from
               to
             }
-            primary {
+            primary_response {
               uuid
-              name
+              current(at: $fromDate) {
+                name
+              }
             }
           }
         }
@@ -146,7 +159,7 @@
       class="{i % 2 === 0 ? '' : 'bg-base-200'} 
         leading-5 border-t border-base-300 text-base-content"
     >
-      <td class="text-sm p-4">{ituser.itsystem.name} </td>
+      <td class="text-sm p-4">{ituser.itsystem_response.current?.name} </td>
       <td class="text-sm p-4">{ituser.user_key}</td>
       <td class="text-sm p-4">{ituser.external_id ?? ""}</td>
       {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
@@ -162,7 +175,7 @@
           {/if}
         </td>
       {/if}
-      <td class="text-sm p-4">{ituser.primary ? ituser.primary.name : ""}</td>
+      <td class="text-sm p-4">{ituser.primary_response?.current?.name ?? ""}</td>
       <ValidityTableCell validity={ituser.validity} />
       <td class="flex p-4 gap-2 justify-end">
         <a href={`${base}/auditlog/${ituser.uuid}`}>

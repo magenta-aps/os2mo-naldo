@@ -22,8 +22,11 @@
     mutation CreateOwner($input: OwnerCreateInput!, $date: DateTime!) {
       owner_create(input: $input) {
         current(at: $date) {
-          person {
-            name
+          person_response {
+            uuid
+            current(at: $date) {
+              name
+            }
           }
         }
       }
@@ -57,7 +60,7 @@
                 $_("success_create_item", {
                   values: {
                     item: $_("owner", { values: { n: 0 } }),
-                    name: mutation.owner_create.current?.person?.[0].name,
+                    name: mutation.owner_create.current?.person_response?.current?.name,
                   },
                 })
               ),

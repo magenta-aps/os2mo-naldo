@@ -1,5 +1,6 @@
 stages:
   - lint
+  - test
   - build
   - docs
   - release
@@ -64,6 +65,14 @@ Svelte-check:
     - cd web/
     - yarn
     - yarn run check
+
+Unit tests:
+  image: node:20
+  stage: test
+  script:
+    - cd web/
+    - yarn
+    - yarn test
 
 SvelteKit build:
   image: node:20

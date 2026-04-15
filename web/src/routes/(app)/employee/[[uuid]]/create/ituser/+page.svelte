@@ -68,11 +68,17 @@
       ituser_create(input: $itUserInput) {
         current(at: $date) {
           uuid
-          person {
-            name
+          person_response {
+            uuid
+            current(at: $date) {
+              name
+            }
           }
-          itsystem {
-            name
+          itsystem_response {
+            uuid
+            current(at: $date) {
+              name
+            }
           }
         }
       }
@@ -84,11 +90,17 @@
       ituser_create(input: $itUserInput) {
         current(at: $date) {
           uuid
-          person {
-            name
+          person_response {
+            uuid
+            current(at: $date) {
+              name
+            }
           }
-          itsystem {
-            name
+          itsystem_response {
+            uuid
+            current(at: $date) {
+              name
+            }
           }
         }
       }
@@ -156,7 +168,8 @@
                   $_("success_create_item", {
                     values: {
                       item: $_("ituser", { values: { n: 0 } }),
-                      name: mutation.ituser_create.current?.person?.[0].name,
+                      name: mutation.ituser_create.current?.person_response?.current
+                        ?.name,
                     },
                   })
                 ),
@@ -177,7 +190,8 @@
                   $_("success_create_item", {
                     values: {
                       item: $_("ituser", { values: { n: 0 } }),
-                      name: mutation.ituser_create.current?.person?.[0].name,
+                      name: mutation.ituser_create.current?.person_response?.current
+                        ?.name,
                     },
                   })
                 ),

@@ -33,14 +33,18 @@
             uuid
             user_key
             name
-            facet(filter: { from_date: $fromDate, to_date: $toDate }) {
+            facet_response {
               uuid
-              user_key
+              current(at: $fromDate) {
+                user_key
+              }
             }
-            it_system(filter: { from_date: $fromDate, to_date: $toDate }) {
+            it_system_response {
               uuid
-              user_key
-              name
+              current(at: $fromDate) {
+                user_key
+                name
+              }
             }
             validity {
               from
@@ -175,7 +179,7 @@
   {capital($_("loading"))}
 {:then data}
   {@const cls = data.classes.objects[0].validities[0]}
-  {@const facet = data.classes.objects[0].validities[0].facet}
+  {@const facetResponse = data.classes.objects[0].validities[0].facet_response}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
@@ -205,11 +209,13 @@
           id="facet"
           bind:value={chosenFacet}
           startValue={{
-            uuid: facet.uuid,
+            uuid: facetResponse.uuid,
             name: capital(
-              $_("facets.name." + facet.user_key, { default: facet.user_key })
+              $_("facets.name." + facetResponse.current?.user_key, {
+                default: facetResponse.current?.user_key,
+              })
             ),
-            user_key: facet.user_key,
+            user_key: facetResponse.current?.user_key,
           }}
           required={true}
           extra_classes="basis-1/2"
@@ -221,10 +227,10 @@
             title={capital($_("itsystem", { values: { n: 1 } }))}
             id="itsystem"
             bind:value={chosenItSystem}
-            startValue={cls.it_system
+            startValue={cls.it_system_response?.current
               ? {
-                  uuid: cls.it_system.uuid,
-                  name: cls.it_system.name,
+                  uuid: cls.it_system_response.uuid,
+                  name: cls.it_system_response.current.name,
                 }
               : undefined}
             iterable={formatITSystemNames(itSystems)}

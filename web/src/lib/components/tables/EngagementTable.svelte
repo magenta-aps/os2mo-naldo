@@ -56,31 +56,37 @@
             uuid
             user_key
             org_unit_uuid
-            person(filter: { from_date: $fromDate, to_date: $toDate }) {
+            person_response {
               uuid
-              name
-              validity {
-                from
-                to
+              current(at: $fromDate) {
+                name
               }
             }
-            job_function(filter: { from_date: $fromDate, to_date: $toDate }) {
-              name
-              user_key
+            job_function_response {
+              uuid
+              current(at: $fromDate) {
+                name
+                user_key
+              }
             }
             extension_1
             extension_4
-            engagement_type(filter: { from_date: $fromDate, to_date: $toDate }) {
-              name
+            engagement_type_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
             }
             itusers(filter: { from_date: $fromDate, to_date: $toDate }) {
               validities {
                 user_key
                 uuid
-                itsystem {
-                  user_key
-                  name
+                itsystem_response {
                   uuid
+                  current(at: $fromDate) {
+                    user_key
+                    name
+                  }
                 }
                 validity {
                   from
@@ -88,22 +94,17 @@
                 }
               }
             }
-            org_unit(filter: { from_date: $fromDate, to_date: $toDate })
-              @skip(if: $isOrg) {
-              name
+            org_unit_response @skip(if: $isOrg) {
               uuid
-              validity {
-                from
-                to
+              current(at: $fromDate) {
+                name
               }
             }
             managers(inherit: $inherit, exclude_self: true) @skip(if: $isOrg) {
-              person(filter: { from_date: $fromDate, to_date: $toDate }) {
-                name
+              person_response {
                 uuid
-                validity {
-                  from
-                  to
+                current(at: $fromDate) {
+                  name
                 }
               }
             }
@@ -111,8 +112,11 @@
               from
               to
             }
-            primary {
-              name
+            primary_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
             }
           }
         }
@@ -164,14 +168,14 @@
     >
       <td class="text-sm p-4">
         {#if isOrg}
-          <a href="{base}/employee/{engagement.person[0].uuid}"
-            >{findClosestValidity(engagement.person, $date).name}</a
+          <a href="{base}/employee/{engagement.person_response.uuid}"
+            >{engagement.person_response.current?.name}</a
           >
         {:else}
           <a
-            href="{base}/organisation/{engagement.org_unit?.[0].uuid}"
-            on:click={() => updateGlobalNavigation(engagement.org_unit?.[0].uuid)}
-            >{findClosestValidity(engagement.org_unit, $date).name}</a
+            href="{base}/organisation/{engagement.org_unit_response?.uuid}"
+            on:click={() => updateGlobalNavigation(engagement.org_unit_response?.uuid)}
+            >{engagement.org_unit_response?.current?.name}</a
           >
         {/if}
       </td>
@@ -183,15 +187,15 @@
       <td class="text-sm p-4">{engagement.user_key}</td>
       <td class="text-sm p-4"
         >{env.PUBLIC_SHOW_JOB_FUNCTION_USER_KEY
-          ? `${engagement.job_function.user_key} - ${engagement.job_function.name}`
-          : engagement.job_function.name}</td
+          ? `${engagement.job_function_response.current?.user_key} - ${engagement.job_function_response.current?.name}`
+          : engagement.job_function_response.current?.name}</td
       >
       {#if env.PUBLIC_SHOW_EXTENSION_1}
         <td class="text-sm p-4"
           >{engagement.extension_1 ? engagement.extension_1 : ""}</td
         >
       {/if}
-      <td class="text-sm p-4">{engagement.engagement_type.name}</td>
+      <td class="text-sm p-4">{engagement.engagement_type_response?.current?.name}</td>
       {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
         <td class="text-sm p-4">
           {#each engagement.itusers as ituser}
@@ -213,9 +217,9 @@
               <ul>
                 {#each engagement.managers as manager}
                   <li>
-                    {#if manager.person}
-                      <a href="{base}/employee/{manager.person?.[0].uuid}">
-                        • {findClosestValidity(manager.person, $date).name}
+                    {#if manager.person_response}
+                      <a href="{base}/employee/{manager.person_response.uuid}">
+                        • {manager.person_response.current?.name}
                       </a>
                     {:else}
                       • {capital($_("vacant"))}
@@ -224,9 +228,9 @@
                 {/each}
               </ul>
               <!-- If there's only 1 manager and it's not vacant -->
-            {:else if engagement.managers[0] && engagement.managers[0].person?.[0]}
-              <a href="{base}/employee/{engagement.managers[0].person[0].uuid}">
-                {findClosestValidity(engagement.managers[0].person, $date).name}
+            {:else if engagement.managers[0] && engagement.managers[0].person_response}
+              <a href="{base}/employee/{engagement.managers[0].person_response.uuid}">
+                {engagement.managers[0].person_response.current?.name}
               </a>
               <!-- 1 vacant manager -->
             {:else if engagement.managers[0]}
@@ -240,7 +244,7 @@
         </td>
       {/if}
       {#if env.PUBLIC_SHOW_PRIMARY_ENGAGEMENT}
-        <td class="text-sm p-4">{engagement.primary ? engagement.primary.name : ""}</td>
+        <td class="text-sm p-4">{engagement.primary_response?.current?.name ?? ""}</td>
       {/if}
       <ValidityTableCell validity={engagement.validity} />
       <td class="flex p-4 gap-2 justify-end">

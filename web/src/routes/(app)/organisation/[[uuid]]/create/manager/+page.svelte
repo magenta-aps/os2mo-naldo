@@ -26,8 +26,11 @@
     mutation CreateManager($input: ManagerCreateInput!, $date: DateTime!) {
       manager_create(input: $input) {
         current(at: $date) {
-          person {
-            name
+          person_response {
+            uuid
+            current(at: $date) {
+              name
+            }
           }
         }
       }
@@ -60,7 +63,7 @@
             $_("success_create_item", {
               values: {
                 item: $_("manager", { values: { n: 0 } }),
-                name: mutation.manager_create.current?.person?.[0].name,
+                name: mutation.manager_create.current?.person_response?.current?.name,
               },
             })
           ),

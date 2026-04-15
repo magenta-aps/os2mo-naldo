@@ -184,18 +184,26 @@
         table={OrgUnitTable}
         headers={[
           { title: capital($_("unit", { values: { n: 1 } })), sortPath: "name" },
-          { title: capital($_("org_unit_type")), sortPath: "unit_type.name" },
+          {
+            title: capital($_("org_unit_type")),
+            sortPath: "unit_type_response.current.name",
+          },
           ...(env.PUBLIC_SHOW_ORG_UNIT_LEVEL
             ? [
                 {
                   title: capital($_("org_unit_level")),
-                  sortPath: "org_unit_level.name",
+                  sortPath: "unit_level_response.current.name",
                 },
               ]
             : []),
           { title: capital($_("parent")) },
           ...(env.PUBLIC_SHOW_TIME_PLANNING
-            ? [{ title: capital($_("time_planning")), sortPath: "time_planning.name" }]
+            ? [
+                {
+                  title: capital($_("time_planning")),
+                  sortPath: "time_planning_response.current.name",
+                },
+              ]
             : []),
           { title: capital($_("date.date")), sortPath: "validity.from" },
         ]}
@@ -204,7 +212,10 @@
       <TableTensesWrapper
         table={AddressTable}
         headers={[
-          { title: capital($_("address_type")), sortPath: "address_type.name" },
+          {
+            title: capital($_("address_type")),
+            sortPath: "address_type_response.current.name",
+          },
           { title: capital($_("description")) },
           { title: capital($_("address", { values: { n: 1 } })), sortPath: "name" },
           // TODO: Make it possible to sort optional fields maybe? visibility and primary for example
@@ -216,19 +227,27 @@
       <TableTensesWrapper
         table={EngagementTable}
         headers={[
-          { title: capital($_("name")), sortPath: "person[0].name" },
+          { title: capital($_("name")), sortPath: "person_response.current.name" },
           ...(env.PUBLIC_SHOW_EXTENSION_4
             ? [{ title: capital($_("department_code")), sortPath: "sd_code" }]
             : []),
           { title: upperCase($_("id")), sortPath: "user_key" },
           ...(env.PUBLIC_SHOW_EXTENSION_1
-            ? [{ title: capital($_("job_code")), sortPath: "job_function.name" }]
+            ? [
+                {
+                  title: capital($_("job_code")),
+                  sortPath: "job_function_response.current.name",
+                },
+              ]
             : []),
           {
             title: capital($_("job_function", { values: { n: 1 } })),
-            sortPath: "job_function.name",
+            sortPath: "job_function_response.current.name",
           },
-          { title: capital($_("engagement_type")), sortPath: "engagement_type.name" },
+          {
+            title: capital($_("engagement_type")),
+            sortPath: "engagement_type_response.current.name",
+          },
           ...(env.PUBLIC_SHOW_ITUSER_CONNECTIONS
             ? [{ title: capital($_("ituser", { values: { n: 2 } })) }]
             : []),
@@ -242,9 +261,15 @@
       <TableTensesWrapper
         table={AssociationTable}
         headers={[
-          { title: capital($_("name")), sortPath: "person[0].name" },
-          { title: capital($_("association_type")), sortPath: "association_type.name" },
-          { title: capital($_("substitute")), sortPath: "substitute[0].name" },
+          { title: capital($_("name")), sortPath: "person_response.current.name" },
+          {
+            title: capital($_("association_type")),
+            sortPath: "association_type_response.current.name",
+          },
+          {
+            title: capital($_("substitute")),
+            sortPath: "substitute_response.current.name",
+          },
           ...(env.PUBLIC_ENABLE_CONFEDERATIONS
             ? [{ title: capital($_("trade_union")) }]
             : []),
@@ -265,7 +290,10 @@
         <TableTensesWrapper
           table={OrgItUserTable}
           headers={[
-            { title: capital($_("it_system")), sortPath: "itsystem.name" },
+            {
+              title: capital($_("it_system")),
+              sortPath: "itsystem_response.current.name",
+            },
             { title: capital($_("account_name")), sortPath: "user_key" },
             { title: capital($_("external_id")), sortPath: "external_id" },
             ...(env.PUBLIC_SHOW_ITUSER_CONNECTIONS
@@ -281,15 +309,15 @@
           headers={[
             {
               title: capital($_("ituser", { values: { n: 1 } })),
-              sortPath: "ituser[0].user_key",
+              sortPath: "ituser_response.current.user_key",
             },
             {
               title: capital($_("itsystem", { values: { n: 1 } })),
-              sortPath: "ituser[0].itsystem.name",
+              sortPath: "ituser_response.current.itsystem_response.current.name",
             },
             {
               title: capital($_("role", { values: { n: 1 } })),
-              sortPath: "role[0].name",
+              sortPath: "role_response.current.name",
             },
             { title: capital($_("date.date")), sortPath: "validity.from" },
           ]}
@@ -299,10 +327,16 @@
       <TableTensesWrapper
         table={ManagerTable}
         headers={[
-          { title: capital($_("name")), sortPath: "person[0].name" },
+          { title: capital($_("name")), sortPath: "person_response.current.name" },
           { title: capital($_("manager_responsibility")) },
-          { title: capital($_("manager_type")), sortPath: "manager_type.name" },
-          { title: capital($_("manager_level")), sortPath: "manager_level.name" },
+          {
+            title: capital($_("manager_type")),
+            sortPath: "manager_type_response.current.name",
+          },
+          {
+            title: capital($_("manager_level")),
+            sortPath: "manager_level_response.current.name",
+          },
           { title: capital($_("date.date")), sortPath: "validity.from" },
         ]}
       />
@@ -311,7 +345,10 @@
         table={KleTable}
         headers={[
           { title: capital($_("kle_aspect")) },
-          { title: capital($_("kle_number")), sortPath: "kle_number[0].user_key" },
+          {
+            title: capital($_("kle_number")),
+            sortPath: "kle_number_response.current.user_key",
+          },
           { title: capital($_("date.date")), sortPath: "validity.from" },
         ]}
       />
@@ -319,7 +356,7 @@
       <TableTensesWrapper
         table={OwnerTable}
         headers={[
-          { title: capital($_("name")), sortPath: "owner[0].name" },
+          { title: capital($_("name")), sortPath: "owner_response.current.name" },
           { title: capital($_("date.date")), sortPath: "validity.from" },
         ]}
       />

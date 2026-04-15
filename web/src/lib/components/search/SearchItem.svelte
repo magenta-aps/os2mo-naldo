@@ -47,7 +47,15 @@
     {#if isEmployee(item, type) && env.PUBLIC_ENABLE_RSD_SEARCH}
       <!-- Show employee engagement locations (RSD behaviour)-->
       {#each item.engagements as engagement}
-        <LocationTemplate orgUnit={engagement.org_unit?.[0]} showCurrentName={true} />
+        <LocationTemplate
+          orgUnit={engagement.org_unit_response?.current
+            ? {
+                name: engagement.org_unit_response.current.name,
+                ancestors: engagement.org_unit_response.current.ancestors,
+              }
+            : undefined}
+          showCurrentName={true}
+        />
       {/each}
     {:else if isOrgUnit(item, type)}
       <!-- Show org_unit locations (General behaviour) -->

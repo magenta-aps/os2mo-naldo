@@ -30,9 +30,11 @@
         objects {
           current(at: $currentDate) {
             uuid
-            person {
+            person_response {
               uuid
-              name
+              current(at: $currentDate) {
+                name
+              }
             }
           }
           validities(start: null, end: null) {
@@ -48,9 +50,11 @@
       engagements_update(input: $input) {
         current(at: $date) {
           uuid
-          org_unit(filter: { from_date: null, to_date: null }) {
-            name
+          org_unit_response {
             uuid
+            current(at: $date) {
+              name
+            }
           }
         }
       }
@@ -77,7 +81,7 @@
 
             $success = {
               message: capital($_("success_move_engagements")),
-              uuid: mutation.engagements_update[0].current?.org_unit[0]?.uuid,
+              uuid: mutation.engagements_update[0].current?.org_unit_response?.uuid,
               type: "organisation",
             }
           } catch (err) {
@@ -224,8 +228,8 @@
                   </label>
                 </div>
                 {#each engagements.sort((a, b) => {
-                  const nameA = a.current?.person[0]?.name?.toLowerCase() || ""
-                  const nameB = b.current?.person[0]?.name?.toLowerCase() || ""
+                  const nameA = a.current?.person_response?.current?.name?.toLowerCase() || ""
+                  const nameB = b.current?.person_response?.current?.name?.toLowerCase() || ""
                   return nameA > nameB ? 1 : -1
                 }) as engagement}
                   <div class="flex text-base-content">
@@ -240,7 +244,7 @@
                         class="checkbox checkbox-primary rounded-sm normal-case font-normal text-base text-base-100"
                       />
                       <span class="label-text text-base-content"
-                        >{engagement.current?.person[0].name}</span
+                        >{engagement.current?.person_response?.current?.name}</span
                       >
                     </label>
                     {#if selectedEngagements.includes(engagement.current?.uuid)}

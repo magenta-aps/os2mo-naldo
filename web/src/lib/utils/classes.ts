@@ -7,7 +7,12 @@ export type FacetValidities = {
   validities: {
     uuid: any
     user_key: string
-    classes?: { name: string; uuid: any; user_key: string }[]
+    classes_responses?: {
+      objects: {
+        uuid: any
+        current?: { name: string; user_key: string; scope?: string | null } | null
+      }[]
+    }
   }[]
 }
 
@@ -27,7 +32,14 @@ export const filterClassesByFacetUserKey = (
   if (!foundFacet) {
     throw new Error("user_key did not match any of the given facets")
   }
-  return foundFacet.validities[0].classes?.sort((a, b) => (a.name > b.name ? 1 : -1))
+  return foundFacet.validities[0].classes_responses?.objects
+    ?.map((c) => ({
+      name: c.current?.name ?? "",
+      uuid: c.uuid,
+      user_key: c.current?.user_key ?? "",
+      scope: c.current?.scope,
+    }))
+    ?.sort((a, b) => (a.name > b.name ? 1 : -1))
 }
 
 export const filterClassUuidByUserKey = (classes: Class[], user_key: string) => {

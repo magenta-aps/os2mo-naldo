@@ -36,8 +36,11 @@
             user_key
             uuid
             facet_uuid
-            it_system(filter: { from_date: $fromDate, to_date: $toDate }) {
-              name
+            it_system_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
             }
             validity {
               from
@@ -99,7 +102,7 @@
       <td class="text-sm p-4">{cls.name}</td>
       <td class="text-sm p-4">{cls.user_key}</td>
       {#if isRoleFacet}
-        <td class="text-sm p-4">{cls.it_system?.name ?? ""}</td>
+        <td class="text-sm p-4">{cls.it_system_response?.current?.name ?? ""}</td>
       {/if}
       <ValidityTableCell validity={cls.validity} />
       <td class="flex p-4 gap-2 justify-end">

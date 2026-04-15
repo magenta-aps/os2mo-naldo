@@ -30,10 +30,12 @@
               from
               to
             }
-            org_unit(filter: { from_date: null, to_date: null }) {
-              validity {
-                from
-                to
+            org_unit_response {
+              validities(start: null, end: null) {
+                validity {
+                  from
+                  to
+                }
               }
             }
           }
@@ -44,8 +46,11 @@
     mutation TerminateAddress($input: AddressTerminateInput!, $date: DateTime!) {
       address_terminate(input: $input) {
         current(at: $date) {
-          org_unit(filter: { from_date: null, to_date: null }) {
-            name
+          org_unit_response {
+            uuid
+            current(at: $date) {
+              name
+            }
           }
         }
       }
@@ -69,7 +74,8 @@
                 $_("success_terminate_item", {
                   values: {
                     item: $_("address", { values: { n: 0 } }),
-                    name: mutation.address_terminate.current?.org_unit?.[0]?.name,
+                    name: mutation.address_terminate.current?.org_unit_response?.current
+                      ?.name,
                   },
                 })
               ),
@@ -115,7 +121,7 @@
 {:then data}
   {@const addressValidities = getMinMaxValidities(data.addresses.objects[0].validities)}
   {@const validities = getMinMaxValidities(
-    data.addresses.objects[0].validities[0].org_unit
+    data.addresses.objects[0].validities[0].org_unit_response?.validities
   )}
 
   <form method="post" class="mx-6" use:enhance={handler}>

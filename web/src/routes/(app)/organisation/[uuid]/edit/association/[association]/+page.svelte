@@ -26,7 +26,6 @@
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getValidities } from "$lib/http/getValidities"
   import { getClasses } from "$lib/http/getClasses"
-  import { findClosestValidity } from "$lib/utils/validities"
   import SelectGroup from "$lib/components/forms/shared/SelectGroup.svelte"
   import { normalizeAssociation } from "$lib/utils/normalizeForm"
 
@@ -42,40 +41,52 @@
         objects {
           validities {
             uuid
-            person(filter: { from_date: $fromDate, to_date: $toDate }) {
+            person_response {
               uuid
-              name
-            }
-            org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
-              uuid
-              name
-              validity {
-                from
-                to
+              current(at: $fromDate) {
+                name
               }
             }
-            association_type {
+            org_unit_response {
               uuid
-              user_key
-              name
-            }
-            primary {
-              uuid
-              user_key
-              name
-            }
-            substitute(filter: { from_date: $fromDate, to_date: $toDate }) {
-              name
-              uuid
-              validity {
-                from
-                to
+              current(at: $fromDate) {
+                name
+                validity {
+                  from
+                  to
+                }
               }
             }
-            trade_union {
+            association_type_response {
               uuid
-              user_key
-              name
+              current(at: $fromDate) {
+                user_key
+                name
+              }
+            }
+            primary_response {
+              uuid
+              current(at: $fromDate) {
+                user_key
+                name
+              }
+            }
+            substitute_response {
+              uuid
+              current(at: $fromDate) {
+                name
+                validity {
+                  from
+                  to
+                }
+              }
+            }
+            trade_union_response {
+              uuid
+              current(at: $fromDate) {
+                user_key
+                name
+              }
             }
             validity {
               from
@@ -109,8 +120,11 @@
     mutation UpdateAssociation($input: AssociationUpdateInput!, $date: DateTime!) {
       association_update(input: $input) {
         current(at: $date) {
-          person {
-            name
+          person_response {
+            uuid
+            current(at: $date) {
+              name
+            }
           }
         }
       }
@@ -168,7 +182,8 @@
                 $_("success_edit_item", {
                   values: {
                     item: $_("association", { values: { n: 0 } }),
-                    name: mutation.association_update.current?.person?.[0].name,
+                    name: mutation.association_update.current?.person_response?.current
+                      ?.name,
                   },
                 })
               ),
@@ -311,8 +326,8 @@
           type="org-unit"
           bind:value={selectedOrgUnit}
           startValue={{
-            uuid: findClosestValidity(association.org_unit, startDate).uuid,
-            name: findClosestValidity(association.org_unit, startDate).name,
+            uuid: association.org_unit_response.uuid,
+            name: association.org_unit_response.current?.name ?? "",
           }}
           disabled
           required={true}
@@ -322,8 +337,8 @@
           type="employee"
           at={startDate}
           startValue={{
-            uuid: findClosestValidity(association.person, startDate).uuid,
-            name: findClosestValidity(association.person, startDate).name,
+            uuid: association.person_response?.uuid,
+            name: association.person_response?.current?.name ?? "",
           }}
           bind:value={selectedPerson}
           bind:name={$person.value}
@@ -336,8 +351,13 @@
             <Select
               title={capital($_("association_type"))}
               id="association-type"
-              startValue={association.association_type
-                ? association.association_type
+              startValue={association.association_type_response
+                ? {
+                    uuid: association.association_type_response.uuid,
+                    user_key:
+                      association.association_type_response.current?.user_key ?? "",
+                    name: association.association_type_response.current?.name ?? "",
+                  }
                 : undefined}
               bind:name={$associationTypeField.value}
               bind:value={associationType}
@@ -349,7 +369,13 @@
             <Select
               title={capital($_("primary"))}
               id="primary"
-              startValue={association.primary ? association.primary : undefined}
+              startValue={association.primary_response
+                ? {
+                    uuid: association.primary_response.uuid,
+                    user_key: association.primary_response.current?.user_key ?? "",
+                    name: association.primary_response.current?.name ?? "",
+                  }
+                : undefined}
               bind:name={$primary.value}
               iterable={filterClassesByFacetUserKey(facets, "primary_type")}
               extra_classes="basis-1/2"
@@ -363,10 +389,10 @@
                 id="substitute"
                 title={capital($_("substitute"))}
                 at={startDate}
-                startValue={association.substitute.length
+                startValue={association.substitute_response?.uuid
                   ? {
-                      uuid: findClosestValidity(association.substitute, startDate).uuid,
-                      name: findClosestValidity(association.substitute, startDate).name,
+                      uuid: association.substitute_response.uuid,
+                      name: association.substitute_response.current?.name ?? "",
                     }
                   : undefined}
                 bind:name={$substitute.value}
@@ -381,7 +407,13 @@
               title={$_("trade_union")}
               bind:name={$tradeUnion.value}
               iterable={topLevelFacets}
-              startValue={association.trade_union ? association.trade_union : undefined}
+              startValue={association.trade_union_response
+                ? {
+                    uuid: association.trade_union_response.uuid,
+                    user_key: association.trade_union_response.current?.user_key ?? "",
+                    name: association.trade_union_response.current?.name ?? "",
+                  }
+                : undefined}
               on:clear={() => ($tradeUnion.value = "")}
               isClearable={true}
             />

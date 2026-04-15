@@ -18,7 +18,7 @@
   import { getItuserValidities } from "$lib/http/getValidities"
   import { getRoleClasses } from "$lib/http/getClasses"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
-  import { formatITUserITSystemName } from "$lib/utils/helpers"
+  import { getITUserITSystemName } from "$lib/utils/display"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
@@ -30,18 +30,24 @@
         objects {
           validities {
             uuid
-            ituser(filter: { from_date: $fromDate, to_date: $toDate }) {
-              itsystem {
-                uuid
+            ituser_response {
+              uuid
+              current(at: $fromDate) {
+                itsystem_response {
+                  uuid
+                  current(at: $fromDate) {
+                    name
+                  }
+                }
+                user_key
+              }
+            }
+            role_response {
+              uuid
+              current(at: $fromDate) {
+                user_key
                 name
               }
-              uuid
-              user_key
-            }
-            role {
-              uuid
-              user_key
-              name
             }
             validity {
               from
@@ -55,9 +61,15 @@
     mutation UpdateRoleBinding($input: RoleBindingUpdateInput!, $date: DateTime!) {
       rolebinding_update(input: $input) {
         current(at: $date) {
-          ituser(filter: { from_date: null, to_date: null }) {
-            org_unit(filter: { from_date: null, to_date: null }) {
-              name
+          ituser_response {
+            uuid
+            current(at: $date) {
+              org_unit_response {
+                uuid
+                current(at: $date) {
+                  name
+                }
+              }
             }
           }
         }
@@ -98,8 +110,8 @@
                 $_("success_edit_item", {
                   values: {
                     item: $_("rolebinding", { values: { n: 0 } }),
-                    name: mutation.rolebinding_update.current?.ituser?.[0]
-                      ?.org_unit?.[0]?.name,
+                    name: mutation.rolebinding_update.current?.ituser_response?.current
+                      ?.org_unit_response?.current?.name,
                   },
                 })
               ),
@@ -199,7 +211,13 @@
   </div>
 {:then data}
   {@const rolebinding = data.rolebindings.objects[0].validities[0]}
-  {@const ituser = formatITUserITSystemName(rolebinding.ituser)}
+  {@const ituser = getITUserITSystemName([
+    {
+      uuid: rolebinding.ituser_response?.uuid,
+      user_key: rolebinding.ituser_response?.current?.user_key ?? "",
+      itsystem_response: rolebinding.ituser_response?.current?.itsystem_response,
+    },
+  ])}
   {#if !initialRolebinding}
     {@html (() => {
       initialRolebinding = normalizeRolebinding(rolebinding)
@@ -248,7 +266,13 @@
             <Select
               title={capital($_("role", { values: { n: 1 } }))}
               id="it-system-role-uuid"
-              startValue={rolebinding.role[0]}
+              startValue={rolebinding.role_response?.current
+                ? {
+                    uuid: rolebinding.role_response.uuid,
+                    name: rolebinding.role_response.current.name,
+                    user_key: rolebinding.role_response.current.user_key,
+                  }
+                : undefined}
               bind:name={$role.value}
               errors={$role.errors}
               iterable={filterClassesByFacetUserKey(facets, "role")}

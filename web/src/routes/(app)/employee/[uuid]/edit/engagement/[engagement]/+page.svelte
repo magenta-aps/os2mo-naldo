@@ -24,7 +24,7 @@
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getValidities } from "$lib/http/getValidities"
   import { getClasses } from "$lib/http/getClasses"
-  import { findClosestValidity } from "$lib/utils/validities"
+
   import { env } from "$lib/env"
   import { normalizeEngagement } from "$lib/utils/normalizeForm"
 
@@ -35,28 +35,32 @@
           validities {
             uuid
             user_key
-            engagement_type {
+            engagement_type_response {
               uuid
-              name
+              current(at: $fromDate) {
+                name
+              }
             }
-            job_function {
+            job_function_response {
               uuid
-              name
+              current(at: $fromDate) {
+                name
+              }
             }
-            primary {
+            primary_response {
               uuid
-              name
+              current(at: $fromDate) {
+                name
+              }
             }
             validity {
               from
               to
             }
-            org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
+            org_unit_response {
               uuid
-              name
-              validity {
-                from
-                to
+              current(at: $fromDate) {
+                name
               }
             }
             extension_1
@@ -69,8 +73,11 @@
     mutation UpdateEngagement($input: EngagementUpdateInput!, $date: DateTime!) {
       engagement_update(input: $input) {
         current(at: $date) {
-          person {
-            name
+          person_response {
+            uuid
+            current(at: $date) {
+              name
+            }
           }
         }
       }
@@ -117,7 +124,8 @@
             $_("success_edit_item", {
               values: {
                 item: $_("engagement", { values: { n: 0 } }),
-                name: mutation.engagement_update.current?.person?.[0].name,
+                name: mutation.engagement_update.current?.person_response?.current
+                  ?.name,
               },
             })
           ),
@@ -261,8 +269,8 @@
           type="org-unit"
           at={startDate}
           startValue={{
-            uuid: findClosestValidity(engagement.org_unit, startDate).uuid,
-            name: findClosestValidity(engagement.org_unit, startDate).name,
+            uuid: engagement.org_unit_response.uuid,
+            name: engagement.org_unit_response.current?.name ?? "",
           }}
           bind:name={$orgUnit.value}
           errors={$orgUnit.errors}
@@ -285,7 +293,10 @@
                 ? capital($_("job_code"))
                 : capital($_("job_function", { values: { n: 1 } }))}
               id="job-function"
-              startValue={engagement.job_function}
+              startValue={{
+                uuid: engagement.job_function_response.uuid,
+                name: engagement.job_function_response.current?.name ?? "",
+              }}
               bind:name={$jobFunction.value}
               errors={$jobFunction.errors}
               iterable={filterClassesByFacetUserKey(facets, "engagement_job_function")}
@@ -317,7 +328,10 @@
             <Select
               title={capital($_("engagement_type"))}
               id="engagement-type"
-              startValue={engagement.engagement_type}
+              startValue={{
+                uuid: engagement.engagement_type_response.uuid,
+                name: engagement.engagement_type_response.current?.name ?? "",
+              }}
               bind:name={$engagementType.value}
               errors={$engagementType.errors}
               iterable={filterClassesByFacetUserKey(facets, "engagement_type")}
@@ -328,7 +342,12 @@
               title={capital($_("primary"))}
               id="primary"
               bind:name={$primary.value}
-              startValue={engagement.primary ? engagement.primary : undefined}
+              startValue={engagement.primary_response
+                ? {
+                    uuid: engagement.primary_response.uuid,
+                    name: engagement.primary_response.current?.name ?? "",
+                  }
+                : undefined}
               iterable={filterClassesByFacetUserKey(facets, "primary_type")}
               extra_classes="basis-1/2"
               on:clear={() => ($primary.value = "")}

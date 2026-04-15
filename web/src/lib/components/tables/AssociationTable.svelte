@@ -8,7 +8,6 @@
   import { page } from "$app/stores"
   import { AssociationsDocument, type AssociationsQuery } from "./query.generated"
   import { date } from "$lib/stores/date"
-  import { findClosestValidity } from "$lib/utils/validities"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { sortData } from "$lib/utils/sorting"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
@@ -50,33 +49,41 @@
         objects {
           validities {
             uuid
-            org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
-              name
+            org_unit_response {
               uuid
-              validity {
-                from
-                to
+              current(at: $fromDate) {
+                name
               }
             }
-            person(filter: { from_date: $fromDate, to_date: $toDate }) {
-              name
+            person_response {
               uuid
-              validity {
-                from
-                to
+              current(at: $fromDate) {
+                name
               }
             }
-            association_type {
-              name
+            association_type_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
             }
-            trade_union {
-              name
+            trade_union_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
             }
-            substitute(filter: { from_date: $fromDate, to_date: $toDate }) {
-              name
+            substitute_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
             }
-            primary {
-              name
+            primary_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
             }
             validity {
               from
@@ -109,7 +116,7 @@
         if (!tenseFilter(obj, tense)) return false
         // Check if association validity is in current org_unit ($page.params.uuid)
         // TODO: Do this with GraphQL, when following issues are resolved (#65031) (#65303)
-        if (isOrg && obj.org_unit[0].uuid !== $page.params.uuid) return false
+        if (isOrg && obj.org_unit_response.uuid !== $page.params.uuid) return false
         return true
       })
       associations.push(...filtered)
@@ -132,35 +139,33 @@
         {#if isOrg}
           <!-- GraphQL and Naldo doesn't allow creating vacant associations, but the old frontend did -->
           <!-- This means that some customers might have them, and therefore we need this check. -->
-          {#if association.person[0]?.name}
-            <a href="{base}/employee/{association.person[0].uuid}">
-              {findClosestValidity(association.person, $date).name}
+          {#if association.person_response?.current?.name}
+            <a href="{base}/employee/{association.person_response.uuid}">
+              {association.person_response.current.name}
             </a>
           {:else}
             {capital($_("vacant"))}
           {/if}
         {:else}
           <a
-            href="{base}/organisation/{association.org_unit[0].uuid}"
-            on:click={() => updateGlobalNavigation(association.org_unit[0].uuid)}
+            href="{base}/organisation/{association.org_unit_response.uuid}"
+            on:click={() => updateGlobalNavigation(association.org_unit_response.uuid)}
           >
-            {findClosestValidity(association.org_unit, $date).name}</a
+            {association.org_unit_response.current?.name}</a
           >
         {/if}
       </td>
-      <td class="text-sm p-4">{association.association_type?.name}</td>
-      <td class="text-sm p-4"
-        >{association.substitute[0] ? association.substitute[0].name : ""}</td
+      <td class="text-sm p-4">{association.association_type_response?.current?.name}</td
+      >
+      <td class="text-sm p-4">{association.substitute_response?.current?.name ?? ""}</td
       >
       {#if env.PUBLIC_ENABLE_CONFEDERATIONS}
         <td class="text-sm p-4"
-          >{association.trade_union ? association.trade_union?.name : ""}</td
+          >{association.trade_union_response?.current?.name ?? ""}</td
         >
       {/if}
       {#if env.PUBLIC_SHOW_PRIMARY_ASSOCIATION}
-        <td class="text-sm p-4"
-          >{association.primary ? association.primary?.name : ""}</td
-        >
+        <td class="text-sm p-4">{association.primary_response?.current?.name ?? ""}</td>
       {/if}
       <ValidityTableCell validity={association.validity} />
       <td class="flex p-4 gap-2 justify-end">

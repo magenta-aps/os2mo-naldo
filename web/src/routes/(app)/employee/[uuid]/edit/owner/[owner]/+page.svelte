@@ -18,7 +18,6 @@
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getPersonValidities } from "$lib/http/getValidities"
-  import { findClosestValidity } from "$lib/utils/validities"
   import { normalizeOwner } from "$lib/utils/normalizeForm"
 
   gql`
@@ -26,12 +25,10 @@
       owners(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
           validities {
-            owner(filter: { from_date: $fromDate, to_date: $toDate }) {
-              name
+            owner_response {
               uuid
-              validity {
-                from
-                to
+              current(at: $fromDate) {
+                name
               }
             }
             validity {
@@ -46,8 +43,11 @@
     mutation UpdateOwner($input: OwnerUpdateInput!, $date: DateTime!) {
       owner_update(input: $input) {
         current(at: $date) {
-          person {
-            name
+          person_response {
+            uuid
+            current(at: $date) {
+              name
+            }
           }
         }
       }
@@ -81,7 +81,7 @@
                 $_("success_edit_item", {
                   values: {
                     item: $_("owner", { values: { n: 0 } }),
-                    name: mutation.owner_update.current?.person?.[0].name,
+                    name: mutation.owner_update.current?.person_response?.current?.name,
                   },
                 })
               ),
@@ -191,10 +191,10 @@
           type="employee"
           at={startDate}
           bind:value={selectedPerson}
-          startValue={ownerObj.owner
+          startValue={ownerObj.owner_response
             ? {
-                uuid: findClosestValidity(ownerObj.owner, startDate).uuid,
-                name: findClosestValidity(ownerObj.owner, startDate).name,
+                uuid: ownerObj.owner_response.uuid,
+                name: ownerObj.owner_response.current?.name ?? "",
               }
             : undefined}
         />

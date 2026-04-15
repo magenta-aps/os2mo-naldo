@@ -40,14 +40,18 @@
             uuid
             user_key
             external_id
-            primary {
-              name
-              user_key
+            primary_response {
               uuid
+              current(at: $fromDate) {
+                name
+                user_key
+              }
             }
-            itsystem {
-              name
+            itsystem_response {
               uuid
+              current(at: $fromDate) {
+                name
+              }
             }
             validity {
               from
@@ -72,8 +76,11 @@
     mutation UpdateITUser($input: ITUserUpdateInput!, $date: DateTime!) {
       ituser_update(input: $input) {
         current(at: $date) {
-          person {
-            name
+          person_response {
+            uuid
+            current(at: $date) {
+              name
+            }
           }
         }
       }
@@ -115,7 +122,8 @@
                 $_("success_edit_item", {
                   values: {
                     item: $_("ituser", { values: { n: 0 } }),
-                    name: mutation.ituser_update.current?.person?.[0].name,
+                    name: mutation.ituser_update.current?.person_response?.current
+                      ?.name,
                   },
                 })
               ),
@@ -262,7 +270,12 @@
           <Select
             title={capital($_("it_system"))}
             id="it-system"
-            startValue={itUser.itsystem}
+            startValue={itUser.itsystem_response?.current
+              ? {
+                  uuid: itUser.itsystem_response.uuid,
+                  name: itUser.itsystem_response.current.name,
+                }
+              : undefined}
             bind:name={$itSystem.value}
             errors={$itSystem.errors}
             extra_classes="basis-1/2"
@@ -286,7 +299,13 @@
             title={capital($_("primary"))}
             id="primary"
             bind:name={$primary.value}
-            startValue={itUser.primary ? itUser.primary : undefined}
+            startValue={itUser.primary_response?.current
+              ? {
+                  uuid: itUser.primary_response.uuid,
+                  name: itUser.primary_response.current.name,
+                  user_key: itUser.primary_response.current.user_key,
+                }
+              : undefined}
             iterable={filterClassesByFacetUserKey(facets, "primary_type")}
             on:clear={() => ($primary.value = "")}
             isClearable={true}

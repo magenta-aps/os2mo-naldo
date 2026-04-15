@@ -32,12 +32,20 @@
         objects {
           validities {
             uuid
-            kle_number(filter: { from_date: null, to_date: null }) {
-              name
-              user_key
+            kle_number_response {
+              uuid
+              current(at: $fromDate) {
+                name
+                user_key
+              }
             }
-            kle_aspects {
-              name
+            kle_aspects_response {
+              objects {
+                uuid
+                current(at: $fromDate) {
+                  name
+                }
+              }
             }
             validity {
               from
@@ -86,15 +94,15 @@
     >
       <td class="text-sm p-4">
         <ul>
-          {#each kle.kle_aspects as aspect}
+          {#each kle.kle_aspects_response.objects as aspect}
             <li>
-              • {aspect.name}
+              • {aspect.current?.name}
             </li>
           {/each}
         </ul>
       </td>
-      <td class="text-sm p-4"
-        >{`${kle.kle_number[0].user_key} - ${kle.kle_number[0].name}`}
+      <td class="text-sm p-4">
+        • {`${kle.kle_number_response.current?.user_key} - ${kle.kle_number_response.current?.name}`}
       </td>
       <ValidityTableCell validity={kle.validity} />
       <td class="flex p-4 gap-2 justify-end">

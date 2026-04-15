@@ -30,10 +30,12 @@
               from
               to
             }
-            ituser(filter: { from_date: null, to_date: null }) {
-              validity {
-                from
-                to
+            ituser_response {
+              validities(start: null, end: null) {
+                validity {
+                  from
+                  to
+                }
               }
             }
           }
@@ -47,9 +49,15 @@
     ) {
       rolebinding_terminate(input: $input) {
         current(at: $date) {
-          ituser {
-            person {
-              name
+          ituser_response {
+            uuid
+            current(at: $date) {
+              person_response {
+                uuid
+                current(at: $date) {
+                  name
+                }
+              }
             }
           }
         }
@@ -77,8 +85,8 @@
                 $_("success_terminate_item", {
                   values: {
                     item: $_("rolebinding", { values: { n: 0 } }),
-                    name: mutation.rolebinding_terminate.current?.ituser?.[0]
-                      .person?.[0].name,
+                    name: mutation.rolebinding_terminate.current?.ituser_response
+                      ?.current?.person_response?.current?.name,
                   },
                 })
               ),
@@ -126,7 +134,7 @@
     data.rolebindings.objects[0].validities
   )}
   {@const validities = getMinMaxValidities(
-    data.rolebindings.objects[0].validities[0].ituser
+    data.rolebindings.objects[0].validities[0].ituser_response?.validities
   )}
 
   <form method="post" class="mx-6" use:enhance={handler}>

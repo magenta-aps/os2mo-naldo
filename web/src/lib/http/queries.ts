@@ -5,9 +5,11 @@ gql`
     org_units(filter: { uuids: $uuid, from_date: $currentDate }) {
       objects {
         current(at: $currentDate) {
-          parent(filter: { from_date: $currentDate }) {
-            name
+          parent_response {
             uuid
+            current(at: $currentDate) {
+              name
+            }
           }
         }
       }
@@ -84,7 +86,7 @@ gql`
         validities {
           uuid
           user_key
-          classes(
+          classes_responses(
             filter: {
               from_date: $currentDate
               owner: {
@@ -94,10 +96,14 @@ gql`
               }
             }
           ) {
-            name
-            uuid
-            user_key
-            scope
+            objects {
+              uuid
+              current(at: $currentDate) {
+                name
+                user_key
+                scope
+              }
+            }
           }
         }
       }
@@ -117,12 +123,16 @@ gql`
     facets(filter: { user_keys: ["primary_type"] }) {
       objects {
         validities {
-          classes(
+          classes_responses(
             filter: { user_keys: [$primaryClass, "non-primary"], from_date: $fromDate }
           ) {
-            name
-            uuid
-            user_key
+            objects {
+              uuid
+              current(at: $fromDate) {
+                name
+                user_key
+              }
+            }
           }
           uuid
           user_key
@@ -134,10 +144,16 @@ gql`
     facets(filter: { user_keys: ["role"] }) {
       objects {
         validities {
-          classes(filter: { it_system: { uuids: [$itSystem] }, from_date: $fromDate }) {
-            name
-            uuid
-            user_key
+          classes_responses(
+            filter: { it_system: { uuids: [$itSystem] }, from_date: $fromDate }
+          ) {
+            objects {
+              uuid
+              current(at: $fromDate) {
+                name
+                user_key
+              }
+            }
           }
           uuid
           user_key

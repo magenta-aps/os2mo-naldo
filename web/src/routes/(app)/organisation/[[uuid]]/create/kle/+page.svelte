@@ -27,8 +27,11 @@
     mutation CreateKLE($input: KLECreateInput!, $date: DateTime!) {
       kle_create(input: $input) {
         current(at: $date) {
-          org_unit(filter: { from_date: null, to_date: null }) {
-            name
+          org_unit_response {
+            uuid
+            current(at: $date) {
+              name
+            }
           }
         }
       }
@@ -59,7 +62,7 @@
                 $_("success_create_item", {
                   values: {
                     item: $_("kle", { values: { n: 0 } }),
-                    name: mutation.kle_create.current?.org_unit?.[0]?.name,
+                    name: mutation.kle_create.current?.org_unit_response?.current?.name,
                   },
                 })
               ),
