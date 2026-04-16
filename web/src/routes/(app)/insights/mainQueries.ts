@@ -20,10 +20,10 @@ const subjectField = {
   getValues: (row: any) => [row.__typename ?? ""],
 }
 
-// Helper to join array of objects by name
-const joinNames = (arr: any[]) =>
+// Helper to join array of objects by name (for _response.objects pattern)
+const joinCurrentNames = (arr: any[]) =>
   arr
-    ?.map((i: any) => i.name)
+    ?.map((i: any) => i.current?.name)
     .filter(Boolean)
     .join(", ") ?? ""
 
@@ -67,21 +67,21 @@ export const mainQueries: MainQuery[] = [
       },
       {
         label: "parent",
-        query: "parent { name }",
+        query: "parent_response { uuid current { name } }",
         getHeaders: () => [t("parent")],
-        getValues: (row) => [row.parent?.name ?? ""],
+        getValues: (row) => [row.parent_response?.current?.name ?? ""],
       },
       {
         label: "unit_type",
-        query: "unit_type { name }",
+        query: "unit_type_response { uuid current { name } }",
         getHeaders: () => [t("unit_type", { values: { n: 1 } })],
-        getValues: (row) => [row.unit_type?.name ?? ""],
+        getValues: (row) => [row.unit_type_response?.current?.name ?? ""],
       },
       {
         label: "org_unit_level",
-        query: "org_unit_level { name }",
+        query: "unit_level_response { uuid current { name } }",
         getHeaders: () => [t("org_unit_level", { values: { n: 1 } })],
-        getValues: (row) => [row.org_unit_level?.name ?? ""],
+        getValues: (row) => [row.unit_level_response?.current?.name ?? ""],
       },
       validityField,
     ],
@@ -94,18 +94,18 @@ export const mainQueries: MainQuery[] = [
       subjectField,
       {
         label: "name",
-        query: "person { name }",
+        query: "person_response { uuid current { name } }",
         getHeaders: () => [t("name")],
-        getValues: (row) => [row.person?.[0]?.name ?? ""],
+        getValues: (row) => [row.person_response?.current?.name ?? ""],
       },
       // --- Conditional Extension Logic ---
       ...(showExtension1
         ? [
             {
               label: "job_code",
-              query: "job_function { name }",
+              query: "job_function_response { uuid current { name } }",
               getHeaders: () => [t("job_code", { values: { n: 1 } })],
-              getValues: (row: any) => [row.job_function?.name ?? ""],
+              getValues: (row: any) => [row.job_function_response?.current?.name ?? ""],
             },
             {
               label: "job_function",
@@ -117,9 +117,9 @@ export const mainQueries: MainQuery[] = [
         : [
             {
               label: "job_function",
-              query: "job_function { name }",
+              query: "job_function_response { uuid current { name } }",
               getHeaders: () => [t("job_function", { values: { n: 1 } })],
-              getValues: (row: any) => [row.job_function?.name ?? ""],
+              getValues: (row: any) => [row.job_function_response?.current?.name ?? ""],
             },
           ]),
       {
@@ -130,52 +130,62 @@ export const mainQueries: MainQuery[] = [
       },
       {
         label: "cpr_number",
-        query: "person { cpr_number }",
+        query: "person_response { uuid current { cpr_number } }",
         getHeaders: () => [t("cpr_number")],
-        getValues: (row) => [row.person?.[0]?.cpr_number ?? ""],
+        getValues: (row) => [row.person_response?.current?.cpr_number ?? ""],
       },
       {
         label: "engagement_type",
-        query: "engagement_type { name }",
+        query: "engagement_type_response { uuid current { name } }",
         getHeaders: () => [t("engagement_type")],
-        getValues: (row) => [row.engagement_type?.name ?? ""],
+        getValues: (row) => [row.engagement_type_response?.current?.name ?? ""],
       },
       {
         label: "primary",
-        query: "primary { name }",
+        query: "primary_response { uuid current { name } }",
         getHeaders: () => [t("primary")],
-        getValues: (row) => [row.primary?.name ?? ""],
+        getValues: (row) => [row.primary_response?.current?.name ?? ""],
       },
       {
         label: "email",
         // Using GraphQL alias 'email' to make parsing easier
         query:
-          'person { email: addresses(filter: { address_type: { scope: "EMAIL" } }) { name } }',
+          'person_response { uuid current { email: addresses(filter: { address_type: { scope: "EMAIL" } }) { name } } }',
         getHeaders: () => [t("email")],
         getValues: (row) => {
-          const emails = row.person?.[0]?.email
-          return [joinNames(emails)]
+          const emails = row.person_response?.current?.email
+          return [
+            emails
+              ?.map((i: any) => i.name)
+              .filter(Boolean)
+              .join(", ") ?? "",
+          ]
         },
       },
       {
         label: "phone",
         // Using GraphQL alias 'phone' to make parsing easier
         query:
-          'person { phone: addresses(filter: { address_type: { scope: "PHONE" } }) { name } }',
+          'person_response { uuid current { phone: addresses(filter: { address_type: { scope: "PHONE" } }) { name } } }',
         getHeaders: () => [t("phone")],
         getValues: (row) => {
-          const phones = row.person?.[0]?.phone
-          return [joinNames(phones)]
+          const phones = row.person_response?.current?.phone
+          return [
+            phones
+              ?.map((i: any) => i.name)
+              .filter(Boolean)
+              .join(", ") ?? "",
+          ]
         },
       },
       {
         label: "manager",
-        query: "managers(exclude_self: true, inherit: true) { person { name } }",
+        query:
+          "managers(exclude_self: true, inherit: true) { person_response { uuid current { name } } }",
         getHeaders: () => [t("manager", { values: { n: 1 } })],
         getValues: (row) => {
-          // Giver det mening at skrive vakant, når der spørges om hvem personens leder er??
           const managerNames = row.managers
-            .map((m: any) => m.person?.[0]?.name ?? t("vacant"))
+            .map((m: any) => m.person_response?.current?.name ?? t("vacant"))
             .filter(Boolean)
             .join(", ")
           return [managerNames]
@@ -184,12 +194,12 @@ export const mainQueries: MainQuery[] = [
       {
         label: "manager_email",
         query:
-          'managers(exclude_self: true, inherit: true) { person { addresses(filter: { address_type: { scope: "EMAIL" } }) { name } } }',
+          'managers(exclude_self: true, inherit: true) { person_response { uuid current { addresses(filter: { address_type: { scope: "EMAIL" } }) { name } } } }',
         getHeaders: () => [t("manager_email")],
         getValues: (row) => {
           if (!row.managers) return [""]
           const emails = row.managers
-            .flatMap((m: any) => m.person?.[0]?.addresses ?? [])
+            .flatMap((m: any) => m.person_response?.current?.addresses ?? [])
             .map((a: any) => a.name)
             .filter(Boolean)
             .join(", ")
@@ -207,27 +217,27 @@ export const mainQueries: MainQuery[] = [
       subjectField,
       {
         label: "name",
-        query: "person { name }",
+        query: "person_response { uuid current { name } }",
         getHeaders: () => [t("name")],
-        getValues: (row) => [row.person?.[0]?.name ?? ""],
+        getValues: (row) => [row.person_response?.current?.name ?? ""],
       },
       {
         label: "association_type",
-        query: "association_type { name }",
+        query: "association_type_response { uuid current { name } }",
         getHeaders: () => [t("association_type")],
-        getValues: (row) => [row.association_type?.name ?? ""],
+        getValues: (row) => [row.association_type_response?.current?.name ?? ""],
       },
       {
         label: "substitute",
-        query: "substitute { name }",
+        query: "substitute_response { uuid current { name } }",
         getHeaders: () => [t("substitute")],
-        getValues: (row) => [row.substitute?.[0]?.name ?? ""],
+        getValues: (row) => [row.substitute_response?.current?.name ?? ""],
       },
       {
         label: "trade_union",
-        query: "trade_union { name }",
+        query: "trade_union_response { uuid current { name } }",
         getHeaders: () => [t("trade_union")],
-        getValues: (row) => [row.trade_union?.name ?? ""],
+        getValues: (row) => [row.trade_union_response?.current?.name ?? ""],
       },
       validityField,
     ],
@@ -240,9 +250,9 @@ export const mainQueries: MainQuery[] = [
       subjectField,
       {
         label: "itsystem",
-        query: "itsystem { name }",
+        query: "itsystem_response { uuid current { name } }",
         getHeaders: () => [t("itsystem", { values: { n: 1 } })],
-        getValues: (row) => [row.itsystem?.name ?? ""],
+        getValues: (row) => [row.itsystem_response?.current?.name ?? ""],
       },
       {
         label: "account_name",
@@ -253,14 +263,11 @@ export const mainQueries: MainQuery[] = [
       {
         label: "rolebinding",
         query:
-          "rolebindings(filter: { from_date: $date }) { role(filter: { from_date: $date }){ name }}",
+          "rolebindings(filter: { from_date: $date }) { role_response { uuid current { name } } }",
         getHeaders: () => [t("rolebinding", { values: { n: 2 } })],
         getValues: (row) => {
-          // row.rolebindings is an array of objects.
-          // each object has a 'role' array.
-          // We flatten everything to get a list of role names.
           const roles = row.rolebindings
-            ?.flatMap((rb: any) => rb.role?.map((r: any) => r.name))
+            ?.flatMap((rb: any) => rb.role_response?.current?.name)
             .filter(Boolean)
             .join(", ")
           return [roles ?? ""]
@@ -268,9 +275,9 @@ export const mainQueries: MainQuery[] = [
       },
       {
         label: "primary",
-        query: "primary { name }",
+        query: "primary_response { uuid current { name } }",
         getHeaders: () => [t("primary")],
-        getValues: (row) => [row.primary?.name ?? ""],
+        getValues: (row) => [row.primary_response?.current?.name ?? ""],
       },
       validityField,
     ],
@@ -283,27 +290,27 @@ export const mainQueries: MainQuery[] = [
       subjectField,
       {
         label: "name",
-        query: "person { name }",
+        query: "person_response { uuid current { name } }",
         getHeaders: () => [t("name")],
-        getValues: (row) => [row.person?.[0]?.name ?? t("vacant")],
+        getValues: (row) => [row.person_response?.current?.name ?? t("vacant")],
       },
       {
         label: "manager_responsibility",
-        query: "responsibilities { name }",
+        query: "responsibilities_response { objects { uuid current { name } } }",
         getHeaders: () => [t("manager_responsibility")],
-        getValues: (row) => [joinNames(row.responsibilities)],
+        getValues: (row) => [joinCurrentNames(row.responsibilities_response?.objects)],
       },
       {
         label: "manager_type",
-        query: "manager_type { name }",
+        query: "manager_type_response { uuid current { name } }",
         getHeaders: () => [t("manager_type")],
-        getValues: (row) => [row.manager_type?.name ?? ""],
+        getValues: (row) => [row.manager_type_response?.current?.name ?? ""],
       },
       {
         label: "manager_level",
-        query: "manager_level { name }",
+        query: "manager_level_response { uuid current { name } }",
         getHeaders: () => [t("manager_level")],
-        getValues: (row) => [row.manager_level?.name ?? ""],
+        getValues: (row) => [row.manager_level_response?.current?.name ?? ""],
       },
       validityField,
     ],
@@ -316,9 +323,9 @@ export const mainQueries: MainQuery[] = [
       subjectField,
       {
         label: "name",
-        query: "owner { name }",
+        query: "owner_response { uuid current { name } }",
         getHeaders: () => [t("name")],
-        getValues: (row) => [row.owner?.[0]?.name ?? ""],
+        getValues: (row) => [row.owner_response?.current?.name ?? ""],
       },
       validityField,
     ],
@@ -331,14 +338,14 @@ export const mainQueries: MainQuery[] = [
       subjectField,
       {
         label: "related_unit",
-        query: "org_units { name }",
+        query: "org_units_response { objects { uuid current { name } } }",
         getHeaders: () => [
           `${t("related_unit", { values: { n: 1 } })} 1`,
           `${t("related_unit", { values: { n: 1 } })} 2`,
         ],
         getValues: (row) => [
-          row.org_units?.[0]?.name ?? "",
-          row.org_units?.[1]?.name ?? "",
+          row.org_units_response?.objects?.[0]?.current?.name ?? "",
+          row.org_units_response?.objects?.[1]?.current?.name ?? "",
         ],
       },
     ],

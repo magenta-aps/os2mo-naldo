@@ -28,11 +28,15 @@
           validities {
             uuid
             user_key
-            classes(filter: { from_date: $currentDate }) {
-              uuid
-              user_key
-              name
-              scope
+            classes_responses(filter: { from_date: $currentDate }) {
+              objects {
+                uuid
+                current(at: $currentDate) {
+                  user_key
+                  name
+                  scope
+                }
+              }
             }
           }
         }

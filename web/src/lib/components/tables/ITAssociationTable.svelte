@@ -7,7 +7,6 @@
   import ValidityTableCell from "$lib/components/shared/ValidityTableCell.svelte"
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
-  import { findClosestValidity } from "$lib/utils/validities"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { onMount } from "svelte"
   import { sortKey, sortDirection } from "$lib/stores/sorting"
@@ -41,28 +40,34 @@
         objects {
           validities {
             uuid
-            org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
-              name
+            org_unit_response {
               uuid
-              validity {
-                from
-                to
-              }
-            }
-            job_function {
-              name
-            }
-            primary {
-              name
-            }
-            it_user(filter: { from_date: $fromDate, to_date: $toDate }) {
-              itsystem {
+              current(at: $fromDate) {
                 name
               }
-              user_key
-              validity {
-                from
-                to
+            }
+            job_function_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
+            }
+            primary_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
+            }
+            it_user_response {
+              uuid
+              current(at: $fromDate) {
+                itsystem_response {
+                  uuid
+                  current(at: $fromDate) {
+                    name
+                  }
+                }
+                user_key
               }
             }
             validity {
@@ -112,22 +117,18 @@
     >
       <td class="text-sm p-4">
         <a
-          href="{base}/organisation/{itassociation.org_unit[0].uuid}"
-          on:click={() => updateGlobalNavigation(itassociation.org_unit[0].uuid)}
+          href="{base}/organisation/{itassociation.org_unit_response.uuid}"
+          on:click={() => updateGlobalNavigation(itassociation.org_unit_response.uuid)}
         >
-          {findClosestValidity(itassociation.org_unit, $date).name}
+          {itassociation.org_unit_response.current?.name}
         </a>
       </td>
-      <td class="text-sm p-4">{itassociation.job_function?.name}</td>
+      <td class="text-sm p-4">{itassociation.job_function_response?.current?.name}</td>
       <td class="text-sm p-4"
-        >{findClosestValidity(itassociation.it_user, $date).itsystem.name}</td
+        >{itassociation.it_user_response?.current?.itsystem_response?.current?.name}</td
       >
-      <td class="text-sm p-4"
-        >{findClosestValidity(itassociation.it_user, $date).user_key}</td
-      >
-      <td class="text-sm p-4"
-        >{itassociation.primary ? itassociation.primary?.name : ""}</td
-      >
+      <td class="text-sm p-4">{itassociation.it_user_response?.current?.user_key}</td>
+      <td class="text-sm p-4">{itassociation.primary_response?.current?.name ?? ""}</td>
       <ValidityTableCell validity={itassociation.validity} />
       <td class="flex p-4 gap-2 justify-end">
         <a href={`${base}/auditlog/${itassociation.uuid}`}>

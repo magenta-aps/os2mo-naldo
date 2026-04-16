@@ -13,7 +13,6 @@
     type OrgUnitOwnerQuery,
   } from "./query.generated"
   import { date } from "$lib/stores/date"
-  import { findClosestValidity } from "$lib/utils/validities"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { onMount } from "svelte"
   import { sortData } from "$lib/utils/sorting"
@@ -48,24 +47,22 @@
               from
               to
             }
-            person(filter: { from_date: $fromDate, to_date: $toDate }) {
-              name
+            person_response {
               uuid
-            }
-            org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
-              name
-              uuid
-              validity {
-                from
-                to
+              current(at: $fromDate) {
+                name
               }
             }
-            owner(filter: { from_date: $fromDate, to_date: $toDate }) {
-              name
+            org_unit_response {
               uuid
-              validity {
-                from
-                to
+              current(at: $fromDate) {
+                name
+              }
+            }
+            owner_response {
+              uuid
+              current(at: $fromDate) {
+                name
               }
             }
           }
@@ -83,24 +80,22 @@
                 from
                 to
               }
-              person(filter: { from_date: $fromDate, to_date: $toDate }) {
-                name
+              person_response {
                 uuid
-              }
-              org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
-                name
-                uuid
-                validity {
-                  from
-                  to
+                current(at: $fromDate) {
+                  name
                 }
               }
-              owner(filter: { from_date: $fromDate, to_date: $toDate }) {
-                name
+              org_unit_response {
                 uuid
-                validity {
-                  from
-                  to
+                current(at: $fromDate) {
+                  name
+                }
+              }
+              owner_response {
+                uuid
+                current(at: $fromDate) {
+                  name
                 }
               }
             }
@@ -163,20 +158,20 @@
         leading-5 border-t border-base-300 text-base-content"
     >
       <td class="text-sm p-4">
-        {#if ownerObj.owner}
-          <a href="{base}/employee/{ownerObj.owner[0].uuid}">
-            {findClosestValidity(ownerObj.owner, $date).name}
+        {#if ownerObj.owner_response}
+          <a href="{base}/employee/{ownerObj.owner_response.uuid}">
+            {ownerObj.owner_response.current?.name}
           </a>
         {:else}
           {capital($_("vacant"))}
         {/if}
         <!-- Add (*) if owner-object is inherited -->
-        {#if isOrg && ownerObj.org_unit?.[0].uuid !== $page.params.uuid}
+        {#if isOrg && ownerObj.org_unit_response?.uuid !== $page.params.uuid}
           <span
             title={capital(
               $_("inherited_owner", {
                 values: {
-                  org_unit: findClosestValidity(ownerObj.org_unit, $date).name,
+                  org_unit: ownerObj.org_unit_response?.current?.name,
                 },
               })
             )}>(*)</span

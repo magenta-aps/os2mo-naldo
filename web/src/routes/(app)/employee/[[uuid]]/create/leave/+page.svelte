@@ -55,14 +55,19 @@
       ) {
         objects {
           validities {
-            org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
-              name
-              user_key
+            org_unit_response {
+              uuid
+              current(at: $fromDate) {
+                name
+                user_key
+              }
             }
             uuid
-            job_function {
-              user_key
-              name
+            job_function_response {
+              current(at: $fromDate) {
+                user_key
+                name
+              }
             }
           }
         }
@@ -72,9 +77,11 @@
     mutation CreateLeave($input: LeaveCreateInput!, $date: DateTime!) {
       leave_create(input: $input) {
         current(at: $date) {
-          person {
-            name
+          person_response {
             uuid
+            current(at: $date) {
+              name
+            }
           }
         }
       }
@@ -115,11 +122,11 @@
                 $_("success_create_item", {
                   values: {
                     item: $_("leave", { values: { n: 0 } }),
-                    name: mutation.leave_create.current?.person?.[0].name,
+                    name: mutation.leave_create.current?.person_response?.current?.name,
                   },
                 })
               ),
-              uuid: mutation.leave_create.current?.person?.[0].uuid,
+              uuid: mutation.leave_create.current?.person_response?.uuid,
               type: "employee",
             }
           } catch (err) {

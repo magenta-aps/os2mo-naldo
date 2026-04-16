@@ -30,10 +30,12 @@
               from
               to
             }
-            org_unit(filter: { from_date: null, to_date: null }) {
-              validity {
-                from
-                to
+            org_unit_response {
+              validities(start: null, end: null) {
+                validity {
+                  from
+                  to
+                }
               }
             }
           }
@@ -44,8 +46,11 @@
     mutation TerminateKLE($input: KLETerminateInput!, $date: DateTime!) {
       kle_terminate(input: $input) {
         current(at: $date) {
-          org_unit(filter: { from_date: null, to_date: null }) {
-            name
+          org_unit_response {
+            uuid
+            current(at: $date) {
+              name
+            }
           }
         }
       }
@@ -69,7 +74,8 @@
                 $_("success_terminate_item", {
                   values: {
                     item: $_("kle", { values: { n: 0 } }),
-                    name: mutation.kle_terminate.current?.org_unit?.[0]?.name,
+                    name: mutation.kle_terminate.current?.org_unit_response?.current
+                      ?.name,
                   },
                 })
               ),
@@ -114,7 +120,9 @@
   </div>
 {:then data}
   {@const kleValidities = getMinMaxValidities(data.kles.objects[0].validities)}
-  {@const validities = getMinMaxValidities(data.kles.objects[0].validities[0].org_unit)}
+  {@const validities = getMinMaxValidities(
+    data.kles.objects[0].validities[0].org_unit_response?.validities
+  )}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">

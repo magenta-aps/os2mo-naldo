@@ -7,25 +7,27 @@ import { get } from "svelte/store"
 export type ITUserITSystemName = {
   uuid: string
   user_key: string
-  itsystem: {
-    name: string
-    uuid?: string
+  itsystem_response: {
+    uuid: string
+    current?: {
+      name: string
+    } | null
   }
 }
 
 export const formatITUserITSystemName = (itusers: ITUserITSystemName[] | undefined) => {
   return itusers?.map((ituser) => ({
     uuid: ituser.uuid,
-    name: `${ituser.itsystem.name}, ${ituser.user_key}`,
-    itsystem: { uuid: ituser.itsystem.uuid },
+    name: `${ituser.itsystem_response.current?.name}, ${ituser.user_key}`,
+    itsystem: { uuid: ituser.itsystem_response.uuid },
   }))
 }
 
 // Used to display both job_function-name and org-name on a single line, for example, in a dropdown select.
 export type EngagementTitleAndUuid = {
   uuid: string
-  job_function: { name: string }
-  org_unit: { name: string }[]
+  job_function_response: { current?: { name: string } | null }
+  org_unit_response: { current?: { name: string } | null }
 }
 
 export const formatEngagementTitlesAndUuid = (
@@ -33,7 +35,7 @@ export const formatEngagementTitlesAndUuid = (
 ) => {
   return engagements.map((engagement) => ({
     uuid: engagement.uuid,
-    name: `${engagement.job_function.name}, ${engagement.org_unit[0].name}`,
+    name: `${engagement.job_function_response.current?.name}, ${engagement.org_unit_response.current?.name}`,
   }))
 }
 

@@ -30,10 +30,12 @@
               from
               to
             }
-            org_unit(filter: { from_date: null, to_date: null }) {
-              validity {
-                from
-                to
+            org_unit_response {
+              validities(start: null, end: null) {
+                validity {
+                  from
+                  to
+                }
               }
             }
           }
@@ -44,8 +46,11 @@
     mutation TerminateITUser($input: ITUserTerminateInput!, $date: DateTime!) {
       ituser_terminate(input: $input) {
         current(at: $date) {
-          person {
-            name
+          person_response {
+            uuid
+            current(at: $date) {
+              name
+            }
           }
         }
       }
@@ -69,7 +74,8 @@
                 $_("success_terminate_item", {
                   values: {
                     item: $_("ituser", { values: { n: 0 } }),
-                    name: mutation.ituser_terminate.current?.person?.[0].name,
+                    name: mutation.ituser_terminate.current?.person_response?.current
+                      ?.name,
                   },
                 })
               ),
@@ -115,7 +121,7 @@
 {:then data}
   {@const ituserValidities = getMinMaxValidities(data.itusers.objects[0].validities)}
   {@const validities = getMinMaxValidities(
-    data.itusers.objects[0].validities[0].org_unit
+    data.itusers.objects[0].validities[0].org_unit_response?.validities
   )}
 
   <form method="post" class="mx-6" use:enhance={handler}>

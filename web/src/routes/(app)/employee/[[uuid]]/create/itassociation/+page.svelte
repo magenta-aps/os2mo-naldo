@@ -51,10 +51,14 @@
           validities {
             uuid
             user_key
-            classes(filter: { from_date: $currentDate }) {
-              user_key
-              name
-              uuid
+            classes_responses(filter: { from_date: $currentDate }) {
+              objects {
+                uuid
+                current(at: $currentDate) {
+                  user_key
+                  name
+                }
+              }
             }
           }
         }
@@ -75,9 +79,11 @@
             uuid
             name
             itusers {
-              itsystem {
-                name
+              itsystem_response {
                 uuid
+                current(at: $currentDate) {
+                  name
+                }
               }
               user_key
               uuid
@@ -90,8 +96,11 @@
     mutation CreateITAssociation($input: ITAssociationCreateInput!, $date: DateTime!) {
       itassociation_create(input: $input) {
         current(at: $date) {
-          person {
-            name
+          person_response {
+            uuid
+            current(at: $date) {
+              name
+            }
           }
         }
       }
@@ -132,7 +141,8 @@
                 $_("success_create_item", {
                   values: {
                     item: $_("itassociation", { values: { n: 0 } }),
-                    name: mutation.itassociation_create.current?.person?.[0].name,
+                    name: mutation.itassociation_create.current?.person_response
+                      ?.current?.name,
                   },
                 })
               ),

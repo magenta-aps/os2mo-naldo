@@ -8,7 +8,6 @@
   import { page } from "$app/stores"
   import { ManagersDocument, type ManagersQuery } from "./query.generated"
   import { date } from "$lib/stores/date"
-  import { findClosestValidity } from "$lib/utils/validities"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { sortData } from "$lib/utils/sorting"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
@@ -51,30 +50,37 @@
         objects {
           validities {
             uuid
-            person(filter: { from_date: $fromDate, to_date: $toDate }) {
-              name
+            person_response {
               uuid
-              validity {
-                from
-                to
+              current(at: $fromDate) {
+                name
               }
             }
-            org_unit(filter: { from_date: $fromDate, to_date: $toDate }) {
-              name
+            org_unit_response {
               uuid
-              validity {
-                from
-                to
+              current(at: $fromDate) {
+                name
               }
             }
-            manager_level(filter: { from_date: $fromDate, to_date: $toDate }) {
-              name
+            manager_level_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
             }
-            manager_type(filter: { from_date: $fromDate, to_date: $toDate }) {
-              name
+            manager_type_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
             }
-            responsibilities(filter: { from_date: $fromDate, to_date: $toDate }) {
-              name
+            responsibilities_response {
+              objects {
+                uuid
+                current(at: $fromDate) {
+                  name
+                }
+              }
             }
             validity {
               from
@@ -109,7 +115,7 @@
         if (!tenseFilter(obj, tense)) return false
         // Filter out vacant manager-roles for employees
         // TODO: Do this with GraphQL, when following issues are resolved (#65031) (#65303)
-        if (!isOrg && !obj.person) return false
+        if (!isOrg && !obj.person_response) return false
         return true
       })
       managers.push(...filtered)
@@ -130,20 +136,20 @@
     >
       <td class="text-sm p-4">
         {#if isOrg}
-          {#if manager.person}
-            <a href="{base}/employee/{manager.person[0].uuid}">
-              {findClosestValidity(manager.person, $date).name}
+          {#if manager.person_response}
+            <a href="{base}/employee/{manager.person_response.uuid}">
+              {manager.person_response.current?.name}
             </a>
           {:else}
             {capital($_("vacant"))}
           {/if}
           <!-- Add (*) if manager-object is inherited -->
-          {#if manager.org_unit?.[0].uuid !== $page.params.uuid}
+          {#if manager.org_unit_response?.uuid !== $page.params.uuid}
             <span
               title={capital(
                 $_("inherited_manager", {
                   values: {
-                    org_unit: findClosestValidity(manager.org_unit, $date).name,
+                    org_unit: manager.org_unit_response?.current?.name,
                   },
                 })
               )}>(*)</span
@@ -151,24 +157,24 @@
           {/if}
         {:else}
           <a
-            href="{base}/organisation/{manager.org_unit[0].uuid}"
-            on:click={() => updateGlobalNavigation(manager.org_unit[0].uuid)}
+            href="{base}/organisation/{manager.org_unit_response.uuid}"
+            on:click={() => updateGlobalNavigation(manager.org_unit_response.uuid)}
           >
-            {findClosestValidity(manager.org_unit, $date).name}
+            {manager.org_unit_response.current?.name}
           </a>
         {/if}
       </td>
       <td class="text-sm p-4">
         <ul>
-          {#each manager.responsibilities as responsibility}
+          {#each manager.responsibilities_response.objects as responsibility}
             <li>
-              • {responsibility.name}
+              • {responsibility.current?.name}
             </li>
           {/each}
         </ul>
       </td>
-      <td class="text-sm p-4">{manager.manager_type.name}</td>
-      <td class="text-sm p-4">{manager.manager_level.name}</td>
+      <td class="text-sm p-4">{manager.manager_type_response?.current?.name}</td>
+      <td class="text-sm p-4">{manager.manager_level_response?.current?.name}</td>
       <ValidityTableCell validity={manager.validity} />
       <td class="flex p-4 gap-2 justify-end">
         <a href={`${base}/auditlog/${manager.uuid}`}>

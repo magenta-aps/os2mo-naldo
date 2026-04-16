@@ -5,7 +5,6 @@
   import { base } from "$app/paths"
   import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
-  import { getITUserITSystemName } from "$lib/utils/display"
   import { tenseToValidity, tenseFilter } from "$lib/utils/tenses"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
@@ -51,24 +50,34 @@
             uuid
             user_key
             value
-            address_type {
-              name
-            }
-            ituser(filter: { from_date: $fromDate, to_date: $toDate }) {
-              user_key
+            address_type_response {
               uuid
-              itsystem {
-                user_key
+              current(at: $fromDate) {
                 name
-                uuid
-              }
-              validity {
-                from
-                to
               }
             }
-            visibility {
-              name
+            ituser_response {
+              uuid
+              validities(start: $fromDate, end: $toDate) {
+                user_key
+                itsystem_response {
+                  uuid
+                  current(at: $fromDate) {
+                    user_key
+                    name
+                  }
+                }
+                validity {
+                  from
+                  to
+                }
+              }
+            }
+            visibility_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
             }
             validity {
               from
@@ -116,7 +125,7 @@
       class="{i % 2 === 0 ? '' : 'bg-base-200'} 
       leading-5 border-t border-base-300 text-base-content"
     >
-      <td class="text-sm p-4">{address.address_type.name}</td>
+      <td class="text-sm p-4">{address.address_type_response?.current?.name}</td>
       <td class="text-sm p-4"
         >{address.user_key !== address.value && address.user_key !== address.uuid
           ? address.user_key
@@ -125,16 +134,17 @@
       <td class="text-sm p-4">{address.name}</td>
       {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS && !isOrg}
         <td class="text-sm p-4">
-          {#if address.ituser.length}
-            <!-- getITUserITSystemName returns a list, but should always just be a single ituser -->
-            {#each getITUserITSystemName( [findClosestValidity(address.ituser, $date)] ) as ituser}
-              {ituser.name}
-            {/each}
+          {#if address.ituser_response?.validities?.length}
+            {@const closest = findClosestValidity(
+              address.ituser_response.validities,
+              $date
+            )}
+            {closest?.itsystem_response?.current?.name}, {closest?.user_key}
           {/if}
         </td>
       {/if}
       <td class="text-sm p-4"
-        >{address.visibility ? address.visibility.name : capital($_("not_set"))}</td
+        >{address.visibility_response?.current?.name ?? capital($_("not_set"))}</td
       >
       <ValidityTableCell validity={address.validity} />
       <td class="flex p-4 gap-2 justify-end">

@@ -23,7 +23,7 @@
     filterClassesByFacetUserKey,
   } from "$lib/utils/classes"
   import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
-  import { formatITUserITSystemName } from "$lib/utils/helpers"
+  import { getITUserITSystemName } from "$lib/utils/display"
   import { getValidities } from "$lib/http/getValidities"
   import Search from "$lib/components/search/Search.svelte"
   import { form, field } from "svelte-forms"
@@ -56,10 +56,14 @@
           validities {
             uuid
             user_key
-            classes(filter: { from_date: $currentDate }) {
-              user_key
-              name
-              uuid
+            classes_responses(filter: { from_date: $currentDate }) {
+              objects {
+                uuid
+                current(at: $currentDate) {
+                  user_key
+                  name
+                }
+              }
             }
           }
         }
@@ -86,41 +90,55 @@
         objects {
           validities {
             uuid
-            person {
+            person_response {
               uuid
-              name
-              itusers {
-                itsystem {
+              current(at: $currentDate) {
+                name
+                itusers {
+                  itsystem_response {
+                    uuid
+                    current(at: $currentDate) {
+                      name
+                    }
+                  }
+                  user_key
                   uuid
-                  name
                 }
-                user_key
-                uuid
-              }
-              validity {
-                from
-                to
+                validity {
+                  from
+                  to
+                }
               }
             }
-            org_unit {
+            org_unit_response {
               uuid
-              name
-            }
-            it_user {
-              itsystem {
-                uuid
+              current(at: $currentDate) {
                 name
               }
-              uuid
-              user_key
             }
-            job_function {
+            it_user_response {
               uuid
-              name
+              current(at: $currentDate) {
+                itsystem_response {
+                  uuid
+                  current(at: $currentDate) {
+                    name
+                  }
+                }
+                user_key
+              }
             }
-            primary {
-              name
+            job_function_response {
               uuid
+              current(at: $currentDate) {
+                name
+              }
+            }
+            primary_response {
+              uuid
+              current(at: $currentDate) {
+                name
+              }
             }
             validity {
               from
@@ -134,8 +152,11 @@
     mutation UpdateITAssociation($input: ITAssociationUpdateInput!, $date: DateTime!) {
       itassociation_update(input: $input) {
         current(at: $date) {
-          person {
-            name
+          person_response {
+            uuid
+            current(at: $date) {
+              name
+            }
           }
         }
       }
@@ -176,7 +197,8 @@
                 $_("success_edit_item", {
                   values: {
                     item: $_("itassociation", { values: { n: 0 } }),
-                    name: mutation.itassociation_update.current?.person?.[0].name,
+                    name: mutation.itassociation_update.current?.person_response
+                      ?.current?.name,
                   },
                 })
               ),
@@ -231,10 +253,16 @@
   </div>
 {:then data}
   {@const itassociation = data.associations.objects[0].validities[0]}
-  {@const itusers = itassociation.person[0].itusers}
+  {@const itusers = itassociation.person_response?.current?.itusers ?? []}
   {@const facets = data.facets.objects}
   {@const classes = data.classes.objects}
-  {@const itUserStartValue = formatITUserITSystemName(itassociation.it_user)}
+  {@const itUserStartValue = getITUserITSystemName([
+    {
+      uuid: itassociation.it_user_response?.uuid,
+      user_key: itassociation.it_user_response?.current?.user_key ?? "",
+      itsystem_response: itassociation.it_user_response?.current?.itsystem_response,
+    },
+  ])}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
@@ -264,8 +292,8 @@
         <Search
           type="employee"
           startValue={{
-            uuid: itassociation.person[0].uuid,
-            name: itassociation.person[0].name,
+            uuid: itassociation.person_response?.uuid,
+            name: itassociation.person_response?.current?.name ?? "",
           }}
           disabled
           required={true}
@@ -273,8 +301,8 @@
         <Search
           type="org-unit"
           startValue={{
-            uuid: itassociation.org_unit[0].uuid,
-            name: itassociation.org_unit[0].name,
+            uuid: itassociation.org_unit_response.uuid,
+            name: itassociation.org_unit_response.current?.name ?? "",
           }}
           bind:name={$orgUnit.value}
           errors={$orgUnit.errors}
@@ -290,7 +318,7 @@
             startValue={itUserStartValue?.[0]}
             bind:name={$itUser.value}
             errors={$itUser.errors}
-            iterable={formatITUserITSystemName(itusers)}
+            iterable={getITUserITSystemName(itusers)}
             extra_classes="basis-1/2"
             required={true}
           />
@@ -299,8 +327,11 @@
               ? capital($_("job_code"))
               : capital($_("job_function", { values: { n: 1 } }))}
             id="job-function"
-            startValue={itassociation.job_function
-              ? itassociation.job_function
+            startValue={itassociation.job_function_response?.current
+              ? {
+                  uuid: itassociation.job_function_response.uuid,
+                  name: itassociation.job_function_response.current.name,
+                }
               : undefined}
             bind:name={$jobFunction.value}
             errors={$jobFunction.errors}
@@ -316,7 +347,7 @@
           <Checkbox
             title={capital($_("primary"))}
             id="primary"
-            startValue={itassociation.primary?.uuid}
+            startValue={itassociation.primary_response?.uuid}
             value={filterClassUuidByUserKey(classes, "primary")}
           />
         </div>

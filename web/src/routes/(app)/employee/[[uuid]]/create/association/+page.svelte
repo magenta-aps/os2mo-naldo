@@ -41,10 +41,14 @@
           validities {
             uuid
             user_key
-            classes(filter: { from_date: $currentDate }) {
-              user_key
-              name
-              uuid
+            classes_responses(filter: { from_date: $currentDate }) {
+              objects {
+                uuid
+                current(at: $currentDate) {
+                  user_key
+                  name
+                }
+              }
             }
           }
         }
@@ -82,8 +86,11 @@
     mutation CreateAssociation($input: AssociationCreateInput!, $date: DateTime!) {
       association_create(input: $input) {
         current(at: $date) {
-          person {
-            name
+          person_response {
+            uuid
+            current(at: $date) {
+              name
+            }
           }
         }
       }
@@ -126,7 +133,8 @@
                 $_("success_create_item", {
                   values: {
                     item: $_("association", { values: { n: 0 } }),
-                    name: mutation.association_create.current?.person?.[0].name,
+                    name: mutation.association_create.current?.person_response?.current
+                      ?.name,
                   },
                 })
               ),

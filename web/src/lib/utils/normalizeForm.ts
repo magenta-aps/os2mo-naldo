@@ -1,5 +1,3 @@
-import { formatKleNumberTitleAndUuid } from "$lib/utils/helpers"
-
 export const normalizeEmployee = (e: any) => {
   return {
     to: e.validity?.to?.split("T")[0] ?? null,
@@ -14,10 +12,10 @@ export const normalizeOrganisation = (o: any) => {
   return {
     to: o.validity?.to?.split("T")[0] ?? null,
     name: o.name ?? null,
-    parent: o.parent?.uuid ?? undefined,
-    unit_type: o.unit_type?.name ?? null,
-    org_unit_level: o.org_unit_level?.name ?? "",
-    time_planning: o.time_planning?.name ?? "",
+    parent: o.parent_response?.uuid ?? undefined,
+    unit_type: o.unit_type_response?.current?.name ?? null,
+    org_unit_level: o.unit_level_response?.current?.name ?? "",
+    time_planning: o.time_planning_response?.current?.name ?? "",
     user_key: o.user_key ?? "",
   }
 }
@@ -25,32 +23,32 @@ export const normalizeOrganisation = (o: any) => {
 export const normalizeEngagement = (e: any) => {
   return {
     to: e.validity?.to?.split("T")[0] ?? null,
-    org_unit: e.org_unit?.[0]?.uuid ?? null,
-    job_function: e.job_function?.name ?? null,
-    engagement_type: e.engagement_type?.name ?? null,
+    org_unit: e.org_unit_response?.uuid ?? null,
+    job_function: e.job_function_response?.current?.name ?? null,
+    engagement_type: e.engagement_type_response?.current?.name ?? null,
     user_key: e.user_key ?? null,
-    primary: e.primary?.name ?? "",
+    primary: e.primary_response?.current?.name ?? "",
   }
 }
 
 export const normalizeAssociation = (a: any) => {
   return {
     to: a.validity?.to?.split("T")[0] ?? null,
-    person: a.person?.[0]?.uuid ?? null,
-    org_unit: a.org_unit?.[0]?.uuid ?? null,
-    association_type: a.association_type?.name ?? null,
-    primary: a.primary?.name ?? "",
-    substitute: a.substitute?.[0]?.name ?? "",
-    trade_union: a.trade_union?.name ?? "",
+    person: a.person_response?.uuid ?? null,
+    org_unit: a.org_unit_response?.uuid ?? null,
+    association_type: a.association_type_response?.current?.name ?? null,
+    primary: a.primary_response?.current?.name ?? "",
+    substitute: a.substitute_response?.current?.name ?? "",
+    trade_union: a.trade_union_response?.current?.name ?? "",
   }
 }
 
 export const normalizeITUser = (i: any, note: string | null | undefined) => {
   return {
     to: i.validity?.to?.split("T")[0] ?? null,
-    itsystem: i.itsystem?.name ?? null,
+    itsystem: i.itsystem_response?.current?.name ?? null,
     user_key: i.user_key ?? "",
-    primary: i.primary?.name ?? "",
+    primary: i.primary_response?.current?.name ?? "",
     external_id: i.external_id ?? "",
     note: note ?? "",
   }
@@ -59,50 +57,54 @@ export const normalizeITUser = (i: any, note: string | null | undefined) => {
 export const normalizeAddress = (a: any) => {
   return {
     to: a.validity?.to?.split("T")[0] ?? null,
-    address_type: a.address_type?.name ?? null,
+    address_type: a.address_type_response?.current?.name ?? null,
     value: a.name ?? null,
     user_key: a.user_key ?? "",
-    visibility: a.visibility?.name ?? "",
+    visibility: a.visibility_response?.current?.name ?? "",
   }
 }
 
 export const normalizeManager = (m: any) => {
   return {
     to: m.validity?.to?.split("T")[0] ?? null,
-    person: m.person?.[0]?.uuid ?? undefined,
-    org_unit: m.org_unit?.[0]?.uuid ?? null,
-    manager_type: m.manager_type?.name ?? null,
-    manager_level: m.manager_level?.name ?? null,
-    responsibility: m.responsibilities.map((r: any) => r.name),
+    person: m.person_response?.uuid ?? undefined,
+    org_unit: m.org_unit_response?.uuid ?? null,
+    manager_type: m.manager_type_response?.current?.name ?? null,
+    manager_level: m.manager_level_response?.current?.name ?? null,
+    responsibility: m.responsibilities_response.objects.map(
+      (r: any) => r.current?.name
+    ),
   }
 }
 
 export const normalizeOwner = (o: any) => {
   return {
     to: o.validity?.to?.split("T")[0] ?? null,
-    person: o.owner?.[0]?.uuid ?? undefined,
+    person: o.owner_response?.uuid ?? undefined,
   }
 }
 
 export const normalizeLeave = (l: any) => {
   return {
     to: l.validity?.to?.split("T")[0] ?? null,
-    leave_type: l.leave_type?.name ?? null,
-    engagement: l.engagement?.uuid ?? null,
+    leave_type: l.leave_type_response?.current?.name ?? null,
+    engagement: l.engagement_response?.uuid ?? null,
   }
 }
 
 export const normalizeKLE = (k: any) => {
   return {
     to: k.validity?.to?.split("T")[0] ?? null,
-    kle_number: formatKleNumberTitleAndUuid(k.kle_number)[0].name ?? null,
-    kle_aspect: k.kle_aspects.map((a: any) => a.name),
+    kle_number: k.kle_number_response?.current
+      ? `${k.kle_number_response.current.user_key} - ${k.kle_number_response.current.name}`
+      : null,
+    kle_aspect: k.kle_aspects_response?.objects?.map((a: any) => a.current?.name),
   }
 }
 
 export const normalizeRolebinding = (r: any) => {
   return {
     to: r.validity?.to?.split("T")[0] ?? null,
-    role: r.role?.[0]?.name ?? undefined,
+    role: r.role_response?.current?.name ?? undefined,
   }
 }

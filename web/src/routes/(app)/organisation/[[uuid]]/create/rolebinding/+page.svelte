@@ -34,9 +34,11 @@
             itusers(filter: { from_date: $fromDate }) {
               user_key
               uuid
-              itsystem(filter: { from_date: $fromDate }) {
+              itsystem_response {
                 uuid
-                name
+                current(at: $fromDate) {
+                  name
+                }
               }
             }
           }
@@ -47,9 +49,15 @@
     mutation CreateRoleBinding($input: [RoleBindingCreateInput!]!, $date: DateTime!) {
       rolebindings_create(input: $input) {
         current(at: $date) {
-          ituser(filter: { from_date: $date }) {
-            org_unit {
-              name
+          ituser_response {
+            uuid
+            current(at: $date) {
+              org_unit_response {
+                uuid
+                current(at: $date) {
+                  name
+                }
+              }
             }
           }
         }
@@ -60,7 +68,7 @@
   let itUser: {
     uuid: string
     name: string
-    itsystem: {
+    itsystem_response: {
       uuid: string
     }
   }
@@ -91,8 +99,8 @@
                 $_("success_create_item", {
                   values: {
                     item: $_("rolebinding", { values: { n: 0 } }),
-                    name: mutation.rolebindings_create[0].current?.ituser?.[0]
-                      .org_unit?.[0].name,
+                    name: mutation.rolebindings_create[0].current?.ituser_response
+                      ?.current?.org_unit_response?.current?.name,
                   },
                 })
               ),
@@ -159,7 +167,7 @@
     // Make sure `currentDate` isn't sent if startDate is null.
     const params = {
       fromDate: startDate,
-      itSystem: itUser?.itsystem.uuid,
+      itSystem: itUser?.itsystem_response.uuid,
     }
 
     ;(async () => {

@@ -6,7 +6,9 @@
     "build": "vite build",
     "package": "svelte-kit package",
     "preview": "vite preview",
-    "test": "playwright test",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
     "generate": "graphql-codegen && svelte-kit sync",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
@@ -33,7 +35,8 @@
     "tailwindcss": "^4.1.18",
     "tslib": "^2.6.2",
     "typescript": "^5.2.2",
-    "vite": "^4.5.13"
+    "vite": "^4.5.13",
+    "vitest": "^1"
   },
   "type": "module",
   "dependencies": {
