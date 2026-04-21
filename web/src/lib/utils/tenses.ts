@@ -37,7 +37,7 @@ export const tenseFilter = (
   const globalDate = get(date)
   switch (tense) {
     case "past":
-      return globalDate > obj.validity.to?.split("T")[0]
+      return globalDate >= obj.validity.to?.split("T")[0]
     case "present":
       return true
     case "future":
