@@ -120,7 +120,8 @@
           href="{base}/organisation/{itassociation.org_unit_response.uuid}"
           on:click={() => updateGlobalNavigation(itassociation.org_unit_response.uuid)}
         >
-          {itassociation.org_unit_response.current?.name}
+          {itassociation.org_unit_response.current?.name ??
+            itassociation.org_unit_response.uuid}
         </a>
       </td>
       <td class="text-sm p-4">{itassociation.job_function_response?.current?.name}</td>
