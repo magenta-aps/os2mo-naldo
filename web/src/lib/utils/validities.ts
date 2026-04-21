@@ -83,7 +83,7 @@ export const findClosestValidity = (validities: any, date: string) => {
     const toDate = object.validity.to ? parseISO(object.validity.to) : null
 
     // Check if the validity is active on input `date`
-    if (fromDate <= filterDate && (!toDate || toDate >= filterDate)) {
+    if (fromDate <= filterDate && (!toDate || toDate > filterDate)) {
       return object
     }
 
