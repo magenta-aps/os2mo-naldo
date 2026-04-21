@@ -160,7 +160,7 @@
             href="{base}/organisation/{manager.org_unit_response.uuid}"
             on:click={() => updateGlobalNavigation(manager.org_unit_response.uuid)}
           >
-            {manager.org_unit_response.current?.name}
+            {manager.org_unit_response.current?.name ?? manager.org_unit_response.uuid}
           </a>
         {/if}
       </td>

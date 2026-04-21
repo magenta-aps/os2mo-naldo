@@ -175,7 +175,8 @@
           <a
             href="{base}/organisation/{engagement.org_unit_response?.uuid}"
             on:click={() => updateGlobalNavigation(engagement.org_unit_response?.uuid)}
-            >{engagement.org_unit_response?.current?.name}</a
+            >{engagement.org_unit_response?.current?.name ??
+              engagement.org_unit_response?.uuid}</a
           >
         {/if}
       </td>
