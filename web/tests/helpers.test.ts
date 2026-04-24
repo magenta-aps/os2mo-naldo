@@ -5,6 +5,7 @@ import {
   formatITUserITSystemName,
   formatKleNumberTitleAndUuid,
   isUUID,
+  shouldSuffixSDCode,
   upperCase,
 } from "$lib/utils/helpers"
 
@@ -60,6 +61,32 @@ describe("capital", () => {
 
   it("returns empty string unchanged", () => {
     expect(capital("")).toBe("")
+  })
+})
+
+describe("shouldSuffixSDCode", () => {
+  // Extracted from `checkSDIdentifier` so the predicate can be tested
+  // without mocking $env/dynamic/public.
+  it("returns false when the SD-code flag is off", () => {
+    expect(shouldSuffixSDCode("Name", "user_key", false)).toBe(false)
+  })
+
+  it("returns true when flag is on and user_key is a meaningful distinct code", () => {
+    expect(shouldSuffixSDCode("Name", "ABC123", true)).toBe(true)
+  })
+
+  it("returns false when name equals user_key (nothing to add)", () => {
+    expect(shouldSuffixSDCode("ABC123", "ABC123", true)).toBe(false)
+  })
+
+  it("returns false when user_key is the 'no value' placeholder '-'", () => {
+    expect(shouldSuffixSDCode("Name", "-", true)).toBe(false)
+  })
+
+  it("returns false when user_key is itself a UUID (auto-generated, not an SD code)", () => {
+    expect(
+      shouldSuffixSDCode("Name", "e0f496c4-bb51-47af-baeb-3fb771c51a9f", true)
+    ).toBe(false)
   })
 })
 

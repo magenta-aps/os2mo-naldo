@@ -1,4 +1,4 @@
-import { env } from "$env/dynamic/public"
+import { env } from "$lib/env"
 import { date } from "$lib/stores/date"
 import { keycloak } from "$lib/auth/keycloak"
 import { _ } from "svelte-i18n"
@@ -95,16 +95,24 @@ export const isUUID = (value: string) => {
   return uuidRegex.test(value)
 }
 
+// Decides whether a unit name should be suffixed with its SD user_key in
+// tree views. Extracted so it's testable without mocking `env`.
+export const shouldSuffixSDCode = (
+  name: string,
+  user_key: string,
+  showSDCode: boolean
+): boolean => {
+  if (!showSDCode) return false
+  if (name === user_key) return false
+  if (user_key === "-") return false
+  if (isUUID(user_key)) return false
+  return true
+}
+
 export const checkSDIdentifier = (name: string, user_key: string) => {
-  if (
-    env.PUBLIC_SHOW_SD_CODE_IN_TREES !== "true" ||
-    name === user_key ||
-    user_key === "-" ||
-    isUUID(user_key)
-  ) {
-    return name
-  }
-  return `${name} (${user_key})`
+  return shouldSuffixSDCode(name, user_key, env.PUBLIC_SHOW_SD_CODE_IN_TREES)
+    ? `${name} (${user_key})`
+    : name
 }
 
 export const capital = (str: string) => {
