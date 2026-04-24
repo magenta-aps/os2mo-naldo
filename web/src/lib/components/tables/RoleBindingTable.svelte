@@ -21,9 +21,19 @@
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import type { RoleBindingFilter } from "$lib/graphql/types"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
-  import { formatQueryDates } from "$lib/utils/validities"
+  import { findClosestValidity, formatQueryDates } from "$lib/utils/validities"
 
-  type Rolebinding = RolebindingsQuery["rolebindings"]["objects"][0]["validities"]
+  // Row validities are enriched post-fetch with a `current` field on each
+  // related _response, resolved at the row's own `validity.from`.
+  type Current<T> = T extends { validities: Array<infer V> } ? V : never
+  type WithCurrent<T> = T extends null | undefined
+    ? T
+    : T & { current?: Current<T> | null }
+  type Row = RolebindingsQuery["rolebindings"]["objects"][0]["validities"][number]
+  type EnrichedRow = Omit<Row, "role_response"> & {
+    role_response: WithCurrent<Row["role_response"]>
+  }
+  type Rolebinding = EnrichedRow[]
   let data: Rolebinding
 
   export let tense: Tense
@@ -64,8 +74,12 @@
             }
             role_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             validity {
@@ -83,6 +97,16 @@
     }
   }
 
+  // Resolves a related _response's `current` at the row's own anchor date so
+  // past rows show the state the related object had at the time, not today's.
+  const resolve = <T extends { validities: any[] } | null | undefined>(
+    response: T,
+    anchor: string
+  ) =>
+    response
+      ? { ...response, current: findClosestValidity(response.validities, anchor) }
+      : response
+
   onMount(async () => {
     const res = await graphQLClient().request(RolebindingsDocument, {
       filter: filter,
@@ -97,7 +121,10 @@
       const filtered = outer.validities.filter((obj) => {
         return tenseFilter(obj, tense)
       })
-      rolebindings.push(...filtered)
+      for (const r of filtered as unknown as EnrichedRow[]) {
+        r.role_response = resolve(r.role_response, r.validity.from)
+      }
+      rolebindings.push(...(filtered as unknown as EnrichedRow[]))
     }
     data = rolebindings
   })
