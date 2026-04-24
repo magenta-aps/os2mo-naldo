@@ -16,7 +16,7 @@
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import {
-    anchorFor,
+    lookupDate,
     findClosestValidity,
     formatQueryDates,
   } from "$lib/utils/validities"
@@ -176,7 +176,7 @@
         return true
       })
       for (const m of filtered as unknown as EnrichedRow[]) {
-        const anchor = anchorFor(m.validity, $date)
+        const anchor = lookupDate(m.validity, $date)
         m.person_response = resolve(m.person_response, anchor)
         m.org_unit_response = resolve(m.org_unit_response, anchor)!
         m.manager_level_response = resolve(m.manager_level_response, anchor)
@@ -205,7 +205,7 @@
         {#if isOrg}
           {#if manager.person_response}
             <a href="{base}/employee/{manager.person_response.uuid}">
-              {manager.person_response.current?.name}
+              {manager.person_response.current?.name ?? manager.person_response.uuid}
             </a>
           {:else}
             {capital($_("vacant"))}
@@ -235,13 +235,19 @@
         <ul>
           {#each manager.responsibilities_response.objects as responsibility}
             <li>
-              • {responsibility.current?.name}
+              • {responsibility.current?.name ?? responsibility.uuid}
             </li>
           {/each}
         </ul>
       </td>
-      <td class="text-sm p-4">{manager.manager_type_response?.current?.name}</td>
-      <td class="text-sm p-4">{manager.manager_level_response?.current?.name}</td>
+      <td class="text-sm p-4"
+        >{manager.manager_type_response?.current?.name ??
+          manager.manager_type_response?.uuid}</td
+      >
+      <td class="text-sm p-4"
+        >{manager.manager_level_response?.current?.name ??
+          manager.manager_level_response?.uuid}</td
+      >
       <ValidityTableCell validity={manager.validity} />
       <td class="flex p-4 gap-2 justify-end">
         <a href={`${base}/auditlog/${manager.uuid}`}>

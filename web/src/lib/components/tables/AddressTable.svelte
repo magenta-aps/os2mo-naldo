@@ -16,7 +16,7 @@
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import {
-    anchorFor,
+    lookupDate,
     findClosestValidity,
     formatQueryDates,
   } from "$lib/utils/validities"
@@ -143,7 +143,7 @@
         return tenseFilter(obj, tense)
       })
       for (const a of filtered as unknown as EnrichedRow[]) {
-        const anchor = anchorFor(a.validity, $date)
+        const anchor = lookupDate(a.validity, $date)
         a.address_type_response = resolve(a.address_type_response, anchor)!
         a.visibility_response = resolve(a.visibility_response, anchor)
       }
@@ -163,7 +163,10 @@
       class="{i % 2 === 0 ? '' : 'bg-base-200'} 
       leading-5 border-t border-base-300 text-base-content"
     >
-      <td class="text-sm p-4">{address.address_type_response?.current?.name}</td>
+      <td class="text-sm p-4"
+        >{address.address_type_response?.current?.name ??
+          address.address_type_response?.uuid}</td
+      >
       <td class="text-sm p-4"
         >{address.user_key !== address.value && address.user_key !== address.uuid
           ? address.user_key

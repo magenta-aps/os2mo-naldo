@@ -16,7 +16,7 @@
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import {
-    anchorFor,
+    lookupDate,
     findClosestValidity,
     formatQueryDates,
   } from "$lib/utils/validities"
@@ -181,7 +181,7 @@
         return true
       })
       for (const a of filtered as unknown as EnrichedRow[]) {
-        const anchor = anchorFor(a.validity, $date)
+        const anchor = lookupDate(a.validity, $date)
         a.org_unit_response = resolve(a.org_unit_response, anchor)!
         a.person_response = resolve(a.person_response, anchor)
         a.association_type_response = resolve(a.association_type_response, anchor)
@@ -226,7 +226,9 @@
           >
         {/if}
       </td>
-      <td class="text-sm p-4">{association.association_type_response?.current?.name}</td
+      <td class="text-sm p-4"
+        >{association.association_type_response?.current?.name ??
+          association.association_type_response?.uuid}</td
       >
       <td class="text-sm p-4">{association.substitute_response?.current?.name ?? ""}</td
       >

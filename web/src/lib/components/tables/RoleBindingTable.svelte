@@ -22,7 +22,7 @@
   import type { RoleBindingFilter } from "$lib/graphql/types"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import {
-    anchorFor,
+    lookupDate,
     findClosestValidity,
     formatQueryDates,
   } from "$lib/utils/validities"
@@ -126,7 +126,7 @@
         return tenseFilter(obj, tense)
       })
       for (const r of filtered as unknown as EnrichedRow[]) {
-        r.role_response = resolve(r.role_response, anchorFor(r.validity, $date))
+        r.role_response = resolve(r.role_response, lookupDate(r.validity, $date))
       }
       rolebindings.push(...(filtered as unknown as EnrichedRow[]))
     }
@@ -148,7 +148,10 @@
       <td class="text-sm p-4"
         >{rolebindingObj.ituser_response?.current?.itsystem_response?.current?.name}</td
       >
-      <td class="text-sm p-4">{rolebindingObj.role_response?.current?.name}</td>
+      <td class="text-sm p-4"
+        >{rolebindingObj.role_response?.current?.name ??
+          rolebindingObj.role_response?.uuid}</td
+      >
       <ValidityTableCell validity={rolebindingObj.validity} />
       <td class="flex p-4 gap-2 justify-end">
         <a href={`${base}/auditlog/${rolebindingObj.uuid}`}>

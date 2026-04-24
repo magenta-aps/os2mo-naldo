@@ -11,7 +11,7 @@
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { sortData } from "$lib/utils/sorting"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
-  import { anchorFor, findClosestValidity } from "$lib/utils/validities"
+  import { lookupDate, findClosestValidity } from "$lib/utils/validities"
   import { onMount } from "svelte"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
@@ -183,7 +183,7 @@
         return tenseFilter(obj, tense)
       })
       for (const u of filtered as unknown as ITUsers) {
-        const anchor = anchorFor(u.validity, $date)
+        const anchor = lookupDate(u.validity, $date)
         u.itsystem_response = resolve(u.itsystem_response, anchor)!
         u.primary_response = resolve(u.primary_response, anchor)
       }
@@ -203,7 +203,9 @@
       class="{i % 2 === 0 ? '' : 'bg-base-200'} 
         leading-5 border-t border-base-300 text-base-content"
     >
-      <td class="text-sm p-4">{ituser.itsystem_response.current?.name} </td>
+      <td class="text-sm p-4"
+        >{ituser.itsystem_response.current?.name ?? ituser.itsystem_response.uuid}
+      </td>
       <td class="text-sm p-4">{ituser.user_key}</td>
       <td class="text-sm p-4">{ituser.external_id ?? ""}</td>
       {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}

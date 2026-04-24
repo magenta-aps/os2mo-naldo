@@ -16,7 +16,7 @@
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import {
-    anchorFor,
+    lookupDate,
     findClosestValidity,
     formatQueryDates,
   } from "$lib/utils/validities"
@@ -119,7 +119,7 @@
       for (const l of filtered as unknown as EnrichedRow[]) {
         l.leave_type_response = resolve(
           l.leave_type_response,
-          anchorFor(l.validity, $date)
+          lookupDate(l.validity, $date)
         )!
       }
       leaves.push(...(filtered as unknown as EnrichedRow[]))
@@ -139,7 +139,7 @@
       leading-5 border-t border-base-300 text-base-content"
     >
       <td class="text-sm p-4">
-        {leave.leave_type_response?.current?.name}
+        {leave.leave_type_response?.current?.name ?? leave.leave_type_response?.uuid}
       </td>
       <td class="text-sm p-4">
         {leave.engagement_response?.current?.job_function_response?.current?.name}, {leave

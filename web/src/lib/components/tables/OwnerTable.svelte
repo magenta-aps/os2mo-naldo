@@ -21,7 +21,7 @@
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import {
-    anchorFor,
+    lookupDate,
     findClosestValidity,
     formatQueryDates,
   } from "$lib/utils/validities"
@@ -172,7 +172,7 @@
 
   const enrich = (rows: any[]) => {
     for (const o of rows) {
-      const anchor = anchorFor(o.validity, $date)
+      const anchor = lookupDate(o.validity, $date)
       o.person_response = resolve(o.person_response, anchor)
       o.org_unit_response = resolve(o.org_unit_response, anchor)
       o.owner_response = resolve(o.owner_response, anchor)
@@ -229,7 +229,7 @@
       <td class="text-sm p-4">
         {#if ownerObj.owner_response}
           <a href="{base}/employee/{ownerObj.owner_response.uuid}">
-            {ownerObj.owner_response.current?.name}
+            {ownerObj.owner_response.current?.name ?? ownerObj.owner_response.uuid}
           </a>
         {:else}
           {capital($_("vacant"))}

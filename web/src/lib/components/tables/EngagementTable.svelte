@@ -9,7 +9,7 @@
   import { EngagementsDocument, type EngagementsQuery } from "./query.generated"
   import { date } from "$lib/stores/date"
   import { getITUserITSystemName } from "$lib/utils/display"
-  import { anchorFor, findClosestValidity } from "$lib/utils/validities"
+  import { lookupDate, findClosestValidity } from "$lib/utils/validities"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { sortData } from "$lib/utils/sorting"
@@ -217,7 +217,7 @@
         return true
       })
       for (const e of filtered as unknown as EnrichedRow[]) {
-        const anchor = anchorFor(e.validity, $date)
+        const anchor = lookupDate(e.validity, $date)
         e.person_response = resolve(e.person_response, anchor)
         e.job_function_response = resolve(e.job_function_response, anchor)
         e.engagement_type_response = resolve(e.engagement_type_response, anchor)
@@ -249,7 +249,8 @@
       <td class="text-sm p-4">
         {#if isOrg}
           <a href="{base}/employee/{engagement.person_response.uuid}"
-            >{engagement.person_response.current?.name}</a
+            >{engagement.person_response.current?.name ??
+              engagement.person_response.uuid}</a
           >
         {:else}
           <a
@@ -269,14 +270,18 @@
       <td class="text-sm p-4"
         >{env.PUBLIC_SHOW_JOB_FUNCTION_USER_KEY
           ? `${engagement.job_function_response.current?.user_key} - ${engagement.job_function_response.current?.name}`
-          : engagement.job_function_response.current?.name}</td
+          : engagement.job_function_response.current?.name ??
+            engagement.job_function_response.uuid}</td
       >
       {#if env.PUBLIC_SHOW_EXTENSION_1}
         <td class="text-sm p-4"
           >{engagement.extension_1 ? engagement.extension_1 : ""}</td
         >
       {/if}
-      <td class="text-sm p-4">{engagement.engagement_type_response?.current?.name}</td>
+      <td class="text-sm p-4"
+        >{engagement.engagement_type_response?.current?.name ??
+          engagement.engagement_type_response?.uuid}</td
+      >
       {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
         <td class="text-sm p-4">
           {#each engagement.itusers as ituser}
@@ -300,7 +305,8 @@
                   <li>
                     {#if manager.person_response}
                       <a href="{base}/employee/{manager.person_response.uuid}">
-                        • {manager.person_response.current?.name}
+                        • {manager.person_response.current?.name ??
+                          manager.person_response.uuid}
                       </a>
                     {:else}
                       • {capital($_("vacant"))}
@@ -311,7 +317,8 @@
               <!-- If there's only 1 manager and it's not vacant -->
             {:else if engagement.managers[0] && engagement.managers[0].person_response}
               <a href="{base}/employee/{engagement.managers[0].person_response.uuid}">
-                {engagement.managers[0].person_response.current?.name}
+                {engagement.managers[0].person_response.current?.name ??
+                  engagement.managers[0].person_response.uuid}
               </a>
               <!-- 1 vacant manager -->
             {:else if engagement.managers[0]}

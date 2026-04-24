@@ -16,7 +16,7 @@
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import {
-    anchorFor,
+    lookupDate,
     findClosestValidity,
     formatQueryDates,
   } from "$lib/utils/validities"
@@ -112,7 +112,7 @@
         return tenseFilter(obj, tense)
       })
       for (const k of filtered as unknown as EnrichedRow[]) {
-        const anchor = anchorFor(k.validity, $date)
+        const anchor = lookupDate(k.validity, $date)
         k.kle_number_response = resolve(k.kle_number_response, anchor)!
         k.kle_aspects_response.objects = k.kle_aspects_response.objects.map(
           (a) => resolve(a, anchor)!
@@ -138,7 +138,7 @@
         <ul>
           {#each kle.kle_aspects_response.objects as aspect}
             <li>
-              • {aspect.current?.name}
+              • {aspect.current?.name ?? aspect.uuid}
             </li>
           {/each}
         </ul>

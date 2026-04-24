@@ -70,7 +70,7 @@ export const formatQueryDates = (validity: Validity | OpenValidity): string => {
 // Picks the most meaningful date inside a row's validity window for resolving
 // related-object names: today for currently-active rows, validity.to for past
 // rows (name at role end), validity.from for future rows (name at role start).
-export const anchorFor = (
+export const lookupDate = (
   rowValidity: Validity | OpenValidity,
   today: string
 ): string => {

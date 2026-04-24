@@ -8,7 +8,7 @@
   import { gql } from "graphql-request"
   import { tenseToValidity, tenseFilter } from "$lib/utils/tenses"
   import {
-    anchorFor,
+    lookupDate,
     findClosestValidity,
     formatQueryDates,
   } from "$lib/utils/validities"
@@ -102,7 +102,7 @@
       for (const c of filtered as unknown as EnrichedRow[]) {
         c.it_system_response = resolve(
           c.it_system_response,
-          anchorFor(c.validity, $date)
+          lookupDate(c.validity, $date)
         )
       }
       classes.push(...(filtered as unknown as EnrichedRow[]))
