@@ -67,6 +67,20 @@ export const formatQueryDates = (validity: Validity | OpenValidity): string => {
   return `?${formattedFrom || formattedTo}`
 }
 
+// Picks the most meaningful date inside a row's validity window for resolving
+// related-object names: today for currently-active rows, validity.to for past
+// rows (name at role end), validity.from for future rows (name at role start).
+export const anchorFor = (
+  rowValidity: Validity | OpenValidity,
+  today: string
+): string => {
+  const from = rowValidity.from?.split("T")[0]
+  const to = rowValidity.to?.split("T")[0]
+  if (to && today >= to) return rowValidity.to!
+  if (from && today < from) return rowValidity.from!
+  return today
+}
+
 // Setting `validities: any` to avoid having to create the types in `Search.svelte` by hand
 export const findClosestValidity = (validities: any, date: string) => {
   // Return early if only 1 validity is present (this should always be the case, unless `PUBLIC_SEARCH_INFINITY: "true"`)

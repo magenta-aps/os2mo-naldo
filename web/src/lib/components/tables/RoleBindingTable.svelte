@@ -21,7 +21,11 @@
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import type { RoleBindingFilter } from "$lib/graphql/types"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
-  import { findClosestValidity, formatQueryDates } from "$lib/utils/validities"
+  import {
+    anchorFor,
+    findClosestValidity,
+    formatQueryDates,
+  } from "$lib/utils/validities"
 
   // Row validities are enriched post-fetch with a `current` field on each
   // related _response, resolved at the row's own `validity.from`.
@@ -122,7 +126,7 @@
         return tenseFilter(obj, tense)
       })
       for (const r of filtered as unknown as EnrichedRow[]) {
-        r.role_response = resolve(r.role_response, r.validity.from)
+        r.role_response = resolve(r.role_response, anchorFor(r.validity, $date))
       }
       rolebindings.push(...(filtered as unknown as EnrichedRow[]))
     }

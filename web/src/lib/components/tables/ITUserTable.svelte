@@ -10,7 +10,7 @@
   import { date } from "$lib/stores/date"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { sortData } from "$lib/utils/sorting"
-  import { findClosestValidity } from "$lib/utils/validities"
+  import { anchorFor, findClosestValidity } from "$lib/utils/validities"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { onMount } from "svelte"
   import Icon from "@iconify/svelte"
@@ -135,7 +135,7 @@
         return tenseFilter(obj, tense)
       })
       for (const u of filtered as unknown as EnrichedRow[]) {
-        const anchor = u.validity.from
+        const anchor = anchorFor(u.validity, $date)
         u.itsystem_response = resolve(u.itsystem_response, anchor)!
         u.primary_response = resolve(u.primary_response, anchor)
       }

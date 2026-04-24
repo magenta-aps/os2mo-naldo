@@ -15,7 +15,11 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
-  import { findClosestValidity, formatQueryDates } from "$lib/utils/validities"
+  import {
+    anchorFor,
+    findClosestValidity,
+    formatQueryDates,
+  } from "$lib/utils/validities"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
 
@@ -133,7 +137,7 @@
         return tenseFilter(obj, tense)
       })
       for (const o of filtered as unknown as EnrichedRow[]) {
-        const anchor = o.validity.from
+        const anchor = anchorFor(o.validity, $date)
         o.unit_type_response = resolve(o.unit_type_response, anchor)
         o.unit_level_response = resolve(o.unit_level_response, anchor)
         o.parent_response = resolve(o.parent_response, anchor)

@@ -11,7 +11,7 @@
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { sortData } from "$lib/utils/sorting"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
-  import { findClosestValidity } from "$lib/utils/validities"
+  import { anchorFor, findClosestValidity } from "$lib/utils/validities"
   import { onMount } from "svelte"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
@@ -183,7 +183,7 @@
         return tenseFilter(obj, tense)
       })
       for (const u of filtered as unknown as ITUsers) {
-        const anchor = u.validity.from
+        const anchor = anchorFor(u.validity, $date)
         u.itsystem_response = resolve(u.itsystem_response, anchor)!
         u.primary_response = resolve(u.primary_response, anchor)
       }

@@ -9,7 +9,7 @@
   import { EngagementsDocument, type EngagementsQuery } from "./query.generated"
   import { date } from "$lib/stores/date"
   import { getITUserITSystemName } from "$lib/utils/display"
-  import { findClosestValidity } from "$lib/utils/validities"
+  import { anchorFor, findClosestValidity } from "$lib/utils/validities"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { sortData } from "$lib/utils/sorting"
@@ -217,7 +217,7 @@
         return true
       })
       for (const e of filtered as unknown as EnrichedRow[]) {
-        const anchor = e.validity.from
+        const anchor = anchorFor(e.validity, $date)
         e.person_response = resolve(e.person_response, anchor)
         e.job_function_response = resolve(e.job_function_response, anchor)
         e.engagement_type_response = resolve(e.engagement_type_response, anchor)

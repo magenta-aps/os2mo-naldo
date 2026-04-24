@@ -7,7 +7,11 @@
   import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { tenseToValidity, tenseFilter } from "$lib/utils/tenses"
-  import { findClosestValidity, formatQueryDates } from "$lib/utils/validities"
+  import {
+    anchorFor,
+    findClosestValidity,
+    formatQueryDates,
+  } from "$lib/utils/validities"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { ClassDocument, type ClassQuery } from "./query.generated"
@@ -96,7 +100,10 @@
         return tenseFilter(obj, tense)
       })
       for (const c of filtered as unknown as EnrichedRow[]) {
-        c.it_system_response = resolve(c.it_system_response, c.validity.from ?? $date)
+        c.it_system_response = resolve(
+          c.it_system_response,
+          anchorFor(c.validity, $date)
+        )
       }
       classes.push(...(filtered as unknown as EnrichedRow[]))
     }

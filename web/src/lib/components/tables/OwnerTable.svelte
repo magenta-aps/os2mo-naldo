@@ -20,7 +20,11 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
-  import { findClosestValidity, formatQueryDates } from "$lib/utils/validities"
+  import {
+    anchorFor,
+    findClosestValidity,
+    formatQueryDates,
+  } from "$lib/utils/validities"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
 
@@ -168,7 +172,7 @@
 
   const enrich = (rows: any[]) => {
     for (const o of rows) {
-      const anchor = o.validity.from
+      const anchor = anchorFor(o.validity, $date)
       o.person_response = resolve(o.person_response, anchor)
       o.org_unit_response = resolve(o.org_unit_response, anchor)
       o.owner_response = resolve(o.owner_response, anchor)
