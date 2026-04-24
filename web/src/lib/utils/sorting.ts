@@ -15,7 +15,7 @@ export const getValueAtPath = (obj: any, path: string) => {
   path = path.replace(/^\./, "") // strip a leading dot
   const pathKeys = path.split(".")
   for (const key of pathKeys) {
-    if (key in obj) {
+    if (obj != null && key in obj) {
       obj = obj[key]
     } else {
       return
