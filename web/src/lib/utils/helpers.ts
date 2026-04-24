@@ -18,7 +18,9 @@ export type ITUserITSystemName = {
 export const formatITUserITSystemName = (itusers: ITUserITSystemName[] | undefined) => {
   return itusers?.map((ituser) => ({
     uuid: ituser.uuid,
-    name: `${ituser.itsystem_response.current?.name}, ${ituser.user_key}`,
+    name: `${
+      ituser.itsystem_response.current?.name ?? ituser.itsystem_response.uuid
+    }, ${ituser.user_key}`,
     itsystem: { uuid: ituser.itsystem_response.uuid },
   }))
 }

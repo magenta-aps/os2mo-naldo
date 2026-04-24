@@ -130,9 +130,7 @@ describe("formatITUserITSystemName", () => {
     ])
   })
 
-  it("renders `undefined, user_key` when itsystem current is null (no fallback)", () => {
-    // Pinning the current behavior — this is ugly output but it's what
-    // the helper produces. Worth flagging as a display bug if it surfaces.
+  it("falls back to itsystem uuid when current is null", () => {
     const result = formatITUserITSystemName([
       {
         uuid: "u1",
@@ -140,7 +138,7 @@ describe("formatITUserITSystemName", () => {
         itsystem_response: { uuid: "s1", current: null },
       },
     ])
-    expect(result?.[0].name).toBe("undefined, bruce")
+    expect(result?.[0].name).toBe("s1, bruce")
   })
 
   it("returns undefined when input is undefined", () => {
