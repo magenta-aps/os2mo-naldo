@@ -16,8 +16,9 @@
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import {
+    type EnrichResponses,
     lookupDate,
-    findClosestValidity,
+    resolveCurrent,
     formatQueryDates,
   } from "$lib/utils/validities"
   import { updateGlobalNavigation } from "$lib/stores/navigation"
@@ -26,21 +27,11 @@
 
   export let tense: Tense
 
-  // Row validities are enriched post-fetch with a `current` field on each
-  // related _response, resolved at the row's own `validity.from`.
-  type Current<T> = T extends { validities: Array<infer V> } ? V : never
-  type WithCurrent<T> = T extends null | undefined
-    ? T
-    : T & { current?: Current<T> | null }
   type Row = ItAssociationsQuery["associations"]["objects"][0]["validities"][number]
-  type EnrichedRow = Omit<
+  type EnrichedRow = EnrichResponses<
     Row,
     "org_unit_response" | "job_function_response" | "primary_response"
-  > & {
-    org_unit_response: WithCurrent<Row["org_unit_response"]>
-    job_function_response: WithCurrent<Row["job_function_response"]>
-    primary_response: WithCurrent<Row["primary_response"]>
-  }
+  >
   type ItAssociations = EnrichedRow[]
   let data: ItAssociations
 
@@ -117,16 +108,6 @@
     }
   }
 
-  // Resolves a related _response's `current` at the row's own anchor date so
-  // past rows show the state the related object had at the time, not today's.
-  const resolve = <T extends { validities: any[] } | null | undefined>(
-    response: T,
-    anchor: string
-  ) =>
-    response
-      ? { ...response, current: findClosestValidity(response.validities, anchor) }
-      : response
-
   onMount(async () => {
     const res = await graphQLClient().request(ItAssociationsDocument, {
       employee: uuid,
@@ -142,9 +123,9 @@
       })
       for (const a of filtered as unknown as EnrichedRow[]) {
         const anchor = lookupDate(a.validity, $date)
-        a.org_unit_response = resolve(a.org_unit_response, anchor)!
-        a.job_function_response = resolve(a.job_function_response, anchor)
-        a.primary_response = resolve(a.primary_response, anchor)
+        a.org_unit_response = resolveCurrent(a.org_unit_response, anchor)!
+        a.job_function_response = resolveCurrent(a.job_function_response, anchor)
+        a.primary_response = resolveCurrent(a.primary_response, anchor)
       }
       itAssociations.push(...(filtered as unknown as EnrichedRow[]))
     }

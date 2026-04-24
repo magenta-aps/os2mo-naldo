@@ -9,7 +9,13 @@
   import { EngagementsDocument, type EngagementsQuery } from "./query.generated"
   import { date } from "$lib/stores/date"
   import { getITUserITSystemName } from "$lib/utils/display"
-  import { lookupDate, findClosestValidity } from "$lib/utils/validities"
+  import {
+    type EnrichResponses,
+    type WithCurrent,
+    lookupDate,
+    findClosestValidity,
+    resolveCurrent,
+  } from "$lib/utils/validities"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { sortData } from "$lib/utils/sorting"
@@ -22,29 +28,15 @@
   import { updateGlobalNavigation } from "$lib/stores/navigation"
   import { env } from "$lib/env"
 
-  // Row validities are enriched post-fetch with a `current` field on each
-  // related _response, resolved at the row's own `validity.from`.
-  type Current<T> = T extends { validities: Array<infer V> } ? V : never
-  type WithCurrent<T> = T extends null | undefined
-    ? T
-    : T & { current?: Current<T> | null }
   type Row = EngagementsQuery["engagements"]["objects"][0]["validities"][number]
-  type EnrichedRow = Omit<
+  type EnrichedRow = EnrichResponses<
     Row,
     | "person_response"
     | "job_function_response"
     | "engagement_type_response"
     | "org_unit_response"
     | "primary_response"
-    | "itusers"
-    | "managers"
   > & {
-    person_response: WithCurrent<Row["person_response"]>
-    job_function_response: WithCurrent<Row["job_function_response"]>
-    engagement_type_response: WithCurrent<Row["engagement_type_response"]>
-    org_unit_response: WithCurrent<Row["org_unit_response"]>
-    primary_response: WithCurrent<Row["primary_response"]>
-    itusers: Row["itusers"]
     managers:
       | Array<{
           person_response: WithCurrent<
@@ -186,16 +178,6 @@
     }
   }
 
-  // Resolves a related _response's `current` at the row's own anchor date so
-  // past rows show the state the related object had at the time, not today's.
-  const resolve = <T extends { validities: any[] } | null | undefined>(
-    response: T,
-    anchor: string
-  ) =>
-    response
-      ? { ...response, current: findClosestValidity(response.validities, anchor) }
-      : response
-
   onMount(async () => {
     const res = await graphQLClient().request(EngagementsDocument, {
       org_unit: org_unit,
@@ -218,15 +200,15 @@
       })
       for (const e of filtered as unknown as EnrichedRow[]) {
         const anchor = lookupDate(e.validity, $date)
-        e.person_response = resolve(e.person_response, anchor)
-        e.job_function_response = resolve(e.job_function_response, anchor)
-        e.engagement_type_response = resolve(e.engagement_type_response, anchor)
-        e.org_unit_response = resolve(e.org_unit_response, anchor)
-        e.primary_response = resolve(e.primary_response, anchor)
+        e.person_response = resolveCurrent(e.person_response, anchor)
+        e.job_function_response = resolveCurrent(e.job_function_response, anchor)
+        e.engagement_type_response = resolveCurrent(e.engagement_type_response, anchor)
+        e.org_unit_response = resolveCurrent(e.org_unit_response, anchor)
+        e.primary_response = resolveCurrent(e.primary_response, anchor)
         if (e.managers) {
           e.managers = e.managers.map((m: any) => ({
             ...m,
-            person_response: resolve(m.person_response, anchor),
+            person_response: resolveCurrent(m.person_response, anchor),
           })) as typeof e.managers
         }
       }

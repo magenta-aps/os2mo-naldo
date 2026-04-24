@@ -16,8 +16,10 @@
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import {
+    type WithCurrent,
     lookupDate,
     findClosestValidity,
+    resolveCurrent,
     formatQueryDates,
   } from "$lib/utils/validities"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
@@ -26,12 +28,6 @@
   export let tense: Tense
 
   const uuid = $page.params.uuid
-  // Row validities are enriched post-fetch with a `current` field on each
-  // related _response, resolved at the row's own lookupDate.
-  type Current<T> = T extends { validities: Array<infer V> } ? V : never
-  type WithCurrent<T> = T extends null | undefined
-    ? T
-    : T & { current?: Current<T> | null }
   type Row = EmployeeLeavesQuery["leaves"]["objects"][0]["validities"][number]
   // engagement_response is resolved in two passes: first we pick the
   // engagement validity closest to the leave's lookupDate, then within it
@@ -125,16 +121,6 @@
     }
   }
 
-  // Resolves a related _response's `current` at the row's own anchor date so
-  // past rows show the state the related object had at the time, not today's.
-  const resolve = <T extends { validities: any[] } | null | undefined>(
-    response: T,
-    anchor: string
-  ) =>
-    response
-      ? { ...response, current: findClosestValidity(response.validities, anchor) }
-      : response
-
   onMount(async () => {
     const res = await graphQLClient().request(EmployeeLeavesDocument, {
       employee_uuid: uuid,
@@ -150,7 +136,7 @@
       })
       for (const l of filtered as unknown as EnrichedRow[]) {
         const anchor = lookupDate(l.validity, $date)
-        l.leave_type_response = resolve(l.leave_type_response, anchor)!
+        l.leave_type_response = resolveCurrent(l.leave_type_response, anchor)!
 
         // engagement_response: pick the engagement validity closest to the
         // leave's anchor, then resolve the nested classes at that engagement
@@ -163,11 +149,11 @@
             const engagementAnchor = lookupDate(engagementCurrent.validity, $date)
             engagement.current = {
               ...engagementCurrent,
-              org_unit_response: resolve(
+              org_unit_response: resolveCurrent(
                 engagementCurrent.org_unit_response,
                 engagementAnchor
               )!,
-              job_function_response: resolve(
+              job_function_response: resolveCurrent(
                 engagementCurrent.job_function_response,
                 engagementAnchor
               )!,

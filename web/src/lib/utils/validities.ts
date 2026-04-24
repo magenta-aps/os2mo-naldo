@@ -81,6 +81,28 @@ export const lookupDate = (
   return today
 }
 
+// Type helpers for enriching a row's related `_response` fields with a
+// synthetic `current` computed from `validities` + `findClosestValidity`.
+// Injecting `current` ourselves lets templates keep reading `.current?.name`
+// (and sort paths keep working) while the value comes from our own lookup
+// rather than the server's `current(at:)` which resolves at today for any
+// nullish `at`.
+export type Current<T> = T extends { validities: Array<infer V> } ? V : never
+export type WithCurrent<T> = T extends null | undefined
+  ? T
+  : T & { current?: Current<T> | null }
+export type EnrichResponses<Row, Keys extends keyof Row> = Omit<Row, Keys> & {
+  [K in Keys]: WithCurrent<Row[K]>
+}
+
+export const resolveCurrent = <T extends { validities: any[] } | null | undefined>(
+  response: T,
+  anchor: string
+) =>
+  response
+    ? { ...response, current: findClosestValidity(response.validities, anchor) }
+    : response
+
 // Setting `validities: any` to avoid having to create the types in `Search.svelte` by hand
 export const findClosestValidity = (validities: any, date: string) => {
   // Return early if only 1 validity is present (this should always be the case, unless `PUBLIC_SEARCH_INFINITY: "true"`)

@@ -10,7 +10,12 @@
   import { date } from "$lib/stores/date"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { sortData } from "$lib/utils/sorting"
-  import { lookupDate, findClosestValidity } from "$lib/utils/validities"
+  import {
+    type EnrichResponses,
+    lookupDate,
+    findClosestValidity,
+    resolveCurrent,
+  } from "$lib/utils/validities"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { onMount } from "svelte"
   import Icon from "@iconify/svelte"
@@ -21,17 +26,8 @@
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
 
-  // Row validities are enriched post-fetch with a `current` field on each
-  // related _response, resolved at the row's own `validity.from`.
-  type Current<T> = T extends { validities: Array<infer V> } ? V : never
-  type WithCurrent<T> = T extends null | undefined
-    ? T
-    : T & { current?: Current<T> | null }
   type Row = EmployeeItUsersQuery["itusers"]["objects"][0]["validities"][number]
-  type EnrichedRow = Omit<Row, "itsystem_response" | "primary_response"> & {
-    itsystem_response: WithCurrent<Row["itsystem_response"]>
-    primary_response: WithCurrent<Row["primary_response"]>
-  }
+  type EnrichedRow = EnrichResponses<Row, "itsystem_response" | "primary_response">
   type ITUsers = EnrichedRow[]
   let data: ITUsers
 
@@ -111,16 +107,6 @@
     }
   }
 
-  // Resolves a related _response's `current` at the row's own anchor date so
-  // past rows show the state the related object had at the time, not today's.
-  const resolve = <T extends { validities: any[] } | null | undefined>(
-    response: T,
-    anchor: string
-  ) =>
-    response
-      ? { ...response, current: findClosestValidity(response.validities, anchor) }
-      : response
-
   onMount(async () => {
     const res = await graphQLClient().request(EmployeeItUsersDocument, {
       employee: uuid,
@@ -136,8 +122,8 @@
       })
       for (const u of filtered as unknown as EnrichedRow[]) {
         const anchor = lookupDate(u.validity, $date)
-        u.itsystem_response = resolve(u.itsystem_response, anchor)!
-        u.primary_response = resolve(u.primary_response, anchor)
+        u.itsystem_response = resolveCurrent(u.itsystem_response, anchor)!
+        u.primary_response = resolveCurrent(u.primary_response, anchor)
       }
       itUsers.push(...(filtered as unknown as EnrichedRow[]))
     }

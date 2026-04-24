@@ -21,19 +21,16 @@
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import {
+    type WithCurrent,
     lookupDate,
-    findClosestValidity,
+    resolveCurrent,
     formatQueryDates,
   } from "$lib/utils/validities"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
 
-  // Row validities are enriched post-fetch with a `current` field on each
-  // related _response, resolved at the row's own `validity.from`.
-  type Current<T> = T extends { validities: Array<infer V> } ? V : never
-  type WithCurrent<T> = T extends null | undefined
-    ? T
-    : T & { current?: Current<T> | null }
+  // Union of two row shapes (employee owner / org unit owner) share the same
+  // enrichment fields, but different parents — define locally.
   type Enrich<
     T extends {
       person_response?: any
@@ -160,22 +157,12 @@
     }
   }
 
-  // Resolves a related _response's `current` at the row's own anchor date so
-  // past rows show the state the related object had at the time, not today's.
-  const resolve = <T extends { validities: any[] } | null | undefined>(
-    response: T,
-    anchor: string
-  ) =>
-    response
-      ? { ...response, current: findClosestValidity(response.validities, anchor) }
-      : response
-
   const enrich = (rows: any[]) => {
     for (const o of rows) {
       const anchor = lookupDate(o.validity, $date)
-      o.person_response = resolve(o.person_response, anchor)
-      o.org_unit_response = resolve(o.org_unit_response, anchor)
-      o.owner_response = resolve(o.owner_response, anchor)
+      o.person_response = resolveCurrent(o.person_response, anchor)
+      o.org_unit_response = resolveCurrent(o.org_unit_response, anchor)
+      o.owner_response = resolveCurrent(o.owner_response, anchor)
     }
     return rows
   }
