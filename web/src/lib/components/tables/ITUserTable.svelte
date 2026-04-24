@@ -21,7 +21,18 @@
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
 
-  type ITUsers = EmployeeItUsersQuery["itusers"]["objects"][0]["validities"]
+  // Row validities are enriched post-fetch with a `current` field on each
+  // related _response, resolved at the row's own `validity.from`.
+  type Current<T> = T extends { validities: Array<infer V> } ? V : never
+  type WithCurrent<T> = T extends null | undefined
+    ? T
+    : T & { current?: Current<T> | null }
+  type Row = EmployeeItUsersQuery["itusers"]["objects"][0]["validities"][number]
+  type EnrichedRow = Omit<Row, "itsystem_response" | "primary_response"> & {
+    itsystem_response: WithCurrent<Row["itsystem_response"]>
+    primary_response: WithCurrent<Row["primary_response"]>
+  }
+  type ITUsers = EnrichedRow[]
   let data: ITUsers
 
   export let tense: Tense
@@ -43,8 +54,12 @@
             uuid
             itsystem_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             external_id
@@ -76,8 +91,12 @@
             }
             primary_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
           }
@@ -92,6 +111,16 @@
     }
   }
 
+  // Resolves a related _response's `current` at the row's own anchor date so
+  // past rows show the state the related object had at the time, not today's.
+  const resolve = <T extends { validities: any[] } | null | undefined>(
+    response: T,
+    anchor: string
+  ) =>
+    response
+      ? { ...response, current: findClosestValidity(response.validities, anchor) }
+      : response
+
   onMount(async () => {
     const res = await graphQLClient().request(EmployeeItUsersDocument, {
       employee: uuid,
@@ -105,7 +134,12 @@
       const filtered = outer.validities.filter((obj) => {
         return tenseFilter(obj, tense)
       })
-      itUsers.push(...filtered)
+      for (const u of filtered as unknown as EnrichedRow[]) {
+        const anchor = u.validity.from
+        u.itsystem_response = resolve(u.itsystem_response, anchor)!
+        u.primary_response = resolve(u.primary_response, anchor)
+      }
+      itUsers.push(...(filtered as unknown as EnrichedRow[]))
     }
     data = itUsers
   })
