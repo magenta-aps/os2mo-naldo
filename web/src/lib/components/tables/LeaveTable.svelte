@@ -27,14 +27,33 @@
 
   const uuid = $page.params.uuid
   // Row validities are enriched post-fetch with a `current` field on each
-  // related _response, resolved at the row's own `validity.from`.
+  // related _response, resolved at the row's own lookupDate.
   type Current<T> = T extends { validities: Array<infer V> } ? V : never
   type WithCurrent<T> = T extends null | undefined
     ? T
     : T & { current?: Current<T> | null }
   type Row = EmployeeLeavesQuery["leaves"]["objects"][0]["validities"][number]
-  type EnrichedRow = Omit<Row, "leave_type_response"> & {
+  // engagement_response is resolved in two passes: first we pick the
+  // engagement validity closest to the leave's lookupDate, then within it
+  // we enrich the nested org_unit/job_function at the engagement's own
+  // lookupDate. That way a leave pointing at a terminated engagement still
+  // renders the engagement's historical fields instead of blank.
+  type EngagementValidity = NonNullable<
+    Row["engagement_response"]
+  >["validities"][number]
+  type EnrichedEngagementCurrent = Omit<
+    EngagementValidity,
+    "org_unit_response" | "job_function_response"
+  > & {
+    org_unit_response: WithCurrent<EngagementValidity["org_unit_response"]>
+    job_function_response: WithCurrent<EngagementValidity["job_function_response"]>
+  }
+  type EnrichedRow = Omit<Row, "leave_type_response" | "engagement_response"> & {
     leave_type_response: WithCurrent<Row["leave_type_response"]>
+    engagement_response:
+      | (Row["engagement_response"] & { current: EnrichedEngagementCurrent | null })
+      | null
+      | undefined
   }
   type Leaves = EnrichedRow[]
   let data: Leaves
@@ -67,16 +86,29 @@
             }
             engagement_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
+                validity {
+                  from
+                  to
+                }
                 org_unit_response {
                   uuid
-                  current(at: $fromDate) {
+                  validities(start: null, end: null) {
                     name
+                    validity {
+                      from
+                      to
+                    }
                   }
                 }
                 job_function_response {
-                  current(at: $fromDate) {
+                  uuid
+                  validities(start: null, end: null) {
                     name
+                    validity {
+                      from
+                      to
+                    }
                   }
                 }
               }
@@ -117,10 +149,33 @@
         return tenseFilter(obj, tense)
       })
       for (const l of filtered as unknown as EnrichedRow[]) {
-        l.leave_type_response = resolve(
-          l.leave_type_response,
-          lookupDate(l.validity, $date)
-        )!
+        const anchor = lookupDate(l.validity, $date)
+        l.leave_type_response = resolve(l.leave_type_response, anchor)!
+
+        // engagement_response: pick the engagement validity closest to the
+        // leave's anchor, then resolve the nested classes at that engagement
+        // validity's OWN lookupDate. `engagement` here is a snapshot of the
+        // engagement at a past point in time, not "today".
+        const engagement = l.engagement_response
+        if (engagement) {
+          const engagementCurrent = findClosestValidity(engagement.validities, anchor)
+          if (engagementCurrent) {
+            const engagementAnchor = lookupDate(engagementCurrent.validity, $date)
+            engagement.current = {
+              ...engagementCurrent,
+              org_unit_response: resolve(
+                engagementCurrent.org_unit_response,
+                engagementAnchor
+              )!,
+              job_function_response: resolve(
+                engagementCurrent.job_function_response,
+                engagementAnchor
+              )!,
+            }
+          } else {
+            engagement.current = null
+          }
+        }
       }
       leaves.push(...(filtered as unknown as EnrichedRow[]))
     }
@@ -142,8 +197,10 @@
         {leave.leave_type_response?.current?.name ?? leave.leave_type_response?.uuid}
       </td>
       <td class="text-sm p-4">
-        {leave.engagement_response?.current?.job_function_response?.current?.name}, {leave
-          .engagement_response?.current?.org_unit_response?.current?.name}
+        {leave.engagement_response?.current?.job_function_response?.current?.name ??
+          leave.engagement_response?.current?.job_function_response?.uuid}, {leave
+          .engagement_response?.current?.org_unit_response?.current?.name ??
+          leave.engagement_response?.current?.org_unit_response?.uuid}
       </td>
       <ValidityTableCell validity={leave.validity} />
       <td class="flex p-4 gap-2 justify-end">
