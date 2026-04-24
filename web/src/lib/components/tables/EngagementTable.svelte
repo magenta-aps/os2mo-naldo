@@ -22,7 +22,39 @@
   import { updateGlobalNavigation } from "$lib/stores/navigation"
   import { env } from "$lib/env"
 
-  type Engagements = EngagementsQuery["engagements"]["objects"][0]["validities"]
+  // Row validities are enriched post-fetch with a `current` field on each
+  // related _response, resolved at the row's own `validity.from`.
+  type Current<T> = T extends { validities: Array<infer V> } ? V : never
+  type WithCurrent<T> = T extends null | undefined
+    ? T
+    : T & { current?: Current<T> | null }
+  type Row = EngagementsQuery["engagements"]["objects"][0]["validities"][number]
+  type EnrichedRow = Omit<
+    Row,
+    | "person_response"
+    | "job_function_response"
+    | "engagement_type_response"
+    | "org_unit_response"
+    | "primary_response"
+    | "itusers"
+    | "managers"
+  > & {
+    person_response: WithCurrent<Row["person_response"]>
+    job_function_response: WithCurrent<Row["job_function_response"]>
+    engagement_type_response: WithCurrent<Row["engagement_type_response"]>
+    org_unit_response: WithCurrent<Row["org_unit_response"]>
+    primary_response: WithCurrent<Row["primary_response"]>
+    itusers: Row["itusers"]
+    managers:
+      | Array<{
+          person_response: WithCurrent<
+            NonNullable<Row["managers"]>[number]["person_response"]
+          >
+        }>
+      | null
+      | undefined
+  }
+  type Engagements = EnrichedRow[]
   let data: Engagements
 
   export let tense: Tense
@@ -58,23 +90,35 @@
             org_unit_uuid
             person_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             job_function_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
                 user_key
+                validity {
+                  from
+                  to
+                }
               }
             }
             extension_1
             extension_4
             engagement_type_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             itusers(filter: { from_date: $fromDate, to_date: $toDate }) {
@@ -96,15 +140,23 @@
             }
             org_unit_response @skip(if: $isOrg) {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             managers(inherit: $inherit, exclude_self: true) @skip(if: $isOrg) {
               person_response {
                 uuid
-                current(at: $fromDate) {
+                validities(start: null, end: null) {
                   name
+                  validity {
+                    from
+                    to
+                  }
                 }
               }
             }
@@ -114,8 +166,12 @@
             }
             primary_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
           }
@@ -129,6 +185,16 @@
       data = sortData(data, $sortKey, $sortDirection)
     }
   }
+
+  // Resolves a related _response's `current` at the row's own anchor date so
+  // past rows show the state the related object had at the time, not today's.
+  const resolve = <T extends { validities: any[] } | null | undefined>(
+    response: T,
+    anchor: string
+  ) =>
+    response
+      ? { ...response, current: findClosestValidity(response.validities, anchor) }
+      : response
 
   onMount(async () => {
     const res = await graphQLClient().request(EngagementsDocument, {
@@ -150,7 +216,21 @@
         if (isOrg && obj.org_unit_uuid !== $page.params.uuid) return false
         return true
       })
-      engagements.push(...filtered)
+      for (const e of filtered as unknown as EnrichedRow[]) {
+        const anchor = e.validity.from
+        e.person_response = resolve(e.person_response, anchor)
+        e.job_function_response = resolve(e.job_function_response, anchor)
+        e.engagement_type_response = resolve(e.engagement_type_response, anchor)
+        e.org_unit_response = resolve(e.org_unit_response, anchor)
+        e.primary_response = resolve(e.primary_response, anchor)
+        if (e.managers) {
+          e.managers = e.managers.map((m: any) => ({
+            ...m,
+            person_response: resolve(m.person_response, anchor),
+          })) as typeof e.managers
+        }
+      }
+      engagements.push(...(filtered as unknown as EnrichedRow[]))
     }
     data = engagements
   })
