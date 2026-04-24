@@ -7,7 +7,7 @@
   import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { tenseToValidity, tenseFilter } from "$lib/utils/tenses"
-  import { formatQueryDates } from "$lib/utils/validities"
+  import { findClosestValidity, formatQueryDates } from "$lib/utils/validities"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { ClassDocument, type ClassQuery } from "./query.generated"
@@ -18,7 +18,17 @@
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
 
-  type Classes = ClassQuery["classes"]["objects"][0]["validities"]
+  // Row validities are enriched post-fetch with a `current` field on each
+  // related _response, resolved at the row's own `validity.from`.
+  type Current<T> = T extends { validities: Array<infer V> } ? V : never
+  type WithCurrent<T> = T extends null | undefined
+    ? T
+    : T & { current?: Current<T> | null }
+  type Row = ClassQuery["classes"]["objects"][0]["validities"][number]
+  type EnrichedRow = Omit<Row, "it_system_response"> & {
+    it_system_response: WithCurrent<Row["it_system_response"]>
+  }
+  type Classes = EnrichedRow[]
   let data: Classes
 
   export let tense: Tense
@@ -38,8 +48,12 @@
             facet_uuid
             it_system_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             validity {
@@ -58,6 +72,16 @@
     }
   }
 
+  // Resolves a related _response's `current` at the row's own anchor date so
+  // past rows show the state the related object had at the time, not today's.
+  const resolve = <T extends { validities: any[] } | null | undefined>(
+    response: T,
+    anchor: string
+  ) =>
+    response
+      ? { ...response, current: findClosestValidity(response.validities, anchor) }
+      : response
+
   const getClasses = async (facetUuid: string) => {
     const res = await graphQLClient().request(ClassDocument, {
       facetUuid: facetUuid,
@@ -71,7 +95,10 @@
       const filtered = outer.validities.filter((obj) => {
         return tenseFilter(obj, tense)
       })
-      classes.push(...filtered)
+      for (const c of filtered as unknown as EnrichedRow[]) {
+        c.it_system_response = resolve(c.it_system_response, c.validity.from ?? $date)
+      }
+      classes.push(...(filtered as unknown as EnrichedRow[]))
     }
     data = classes
   }
