@@ -26,7 +26,18 @@
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
 
-  type Addresses = AddressQuery["addresses"]["objects"][0]["validities"]
+  // Row validities are enriched post-fetch with a `current` field on each
+  // related _response, resolved at the row's own `validity.from`.
+  type Current<T> = T extends { validities: Array<infer V> } ? V : never
+  type WithCurrent<T> = T extends null | undefined
+    ? T
+    : T & { current?: Current<T> | null }
+  type Row = AddressQuery["addresses"]["objects"][0]["validities"][number]
+  type EnrichedRow = Omit<Row, "address_type_response" | "visibility_response"> & {
+    address_type_response: WithCurrent<Row["address_type_response"]>
+    visibility_response: WithCurrent<Row["visibility_response"]>
+  }
+  type Addresses = EnrichedRow[]
   let data: Addresses
 
   gql`
@@ -52,8 +63,12 @@
             value
             address_type_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             ituser_response {
@@ -75,8 +90,12 @@
             }
             visibility_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             validity {
@@ -95,6 +114,16 @@
     }
   }
 
+  // Resolves a related _response's `current` at the row's own anchor date so
+  // past rows show the state the related object had at the time, not today's.
+  const resolve = <T extends { validities: any[] } | null | undefined>(
+    response: T,
+    anchor: string
+  ) =>
+    response
+      ? { ...response, current: findClosestValidity(response.validities, anchor) }
+      : response
+
   onMount(async () => {
     const res = await graphQLClient().request(AddressDocument, {
       org_unit: org_unit,
@@ -109,7 +138,12 @@
       const filtered = outer.validities.filter((obj) => {
         return tenseFilter(obj, tense)
       })
-      addresses.push(...filtered)
+      for (const a of filtered as unknown as EnrichedRow[]) {
+        const anchor = a.validity.from
+        a.address_type_response = resolve(a.address_type_response, anchor)!
+        a.visibility_response = resolve(a.visibility_response, anchor)
+      }
+      addresses.push(...(filtered as unknown as EnrichedRow[]))
     }
     data = addresses
   })
