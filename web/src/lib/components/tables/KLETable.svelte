@@ -15,11 +15,24 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
-  import { formatQueryDates } from "$lib/utils/validities"
+  import { findClosestValidity, formatQueryDates } from "$lib/utils/validities"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
 
-  type KLEs = KleQuery["kles"]["objects"][0]["validities"]
+  // Row validities are enriched post-fetch with a `current` field on each
+  // related _response, resolved at the row's own `validity.from`.
+  type Current<T> = T extends { validities: Array<infer V> } ? V : never
+  type WithCurrent<T> = T extends null | undefined
+    ? T
+    : T & { current?: Current<T> | null }
+  type Row = KleQuery["kles"]["objects"][0]["validities"][number]
+  type EnrichedRow = Omit<Row, "kle_number_response" | "kle_aspects_response"> & {
+    kle_number_response: WithCurrent<Row["kle_number_response"]>
+    kle_aspects_response: {
+      objects: Array<WithCurrent<Row["kle_aspects_response"]["objects"][number]>>
+    }
+  }
+  type KLEs = EnrichedRow[]
   let data: KLEs
 
   export let tense: Tense
@@ -34,16 +47,24 @@
             uuid
             kle_number_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
                 user_key
+                validity {
+                  from
+                  to
+                }
               }
             }
             kle_aspects_response {
               objects {
                 uuid
-                current(at: $fromDate) {
+                validities(start: null, end: null) {
                   name
+                  validity {
+                    from
+                    to
+                  }
                 }
               }
             }
@@ -62,6 +83,16 @@
     }
   }
 
+  // Resolves a related _response's `current` at the row's own anchor date so
+  // past rows show the state the related object had at the time, not today's.
+  const resolve = <T extends { validities: any[] } | null | undefined>(
+    response: T,
+    anchor: string
+  ) =>
+    response
+      ? { ...response, current: findClosestValidity(response.validities, anchor) }
+      : response
+
   onMount(async () => {
     const res = await graphQLClient().request(KleDocument, {
       org_unit: uuid,
@@ -76,7 +107,14 @@
       const filtered = outer.validities.filter((obj) => {
         return tenseFilter(obj, tense)
       })
-      kles.push(...filtered)
+      for (const k of filtered as unknown as EnrichedRow[]) {
+        const anchor = k.validity.from
+        k.kle_number_response = resolve(k.kle_number_response, anchor)!
+        k.kle_aspects_response.objects = k.kle_aspects_response.objects.map(
+          (a) => resolve(a, anchor)!
+        )
+      }
+      kles.push(...(filtered as unknown as EnrichedRow[]))
     }
     data = kles
   })
