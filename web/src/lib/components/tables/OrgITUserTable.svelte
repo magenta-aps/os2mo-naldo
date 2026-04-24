@@ -21,12 +21,25 @@
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
 
+  // Row validities are enriched post-fetch with a `current` field on each
+  // related _response, resolved at the row's own `validity.from`.
+  type Current<T> = T extends { validities: Array<infer V> } ? V : never
+  type WithCurrent<T> = T extends null | undefined
+    ? T
+    : T & { current?: Current<T> | null }
+  type Enrich<T extends { itsystem_response: any; primary_response?: any }> = Omit<
+    T,
+    "itsystem_response" | "primary_response"
+  > & {
+    itsystem_response: WithCurrent<T["itsystem_response"]>
+    primary_response: WithCurrent<T["primary_response"]>
+  }
   // Note: [number] in this case, does not mean the type `number`
   type EngagementITUser =
     OrgUnitItUsersQuery["byEngagement"]["objects"][0]["validities"][number]
   type OrgUnitITUser =
     OrgUnitItUsersQuery["byOrgUnit"]["objects"][0]["validities"][number]
-  type ITUsers = Array<EngagementITUser | OrgUnitITUser>
+  type ITUsers = Array<Enrich<EngagementITUser> | Enrich<OrgUnitITUser>>
   let data: ITUsers
 
   export let tense: Tense
@@ -49,8 +62,12 @@
             external_id
             itsystem_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             engagements(filter: { from_date: $fromDate, to_date: $toDate }) {
@@ -81,8 +98,12 @@
             }
             primary_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
           }
@@ -102,8 +123,12 @@
             external_id
             itsystem_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             validity {
@@ -112,8 +137,12 @@
             }
             primary_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
           }
@@ -127,6 +156,16 @@
       data = sortData(data, $sortKey, $sortDirection)
     }
   }
+
+  // Resolves a related _response's `current` at the row's own anchor date so
+  // past rows show the state the related object had at the time, not today's.
+  const resolve = <T extends { validities: any[] } | null | undefined>(
+    response: T,
+    anchor: string
+  ) =>
+    response
+      ? { ...response, current: findClosestValidity(response.validities, anchor) }
+      : response
 
   onMount(async () => {
     const res = await graphQLClient().request(OrgUnitItUsersDocument, {
@@ -143,7 +182,12 @@
       const filtered = outer.validities.filter((obj) => {
         return tenseFilter(obj, tense)
       })
-      itUsers.push(...filtered)
+      for (const u of filtered as unknown as ITUsers) {
+        const anchor = u.validity.from
+        u.itsystem_response = resolve(u.itsystem_response, anchor)!
+        u.primary_response = resolve(u.primary_response, anchor)
+      }
+      itUsers.push(...(filtered as unknown as ITUsers))
     }
     data = itUsers
   })
