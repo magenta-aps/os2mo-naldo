@@ -1,5 +1,18 @@
 import { graphQLClient } from "$lib/http/client"
 
+// Classifies an error thrown during a GraphQL request as safe-to-retry or
+// not. Covers the cases added in #68989: network blips (TypeError from
+// fetch), request timeouts (AbortSignal.timeout raises TimeoutError), and
+// expired keycloak signatures.
+export const isRetryableError = (error: any): boolean => {
+  const errorMessage = error?.response?.errors?.[0]?.message || error?.message
+  return (
+    error instanceof TypeError ||
+    error?.name === "TimeoutError" ||
+    !!errorMessage?.toLowerCase().includes("signature has expired")
+  )
+}
+
 export const paginateQuery = async (
   query: string,
   variableValues: Record<string, any> = {},
@@ -40,12 +53,8 @@ export const paginateQuery = async (
         } catch (error: any) {
           console.error("Error encountered during request:", error)
           const errorMessage = error?.response?.errors?.[0]?.message || error.message
-          const isRetryable =
-            error instanceof TypeError ||
-            error.name === "TimeoutError" ||
-            errorMessage?.toLowerCase().includes("signature has expired")
 
-          if (isRetryable && attempts < maxRetries) {
+          if (isRetryableError(error) && attempts < maxRetries) {
             console.warn(
               `Retrying request (${attempts + 1}/${maxRetries}) due to: ${errorMessage}`
             )

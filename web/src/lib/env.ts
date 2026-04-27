@@ -1,16 +1,16 @@
 import { env as dynamicEnv } from "$env/dynamic/public"
 
-const bool = (value: string | undefined, defaultValue = false): boolean => {
+export const bool = (value: string | undefined, defaultValue = false): boolean => {
   if (!value) return defaultValue
   if (value === "true") return true
   if (value === "false") return false
   throw new Error(`Invalid boolean env var: "${value}". Must be "true" or "false"`)
 }
 
-type Environment = "dev" | "test" | "prod"
+export type Environment = "dev" | "test" | "prod"
 const VALID_ENVIRONMENTS: Environment[] = ["dev", "test", "prod"]
 
-const environment = (
+export const environment = (
   value: string | undefined,
   defaultValue: Environment = "dev"
 ): Environment => {
@@ -23,7 +23,7 @@ const environment = (
   )
 }
 
-const json = <T>(value: string | undefined, defaultValue: T): T => {
+export const json = <T>(value: string | undefined, defaultValue: T): T => {
   if (!value) return defaultValue
   try {
     return JSON.parse(value) as T
