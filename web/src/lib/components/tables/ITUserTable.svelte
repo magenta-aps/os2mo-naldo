@@ -126,13 +126,17 @@
       <td class="text-sm p-4">{ituser.external_id ?? ""}</td>
       {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
         <td class="text-sm p-4">
-          {#each ituser.engagements as engagement}
-            {#if engagement.validities && engagement.validities.length}
-              {#each getEngagementTitlesAndUuid( [findClosestValidity(engagement.validities, $date)] ) as nameObj}
-                <div>{nameObj.name}</div>
-              {/each}
-            {/if}
-          {/each}
+          <ul>
+            {#each ituser.engagements as engagement}
+              {#if engagement.validities && engagement.validities.length}
+                {#each getEngagementTitlesAndUuid( [findClosestValidity(engagement.validities, $date)] ) as nameObj}
+                  <li>
+                    • {nameObj.name}
+                  </li>
+                {/each}
+              {/if}
+            {/each}
+          </ul>
         </td>
       {/if}
       <td class="text-sm p-4">{ituser.primary_response?.current?.name ?? ""}</td>
