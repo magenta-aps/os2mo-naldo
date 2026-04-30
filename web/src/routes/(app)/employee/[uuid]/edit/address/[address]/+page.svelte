@@ -30,7 +30,10 @@
   import { required, email, pattern } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { normalizeAddress } from "$lib/utils/normalizeForm"
-  import { formatITUserITSystemName } from "$lib/utils/helpers"
+  import {
+    formatITUserITSystemName,
+    formatITUserITSystemNames,
+  } from "$lib/utils/helpers"
   import { env } from "$lib/env"
 
   gql`
@@ -222,7 +225,7 @@
     })()
   }
 
-  let itusers: ReturnType<typeof formatITUserITSystemName> = []
+  let itusers: ReturnType<typeof formatITUserITSystemNames> = []
 
   const updateItUsers = async (
     employeeUuid: string | undefined | null,
@@ -236,7 +239,7 @@
       toDate: toDate,
     })
     itusers =
-      formatITUserITSystemName(res.itusers?.objects.map((e) => e.validities[0])) ?? []
+      formatITUserITSystemNames(res.itusers?.objects.map((e) => e.validities[0])) ?? []
   }
 
   let initialAddress: any = null
@@ -299,12 +302,8 @@
   </div>
 {:then data}
   {@const address = data.addresses.objects[0].validities[0]}
-  {@const currentItuser = address.ituser?.length
-    ? {
-        uuid: address.ituser[0].uuid,
-        name: `${address.ituser[0].itsystem_response.current?.name}, ${address.ituser[0].user_key}`,
-        itsystem: { uuid: address.ituser[0].itsystem_response.uuid },
-      }
+  {@const currentItuser = address.ituser?.[0]
+    ? formatITUserITSystemName(address.ituser[0])
     : undefined}
   {#if !initialAddress}
     {@html (() => {

@@ -14,7 +14,7 @@
     CreateAddressDocument,
     GetItUsersForAddressDocument,
   } from "./query.generated"
-  import { formatITUserITSystemName } from "$lib/utils/helpers"
+  import { formatITUserITSystemNames } from "$lib/utils/helpers"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
@@ -75,7 +75,7 @@
   let startDate: string = $date
   let toDate: string
   let addressType: { name: string; user_key: string; uuid: string; scope: string }
-  let itusers: ReturnType<typeof formatITUserITSystemName> = []
+  let itusers: ReturnType<typeof formatITUserITSystemNames> = []
 
   const updateItUsers = async (
     employeeUuid: string | undefined | null,
@@ -89,7 +89,7 @@
       toDate: toDate,
     })
     itusers =
-      formatITUserITSystemName(res.itusers?.objects.map((e) => e.validities[0])) ?? []
+      formatITUserITSystemNames(res.itusers?.objects.map((e) => e.validities[0])) ?? []
   }
   $: addressTypeUuid = addressType?.uuid
 

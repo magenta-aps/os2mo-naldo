@@ -3,6 +3,7 @@ import {
   capital,
   formatITSystemNames,
   formatITUserITSystemName,
+  formatITUserITSystemNames,
   formatKleNumberTitleAndUuid,
   isUUID,
   shouldSuffixSDCode,
@@ -138,8 +139,28 @@ describe("formatITSystemNames", () => {
 })
 
 describe("formatITUserITSystemName", () => {
-  it("formats 'itsystem-name, user_key' per entry, preserving order", () => {
-    const result = formatITUserITSystemName([
+  it("formats 'itsystem-name, user_key' for a single ituser", () => {
+    const result = formatITUserITSystemName({
+      uuid: "u1",
+      user_key: "bruce",
+      itsystem_response: { uuid: "s1", current: { name: "AD" } },
+    })
+    expect(result).toEqual({ uuid: "u1", name: "AD, bruce", itsystem: { uuid: "s1" } })
+  })
+
+  it("falls back to itsystem uuid when current is null", () => {
+    const result = formatITUserITSystemName({
+      uuid: "u1",
+      user_key: "bruce",
+      itsystem_response: { uuid: "s1", current: null },
+    })
+    expect(result.name).toBe("s1, bruce")
+  })
+})
+
+describe("formatITUserITSystemNames", () => {
+  it("maps the singular formatter over a list, preserving order", () => {
+    const result = formatITUserITSystemNames([
       {
         uuid: "u1",
         user_key: "bruce",
@@ -157,18 +178,7 @@ describe("formatITUserITSystemName", () => {
     ])
   })
 
-  it("falls back to itsystem uuid when current is null", () => {
-    const result = formatITUserITSystemName([
-      {
-        uuid: "u1",
-        user_key: "bruce",
-        itsystem_response: { uuid: "s1", current: null },
-      },
-    ])
-    expect(result?.[0].name).toBe("s1, bruce")
-  })
-
   it("returns undefined when input is undefined", () => {
-    expect(formatITUserITSystemName(undefined)).toBeUndefined()
+    expect(formatITUserITSystemNames(undefined)).toBeUndefined()
   })
 })

@@ -19,7 +19,7 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
-  import { formatITUserITSystemName, type UnpackedClass } from "$lib/utils/helpers"
+  import { formatITUserITSystemNames, type UnpackedClass } from "$lib/utils/helpers"
   import { getItuserValidities } from "$lib/http/getValidities"
   import { getRoleClasses } from "$lib/http/getClasses"
   import type { RoleBindingCreateInput } from "$lib/graphql/types"
@@ -149,7 +149,7 @@
           fromDate: startDate,
         })
         itUserOptions =
-          formatITUserITSystemName(
+          formatITUserITSystemNames(
             itUserResponse.employees.objects[0]?.validities?.flatMap(
               (v) => v.itusers ?? []
             )

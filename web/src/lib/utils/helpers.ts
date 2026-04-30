@@ -15,15 +15,16 @@ export type ITUserITSystemName = {
   }
 }
 
-export const formatITUserITSystemName = (itusers: ITUserITSystemName[] | undefined) => {
-  return itusers?.map((ituser) => ({
-    uuid: ituser.uuid,
-    name: `${
-      ituser.itsystem_response.current?.name ?? ituser.itsystem_response.uuid
-    }, ${ituser.user_key}`,
-    itsystem: { uuid: ituser.itsystem_response.uuid },
-  }))
-}
+export const formatITUserITSystemName = (ituser: ITUserITSystemName) => ({
+  uuid: ituser.uuid,
+  name: `${ituser.itsystem_response.current?.name ?? ituser.itsystem_response.uuid}, ${
+    ituser.user_key
+  }`,
+  itsystem: { uuid: ituser.itsystem_response.uuid },
+})
+
+export const formatITUserITSystemNames = (itusers: ITUserITSystemName[] | undefined) =>
+  itusers?.map(formatITUserITSystemName)
 
 // Used to display both job_function-name and org-name on a single line, for example, in a dropdown select.
 export type EngagementTitleAndUuid = {
