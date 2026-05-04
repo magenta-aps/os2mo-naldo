@@ -1294,30 +1294,17 @@ export type AddressTerminateInput = {
 };
 
 export type AddressUpdateInput = {
-  /** Type of the address. */
   address_type?: InputMaybe<Scalars['UUID']['input']>;
-  /**
-   * UUID for the related person.
-   * @deprecated Use 'person' instead. Will be removed in a future version of OS2mo.
-   */
+  /** @deprecated Use 'person' instead. Will be removed in a future version of OS2mo. */
   employee?: InputMaybe<Scalars['UUID']['input']>;
-  /** UUID for the related engagement. */
   engagement?: InputMaybe<Scalars['UUID']['input']>;
-  /** UUID for the related ituser. */
   ituser?: InputMaybe<Scalars['UUID']['input']>;
-  /** UUID for the related org unit. */
   org_unit?: InputMaybe<Scalars['UUID']['input']>;
-  /** UUID for the related person. */
   person?: InputMaybe<Scalars['UUID']['input']>;
-  /** User key of the address. If None, defaults to value */
   user_key?: InputMaybe<Scalars['String']['input']>;
-  /** UUID of the address we want to update. */
   uuid: Scalars['UUID']['input'];
-  /** Validity range for the org-unit. */
   validity: RaValidityInput;
-  /** The actual address value. */
   value?: InputMaybe<Scalars['String']['input']>;
-  /** Visibility for the address. */
   visibility?: InputMaybe<Scalars['UUID']['input']>;
 };
 
@@ -13668,6 +13655,9 @@ export type OrganisationUnit = {
   /**
    *
    * The top-unit (root) of the organisation unit, in the hierarchy.
+   *
+   * Note that this assumes that the unit had a unique root over all
+   * time. If this is not the case, an error will be thrown.
    *
    */
   root_response?: Maybe<OrganisationUnitResponse>;
