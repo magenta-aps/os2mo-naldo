@@ -161,8 +161,14 @@
           href="{base}/organisation/{$page.params.uuid}/create/{itActiveItem}"
           extraClasses="my-5"
         />
+      {:else if activeItem === OrgTab.RELATED_UNIT}
+        <Button
+          type="button"
+          title={capital($_("manage_connections"))}
+          href="{base}/connections/{$page.params.uuid}"
+          extraClasses="my-5"
+        />
       {:else}
-        <!-- Links are different on `org_unit` and `related`-tabs -->
         <Button
           type="button"
           title={capital(
@@ -170,9 +176,7 @@
               values: { item: $_(activeItem, { values: { n: 1 } }) },
             })
           )}
-          href="{base}/{activeItem === OrgTab.RELATED_UNIT
-            ? `connections/${$page.params.uuid}`
-            : `organisation/${$page.params.uuid}/create/${activeItem}`}"
+          href="{base}/organisation/{$page.params.uuid}/create/{activeItem}"
           extraClasses="my-5"
         />
       {/if}
