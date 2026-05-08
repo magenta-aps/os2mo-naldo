@@ -2,12 +2,10 @@
   import { _ } from "svelte-i18n"
   import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
-  import { onMount } from "svelte"
   import { OrgUnitChildrenDocument, type OrgUnitChildrenQuery } from "./query.generated"
   import Icon from "@iconify/svelte"
   import keyboardArrowDownRounded from "@iconify/icons-material-symbols/keyboard-arrow-down-rounded"
   import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
-  import RadioButton from "$lib/components/forms/shared/RadioButton.svelte"
   import { checkSDIdentifier } from "$lib/utils/helpers"
 
   type Child = {
@@ -23,8 +21,7 @@
   export let uuid = ""
   export let open = false
   export let fromDate: string
-  export let type: "checkbox" | "radio"
-  export let breadcrumbs: string[][] = []
+  export let openSet: Set<string> = new Set()
   export let selectedOriginOrg: string | null = null
   export let selectedDestinationOrgs: string[] = []
   export let has_children: boolean
@@ -57,55 +54,31 @@
     return res.org_units.objects
   }
 
-  const hasMatchingDescendant = (node: Child) => {
-    // Checks for children, and if there are children, checks recursively for match.
-    if (node.children) {
-      for (let child of node.children) {
-        if (
-          selectedDestinationOrgs.some((uuid) => uuid === child.uuid) ||
-          hasMatchingDescendant(child)
-        ) {
-          return true
-        }
-      }
-    }
-    return false
-  }
-
-  const expandToDestinationOrgs = async () => {
-    let shouldOpen = false
-
-    if (breadcrumbs.length) {
-      for (let i = 0; i < breadcrumbs.length; i++) {
-        let breadcrumb = breadcrumbs[i]
-
-        if (breadcrumb[0] === uuid) {
-          breadcrumbs[i] = breadcrumb.slice(1)
-          shouldOpen = true
-        }
-      }
-    }
-
-    if (shouldOpen) await toggleOpen()
+  // Auto-open this node whenever a fresh `openSet` says so (e.g. a new origin
+  // brings a new set of ancestors-to-expand). Compared against `appliedOpenSet`
+  // so user-driven manual toggles aren't undone on every reactive tick.
+  let appliedOpenSet: Set<string> | undefined
+  $: if (openSet !== appliedOpenSet) {
+    appliedOpenSet = openSet
+    if (openSet.has(uuid) && !open && !loading) toggleOpen()
   }
 
   const toggleOpen = async () => {
-    if (!open) {
-      loading = true
-
-      const res = await fetchChildren(uuid)
-
-      // Overwrite with the new layer of children
-      children = res.map((child) => child.validities[0])
-
-      loading = false
+    if (open) {
+      open = false
+      return
     }
-    open = !open
+    // Bail if a load is already running. Without this, two concurrent calls
+    // (e.g. the reactive firing for the prefill chain and again for the
+    // origin update) would each `open = !open` at the end and cancel out,
+    // leaving `open === false` and collapsing the node.
+    if (loading) return
+    loading = true
+    const res = await fetchChildren(uuid)
+    children = res.map((child) => child.validities[0])
+    loading = false
+    open = true
   }
-
-  onMount(async () => {
-    await expandToDestinationOrgs()
-  })
 </script>
 
 <li style="padding-left: {indent}px">
@@ -125,25 +98,15 @@
     {:else}
       <div class="w-5 h-5" />
     {/if}
-    {#if type === "radio"}
-      <RadioButton
-        id={uuid}
-        name="origin"
-        title={checkSDIdentifier(name, user_key)}
-        value={uuid}
-        noPadding={true}
-      />
-    {:else}
-      <Checkbox
-        id={uuid}
-        name="destination"
-        title={checkSDIdentifier(name, user_key)}
-        value={uuid}
-        checked={selectedDestinationOrgs.includes(uuid)}
-        disabled={!selectedOriginOrg || selectedOriginOrg === uuid}
-        noPadding={true}
-      />
-    {/if}
+    <Checkbox
+      id={uuid}
+      name="destination"
+      title={checkSDIdentifier(name, user_key)}
+      value={uuid}
+      checked={selectedDestinationOrgs.includes(uuid)}
+      disabled={!selectedOriginOrg || selectedOriginOrg === uuid}
+      noPadding={true}
+    />
   </div>
 </li>
 
@@ -153,8 +116,7 @@
       {...child}
       {selectedDestinationOrgs}
       {selectedOriginOrg}
-      {breadcrumbs}
-      {type}
+      {openSet}
       {fromDate}
       indent={indent + 24}
     />
