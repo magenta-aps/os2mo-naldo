@@ -2,7 +2,6 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
   import { graphQLClient } from "$lib/http/client"
-  import { fetchParentTree } from "$lib/http/parentTree"
   import Node from "./node.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
@@ -53,9 +52,15 @@
       related_units(filter: { org_unit: { uuids: $org_unit }, from_date: $fromDate }) {
         objects {
           validities {
-            org_units {
-              name
-              uuid
+            org_units_response {
+              objects {
+                uuid
+                current(at: $fromDate) {
+                  ancestors {
+                    uuid
+                  }
+                }
+              }
             }
             validity {
               from
@@ -109,22 +114,40 @@
     org: { uuid: string; name: string } | undefined,
     fromDate: string
   ) => {
-    const tree = await fetchOrgTree(fromDate)
-    if (!org) return { tree, destinations: [] as string[], openSet: new Set<string>() }
-    const res = await graphQLClient().request(RelatedUnitsDocument, {
-      fromDate: fromDate,
-      org_unit: org.uuid,
-    })
-    const destinations = res.related_units.objects.map((r) => {
-      const [a, b] = r.validities[0].org_units
-      return a.uuid === org.uuid ? b.uuid : a.uuid
-    })
-    const ancestors = await Promise.all(
-      destinations.map((uuid) =>
-        fetchParentTree(uuid, fromDate).then((p) => p.map((n) => n.uuid))
-      )
-    )
-    return { tree, destinations, openSet: new Set<string>(ancestors.flat()) }
+    if (!org)
+      return {
+        tree: await fetchOrgTree(fromDate),
+        destinations: [] as string[],
+        openSet: new Set<string>(),
+      }
+    // The tree (date only) and the relations (origin + date) are independent —
+    // fetch them together rather than serially.
+    const [tree, res] = await Promise.all([
+      fetchOrgTree(fromDate),
+      graphQLClient().request(RelatedUnitsDocument, {
+        fromDate: fromDate,
+        org_unit: org.uuid,
+      }),
+    ])
+    const destinations = new Set<string>()
+    const openSet = new Set<string>()
+    for (const r of res.related_units.objects) {
+      // A relation is a bijection of two units; pick the counterpart by UUID
+      // rather than assuming a clean [origin, dest] pair. The field can be
+      // short or empty when a unit was terminated/deleted while still related —
+      // this has actually happened in production via out-of-band data. Skip
+      // such relations: an absent row beats a crash (or rendering the origin as
+      // its own connection). Dedup via the Set so two relations to the same
+      // unit don't produce a duplicate keyed-each key.
+      const units = r.validities[0]?.org_units_response.objects ?? []
+      const dest = units.find((unit) => unit.uuid !== org.uuid)
+      if (!dest) continue
+      destinations.add(dest.uuid)
+      for (const ancestor of dest.current?.ancestors ?? []) {
+        openSet.add(ancestor.uuid)
+      }
+    }
+    return { tree, destinations: [...destinations], openSet }
   }
 
   // Optional prefill from `/connections/<uuid>`. buildState below waits on
