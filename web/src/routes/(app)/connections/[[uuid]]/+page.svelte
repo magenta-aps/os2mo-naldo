@@ -21,6 +21,8 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import { page } from "$app/stores"
+  import { goto } from "$app/navigation"
+  import { base } from "$app/paths"
 
   gql`
     query OrgUnit($uuid: [UUID!], $fromDate: DateTime) {
@@ -145,10 +147,14 @@
           try {
             const mutation = await graphQLClient().request(UpdateRelatedUnitsDocument, {
               input: result.data,
+              date: result.data.validity.from,
             })
             $success = {
               message: capital($_("connection_success")),
             }
+            goto(
+              `${base}/organisation/${mutation.related_units_update.uuid}#related_unit`
+            )
           } catch (err) {
             $error = { message: err }
           }
