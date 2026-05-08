@@ -173,8 +173,8 @@
 
 <form method="post" class="mx-6" use:enhance={handler}>
   <div class="rounded-sm min-w-fit bg-base-200">
-    <div class="p-8">
-      <div class="flex flex-row gap-6 w-1/2">
+    <div class="flex flex-col gap-6 p-8 sm:flex-row sm:items-start">
+      <div class="flex flex-col gap-6 w-full sm:w-1/4">
         <DateInput
           bind:value={startDate}
           bind:validationValue={$fromDate.value}
@@ -183,44 +183,39 @@
           id="from"
           required={true}
         />
-        <div class="basis-1/2" />
+        <Search
+          type="org-unit"
+          id="origin"
+          at={startDate}
+          bind:value={originOrgUnit}
+          startValue={originOrgUnit}
+          required={true}
+        />
       </div>
-      <div class="flex flex-col gap-6 w-full sm:flex-row">
-        <div class="w-1/2">
-          <Search
-            type="org-unit"
-            id="origin"
-            at={startDate}
-            bind:value={originOrgUnit}
-            startValue={originOrgUnit}
-            required={true}
-          />
-        </div>
-        <div class="w-1/2 relative">
-          {#if lastState}
-            <div class="overflow-y-auto max-h-[60vh]">
-              <ul class="py-4 w-full menu bg-base-100 text-base-content">
-                {#each lastState.tree as child}
-                  <Node
-                    {...child}
-                    openSet={lastState.openSet}
-                    selectedDestinationOrgs={lastState.destinations}
-                    {selectedOriginOrg}
-                  />
-                {/each}
-              </ul>
-            </div>
-          {/if}
-          {#await statePromise}
-            <div
-              class="flex justify-center items-center {lastState
-                ? 'absolute inset-0 bg-base-100/50 pointer-events-none'
-                : ''}"
-            >
-              <span class="loading loading-spinner" />
-            </div>
-          {/await}
-        </div>
+      <div class="w-full sm:flex-1 relative">
+        {#if lastState}
+          <div class="overflow-y-auto max-h-[60vh]">
+            <ul class="py-4 w-full menu bg-base-100 text-base-content">
+              {#each lastState.tree as child}
+                <Node
+                  {...child}
+                  openSet={lastState.openSet}
+                  selectedDestinationOrgs={lastState.destinations}
+                  {selectedOriginOrg}
+                />
+              {/each}
+            </ul>
+          </div>
+        {/if}
+        {#await statePromise}
+          <div
+            class="flex justify-center items-center {lastState
+              ? 'absolute inset-0 bg-base-100/50 pointer-events-none'
+              : ''}"
+          >
+            <span class="loading loading-spinner" />
+          </div>
+        {/await}
       </div>
     </div>
   </div>
