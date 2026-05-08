@@ -2,7 +2,6 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
   import { graphQLClient } from "$lib/http/client"
-  import { fetchParentTree } from "$lib/http/parentTree"
   import Node from "./node.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
@@ -53,9 +52,15 @@
       related_units(filter: { org_unit: { uuids: $org_unit }, from_date: $fromDate }) {
         objects {
           validities {
-            org_units {
-              name
-              uuid
+            org_units_response {
+              objects {
+                uuid
+                current(at: $fromDate) {
+                  ancestors {
+                    uuid
+                  }
+                }
+              }
             }
             validity {
               from
@@ -104,16 +109,17 @@
       fromDate: fromDate,
       org_unit: org.uuid,
     })
-    const destinations = res.related_units.objects.map((r) => {
-      const [a, b] = r.validities[0].org_units
-      return a.uuid === org.uuid ? b.uuid : a.uuid
-    })
-    const ancestors = await Promise.all(
-      destinations.map((uuid) =>
-        fetchParentTree(uuid, fromDate).then((p) => p.map((n) => n.uuid))
-      )
-    )
-    return { tree, destinations, openSet: new Set<string>(ancestors.flat()) }
+    const destinations: string[] = []
+    const openSet = new Set<string>()
+    for (const r of res.related_units.objects) {
+      const [a, b] = r.validities[0].org_units_response.objects
+      const dest = a.uuid === org.uuid ? b : a
+      destinations.push(dest.uuid)
+      for (const ancestor of dest.current?.ancestors ?? []) {
+        openSet.add(ancestor.uuid)
+      }
+    }
+    return { tree, destinations, openSet }
   }
 
   // Optional prefill from `/connections/<uuid>`. buildState below waits on
