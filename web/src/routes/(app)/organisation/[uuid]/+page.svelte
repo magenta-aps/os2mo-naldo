@@ -171,7 +171,7 @@
             })
           )}
           href="{base}/{activeItem === OrgTab.RELATED_UNIT
-            ? 'connections'
+            ? `connections/${$page.params.uuid}`
             : `organisation/${$page.params.uuid}/create/${activeItem}`}"
           extraClasses="my-5"
         />

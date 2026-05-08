@@ -5,7 +5,7 @@
   import { fetchParentTree } from "$lib/http/parentTree"
   import Node from "./node.svelte"
   import { enhance } from "$app/forms"
-  import type { SubmitFunction } from "../connections/$types"
+  import type { SubmitFunction } from "./$types"
   import { error, success } from "$lib/stores/alert"
   import { date } from "$lib/stores/date"
   import { gql } from "graphql-request"
