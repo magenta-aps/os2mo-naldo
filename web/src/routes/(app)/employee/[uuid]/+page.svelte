@@ -15,6 +15,9 @@
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
   import { onMount } from "svelte"
+  import Icon from "@iconify/svelte"
+  import visibilityOutlineRounded from "@iconify/icons-material-symbols/visibility-outline-rounded"
+  import visibilityOffOutlineRounded from "@iconify/icons-material-symbols/visibility-off-outline-rounded"
   import TableTensesWrapper from "$lib/components/tables/TableTensesWrapper.svelte"
   import EngagementTable from "$lib/components/tables/EngagementTable.svelte"
   import ItUserTable from "$lib/components/tables/ITUserTable.svelte"
@@ -94,6 +97,8 @@
   $: if (uuidFromUrl !== $page.params.uuid) {
     uuidFromUrl = $page.params.uuid
   }
+
+  let cprRevealed = false
 </script>
 
 <HeadTitle type="employee" />
@@ -111,11 +116,25 @@
     {@const item = items.find((item) => item.value === activeItem)?.label || ""}
     <h1 class="mb-4">
       {employee.name}
-      {#if env.PUBLIC_SHOW_CPR_NUMBER}
-        <span>
-          {employee.cpr_number
-            ? `(${employee.cpr_number.slice(0, 6)}-${employee.cpr_number.slice(-4)})`
-            : ""}
+      {#if env.PUBLIC_SHOW_CPR_NUMBER && employee.cpr_number}
+        <span class="font-normal text-base text-base-content/70 align-middle">
+          ({employee.cpr_number.slice(0, 6)}-{cprRevealed
+            ? employee.cpr_number.slice(-4)
+            : "XXXX"}
+          <button
+            type="button"
+            class="align-middle text-base-content/70 hover:text-base-content cursor-pointer"
+            aria-label={capital($_(cprRevealed ? "hide_cpr" : "show_cpr"))}
+            on:click={() => (cprRevealed = !cprRevealed)}
+          >
+            <Icon
+              icon={cprRevealed
+                ? visibilityOffOutlineRounded
+                : visibilityOutlineRounded}
+              width="20"
+              height="20"
+            />
+          </button>)
         </span>
       {/if}
       <CopyToClipboard uuid={employee.uuid} name={employee.name} />
