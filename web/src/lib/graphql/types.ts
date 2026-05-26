@@ -2582,6 +2582,12 @@ export type Class = {
   owner?: Maybe<Scalars['UUID']['output']>;
   /**
    *
+   * The organisation unit that owns this class.
+   *
+   */
+  owner_response?: Maybe<OrganisationUnitResponse>;
+  /**
+   *
    * Parent class.
    *
    * Almost always `null` as class hierarchies are rare.

@@ -102,6 +102,10 @@
               },
             ]
           : []),
+        {
+          title: capital($_("class_owner", { values: { n: 1 } })),
+          sortPath: "owner_response.current.name",
+        },
         { title: capital($_("date.date")), sortPath: "validity.from" },
       ]}
       {facetUuid}
