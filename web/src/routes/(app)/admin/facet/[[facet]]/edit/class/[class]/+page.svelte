@@ -13,6 +13,7 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import Input from "$lib/components/forms/shared/Input.svelte"
+  import Search from "$lib/components/search/Search.svelte"
   import type { SubmitFunction } from "./$types"
   import {
     GetItSystemsDocument,
@@ -35,6 +36,12 @@
             user_key
             name
             scope
+            owner_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
+            }
             facet_response {
               uuid
               current(at: $fromDate) {
@@ -115,6 +122,7 @@
   let chosenItSystem: { name: string; uuid: string; user_key?: string } | undefined =
     undefined
   let itSystems: ITSystem[] | undefined = undefined
+  let selectedOwner: { uuid: string; name: string } | undefined = undefined
 
   const fromDate = field("from", "", [required()])
   const name = field("name", "", [required()])
@@ -269,6 +277,18 @@
             required={true}
           />
         </div>
+        <Search
+          type="org-unit"
+          at={startDate}
+          title={capital($_("class_owner", { values: { n: 1 } }))}
+          bind:value={selectedOwner}
+          startValue={cls.owner_response
+            ? {
+                uuid: cls.owner_response.uuid,
+                name: cls.owner_response.current?.name ?? "",
+              }
+            : undefined}
+        />
       </div>
     </div>
     <div class="flex py-6 gap-4">
