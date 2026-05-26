@@ -41,6 +41,12 @@
                 name
               }
             }
+            owner_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
+            }
             validity {
               from
               to
@@ -88,6 +94,7 @@
       {#if isRoleFacet}
         <td class="text-sm p-4">{cls.it_system_response?.current?.name ?? ""}</td>
       {/if}
+      <td class="text-sm p-4">{cls.owner_response?.current?.name ?? ""}</td>
       <ValidityTableCell validity={cls.validity} />
       <td class="flex p-4 gap-2 justify-end">
         <a href={`${base}/auditlog/${cls.uuid}`}>
