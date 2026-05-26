@@ -13,6 +13,7 @@
   import { date } from "$lib/stores/date"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Button from "$lib/components/shared/Button.svelte"
+  import Search from "$lib/components/search/Search.svelte"
   import type { SubmitFunction } from "./$types"
   import { GetItSystemsDocument, CreateClassDocument } from "./query.generated"
   import { formatITSystemNames, type ITSystem } from "$lib/utils/helpers"
@@ -90,6 +91,7 @@
   let chosenItSystem: { name: string; uuid: string; user_key?: string } | undefined =
     undefined
   let itSystems: ITSystem[] | undefined = undefined
+  let selectedOwner: { uuid: string; name: string } | undefined = undefined
 
   // Logic for updating datepicker intervals
   let validities: {
@@ -257,6 +259,12 @@
           required={true}
         />
       </div>
+      <Search
+        type="org-unit"
+        at={startDate}
+        title={capital($_("class_owner", { values: { n: 1 } }))}
+        bind:value={selectedOwner}
+      />
     </div>
   </div>
   <div class="flex py-6 gap-4">
