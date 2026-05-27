@@ -11,7 +11,7 @@
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
-  import { CreateManagerDocument } from "./query.generated"
+  import { CreateManagerDocument, GetEngagementsDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
@@ -23,8 +23,43 @@
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import { getClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
+  import {
+    formatEngagementTitlesAndUuid,
+    type EngagementTitleAndUuid,
+  } from "$lib/utils/helpers"
 
   gql`
+    query GetEngagements($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+      engagements(
+        filter: { employees: $uuid, from_date: $fromDate, to_date: $toDate }
+      ) {
+        objects {
+          validities {
+            uuid
+            person_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
+            }
+            org_unit_response {
+              uuid
+              current(at: $fromDate) {
+                name
+                user_key
+              }
+            }
+            job_function_response {
+              current(at: $fromDate) {
+                user_key
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+
     mutation CreateManager($input: ManagerCreateInput!, $date: DateTime!) {
       manager_create(input: $input) {
         current(at: $date) {
@@ -42,6 +77,14 @@
   let startDate: string = $date
   let toDate: string
   let selectedOrgUnit: {
+    uuid: string
+    name: string
+  }
+  let selectedEngagement: {
+    uuid: string
+    name: string
+  }
+  let selectedPerson: {
     uuid: string
     name: string
   }
@@ -95,7 +138,21 @@
     to: string | undefined | null
   } = { from: null, to: null }
 
+  const updateEngagements = async (
+    employeeUuid: string | undefined | null,
+    fromDate: string,
+    toDate: string
+  ) => {
+    const res = await graphQLClient().request(GetEngagementsDocument, {
+      uuid: employeeUuid,
+      fromDate: fromDate,
+      toDate: toDate,
+    })
+    return (engagements = res.engagements?.objects.map((e) => e.validities[0]))
+  }
+
   let facets: FacetValidities[]
+  let engagements: EngagementTitleAndUuid[]
   let abortController: AbortController
   $: {
     // Abort the previous request if a new one is about to start
@@ -119,7 +176,15 @@
           console.error("Request failed:", err)
         }
       }
+      await updateEngagements($page.params.uuid, startDate, toDate)
     })()
+  }
+
+  $: if (engagements?.[0]?.person_response && !selectedPerson) {
+    selectedPerson = {
+      uuid: engagements[0].person_response.uuid,
+      name: engagements[0].person_response.current?.name ?? "",
+    }
   }
 </script>
 
@@ -175,6 +240,15 @@
         required={true}
       />
       <Breadcrumbs orgUnit={selectedOrgUnit} />
+      <Search type="employee" bind:value={selectedPerson} disabled />
+      <Select
+        title={capital($_("engagement", { values: { n: 1 } }))}
+        id="engagement-uuid"
+        bind:value={selectedEngagement}
+        iterable={engagements ? formatEngagementTitlesAndUuid(engagements) : []}
+        isClearable={true}
+        disabled={!engagements?.length}
+      />
       {#if facets}
         <div class="flex flex-row gap-6">
           <Select

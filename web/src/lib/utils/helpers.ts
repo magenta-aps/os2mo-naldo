@@ -30,6 +30,7 @@ export type EngagementTitleAndUuid = {
   uuid: string
   job_function_response: { current?: { name: string } | null }
   org_unit_response: { current?: { name: string } | null }
+  person_response?: { uuid: string; current?: { name: string } | null } | null
 }
 
 export const formatEngagementTitlesAndUuid = (
