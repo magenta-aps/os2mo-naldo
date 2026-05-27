@@ -16,6 +16,7 @@ export const actions: Actions = {
     const responsibilities = (
       JSON.parse(data.get("responsibility") as string) as UnpackedClass
     ).map((v) => v.uuid)
+    const engagementUuid = data.get("engagement-uuid")
     const startDate = data.get("from")
     const endDate = data.get("to")
 
@@ -26,6 +27,7 @@ export const actions: Actions = {
       manager_type: managerType,
       manager_level: managerLevel,
       responsibility: responsibilities,
+      engagement: engagementUuid,
       validity: { from: startDate, ...(endDate && { to: endDate }) },
     }
   },

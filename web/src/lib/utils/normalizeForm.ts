@@ -74,6 +74,7 @@ export const normalizeManager = (m: any) => {
     responsibility: m.responsibilities_response.objects.map(
       (r: any) => r.current?.name
     ),
+    engagement: m.engagement_response?.uuid ?? null,
   }
 }
 

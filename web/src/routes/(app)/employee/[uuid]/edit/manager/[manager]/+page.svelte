@@ -11,7 +11,11 @@
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
-  import { ManagerDocument, UpdateManagerDocument } from "./query.generated"
+  import {
+    ManagerDocument,
+    UpdateManagerDocument,
+    GetEngagementsDocument,
+  } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
@@ -25,6 +29,10 @@
   import { getClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
   import { normalizeManager } from "$lib/utils/normalizeForm"
+  import {
+    getEngagementTitlesAndUuid,
+    type EngagementTitleAndUuid,
+  } from "$lib/utils/display"
 
   gql`
     query Manager($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
@@ -73,6 +81,49 @@
                 }
               }
             }
+            engagement_response {
+              uuid
+              current(at: $fromDate) {
+                org_unit_response {
+                  uuid
+                  current(at: $fromDate) {
+                    name
+                  }
+                }
+                job_function_response {
+                  uuid
+                  current(at: $fromDate) {
+                    name
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    query GetEngagements($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+      engagements(
+        filter: { employees: $uuid, from_date: $fromDate, to_date: $toDate }
+      ) {
+        objects {
+          validities {
+            uuid
+            org_unit_response {
+              uuid
+              current(at: $fromDate) {
+                name
+                user_key
+              }
+            }
+            job_function_response {
+              uuid
+              current(at: $fromDate) {
+                user_key
+                name
+              }
+            }
           }
         }
       }
@@ -102,6 +153,12 @@
     uuid: string
     name: string
   }
+  let selectedEngagement:
+    | {
+        uuid: string
+        name: string
+      }
+    | undefined
 
   const fromDate = field("from", "", [required()])
   const orgUnit = field("org_unit", "", [required()])
@@ -153,6 +210,7 @@
   } = { from: null, to: null }
 
   let facets: FacetValidities[]
+  let engagements: EngagementTitleAndUuid[] = []
   let abortController: AbortController
   $: {
     // Abort the previous request if a new one is about to start
@@ -181,6 +239,23 @@
     })()
   }
 
+  $: personUuid = selectedPerson?.uuid
+  $: if (personUuid) {
+    const fetchUuid = personUuid
+    ;(async () => {
+      const res = await graphQLClient().request(GetEngagementsDocument, {
+        uuid: fetchUuid,
+        fromDate: startDate,
+        toDate: toDate || null,
+      })
+      if (personUuid !== fetchUuid) return
+      engagements = res.engagements?.objects.map((e) => e.validities[0]) ?? []
+    })()
+  } else {
+    engagements = []
+    selectedEngagement = undefined
+  }
+
   let initialManager: any = null
   let hasChanges = false
   $: if (initialManager) {
@@ -191,7 +266,8 @@
       $managerType.value !== initialManager.manager_type ||
       $managerLevel.value !== initialManager.manager_level ||
       JSON.stringify($responsibilitiesField.value) !==
-        JSON.stringify(initialManager.responsibility)
+        JSON.stringify(initialManager.responsibility) ||
+      (selectedEngagement?.uuid ?? null) !== (initialManager.engagement ?? null)
 
     const toDateExtended =
       toDate === "" ? initialManager.to !== null : toDate > (initialManager.to ?? null)
@@ -244,6 +320,20 @@
     name: r.current?.name ?? "",
     user_key: r.current?.user_key ?? "",
   }))}
+  {@const engagementStartValue = manager.engagement_response
+    ? getEngagementTitlesAndUuid([
+        {
+          uuid: manager.engagement_response.uuid,
+          job_function_response: manager.engagement_response.current
+            ?.job_function_response ?? {
+            current: null,
+          },
+          org_unit_response: manager.engagement_response.current?.org_unit_response ?? {
+            current: null,
+          },
+        },
+      ])[0]
+    : undefined}
   {#if !initialManager}
     {@html (() => {
       initialManager = normalizeManager(manager)
@@ -298,6 +388,19 @@
                 name: manager.person_response.current?.name ?? "",
               }
             : undefined}
+        />
+        <Select
+          title={capital($_("engagement", { values: { n: 1 } }))}
+          id="engagement-uuid"
+          startValue={engagementStartValue}
+          bind:value={selectedEngagement}
+          iterable={engagements?.length
+            ? getEngagementTitlesAndUuid(engagements)
+            : engagementStartValue
+            ? [engagementStartValue]
+            : []}
+          isClearable={true}
+          disabled={!engagements?.length}
         />
         {#if facets}
           <div class="flex flex-row gap-6">
