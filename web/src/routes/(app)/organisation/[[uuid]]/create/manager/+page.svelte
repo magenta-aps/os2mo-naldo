@@ -11,7 +11,7 @@
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
-  import { CreateManagerDocument } from "./query.generated"
+  import { CreateManagerDocument, GetEngagementsDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
@@ -21,8 +21,37 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import { getClasses } from "$lib/http/getClasses"
+  import {
+    formatEngagementTitlesAndUuid,
+    type EngagementTitleAndUuid,
+  } from "$lib/utils/helpers"
 
   gql`
+    query GetEngagements($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+      engagements(
+        filter: { employees: $uuid, from_date: $fromDate, to_date: $toDate }
+      ) {
+        objects {
+          validities {
+            uuid
+            org_unit_response {
+              uuid
+              current(at: $fromDate) {
+                name
+                user_key
+              }
+            }
+            job_function_response {
+              current(at: $fromDate) {
+                user_key
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+
     mutation CreateManager($input: ManagerCreateInput!, $date: DateTime!) {
       manager_create(input: $input) {
         current(at: $date) {
@@ -39,6 +68,14 @@
 
   let startDate: string = $date
   let toDate: string
+  let selectedPerson: {
+    uuid: string
+    name: string
+  }
+  let selectedEngagement: {
+    uuid: string
+    name: string
+  }
 
   const fromDate = field("from", "", [required()])
   const managerType = field("manager_type", "", [required()])
@@ -104,6 +141,24 @@
       }
     })()
   }
+
+  let engagements: EngagementTitleAndUuid[] = []
+  $: personUuid = selectedPerson?.uuid
+  $: if (personUuid) {
+    const fetchUuid = personUuid
+    ;(async () => {
+      const res = await graphQLClient().request(GetEngagementsDocument, {
+        uuid: fetchUuid,
+        fromDate: startDate,
+        toDate: toDate || null,
+      })
+      if (personUuid !== fetchUuid) return
+      engagements = res.engagements?.objects.map((e) => e.validities[0]) ?? []
+    })()
+  } else {
+    engagements = []
+    selectedEngagement = undefined as any
+  }
 </script>
 
 <title
@@ -148,7 +203,15 @@
           max={validities.to}
         />
       </div>
-      <Search type="employee" at={startDate} />
+      <Search type="employee" at={startDate} bind:value={selectedPerson} />
+      <Select
+        title={capital($_("engagement", { values: { n: 1 } }))}
+        id="engagement-uuid"
+        bind:value={selectedEngagement}
+        iterable={engagements.length ? formatEngagementTitlesAndUuid(engagements) : []}
+        isClearable={true}
+        disabled={!engagements.length}
+      />
       {#if facets}
         <div class="flex flex-row gap-6">
           <Select
