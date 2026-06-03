@@ -22,7 +22,8 @@
       {id}
       {name}
       {value}
-      {checked}
+      bind:checked
+      on:change
       class="checkbox checkbox-primary {extra_classes} rounded-sm normal-case font-normal text-base text-base-100"
       {disabled}
     />

@@ -18,6 +18,7 @@
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import Search from "$lib/components/search/Search.svelte"
   import SelectMultiple from "$lib/components/forms/shared/SelectMultiple.svelte"
+  import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
@@ -80,27 +81,39 @@
     uuid: string
     name: string
   }
-  let selectedEngagement: {
-    uuid: string
-    name: string
-  }
+  let selectedEngagement:
+    | {
+        uuid: string
+        name: string
+      }
+    | undefined
   let selectedPerson: {
     uuid: string
     name: string
   }
+  // Forces a conscious choice: either pick an engagement or actively
+  // confirm there is none.
+  let noEngagement = false
 
   const fromDate = field("from", "", [required()])
   const orgUnit = field("org_unit", "", [required()])
   const managerType = field("manager_type", "", [required()])
   const managerLevel = field("manager_level", "", [required()])
   const responsibilities = field("responsibilities", undefined, [required()])
+  const engagement = field("engagement", "", [
+    () => ({ valid: noEngagement || !!selectedEngagement?.uuid, name: "required" }),
+  ])
   const svelteForm = form(
     fromDate,
     orgUnit,
     managerType,
     managerLevel,
-    responsibilities
+    responsibilities,
+    engagement
   )
+
+  // Clear any selected engagement when the user opts out.
+  $: if (noEngagement && selectedEngagement) selectedEngagement = undefined
 
   const handler: SubmitFunction =
     () =>
@@ -245,10 +258,22 @@
         title={capital($_("engagement", { values: { n: 1 } }))}
         id="engagement-uuid"
         bind:value={selectedEngagement}
+        errors={$engagement.errors}
         iterable={engagements ? formatEngagementTitlesAndUuid(engagements) : []}
         isClearable={true}
-        disabled={!engagements?.length}
+        disabled={!engagements?.length || noEngagement}
+        required={!noEngagement}
+        on:change={() => engagement.validate()}
       />
+      <div class="-mt-2">
+        <Checkbox
+          title={capital($_("no_engagement"))}
+          id="no-engagement"
+          value="true"
+          bind:checked={noEngagement}
+          on:change={() => engagement.validate()}
+        />
+      </div>
       {#if facets}
         <div class="flex flex-row gap-6">
           <Select
