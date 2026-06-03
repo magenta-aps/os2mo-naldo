@@ -253,7 +253,7 @@
         required={true}
       />
       <Breadcrumbs orgUnit={selectedOrgUnit} />
-      <Search type="employee" bind:value={selectedPerson} disabled />
+      <Search type="employee" bind:value={selectedPerson} disabled required={true} />
       <Select
         title={capital($_("engagement", { values: { n: 1 } }))}
         id="engagement-uuid"
