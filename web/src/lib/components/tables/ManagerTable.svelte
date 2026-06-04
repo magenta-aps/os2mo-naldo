@@ -74,6 +74,22 @@
                 name
               }
             }
+            engagement_response {
+              uuid
+              current(at: $fromDate) {
+                org_unit_response {
+                  uuid
+                  current(at: $fromDate) {
+                    name
+                  }
+                }
+                job_function_response {
+                  current(at: $fromDate) {
+                    name
+                  }
+                }
+              }
+            }
             responsibilities_response {
               objects {
                 uuid
@@ -162,6 +178,12 @@
           >
             {manager.org_unit_response.current?.name ?? manager.org_unit_response.uuid}
           </a>
+        {/if}
+      </td>
+      <td class="text-sm p-4">
+        {#if manager.engagement_response?.current}
+          {manager.engagement_response.current.job_function_response?.current?.name}, {manager
+            .engagement_response.current.org_unit_response?.current?.name}
         {/if}
       </td>
       <td class="text-sm p-4">

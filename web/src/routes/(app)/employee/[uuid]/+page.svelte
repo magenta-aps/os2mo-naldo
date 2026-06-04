@@ -354,6 +354,10 @@
             title: capital($_("unit", { values: { n: 1 } })),
             sortPath: "org_unit_response.current.name",
           },
+          {
+            title: capital($_("engagement", { values: { n: 1 } })),
+            sortPath: "engagement_response.current.job_function_response.current.name",
+          },
           { title: capital($_("manager_responsibility")) },
           {
             title: capital($_("manager_type")),

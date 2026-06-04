@@ -6660,6 +6660,21 @@ export type File = {
 /** File filter. */
 export type FileFilter = {
   /**
+   * Case-insensitive substring of the filename filter limiting which entries are returned.
+   *
+   * | `file_name_contains`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  file_name_contains?: InputMaybe<Scalars['String']['input']>;
+  /**
    * Filename filter limiting which entries are returned.
    *
    * | `file_names`      | Elements returned                            |
@@ -13668,6 +13683,9 @@ export type OrganisationUnit = {
   /**
    *
    * The top-unit (root) of the organisation unit, in the hierarchy.
+   *
+   * Note that this assumes that the unit had a unique root over all
+   * time. If this is not the case, an error will be thrown.
    *
    */
   root_response?: Maybe<OrganisationUnitResponse>;

@@ -11,20 +11,56 @@
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
-  import { CreateManagerDocument } from "./query.generated"
+  import { CreateManagerDocument, GetEngagementsDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import Search from "$lib/components/search/Search.svelte"
   import SelectMultiple from "$lib/components/forms/shared/SelectMultiple.svelte"
+  import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import { getClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
+  import {
+    formatEngagementTitlesAndUuid,
+    type EngagementTitleAndUuid,
+  } from "$lib/utils/helpers"
 
   gql`
+    query GetEngagements($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+      engagements(
+        filter: { employees: $uuid, from_date: $fromDate, to_date: $toDate }
+      ) {
+        objects {
+          validities {
+            uuid
+            person_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
+            }
+            org_unit_response {
+              uuid
+              current(at: $fromDate) {
+                name
+                user_key
+              }
+            }
+            job_function_response {
+              current(at: $fromDate) {
+                user_key
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+
     mutation CreateManager($input: ManagerCreateInput!, $date: DateTime!) {
       manager_create(input: $input) {
         current(at: $date) {
@@ -45,19 +81,39 @@
     uuid: string
     name: string
   }
+  let selectedEngagement:
+    | {
+        uuid: string
+        name: string
+      }
+    | undefined
+  let selectedPerson: {
+    uuid: string
+    name: string
+  }
+  // Forces a conscious choice: either pick an engagement or actively
+  // confirm there is none.
+  let noEngagement = false
 
   const fromDate = field("from", "", [required()])
   const orgUnit = field("org_unit", "", [required()])
   const managerType = field("manager_type", "", [required()])
   const managerLevel = field("manager_level", "", [required()])
   const responsibilities = field("responsibilities", undefined, [required()])
+  const engagement = field("engagement", "", [
+    () => ({ valid: noEngagement || !!selectedEngagement?.uuid, name: "required" }),
+  ])
   const svelteForm = form(
     fromDate,
     orgUnit,
     managerType,
     managerLevel,
-    responsibilities
+    responsibilities,
+    engagement
   )
+
+  // Clear any selected engagement when the user opts out.
+  $: if (noEngagement && selectedEngagement) selectedEngagement = undefined
 
   const handler: SubmitFunction =
     () =>
@@ -95,7 +151,21 @@
     to: string | undefined | null
   } = { from: null, to: null }
 
+  const updateEngagements = async (
+    employeeUuid: string | undefined | null,
+    fromDate: string,
+    toDate: string
+  ) => {
+    const res = await graphQLClient().request(GetEngagementsDocument, {
+      uuid: employeeUuid,
+      fromDate: fromDate,
+      toDate: toDate,
+    })
+    return (engagements = res.engagements?.objects.map((e) => e.validities[0]))
+  }
+
   let facets: FacetValidities[]
+  let engagements: EngagementTitleAndUuid[]
   let abortController: AbortController
   $: {
     // Abort the previous request if a new one is about to start
@@ -119,7 +189,15 @@
           console.error("Request failed:", err)
         }
       }
+      await updateEngagements($page.params.uuid, startDate, toDate)
     })()
+  }
+
+  $: if (engagements?.[0]?.person_response && !selectedPerson) {
+    selectedPerson = {
+      uuid: engagements[0].person_response.uuid,
+      name: engagements[0].person_response.current?.name ?? "",
+    }
   }
 </script>
 
@@ -175,6 +253,27 @@
         required={true}
       />
       <Breadcrumbs orgUnit={selectedOrgUnit} />
+      <Search type="employee" bind:value={selectedPerson} disabled required={true} />
+      <Select
+        title={capital($_("engagement", { values: { n: 1 } }))}
+        id="engagement-uuid"
+        bind:value={selectedEngagement}
+        errors={$engagement.errors}
+        iterable={engagements ? formatEngagementTitlesAndUuid(engagements) : []}
+        isClearable={true}
+        disabled={!engagements?.length || noEngagement}
+        required={!noEngagement}
+        on:change={() => engagement.validate()}
+      />
+      <div class="-mt-2">
+        <Checkbox
+          title={capital($_("no_engagement"))}
+          id="no-engagement"
+          value="true"
+          bind:checked={noEngagement}
+          on:change={() => engagement.validate()}
+        />
+      </div>
       {#if facets}
         <div class="flex flex-row gap-6">
           <Select
