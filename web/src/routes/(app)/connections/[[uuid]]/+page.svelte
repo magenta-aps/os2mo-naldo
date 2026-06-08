@@ -186,6 +186,23 @@
       })
   }
 
+  // Controlled selection: seeded from each freshly-resolved state, then mutated
+  // by checkbox toggles. Kept at page level (rather than read off the DOM
+  // checkboxes) so collapsing a tree node — which unmounts its checkbox — never
+  // drops an already-selected destination from the submitted form.
+  let selectedDestinations: string[] = []
+  let appliedState: typeof lastState
+  $: if (lastState && lastState !== appliedState) {
+    appliedState = lastState
+    selectedDestinations = [...lastState.destinations]
+  }
+
+  const toggleDestination = (uuid: string) => {
+    selectedDestinations = selectedDestinations.includes(uuid)
+      ? selectedDestinations.filter((u) => u !== uuid)
+      : [...selectedDestinations, uuid]
+  }
+
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
@@ -220,6 +237,11 @@
 <div class="p-0 m-0 mb-4 w-full divider" />
 
 <form method="post" class="mx-6" use:enhance={handler}>
+  <!-- Source of truth for the submitted destinations: rendered from page state,
+       not the tree checkboxes, so collapsed (unmounted) selections still post. -->
+  {#each selectedDestinations as uuid (uuid)}
+    <input type="hidden" name="destination" value={uuid} />
+  {/each}
   <div class="rounded-sm min-w-fit bg-base-200">
     <div class="flex flex-col gap-6 p-8 sm:flex-row sm:items-start">
       <div class="flex flex-col gap-6 w-full sm:w-1/4">
@@ -248,7 +270,8 @@
                 <Node
                   {...child}
                   openSet={lastState.openSet}
-                  selectedDestinationOrgs={lastState.destinations}
+                  selectedDestinationOrgs={selectedDestinations}
+                  onToggleDestination={toggleDestination}
                   {selectedOriginOrg}
                 />
               {/each}

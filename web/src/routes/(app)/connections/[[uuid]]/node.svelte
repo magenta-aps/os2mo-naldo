@@ -24,6 +24,7 @@
   export let openSet: Set<string> = new Set()
   export let selectedOriginOrg: string | null = null
   export let selectedDestinationOrgs: string[] = []
+  export let onToggleDestination: (uuid: string) => void
   export let has_children: boolean
 
   let loading = false
@@ -109,10 +110,10 @@
     {/if}
     <Checkbox
       id={uuid}
-      name="destination"
       title={checkSDIdentifier(name, user_key)}
       value={uuid}
       checked={selectedDestinationOrgs.includes(uuid)}
+      on:change={() => onToggleDestination(uuid)}
       disabled={!selectedOriginOrg || selectedOriginOrg === uuid}
       noPadding={true}
     />
@@ -125,6 +126,7 @@
       {...child}
       {selectedDestinationOrgs}
       {selectedOriginOrg}
+      {onToggleDestination}
       {openSet}
       {fromDate}
       indent={indent + 24}
