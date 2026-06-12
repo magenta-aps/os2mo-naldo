@@ -1,0 +1,2 @@
+# Keycloak session tokens and discovered fixture references — never commit
+.auth/
