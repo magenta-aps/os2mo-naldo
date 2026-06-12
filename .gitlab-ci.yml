@@ -135,7 +135,7 @@ E2E tests:
     # Install Playwright browsers
     - yarn playwright install --with-deps chromium
   script:
-    - cd web && yarn test:e2e
+    - yarn test:e2e
   artifacts:
     when: on_failure
     paths:
