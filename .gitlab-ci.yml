@@ -80,6 +80,10 @@ Unit tests:
 E2E tests:
   image: node:20
   stage: test
+  cache:
+    key: playwright-chromium-v1.47.2
+    paths:
+      - /root/.cache/ms-playwright/
   variables:
     # MO backend env — mirrors .variables:mo from the os2mo template
     DB_HOST: "mox-db"
@@ -129,17 +133,16 @@ E2E tests:
     # Wait for MO to be ready — globalSetup will purge, seed the org, and snapshot
     # Build naldo and start the preview server pointing at the mo service
     - cd web && yarn install
+    - yarn playwright install --with-deps chromium
     - yarn build
     - PUBLIC_BASE_URL=http://mo:5000 yarn preview &
     - until wget -qO /dev/null http://localhost:4173; do sleep 1; done
-    # Install Playwright browsers
-    - yarn playwright install --with-deps chromium
   script:
     - yarn test:e2e
   artifacts:
     when: on_failure
     paths:
-      - web/playwright-report/
+      - web/test-results-integration/
     expire_in: 7 days
   rules:
     - <<: *if-merge-request

@@ -10,7 +10,7 @@ test("homepage renders with search bar and authenticated user", async ({ page })
 test("sidebar renders", async ({ page }) => {
   await page.goto("/")
   await page.waitForLoadState("networkidle")
-  await expect(page.locator(".drawer-side")).toBeVisible()
+  await expect(page.locator(".drawer-side").first()).toBeVisible()
 })
 
 test("reports page is reachable", async ({ page }) => {
