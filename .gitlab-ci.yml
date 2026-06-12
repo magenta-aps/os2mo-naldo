@@ -28,6 +28,9 @@ variables:
   if: "$CI_MERGE_REQUEST_IID"
 
 include:
+  # Pull in the MO backing-services template so we can reuse it here
+  - project: "rammearkitektur/os2mo"
+    file: "gitlab-ci-templates/integration-test-meta.v1.yml"
   - project: "labs/salt-automation"
     file:
       - gitlab-ci-templates/common/no-interrupt-meta.v1.yml
@@ -73,6 +76,74 @@ Unit tests:
     - cd web/
     - yarn
     - yarn test
+
+E2E tests:
+  image: node:20
+  stage: test
+  variables:
+    # MO backend env — mirrors .variables:mo from the os2mo template
+    DB_HOST: "mox-db"
+    DB_NAME: "mox"
+    DB_USER: "mox"
+    DB_PASSWORD: "mox"
+    KEYCLOAK_SCHEMA: "http"
+    KEYCLOAK_PORT: "8080"
+    KEYCLOAK_AUTH_SERVER_URL: "http://keycloak:8080/auth/"
+    KEYCLOAK_VERIFY_AUDIENCE: "false"
+    ENVIRONMENT: "testing"
+    LORA_AUTH: "false"
+    INSECURE_ENABLE_TESTING_API: "true"
+    AMQP_ENABLE: "true"
+    AMQP_URL: "amqp://guest:guest@msg-broker:5672/"
+    # Naldo's runtime backend URL (read by $env/dynamic/public at preview start)
+    PUBLIC_BASE_URL: "http://mo:5000"
+    # Playwright: browser navigates to naldo, API calls go to mo directly
+    BASE_URL: "http://localhost:4173"
+    MO_URL: "http://mo:5000"
+  services:
+    - !reference [.services:mo-backing, services]
+    - name: magentaaps/os2mo:latest
+      alias: mo
+      variables:
+        DB_HOST: "mox-db"
+        DB_NAME: "mox"
+        DB_USER: "mox"
+        DB_PASSWORD: "mox"
+        KEYCLOAK_SCHEMA: "http"
+        KEYCLOAK_PORT: "8080"
+        KEYCLOAK_AUTH_SERVER_URL: "http://keycloak:8080/auth/"
+        KEYCLOAK_VERIFY_AUDIENCE: "false"
+        ENVIRONMENT: "testing"
+        LORA_AUTH: "false"
+        INSECURE_ENABLE_TESTING_API: "true"
+        AMQP_ENABLE: "true"
+        AMQP_URL: "amqp://guest:guest@msg-broker:5672/"
+      entrypoint:
+        - "sh"
+        - "-c"
+        - |
+          while ! ./docker/start.sh; do sleep 1; done
+  before_script:
+    # Wait for Keycloak + backing services
+    - !reference [.services:mo-backing, before_script]
+    # Wait for MO to be ready — globalSetup will purge, seed the org, and snapshot
+    # Build naldo and start the preview server pointing at the mo service
+    - cd web && yarn install
+    - yarn build
+    - PUBLIC_BASE_URL=http://mo:5000 yarn preview &
+    - until wget -qO /dev/null http://localhost:4173; do sleep 1; done
+    # Install Playwright browsers
+    - yarn playwright install --with-deps chromium
+  script:
+    - cd web && yarn test:e2e
+  artifacts:
+    when: on_failure
+    paths:
+      - web/playwright-report/
+    expire_in: 7 days
+  rules:
+    - <<: *if-merge-request
+    - <<: *if-default-branch-refs
 
 SvelteKit build:
   image: node:20
