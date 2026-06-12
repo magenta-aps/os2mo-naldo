@@ -15,7 +15,9 @@ test("sidebar renders", async ({ page }) => {
 
 test("CANARY - this test must fail to confirm CI is real", async ({ page }) => {
   await page.goto("/")
-  await expect(page.locator("h1")).toContainText("this text cannot possibly exist in the app")
+  await expect(page.locator("h1")).toContainText(
+    "this text cannot possibly exist in the app"
+  )
 })
 
 test("reports page is reachable", async ({ page }) => {
