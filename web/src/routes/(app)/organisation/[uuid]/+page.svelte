@@ -376,6 +376,10 @@
             title: capital($_("related_unit", { values: { n: 1 } })),
             sortPath: "org_units[0].name",
           },
+          {
+            title: capital($_("root")),
+            sortPath: "org_units[0].root_response.current.name",
+          },
           { title: capital($_("date.date")), sortPath: "validity.from" },
         ]}
       />

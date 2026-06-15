@@ -15,6 +15,7 @@
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { updateGlobalNavigation } from "$lib/stores/navigation"
+  import { findClosestValidity } from "$lib/utils/validities"
 
   type RelatedUnits = RelatedUnitsQuery["related_units"]["objects"][0]["validities"]
   type RelatedUnit = RelatedUnitsQuery["related_units"]["objects"][0]["validities"]
@@ -32,9 +33,19 @@
         objects {
           validities {
             uuid
-            org_units(filter: { from_date: $fromDate, to_date: $toDate }) {
+            org_units(filter: { from_date: null, to_date: null }) {
               name
               uuid
+              validity {
+                from
+                to
+              }
+              root_response {
+                current(at: $fromDate) {
+                  name
+                  uuid
+                }
+              }
             }
             validity {
               from
@@ -66,21 +77,23 @@
       })
       relatedUnits.push(...filtered)
     }
-    // Filter out the highlighted org_unit, so we only have the actual relation left.
-    // This allows for cleaner templating and sorting by name
-    data = relatedUnits.map((unit) =>
-      unit.org_units[0].uuid === $page.params.uuid
-        ? {
-            uuid: unit.uuid,
-            org_units: [unit.org_units[1]],
-            validity: unit.validity,
-          }
-        : {
-            uuid: unit.uuid,
-            org_units: [unit.org_units[0]],
-            validity: unit.validity,
-          }
-    )
+    // A relation links two distinct units. `org_units` is queried with
+    // `from_date: null, to_date: null`, so every temporal slice of both units is
+    // returned even when a unit's dates are inconsistent (e.g. imported data).
+    // Drop the unit we're already looking at and pick the slice of the other one
+    // closest to the selected date. If the other unit is absent entirely, leave
+    // org_units empty so the row renders blank instead of indexing into nothing.
+    data = relatedUnits.map((unit) => {
+      const related = findClosestValidity(
+        unit.org_units.filter((org_unit) => org_unit.uuid !== $page.params.uuid),
+        $date
+      )
+      return {
+        uuid: unit.uuid,
+        org_units: related ? [related] : [],
+        validity: unit.validity,
+      }
+    })
   })
 </script>
 
@@ -95,11 +108,26 @@
         leading-5 border-t border-base-300 text-base-content"
     >
       <td class="text-sm p-4">
-        <a
-          href="{base}/organisation/{related_unit.org_units[0].uuid}"
-          on:click={() => updateGlobalNavigation(related_unit.org_units[0].uuid)}
-          >{related_unit.org_units[0].name}
-        </a>
+        {#if related_unit.org_units[0]}
+          <a
+            href="{base}/organisation/{related_unit.org_units[0].uuid}"
+            on:click={() => updateGlobalNavigation(related_unit.org_units[0].uuid)}
+            >{related_unit.org_units[0].name}
+          </a>
+        {/if}
+      </td>
+      <td class="text-sm p-4">
+        {#if related_unit.org_units[0]?.root_response?.current}
+          <a
+            href="{base}/organisation/{related_unit.org_units[0].root_response?.current
+              ?.uuid}"
+            on:click={() =>
+              updateGlobalNavigation(
+                related_unit.org_units[0].root_response?.current?.uuid
+              )}
+            >{related_unit.org_units[0].root_response.current.name}
+          </a>
+        {/if}
       </td>
       <ValidityTableCell validity={related_unit.validity} />
       <td class="flex p-4 gap-2 justify-end">
