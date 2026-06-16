@@ -268,5 +268,6 @@
 	"manage_itsystems": "manage IT systems",
 	"itsystem_roles_hint": "IT systems can be connected to roles.",
 	"manage_roles": "manage roles",
+	"manage_connections": "manage connections",
 	"welcome_message": "Welcome to GIR"
 }

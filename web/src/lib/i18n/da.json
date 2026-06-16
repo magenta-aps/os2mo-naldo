@@ -268,5 +268,6 @@
 	"manage_itsystems": "administrér IT-systemer",
 	"itsystem_roles_hint": "IT-systemer kan forbindes til roller.",
 	"manage_roles": "administrér roller",
+	"manage_connections": "administrér sammenkoblinger",
 	"welcome_message": "Velkommen til MO"
 }
