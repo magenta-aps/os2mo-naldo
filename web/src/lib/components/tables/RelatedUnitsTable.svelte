@@ -17,9 +17,17 @@
   import { updateGlobalNavigation } from "$lib/stores/navigation"
   import { findClosestValidity } from "$lib/utils/validities"
 
-  type RelatedUnits = RelatedUnitsQuery["related_units"]["objects"][0]["validities"]
-  type RelatedUnit = RelatedUnitsQuery["related_units"]["objects"][0]["validities"]
-  let data: RelatedUnits
+  type RelatedValidity =
+    RelatedUnitsQuery["related_units"]["objects"][0]["validities"][0]
+  // View-model built from the query for rendering: the counterpart unit plus a
+  // derived `root` (its top-most ancestor), which the table sorts on by path.
+  type RelatedRow = {
+    uuid: RelatedValidity["uuid"]
+    org_units: RelatedValidity["org_units"]
+    validity: RelatedValidity["validity"]
+    root?: { name: string; uuid: string }
+  }
+  let data: RelatedRow[]
 
   export let tense: Tense
 
@@ -40,11 +48,9 @@
                 from
                 to
               }
-              root_response {
-                current(at: $fromDate) {
-                  name
-                  uuid
-                }
+              ancestors {
+                name
+                uuid
               }
             }
             validity {
@@ -88,10 +94,18 @@
         unit.org_units.filter((org_unit) => org_unit.uuid !== $page.params.uuid),
         $date
       )
+      // The root is the top-most ancestor of the chosen slice. Deriving it from
+      // `ancestors` (per-validity) instead of `root_response` avoids the backend
+      // error thrown when a unit's root isn't unique over all time (e.g. a unit
+      // that was moved/renamed). A unit with no ancestors is itself the root.
+      const root = related
+        ? related.ancestors.at(-1) ?? { name: related.name, uuid: related.uuid }
+        : undefined
       return {
         uuid: unit.uuid,
         org_units: related ? [related] : [],
         validity: unit.validity,
+        root,
       }
     })
   })
@@ -117,15 +131,11 @@
         {/if}
       </td>
       <td class="text-sm p-4">
-        {#if related_unit.org_units[0]?.root_response?.current}
+        {#if related_unit.root}
           <a
-            href="{base}/organisation/{related_unit.org_units[0].root_response?.current
-              ?.uuid}"
-            on:click={() =>
-              updateGlobalNavigation(
-                related_unit.org_units[0].root_response?.current?.uuid
-              )}
-            >{related_unit.org_units[0].root_response.current.name}
+            href="{base}/organisation/{related_unit.root.uuid}"
+            on:click={() => updateGlobalNavigation(related_unit.root?.uuid)}
+            >{related_unit.root.name}
           </a>
         {/if}
       </td>
