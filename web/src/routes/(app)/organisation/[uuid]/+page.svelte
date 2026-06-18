@@ -378,7 +378,7 @@
           },
           {
             title: capital($_("root")),
-            sortPath: "org_units[0].root_response.current.name",
+            sortPath: "root.name",
           },
           { title: capital($_("date.date")), sortPath: "validity.from" },
         ]}
