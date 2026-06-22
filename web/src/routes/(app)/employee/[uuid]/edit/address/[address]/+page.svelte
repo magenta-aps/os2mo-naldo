@@ -21,7 +21,6 @@
   import { getPersonValidities } from "$lib/http/getValidities"
   import { getClasses } from "$lib/http/getClasses"
   import DarSearch from "$lib/components/forms/shared/DARSearch.svelte"
-  import { Addresses } from "$lib/constants/addresses"
   import { form, field } from "svelte-forms"
   import { required, email, pattern } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
@@ -94,21 +93,23 @@
     description
   )
 
-  $: switch (addressType?.name) {
-    case Addresses.EMAIL:
-      addressField = field(Addresses.EMAIL, "", [required(), email()])
-      break
-    case Addresses.LOKATION:
-      addressField = field(Addresses.LOKATION, "", [required()])
-      break
-    case Addresses.POSTADRESSE:
-      addressField = field(Addresses.POSTADRESSE, "", [required()])
-      break
-    case Addresses.TELEFON:
-      addressField = field(Addresses.TELEFON, "", [required(), pattern(/^\+?\d+$/)])
-      break
-    default:
-      break
+  // Derive validators from the address type's scope, not its name. The name is
+  // customer-configurable, so matching on it left custom-named types in the
+  // default branch where the field was never recreated — the value field didn't
+  // clear and the validators didn't update when switching type.
+  $: if (addressType) {
+    switch (addressType.scope) {
+      case "EMAIL":
+        addressField = field(addressType.name, "", [required(), email()])
+        break
+      case "PHONE":
+        addressField = field(addressType.name, "", [required(), pattern(/^\+?\d+$/)])
+        break
+      default:
+        // DAR, TEXT and any other scope: value required only
+        addressField = field(addressType.name, "", [required()])
+        break
+    }
   }
 
   const handler: SubmitFunction =
