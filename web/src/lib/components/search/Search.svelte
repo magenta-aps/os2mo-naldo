@@ -172,7 +172,7 @@
           {
             employeeFilter: employeeFilter,
             defaultSearch: !env.PUBLIC_ENABLE_RSD_SEARCH,
-            limit: 15,
+            limit: 30,
             date: at ?? $date,
           }
         )
@@ -199,7 +199,7 @@
           OrgUnitSearchDocument,
           {
             orgUnitFilter: orgUnitFilter,
-            limit: 15,
+            limit: 30,
             date: at ?? $date,
           }
         )
