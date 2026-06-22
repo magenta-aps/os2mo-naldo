@@ -10,7 +10,6 @@
   import { form, field } from "svelte-forms"
   import { required, email, pattern } from "svelte-forms/validators"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
-  import { Addresses } from "$lib/constants/addresses"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
@@ -48,22 +47,25 @@
 
   let addressField = field("", "")
 
+  // Derive validators from the address type's scope, not its name. The name is
+  // customer-configurable, so matching on it left custom-named types without the
+  // correct validators when switching type.
   $: {
-    switch (address.addressType?.name) {
-      case Addresses.EMAIL:
-        addressField = field(Addresses.EMAIL, "", [required(), email()])
+    switch (address.addressType?.scope) {
+      case "EMAIL":
+        addressField = field(address.addressType.name, "", [required(), email()])
         break
-      case Addresses.LOKATION:
-        addressField = field(Addresses.LOKATION, "", [required()])
-        break
-      case Addresses.POSTADRESSE:
-        addressField = field(Addresses.POSTADRESSE, "", [required()])
-        break
-      case Addresses.TELEFON:
-        addressField = field(Addresses.TELEFON, "", [required(), pattern(/^\+?\d+$/)])
+      case "PHONE":
+        addressField = field(address.addressType.name, "", [
+          required(),
+          pattern(/^\+?\d+$/),
+        ])
         break
       default:
-        addressField = field("", "")
+        // No type selected yet → empty field; otherwise (DAR, TEXT, etc.) require a value
+        addressField = address.addressType
+          ? field(address.addressType.name, "", [required()])
+          : field("", "")
         break
     }
   }

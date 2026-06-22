@@ -19,7 +19,6 @@
   import DarSearch from "$lib/components/forms/shared/DARSearch.svelte"
   import { form, field } from "svelte-forms"
   import { required, email, pattern, url } from "svelte-forms/validators"
-  import { Addresses } from "$lib/constants/addresses"
   import type { FacetValidities } from "$lib/utils/classes"
   import { getClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
@@ -51,50 +50,33 @@
   let addressField = field("", "")
   $: svelteForm = form(fromDate, addressTypeField, addressField)
 
-  $: switch (addressType?.name) {
-    case Addresses.AFDELINGSKODE:
-      addressField = field(Addresses.AFDELINGSKODE, "", [required()])
-      break
-    case Addresses.EAN_NUMMER:
-      addressField = field(Addresses.EAN_NUMMER, "", [required(), pattern(/^\d{13}$/)])
-      break
-    case Addresses.EMAIL:
-      addressField = field(Addresses.EMAIL, "", [required(), email()])
-      break
-    case Addresses.FAX:
-      // Jeg ved ikke hvordan en fax kan se ud, det gør MO heller ikke
-      addressField = field(Addresses.FAX, "", [required(), pattern(/\d+/)])
-      break
-    case Addresses.FORMAALSKODE:
-      addressField = field(Addresses.FORMAALSKODE, "", [required()])
-      break
-    case Addresses.HENVENDELSESSTED:
-      addressField = field(Addresses.HENVENDELSESSTED, "", [required()])
-      break
-    case Addresses.LOKATION:
-      addressField = field(Addresses.LOKATION, "", [required()])
-      break
-    case Addresses.P_NUMMER:
-      addressField = field(Addresses.P_NUMMER, "", [required(), pattern(/^\d{10}$/)])
-      break
-    case Addresses.POSTADRESSE:
-      addressField = field(Addresses.POSTADRESSE, "", [required()])
-      break
-    case Addresses.RETURADRESSE:
-      addressField = field(Addresses.RETURADRESSE, "", [required()])
-      break
-    case Addresses.SKOLEKODE:
-      addressField = field(Addresses.SKOLEKODE, "", [required()])
-      break
-    case Addresses.TELEFON:
-      addressField = field(Addresses.TELEFON, "", [required(), pattern(/^\+?\d+$/)])
-      break
-    case Addresses.WEBADRESSE:
-      // URL skal have http(s), ftp, git eller svn :shrug: Skal vi acceptere `www.lol.dk`?
-      addressField = field(Addresses.WEBADRESSE, "", [required(), url()])
-      break
-    default:
-      break
+  // Derive validators from the address type's scope, not its name. The name is
+  // customer-configurable, so matching on it left custom-named types in the
+  // default branch where the field was never recreated — the value field didn't
+  // clear and the validators didn't update when switching type.
+  $: if (addressType) {
+    switch (addressType.scope) {
+      case "EMAIL":
+        addressField = field(addressType.name, "", [required(), email()])
+        break
+      case "PHONE":
+        addressField = field(addressType.name, "", [required(), pattern(/^\+?\d+$/)])
+        break
+      case "EAN":
+        addressField = field(addressType.name, "", [required(), pattern(/^\d{13}$/)])
+        break
+      case "PNUMBER":
+        addressField = field(addressType.name, "", [required(), pattern(/^\d{10}$/)])
+        break
+      case "WWW":
+        // URL skal have http(s), ftp, git eller svn :shrug: Skal vi acceptere `www.lol.dk`?
+        addressField = field(addressType.name, "", [required(), url()])
+        break
+      default:
+        // DAR, TEXT, MULTIFIELD_TEXT and any other/custom scope: value required only
+        addressField = field(addressType.name, "", [required()])
+        break
+    }
   }
 
   const handler: SubmitFunction =
