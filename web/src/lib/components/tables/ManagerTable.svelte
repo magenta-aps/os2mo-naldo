@@ -11,7 +11,6 @@
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { sortData } from "$lib/utils/sorting"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
-  import { onMount } from "svelte"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
@@ -28,7 +27,6 @@
   const org_unit = isOrg ? uuid : null
 
   type Managers = ManagersQuery["managers"]["objects"][0]["validities"]
-  let data: Managers
 
   gql`
     query Managers(
@@ -108,21 +106,14 @@
     }
   `
 
-  $: {
-    if (data) {
-      data = sortData(data, $sortKey, $sortDirection)
-    }
-  }
-
-  onMount(async () => {
-    const res = await graphQLClient().request(ManagersDocument, {
-      org_unit: org_unit,
-      employee: employee,
-      // Don't set inherit flag if employee, to avoid:
-      // "The inherit flag requires an organizational unit filter"
-      inherit: !isOrg ? false : env.PUBLIC_INHERIT_MANAGER,
-      ...tenseToValidity(tense, $date),
-    })
+  $: dataPromise = graphQLClient().request(ManagersDocument, {
+    org_unit: org_unit,
+    employee: employee,
+    // Don't set inherit flag if employee, to avoid:
+    // "The inherit flag requires an organizational unit filter"
+    inherit: !isOrg ? false : env.PUBLIC_INHERIT_MANAGER,
+    ...tenseToValidity(tense, $date),
+  }).then((res) => {
     const managers: Managers = []
 
     // Filters and flattens the data
@@ -136,16 +127,16 @@
       })
       managers.push(...filtered)
     }
-    data = managers
+    return managers
   })
 </script>
 
-{#if !data}
+{#await dataPromise}
   <tr class="leading-5 border-t border-base-300 text-base-content">
     <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
-{:else}
-  {#each data as manager, i}
+{:then data}
+  {#each sortData(data, $sortKey, $sortDirection) as manager, i}
     <tr
       class="{i % 2 === 0 ? '' : 'bg-base-200'} 
       leading-5 border-t border-base-300 text-base-content"
@@ -227,4 +218,8 @@
       >
     </tr>
   {/each}
-{/if}
+{:catch}
+  <tr class="leading-5 border-t border-base-300 text-base-content">
+    <td class="text-sm p-4">{capital($_("load_error"))}</td>
+  </tr>
+{/await}
