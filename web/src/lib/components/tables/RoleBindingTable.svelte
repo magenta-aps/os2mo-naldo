@@ -13,7 +13,6 @@
     tenseToValidity,
     filterTenseToValidity,
   } from "$lib/utils/tenses"
-  import { onMount } from "svelte"
   import { sortData } from "$lib/utils/sorting"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import Icon from "@iconify/svelte"
@@ -24,7 +23,6 @@
   import { formatQueryDates } from "$lib/utils/validities"
 
   type Rolebinding = RolebindingsQuery["rolebindings"]["objects"][0]["validities"]
-  let data: Rolebinding
 
   export let tense: Tense
 
@@ -73,18 +71,10 @@
       }
     }
   `
-  $: {
-    if (data) {
-      data = sortData(data, $sortKey, $sortDirection)
-    }
-  }
-
-  onMount(async () => {
-    const res = await graphQLClient().request(RolebindingsDocument, {
-      filter: filter,
-      ...tenseToValidity(tense, $date),
-    })
-
+  $: dataPromise = graphQLClient().request(RolebindingsDocument, {
+    filter: filter,
+    ...tenseToValidity(tense, $date),
+  }).then((res) => {
     const rolebindings: Rolebinding = []
 
     // Filters and flattens the data
@@ -95,16 +85,16 @@
       })
       rolebindings.push(...filtered)
     }
-    data = rolebindings
+    return rolebindings
   })
 </script>
 
-{#if !data}
+{#await dataPromise}
   <tr class="leading-5 border-t border-base-300 text-base-content">
     <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
-{:else}
-  {#each data as rolebindingObj, i}
+{:then data}
+  {#each sortData(data, $sortKey, $sortDirection) as rolebindingObj, i}
     <tr
       class="{i % 2 === 0 ? '' : 'bg-base-200'} 
         leading-5 border-t border-base-300 text-base-content"
@@ -146,4 +136,8 @@
       >
     </tr>
   {/each}
-{/if}
+{:catch}
+  <tr class="leading-5 border-t border-base-300 text-base-content">
+    <td class="text-sm p-4">{capital($_("load_error"))}</td>
+  </tr>
+{/await}
