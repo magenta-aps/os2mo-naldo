@@ -9,7 +9,6 @@
   import { gql } from "graphql-request"
   import { date } from "$lib/stores/date"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
-  import { onMount } from "svelte"
   import { sortData } from "$lib/utils/sorting"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import Icon from "@iconify/svelte"
@@ -20,7 +19,6 @@
   import { env } from "$lib/env"
 
   type OrgUnits = OrgUnitQuery["org_units"]["objects"][0]["validities"]
-  let data: OrgUnits
 
   export let tense: Tense
 
@@ -67,18 +65,10 @@
     }
   `
 
-  $: {
-    if (data) {
-      data = sortData(data, $sortKey, $sortDirection)
-    }
-  }
-
-  onMount(async () => {
-    const res = await graphQLClient().request(OrgUnitDocument, {
-      uuid: uuid,
-      ...tenseToValidity(tense, $date),
-    })
-
+  $: dataPromise = graphQLClient().request(OrgUnitDocument, {
+    uuid: uuid,
+    ...tenseToValidity(tense, $date),
+  }).then((res) => {
     const orgUnits: OrgUnits = []
 
     // Filters and flattens the data
@@ -89,16 +79,16 @@
       })
       orgUnits.push(...filtered)
     }
-    data = orgUnits
+    return orgUnits
   })
 </script>
 
-{#if !data}
+{#await dataPromise}
   <tr class="leading-5 border-t border-base-300 text-base-content">
     <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
-{:else}
-  {#each data as org_unit, i}
+{:then data}
+  {#each sortData(data, $sortKey, $sortDirection) as org_unit, i}
     <tr
       class="{i % 2 === 0 ? '' : 'bg-base-200'} 
         leading-5 border-t border-base-300 text-base-content"
@@ -154,4 +144,8 @@
       >
     </tr>
   {/each}
-{/if}
+{:catch}
+  <tr class="leading-5 border-t border-base-300 text-base-content">
+    <td class="text-sm p-4">{capital($_("load_error"))}</td>
+  </tr>
+{/await}
