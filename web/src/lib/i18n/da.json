@@ -141,6 +141,7 @@
 	"leave": "{n, plural, =0 {orloven} one {orlov} other {orlover}}",
 	"leave_type": "orlovstype",
 	"link": "{n, plural, =0 {linket} one {link} other {links}}",
+	"load_error": "Noget gik galt",
 	"loading": "henter",
 	"location": "placering",
 	"logout": "log ud",
