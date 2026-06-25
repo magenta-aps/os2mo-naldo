@@ -14,7 +14,6 @@
   } from "./query.generated"
   import { date } from "$lib/stores/date"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
-  import { onMount } from "svelte"
   import { sortData } from "$lib/utils/sorting"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import Icon from "@iconify/svelte"
@@ -27,8 +26,6 @@
   type Owners =
     | EmployeeOwnerQuery["owners"]["objects"][0]["validities"]
     | OrgUnitOwnerQuery["org_units"]["objects"][0]["validities"][0]["owners"]
-
-  let data: Owners
 
   export let tense: Tense
 
@@ -105,54 +102,47 @@
     }
   `
 
-  $: {
-    if (data) {
-      data = sortData(data, $sortKey, $sortDirection)
-    }
-  }
-
-  onMount(async () => {
-    const owners: Owners = []
-
-    if (isOrg) {
-      const res = await graphQLClient().request(OrgUnitOwnerDocument, {
+  $: dataPromise = isOrg
+    ? graphQLClient().request(OrgUnitOwnerDocument, {
         uuids: uuid,
         ...tenseToValidity(tense, $date),
-      })
+      }).then((res) => {
+        const owners: Owners = []
 
-      // Filters and flattens the data
-      for (const outer of res.org_units.objects) {
-        // TODO: Remove when GraphQL is able to do this for us
-        const filtered = outer.validities[0].owners.filter((obj) => {
-          return tenseFilter(obj, tense)
-        })
-        owners.push(...filtered)
-      }
-      data = owners
-    } else {
-      const res = await graphQLClient().request(EmployeeOwnerDocument, {
+        // Filters and flattens the data
+        for (const outer of res.org_units.objects) {
+          // TODO: Remove when GraphQL is able to do this for us
+          const filtered = outer.validities[0].owners.filter((obj) => {
+            return tenseFilter(obj, tense)
+          })
+          owners.push(...filtered)
+        }
+        return owners
+      })
+    : graphQLClient().request(EmployeeOwnerDocument, {
         uuids: uuid,
         ...tenseToValidity(tense, $date),
+      }).then((res) => {
+        const owners: Owners = []
+
+        // Filters and flattens the data
+        for (const outer of res.owners.objects) {
+          // TODO: Remove when GraphQL is able to do this for us
+          const filtered = outer.validities.filter((obj) => {
+            return tenseFilter(obj, tense)
+          })
+          owners.push(...filtered)
+        }
+        return owners
       })
-      // Filters and flattens the data
-      for (const outer of res.owners.objects) {
-        // TODO: Remove when GraphQL is able to do this for us
-        const filtered = outer.validities.filter((obj) => {
-          return tenseFilter(obj, tense)
-        })
-        owners.push(...filtered)
-      }
-      data = owners
-    }
-  })
 </script>
 
-{#if !data}
+{#await dataPromise}
   <tr class="leading-5 border-t border-base-300 text-base-content">
     <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
-{:else}
-  {#each data as ownerObj, i}
+{:then data}
+  {#each sortData(data, $sortKey, $sortDirection) as ownerObj, i}
     <tr
       class="{i % 2 === 0 ? '' : 'bg-base-200'} 
         leading-5 border-t border-base-300 text-base-content"
@@ -208,4 +198,8 @@
       >
     </tr>
   {/each}
-{/if}
+{:catch}
+  <tr class="leading-5 border-t border-base-300 text-base-content">
+    <td class="text-sm p-4">{capital($_("load_error"))}</td>
+  </tr>
+{/await}
