@@ -8,7 +8,6 @@
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
-  import { onMount } from "svelte"
   import { sortKey, sortDirection } from "$lib/stores/sorting"
   import { sortData } from "$lib/utils/sorting"
   import { page } from "$app/stores"
@@ -23,7 +22,6 @@
 
   const uuid = $page.params.uuid
   type Leaves = EmployeeLeavesQuery["leaves"]["objects"][0]["validities"]
-  let data: Leaves
 
   gql`
     query EmployeeLeaves(
@@ -69,17 +67,10 @@
     }
   `
 
-  $: {
-    if (data) {
-      data = sortData(data, $sortKey, $sortDirection)
-    }
-  }
-
-  onMount(async () => {
-    const res = await graphQLClient().request(EmployeeLeavesDocument, {
-      employee_uuid: uuid,
-      ...tenseToValidity(tense, $date),
-    })
+  $: dataPromise = graphQLClient().request(EmployeeLeavesDocument, {
+    employee_uuid: uuid,
+    ...tenseToValidity(tense, $date),
+  }).then((res) => {
     const leaves: Leaves = []
 
     // Filters and flattens the data
@@ -90,16 +81,16 @@
       })
       leaves.push(...filtered)
     }
-    data = leaves
+    return leaves
   })
 </script>
 
-{#if !data}
+{#await dataPromise}
   <tr class="leading-5 border-t border-base-300 text-base-content">
     <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
-{:else}
-  {#each data as leave, i}
+{:then data}
+  {#each sortData(data, $sortKey, $sortDirection) as leave, i}
     <tr
       class="{i % 2 === 0 ? '' : 'bg-base-200'} 
       leading-5 border-t border-base-300 text-base-content"
@@ -137,4 +128,8 @@
       >
     </tr>
   {/each}
-{/if}
+{:catch}
+  <tr class="leading-5 border-t border-base-300 text-base-content">
+    <td class="text-sm p-4">{capital($_("load_error"))}</td>
+  </tr>
+{/await}
