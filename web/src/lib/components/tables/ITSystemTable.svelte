@@ -10,7 +10,6 @@
   import { formatQueryDates } from "$lib/utils/validities"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import { onMount } from "svelte"
   import { ItSystemDocument, type ItSystemQuery } from "./query.generated"
   import { sortKey, sortDirection } from "$lib/stores/sorting"
   import { sortData } from "$lib/utils/sorting"
@@ -21,7 +20,6 @@
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
 
   type ITSystems = ItSystemQuery["itsystems"]["objects"][0]["validities"]
-  let data: ITSystems
 
   export let tense: Tense
 
@@ -50,16 +48,9 @@
     }
   `
 
-  $: {
-    if (data) {
-      data = sortData(data, $sortKey, $sortDirection)
-    }
-  }
-
-  onMount(async () => {
-    const res = await graphQLClient().request(ItSystemDocument, {
-      ...tenseToValidity(tense, $date),
-    })
+  $: dataPromise = graphQLClient().request(ItSystemDocument, {
+    ...tenseToValidity(tense, $date),
+  }).then((res) => {
     const itsystems: ITSystems = []
 
     // Filters and flattens the data
@@ -70,16 +61,16 @@
       })
       itsystems.push(...filtered)
     }
-    data = itsystems
+    return itsystems
   })
 </script>
 
-{#if !data}
+{#await dataPromise}
   <tr class="leading-5 border-t border-base-300 text-base-content">
     <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
-{:else}
-  {#each data as itsystem, i}
+{:then data}
+  {#each sortData(data, $sortKey, $sortDirection) as itsystem, i}
     <tr
       class="{i % 2 === 0 ? '' : 'bg-base-200'} 
         leading-5 border-t border-base-300 text-base-content"
@@ -123,4 +114,8 @@
       >
     </tr>
   {/each}
-{/if}
+{:catch}
+  <tr class="leading-5 border-t border-base-300 text-base-content">
+    <td class="text-sm p-4">{capital($_("load_error"))}</td>
+  </tr>
+{/await}
