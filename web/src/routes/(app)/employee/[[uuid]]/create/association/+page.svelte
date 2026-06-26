@@ -27,6 +27,7 @@
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import SelectGroup from "$lib/components/forms/shared/SelectGroup.svelte"
+  import { onDestroy } from "svelte"
   import { getClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
 
@@ -154,32 +155,27 @@
     to: string | undefined | null
   } = { from: null, to: null }
 
-  let facets: FacetValidities[]
-  let abortController: AbortController
-  $: {
-    // Abort the previous request if a new one is about to start
-    if (abortController) abortController.abort()
-    abortController = new AbortController()
-
-    const params = {
-      currentDate: startDate,
-      orgUuid: selectedOrgUnit?.uuid,
-      facetUserKeys: ["association_type", "primary_type"],
-    }
-
-    ;(async () => {
-      validities = selectedOrgUnit
-        ? await getValidities(selectedOrgUnit.uuid)
-        : { from: null, to: null }
-      try {
-        facets = await getClasses(params, abortController.signal)
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Request failed:", err)
-        }
-      }
-    })()
+  $: if (selectedOrgUnit?.uuid) {
+    getValidities(selectedOrgUnit.uuid).then((v) => { validities = v })
+  } else {
+    validities = { from: null, to: null }
   }
+
+  let facetsController: AbortController
+  onDestroy(() => facetsController?.abort())
+
+  $: facetsPromise = (() => {
+    facetsController?.abort()
+    facetsController = new AbortController()
+    return getClasses(
+      {
+        currentDate: startDate,
+        orgUuid: selectedOrgUnit?.uuid,
+        facetUserKeys: ["association_type", "primary_type"],
+      },
+      facetsController.signal
+    )
+  })()
 </script>
 
 <title
@@ -265,7 +261,7 @@
           required={true}
         />
         <Breadcrumbs orgUnit={selectedOrgUnit} />
-        {#if facets}
+        {#await facetsPromise then facets}
           <div class="flex flex-row gap-6">
             <Select
               title={capital($_("association_type"))}
@@ -302,7 +298,9 @@
               iterable={topLevelFacets ? topLevelFacets : []}
             />
           {/if}
-        {/if}
+        {:catch}
+          <p class="text-sm text-error">{capital($_("load_error"))}</p>
+        {/await}
       </div>
     </div>
     <div class="flex py-6 gap-4">
