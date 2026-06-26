@@ -261,7 +261,12 @@
           required={true}
         />
         <Breadcrumbs orgUnit={selectedOrgUnit} />
-        {#await facetsPromise then facets}
+        {#await facetsPromise}
+          <div class="flex flex-row gap-6">
+            <Skeleton extra_classes="basis-1/2" />
+            <Skeleton extra_classes="basis-1/2" />
+          </div>
+        {:then facets}
           <div class="flex flex-row gap-6">
             <Select
               title={capital($_("association_type"))}

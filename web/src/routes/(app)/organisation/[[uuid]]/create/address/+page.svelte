@@ -21,6 +21,7 @@
   import { required, email, pattern, url } from "svelte-forms/validators"
   import type { FacetValidities } from "$lib/utils/classes"
   import { onDestroy } from "svelte"
+  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
 
@@ -183,7 +184,12 @@
           max={validities.to}
         />
       </div>
-      {#await facetsPromise then facets}
+      {#await facetsPromise}
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+      {:then facets}
         <div class="flex flex-row gap-6">
           <Select
             title={capital($_("visibility"))}

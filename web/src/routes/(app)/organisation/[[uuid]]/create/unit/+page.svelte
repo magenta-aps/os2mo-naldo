@@ -206,7 +206,13 @@
         bind:value={$name.value}
         errors={$name.errors}
       />
-      {#await facetsPromise then facets}
+      {#await facetsPromise}
+        <Skeleton />
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+      {:then facets}
         {#if env.PUBLIC_SHOW_ORG_UNIT_LEVEL}
           <Select
             title={capital($_("org_unit_level"))}
