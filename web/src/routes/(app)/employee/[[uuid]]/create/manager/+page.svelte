@@ -174,6 +174,8 @@
     )
   })()
 
+  let resolvedEngagements: EngagementTitleAndUuid[] = []
+
   let engagementsController: AbortController
   onDestroy(() => engagementsController?.abort())
 
@@ -186,13 +188,16 @@
         fromDate: startDate,
         toDate: toDate || null,
       })
-      .then((res) => res.engagements?.objects.map((e) => e.validities[0]) ?? [])
+      .then((res) => {
+        resolvedEngagements = res.engagements?.objects.map((e) => e.validities[0]) ?? []
+        return resolvedEngagements
+      })
   })()
 
-  $: if (engagements?.[0]?.person_response && !selectedPerson) {
+  $: if (resolvedEngagements[0]?.person_response && !selectedPerson) {
     selectedPerson = {
-      uuid: engagements[0].person_response.uuid,
-      name: engagements[0].person_response.current?.name ?? "",
+      uuid: resolvedEngagements[0].person_response.uuid,
+      name: resolvedEngagements[0].person_response.current?.name ?? "",
     }
   }
 </script>
