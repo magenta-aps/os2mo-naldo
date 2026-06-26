@@ -21,6 +21,7 @@
   import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
+  import { onDestroy } from "svelte"
   import { getClasses } from "$lib/http/getClasses"
   import {
     formatEngagementTitlesAndUuid,
@@ -136,47 +137,43 @@
     to: string | undefined | null
   } = { from: null, to: null }
 
-  let facets: FacetValidities[]
-  let abortController: AbortController
-  $: if (startDate) {
-    // Abort the previous request if a new one is about to start
-    if (abortController) abortController.abort()
-    abortController = new AbortController()
+  let facetsController: AbortController
+  onDestroy(() => facetsController?.abort())
 
-    const params = {
-      currentDate: startDate,
-      orgUuid: $page.params.uuid,
-      facetUserKeys: ["manager_type", "manager_level", "responsibility"],
-    }
+  $: facetsPromise = (() => {
+    facetsController?.abort()
+    facetsController = new AbortController()
+    return startDate
+      ? getClasses(
+          {
+            currentDate: startDate,
+            orgUuid: $page.params.uuid,
+            facetUserKeys: ["manager_type", "manager_level", "responsibility"],
+          },
+          facetsController.signal
+        )
+      : Promise.resolve([] as FacetValidities[])
+  })()
 
-    ;(async () => {
-      try {
-        facets = await getClasses(params, abortController.signal)
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Request failed:", err)
-        }
-      }
-    })()
-  }
+  let engagementsController: AbortController
+  onDestroy(() => engagementsController?.abort())
 
-  let engagements: EngagementTitleAndUuid[] = []
   $: personUuid = selectedPerson?.uuid
-  $: if (personUuid) {
-    const fetchUuid = personUuid
-    ;(async () => {
-      const res = await graphQLClient().request(GetEngagementsDocument, {
-        uuid: fetchUuid,
+  $: engagementsPromise = (() => {
+    engagementsController?.abort()
+    engagementsController = new AbortController()
+    if (!personUuid) {
+      selectedEngagement = undefined
+      return Promise.resolve([] as EngagementTitleAndUuid[])
+    }
+    return graphQLClient(engagementsController.signal)
+      .request(GetEngagementsDocument, {
+        uuid: personUuid,
         fromDate: startDate,
         toDate: toDate || null,
       })
-      if (personUuid !== fetchUuid) return
-      engagements = res.engagements?.objects.map((e) => e.validities[0]) ?? []
-    })()
-  } else {
-    engagements = []
-    selectedEngagement = undefined
-  }
+      .then((res) => res.engagements?.objects.map((e) => e.validities[0]) ?? [])
+  })()
 </script>
 
 <title
@@ -222,17 +219,19 @@
         />
       </div>
       <Search type="employee" at={startDate} bind:value={selectedPerson} />
-      <Select
-        title={capital($_("engagement", { values: { n: 1 } }))}
-        id="engagement-uuid"
-        bind:value={selectedEngagement}
-        errors={$engagement.errors}
-        iterable={engagements.length ? formatEngagementTitlesAndUuid(engagements) : []}
-        isClearable={true}
-        disabled={!engagements.length || noEngagement}
-        required={!noEngagement}
-        on:change={() => engagement.validate()}
-      />
+      {#await engagementsPromise then engagements}
+        <Select
+          title={capital($_("engagement", { values: { n: 1 } }))}
+          id="engagement-uuid"
+          bind:value={selectedEngagement}
+          errors={$engagement.errors}
+          iterable={engagements.length ? formatEngagementTitlesAndUuid(engagements) : []}
+          isClearable={true}
+          disabled={!engagements.length || noEngagement}
+          required={!noEngagement}
+          on:change={() => engagement.validate()}
+        />
+      {/await}
       <div class="-mt-2">
         <Checkbox
           title={capital($_("no_engagement"))}
@@ -242,7 +241,7 @@
           on:change={() => engagement.validate()}
         />
       </div>
-      {#if facets}
+      {#await facetsPromise then facets}
         <div class="flex flex-row gap-6">
           <Select
             title={capital($_("manager_type"))}
@@ -271,7 +270,9 @@
           iterable={filterClassesByFacetUserKey(facets, "responsibility")}
           required={true}
         />
-      {/if}
+      {:catch}
+        <p class="text-sm text-error">{capital($_("load_error"))}</p>
+      {/await}
     </div>
   </div>
   <div class="flex py-6 gap-4">
