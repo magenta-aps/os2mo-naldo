@@ -23,6 +23,7 @@
   import type { FacetValidities } from "$lib/utils/classes"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import { formatITSystemNames } from "$lib/utils/helpers"
+  import { onDestroy } from "svelte"
   import { getPrimaryClasses } from "$lib/http/getClasses"
   import { getPersonValidities } from "$lib/http/getValidities"
   import { normalizeITUser } from "$lib/utils/normalizeForm"
@@ -143,32 +144,23 @@
     to: string | undefined | null
   } = { from: null, to: null }
 
-  let facets: FacetValidities[]
-  let abortController: AbortController
-  $: {
-    // Abort the previous request if a new one is about to start
-    if (abortController) abortController.abort()
-    abortController = new AbortController()
-
-    // Make sure `currentDate` isn't sent if startDate is null.
-    const params = {
-      fromDate: startDate,
-      primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY,
-    }
-
-    ;(async () => {
-      validities = $page.params.uuid
-        ? await getPersonValidities($page.params.uuid)
-        : { from: null, to: null }
-      try {
-        facets = await getPrimaryClasses(params, abortController.signal)
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Request failed:", err)
-        }
-      }
-    })()
+  $: if ($page.params.uuid) {
+    getPersonValidities($page.params.uuid).then((v) => { validities = v })
   }
+
+  let facetsController: AbortController
+  onDestroy(() => facetsController?.abort())
+
+  $: facetsPromise = (() => {
+    facetsController?.abort()
+    facetsController = new AbortController()
+    return startDate
+      ? getPrimaryClasses(
+          { fromDate: startDate, primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY },
+          facetsController.signal
+        )
+      : Promise.resolve([] as FacetValidities[])
+  })()
 
   let initialITUser: any = null
   let hasChanges = false
@@ -294,7 +286,7 @@
             disabled={disableForm}
           />
         </div>
-        {#if facets}
+        {#await facetsPromise then facets}
           <Select
             title={capital($_("primary"))}
             id="primary"
@@ -311,7 +303,9 @@
             isClearable={true}
             disabled={disableForm}
           />
-        {/if}
+        {:catch}
+          <p class="text-sm text-error">{capital($_("load_error"))}</p>
+        {/await}
         <Input
           title={capital($_("external_id"))}
           id="external-id"
