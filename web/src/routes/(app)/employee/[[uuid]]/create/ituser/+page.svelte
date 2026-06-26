@@ -327,7 +327,9 @@
             required={true}
           />
         </div>
-        {#await facetsPromise then facets}
+        {#await facetsPromise}
+          <Skeleton />
+        {:then facets}
           <Select
             title={capital($_("primary"))}
             id="primary"

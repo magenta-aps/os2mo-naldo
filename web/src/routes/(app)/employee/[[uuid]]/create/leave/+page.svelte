@@ -249,7 +249,9 @@
           disabled
           required={true}
         />
-        {#await facetsPromise then facets}
+        {#await facetsPromise}
+          <Skeleton />
+        {:then facets}
           <Select
             title={capital($_("leave_type"))}
             id="leave-type-uuid"
@@ -262,7 +264,9 @@
           <p class="text-sm text-error">{capital($_("load_error"))}</p>
         {/await}
 
-        {#await engagementsPromise then engagements}
+        {#await engagementsPromise}
+          <Skeleton />
+        {:then engagements}
           {#if engagements.length}
             <Select
               title={capital($_("engagement", { values: { n: 2 } }))}

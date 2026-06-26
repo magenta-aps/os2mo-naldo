@@ -20,6 +20,7 @@
   } from "./query.generated"
   import Select from "$lib/components/forms/shared/Select.svelte"
   import { onDestroy } from "svelte"
+  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getValidities } from "$lib/http/getValidities"
   import { getMinMaxValidities } from "$lib/utils/validities"
 
@@ -183,7 +184,9 @@
         />
       </div>
       <div class="text-base-content pb-3">
-        {#await engagementsPromise then engagements}
+        {#await engagementsPromise}
+          <Skeleton />
+        {:then engagements}
         {#if engagements.length}
           {#key engagements}
             <fieldset>

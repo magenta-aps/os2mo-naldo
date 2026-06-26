@@ -21,6 +21,7 @@
   import DarSearch from "$lib/components/forms/shared/DARSearch.svelte"
   import type { FacetValidities } from "$lib/utils/classes"
   import { onDestroy } from "svelte"
+  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getClasses } from "$lib/http/getClasses"
   import { getPersonValidities } from "$lib/http/getValidities"
 

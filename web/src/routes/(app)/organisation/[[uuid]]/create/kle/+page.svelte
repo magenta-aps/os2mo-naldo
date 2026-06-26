@@ -21,6 +21,7 @@
   import { required } from "svelte-forms/validators"
   import { formatKleNumberTitleAndUuid } from "$lib/utils/helpers"
   import { onDestroy } from "svelte"
+  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
 
@@ -148,7 +149,10 @@
           max={validities.to}
         />
       </div>
-      {#await facetsPromise then facets}
+      {#await facetsPromise}
+        <Skeleton />
+        <Skeleton />
+      {:then facets}
         <Select
           title={capital($_("kle_number"))}
           id="kle-number"

@@ -21,6 +21,7 @@
   import { required, email, pattern, url } from "svelte-forms/validators"
   import type { FacetValidities } from "$lib/utils/classes"
   import { onDestroy } from "svelte"
+  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
 

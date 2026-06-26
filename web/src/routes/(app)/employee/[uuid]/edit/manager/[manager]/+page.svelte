@@ -385,7 +385,9 @@
               }
             : undefined}
         />
-        {#await engagementsPromise then engagements}
+        {#await engagementsPromise}
+          <Skeleton />
+        {:then engagements}
           <Select
             title={capital($_("engagement", { values: { n: 1 } }))}
             id="engagement-uuid"
@@ -400,7 +402,13 @@
             disabled={!engagements?.length}
           />
         {/await}
-        {#await facetsPromise then facets}
+        {#await facetsPromise}
+          <div class="flex flex-row gap-6">
+            <Skeleton extra_classes="basis-1/2" />
+            <Skeleton extra_classes="basis-1/2" />
+          </div>
+          <Skeleton />
+        {:then facets}
           <div class="flex flex-row gap-6">
             <Select
               title={capital($_("manager_type"))}
