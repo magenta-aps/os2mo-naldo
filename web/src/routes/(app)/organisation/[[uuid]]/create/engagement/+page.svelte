@@ -23,7 +23,7 @@
   import { getClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
   import { env } from "$lib/env"
-  import { onMount } from "svelte"
+  import { onMount, onDestroy } from "svelte"
 
   gql`
     mutation CreateEngagement($input: EngagementCreateInput!, $date: DateTime!) {
@@ -89,29 +89,23 @@
       }
     }
 
-  let facets: FacetValidities[]
-  let abortController: AbortController
-  $: if (startDate) {
-    // Abort the previous request if a new one is about to start
-    if (abortController) abortController.abort()
-    abortController = new AbortController()
+  let facetsController: AbortController
+  onDestroy(() => facetsController?.abort())
 
-    const params = {
-      currentDate: startDate,
-      orgUuid: $page.params.uuid,
-      facetUserKeys: ["engagement_type", "engagement_job_function", "primary_type"],
-    }
-
-    ;(async () => {
-      try {
-        facets = await getClasses(params, abortController.signal)
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Request failed:", err)
-        }
-      }
-    })()
-  }
+  $: facetsPromise = (() => {
+    facetsController?.abort()
+    facetsController = new AbortController()
+    return startDate
+      ? getClasses(
+          {
+            currentDate: startDate,
+            orgUuid: $page.params.uuid,
+            facetUserKeys: ["engagement_type", "engagement_job_function", "primary_type"],
+          },
+          facetsController.signal
+        )
+      : Promise.resolve([] as FacetValidities[])
+  })()
 </script>
 
 <title
@@ -164,7 +158,7 @@
         on:clear={() => ($employee.value = "")}
         required={true}
       />
-      {#if facets}
+      {#await facetsPromise then facets}
         <div class="flex flex-row gap-6">
           <Input title="ID" id="user-key" extra_classes="basis-1/2" />
           <Select
@@ -215,7 +209,9 @@
             isClearable={true}
           />
         </div>
-      {/if}
+      {:catch}
+        <p class="text-sm text-error">{capital($_("load_error"))}</p>
+      {/await}
     </div>
   </div>
   <div class="flex py-6 gap-4">
