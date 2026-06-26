@@ -348,6 +348,9 @@
             <Skeleton extra_classes="basis-1/2" />
             <Skeleton extra_classes="basis-1/2" />
           </div>
+          {#if env.PUBLIC_ENABLE_CONFEDERATIONS}
+            <Skeleton />
+          {/if}
         {:then facets}
           <div class="flex flex-row gap-6">
             <Select
