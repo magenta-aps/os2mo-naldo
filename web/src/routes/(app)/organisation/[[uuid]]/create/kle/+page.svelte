@@ -20,6 +20,7 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import { formatKleNumberTitleAndUuid } from "$lib/utils/helpers"
+  import { onDestroy } from "svelte"
   import { getClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
 
@@ -82,32 +83,27 @@
     to: string | undefined | null
   } = { from: null, to: null }
 
-  let facets: FacetValidities[]
-  let abortController: AbortController
-  $: if (startDate) {
-    // Abort the previous request if a new one is about to start
-    if (abortController) abortController.abort()
-    abortController = new AbortController()
-
-    const params = {
-      currentDate: startDate,
-      orgUuid: $page.params.uuid,
-      facetUserKeys: ["kle_aspect", "kle_number"],
-    }
-
-    ;(async () => {
-      validities = $page.params.uuid
-        ? await getValidities($page.params.uuid)
-        : { from: null, to: null }
-      try {
-        facets = await getClasses(params, abortController.signal)
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Request failed:", err)
-        }
-      }
-    })()
+  $: if ($page.params.uuid) {
+    getValidities($page.params.uuid).then((v) => { validities = v })
   }
+
+  let facetsController: AbortController
+  onDestroy(() => facetsController?.abort())
+
+  $: facetsPromise = (() => {
+    facetsController?.abort()
+    facetsController = new AbortController()
+    return startDate
+      ? getClasses(
+          {
+            currentDate: startDate,
+            orgUuid: $page.params.uuid,
+            facetUserKeys: ["kle_aspect", "kle_number"],
+          },
+          facetsController.signal
+        )
+      : Promise.resolve([] as FacetValidities[])
+  })()
 </script>
 
 <title
@@ -152,7 +148,7 @@
           max={validities.to}
         />
       </div>
-      {#if facets}
+      {#await facetsPromise then facets}
         <Select
           title={capital($_("kle_number"))}
           id="kle-number"
@@ -172,7 +168,9 @@
           iterable={filterClassesByFacetUserKey(facets, "kle_aspect")}
           required={true}
         />
-      {/if}
+      {:catch}
+        <p class="text-sm text-error">{capital($_("load_error"))}</p>
+      {/await}
     </div>
   </div>
   <div class="flex py-6 gap-4">
