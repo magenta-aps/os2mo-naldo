@@ -24,6 +24,7 @@
     type EngagementTitleAndUuid,
   } from "$lib/utils/display"
   import type { FacetValidities } from "$lib/utils/classes"
+  import { onDestroy } from "svelte"
   import { getEngagementValidities } from "$lib/http/getValidities"
   import { getClasses } from "$lib/http/getClasses"
   import { form, field } from "svelte-forms"
@@ -187,19 +188,6 @@
       }
     }
 
-  const updateEngagements = async (
-    employeeUuid: string | undefined | null,
-    fromDate: string,
-    toDate: string
-  ) => {
-    const res = await graphQLClient().request(GetEngagementsDocument, {
-      uuid: employeeUuid,
-      fromDate: fromDate,
-      toDate: toDate,
-    })
-    return (engagements = res.engagements?.objects.map((e) => e.validities[0]))
-  }
-
   // Logic for updating datepicker intervals
   let validities: {
     from: string | undefined | null
@@ -207,38 +195,37 @@
   } = { from: null, to: null }
 
   $: if (selectedEngagement) {
-    ;(async () => {
-      validities = await getEngagementValidities(selectedEngagement.uuid)
-    })()
+    getEngagementValidities(selectedEngagement.uuid).then((v) => { validities = v })
   } else {
     validities = { from: null, to: null }
   }
 
-  let facets: FacetValidities[]
-  let engagements: EngagementTitleAndUuid[]
-  let abortController: AbortController
-  $: {
-    // Abort the previous request if a new one is about to start
-    if (abortController) abortController.abort()
-    abortController = new AbortController()
+  let facetsController: AbortController
+  onDestroy(() => facetsController?.abort())
 
-    const params = {
-      currentDate: startDate,
-      orgUuid: null,
-      facetUserKeys: ["leave_type"],
-    }
+  $: facetsPromise = (() => {
+    facetsController?.abort()
+    facetsController = new AbortController()
+    return getClasses(
+      { currentDate: startDate, orgUuid: null, facetUserKeys: ["leave_type"] },
+      facetsController.signal
+    )
+  })()
 
-    ;(async () => {
-      try {
-        facets = await getClasses(params, abortController.signal)
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Request failed:", err)
-        }
-      }
-      await updateEngagements($page.params.uuid, startDate, toDate)
-    })()
-  }
+  let engagementsController: AbortController
+  onDestroy(() => engagementsController?.abort())
+
+  $: engagementsPromise = (() => {
+    engagementsController?.abort()
+    engagementsController = new AbortController()
+    return graphQLClient(engagementsController.signal)
+      .request(GetEngagementsDocument, {
+        uuid: $page.params.uuid,
+        fromDate: startDate,
+        toDate: toDate || null,
+      })
+      .then((res) => res.engagements?.objects.map((e) => e.validities[0]) ?? [])
+  })()
 
   let initialLeave: any = null
   let hasChanges = false
@@ -342,7 +329,7 @@
           disabled
           required={true}
         />
-        {#if facets}
+        {#await facetsPromise then facets}
           <Select
             startValue={leave.leave_type_response?.current
               ? {
@@ -358,20 +345,24 @@
             iterable={filterClassesByFacetUserKey(facets, "leave_type")}
             required={true}
           />
-        {/if}
+        {:catch}
+          <p class="text-sm text-error">{capital($_("load_error"))}</p>
+        {/await}
 
-        {#if engagements && engagements.length}
-          <Select
-            title={capital($_("engagement", { values: { n: 2 } }))}
-            id="engagement-uuid"
-            startValue={engagementStartValue}
-            bind:value={selectedEngagement}
-            bind:name={$engagement.value}
-            errors={$engagement.errors}
-            iterable={getEngagementTitlesAndUuid(engagements)}
-            required={true}
-          />
-        {/if}
+        {#await engagementsPromise then engagements}
+          {#if engagements.length}
+            <Select
+              title={capital($_("engagement", { values: { n: 2 } }))}
+              id="engagement-uuid"
+              startValue={engagementStartValue}
+              bind:value={selectedEngagement}
+              bind:name={$engagement.value}
+              errors={$engagement.errors}
+              iterable={getEngagementTitlesAndUuid(engagements)}
+              required={true}
+            />
+          {/if}
+        {/await}
       </div>
     </div>
     <div class="flex py-6 gap-4">
