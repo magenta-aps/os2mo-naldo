@@ -19,6 +19,7 @@
   import { findClosestValidity } from "$lib/utils/validities"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import Search from "$lib/components/search/Search.svelte"
+  import { onDestroy } from "svelte"
   import { getClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
   import { form, field } from "svelte-forms"
@@ -71,33 +72,27 @@
     to: string | undefined | null
   } = { from: null, to: null }
 
-  let facets: FacetValidities[]
-  let abortController: AbortController
-  $: {
-    const params = {
-      currentDate: startDate,
-      orgUuid: parent ? parent.uuid : null,
-      facetUserKeys: ["org_unit_level", "org_unit_type", "time_planning"],
-    }
-
-    // Abort the previous request if a new one is about to start
-    if (abortController) {
-      abortController.abort() // Cancel any in-progress request
-    }
-
-    abortController = new AbortController()
-    ;(async () => {
-      validities = parent ? await getValidities(parent.uuid) : { from: null, to: null }
-      try {
-        const result = await getClasses(params, abortController.signal)
-        facets = result // Update facets if the request is successful
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Request failed:", err) // Handle other errors
-        }
-      }
-    })()
+  $: if (parent?.uuid) {
+    getValidities(parent.uuid).then((v) => { validities = v })
+  } else {
+    validities = { from: null, to: null }
   }
+
+  let facetsController: AbortController
+  onDestroy(() => facetsController?.abort())
+
+  $: facetsPromise = (() => {
+    facetsController?.abort()
+    facetsController = new AbortController()
+    return getClasses(
+      {
+        currentDate: startDate,
+        orgUuid: parent?.uuid ?? null,
+        facetUserKeys: ["org_unit_level", "org_unit_type", "time_planning"],
+      },
+      facetsController.signal
+    )
+  })()
 
   const handler: SubmitFunction =
     () =>
@@ -211,7 +206,7 @@
         bind:value={$name.value}
         errors={$name.errors}
       />
-      {#if facets}
+      {#await facetsPromise then facets}
         {#if env.PUBLIC_SHOW_ORG_UNIT_LEVEL}
           <Select
             title={capital($_("org_unit_level"))}
@@ -250,7 +245,9 @@
             extra_classes="basis-1/2"
           />
         </div>
-      {/if}
+      {:catch}
+        <p class="text-sm text-error">{capital($_("load_error"))}</p>
+      {/await}
     </div>
   </div>
   <div class="flex py-6 gap-4">
