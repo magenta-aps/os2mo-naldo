@@ -19,6 +19,7 @@
     type GetEngagementsQuery,
   } from "./query.generated"
   import Select from "$lib/components/forms/shared/Select.svelte"
+  import { onDestroy } from "svelte"
   import { getValidities } from "$lib/http/getValidities"
   import { getMinMaxValidities } from "$lib/utils/validities"
 
@@ -97,29 +98,26 @@
     to: string | undefined | null
   } = { from: null, to: null }
 
-  let abortController: AbortController
-  $: if (startDate) {
-    // Abort the previous request if a new one is about to start
-    if (abortController) {
-      abortController.abort()
-    }
-
-    abortController = new AbortController()
-    ;(async () => {
-      validities = orgUnit
-        ? await getValidities(orgUnit.uuid)
-        : { from: null, to: null }
-      if (orgUnit) {
-        try {
-          await updateEngagements(orgUnit?.uuid, startDate, abortController.signal)
-        } catch (err: any) {
-          if (err.name !== "AbortError") {
-            console.error("Request failed:", err)
-          }
-        }
-      }
-    })()
+  $: if (orgUnit?.uuid) {
+    getValidities(orgUnit.uuid).then((v) => { validities = v })
+  } else {
+    validities = { from: null, to: null }
   }
+
+  let engagementsController: AbortController
+  onDestroy(() => engagementsController?.abort())
+
+  $: engagementsPromise = (() => {
+    engagementsController?.abort()
+    engagementsController = new AbortController()
+    if (!orgUnit?.uuid) return Promise.resolve([] as Engagements[])
+    return graphQLClient(engagementsController.signal)
+      .request(GetEngagementsDocument, {
+        org_unit: orgUnit.uuid,
+        currentDate: startDate,
+      })
+      .then((res) => res.engagements?.objects ?? [])
+  })()
 
   const fromDate = field("from", "", [required()])
   const orgUnitField = field("org_unit", "", [required()])
@@ -136,19 +134,6 @@
     name: string
   }
   let selectedEngagements: string[] = []
-
-  const updateEngagements = async (
-    orgUnitUuid: string | undefined | null,
-    date: string,
-    signal?: AbortSignal
-  ) => {
-    const res = await graphQLClient(signal).request(GetEngagementsDocument, {
-      org_unit: orgUnitUuid,
-      currentDate: date,
-    })
-
-    engagements = res.engagements?.objects
-  }
 
   const toggleSelectAll = (engagements: Engagements[]) => {
     selectedEngagements =
@@ -198,7 +183,8 @@
         />
       </div>
       <div class="text-base-content pb-3">
-        {#if engagements && engagements.length}
+        {#await engagementsPromise then engagements}
+        {#if engagements.length}
           {#key engagements}
             <fieldset>
               <legend class="text-sm pb-1">
@@ -270,6 +256,7 @@
             required={true}
           />
         {/if}
+        {/await}
       </div>
       <div class="flex flex-row gap-6">
         <Search
