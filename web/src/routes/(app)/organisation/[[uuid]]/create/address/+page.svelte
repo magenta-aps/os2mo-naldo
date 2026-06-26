@@ -20,6 +20,7 @@
   import { form, field } from "svelte-forms"
   import { required, email, pattern, url } from "svelte-forms/validators"
   import type { FacetValidities } from "$lib/utils/classes"
+  import { onDestroy } from "svelte"
   import { getClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
 
@@ -117,33 +118,27 @@
     to: string | undefined | null
   } = { from: null, to: null }
 
-  let facets: FacetValidities[]
-  let abortController: AbortController
-  $: {
-    // Abort the previous request if a new one is about to start
-    if (abortController) abortController.abort()
-    abortController = new AbortController()
-
-    // Make sure `currentDate` isn't sent if startDate is null.
-    const params = {
-      currentDate: startDate,
-      orgUuid: $page.params.uuid,
-      facetUserKeys: ["org_unit_address_type", "visibility"],
-    }
-
-    ;(async () => {
-      validities = $page.params.uuid
-        ? await getValidities($page.params.uuid)
-        : { from: null, to: null }
-      try {
-        facets = await getClasses(params, abortController.signal)
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Request failed:", err)
-        }
-      }
-    })()
+  $: if ($page.params.uuid) {
+    getValidities($page.params.uuid).then((v) => { validities = v })
   }
+
+  let facetsController: AbortController
+  onDestroy(() => facetsController?.abort())
+
+  $: facetsPromise = (() => {
+    facetsController?.abort()
+    facetsController = new AbortController()
+    return startDate
+      ? getClasses(
+          {
+            currentDate: startDate,
+            orgUuid: $page.params.uuid,
+            facetUserKeys: ["org_unit_address_type", "visibility"],
+          },
+          facetsController.signal
+        )
+      : Promise.resolve([] as FacetValidities[])
+  })()
 </script>
 
 <title
@@ -188,7 +183,7 @@
           max={validities.to}
         />
       </div>
-      {#if facets}
+      {#await facetsPromise then facets}
         <div class="flex flex-row gap-6">
           <Select
             title={capital($_("visibility"))}
@@ -209,7 +204,9 @@
           />
           <input hidden name="address-type-uuid" bind:value={addressTypeUuid} />
         </div>
-      {/if}
+      {:catch}
+        <p class="text-sm text-error">{capital($_("load_error"))}</p>
+      {/await}
       <Input title={capital($_("description"))} id="user-key" />
       {#if addressType}
         {#if addressType.scope === "DAR"}
