@@ -26,6 +26,7 @@
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
+  import { onDestroy } from "svelte"
   import { getClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
   import { normalizeManager } from "$lib/utils/normalizeForm"
@@ -209,52 +210,47 @@
     to: string | undefined | null
   } = { from: null, to: null }
 
-  let facets: FacetValidities[]
-  let engagements: EngagementTitleAndUuid[] = []
-  let abortController: AbortController
-  $: {
-    // Abort the previous request if a new one is about to start
-    if (abortController) abortController.abort()
-    abortController = new AbortController()
-
-    // Make sure `currentDate` isn't sent if startDate is null.
-    const params = {
-      currentDate: startDate,
-      orgUuid: selectedOrgUnit?.uuid,
-      facetUserKeys: ["manager_type", "manager_level", "responsibility"],
-    }
-
-    abortController = new AbortController()
-    ;(async () => {
-      validities = selectedOrgUnit
-        ? await getValidities(selectedOrgUnit.uuid)
-        : { from: null, to: null }
-      try {
-        facets = await getClasses(params, abortController.signal)
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Request failed:", err)
-        }
-      }
-    })()
+  $: if (selectedOrgUnit?.uuid) {
+    getValidities(selectedOrgUnit.uuid).then((v) => { validities = v })
+  } else {
+    validities = { from: null, to: null }
   }
 
+  let facetsController: AbortController
+  onDestroy(() => facetsController?.abort())
+
+  $: facetsPromise = (() => {
+    facetsController?.abort()
+    facetsController = new AbortController()
+    return getClasses(
+      {
+        currentDate: startDate,
+        orgUuid: selectedOrgUnit?.uuid,
+        facetUserKeys: ["manager_type", "manager_level", "responsibility"],
+      },
+      facetsController.signal
+    )
+  })()
+
+  let engagementsController: AbortController
+  onDestroy(() => engagementsController?.abort())
+
   $: personUuid = selectedPerson?.uuid
-  $: if (personUuid) {
-    const fetchUuid = personUuid
-    ;(async () => {
-      const res = await graphQLClient().request(GetEngagementsDocument, {
-        uuid: fetchUuid,
+  $: engagementsPromise = (() => {
+    engagementsController?.abort()
+    engagementsController = new AbortController()
+    if (!personUuid) {
+      selectedEngagement = undefined
+      return Promise.resolve([] as EngagementTitleAndUuid[])
+    }
+    return graphQLClient(engagementsController.signal)
+      .request(GetEngagementsDocument, {
+        uuid: personUuid,
         fromDate: startDate,
         toDate: toDate || null,
       })
-      if (personUuid !== fetchUuid) return
-      engagements = res.engagements?.objects.map((e) => e.validities[0]) ?? []
-    })()
-  } else {
-    engagements = []
-    selectedEngagement = undefined
-  }
+      .then((res) => res.engagements?.objects.map((e) => e.validities[0]) ?? [])
+  })()
 
   let initialManager: any = null
   let hasChanges = false
@@ -389,20 +385,22 @@
               }
             : undefined}
         />
-        <Select
-          title={capital($_("engagement", { values: { n: 1 } }))}
-          id="engagement-uuid"
-          startValue={engagementStartValue}
-          bind:value={selectedEngagement}
-          iterable={engagements?.length
-            ? getEngagementTitlesAndUuid(engagements)
-            : engagementStartValue
-            ? [engagementStartValue]
-            : []}
-          isClearable={true}
-          disabled={!engagements?.length}
-        />
-        {#if facets}
+        {#await engagementsPromise then engagements}
+          <Select
+            title={capital($_("engagement", { values: { n: 1 } }))}
+            id="engagement-uuid"
+            startValue={engagementStartValue}
+            bind:value={selectedEngagement}
+            iterable={engagements?.length
+              ? getEngagementTitlesAndUuid(engagements)
+              : engagementStartValue
+              ? [engagementStartValue]
+              : []}
+            isClearable={true}
+            disabled={!engagements?.length}
+          />
+        {/await}
+        {#await facetsPromise then facets}
           <div class="flex flex-row gap-6">
             <Select
               title={capital($_("manager_type"))}
@@ -440,7 +438,9 @@
             iterable={filterClassesByFacetUserKey(facets, "responsibility")}
             required={true}
           />
-        {/if}
+        {:catch}
+          <p class="text-sm text-error">{capital($_("load_error"))}</p>
+        {/await}
       </div>
     </div>
     <div class="flex py-6 gap-4">
