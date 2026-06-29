@@ -20,6 +20,7 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import deleteOutlineRounded from "@iconify/icons-material-symbols/delete-outline-rounded"
+  import fileCopyOutlineRounded from "@iconify/icons-material-symbols/file-copy-outline-rounded"
 
   // Magic UUID of the bootstrap "Policy Administrator" policy. It is protected
   // from deletion in the backend, so we also disable its delete action here.
@@ -79,6 +80,12 @@
 
   onMount(load)
 
+  const copyUuid = (policy: { uuid: string; name: string }) => {
+    navigator.clipboard.writeText(policy.uuid).then(() => {
+      $success = { message: `${policy.name} ${$_("copied")}`, type: "clipboard" }
+    })
+  }
+
   const openDelete = (policy: { uuid: string; name: string }) => {
     policyToDelete = { uuid: policy.uuid, name: policy.name }
     dialog.showModal()
@@ -133,6 +140,13 @@
         </td>
         <ValidityTableCell validity={{ from: policy.start, to: policy.end }} />
         <td class="flex p-4 gap-2 justify-end">
+          <button
+            type="button"
+            title={capital($_("copy"))}
+            on:click={() => copyUuid(policy)}
+          >
+            <Icon icon={fileCopyOutlineRounded} width="25" height="25" />
+          </button>
           {#if policy.uuid === POLICYADMIN_UUID}
             <span
               class="tooltip tooltip-left cursor-not-allowed"
