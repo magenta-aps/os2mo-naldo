@@ -1,6 +1,7 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
+  import { base } from "$app/paths"
   import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { onMount } from "svelte"
@@ -16,6 +17,7 @@
   import ValidityTableCell from "$lib/components/shared/ValidityTableCell.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import Icon from "@iconify/svelte"
+  import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import deleteOutlineRounded from "@iconify/icons-material-symbols/delete-outline-rounded"
 
   // Magic UUID of the bootstrap "Policy Administrator" policy. It is protected
@@ -107,6 +109,9 @@
         <td class="text-sm p-4">{policy.description ?? ""}</td>
         <ValidityTableCell validity={{ from: policy.start, to: policy.end }} />
         <td class="flex p-4 gap-2 justify-end">
+          <a href="{base}/admin/policies/{policy.uuid}/edit">
+            <Icon icon={editSquareOutlineRounded} width="25" height="25" />
+          </a>
           {#if policy.uuid === POLICYADMIN_UUID}
             <span
               class="tooltip tooltip-left cursor-not-allowed"
