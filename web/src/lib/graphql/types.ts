@@ -17764,3 +17764,9 @@ export type Version = {
    */
   mo_version?: Maybe<Scalars['String']['output']>;
 };
+
+/** Delete a policy. */
+export type PolicyDeleteInput = {
+  /** UUID of the policy to delete. */
+  uuid: Scalars['UUID']['input'];
+};
