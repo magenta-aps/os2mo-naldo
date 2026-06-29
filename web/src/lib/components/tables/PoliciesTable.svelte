@@ -139,7 +139,7 @@
           {/if}
         </td>
         <ValidityTableCell validity={{ from: policy.start, to: policy.end }} />
-        <td class="flex p-4 gap-2 justify-end">
+        <td class="flex p-4 gap-2 justify-end text-primary">
           <button
             type="button"
             title={capital($_("copy"))}
