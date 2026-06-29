@@ -193,6 +193,7 @@
 	"parent_response": "overenhed",
 	"past": "fortid",
 	"phone": "telefon",
+	"policies": "{n, plural, =0 {politikken} one {politik} other {politikker}}",
 	"present": "nutid",
 	"primary": "primær",
 	"quick_actions": "Hurtige handlinger",

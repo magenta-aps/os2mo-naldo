@@ -193,6 +193,7 @@
 	"parent_response": "parent unit",
 	"past": "past",
 	"phone": "phone",
+	"policies": "{n, plural, =0 {the policy} one {policy} other {policies}}",
 	"present": "present",
 	"primary": "primary",
 	"quick_actions": "Quick actions",
