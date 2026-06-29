@@ -109,10 +109,18 @@
         <td class="text-sm p-4">{policy.description ?? ""}</td>
         <ValidityTableCell validity={{ from: policy.start, to: policy.end }} />
         <td class="flex p-4 gap-2 justify-end">
-          <a href="{base}/admin/policies/{policy.uuid}/edit">
-            <Icon icon={editSquareOutlineRounded} width="25" height="25" />
-          </a>
           {#if policy.uuid === POLICYADMIN_UUID}
+            <span
+              class="tooltip tooltip-left cursor-not-allowed"
+              data-tip={$_("policyadmin_immutable")}
+            >
+              <Icon
+                icon={editSquareOutlineRounded}
+                width="25"
+                height="25"
+                class="opacity-30"
+              />
+            </span>
             <span
               class="tooltip tooltip-left cursor-not-allowed"
               data-tip={$_("policyadmin_protected")}
@@ -125,6 +133,9 @@
               />
             </span>
           {:else}
+            <a href="{base}/admin/policies/{policy.uuid}/edit">
+              <Icon icon={editSquareOutlineRounded} width="25" height="25" />
+            </a>
             <button type="button" on:click={() => openDelete(policy)}>
               <Icon icon={deleteOutlineRounded} width="25" height="25" />
             </button>

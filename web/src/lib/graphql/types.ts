@@ -17793,3 +17793,32 @@ export type PolicyDeleteInput = {
   /** UUID of the policy to delete. */
   uuid: Scalars['UUID']['input'];
 };
+
+/** A single actor entry. */
+export type PolicyActorEntryInput = {
+  /** The kind of attribute to match on. */
+  kind: PolicyActorKind;
+  /** The value the attribute must equal. */
+  value: Scalars['String']['input'];
+};
+
+/** Declare (idempotently ensure) a set of actors on a policy. */
+export type PolicyActorsDeclareInput = {
+  /** The actors to declare on the policy. */
+  actors: Array<PolicyActorEntryInput>;
+  /** UUID of the policy to declare the actors on. */
+  policy: Scalars['UUID']['input'];
+};
+
+/** Delete an actor from a policy. */
+export type PolicyActorDeleteInput = {
+  /** UUID of the actor binding to delete. */
+  uuid: Scalars['UUID']['input'];
+};
+
+/** The kind of actor attribute a policy matches on. */
+export enum PolicyActorKind {
+  Role = 'role',
+  Username = 'username',
+  Uuid = 'uuid'
+}
