@@ -62,6 +62,7 @@
     [PolicyActorKind.Uuid]: capital($_("uuid")),
     [PolicyActorKind.Username]: capital($_("username")),
     [PolicyActorKind.Role]: capital($_("role", { values: { n: 1 } })),
+    [PolicyActorKind.All]: capital($_("everyone")),
   }
 
   $: headers = [
@@ -147,7 +148,11 @@
           {:else}
             <ul>
               {#each policy.actors as actor}
-                <li>{kindLabels[actor.kind]}: {actor.value}</li>
+                <li>
+                  {actor.kind === PolicyActorKind.All
+                    ? kindLabels[actor.kind]
+                    : `${kindLabels[actor.kind]}: ${actor.value}`}
+                </li>
               {/each}
             </ul>
           {/if}

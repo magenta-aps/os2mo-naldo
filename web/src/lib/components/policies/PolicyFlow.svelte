@@ -177,7 +177,12 @@
     [PolicyActorKind.Uuid]: capital($_("uuid")),
     [PolicyActorKind.Username]: capital($_("username")),
     [PolicyActorKind.Role]: capital($_("role", { values: { n: 1 } })),
+    [PolicyActorKind.All]: capital($_("everyone")),
   }
+
+  // An "all" actor needs no value; others require one to be saved.
+  const actorIsSet = (actor: ActorDraft): boolean =>
+    actor.kind === PolicyActorKind.All || !!actor.value.trim()
 
   $: steps = [
     {
@@ -264,8 +269,11 @@
       ...(endDate && { end: endDate }),
     }
     const declaredActors = actors
-      .filter((actor) => actor.value.trim())
-      .map((actor) => ({ kind: actor.kind, value: actor.value.trim() }))
+      .filter(actorIsSet)
+      .map((actor) => ({
+        kind: actor.kind,
+        value: actor.kind === PolicyActorKind.All ? "" : actor.value.trim(),
+      }))
     const declaredRules = rules
       .filter((rule) => rule.field.trim())
       .map((rule) => ({ type: rule.type, field: rule.field.trim() }))
@@ -383,14 +391,21 @@
                     <option value={PolicyActorKind.Uuid}
                       >{capital($_("uuid"))}</option
                     >
+                    <option value={PolicyActorKind.All}
+                      >{capital($_("everyone"))}</option
+                    >
                   </select>
                 </div>
-                <Input
-                  title={capital($_("value"))}
-                  id="actor-value-{i}"
-                  bind:value={actor.value}
-                  extra_classes="basis-2/3"
-                />
+                {#if actor.kind !== PolicyActorKind.All}
+                  <Input
+                    title={capital($_("value"))}
+                    id="actor-value-{i}"
+                    bind:value={actor.value}
+                    extra_classes="basis-2/3"
+                  />
+                {:else}
+                  <div class="basis-2/3" />
+                {/if}
                 <button
                   type="button"
                   class="text-base-content pb-5"
@@ -543,14 +558,18 @@
             <h3 class="pb-2 text-primary">
               {capital($_("actors", { values: { n: 2 } }))}
             </h3>
-            {#if actors.filter((a) => a.value.trim()).length === 0}
+            {#if actors.filter(actorIsSet).length === 0}
               <p class="text-sm text-base-content/70">
                 {$_("policy_unbound_hint")}
               </p>
             {:else}
               <ul class="list-disc list-inside">
-                {#each actors.filter((a) => a.value.trim()) as actor}
-                  <li>{kindLabels[actor.kind]}: {actor.value}</li>
+                {#each actors.filter(actorIsSet) as actor}
+                  <li>
+                    {actor.kind === PolicyActorKind.All
+                      ? kindLabels[actor.kind]
+                      : `${kindLabels[actor.kind]}: ${actor.value}`}
+                  </li>
                 {/each}
               </ul>
             {/if}
