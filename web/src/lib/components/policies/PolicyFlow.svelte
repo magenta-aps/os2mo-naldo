@@ -41,6 +41,7 @@
             uuid
             type
             field
+            condition
           }
         }
       }
@@ -100,9 +101,11 @@
   }
   // A rule grants access to a GraphQL (type, field). In the UI the "type" is
   // chosen via a Mutator/Query toggle: mutator -> "Mutation", query -> "Query".
+  // An optional CEL condition further gates the grant (empty == unconditional).
   type RuleDraft = {
     type: string
     field: string
+    condition: string
   }
   let actors: ActorDraft[] = []
   let rules: RuleDraft[] = []
@@ -151,6 +154,7 @@
           rules = policy.rules.map((rule) => ({
             type: rule.type,
             field: rule.field,
+            condition: rule.condition ?? "",
           }))
           initial = {
             name,
@@ -227,7 +231,7 @@
   }
 
   const addRule = () => {
-    rules = [...rules, { type: "Query", field: "" }]
+    rules = [...rules, { type: "Query", field: "", condition: "" }]
   }
 
   const removeRule = (index: number) => {
@@ -276,7 +280,13 @@
       }))
     const declaredRules = rules
       .filter((rule) => rule.field.trim())
-      .map((rule) => ({ type: rule.type, field: rule.field.trim() }))
+      .map((rule) => ({
+        type: rule.type,
+        field: rule.field.trim(),
+        // The condition passes through verbatim; an empty one is treated as
+        // unconditional by MO.
+        ...(rule.condition.trim() && { condition: rule.condition.trim() }),
+      }))
     try {
       const result = await graphQLClient().request(SavePolicyDocument, {
         policy,
@@ -502,6 +512,29 @@
                   {/each}
                 </select>
               </div>
+
+              <!-- Optional CEL condition that further gates the grant. For now
+                   this is a free-form text field passed verbatim to MO.
+                   TODO: offer a simple dropdown-based CEL builder as an
+                   alternative input mode (e.g. pick token attribute / operator
+                   / value rows that compile to CEL), keeping this raw field as
+                   the "advanced" escape hatch. -->
+              <div class="form-control pb-1">
+                <label for="rule-condition-{i}" class="text-sm pb-1">
+                  {capital($_("condition"))}
+                  <span class="text-base-content/70">({$_("optional")})</span>
+                </label>
+                <input
+                  id="rule-condition-{i}"
+                  type="text"
+                  bind:value={rule.condition}
+                  placeholder={'"admin" in token.roles'}
+                  class="input input-bordered input-sm rounded font-mono text-sm w-full focus:outline-0 focus:input-primary"
+                />
+                <span class="text-xs text-base-content/70 pt-1">
+                  {$_("policy_condition_hint")}
+                </span>
+              </div>
             </div>
           </div>
         {/each}
@@ -585,7 +618,14 @@
             {:else}
               <ul class="list-disc list-inside">
                 {#each rules.filter((r) => r.field.trim()) as rule}
-                  <li>{rule.type}.{rule.field}</li>
+                  <li>
+                    {rule.type}.{rule.field}
+                    {#if rule.condition.trim()}
+                      <span class="font-mono text-sm text-base-content/70">
+                        ({rule.condition.trim()})
+                      </span>
+                    {/if}
+                  </li>
                 {/each}
               </ul>
             {/if}
