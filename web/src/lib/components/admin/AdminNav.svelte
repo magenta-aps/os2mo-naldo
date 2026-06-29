@@ -6,6 +6,7 @@
   import Icon from "@iconify/svelte"
   import categoryIcon from "@iconify/icons-material-symbols/category-outline"
   import computerIcon from "@iconify/icons-material-symbols/computer-outline"
+  import policyIcon from "@iconify/icons-material-symbols/policy-outline"
 
   const adminTabs = [
     {
@@ -17,6 +18,11 @@
       name: "itsystem",
       path: "/admin/itsystem",
       icon: computerIcon,
+    },
+    {
+      name: "policies",
+      path: "/admin/policies",
+      icon: policyIcon,
     },
   ]
 </script>
