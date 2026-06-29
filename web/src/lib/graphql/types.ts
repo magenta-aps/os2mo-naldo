@@ -17810,6 +17810,22 @@ export type PolicyActorsDeclareInput = {
   policy: Scalars['UUID']['input'];
 };
 
+/** A single rule entry. */
+export type PolicyRuleEntryInput = {
+  /** Field/mutator on the type, or "*" for all fields. */
+  field: Scalars['String']['input'];
+  /** GraphQL type the rule grants access to (or "Query"/"Mutation"). */
+  type: Scalars['String']['input'];
+};
+
+/** Declare (idempotently ensure) a set of rules on a policy. */
+export type PolicyRulesDeclareInput = {
+  /** UUID of the policy to declare the rules on. */
+  policy: Scalars['UUID']['input'];
+  /** The rules to declare on the policy. */
+  rules: Array<PolicyRuleEntryInput>;
+};
+
 /** Delete an actor from a policy. */
 export type PolicyActorDeleteInput = {
   /** UUID of the actor binding to delete. */
