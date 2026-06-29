@@ -194,6 +194,7 @@
 	"past": "fortid",
 	"phone": "telefon",
 	"policies": "{n, plural, =0 {politikken} one {politik} other {politikker}}",
+	"policies_text": "Her kan du oprette og ændre adgangspolitikker for MO. Hver politik gælder for en gruppe af aktører og giver dem adgang til en række ressourcer.",
 	"present": "nutid",
 	"primary": "primær",
 	"quick_actions": "Hurtige handlinger",
