@@ -37,15 +37,21 @@
             kind
             value
           }
+          rules {
+            uuid
+            type
+            field
+          }
         }
       }
     }
 
-    # Save the policy and its full actor set in a single request, so MO runs it
-    # as one transaction (atomic).
+    # Save the policy and its full actor + rule sets in a single request, so MO
+    # runs it as one transaction (atomic).
     mutation SavePolicy(
       $policy: PolicyDeclareInput!
       $actors: PolicyActorsDeclareInput!
+      $rules: PolicyRulesDeclareInput!
     ) {
       policy_declare(input: $policy) {
         uuid
@@ -54,14 +60,31 @@
       policy_actors_declare(input: $actors) {
         uuid
       }
+      policy_rules_declare(input: $rules) {
+        uuid
+      }
     }
   `
 
-  // Steps: policy details -> actors -> summary. Only these for now; more (e.g.
-  // rules) will be added before the summary later.
+  // Introspect the schema so the rules step can offer the available mutators
+  // and query collections to pick from. Kept out of the `gql` tag so codegen
+  // doesn't try to type the introspection query.
+  const SCHEMA_QUERY = `
+    query PolicyRuleSchema {
+      __schema {
+        queryType { fields { name } }
+        mutationType { fields { name } }
+      }
+    }
+  `
+  let mutators: string[] = []
+  let collections: string[] = []
+
+  // Steps: policy details -> actors -> rules -> summary.
   const POLICY_STEP = 1
   const ACTORS_STEP = 2
-  const SUMMARY_STEP = 3
+  const RULES_STEP = 3
+  const SUMMARY_STEP = 4
   let currentStep = POLICY_STEP
 
   let name = ""
@@ -75,7 +98,15 @@
     kind: PolicyActorKind
     value: string
   }
+  // A rule grants access to a GraphQL (type, field). In the UI the "type" is
+  // chosen via a Mutator/Query toggle: mutator -> "Mutation", query -> "Query".
+  type RuleDraft = {
+    type: string
+    field: string
+  }
   let actors: ActorDraft[] = []
+  let rules: RuleDraft[] = []
+
   // Snapshot to restore when "start over" is clicked.
   let initial = {
     name: "",
@@ -83,6 +114,7 @@
     start: $date,
     end: "",
     actors: [] as ActorDraft[],
+    rules: [] as RuleDraft[],
   }
 
   // In edit mode we render the form only once the existing data is loaded, so
@@ -93,27 +125,41 @@
     value ? String(value).split("T")[0] : ""
 
   onMount(async () => {
-    if (!uuid) return
     try {
-      const res = await graphQLClient().request(PolicyByUuidDocument, {
-        uuids: [uuid],
-      })
-      const policy = res.policies.objects[0]
-      if (policy) {
-        name = policy.name
-        description = policy.description ?? ""
-        startDate = toDate(policy.start) || $date
-        endDate = toDate(policy.end)
-        actors = policy.actors.map((actor) => ({
-          kind: actor.kind,
-          value: actor.value,
-        }))
-        initial = {
-          name,
-          description,
-          start: startDate,
-          end: endDate,
-          actors: actors.map((actor) => ({ ...actor })),
+      const schema: any = await graphQLClient().request(SCHEMA_QUERY)
+      mutators = schema.__schema.mutationType.fields
+        .map((f: { name: string }) => f.name)
+        .sort()
+      collections = schema.__schema.queryType.fields
+        .map((f: { name: string }) => f.name)
+        .sort()
+
+      if (uuid) {
+        const res = await graphQLClient().request(PolicyByUuidDocument, {
+          uuids: [uuid],
+        })
+        const policy = res.policies.objects[0]
+        if (policy) {
+          name = policy.name
+          description = policy.description ?? ""
+          startDate = toDate(policy.start) || $date
+          endDate = toDate(policy.end)
+          actors = policy.actors.map((actor) => ({
+            kind: actor.kind,
+            value: actor.value,
+          }))
+          rules = policy.rules.map((rule) => ({
+            type: rule.type,
+            field: rule.field,
+          }))
+          initial = {
+            name,
+            description,
+            start: startDate,
+            end: endDate,
+            actors: actors.map((actor) => ({ ...actor })),
+            rules: rules.map((rule) => ({ ...rule })),
+          }
         }
       }
     } catch (err) {
@@ -144,6 +190,11 @@
       label: capital($_("actors", { values: { n: 2 } })),
       valid: false,
     },
+    {
+      step: RULES_STEP,
+      label: capital($_("rules", { values: { n: 2 } })),
+      valid: false,
+    },
     { step: SUMMARY_STEP, label: capital($_("summary")), valid: false },
   ]
 
@@ -151,7 +202,7 @@
     // Step 1 is always reachable; the later steps require valid policy details.
     if (target === POLICY_STEP || stepValid) {
       showErrors = true
-      if (target === POLICY_STEP || stepValid) currentStep = target
+      currentStep = target
     } else {
       showErrors = true
     }
@@ -170,19 +221,40 @@
     actors = actors.filter((_, i) => i !== index)
   }
 
+  const addRule = () => {
+    rules = [...rules, { type: "Query", field: "" }]
+  }
+
+  const removeRule = (index: number) => {
+    rules = rules.filter((_, i) => i !== index)
+  }
+
+  const setRuleType = (rule: RuleDraft, type: string) => {
+    rule.type = type
+    rule.field = ""
+    rules = rules
+  }
+
+  // Ensure a prefilled value is selectable even if not in the introspected list.
+  const optionsFor = (rule: RuleDraft): string[] => {
+    const list = rule.type === "Mutation" ? mutators : collections
+    return rule.field && !list.includes(rule.field) ? [rule.field, ...list] : list
+  }
+
   const startOver = () => {
     name = initial.name
     description = initial.description
     startDate = initial.start
     endDate = initial.end
     actors = initial.actors.map((actor) => ({ ...actor }))
+    rules = initial.rules.map((rule) => ({ ...rule }))
     showErrors = false
     currentStep = POLICY_STEP
   }
 
   const submit = async () => {
-    // Generate the UUID client-side so the policy and its actors can be saved
-    // in a single (atomic) request; reuse the existing UUID when editing.
+    // Generate the UUID client-side so the policy, its actors and its rules can
+    // be saved in a single (atomic) request; reuse the existing UUID on edit.
     const policyUuid = uuid ?? crypto.randomUUID()
     const policy: PolicyDeclareInput = {
       uuid: policyUuid,
@@ -194,10 +266,14 @@
     const declaredActors = actors
       .filter((actor) => actor.value.trim())
       .map((actor) => ({ kind: actor.kind, value: actor.value.trim() }))
+    const declaredRules = rules
+      .filter((rule) => rule.field.trim())
+      .map((rule) => ({ type: rule.type, field: rule.field.trim() }))
     try {
       const result = await graphQLClient().request(SavePolicyDocument, {
         policy,
         actors: { policy: policyUuid, actors: declaredActors },
+        rules: { policy: policyUuid, rules: declaredRules },
       })
       $success = {
         message: capital(
@@ -347,6 +423,93 @@
         <Button
           type="button"
           title={capital($_("next"))}
+          on:click={() => (currentStep = RULES_STEP)}
+        />
+      </div>
+    {:else if currentStep === RULES_STEP}
+      <div class="sm:w-full md:w-3/4 xl:w-1/2 space-y-4">
+        {#if rules.length === 0}
+          <p class="text-sm text-base-content/70">
+            {$_("policy_no_rules_hint")}
+          </p>
+        {/if}
+
+        {#each rules as rule, i}
+          <div class="bg-base-200 rounded-sm">
+            <div class="p-6 space-y-4">
+              <div class="flex justify-between items-center">
+                <div class="join">
+                  <button
+                    type="button"
+                    class="btn btn-sm join-item {rule.type === 'Mutation'
+                      ? 'btn-primary'
+                      : 'btn-outline'}"
+                    on:click={() => setRuleType(rule, "Mutation")}
+                  >
+                    {capital($_("mutator"))}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm join-item {rule.type !== 'Mutation'
+                      ? 'btn-primary'
+                      : 'btn-outline'}"
+                    on:click={() => setRuleType(rule, "Query")}
+                  >
+                    {capital($_("query"))}
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  class="text-base-content"
+                  title={capital($_("remove"))}
+                  on:click={() => removeRule(i)}
+                >
+                  <Icon icon={deleteOutlineRounded} width="25" height="25" />
+                </button>
+              </div>
+
+              <div class="form-control pb-1">
+                <label for="rule-field-{i}" class="text-sm pb-1">
+                  {rule.type === "Mutation"
+                    ? capital($_("mutator"))
+                    : capital($_("policies", { values: { n: 2 } }))}
+                </label>
+                <select
+                  id="rule-field-{i}"
+                  bind:value={rule.field}
+                  class="select select-bordered select-sm rounded text-base font-normal w-full focus:outline-0 focus:select-primary"
+                >
+                  <option value="" disabled
+                    >{capital($_("select_item", { values: { item: $_("field") } }))}</option
+                  >
+                  {#each optionsFor(rule) as option}
+                    <option value={option}>{option}</option>
+                  {/each}
+                </select>
+              </div>
+            </div>
+          </div>
+        {/each}
+
+        <Button
+          type="button"
+          outline={true}
+          title={capital(
+            $_("create_item", { values: { item: $_("rules", { values: { n: 1 } }) } })
+          )}
+          on:click={addRule}
+        />
+      </div>
+      <div class="flex py-6 gap-4">
+        <Button
+          type="button"
+          title={capital($_("back"))}
+          outline={true}
+          on:click={() => (currentStep = ACTORS_STEP)}
+        />
+        <Button
+          type="button"
+          title={capital($_("next"))}
           on:click={() => (currentStep = SUMMARY_STEP)}
         />
       </div>
@@ -392,6 +555,22 @@
               </ul>
             {/if}
           </div>
+          <div>
+            <h3 class="pb-2 text-primary">
+              {capital($_("rules", { values: { n: 2 } }))}
+            </h3>
+            {#if rules.filter((r) => r.field.trim()).length === 0}
+              <p class="text-sm text-base-content/70">
+                {$_("policy_no_rules_hint")}
+              </p>
+            {:else}
+              <ul class="list-disc list-inside">
+                {#each rules.filter((r) => r.field.trim()) as rule}
+                  <li>{rule.type}.{rule.field}</li>
+                {/each}
+              </ul>
+            {/if}
+          </div>
         </div>
       </div>
       <div class="sm:w-full md:w-3/4 xl:w-1/2 flex justify-between py-6 gap-4">
@@ -400,7 +579,7 @@
             type="button"
             title={capital($_("back"))}
             outline={true}
-            on:click={() => (currentStep = ACTORS_STEP)}
+            on:click={() => (currentStep = RULES_STEP)}
           />
           <Button type="button" title={capital($_("submit"))} on:click={submit} />
         </div>
