@@ -17812,6 +17812,8 @@ export type PolicyActorsDeclareInput = {
 
 /** A single rule entry. */
 export type PolicyRuleEntryInput = {
+  /** Optional CEL condition that must evaluate true for the rule to grant access. Omit or leave null for an unconditional rule. */
+  condition?: InputMaybe<Scalars['String']['input']>;
   /** Field/mutator on the type, or "*" for all fields. */
   field: Scalars['String']['input'];
   /** GraphQL type the rule grants access to (or "Query"/"Mutation"). */
