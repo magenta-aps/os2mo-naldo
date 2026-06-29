@@ -14,6 +14,8 @@
   import { sortKey, sortDirection } from "$lib/stores/sorting"
   import { sortData } from "$lib/utils/sorting"
   import { success, error } from "$lib/stores/alert"
+  import { tenses } from "$lib/stores/tenses"
+  import { date } from "$lib/stores/date"
   import DetailTable from "$lib/components/shared/DetailTable.svelte"
   import ValidityTableCell from "$lib/components/shared/ValidityTableCell.svelte"
   import Button from "$lib/components/shared/Button.svelte"
@@ -73,6 +75,18 @@
     data = sortData(data, $sortKey, $sortDirection)
   }
 
+  // A flat policy falls into exactly one tense relative to the global date.
+  const policyTense = (policy: Policies[0], today: string): Tense => {
+    const start = policy.start ? String(policy.start).split("T")[0] : null
+    const end = policy.end ? String(policy.end).split("T")[0] : null
+    if (start && start > today) return "future"
+    if (end && end < today) return "past"
+    return "present"
+  }
+
+  // Only show policies whose tense is currently selected.
+  $: visible = (data ?? []).filter((policy) => $tenses[policyTense(policy, $date)])
+
   const load = async () => {
     const res = await graphQLClient().request(PoliciesDocument)
     data = res.policies.objects
@@ -120,7 +134,7 @@
       <td class="text-sm p-4">{capital($_("loading"))}</td>
     </tr>
   {:else}
-    {#each data as policy, i}
+    {#each visible as policy, i}
       <tr
         class="{i % 2 === 0 ? '' : 'bg-base-200'}
           leading-5 border-t border-base-300 text-base-content"

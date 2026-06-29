@@ -4,6 +4,7 @@
   import { base } from "$app/paths"
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
   import PoliciesTable from "$lib/components/tables/PoliciesTable.svelte"
+  import TenseTabs from "$lib/components/shared/TenseTabs.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import Icon from "@iconify/svelte"
   import infoOutlineRounded from "@iconify/icons-material-symbols/info-outline-rounded"
@@ -20,7 +21,8 @@
       </div>
     </h1>
 
-    <div class="flex justify-end">
+    <div class="flex justify-between">
+      <TenseTabs />
       <Button
         title={capital(
           $_("create_item", {
