@@ -17765,6 +17765,29 @@ export type Version = {
   mo_version?: Maybe<Scalars['String']['output']>;
 };
 
+/**
+ * Declare a policy.
+ *
+ * Describes the state a policy should have (`name` and `description`)
+ * within a validity interval (`start`, `end`).
+ *
+ * Omit `uuid` to create a new policy. Supply `uuid` to update the existing
+ * policy with that ID.
+ *
+ */
+export type PolicyDeclareInput = {
+  /** Description of the policy. */
+  description?: InputMaybe<Scalars['String']['input']>;
+  /** End of the policy's validity, if applicable. */
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  /** Name of the policy. */
+  name: Scalars['String']['input'];
+  /** Start of the policy's validity. */
+  start: Scalars['DateTime']['input'];
+  /** UUID of the policy to update. Omit to create a new policy. */
+  uuid?: InputMaybe<Scalars['UUID']['input']>;
+};
+
 /** Delete a policy. */
 export type PolicyDeleteInput = {
   /** UUID of the policy to delete. */
