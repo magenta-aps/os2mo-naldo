@@ -8,13 +8,16 @@
   import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { date } from "$lib/stores/date"
+  import { PolicyActorKind } from "$lib/graphql/types"
   import type { PolicyDeclareInput } from "$lib/graphql/types"
-  import { PolicyByUuidDocument, DeclarePolicyDocument } from "./query.generated"
+  import { PolicyByUuidDocument, SavePolicyDocument } from "./query.generated"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
+  import Icon from "@iconify/svelte"
+  import deleteOutlineRounded from "@iconify/icons-material-symbols/delete-outline-rounded"
 
   // When `uuid` is provided we edit that policy (policy_declare upserts on uuid),
   // otherwise we create a new one.
@@ -29,22 +32,36 @@
           description
           start
           end
+          actors {
+            uuid
+            kind
+            value
+          }
         }
       }
     }
 
-    mutation DeclarePolicy($input: PolicyDeclareInput!) {
-      policy_declare(input: $input) {
+    # Save the policy and its full actor set in a single request, so MO runs it
+    # as one transaction (atomic).
+    mutation SavePolicy(
+      $policy: PolicyDeclareInput!
+      $actors: PolicyActorsDeclareInput!
+    ) {
+      policy_declare(input: $policy) {
         uuid
         name
+      }
+      policy_actors_declare(input: $actors) {
+        uuid
       }
     }
   `
 
-  // Only the "policy" details step for now; more (e.g. actors, rules) will be
-  // added later. The final step is always the summary.
+  // Steps: policy details -> actors -> summary. Only these for now; more (e.g.
+  // rules) will be added before the summary later.
   const POLICY_STEP = 1
-  const SUMMARY_STEP = 2
+  const ACTORS_STEP = 2
+  const SUMMARY_STEP = 3
   let currentStep = POLICY_STEP
 
   let name = ""
@@ -53,27 +70,68 @@
   let endDate = ""
   let showErrors = false
 
-  // Snapshot of the values to restore when "start over" is clicked.
-  let initial = { name: "", description: "", start: $date, end: "" }
+  // An actor is a kind + value that maps directly to a policy_actor.
+  type ActorDraft = {
+    kind: PolicyActorKind
+    value: string
+  }
+  let actors: ActorDraft[] = []
+  // Snapshot to restore when "start over" is clicked.
+  let initial = {
+    name: "",
+    description: "",
+    start: $date,
+    end: "",
+    actors: [] as ActorDraft[],
+  }
+
+  // In edit mode we render the form only once the existing data is loaded, so
+  // the inputs mount already populated (create mode is ready immediately).
+  let loaded = !uuid
 
   const toDate = (value: unknown): string =>
     value ? String(value).split("T")[0] : ""
 
   onMount(async () => {
     if (!uuid) return
-    const res = await graphQLClient().request(PolicyByUuidDocument, { uuids: [uuid] })
-    const policy = res.policies.objects[0]
-    if (!policy) return
-    name = policy.name
-    description = policy.description ?? ""
-    startDate = toDate(policy.start) || $date
-    endDate = toDate(policy.end)
-    initial = { name, description, start: startDate, end: endDate }
+    try {
+      const res = await graphQLClient().request(PolicyByUuidDocument, {
+        uuids: [uuid],
+      })
+      const policy = res.policies.objects[0]
+      if (policy) {
+        name = policy.name
+        description = policy.description ?? ""
+        startDate = toDate(policy.start) || $date
+        endDate = toDate(policy.end)
+        actors = policy.actors.map((actor) => ({
+          kind: actor.kind,
+          value: actor.value,
+        }))
+        initial = {
+          name,
+          description,
+          start: startDate,
+          end: endDate,
+          actors: actors.map((actor) => ({ ...actor })),
+        }
+      }
+    } catch (err) {
+      $error = { message: err }
+    } finally {
+      loaded = true
+    }
   })
 
   $: nameErrors = showErrors && !name ? ["required"] : []
   $: startErrors = showErrors && !startDate ? ["required"] : []
   $: stepValid = !!name && !!startDate
+
+  $: kindLabels = {
+    [PolicyActorKind.Uuid]: capital($_("uuid")),
+    [PolicyActorKind.Username]: capital($_("username")),
+    [PolicyActorKind.Role]: capital($_("role", { values: { n: 1 } })),
+  }
 
   $: steps = [
     {
@@ -81,20 +139,35 @@
       label: capital($_("policies", { values: { n: 1 } })),
       valid: stepValid,
     },
+    {
+      step: ACTORS_STEP,
+      label: capital($_("actors", { values: { n: 2 } })),
+      valid: false,
+    },
     { step: SUMMARY_STEP, label: capital($_("summary")), valid: false },
   ]
 
   const goToStep = (target: number) => {
-    if (target === POLICY_STEP) {
-      currentStep = POLICY_STEP
+    // Step 1 is always reachable; the later steps require valid policy details.
+    if (target === POLICY_STEP || stepValid) {
+      showErrors = true
+      if (target === POLICY_STEP || stepValid) currentStep = target
     } else {
-      next()
+      showErrors = true
     }
   }
 
   const next = () => {
     showErrors = true
-    if (stepValid) currentStep = SUMMARY_STEP
+    if (stepValid) currentStep = currentStep + 1
+  }
+
+  const addActor = () => {
+    actors = [...actors, { kind: PolicyActorKind.Username, value: "" }]
+  }
+
+  const removeActor = (index: number) => {
+    actors = actors.filter((_, i) => i !== index)
   }
 
   const startOver = () => {
@@ -102,26 +175,36 @@
     description = initial.description
     startDate = initial.start
     endDate = initial.end
+    actors = initial.actors.map((actor) => ({ ...actor }))
     showErrors = false
     currentStep = POLICY_STEP
   }
 
   const submit = async () => {
-    const input: PolicyDeclareInput = {
+    // Generate the UUID client-side so the policy and its actors can be saved
+    // in a single (atomic) request; reuse the existing UUID when editing.
+    const policyUuid = uuid ?? crypto.randomUUID()
+    const policy: PolicyDeclareInput = {
+      uuid: policyUuid,
       name,
       start: startDate,
       ...(description && { description }),
       ...(endDate && { end: endDate }),
-      ...(uuid && { uuid }),
     }
+    const declaredActors = actors
+      .filter((actor) => actor.value.trim())
+      .map((actor) => ({ kind: actor.kind, value: actor.value.trim() }))
     try {
-      const mutation = await graphQLClient().request(DeclarePolicyDocument, { input })
+      const result = await graphQLClient().request(SavePolicyDocument, {
+        policy,
+        actors: { policy: policyUuid, actors: declaredActors },
+      })
       $success = {
         message: capital(
           $_(uuid ? "success_edit_item" : "success_create_item", {
             values: {
               item: $_("policies", { values: { n: 0 } }),
-              name: mutation.policy_declare.name,
+              name: result.policy_declare.name,
             },
           })
         ),
@@ -150,7 +233,9 @@
   </div>
 
   <div class="mt-8">
-    {#if currentStep === POLICY_STEP}
+    {#if !loaded}
+      <p class="text-sm text-base-content">{capital($_("loading"))}</p>
+    {:else if currentStep === POLICY_STEP}
       <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
         <div class="p-8">
           <Input
@@ -192,6 +277,79 @@
           href="{base}/admin/policies"
         />
       </div>
+    {:else if currentStep === ACTORS_STEP}
+      <div class="sm:w-full md:w-3/4 xl:w-1/2 space-y-4">
+        {#if actors.length === 0}
+          <p class="text-sm text-base-content/70">
+            {$_("policy_unbound_hint")}
+          </p>
+        {/if}
+
+        {#each actors as actor, i}
+          <div class="bg-base-200 rounded-sm">
+            <div class="p-6">
+              <div class="flex flex-row gap-6 items-end">
+                <div class="form-control pb-3 basis-1/3">
+                  <label for="actor-kind-{i}" class="text-sm pb-1">
+                    {capital($_("actors", { values: { n: 1 } }))}
+                  </label>
+                  <select
+                    id="actor-kind-{i}"
+                    bind:value={actor.kind}
+                    class="select select-bordered select-sm rounded text-base font-normal w-full focus:outline-0 focus:select-primary"
+                  >
+                    <option value={PolicyActorKind.Username}
+                      >{capital($_("username"))}</option
+                    >
+                    <option value={PolicyActorKind.Role}
+                      >{capital($_("role", { values: { n: 1 } }))}</option
+                    >
+                    <option value={PolicyActorKind.Uuid}
+                      >{capital($_("uuid"))}</option
+                    >
+                  </select>
+                </div>
+                <Input
+                  title={capital($_("value"))}
+                  id="actor-value-{i}"
+                  bind:value={actor.value}
+                  extra_classes="basis-2/3"
+                />
+                <button
+                  type="button"
+                  class="text-base-content pb-5"
+                  title={capital($_("remove"))}
+                  on:click={() => removeActor(i)}
+                >
+                  <Icon icon={deleteOutlineRounded} width="25" height="25" />
+                </button>
+              </div>
+            </div>
+          </div>
+        {/each}
+
+        <Button
+          type="button"
+          outline={true}
+          title={capital(
+            $_("create_item", { values: { item: $_("actors", { values: { n: 1 } }) } })
+          )}
+          on:click={addActor}
+        />
+      </div>
+      <div class="flex py-6 gap-4">
+        <Button
+          type="button"
+          title={capital($_("back"))}
+          outline={true}
+          on:click={() => (currentStep = POLICY_STEP)}
+        />
+        <Button
+          type="button"
+          title={capital($_("next"))}
+          on:click={() => (currentStep = SUMMARY_STEP)}
+        />
+      </div>
     {:else}
       <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
         <div class="p-8 space-y-5">
@@ -218,6 +376,22 @@
               </div>
             </dl>
           </div>
+          <div>
+            <h3 class="pb-2 text-primary">
+              {capital($_("actors", { values: { n: 2 } }))}
+            </h3>
+            {#if actors.filter((a) => a.value.trim()).length === 0}
+              <p class="text-sm text-base-content/70">
+                {$_("policy_unbound_hint")}
+              </p>
+            {:else}
+              <ul class="list-disc list-inside">
+                {#each actors.filter((a) => a.value.trim()) as actor}
+                  <li>{kindLabels[actor.kind]}: {actor.value}</li>
+                {/each}
+              </ul>
+            {/if}
+          </div>
         </div>
       </div>
       <div class="sm:w-full md:w-3/4 xl:w-1/2 flex justify-between py-6 gap-4">
@@ -226,7 +400,7 @@
             type="button"
             title={capital($_("back"))}
             outline={true}
-            on:click={() => (currentStep = POLICY_STEP)}
+            on:click={() => (currentStep = ACTORS_STEP)}
           />
           <Button type="button" title={capital($_("submit"))} on:click={submit} />
         </div>
