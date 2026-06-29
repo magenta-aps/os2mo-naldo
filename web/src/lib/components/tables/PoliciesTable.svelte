@@ -10,6 +10,7 @@
     DeletePolicyDocument,
     type PoliciesQuery,
   } from "./query.generated"
+  import { PolicyActorKind } from "$lib/graphql/types"
   import { sortKey, sortDirection } from "$lib/stores/sorting"
   import { sortData } from "$lib/utils/sorting"
   import { success, error } from "$lib/stores/alert"
@@ -40,6 +41,11 @@
           description
           start
           end
+          actors {
+            uuid
+            kind
+            value
+          }
         }
       }
     }
@@ -49,9 +55,16 @@
     }
   `
 
+  $: kindLabels = {
+    [PolicyActorKind.Uuid]: capital($_("uuid")),
+    [PolicyActorKind.Username]: capital($_("username")),
+    [PolicyActorKind.Role]: capital($_("role", { values: { n: 1 } })),
+  }
+
   $: headers = [
     { title: capital($_("name")), sortPath: "name" },
     { title: capital($_("description")), sortPath: "description" },
+    { title: capital($_("actors", { values: { n: 2 } })) },
     { title: capital($_("date.date")), sortPath: "start" },
   ]
 
@@ -107,6 +120,17 @@
       >
         <td class="text-sm p-4">{policy.name}</td>
         <td class="text-sm p-4">{policy.description ?? ""}</td>
+        <td class="text-sm p-4">
+          {#if policy.actors.length === 0}
+            <span class="text-base-content/50">{$_("policy_unbound_hint")}</span>
+          {:else}
+            <ul>
+              {#each policy.actors as actor}
+                <li>{kindLabels[actor.kind]}: {actor.value}</li>
+              {/each}
+            </ul>
+          {/if}
+        </td>
         <ValidityTableCell validity={{ from: policy.start, to: policy.end }} />
         <td class="flex p-4 gap-2 justify-end">
           {#if policy.uuid === POLICYADMIN_UUID}
