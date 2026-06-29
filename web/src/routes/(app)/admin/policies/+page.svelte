@@ -2,6 +2,7 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
+  import PoliciesTable from "$lib/components/tables/PoliciesTable.svelte"
   import Icon from "@iconify/svelte"
   import infoOutlineRounded from "@iconify/icons-material-symbols/info-outline-rounded"
 </script>
@@ -16,5 +17,7 @@
         <Icon class="align-middle" icon={infoOutlineRounded} width="25" height="25" />
       </div>
     </h1>
+
+    <PoliciesTable />
   </main>
 </div>
