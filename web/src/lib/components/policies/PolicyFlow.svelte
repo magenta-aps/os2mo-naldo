@@ -305,7 +305,7 @@
   // The placeholder switches with the chosen mutator, e.g.
   // 'ITUser filter as JSON, e.g. {"employee": {"query": "..."}}'.
   const ruleFilterPlaceholder = (rule: RuleDraft): string =>
-    `${ruleEntityLabel(rule)} ${$_("entity_filter_hint_suffix")}, e.g. {"employee": {"query": "..."}}`
+    `${ruleEntityLabel(rule)} ${$_("entity_filter_hint_suffix")}, e.g. {"employee": {"uuids": [token.uuid]}}`
 
   const startOver = () => {
     name = initial.name
