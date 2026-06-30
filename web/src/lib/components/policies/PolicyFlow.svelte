@@ -42,6 +42,7 @@
             type
             field
             condition
+            filter
           }
         }
       }
@@ -102,10 +103,13 @@
   // A rule grants access to a GraphQL (type, field). In the UI the "type" is
   // chosen via a Mutator/Query toggle: mutator -> "Mutation", query -> "Query".
   // An optional CEL condition further gates the grant (empty == unconditional).
+  // An optional entity filter (a serialized MO filter as JSON) restricts the
+  // grant to matching objects (e.g. only IT-users attached to certain persons).
   type RuleDraft = {
     type: string
     field: string
     condition: string
+    filter: string
   }
   let actors: ActorDraft[] = []
   let rules: RuleDraft[] = []
@@ -155,6 +159,7 @@
             type: rule.type,
             field: rule.field,
             condition: rule.condition ?? "",
+            filter: rule.filter ?? "",
           }))
           initial = {
             name,
@@ -232,7 +237,7 @@
   }
 
   const addRule = () => {
-    rules = [...rules, { type: "Query", field: "", condition: "" }]
+    rules = [...rules, { type: "Query", field: "", condition: "", filter: "" }]
   }
 
   const removeRule = (index: number) => {
@@ -250,6 +255,57 @@
     const list = rule.type === "Mutation" ? mutators : collections
     return rule.field && !list.includes(rule.field) ? [rule.field, ...list] : list
   }
+
+  // Display names for entities that support a rule filter; falls back to a
+  // prettified collection name.
+  const ENTITY_LABELS: Record<string, string> = {
+    ituser: "ITUser",
+    org_unit: "Organisation unit",
+  }
+  const RULE_OPERATIONS = ["create", "update", "terminate", "delete", "refresh"]
+  // Must mirror the backend: collections wired up in the entity-filter registry
+  // and the operations that act on a single existing object by uuid (create has
+  // no object yet; refresh is a bulk operation).
+  const SUPPORTED_FILTER_COLLECTIONS = ["ituser"]
+  const FILTERABLE_OPERATIONS = ["update", "terminate", "delete"]
+
+  // Split a mutator rule into its collection and operation (e.g. "ituser_update"
+  // -> { collection: "ituser", operation: "update" }); null for query rules or
+  // fields without a recognised operation suffix.
+  const ruleCollectionAndOp = (
+    rule: RuleDraft
+  ): { collection: string; operation: string } | null => {
+    if (rule.type !== "Mutation") return null
+    for (const operation of RULE_OPERATIONS) {
+      const suffix = `_${operation}`
+      if (rule.field.endsWith(suffix)) {
+        return { collection: rule.field.slice(0, -suffix.length), operation }
+      }
+    }
+    return null
+  }
+
+  // Whether the backend can evaluate an entity filter for this rule. Only then
+  // is the filter input shown, so the UI never offers a filter that won't work.
+  const ruleSupportsFilter = (rule: RuleDraft): boolean => {
+    const co = ruleCollectionAndOp(rule)
+    return (
+      !!co &&
+      SUPPORTED_FILTER_COLLECTIONS.includes(co.collection) &&
+      FILTERABLE_OPERATIONS.includes(co.operation)
+    )
+  }
+
+  const ruleEntityLabel = (rule: RuleDraft): string => {
+    const co = ruleCollectionAndOp(rule)
+    if (!co) return ""
+    return ENTITY_LABELS[co.collection] ?? capital(co.collection.replace(/_/g, " "))
+  }
+
+  // The placeholder switches with the chosen mutator, e.g.
+  // 'ITUser filter as JSON, e.g. {"employee": {"query": "..."}}'.
+  const ruleFilterPlaceholder = (rule: RuleDraft): string =>
+    `${ruleEntityLabel(rule)} ${$_("entity_filter_hint_suffix")}, e.g. {"employee": {"query": "..."}}`
 
   const startOver = () => {
     name = initial.name
@@ -287,6 +343,11 @@
         // The condition passes through verbatim; an empty one is treated as
         // unconditional by MO.
         ...(rule.condition.trim() && { condition: rule.condition.trim() }),
+        // The entity filter (JSON) passes through verbatim; an empty one means
+        // no entity restriction. Only sent for mutators the backend can filter,
+        // so a stale value left after switching mutators is never submitted.
+        ...(ruleSupportsFilter(rule) &&
+          rule.filter.trim() && { filter: rule.filter.trim() }),
       }))
     try {
       const result = await graphQLClient().request(SavePolicyDocument, {
@@ -520,6 +581,30 @@
                 </select>
               </div>
 
+              <!-- Optional entity filter (a serialized MO filter as JSON) that
+                   restricts the grant to matching objects. Only offered for
+                   mutators the backend can filter (a supported collection and a
+                   single-object operation); the placeholder switches with the
+                   chosen mutator. -->
+              {#if ruleSupportsFilter(rule)}
+                <div class="form-control pb-1">
+                  <label for="rule-filter-{i}" class="text-sm pb-1">
+                    {capital($_("filter"))}
+                    <span class="text-base-content/70">({$_("optional")})</span>
+                  </label>
+                  <input
+                    id="rule-filter-{i}"
+                    type="text"
+                    bind:value={rule.filter}
+                    placeholder={ruleFilterPlaceholder(rule)}
+                    class="input input-bordered input-sm rounded font-mono text-sm w-full focus:outline-0 focus:input-primary"
+                  />
+                  <span class="text-xs text-base-content/70 pt-1">
+                    {$_("policy_rule_filter_hint")}
+                  </span>
+                </div>
+              {/if}
+
               <!-- Optional CEL condition that further gates the grant. For now
                    this is a free-form text field passed verbatim to MO.
                    TODO: offer a simple dropdown-based CEL builder as an
@@ -630,6 +715,11 @@
                     {#if rule.condition.trim()}
                       <span class="font-mono text-sm text-base-content/70">
                         ({rule.condition.trim()})
+                      </span>
+                    {/if}
+                    {#if rule.filter.trim()}
+                      <span class="font-mono text-sm text-base-content/70">
+                        [{rule.filter.trim()}]
                       </span>
                     {/if}
                   </li>

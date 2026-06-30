@@ -17816,6 +17816,8 @@ export type PolicyRuleEntryInput = {
   condition?: InputMaybe<Scalars['String']['input']>;
   /** Field/mutator on the type, or "*" for all fields. */
   field: Scalars['String']['input'];
+  /** Optional (serialized) entity filter restricting the grant to the objects it matches (e.g. an ITUserFilter as JSON for an `ituser_*` mutator). Omit or leave null for no entity restriction. */
+  filter?: InputMaybe<Scalars['String']['input']>;
   /** GraphQL type the rule grants access to (or "Query"/"Mutation"). */
   type: Scalars['String']['input'];
 };
