@@ -182,6 +182,7 @@
     [PolicyActorKind.Username]: capital($_("username")),
     [PolicyActorKind.Role]: capital($_("role", { values: { n: 1 } })),
     [PolicyActorKind.All]: capital($_("everyone")),
+    [PolicyActorKind.PersonFilter]: capital($_("person_filter")),
   }
 
   // An "all" actor needs no value; others require one to be saved.
@@ -404,6 +405,9 @@
                     <option value={PolicyActorKind.All}
                       >{capital($_("everyone"))}</option
                     >
+                    <option value={PolicyActorKind.PersonFilter}
+                      >{capital($_("person_filter"))}</option
+                    >
                   </select>
                 </div>
                 {#if actor.kind !== PolicyActorKind.All}
@@ -411,6 +415,9 @@
                     title={capital($_("value"))}
                     id="actor-value-{i}"
                     bind:value={actor.value}
+                    placeholder={actor.kind === PolicyActorKind.PersonFilter
+                      ? $_("person_filter_hint")
+                      : undefined}
                     extra_classes="basis-2/3"
                   />
                 {:else}
