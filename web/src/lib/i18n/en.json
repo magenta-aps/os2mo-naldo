@@ -209,6 +209,8 @@
 	"policy_condition_hint": "An optional CEL expression that must evaluate to true for this rule to apply. Leave empty to always apply.",
 	"policy_no_rules_hint": "This policy grants no access yet.",
 	"policy_unbound_hint": "This policy is not bound to any actor.",
+	"person_filter": "person filter",
+	"person_filter_hint": "A person filter as JSON, e.g. {\"uuids\": [\"...\"]}",
 	"query": "query",
 	"present": "present",
 	"primary": "primary",

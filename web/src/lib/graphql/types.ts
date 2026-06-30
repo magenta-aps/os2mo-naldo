@@ -17837,6 +17837,7 @@ export type PolicyActorDeleteInput = {
 /** The kind of actor attribute a policy matches on. */
 export enum PolicyActorKind {
   All = 'all',
+  PersonFilter = 'person_filter',
   Role = 'role',
   Username = 'username',
   Uuid = 'uuid'

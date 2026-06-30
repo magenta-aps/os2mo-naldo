@@ -63,6 +63,7 @@
     [PolicyActorKind.Username]: capital($_("username")),
     [PolicyActorKind.Role]: capital($_("role", { values: { n: 1 } })),
     [PolicyActorKind.All]: capital($_("everyone")),
+    [PolicyActorKind.PersonFilter]: capital($_("person_filter")),
   }
 
   $: headers = [

@@ -209,6 +209,8 @@
 	"policy_condition_hint": "Et valgfrit CEL-udtryk, der skal være sandt, for at reglen gælder. Lad feltet stå tomt for altid at gælde.",
 	"policy_no_rules_hint": "Denne politik giver ikke adgang til noget endnu.",
 	"policy_unbound_hint": "Denne politik er ikke bundet til nogen aktør.",
+	"person_filter": "personfilter",
+	"person_filter_hint": "Et personfilter som JSON, f.eks. {\"uuids\": [\"...\"]}",
 	"query": "forespørgsel",
 	"present": "nutid",
 	"primary": "primær",
