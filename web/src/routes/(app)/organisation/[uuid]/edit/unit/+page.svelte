@@ -109,10 +109,16 @@
       await svelteForm.validate()
       if ($svelteForm.valid) {
         if (result.type === "success" && result.data) {
+          const input = result.data
+          // Only send `parent` if it actually changes. Leaving it UNSET when it
+          // matches the current parent avoids registering a redundant parent edit.
+          if ((input.parent || null) === (initialOrganisation?.parent || null)) {
+            delete input.parent
+          }
           try {
             const mutation = await graphQLClient().request(UpdateOrgUnitDocument, {
-              input: result.data,
-              date: result.data.validity.from,
+              input: input,
+              date: input.validity.from,
             })
 
             $success = {
