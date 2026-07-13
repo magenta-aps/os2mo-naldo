@@ -2,21 +2,26 @@ import { env } from "$lib/env"
 import { isAdmin, isAuth } from "$lib/stores/auth"
 import Keycloak from "keycloak-js"
 
-const instance = `${env.PUBLIC_BASE_URL}/service/keycloak.json`
-
 export let keycloak: Keycloak
 
 export const initKeycloak = async () => {
-  const res = await fetch(instance)
-
-  if (res.status === 404) {
+  // Keycloak config is provided directly via env vars.
+  if (
+    !env.PUBLIC_KEYCLOAK_URL ||
+    !env.PUBLIC_KEYCLOAK_REALM ||
+    !env.PUBLIC_KEYCLOAK_CLIENT_ID
+  ) {
     isAuth.set(true)
-    console.error("keycloak.json could not be fetched")
+    console.error("Keycloak config is not set")
     console.info("Starting with no authentication ...")
     return
   }
 
-  keycloak = new Keycloak(instance)
+  keycloak = new Keycloak({
+    url: env.PUBLIC_KEYCLOAK_URL,
+    realm: env.PUBLIC_KEYCLOAK_REALM,
+    clientId: env.PUBLIC_KEYCLOAK_CLIENT_ID,
+  })
   keycloak
     .init({ onLoad: "login-required" })
     .then((authenticated) => {

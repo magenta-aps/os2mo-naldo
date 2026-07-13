@@ -44,6 +44,12 @@ export const env = {
     dynamicEnv["PUBLIC_PRIMARY_CLASS_USER_KEY"] ?? "primary",
   PUBLIC_COMMIT_TAG: dynamicEnv["PUBLIC_COMMIT_TAG"] ?? "HEAD",
 
+  // Keycloak config. When URL/realm/client are unset, the app starts with no
+  // authentication.
+  PUBLIC_KEYCLOAK_URL: dynamicEnv["PUBLIC_KEYCLOAK_URL"] ?? "",
+  PUBLIC_KEYCLOAK_REALM: dynamicEnv["PUBLIC_KEYCLOAK_REALM"] ?? "",
+  PUBLIC_KEYCLOAK_CLIENT_ID: dynamicEnv["PUBLIC_KEYCLOAK_CLIENT_ID"] ?? "",
+
   // booleans
   PUBLIC_DAR_ACCESS_ADDRESSES: bool(dynamicEnv["PUBLIC_DAR_ACCESS_ADDRESSES"], true),
   PUBLIC_DOCS_LINK: bool(dynamicEnv["PUBLIC_DOCS_LINK"], true),

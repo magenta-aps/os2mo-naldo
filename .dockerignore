@@ -1,0 +1,6 @@
+# Never copy host-installed dependencies or build artifacts into the image;
+# the Dockerfile installs its own via `yarn install`.
+**/node_modules
+web/.svelte-kit
+web/build
+web/.env
