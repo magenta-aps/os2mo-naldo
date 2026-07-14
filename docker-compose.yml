@@ -6,6 +6,9 @@ services:
       target: dev
     environment:
       PUBLIC_BASE_URL: http://localhost:5000
+      PUBLIC_KEYCLOAK_URL: "http://localhost:5000/auth"
+      PUBLIC_KEYCLOAK_REALM: "mo"
+      PUBLIC_KEYCLOAK_CLIENT_ID: "mo-frontend"
       PUBLIC_DAR_ACCESS_ADDRESSES: "true"
       PUBLIC_SHOW_ADMIN_PANEL: "true"
       PUBLIC_SHOW_INSIGHTS: "true"
