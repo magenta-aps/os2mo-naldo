@@ -10,7 +10,6 @@
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { sortData } from "$lib/utils/sorting"
-  import { onMount } from "svelte"
   import { page } from "$app/stores"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
@@ -20,7 +19,6 @@
   import { env } from "$lib/env"
 
   type Employees = EmployeeQuery["employees"]["objects"][0]["validities"]
-  let data: Employees
 
   export let tense: Tense
 
@@ -44,18 +42,11 @@
     }
   `
 
-  $: {
-    if (data) {
-      data = sortData(data, $sortKey, $sortDirection)
-    }
-  }
-
-  onMount(async () => {
-    const res = await graphQLClient().request(EmployeeDocument, {
-      uuid: uuid,
-      ...tenseToValidity(tense, $date),
-    })
-    const engagements: Employees = []
+  $: dataPromise = graphQLClient().request(EmployeeDocument, {
+    uuid: uuid,
+    ...tenseToValidity(tense, $date),
+  }).then((res) => {
+    const employees: Employees = []
 
     // Filters and flattens the data
     for (const outer of res.employees.objects) {
@@ -63,18 +54,18 @@
       const filtered = outer.validities.filter((obj) => {
         return tenseFilter(obj, tense)
       })
-      engagements.push(...filtered)
+      employees.push(...filtered)
     }
-    data = engagements
+    return employees
   })
 </script>
 
-{#if !data}
+{#await dataPromise}
   <tr class="leading-5 border-t border-base-300 text-base-content">
     <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
-{:else}
-  {#each data as employee, i}
+{:then data}
+  {#each sortData(data, $sortKey, $sortDirection) as employee, i}
     <tr
       class="{i % 2 === 0 ? '' : 'bg-base-200'} 
       leading-5 border-t border-base-300 text-base-content"
@@ -105,4 +96,8 @@
       >
     </tr>
   {/each}
-{/if}
+{:catch}
+  <tr class="leading-5 border-t border-base-300 text-base-content">
+    <td class="text-sm p-4">{capital($_("load_error"))}</td>
+  </tr>
+{/await}
