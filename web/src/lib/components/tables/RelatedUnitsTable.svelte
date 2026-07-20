@@ -10,7 +10,6 @@
   import { date } from "$lib/stores/date"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { sortData } from "$lib/utils/sorting"
-  import { onMount } from "svelte"
   import Icon from "@iconify/svelte"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
@@ -27,7 +26,7 @@
     validity: RelatedValidity["validity"]
     root?: { name: string; uuid: string }
   }
-  let data: RelatedRow[]
+  type RelatedRows = RelatedRow[]
 
   export let tense: Tense
 
@@ -63,18 +62,11 @@
     }
   `
 
-  $: {
-    if (data) {
-      data = sortData(data, $sortKey, $sortDirection)
-    }
-  }
-
-  onMount(async () => {
-    const res = await graphQLClient().request(RelatedUnitsDocument, {
-      org_unit: uuid,
-      fromDate: $date,
-      ...tenseToValidity(tense, $date),
-    })
+  $: dataPromise = graphQLClient().request(RelatedUnitsDocument, {
+    org_unit: uuid,
+    fromDate: $date,
+    ...tenseToValidity(tense, $date),
+  }).then((res) => {
     const relatedUnits = []
 
     for (const outer of res.related_units.objects) {
@@ -89,7 +81,7 @@
     // Drop the unit we're already looking at and pick the slice of the other one
     // closest to the selected date. If the other unit is absent entirely, leave
     // org_units empty so the row renders blank instead of indexing into nothing.
-    data = relatedUnits.map((unit) => {
+    return relatedUnits.map((unit) => {
       const related = findClosestValidity(
         unit.org_units.filter((org_unit) => org_unit.uuid !== $page.params.uuid),
         $date
@@ -111,12 +103,12 @@
   })
 </script>
 
-{#if !data}
+{#await dataPromise}
   <tr class="leading-5 border-t border-base-300 text-base-content">
     <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
-{:else}
-  {#each data as related_unit, i}
+{:then data}
+  {#each sortData(data, $sortKey, $sortDirection) as related_unit, i}
     <tr
       class="{i % 2 === 0 ? '' : 'bg-base-200'} 
         leading-5 border-t border-base-300 text-base-content"
@@ -155,4 +147,8 @@
       >
     </tr>
   {/each}
-{/if}
+{:catch}
+  <tr class="leading-5 border-t border-base-300 text-base-content">
+    <td class="text-sm p-4">{capital($_("load_error"))}</td>
+  </tr>
+{/await}
