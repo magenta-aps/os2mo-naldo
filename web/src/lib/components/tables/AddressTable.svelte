@@ -9,7 +9,6 @@
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import { AddressDocument, type AddressQuery } from "./query.generated"
-  import { onMount } from "svelte"
   import { sortKey, sortDirection } from "$lib/stores/sorting"
   import { sortData } from "$lib/utils/sorting"
   import Icon from "@iconify/svelte"
@@ -27,7 +26,6 @@
   const org_unit = isOrg ? uuid : null
 
   type Addresses = AddressQuery["addresses"]["objects"][0]["validities"]
-  let data: Addresses
 
   gql`
     query Address(
@@ -89,18 +87,11 @@
     }
   `
 
-  $: {
-    if (data) {
-      data = sortData(data, $sortKey, $sortDirection)
-    }
-  }
-
-  onMount(async () => {
-    const res = await graphQLClient().request(AddressDocument, {
-      org_unit: org_unit,
-      employee: employee,
-      ...tenseToValidity(tense, $date),
-    })
+  $: dataPromise = graphQLClient().request(AddressDocument, {
+    org_unit: org_unit,
+    employee: employee,
+    ...tenseToValidity(tense, $date),
+  }).then((res) => {
     const addresses: Addresses = []
 
     // Filters and flattens the data
@@ -111,16 +102,16 @@
       })
       addresses.push(...filtered)
     }
-    data = addresses
+    return addresses
   })
 </script>
 
-{#if !data}
+{#await dataPromise}
   <tr class="leading-5 border-t border-base-300 text-base-content">
     <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
-{:else}
-  {#each data as address, i}
+{:then data}
+  {#each sortData(data, $sortKey, $sortDirection) as address, i}
     <tr
       class="{i % 2 === 0 ? '' : 'bg-base-200'} 
       leading-5 border-t border-base-300 text-base-content"
@@ -176,4 +167,8 @@
       >
     </tr>
   {/each}
-{/if}
+{:catch}
+  <tr class="leading-5 border-t border-base-300 text-base-content">
+    <td class="text-sm p-4">{capital($_("load_error"))}</td>
+  </tr>
+{/await}

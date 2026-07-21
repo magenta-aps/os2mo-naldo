@@ -8,7 +8,6 @@
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
-  import { onMount } from "svelte"
   import { sortKey, sortDirection } from "$lib/stores/sorting"
   import { sortData } from "$lib/utils/sorting"
   import { page } from "$app/stores"
@@ -23,7 +22,6 @@
   export let tense: Tense
 
   type ItAssociations = ItAssociationsQuery["associations"]["objects"][0]["validities"]
-  let data: ItAssociations
 
   const uuid = $page.params.uuid
 
@@ -80,17 +78,10 @@
     }
   `
 
-  $: {
-    if (data) {
-      data = sortData(data, $sortKey, $sortDirection)
-    }
-  }
-
-  onMount(async () => {
-    const res = await graphQLClient().request(ItAssociationsDocument, {
-      employee: uuid,
-      ...tenseToValidity(tense, $date),
-    })
+  $: dataPromise = graphQLClient().request(ItAssociationsDocument, {
+    employee: uuid,
+    ...tenseToValidity(tense, $date),
+  }).then((res) => {
     const itAssociations: ItAssociations = []
 
     // Filters and flattens the data
@@ -101,16 +92,16 @@
       })
       itAssociations.push(...filtered)
     }
-    data = itAssociations
+    return itAssociations
   })
 </script>
 
-{#if !data}
+{#await dataPromise}
   <tr class="leading-5 border-t border-base-300 text-base-content">
     <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
-{:else}
-  {#each data as itassociation, i}
+{:then data}
+  {#each sortData(data, $sortKey, $sortDirection) as itassociation, i}
     <tr
       class="{i % 2 === 0 ? '' : 'bg-base-200'} 
       leading-5 border-t border-base-300 text-base-content"
@@ -156,4 +147,8 @@
       >
     </tr>
   {/each}
-{/if}
+{:catch}
+  <tr class="leading-5 border-t border-base-300 text-base-content">
+    <td class="text-sm p-4">{capital($_("load_error"))}</td>
+  </tr>
+{/await}
