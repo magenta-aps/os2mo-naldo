@@ -12,7 +12,6 @@
   import { sortData } from "$lib/utils/sorting"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { findClosestValidity } from "$lib/utils/validities"
-  import { onMount } from "svelte"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
@@ -27,7 +26,6 @@
   type OrgUnitITUser =
     OrgUnitItUsersQuery["byOrgUnit"]["objects"][0]["validities"][number]
   type ITUsers = Array<EngagementITUser | OrgUnitITUser>
-  let data: ITUsers
 
   export let tense: Tense
 
@@ -122,17 +120,10 @@
     }
   `
 
-  $: {
-    if (data) {
-      data = sortData(data, $sortKey, $sortDirection)
-    }
-  }
-
-  onMount(async () => {
-    const res = await graphQLClient().request(OrgUnitItUsersDocument, {
-      orgUnit: uuid,
-      ...tenseToValidity(tense, $date),
-    })
+  $: dataPromise = graphQLClient().request(OrgUnitItUsersDocument, {
+    orgUnit: uuid,
+    ...tenseToValidity(tense, $date),
+  }).then((res) => {
     const itUsers: ITUsers = []
 
     const combinedItUsers = [...res.byEngagement.objects, ...res.byOrgUnit.objects]
@@ -145,16 +136,16 @@
       })
       itUsers.push(...filtered)
     }
-    data = itUsers
+    return itUsers
   })
 </script>
 
-{#if !data}
+{#await dataPromise}
   <tr class="leading-5 border-t border-base-300 text-base-content">
     <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
-{:else}
-  {#each data as ituser, i}
+{:then data}
+  {#each sortData(data, $sortKey, $sortDirection) as ituser, i}
     <tr
       class="{i % 2 === 0 ? '' : 'bg-base-200'} 
         leading-5 border-t border-base-300 text-base-content"
@@ -206,4 +197,8 @@
       >
     </tr>
   {/each}
-{/if}
+{:catch}
+  <tr class="leading-5 border-t border-base-300 text-base-content">
+    <td class="text-sm p-4">{capital($_("load_error"))}</td>
+  </tr>
+{/await}

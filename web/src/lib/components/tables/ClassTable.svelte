@@ -19,7 +19,6 @@
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
 
   type Classes = ClassQuery["classes"]["objects"][0]["validities"]
-  let data: Classes
 
   export let tense: Tense
   export let facetUuid: string
@@ -52,49 +51,32 @@
     }
   `
 
-  $: {
-    if (data) {
-      data = sortData(data, $sortKey, $sortDirection)
-    }
-  }
+  $: dataPromise = facetUuid
+    ? graphQLClient().request(ClassDocument, {
+        facetUuid: facetUuid,
+        ...tenseToValidity(tense, $date),
+      }).then((res) => {
+        const classes: Classes = []
 
-  const getClasses = async (facetUuid: string) => {
-    const res = await graphQLClient().request(ClassDocument, {
-      facetUuid: facetUuid,
-      ...tenseToValidity(tense, $date),
-    })
-    const classes: Classes = []
-
-    // Filters and flattens the data
-    for (const outer of res.classes.objects) {
-      // TODO: Remove when GraphQL is able to do this for us
-      const filtered = outer.validities.filter((obj) => {
-        return tenseFilter(obj, tense)
+        // Filters and flattens the data
+        for (const outer of res.classes.objects) {
+          // TODO: Remove when GraphQL is able to do this for us
+          const filtered = outer.validities.filter((obj) => {
+            return tenseFilter(obj, tense)
+          })
+          classes.push(...filtered)
+        }
+        return classes
       })
-      classes.push(...filtered)
-    }
-    data = classes
-  }
-
-  $: if (facetUuid) {
-    getClasses(facetUuid)
-  }
+    : Promise.resolve([] as Classes)
 </script>
 
-{#if !data && !facetUuid}
-  <tr class="leading-5 border-t border-base-300 text-base-content">
-    <td class="p-4"
-      >{capital(
-        $_("no_item", { values: { item: $_("class", { values: { n: 2 } }) } })
-      )}</td
-    >
-  </tr>
-{:else if !data}
+{#await dataPromise}
   <tr class="leading-5 border-t border-base-300 text-base-content">
     <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
-{:else}
-  {#each data as cls, i}
+{:then data}
+  {#each sortData(data, $sortKey, $sortDirection) as cls, i}
     <tr
       class="{i % 2 === 0 ? '' : 'bg-base-200'} 
         leading-5 border-t border-base-300 text-base-content"
@@ -138,4 +120,8 @@
       >
     </tr>
   {/each}
-{/if}
+{:catch}
+  <tr class="leading-5 border-t border-base-300 text-base-content">
+    <td class="text-sm p-4">{capital($_("load_error"))}</td>
+  </tr>
+{/await}

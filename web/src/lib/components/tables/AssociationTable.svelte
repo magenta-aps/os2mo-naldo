@@ -11,7 +11,6 @@
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { sortData } from "$lib/utils/sorting"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
-  import { onMount } from "svelte"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
@@ -21,7 +20,6 @@
   import { env } from "$lib/env"
 
   type Associations = AssociationsQuery["associations"]["objects"][0]["validities"]
-  let data: Associations
 
   export let tense: Tense
 
@@ -95,18 +93,11 @@
     }
   `
 
-  $: {
-    if (data) {
-      data = sortData(data, $sortKey, $sortDirection)
-    }
-  }
-
-  onMount(async () => {
-    const res = await graphQLClient().request(AssociationsDocument, {
-      org_unit: org_unit,
-      employee: employee,
-      ...tenseToValidity(tense, $date),
-    })
+  $: dataPromise = graphQLClient().request(AssociationsDocument, {
+    org_unit: org_unit,
+    employee: employee,
+    ...tenseToValidity(tense, $date),
+  }).then((res) => {
     const associations: Associations = []
 
     // Filters and flattens the data
@@ -121,16 +112,16 @@
       })
       associations.push(...filtered)
     }
-    data = associations
+    return associations
   })
 </script>
 
-{#if !data}
+{#await dataPromise}
   <tr class="p-4 leading-5 border-t border-base-300 text-base-content">
     <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
-{:else}
-  {#each data as association, i}
+{:then data}
+  {#each sortData(data, $sortKey, $sortDirection) as association, i}
     <tr
       class="{i % 2 === 0 ? '' : 'bg-base-200'} 
       leading-5 border-t border-base-300 text-base-content"
@@ -200,4 +191,8 @@
       >
     </tr>
   {/each}
-{/if}
+{:catch}
+  <tr class="p-4 leading-5 border-t border-base-300 text-base-content">
+    <td class="text-sm p-4">{capital($_("load_error"))}</td>
+  </tr>
+{/await}
