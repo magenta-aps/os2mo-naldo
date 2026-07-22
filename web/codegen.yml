@@ -1,4 +1,6 @@
-schema: "http://127.0.0.1:5001/graphql/v29"
+# Fetch the schema as SDL: unlike GraphQL introspection, the SDL endpoint
+# requires no authentication (os2mo#58898), so `yarn generate` just works.
+schema: "http://127.0.0.1:5001/graphql/v29/schema.graphql"
 inputValueDeprecation: true
 generates:
   src/lib/graphql/types.ts:
