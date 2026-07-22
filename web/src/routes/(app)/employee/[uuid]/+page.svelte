@@ -317,11 +317,11 @@
           headers={[
             {
               title: capital($_("ituser", { values: { n: 1 } })),
-              sortPath: "ituser_response.current.user_key",
+              sortPath: "ituser_response.validities[0].user_key",
             },
             {
               title: capital($_("itsystem", { values: { n: 1 } })),
-              sortPath: "ituser_response.current.itsystem_response.current.name",
+              sortPath: "ituser_response.validities[0].itsystem_response.current.name",
             },
             {
               title: capital($_("role", { values: { n: 1 } })),

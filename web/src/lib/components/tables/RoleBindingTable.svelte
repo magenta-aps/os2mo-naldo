@@ -14,6 +14,7 @@
     filterTenseToValidity,
   } from "$lib/utils/tenses"
   import { sortData } from "$lib/utils/sorting"
+  import { findClosestValidity } from "$lib/utils/validities"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
@@ -39,20 +40,28 @@
       }
 
   gql`
-    query Rolebindings($filter: RoleBindingFilter!, $fromDate: DateTime) {
+    query Rolebindings(
+      $filter: RoleBindingFilter!
+      $fromDate: DateTime
+      $toDate: DateTime
+    ) {
       rolebindings(filter: $filter) {
         objects {
           validities {
             uuid
             ituser_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: $fromDate, end: $toDate) {
                 user_key
                 itsystem_response {
                   uuid
                   current(at: $fromDate) {
                     name
                   }
+                }
+                validity {
+                  from
+                  to
                 }
               }
             }
@@ -71,22 +80,24 @@
       }
     }
   `
-  $: dataPromise = graphQLClient().request(RolebindingsDocument, {
-    filter: filter,
-    ...tenseToValidity(tense, $date),
-  }).then((res) => {
-    const rolebindings: Rolebinding = []
+  $: dataPromise = graphQLClient()
+    .request(RolebindingsDocument, {
+      filter: filter,
+      ...tenseToValidity(tense, $date),
+    })
+    .then((res) => {
+      const rolebindings: Rolebinding = []
 
-    // Filters and flattens the data
-    for (const outer of res.rolebindings.objects) {
-      // TODO: Remove when GraphQL is able to do this for us
-      const filtered = outer.validities.filter((obj) => {
-        return tenseFilter(obj, tense)
-      })
-      rolebindings.push(...filtered)
-    }
-    return rolebindings
-  })
+      // Filters and flattens the data
+      for (const outer of res.rolebindings.objects) {
+        // TODO: Remove when GraphQL is able to do this for us
+        const filtered = outer.validities.filter((obj) => {
+          return tenseFilter(obj, tense)
+        })
+        rolebindings.push(...filtered)
+      }
+      return rolebindings
+    })
 </script>
 
 {#await dataPromise}
@@ -95,13 +106,16 @@
   </tr>
 {:then data}
   {#each sortData(data, $sortKey, $sortDirection) as rolebindingObj, i}
+    {@const closestItuser = rolebindingObj.ituser_response?.validities?.length
+      ? findClosestValidity(rolebindingObj.ituser_response.validities, $date)
+      : null}
     <tr
-      class="{i % 2 === 0 ? '' : 'bg-base-200'} 
+      class="{i % 2 === 0 ? '' : 'bg-base-200'}
         leading-5 border-t border-base-300 text-base-content"
     >
-      <td class="text-sm p-4">{rolebindingObj.ituser_response?.current?.user_key}</td>
+      <td class="text-sm p-4">{closestItuser?.user_key ?? ""}</td>
       <td class="text-sm p-4"
-        >{rolebindingObj.ituser_response?.current?.itsystem_response?.current?.name}</td
+        >{closestItuser?.itsystem_response?.current?.name ?? ""}</td
       >
       <td class="text-sm p-4">{rolebindingObj.role_response?.current?.name}</td>
       <ValidityTableCell validity={rolebindingObj.validity} />
