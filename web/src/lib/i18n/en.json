@@ -214,6 +214,7 @@
 	},
 	"select_all": "select all",
 	"select_item": "select {item}",
+	"set_start_date_first": "Set a start date before searching",
 	"show_cpr": "show CPR number",
 	"skip": "skip",
 	"specify": "specify",

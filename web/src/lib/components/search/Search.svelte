@@ -287,6 +287,9 @@
       </div>
     </SvelteSelect>
   </div>
+  {#if at === ""}
+    <span class="text-xs text-error">{capital($_("set_start_date_first"))}</span>
+  {/if}
   {#each errors as error}
     {#if error === "required"}
       <span class="text-xs text-error"
