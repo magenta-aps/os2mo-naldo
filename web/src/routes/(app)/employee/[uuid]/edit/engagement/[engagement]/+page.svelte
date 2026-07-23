@@ -145,7 +145,7 @@
 
   let facets: FacetValidities[]
   let abortController: AbortController
-  $: {
+  $: if (startDate) {
     // Abort the previous request if a new one is about to start
     if (abortController) abortController.abort()
     abortController = new AbortController()
