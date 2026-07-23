@@ -146,6 +146,13 @@
     if (!filterText.length) return []
     if (filterText.length < 3) return []
 
+    // A cleared date input passes `at` as an empty string. Don't fall back to
+    // another date to search against, since a picked item might not be valid on
+    // the date the user eventually chooses — require a date to be set first.
+    // (`at === undefined` means no date binding at all, so `$date` is fine.)
+    if (at === "") return []
+    const atDate = at ?? $date
+
     spinner = true
     if (abortController) {
       abortController.abort()
@@ -164,7 +171,7 @@
             query: filterText,
           }
         } else {
-          employeeFilter = { from_date: at ?? $date, query: filterText }
+          employeeFilter = { from_date: atDate, query: filterText }
         }
 
         res = await graphQLClient(abortController.signal).request(
@@ -173,13 +180,13 @@
             employeeFilter: employeeFilter,
             defaultSearch: !env.PUBLIC_ENABLE_RSD_SEARCH,
             limit: 30,
-            date: at ?? $date,
+            date: atDate,
           }
         )
 
         if (res.employees) {
           return (items = res.employees.objects
-            .map((item) => findClosestValidity(item.validities, at ?? $date))
+            .map((item) => findClosestValidity(item.validities, atDate))
             .sort((a, b) => (a.name > b.name ? 1 : -1)))
         }
 
@@ -192,7 +199,7 @@
             query: filterText,
           }
         } else {
-          orgUnitFilter = { from_date: at ?? $date, query: filterText }
+          orgUnitFilter = { from_date: atDate, query: filterText }
         }
 
         res = await graphQLClient(abortController.signal).request(
@@ -200,13 +207,13 @@
           {
             orgUnitFilter: orgUnitFilter,
             limit: 30,
-            date: at ?? $date,
+            date: atDate,
           }
         )
 
         if (res.org_units) {
           return (items = res.org_units.objects
-            .map((item) => findClosestValidity(item.validities, at ?? $date))
+            .map((item) => findClosestValidity(item.validities, atDate))
             .sort((a, b) => (a.name > b.name ? 1 : -1)))
         }
     }
