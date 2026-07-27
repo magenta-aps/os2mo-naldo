@@ -13,6 +13,8 @@
   import {
     EmployeeSearchDocument,
     OrgUnitSearchDocument,
+    OrgUnitAtDocument,
+    EmployeeAtDocument,
     type EmployeeSearchQuery,
     type OrgUnitSearchQuery,
   } from "./query.generated"
@@ -46,6 +48,49 @@
   $: if (value?.name) {
     name = value?.name
   }
+
+  // Clear the selection. `value` and `name` are bound, so resetting them here
+  // propagates to the parent's selection and its form field.
+  const clearSelection = () => {
+    value = undefined
+    name = ""
+  }
+
+  // Re-validate the current selection whenever the effective date changes: an
+  // item valid on the previous date may not exist on the new one. Resolve it
+  // as-of the new date — clear it if it's gone (so the user can't submit a
+  // stale selection the backend would reject) or refresh its name if it was
+  // renamed. `at === undefined` (no date binding) and `at === ""` (date
+  // cleared) both keep the value untouched.
+  let lastRevalidatedAt: string | undefined = at
+  const revalidateSelection = async (currentAt: string | undefined) => {
+    if (currentAt === lastRevalidatedAt) return
+    lastRevalidatedAt = currentAt
+    if (!currentAt || !value?.uuid) return
+
+    const uuid = value.uuid
+    try {
+      const document = type === "employee" ? EmployeeAtDocument : OrgUnitAtDocument
+      const { result } = await graphQLClient().request(document, {
+        uuid,
+        at: currentAt,
+      })
+      const current = result.objects[0]?.current
+
+      // Ignore stale responses if the date changed again or the selection moved.
+      if (currentAt !== lastRevalidatedAt || value?.uuid !== uuid) return
+
+      if (!current) {
+        clearSelection()
+      } else if (current.name !== value.name) {
+        value = { ...value, name: current.name }
+      }
+    } catch (err) {
+      // Keep the selection on lookup failure — the backend still validates on submit.
+      console.error("Validity re-check failed:", err)
+    }
+  }
+  $: revalidateSelection(at)
 
   const itemId = "uuid" // Used by the component to differentiate between items
 
@@ -101,6 +146,28 @@
               ...AddressDetails
             }
             ...RsdSearch @skip(if: $defaultSearch)
+          }
+        }
+      }
+    }
+
+    query OrgUnitAt($uuid: [UUID!], $at: DateTime) {
+      result: org_units(filter: { uuids: $uuid, from_date: null, to_date: null }) {
+        objects {
+          current(at: $at) {
+            uuid
+            name
+          }
+        }
+      }
+    }
+
+    query EmployeeAt($uuid: [UUID!], $at: DateTime) {
+      result: employees(filter: { uuids: $uuid, from_date: null, to_date: null }) {
+        objects {
+          current(at: $at) {
+            uuid
+            name
           }
         }
       }
