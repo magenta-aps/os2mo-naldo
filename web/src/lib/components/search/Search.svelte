@@ -20,82 +20,6 @@
   } from "./query.generated"
   import { env } from "$lib/env"
 
-  type Employees = EmployeeSearchQuery["employees"]["objects"][0]["validities"]
-  type OrgUnits = OrgUnitSearchQuery["org_units"]["objects"][0]["validities"]
-
-  type SearchItems = Employees | OrgUnits
-  type SearchItem = SearchItems[0]
-
-  // { name: string; uuid: string } allows us to use `<Search>` in forms, without using validity, since it's not needed.
-  export let startValue: SearchItem | { name: string; uuid: string } | undefined =
-    undefined
-  export let value: SearchItem | { name: string; uuid: string } | undefined =
-    startValue || undefined
-  export let name: string | undefined = undefined
-  export let type: "employee" | "org-unit"
-  export let action: "select" | "goto" = "select" // Redirect for navigation, select for forms
-  export let title: string = `${type === "employee" ? "Person" : "Organisation"}`
-  export let id = `${type}-uuid`
-  export let required = false
-  export let extra_classes = ""
-  export let disabled = false
-  export let errors: string[] = []
-  export let at: string | undefined = undefined
-
-  // Custom variable for loading/spinner, since aborting queries makes svelte-select set `loading = true`
-  let spinner = false
-
-  $: if (value?.name) {
-    name = value?.name
-  }
-
-  // Clear the selection. `value` and `name` are bound, so resetting them here
-  // propagates to the parent's selection and its form field.
-  const clearSelection = () => {
-    value = undefined
-    name = ""
-  }
-
-  // Re-validate the current selection whenever the effective date changes: an
-  // item valid on the previous date may not exist on the new one. Resolve it
-  // as-of the new date — clear it if it's gone (so the user can't submit a
-  // stale selection the backend would reject) or refresh its name if it was
-  // renamed. `at === undefined` (no date binding) and `at === ""` (date
-  // cleared) both keep the value untouched.
-  let lastRevalidatedAt: string | undefined = at
-  const revalidateSelection = async (currentAt: string | undefined) => {
-    if (currentAt === lastRevalidatedAt) return
-    lastRevalidatedAt = currentAt
-    if (!currentAt || !value?.uuid) return
-
-    const uuid = value.uuid
-    try {
-      const document = type === "employee" ? EmployeeAtDocument : OrgUnitAtDocument
-      const { result } = await graphQLClient().request(document, {
-        uuid,
-        at: currentAt,
-      })
-      const current = result.objects[0]?.current
-
-      // Ignore stale responses if the date changed again or the selection moved.
-      if (currentAt !== lastRevalidatedAt || value?.uuid !== uuid) return
-
-      if (!current) {
-        clearSelection()
-      } else if (current.name !== value.name) {
-        value = { ...value, name: current.name }
-      }
-    } catch (err) {
-      // Keep the selection on lookup failure — the backend still validates on submit.
-      console.error("Validity re-check failed:", err)
-    }
-  }
-  $: revalidateSelection(at)
-
-  const itemId = "uuid" // Used by the component to differentiate between items
-
-  let items: SearchItems
-
   gql`
     query OrgUnitSearch(
       $orgUnitFilter: OrganisationUnitFilter!
@@ -207,6 +131,82 @@
       }
     }
   `
+
+  type Employees = EmployeeSearchQuery["employees"]["objects"][0]["validities"]
+  type OrgUnits = OrgUnitSearchQuery["org_units"]["objects"][0]["validities"]
+
+  type SearchItems = Employees | OrgUnits
+  type SearchItem = SearchItems[0]
+
+  // { name: string; uuid: string } allows us to use `<Search>` in forms, without using validity, since it's not needed.
+  export let startValue: SearchItem | { name: string; uuid: string } | undefined =
+    undefined
+  export let value: SearchItem | { name: string; uuid: string } | undefined =
+    startValue || undefined
+  export let name: string | undefined = undefined
+  export let type: "employee" | "org-unit"
+  export let action: "select" | "goto" = "select" // Redirect for navigation, select for forms
+  export let title: string = `${type === "employee" ? "Person" : "Organisation"}`
+  export let id = `${type}-uuid`
+  export let required = false
+  export let extra_classes = ""
+  export let disabled = false
+  export let errors: string[] = []
+  export let at: string | undefined = undefined
+
+  // Custom variable for loading/spinner, since aborting queries makes svelte-select set `loading = true`
+  let spinner = false
+
+  $: if (value?.name) {
+    name = value?.name
+  }
+
+  // Clear the selection. `value` and `name` are bound, so resetting them here
+  // propagates to the parent's selection and its form field.
+  const clearSelection = () => {
+    value = undefined
+    name = ""
+  }
+
+  // Re-validate the current selection whenever the effective date changes: an
+  // item valid on the previous date may not exist on the new one. Resolve it
+  // as-of the new date — clear it if it's gone (so the user can't submit a
+  // stale selection the backend would reject) or refresh its name if it was
+  // renamed. `at === undefined` (no date binding) and `at === ""` (date
+  // cleared) both keep the value untouched.
+  let lastRevalidatedAt: string | undefined = at
+  const revalidateSelection = async (currentAt: string | undefined) => {
+    if (currentAt === lastRevalidatedAt) return
+    lastRevalidatedAt = currentAt
+    if (!currentAt || !value?.uuid) return
+
+    const uuid = value.uuid
+    try {
+      const document = type === "employee" ? EmployeeAtDocument : OrgUnitAtDocument
+      const { result } = await graphQLClient().request(document, {
+        uuid,
+        at: currentAt,
+      })
+      const current = result.objects[0]?.current
+
+      // Ignore stale responses if the date changed again or the selection moved.
+      if (currentAt !== lastRevalidatedAt || value?.uuid !== uuid) return
+
+      if (!current) {
+        clearSelection()
+      } else if (current.name !== value.name) {
+        value = { ...value, name: current.name }
+      }
+    } catch (err) {
+      // Keep the selection on lookup failure — the backend still validates on submit.
+      console.error("Validity re-check failed:", err)
+    }
+  }
+  $: revalidateSelection(at)
+
+  const itemId = "uuid" // Used by the component to differentiate between items
+
+  let items: SearchItems
 
   let abortController: AbortController
   const searchItems = async (filterText: string) => {
