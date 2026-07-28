@@ -73,7 +73,7 @@
 
   let facets: FacetValidities[]
   let abortController: AbortController
-  $: {
+  $: if (startDate) {
     const params = {
       currentDate: startDate,
       orgUuid: parent ? parent.uuid : null,

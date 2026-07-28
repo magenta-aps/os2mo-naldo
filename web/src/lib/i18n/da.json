@@ -214,6 +214,7 @@
 	},
 	"select_all": "vælg alle",
 	"select_item": "vælg {item}",
+	"set_start_date_first": "Angiv en startdato før du søger",
 	"show_cpr": "vis CPR-nummer",
 	"skip": "spring over",
 	"specify": "angiv",
