@@ -8,14 +8,7 @@
   import checkCircleOutlineRounded from "@iconify/icons-material-symbols/check-circle-outline-rounded"
   import { updateGlobalNavigation } from "$lib/stores/navigation"
 
-  const startTimeout = () => {
-    setTimeout(
-      () => {
-        $success = { message: "" }
-      },
-      $success.timeOutTime ? $success.timeOutTime : 5000
-    )
-
+  const redirect = () => {
     // TODO: This is complete garbage, change the type to take `redirect` instead of creating the redirect by a type
     // type SuccessAlert = {
     //   message: string
@@ -47,7 +40,7 @@
   }
 
   $: if ($success.message) {
-    startTimeout()
+    redirect()
   }
 </script>
 
