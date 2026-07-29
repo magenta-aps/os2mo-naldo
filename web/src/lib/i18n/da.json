@@ -200,6 +200,7 @@
 	"related_unit": "{n, plural, =0 {den relaterede enhed} one {relateret enhed} other {relaterede enheder}}",
 	"rename": "omdøb",
 	"report": "{n, plural, one {rapport} other {rapporter}}",
+	"request_id": "forespørgsels-id",
 	"role": "{n, plural, =0 {rollen} one {rolle} other {roller}}",
 	"role_type": "rolletype",
 	"rolebinding": "{n, plural, =0 {rollebindingen} one {rollebinding} other {rollebindinger}}",

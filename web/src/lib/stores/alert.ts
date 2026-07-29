@@ -45,5 +45,5 @@ const alertStore = <T>(empty: T, timeOut = 5000) => {
 }
 
 export const success = alertStore(defaultSuccessAlert)
-export const error = alertStore(defaultErrorAlert)
+export const error = alertStore(defaultErrorAlert, 10000)
 export const warning = alertStore(defaultWarningAlert)
