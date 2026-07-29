@@ -10,23 +10,40 @@ interface SuccessAlert {
     | "itsystem"
     | "clipboard"
     | "connections"
-  timeOutTime?: number
 }
 
 interface ErrorAlert {
   message: any
-  timeOutTime?: number
 }
 
 interface WarningAlert {
   message: any
-  timeOutTime?: number
 }
 
 const defaultSuccessAlert: SuccessAlert = { message: "" }
 const defaultErrorAlert: ErrorAlert = { message: "" }
 const defaultWarningAlert: WarningAlert = { message: "" }
 
-export const success = writable(defaultSuccessAlert)
-export const error = writable(defaultErrorAlert)
-export const warning = writable(defaultWarningAlert)
+const alertStore = <T>(empty: T, timeOut = 5000) => {
+  const store = writable<T>(empty)
+  let timer: ReturnType<typeof setTimeout> | undefined
+
+  const clear = () => {
+    clearTimeout(timer)
+    store.set(empty)
+  }
+
+  return {
+    subscribe: store.subscribe,
+    clear,
+    set: (alert: T) => {
+      clearTimeout(timer)
+      store.set(alert)
+      timer = setTimeout(clear, timeOut)
+    },
+  }
+}
+
+export const success = alertStore(defaultSuccessAlert)
+export const error = alertStore(defaultErrorAlert)
+export const warning = alertStore(defaultWarningAlert)
