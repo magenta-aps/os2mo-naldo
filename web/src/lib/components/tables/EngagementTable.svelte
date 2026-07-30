@@ -138,9 +138,9 @@
         // TODO: Remove when GraphQL is able to do this for us
         const filtered = outer.validities.filter((obj) => {
           if (!tenseFilter(obj, tense)) return false
-          // Check if engagement validity is in current org_unit ($page.params.uuid)
+          // Check if engagement validity is in the current org_unit
           // TODO: Do this with GraphQL, when following issues are resolved (#65031) (#65303)
-          if (isOrg && obj.org_unit_uuid !== $page.params.uuid) return false
+          if (isOrg && obj.org_unit_uuid !== uuid) return false
           return true
         })
         engagements.push(...filtered)

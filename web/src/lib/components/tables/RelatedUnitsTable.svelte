@@ -85,7 +85,7 @@
       // org_units empty so the row renders blank instead of indexing into nothing.
       return relatedUnits.map((unit) => {
         const related = findClosestValidity(
-          unit.org_units.filter((org_unit) => org_unit.uuid !== $page.params.uuid),
+          unit.org_units.filter((org_unit) => org_unit.uuid !== uuid),
           $date
         )
         // The root is the top-most ancestor of the chosen slice. Deriving it from
