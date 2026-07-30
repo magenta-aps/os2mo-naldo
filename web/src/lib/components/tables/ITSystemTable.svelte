@@ -48,21 +48,23 @@
     }
   `
 
-  $: dataPromise = graphQLClient().request(ItSystemDocument, {
-    ...tenseToValidity(tense, $date),
-  }).then((res) => {
-    const itsystems: ITSystems = []
+  $: dataPromise = graphQLClient()
+    .request(ItSystemDocument, {
+      ...tenseToValidity(tense, $date),
+    })
+    .then((res) => {
+      const itsystems: ITSystems = []
 
-    // Filters and flattens the data
-    for (const outer of res.itsystems.objects) {
-      // TODO: Remove when GraphQL is able to do this for us
-      const filtered = outer.validities.filter((obj) => {
-        return tenseFilter(obj, tense)
-      })
-      itsystems.push(...filtered)
-    }
-    return itsystems
-  })
+      // Filters and flattens the data
+      for (const outer of res.itsystems.objects) {
+        // TODO: Remove when GraphQL is able to do this for us
+        const filtered = outer.validities.filter((obj) => {
+          return tenseFilter(obj, tense)
+        })
+        itsystems.push(...filtered)
+      }
+      return itsystems
+    })
 </script>
 
 {#await dataPromise}

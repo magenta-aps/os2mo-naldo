@@ -93,27 +93,29 @@
     }
   `
 
-  $: dataPromise = graphQLClient().request(AssociationsDocument, {
-    org_unit: org_unit,
-    employee: employee,
-    ...tenseToValidity(tense, $date),
-  }).then((res) => {
-    const associations: Associations = []
+  $: dataPromise = graphQLClient()
+    .request(AssociationsDocument, {
+      org_unit: org_unit,
+      employee: employee,
+      ...tenseToValidity(tense, $date),
+    })
+    .then((res) => {
+      const associations: Associations = []
 
-    // Filters and flattens the data
-    for (const outer of res.associations.objects) {
-      // TODO: Remove when GraphQL is able to do this for us
-      const filtered = outer.validities.filter((obj) => {
-        if (!tenseFilter(obj, tense)) return false
-        // Check if association validity is in current org_unit ($page.params.uuid)
-        // TODO: Do this with GraphQL, when following issues are resolved (#65031) (#65303)
-        if (isOrg && obj.org_unit_response.uuid !== $page.params.uuid) return false
-        return true
-      })
-      associations.push(...filtered)
-    }
-    return associations
-  })
+      // Filters and flattens the data
+      for (const outer of res.associations.objects) {
+        // TODO: Remove when GraphQL is able to do this for us
+        const filtered = outer.validities.filter((obj) => {
+          if (!tenseFilter(obj, tense)) return false
+          // Check if association validity is in current org_unit ($page.params.uuid)
+          // TODO: Do this with GraphQL, when following issues are resolved (#65031) (#65303)
+          if (isOrg && obj.org_unit_response.uuid !== $page.params.uuid) return false
+          return true
+        })
+        associations.push(...filtered)
+      }
+      return associations
+    })
 </script>
 
 {#await dataPromise}

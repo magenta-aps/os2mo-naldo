@@ -78,22 +78,24 @@
     }
   `
 
-  $: dataPromise = graphQLClient().request(ItAssociationsDocument, {
-    employee: uuid,
-    ...tenseToValidity(tense, $date),
-  }).then((res) => {
-    const itAssociations: ItAssociations = []
+  $: dataPromise = graphQLClient()
+    .request(ItAssociationsDocument, {
+      employee: uuid,
+      ...tenseToValidity(tense, $date),
+    })
+    .then((res) => {
+      const itAssociations: ItAssociations = []
 
-    // Filters and flattens the data
-    for (const outer of res.associations.objects) {
-      // TODO: Remove when GraphQL is able to do this for us
-      const filtered = outer.validities.filter((obj) => {
-        return tenseFilter(obj, tense)
-      })
-      itAssociations.push(...filtered)
-    }
-    return itAssociations
-  })
+      // Filters and flattens the data
+      for (const outer of res.associations.objects) {
+        // TODO: Remove when GraphQL is able to do this for us
+        const filtered = outer.validities.filter((obj) => {
+          return tenseFilter(obj, tense)
+        })
+        itAssociations.push(...filtered)
+      }
+      return itAssociations
+    })
 </script>
 
 {#await dataPromise}

@@ -65,22 +65,24 @@
     }
   `
 
-  $: dataPromise = graphQLClient().request(OrgUnitDocument, {
-    uuid: uuid,
-    ...tenseToValidity(tense, $date),
-  }).then((res) => {
-    const orgUnits: OrgUnits = []
+  $: dataPromise = graphQLClient()
+    .request(OrgUnitDocument, {
+      uuid: uuid,
+      ...tenseToValidity(tense, $date),
+    })
+    .then((res) => {
+      const orgUnits: OrgUnits = []
 
-    // Filters and flattens the data
-    for (const outer of res.org_units.objects) {
-      // TODO: Remove when GraphQL is able to do this for us
-      const filtered = outer.validities.filter((obj) => {
-        return tenseFilter(obj, tense)
-      })
-      orgUnits.push(...filtered)
-    }
-    return orgUnits
-  })
+      // Filters and flattens the data
+      for (const outer of res.org_units.objects) {
+        // TODO: Remove when GraphQL is able to do this for us
+        const filtered = outer.validities.filter((obj) => {
+          return tenseFilter(obj, tense)
+        })
+        orgUnits.push(...filtered)
+      }
+      return orgUnits
+    })
 </script>
 
 {#await dataPromise}
