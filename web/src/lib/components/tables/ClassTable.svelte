@@ -52,22 +52,24 @@
   `
 
   $: dataPromise = facetUuid
-    ? graphQLClient().request(ClassDocument, {
-        facetUuid: facetUuid,
-        ...tenseToValidity(tense, $date),
-      }).then((res) => {
-        const classes: Classes = []
+    ? graphQLClient()
+        .request(ClassDocument, {
+          facetUuid: facetUuid,
+          ...tenseToValidity(tense, $date),
+        })
+        .then((res) => {
+          const classes: Classes = []
 
-        // Filters and flattens the data
-        for (const outer of res.classes.objects) {
-          // TODO: Remove when GraphQL is able to do this for us
-          const filtered = outer.validities.filter((obj) => {
-            return tenseFilter(obj, tense)
-          })
-          classes.push(...filtered)
-        }
-        return classes
-      })
+          // Filters and flattens the data
+          for (const outer of res.classes.objects) {
+            // TODO: Remove when GraphQL is able to do this for us
+            const filtered = outer.validities.filter((obj) => {
+              return tenseFilter(obj, tense)
+            })
+            classes.push(...filtered)
+          }
+          return classes
+        })
     : Promise.resolve([] as Classes)
 </script>
 

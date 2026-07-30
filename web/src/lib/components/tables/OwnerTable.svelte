@@ -103,38 +103,42 @@
   `
 
   $: dataPromise = isOrg
-    ? graphQLClient().request(OrgUnitOwnerDocument, {
-        uuids: uuid,
-        ...tenseToValidity(tense, $date),
-      }).then((res) => {
-        const owners: Owners = []
+    ? graphQLClient()
+        .request(OrgUnitOwnerDocument, {
+          uuids: uuid,
+          ...tenseToValidity(tense, $date),
+        })
+        .then((res) => {
+          const owners: Owners = []
 
-        // Filters and flattens the data
-        for (const outer of res.org_units.objects) {
-          // TODO: Remove when GraphQL is able to do this for us
-          const filtered = outer.validities[0].owners.filter((obj) => {
-            return tenseFilter(obj, tense)
-          })
-          owners.push(...filtered)
-        }
-        return owners
-      })
-    : graphQLClient().request(EmployeeOwnerDocument, {
-        uuids: uuid,
-        ...tenseToValidity(tense, $date),
-      }).then((res) => {
-        const owners: Owners = []
+          // Filters and flattens the data
+          for (const outer of res.org_units.objects) {
+            // TODO: Remove when GraphQL is able to do this for us
+            const filtered = outer.validities[0].owners.filter((obj) => {
+              return tenseFilter(obj, tense)
+            })
+            owners.push(...filtered)
+          }
+          return owners
+        })
+    : graphQLClient()
+        .request(EmployeeOwnerDocument, {
+          uuids: uuid,
+          ...tenseToValidity(tense, $date),
+        })
+        .then((res) => {
+          const owners: Owners = []
 
-        // Filters and flattens the data
-        for (const outer of res.owners.objects) {
-          // TODO: Remove when GraphQL is able to do this for us
-          const filtered = outer.validities.filter((obj) => {
-            return tenseFilter(obj, tense)
-          })
-          owners.push(...filtered)
-        }
-        return owners
-      })
+          // Filters and flattens the data
+          for (const outer of res.owners.objects) {
+            // TODO: Remove when GraphQL is able to do this for us
+            const filtered = outer.validities.filter((obj) => {
+              return tenseFilter(obj, tense)
+            })
+            owners.push(...filtered)
+          }
+          return owners
+        })
 </script>
 
 {#await dataPromise}

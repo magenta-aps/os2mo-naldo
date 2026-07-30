@@ -122,29 +122,31 @@
     }
   `
 
-  $: dataPromise = graphQLClient().request(EngagementsDocument, {
-    org_unit: org_unit,
-    employee: employee,
-    inherit: env.PUBLIC_INHERIT_MANAGER,
-    isOrg: isOrg,
-    ...tenseToValidity(tense, $date),
-  }).then((res) => {
-    const engagements: Engagements = []
+  $: dataPromise = graphQLClient()
+    .request(EngagementsDocument, {
+      org_unit: org_unit,
+      employee: employee,
+      inherit: env.PUBLIC_INHERIT_MANAGER,
+      isOrg: isOrg,
+      ...tenseToValidity(tense, $date),
+    })
+    .then((res) => {
+      const engagements: Engagements = []
 
-    // Filters and flattens the data
-    for (const outer of res.engagements.objects) {
-      // TODO: Remove when GraphQL is able to do this for us
-      const filtered = outer.validities.filter((obj) => {
-        if (!tenseFilter(obj, tense)) return false
-        // Check if engagement validity is in current org_unit ($page.params.uuid)
-        // TODO: Do this with GraphQL, when following issues are resolved (#65031) (#65303)
-        if (isOrg && obj.org_unit_uuid !== $page.params.uuid) return false
-        return true
-      })
-      engagements.push(...filtered)
-    }
-    return engagements
-  })
+      // Filters and flattens the data
+      for (const outer of res.engagements.objects) {
+        // TODO: Remove when GraphQL is able to do this for us
+        const filtered = outer.validities.filter((obj) => {
+          if (!tenseFilter(obj, tense)) return false
+          // Check if engagement validity is in the current org_unit
+          // TODO: Do this with GraphQL, when following issues are resolved (#65031) (#65303)
+          if (isOrg && obj.org_unit_uuid !== uuid) return false
+          return true
+        })
+        engagements.push(...filtered)
+      }
+      return engagements
+    })
 </script>
 
 {#await dataPromise}

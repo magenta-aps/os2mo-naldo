@@ -62,45 +62,47 @@
     }
   `
 
-  $: dataPromise = graphQLClient().request(RelatedUnitsDocument, {
-    org_unit: uuid,
-    fromDate: $date,
-    ...tenseToValidity(tense, $date),
-  }).then((res) => {
-    const relatedUnits = []
-
-    for (const outer of res.related_units.objects) {
-      const filtered = outer.validities.filter((obj) => {
-        return tenseFilter(obj, tense)
-      })
-      relatedUnits.push(...filtered)
-    }
-    // A relation links two distinct units. `org_units` is queried with
-    // `from_date: null, to_date: null`, so every temporal slice of both units is
-    // returned even when a unit's dates are inconsistent (e.g. imported data).
-    // Drop the unit we're already looking at and pick the slice of the other one
-    // closest to the selected date. If the other unit is absent entirely, leave
-    // org_units empty so the row renders blank instead of indexing into nothing.
-    return relatedUnits.map((unit) => {
-      const related = findClosestValidity(
-        unit.org_units.filter((org_unit) => org_unit.uuid !== $page.params.uuid),
-        $date
-      )
-      // The root is the top-most ancestor of the chosen slice. Deriving it from
-      // `ancestors` (per-validity) instead of `root_response` avoids the backend
-      // error thrown when a unit's root isn't unique over all time (e.g. a unit
-      // that was moved/renamed). A unit with no ancestors is itself the root.
-      const root = related
-        ? related.ancestors.at(-1) ?? { name: related.name, uuid: related.uuid }
-        : undefined
-      return {
-        uuid: unit.uuid,
-        org_units: related ? [related] : [],
-        validity: unit.validity,
-        root,
-      }
+  $: dataPromise = graphQLClient()
+    .request(RelatedUnitsDocument, {
+      org_unit: uuid,
+      fromDate: $date,
+      ...tenseToValidity(tense, $date),
     })
-  })
+    .then((res) => {
+      const relatedUnits = []
+
+      for (const outer of res.related_units.objects) {
+        const filtered = outer.validities.filter((obj) => {
+          return tenseFilter(obj, tense)
+        })
+        relatedUnits.push(...filtered)
+      }
+      // A relation links two distinct units. `org_units` is queried with
+      // `from_date: null, to_date: null`, so every temporal slice of both units is
+      // returned even when a unit's dates are inconsistent (e.g. imported data).
+      // Drop the unit we're already looking at and pick the slice of the other one
+      // closest to the selected date. If the other unit is absent entirely, leave
+      // org_units empty so the row renders blank instead of indexing into nothing.
+      return relatedUnits.map((unit) => {
+        const related = findClosestValidity(
+          unit.org_units.filter((org_unit) => org_unit.uuid !== uuid),
+          $date
+        )
+        // The root is the top-most ancestor of the chosen slice. Deriving it from
+        // `ancestors` (per-validity) instead of `root_response` avoids the backend
+        // error thrown when a unit's root isn't unique over all time (e.g. a unit
+        // that was moved/renamed). A unit with no ancestors is itself the root.
+        const root = related
+          ? related.ancestors.at(-1) ?? { name: related.name, uuid: related.uuid }
+          : undefined
+        return {
+          uuid: unit.uuid,
+          org_units: related ? [related] : [],
+          validity: unit.validity,
+          root,
+        }
+      })
+    })
 </script>
 
 {#await dataPromise}

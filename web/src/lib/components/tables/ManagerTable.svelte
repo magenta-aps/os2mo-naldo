@@ -106,29 +106,31 @@
     }
   `
 
-  $: dataPromise = graphQLClient().request(ManagersDocument, {
-    org_unit: org_unit,
-    employee: employee,
-    // Don't set inherit flag if employee, to avoid:
-    // "The inherit flag requires an organizational unit filter"
-    inherit: !isOrg ? false : env.PUBLIC_INHERIT_MANAGER,
-    ...tenseToValidity(tense, $date),
-  }).then((res) => {
-    const managers: Managers = []
+  $: dataPromise = graphQLClient()
+    .request(ManagersDocument, {
+      org_unit: org_unit,
+      employee: employee,
+      // Don't set inherit flag if employee, to avoid:
+      // "The inherit flag requires an organizational unit filter"
+      inherit: !isOrg ? false : env.PUBLIC_INHERIT_MANAGER,
+      ...tenseToValidity(tense, $date),
+    })
+    .then((res) => {
+      const managers: Managers = []
 
-    // Filters and flattens the data
-    for (const outer of res.managers.objects) {
-      const filtered = outer.validities.filter((obj) => {
-        if (!tenseFilter(obj, tense)) return false
-        // Filter out vacant manager-roles for employees
-        // TODO: Do this with GraphQL, when following issues are resolved (#65031) (#65303)
-        if (!isOrg && !obj.person_response) return false
-        return true
-      })
-      managers.push(...filtered)
-    }
-    return managers
-  })
+      // Filters and flattens the data
+      for (const outer of res.managers.objects) {
+        const filtered = outer.validities.filter((obj) => {
+          if (!tenseFilter(obj, tense)) return false
+          // Filter out vacant manager-roles for employees
+          // TODO: Do this with GraphQL, when following issues are resolved (#65031) (#65303)
+          if (!isOrg && !obj.person_response) return false
+          return true
+        })
+        managers.push(...filtered)
+      }
+      return managers
+    })
 </script>
 
 {#await dataPromise}

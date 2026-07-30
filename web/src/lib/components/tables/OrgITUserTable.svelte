@@ -120,24 +120,26 @@
     }
   `
 
-  $: dataPromise = graphQLClient().request(OrgUnitItUsersDocument, {
-    orgUnit: uuid,
-    ...tenseToValidity(tense, $date),
-  }).then((res) => {
-    const itUsers: ITUsers = []
+  $: dataPromise = graphQLClient()
+    .request(OrgUnitItUsersDocument, {
+      orgUnit: uuid,
+      ...tenseToValidity(tense, $date),
+    })
+    .then((res) => {
+      const itUsers: ITUsers = []
 
-    const combinedItUsers = [...res.byEngagement.objects, ...res.byOrgUnit.objects]
+      const combinedItUsers = [...res.byEngagement.objects, ...res.byOrgUnit.objects]
 
-    // Filters and flattens the data
-    for (const outer of combinedItUsers) {
-      // TODO: Remove when GraphQL is able to do this for us
-      const filtered = outer.validities.filter((obj) => {
-        return tenseFilter(obj, tense)
-      })
-      itUsers.push(...filtered)
-    }
-    return itUsers
-  })
+      // Filters and flattens the data
+      for (const outer of combinedItUsers) {
+        // TODO: Remove when GraphQL is able to do this for us
+        const filtered = outer.validities.filter((obj) => {
+          return tenseFilter(obj, tense)
+        })
+        itUsers.push(...filtered)
+      }
+      return itUsers
+    })
 </script>
 
 {#await dataPromise}

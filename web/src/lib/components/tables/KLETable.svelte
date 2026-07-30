@@ -54,22 +54,24 @@
       }
     }
   `
-  $: dataPromise = graphQLClient().request(KleDocument, {
-    org_unit: uuid,
-    ...tenseToValidity(tense, $date),
-  }).then((res) => {
-    const kles: KLEs = []
+  $: dataPromise = graphQLClient()
+    .request(KleDocument, {
+      org_unit: uuid,
+      ...tenseToValidity(tense, $date),
+    })
+    .then((res) => {
+      const kles: KLEs = []
 
-    // Filters and flattens the data
-    for (const outer of res.kles.objects) {
-      // TODO: Remove when GraphQL is able to do this for us
-      const filtered = outer.validities.filter((obj) => {
-        return tenseFilter(obj, tense)
-      })
-      kles.push(...filtered)
-    }
-    return kles
-  })
+      // Filters and flattens the data
+      for (const outer of res.kles.objects) {
+        // TODO: Remove when GraphQL is able to do this for us
+        const filtered = outer.validities.filter((obj) => {
+          return tenseFilter(obj, tense)
+        })
+        kles.push(...filtered)
+      }
+      return kles
+    })
 </script>
 
 {#await dataPromise}
