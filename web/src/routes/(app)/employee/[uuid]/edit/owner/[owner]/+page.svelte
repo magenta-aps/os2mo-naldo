@@ -17,6 +17,7 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
+  import { createQuery } from "$lib/http/query"
   import { getPersonValidities } from "$lib/http/getValidities"
   import { normalizeOwner } from "$lib/utils/normalizeForm"
 
@@ -95,21 +96,37 @@
       }
     }
 
-  // Logic for updating datepicker intervals
-  let validities: {
+  // Datepicker bounds for the selected person. See the employee edit
+  // engagement form for the query pattern and its trade-offs.
+  const validities = createQuery<{
     from: string | undefined | null
     to: string | undefined | null
-  } = { from: null, to: null }
-
-  $: {
-    ;(async () => {
-      validities = selectedPerson
-        ? await getPersonValidities(selectedPerson?.uuid)
-        : { from: null, to: null }
-    })()
+  }>({ from: null, to: null })
+  $: if (selectedPerson?.uuid) {
+    const personUuid = selectedPerson.uuid
+    validities.run((signal) => getPersonValidities(personUuid, signal))
+  } else {
+    validities.run(async () => ({ from: null, to: null }))
   }
 
+  // Created in the script (not inline in the {#await} tag) so the result can
+  // be captured below without a side effect in the template.
+  const ownerPromise = graphQLClient().request(OwnerDocument, {
+    uuid: $page.params.owner,
+    fromDate: $page.url.searchParams.get("from"),
+    toDate: $page.url.searchParams.get("to"),
+  })
+
   let initialOwner: any = null
+  ownerPromise.then(
+    (data) => {
+      initialOwner = normalizeOwner(data.owners.objects[0].validities[0])
+    },
+    // The template's {#await} has no {:catch}, so a failed load stays on the
+    // pending branch. This handler only prevents an unhandled rejection from
+    // this second promise chain.
+    () => {}
+  )
   let hasChanges = false
   $: if (initialOwner) {
     // Check if any of the user-editable fields have changed compared to the original values.
@@ -141,7 +158,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( OwnerDocument, { uuid: $page.params.owner, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to") } )}
+{#await ownerPromise}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
       <div class="p-8">
@@ -155,12 +172,6 @@
   </div>
 {:then data}
   {@const ownerObj = data.owners.objects[0].validities[0]}
-  {#if !initialOwner}
-    {@html (() => {
-      initialOwner = normalizeOwner(ownerObj)
-      return ""
-    })()}
-  {/if}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
@@ -172,8 +183,8 @@
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={validities.from}
-            max={toDate ? toDate : validities.to}
+            min={$validities.data?.from}
+            max={toDate ? toDate : $validities.data?.to}
             required={true}
           />
           <DateInput
@@ -183,8 +194,8 @@
               : null}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : validities.from}
-            max={validities.to}
+            min={$fromDate.value ? $fromDate.value : $validities.data?.from}
+            max={$validities.data?.to}
           />
         </div>
         <Search
