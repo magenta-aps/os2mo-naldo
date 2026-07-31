@@ -15,6 +15,7 @@
   import type { SubmitFunction } from "./$types"
   import { UpdateRoleBindingDocument, RolebindingDocument } from "./query.generated"
   import type { FacetValidities } from "$lib/utils/classes"
+  import { createQuery } from "$lib/http/query"
   import { getItuserValidities } from "$lib/http/getValidities"
   import { getRoleClasses } from "$lib/http/getClasses"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
@@ -125,42 +126,50 @@
       }
     }
 
-  // Logic for updating datepicker intervals
-  let validities: {
+  // Datepicker bounds for the selected IT user. See the employee edit
+  // engagement form for the query pattern and its trade-offs.
+  const validities = createQuery<{
     from: string | undefined | null
     to: string | undefined | null
-  } = { from: null, to: null }
-
-  let facets: FacetValidities[]
-  let abortController: AbortController
-  $: if (startDate) {
-    // Abort the previous request if a new one is about to start
-    if (abortController) abortController.abort()
-    abortController = new AbortController()
-
-    // Make sure `currentDate` isn't sent if startDate is null.
-    const params = {
-      fromDate: startDate,
-      itSystem: itUser?.itsystem.uuid,
-    }
-
-    ;(async () => {
-      validities = itUser?.uuid
-        ? await getItuserValidities(itUser?.uuid)
-        : { from: null, to: null }
-      if (itUser?.uuid) {
-        try {
-          facets = await getRoleClasses(params, abortController.signal)
-        } catch (err: any) {
-          if (err.name !== "AbortError") {
-            console.error("Request failed:", err)
-          }
-        }
-      }
-    })()
+  }>({ from: null, to: null })
+  $: if (itUser?.uuid) {
+    const itUserUuid = itUser.uuid
+    validities.run((signal) => getItuserValidities(itUserUuid, signal))
+  } else {
+    validities.run(async () => ({ from: null, to: null }))
   }
 
+  const facets = createQuery<FacetValidities[]>()
+  // Only fetch when a start date and an IT user are set: the role classes
+  // depend on the IT user's system, and the role select is disabled without
+  // them anyway.
+  $: if (startDate && itUser?.uuid) {
+    const itSystemUuid = itUser.itsystem.uuid
+    facets.run((signal) =>
+      getRoleClasses({ fromDate: startDate, itSystem: itSystemUuid }, signal)
+    )
+  }
+
+  // Created in the script (not inline in the {#await} tag) so the result can
+  // be captured below without a side effect in the template.
+  const rolebindingPromise = graphQLClient().request(RolebindingDocument, {
+    uuid: $page.params.rolebinding,
+    fromDate: $page.url.searchParams.get("from"),
+    toDate: $page.url.searchParams.get("to"),
+  })
+
   let initialRolebinding: any = null
+  rolebindingPromise.then(
+    (data) => {
+      initialRolebinding = normalizeRolebinding(
+        data.rolebindings.objects[0].validities[0]
+      )
+    },
+    // The template's {#await} has no {:catch}, so a failed load stays on the
+    // pending branch. This handler only prevents an unhandled rejection from
+    // this second promise chain.
+    () => {}
+  )
   let hasChanges = false
   $: if (initialRolebinding) {
     // Check if any of the user-editable fields have changed compared to the original values.
@@ -194,7 +203,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( RolebindingDocument, { uuid: $page.params.rolebinding, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to") } )}
+{#await rolebindingPromise}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
       <div class="p-8">
@@ -218,12 +227,6 @@
       itsystem_response: rolebinding.ituser_response?.current?.itsystem_response,
     },
   ])}
-  {#if !initialRolebinding}
-    {@html (() => {
-      initialRolebinding = normalizeRolebinding(rolebinding)
-      return ""
-    })()}
-  {/if}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
@@ -235,8 +238,8 @@
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={validities.from}
-            max={toDate ? toDate : validities.to}
+            min={$validities.data?.from}
+            max={toDate ? toDate : $validities.data?.to}
             required={true}
           />
           <DateInput
@@ -246,8 +249,8 @@
               : null}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : validities.from}
-            max={validities.to}
+            min={$fromDate.value ? $fromDate.value : $validities.data?.from}
+            max={$validities.data?.to}
           />
         </div>
         <div class="flex flex-row gap-6">
@@ -262,7 +265,7 @@
             disabled
             extra_classes="basis-1/2"
           />
-          {#if facets && filterClassesByFacetUserKey(facets, "role")?.length}
+          {#if $facets.data && filterClassesByFacetUserKey($facets.data, "role")?.length}
             <Select
               title={capital($_("role", { values: { n: 1 } }))}
               id="it-system-role-uuid"
@@ -275,12 +278,18 @@
                 : undefined}
               bind:name={$role.value}
               errors={$role.errors}
-              iterable={filterClassesByFacetUserKey(facets, "role")}
+              iterable={filterClassesByFacetUserKey($facets.data, "role")}
+              disabled={!startDate || $facets.error}
               extra_classes="basis-1/2"
               required
             />
           {/if}
         </div>
+        {#if $facets.error}
+          <p class="text-sm text-error">
+            {capital($_($facets.data ? "load_error_options" : "load_error"))}
+          </p>
+        {/if}
       </div>
     </div>
     <div class="flex py-6 gap-4">
