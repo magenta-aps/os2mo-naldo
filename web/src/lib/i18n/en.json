@@ -142,6 +142,7 @@
 	"leave_type": "leave type",
 	"link": "{n, plural, =0 {the link} one {link} other {links}}",
 	"load_error": "Something went wrong",
+	"load_error_options": "the options could not be updated – the affected fields are locked until they can be reloaded",
 	"loading": "loading",
 	"location": "location",
 	"logout": "logout",
