@@ -200,6 +200,7 @@
 	"related_unit": "{n, plural, =0 {the related unit} one {related unit} other {related units}}",
 	"rename": "rename",
 	"report": "{n, plural, one {report} other {reports}}",
+	"request_id": "request id",
 	"role": "{n, plural, =0 {the role} one {role} other {roles}}",
 	"role_type": "role type",
 	"rolebinding": "{n, plural, =0 {the rolebinding} one {rolebinding} other {rolebindings}}",

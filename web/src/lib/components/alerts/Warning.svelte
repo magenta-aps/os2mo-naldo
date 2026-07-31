@@ -5,24 +5,17 @@
   import Icon from "@iconify/svelte"
   import warningOutlineRounded from "@iconify/icons-material-symbols/warning-outline-rounded"
 
-  let warningMessage = ""
+  $: if ($warning.message) console.warn($warning.message)
 
-  $: if ($warning.message) {
-    console.warn($warning.message)
-    warningMessage = $warning.message
-    setTimeout(() => (warningMessage = ""), 5000)
-  }
-  $: if ($success) {
-    warningMessage = ""
-  }
+  $: if ($success.message) warning.clear()
 </script>
 
-{#if warningMessage}
+{#if $warning.message}
   <div class="toast toast-end" transition:slide>
     <div class="alert alert-warning shadow-lg">
       <div class="flex gap-1">
         <Icon icon={warningOutlineRounded} width="20" height="20" />
-        <span>{warningMessage}</span>
+        <span>{$warning.message}</span>
       </div>
     </div>
   </div>
