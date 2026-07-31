@@ -20,10 +20,11 @@
   import Search from "$lib/components/search/Search.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
+  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
+  import { createQuery } from "$lib/http/query"
   import { getClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
   import { env } from "$lib/env"
-  import { onMount } from "svelte"
 
   gql`
     mutation CreateEngagement($input: EngagementCreateInput!, $date: DateTime!) {
@@ -42,16 +43,19 @@
 
   let startDate: string = $date
   let toDate: string
-  let validities: {
+
+  // Datepicker bounds for the org unit. See the employee edit engagement form
+  // for the query pattern and its trade-offs.
+  const validities = createQuery<{
     from: string | undefined | null
     to: string | undefined | null
-  } = { from: null, to: null }
-
-  onMount(async () => {
-    validities = $page.params.uuid
-      ? await getValidities($page.params.uuid)
-      : { from: null, to: null }
-  })
+  }>({ from: null, to: null })
+  $: if ($page.params.uuid) {
+    const orgUnitUuid = $page.params.uuid
+    validities.run((signal) => getValidities(orgUnitUuid, signal))
+  } else {
+    validities.run(async () => ({ from: null, to: null }))
+  }
 
   const fromDate = field("from", "", [required()])
   const employee = field("employee", "", [required()])
@@ -89,28 +93,20 @@
       }
     }
 
-  let facets: FacetValidities[]
-  let abortController: AbortController
+  const facets = createQuery<FacetValidities[]>()
+  // Only fetch when a start date is set: getClasses rejects a null date, and
+  // the facet selects are disabled without one anyway.
   $: if (startDate) {
-    // Abort the previous request if a new one is about to start
-    if (abortController) abortController.abort()
-    abortController = new AbortController()
-
-    const params = {
-      currentDate: startDate,
-      orgUuid: $page.params.uuid,
-      facetUserKeys: ["engagement_type", "engagement_job_function", "primary_type"],
-    }
-
-    ;(async () => {
-      try {
-        facets = await getClasses(params, abortController.signal)
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Request failed:", err)
-        }
-      }
-    })()
+    facets.run((signal) =>
+      getClasses(
+        {
+          currentDate: startDate,
+          orgUuid: $page.params.uuid,
+          facetUserKeys: ["engagement_type", "engagement_job_function", "primary_type"],
+        },
+        signal
+      )
+    )
   }
 </script>
 
@@ -144,16 +140,16 @@
           errors={$fromDate.errors}
           title={capital($_("date.start_date"))}
           id="from"
-          min={validities.from}
-          max={toDate ? toDate : validities.to}
+          min={$validities.data?.from}
+          max={toDate ? toDate : $validities.data?.to}
           required={true}
         />
         <DateInput
           bind:value={toDate}
           title={capital($_("date.end_date"))}
           id="to"
-          min={$fromDate.value ? $fromDate.value : validities.from}
-          max={validities.to}
+          min={$fromDate.value ? $fromDate.value : $validities.data?.from}
+          max={$validities.data?.to}
         />
       </div>
       <Search
@@ -164,7 +160,22 @@
         on:clear={() => ($employee.value = "")}
         required={true}
       />
-      {#if facets}
+      {#if $facets.loading && !$facets.data}
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+      {/if}
+      {#if $facets.error}
+        <p class="text-sm text-error">
+          {capital($_($facets.data ? "load_error_options" : "load_error"))}
+        </p>
+      {/if}
+      {#if $facets.data}
         <div class="flex flex-row gap-6">
           <Input title="ID" id="user-key" extra_classes="basis-1/2" />
           <Select
@@ -174,7 +185,8 @@
             id="job-function"
             bind:name={$jobFunction.value}
             errors={$jobFunction.errors}
-            iterable={filterClassesByFacetUserKey(facets, "engagement_job_function")}
+            iterable={filterClassesByFacetUserKey($facets.data, "engagement_job_function")}
+            disabled={!startDate || $facets.error}
             required={true}
             extra_classes="basis-1/2"
           />
@@ -203,14 +215,16 @@
             id="engagement-type"
             bind:name={$engagementType.value}
             errors={$engagementType.errors}
-            iterable={filterClassesByFacetUserKey(facets, "engagement_type")}
+            iterable={filterClassesByFacetUserKey($facets.data, "engagement_type")}
+            disabled={!startDate || $facets.error}
             required={true}
             extra_classes="basis-1/2"
           />
           <Select
             title={capital($_("primary"))}
             id="primary"
-            iterable={filterClassesByFacetUserKey(facets, "primary_type")}
+            iterable={filterClassesByFacetUserKey($facets.data, "primary_type")}
+            disabled={!startDate || $facets.error}
             extra_classes="basis-1/2"
             isClearable={true}
           />
