@@ -23,6 +23,7 @@
   import type { FacetValidities } from "$lib/utils/classes"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import { formatITSystemNames } from "$lib/utils/helpers"
+  import { createQuery } from "$lib/http/query"
   import { getPrimaryClasses } from "$lib/http/getClasses"
   import { getPersonValidities } from "$lib/http/getValidities"
   import { normalizeITUser } from "$lib/utils/normalizeForm"
@@ -137,40 +138,55 @@
       }
     }
 
-  // Logic for updating datepicker intervals
-  let validities: {
+  // Datepicker bounds for the person. See the employee edit engagement form
+  // for the query pattern and its trade-offs.
+  const validities = createQuery<{
     from: string | undefined | null
     to: string | undefined | null
-  } = { from: null, to: null }
-
-  let facets: FacetValidities[]
-  let abortController: AbortController
-  $: if (startDate) {
-    // Abort the previous request if a new one is about to start
-    if (abortController) abortController.abort()
-    abortController = new AbortController()
-
-    // Make sure `currentDate` isn't sent if startDate is null.
-    const params = {
-      fromDate: startDate,
-      primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY,
-    }
-
-    ;(async () => {
-      validities = $page.params.uuid
-        ? await getPersonValidities($page.params.uuid)
-        : { from: null, to: null }
-      try {
-        facets = await getPrimaryClasses(params, abortController.signal)
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Request failed:", err)
-        }
-      }
-    })()
+  }>({ from: null, to: null })
+  $: if ($page.params.uuid) {
+    const personUuid = $page.params.uuid
+    validities.run((signal) => getPersonValidities(personUuid, signal))
+  } else {
+    validities.run(async () => ({ from: null, to: null }))
   }
 
+  const facets = createQuery<FacetValidities[]>()
+  // Only fetch when a start date is set: the query rejects a null date, and
+  // the primary select is disabled without one anyway.
+  $: if (startDate) {
+    facets.run((signal) =>
+      getPrimaryClasses(
+        {
+          fromDate: startDate,
+          primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY,
+        },
+        signal
+      )
+    )
+  }
+
+  // Created in the script (not inline in the {#await} tag) so the result can
+  // be captured below without a side effect in the template.
+  const itUserPromise = graphQLClient().request(ItUserAndItSystemsDocument, {
+    uuid: $page.params.ituser,
+    fromDate: $page.url.searchParams.get("from"),
+    toDate: $page.url.searchParams.get("to"),
+    currentDate: $date,
+  })
+
   let initialITUser: any = null
+  itUserPromise.then(
+    (data) => {
+      const itUser = data.itusers.objects[0].validities[0]
+      const notes = data.itusers.objects[0].registrations
+      initialITUser = normalizeITUser(itUser, notes[notes.length - 1].note)
+    },
+    // The template's {#await} has no {:catch}, so a failed load stays on the
+    // pending branch. This handler only prevents an unhandled rejection from
+    // this second promise chain.
+    () => {}
+  )
   let hasChanges = false
   $: if (initialITUser) {
     // Check if any of the user-editable fields have changed compared to the original values.
@@ -207,7 +223,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ItUserAndItSystemsDocument, { uuid: $page.params.ituser, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), currentDate: $date } )}
+{#await itUserPromise}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
       <div class="p-8">
@@ -232,12 +248,6 @@
   {@const note = notes[notes.length - 1].note}
   {@const itSystems = data.itsystems.objects}
   {@const disableForm = env.PUBLIC_DISABLE_IT_USER_EDIT_FORM}
-  {#if !initialITUser}
-    {@html (() => {
-      initialITUser = normalizeITUser(itUser, note)
-      return ""
-    })()}
-  {/if}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
@@ -251,8 +261,8 @@
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={validities.from}
-            max={toDate ? toDate : validities.to}
+            min={$validities.data?.from}
+            max={toDate ? toDate : $validities.data?.to}
             required={true}
             disabled={disableForm}
           />
@@ -261,8 +271,8 @@
             startValue={itUser.validity.to ? itUser.validity.to.split("T")[0] : null}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : validities.from}
-            max={validities.to}
+            min={$fromDate.value ? $fromDate.value : $validities.data?.from}
+            max={$validities.data?.to}
             disabled={disableForm}
           />
         </div>
@@ -294,7 +304,15 @@
             disabled={disableForm}
           />
         </div>
-        {#if facets}
+        {#if $facets.loading && !$facets.data}
+          <Skeleton />
+        {/if}
+        {#if $facets.error}
+          <p class="text-sm text-error">
+            {capital($_($facets.data ? "load_error_options" : "load_error"))}
+          </p>
+        {/if}
+        {#if $facets.data}
           <Select
             title={capital($_("primary"))}
             id="primary"
@@ -306,10 +324,10 @@
                   user_key: itUser.primary_response.current.user_key,
                 }
               : undefined}
-            iterable={filterClassesByFacetUserKey(facets, "primary_type")}
+            iterable={filterClassesByFacetUserKey($facets.data, "primary_type")}
             on:clear={() => ($primary.value = "")}
             isClearable={true}
-            disabled={disableForm}
+            disabled={disableForm || !startDate || $facets.error}
           />
         {/if}
         <Input
