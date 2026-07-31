@@ -144,7 +144,9 @@
   } = { from: null, to: null }
 
   $: if (selectedEngagement) {
-    getEngagementValidities(selectedEngagement.uuid).then((v) => { validities = v })
+    getEngagementValidities(selectedEngagement.uuid).then((v) => {
+      validities = v
+    })
   } else {
     validities = { from: null, to: null }
   }
@@ -161,6 +163,13 @@
     )
   })()
 
+  // Render the fields from a derived `facets` with {#if} so they stay mounted
+  // across refetches; rendering them inside {#await ... then} would remount and
+  // reset the class <Select>s on every date/org-unit change. The promise is
+  // still awaited in the template below for the loading/error state.
+  let facets: Awaited<typeof facetsPromise> | undefined
+  $: facetsPromise.then((f) => (facets = f)).catch(() => {})
+
   let engagementsController: AbortController
   onDestroy(() => engagementsController?.abort())
 
@@ -175,6 +184,13 @@
       })
       .then((res) => res.engagements?.objects.map((e) => e.validities[0]) ?? [])
   })()
+
+  // Derive a stable `engagements` from the latest promise (see the `facets`
+  // note above): awaiting it in the template remounts the engagement select
+  // on every refetch. Default to [] so the disabled placeholder shows until
+  // the first load resolves.
+  let engagements: Awaited<typeof engagementsPromise> = []
+  $: engagementsPromise.then((e) => (engagements = e)).catch(() => {})
 </script>
 
 <title
@@ -249,7 +265,10 @@
           disabled
           required={true}
         />
-        {#await facetsPromise then facets}
+        {#await facetsPromise catch}
+          <p class="text-sm text-error">{capital($_("load_error"))}</p>
+        {/await}
+        {#if facets}
           <Select
             title={capital($_("leave_type"))}
             id="leave-type-uuid"
@@ -258,35 +277,31 @@
             iterable={filterClassesByFacetUserKey(facets, "leave_type")}
             required={true}
           />
-        {:catch}
-          <p class="text-sm text-error">{capital($_("load_error"))}</p>
-        {/await}
+        {/if}
 
-        {#await engagementsPromise then engagements}
-          {#if engagements.length}
-            <Select
-              title={capital($_("engagement", { values: { n: 2 } }))}
-              id="engagement-uuid"
-              bind:name={$engagement.value}
-              bind:value={selectedEngagement}
-              errors={$engagement.errors}
-              on:clear={() => ($engagement.value = "")}
-              iterable={formatEngagementTitlesAndUuid(engagements)}
-              isClearable={true}
-              required={true}
-            />
-          {:else}
-            <Select
-              title={capital($_("engagement", { values: { n: 2 } }))}
-              id="engagement-uuid"
-              bind:value={selectedEngagement}
-              bind:name={$engagement.value}
-              errors={$engagement.errors}
-              disabled
-              required={true}
-            />
-          {/if}
-        {/await}
+        {#if engagements.length}
+          <Select
+            title={capital($_("engagement", { values: { n: 2 } }))}
+            id="engagement-uuid"
+            bind:name={$engagement.value}
+            bind:value={selectedEngagement}
+            errors={$engagement.errors}
+            on:clear={() => ($engagement.value = "")}
+            iterable={formatEngagementTitlesAndUuid(engagements)}
+            isClearable={true}
+            required={true}
+          />
+        {:else}
+          <Select
+            title={capital($_("engagement", { values: { n: 2 } }))}
+            id="engagement-uuid"
+            bind:value={selectedEngagement}
+            bind:name={$engagement.value}
+            errors={$engagement.errors}
+            disabled
+            required={true}
+          />
+        {/if}
       </div>
     </div>
     <div class="flex py-6 gap-4">

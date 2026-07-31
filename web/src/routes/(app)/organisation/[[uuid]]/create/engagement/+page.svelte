@@ -100,12 +100,23 @@
           {
             currentDate: startDate,
             orgUuid: $page.params.uuid,
-            facetUserKeys: ["engagement_type", "engagement_job_function", "primary_type"],
+            facetUserKeys: [
+              "engagement_type",
+              "engagement_job_function",
+              "primary_type",
+            ],
           },
           facetsController.signal
         )
       : Promise.resolve([] as FacetValidities[])
   })()
+
+  // Render the fields from a derived `facets` with {#if} so they stay mounted
+  // across refetches; rendering them inside {#await ... then} would remount and
+  // reset the class <Select>s on every date/org-unit change. The promise is
+  // still awaited in the template below for the loading/error state.
+  let facets: Awaited<typeof facetsPromise> | undefined
+  $: facetsPromise.then((f) => (facets = f)).catch(() => {})
 </script>
 
 <title
@@ -158,7 +169,10 @@
         on:clear={() => ($employee.value = "")}
         required={true}
       />
-      {#await facetsPromise then facets}
+      {#await facetsPromise catch}
+        <p class="text-sm text-error">{capital($_("load_error"))}</p>
+      {/await}
+      {#if facets}
         <div class="flex flex-row gap-6">
           <Input title="ID" id="user-key" extra_classes="basis-1/2" />
           <Select
@@ -209,9 +223,7 @@
             isClearable={true}
           />
         </div>
-      {:catch}
-        <p class="text-sm text-error">{capital($_("load_error"))}</p>
-      {/await}
+      {/if}
     </div>
   </div>
   <div class="flex py-6 gap-4">

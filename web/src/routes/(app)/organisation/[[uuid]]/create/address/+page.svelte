@@ -119,7 +119,9 @@
   } = { from: null, to: null }
 
   $: if ($page.params.uuid) {
-    getValidities($page.params.uuid).then((v) => { validities = v })
+    getValidities($page.params.uuid).then((v) => {
+      validities = v
+    })
   }
 
   let facetsController: AbortController
@@ -139,6 +141,13 @@
         )
       : Promise.resolve([] as FacetValidities[])
   })()
+
+  // Render the fields from a derived `facets` with {#if} so they stay mounted
+  // across refetches; rendering them inside {#await ... then} would remount and
+  // reset the class <Select>s on every date/org-unit change. The promise is
+  // still awaited in the template below for the loading/error state.
+  let facets: Awaited<typeof facetsPromise> | undefined
+  $: facetsPromise.then((f) => (facets = f)).catch(() => {})
 </script>
 
 <title
@@ -183,7 +192,10 @@
           max={validities.to}
         />
       </div>
-      {#await facetsPromise then facets}
+      {#await facetsPromise catch}
+        <p class="text-sm text-error">{capital($_("load_error"))}</p>
+      {/await}
+      {#if facets}
         <div class="flex flex-row gap-6">
           <Select
             title={capital($_("visibility"))}
@@ -204,9 +216,7 @@
           />
           <input hidden name="address-type-uuid" bind:value={addressTypeUuid} />
         </div>
-      {:catch}
-        <p class="text-sm text-error">{capital($_("load_error"))}</p>
-      {/await}
+      {/if}
       <Input title={capital($_("description"))} id="user-key" />
       {#if addressType}
         {#if addressType.scope === "DAR"}

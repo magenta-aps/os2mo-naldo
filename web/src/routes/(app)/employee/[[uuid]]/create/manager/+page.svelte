@@ -153,7 +153,9 @@
   } = { from: null, to: null }
 
   $: if (selectedOrgUnit?.uuid) {
-    getValidities(selectedOrgUnit.uuid).then((v) => { validities = v })
+    getValidities(selectedOrgUnit.uuid).then((v) => {
+      validities = v
+    })
   } else {
     validities = { from: null, to: null }
   }
@@ -174,6 +176,13 @@
     )
   })()
 
+  // Render the fields from a derived `facets` with {#if} so they stay mounted
+  // across refetches; rendering them inside {#await ... then} would remount and
+  // reset the class <Select>s on every date/org-unit change. The promise is
+  // still awaited in the template below for the loading/error state.
+  let facets: Awaited<typeof facetsPromise> | undefined
+  $: facetsPromise.then((f) => (facets = f)).catch(() => {})
+
   let resolvedEngagements: EngagementTitleAndUuid[] = []
 
   let engagementsController: AbortController
@@ -193,6 +202,13 @@
         return resolvedEngagements
       })
   })()
+
+  // Derive a stable `engagements` from the latest promise (see the `facets`
+  // note above): awaiting it in the template remounts the engagement select
+  // on every refetch. Default to [] so the disabled placeholder shows until
+  // the first load resolves.
+  let engagements: Awaited<typeof engagementsPromise> = []
+  $: engagementsPromise.then((e) => (engagements = e)).catch(() => {})
 
   $: if (resolvedEngagements[0]?.person_response && !selectedPerson) {
     selectedPerson = {
@@ -255,19 +271,17 @@
       />
       <Breadcrumbs orgUnit={selectedOrgUnit} />
       <Search type="employee" bind:value={selectedPerson} disabled required={true} />
-      {#await engagementsPromise then engagements}
-        <Select
-          title={capital($_("engagement", { values: { n: 1 } }))}
-          id="engagement-uuid"
-          bind:value={selectedEngagement}
-          errors={$engagement.errors}
-          iterable={engagements.length ? formatEngagementTitlesAndUuid(engagements) : []}
-          isClearable={true}
-          disabled={!engagements.length || noEngagement}
-          required={!noEngagement}
-          on:change={() => engagement.validate()}
-        />
-      {/await}
+      <Select
+        title={capital($_("engagement", { values: { n: 1 } }))}
+        id="engagement-uuid"
+        bind:value={selectedEngagement}
+        errors={$engagement.errors}
+        iterable={engagements.length ? formatEngagementTitlesAndUuid(engagements) : []}
+        isClearable={true}
+        disabled={!engagements.length || noEngagement}
+        required={!noEngagement}
+        on:change={() => engagement.validate()}
+      />
       <div class="-mt-2">
         <Checkbox
           title={capital($_("no_engagement"))}
@@ -277,7 +291,10 @@
           on:change={() => engagement.validate()}
         />
       </div>
-      {#await facetsPromise then facets}
+      {#await facetsPromise catch}
+        <p class="text-sm text-error">{capital($_("load_error"))}</p>
+      {/await}
+      {#if facets}
         <div class="flex flex-row gap-6">
           <Select
             title={capital($_("manager_type"))}
@@ -307,9 +324,7 @@
           iterable={filterClassesByFacetUserKey(facets, "responsibility")}
           required={true}
         />
-      {:catch}
-        <p class="text-sm text-error">{capital($_("load_error"))}</p>
-      {/await}
+      {/if}
     </div>
   </div>
   <div class="flex py-6 gap-4">

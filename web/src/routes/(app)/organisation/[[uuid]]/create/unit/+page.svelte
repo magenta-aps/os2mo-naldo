@@ -73,7 +73,9 @@
   } = { from: null, to: null }
 
   $: if (parent?.uuid) {
-    getValidities(parent.uuid).then((v) => { validities = v })
+    getValidities(parent.uuid).then((v) => {
+      validities = v
+    })
   } else {
     validities = { from: null, to: null }
   }
@@ -93,6 +95,13 @@
       facetsController.signal
     )
   })()
+
+  // Render the fields from a derived `facets` with {#if} so they stay mounted
+  // across refetches; rendering them inside {#await ... then} would remount and
+  // reset the class <Select>s on every date/org-unit change. The promise is
+  // still awaited in the template below for the loading/error state.
+  let facets: Awaited<typeof facetsPromise> | undefined
+  $: facetsPromise.then((f) => (facets = f)).catch(() => {})
 
   const handler: SubmitFunction =
     () =>
@@ -206,7 +215,10 @@
         bind:value={$name.value}
         errors={$name.errors}
       />
-      {#await facetsPromise then facets}
+      {#await facetsPromise catch}
+        <p class="text-sm text-error">{capital($_("load_error"))}</p>
+      {/await}
+      {#if facets}
         {#if env.PUBLIC_SHOW_ORG_UNIT_LEVEL}
           <Select
             title={capital($_("org_unit_level"))}
@@ -245,9 +257,7 @@
             extra_classes="basis-1/2"
           />
         </div>
-      {:catch}
-        <p class="text-sm text-error">{capital($_("load_error"))}</p>
-      {/await}
+      {/if}
     </div>
   </div>
   <div class="flex py-6 gap-4">

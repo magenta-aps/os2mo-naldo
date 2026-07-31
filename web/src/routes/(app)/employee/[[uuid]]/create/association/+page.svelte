@@ -156,7 +156,9 @@
   } = { from: null, to: null }
 
   $: if (selectedOrgUnit?.uuid) {
-    getValidities(selectedOrgUnit.uuid).then((v) => { validities = v })
+    getValidities(selectedOrgUnit.uuid).then((v) => {
+      validities = v
+    })
   } else {
     validities = { from: null, to: null }
   }
@@ -176,6 +178,13 @@
       facetsController.signal
     )
   })()
+
+  // Render the fields from a derived `facets` with {#if} so they stay mounted
+  // across refetches; rendering them inside {#await ... then} would remount and
+  // reset the class <Select>s on every date/org-unit change. The promise is
+  // still awaited in the template below for the loading/error state.
+  let facets: Awaited<typeof facetsPromise> | undefined
+  $: facetsPromise.then((f) => (facets = f)).catch(() => {})
 </script>
 
 <title
@@ -261,7 +270,10 @@
           required={true}
         />
         <Breadcrumbs orgUnit={selectedOrgUnit} />
-        {#await facetsPromise then facets}
+        {#await facetsPromise catch}
+          <p class="text-sm text-error">{capital($_("load_error"))}</p>
+        {/await}
+        {#if facets}
           <div class="flex flex-row gap-6">
             <Select
               title={capital($_("association_type"))}
@@ -298,9 +310,7 @@
               iterable={topLevelFacets ? topLevelFacets : []}
             />
           {/if}
-        {:catch}
-          <p class="text-sm text-error">{capital($_("load_error"))}</p>
-        {/await}
+        {/if}
       </div>
     </div>
     <div class="flex py-6 gap-4">
