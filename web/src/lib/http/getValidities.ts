@@ -32,8 +32,8 @@ export const getFacetValidities = async (uuid: string, signal?: AbortSignal) => 
   })
   return getMinMaxValidities(res.facets.objects[0].validities)
 }
-export const getItuserValidities = async (uuid: string) => {
-  const res = await graphQLClient().request(GetItuserValiditiesDocument, {
+export const getItuserValidities = async (uuid: string, signal?: AbortSignal) => {
+  const res = await graphQLClient(signal).request(GetItuserValiditiesDocument, {
     uuid: uuid,
   })
   return getMinMaxValidities(res.itusers.objects[0].validities)
