@@ -17,6 +17,7 @@
   import type { SubmitFunction } from "./$types"
   import { CreateRoleBindingDocument, ItUsersDocument } from "./query.generated"
   import type { RoleBindingCreateInput } from "$lib/graphql/types"
+  import { createQuery } from "$lib/http/query"
   import { getItuserValidities } from "$lib/http/getValidities"
   import { getRoleClasses } from "$lib/http/getClasses"
   import { form, field } from "svelte-forms"
@@ -72,8 +73,6 @@
       uuid: string
     }
   }
-  let itUserOptions: any[] = []
-
   let startDate: string = $date
   let toDate: string
 
@@ -136,54 +135,45 @@
     rolebindings = rolebindings.filter((_, i) => i !== index)
   }
 
-  // Logic for updating datepicker intervals
-  let validities: {
+  // The org unit's IT users at the chosen start date. See the employee edit
+  // engagement form for the query pattern and its trade-offs.
+  const itUserOptions = createQuery<any[]>([])
+  $: if ($page.params.uuid && startDate) {
+    const orgUnitUuid = $page.params.uuid
+    itUserOptions.run(async (signal) => {
+      const res = await graphQLClient(signal).request(ItUsersDocument, {
+        uuid: orgUnitUuid,
+        fromDate: startDate,
+      })
+      return (
+        formatITUserITSystemName(
+          res.org_units.objects[0]?.validities?.flatMap((v) => v.itusers ?? [])
+        ) ?? []
+      )
+    })
+  }
+
+  // Datepicker bounds for the selected IT user.
+  const validities = createQuery<{
     from: string | undefined | null
     to: string | undefined | null
-  } = { from: null, to: null }
-  $: {
-    ;(async () => {
-      if ($page.params.uuid && startDate) {
-        const itUserResponse = await graphQLClient().request(ItUsersDocument, {
-          uuid: $page.params.uuid,
-          fromDate: startDate,
-        })
-        itUserOptions =
-          formatITUserITSystemName(
-            itUserResponse.org_units.objects[0]?.validities?.flatMap(
-              (v) => v.itusers ?? []
-            )
-          ) ?? []
-      }
-    })()
+  }>({ from: null, to: null })
+  $: if (itUser?.uuid) {
+    const itUserUuid = itUser.uuid
+    validities.run((signal) => getItuserValidities(itUserUuid, signal))
+  } else {
+    validities.run(async () => ({ from: null, to: null }))
   }
-  let facets: FacetValidities[]
-  let abortController: AbortController
-  $: if (startDate) {
-    // Abort the previous request if a new one is about to start
-    if (abortController) abortController.abort()
-    abortController = new AbortController()
 
-    // Make sure `currentDate` isn't sent if startDate is null.
-    const params = {
-      fromDate: startDate,
-      itSystem: itUser?.itsystem.uuid,
-    }
-
-    ;(async () => {
-      validities = itUser?.uuid
-        ? await getItuserValidities(itUser?.uuid)
-        : { from: null, to: null }
-      if (itUser?.uuid) {
-        try {
-          facets = await getRoleClasses(params, abortController.signal)
-        } catch (err: any) {
-          if (err.name !== "AbortError") {
-            console.error("Request failed:", err)
-          }
-        }
-      }
-    })()
+  const facets = createQuery<FacetValidities[]>()
+  // Only fetch when a start date and an IT user are set: the role classes
+  // depend on the IT user's system, and the role select is disabled without
+  // them anyway.
+  $: if (startDate && itUser?.uuid) {
+    const itSystemUuid = itUser.itsystem.uuid
+    facets.run((signal) =>
+      getRoleClasses({ fromDate: startDate, itSystem: itSystemUuid }, signal)
+    )
   }
 </script>
 
@@ -217,37 +207,49 @@
           errors={$fromDate.errors}
           title={capital($_("date.start_date"))}
           id="from"
-          min={validities.from}
-          max={toDate ? toDate : validities.to}
+          min={$validities.data?.from}
+          max={toDate ? toDate : $validities.data?.to}
           required={true}
         />
         <DateInput
           bind:value={toDate}
           title={capital($_("date.end_date"))}
           id="to"
-          min={$fromDate.value ? $fromDate.value : validities.from}
-          max={validities.to}
+          min={$fromDate.value ? $fromDate.value : $validities.data?.from}
+          max={$validities.data?.to}
         />
       </div>
+      {#if $itUserOptions.error}
+        <p class="text-sm text-error">
+          {capital($_($itUserOptions.data?.length ? "load_error_options" : "load_error"))}
+        </p>
+      {/if}
       <Select
         title={capital($_("ituser", { values: { n: 1 } }))}
         id="it-user-uuid"
         bind:value={itUser}
         bind:name={$itUserField.value}
         errors={$itUserField.errors}
-        iterable={itUserOptions}
+        iterable={$itUserOptions.data}
+        disabled={!startDate || $itUserOptions.error}
         required={true}
       />
+      {#if $facets.error}
+        <p class="text-sm text-error">
+          {capital($_($facets.data ? "load_error_options" : "load_error"))}
+        </p>
+      {/if}
       {#each rolebindings as rolebinding, index}
-        {#if facets && filterClassesByFacetUserKey(facets, "role")?.length}
-          {#key facets}
+        {#if $facets.data && filterClassesByFacetUserKey($facets.data, "role")?.length}
+          {#key $facets.data}
             <Select
               title={capital($_("role", { values: { n: 1 } }))}
               id="role-uuid"
               bind:value={rolebinding.role}
               bind:name={$roleField.value}
               errors={$roleField.errors}
-              iterable={filterClassesByFacetUserKey(facets, "role")}
+              iterable={filterClassesByFacetUserKey($facets.data, "role")}
+              disabled={!startDate || $facets.error}
               extra_classes="basis-1/2"
               required
             />
