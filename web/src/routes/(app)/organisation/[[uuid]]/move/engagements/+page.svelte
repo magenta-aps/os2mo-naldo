@@ -99,7 +99,9 @@
   } = { from: null, to: null }
 
   $: if (orgUnit?.uuid) {
-    getValidities(orgUnit.uuid).then((v) => { validities = v })
+    getValidities(orgUnit.uuid).then((v) => {
+      validities = v
+    })
   } else {
     validities = { from: null, to: null }
   }
@@ -119,11 +121,16 @@
       .then((res) => res.engagements?.objects ?? [])
   })()
 
+  // Derive a stable `engagements` from the latest promise (see the `facets`
+  // note above): awaiting it in the template remounts the engagement select
+  // on every refetch. Default to [] so the disabled placeholder shows until
+  // the first load resolves.
+  let engagements: Awaited<typeof engagementsPromise> = []
+  $: engagementsPromise.then((e) => (engagements = e)).catch(() => {})
+
   const fromDate = field("from", "", [required()])
   const orgUnitField = field("org_unit", "", [required()])
   const svelteForm = form(fromDate, orgUnitField)
-
-  let engagements: Engagements[]
 
   let orgUnit: {
     uuid: string
@@ -183,7 +190,6 @@
         />
       </div>
       <div class="text-base-content pb-3">
-        {#await engagementsPromise then engagements}
         {#if engagements.length}
           {#key engagements}
             <fieldset>
@@ -256,7 +262,6 @@
             required={true}
           />
         {/if}
-        {/await}
       </div>
       <div class="flex flex-row gap-6">
         <Search
