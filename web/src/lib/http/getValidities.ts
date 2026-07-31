@@ -20,8 +20,8 @@ export const getPersonValidities = async (uuid: string, signal?: AbortSignal) =>
   })
   return getMinMaxValidities(res.employees.objects[0].validities)
 }
-export const getEngagementValidities = async (uuid: string) => {
-  const res = await graphQLClient().request(GetEngagementValiditiesDocument, {
+export const getEngagementValidities = async (uuid: string, signal?: AbortSignal) => {
+  const res = await graphQLClient(signal).request(GetEngagementValiditiesDocument, {
     uuid: uuid,
   })
   return getMinMaxValidities(res.engagements.objects[0].validities)
