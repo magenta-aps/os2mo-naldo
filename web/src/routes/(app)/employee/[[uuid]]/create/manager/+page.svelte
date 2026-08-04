@@ -1,68 +1,26 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
-  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
-  import Select from "$lib/components/forms/shared/Select.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
   import type { SubmitFunction } from "./$types"
-  import type { FacetValidities } from "$lib/utils/classes"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
-  import { CreateManagerDocument, GetEngagementsDocument } from "./query.generated"
+  import { CreateManagerDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
-  import { date } from "$lib/stores/date"
-  import { filterClassesByFacetUserKey } from "$lib/utils/classes"
-  import Search from "$lib/components/search/Search.svelte"
-  import SelectMultiple from "$lib/components/forms/shared/SelectMultiple.svelte"
-  import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
-  import { form, field } from "svelte-forms"
-  import { required } from "svelte-forms/validators"
-  import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
-  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { createQuery } from "$lib/http/query"
-  import { getClasses } from "$lib/http/getClasses"
-  import { getValidities } from "$lib/http/getValidities"
+  import ManagerFields from "$lib/components/forms/entity/ManagerFields.svelte"
   import {
-    formatEngagementTitlesAndUuid,
-    type EngagementTitleAndUuid,
-  } from "$lib/utils/helpers"
+    createDefaultManagerValues,
+    type ManagerValues,
+  } from "$lib/components/forms/entity/types"
+
+  let values: ManagerValues = createDefaultManagerValues()
+  let fields: ManagerFields
 
   gql`
-    query GetEngagements($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
-      engagements(
-        filter: { employees: $uuid, from_date: $fromDate, to_date: $toDate }
-      ) {
-        objects {
-          validities {
-            uuid
-            person_response {
-              uuid
-              current(at: $fromDate) {
-                name
-              }
-            }
-            org_unit_response {
-              uuid
-              current(at: $fromDate) {
-                name
-                user_key
-              }
-            }
-            job_function_response {
-              current(at: $fromDate) {
-                user_key
-                name
-              }
-            }
-          }
-        }
-      }
-    }
-
     mutation CreateManager($input: ManagerCreateInput!, $date: DateTime!) {
       manager_create(input: $input) {
         current(at: $date) {
@@ -77,52 +35,11 @@
     }
   `
 
-  let startDate: string = $date
-  let toDate: string
-  let selectedOrgUnit: {
-    uuid: string
-    name: string
-  }
-  let selectedEngagement:
-    | {
-        uuid: string
-        name: string
-      }
-    | undefined
-  let selectedPerson: {
-    uuid: string
-    name: string
-  }
-  // Forces a conscious choice: either pick an engagement or actively
-  // confirm there is none.
-  let noEngagement = false
-
-  const fromDate = field("from", "", [required()])
-  const orgUnit = field("org_unit", "", [required()])
-  const managerType = field("manager_type", "", [required()])
-  const managerLevel = field("manager_level", "", [required()])
-  const responsibilities = field("responsibilities", undefined, [required()])
-  const engagement = field("engagement", "", [
-    () => ({ valid: noEngagement || !!selectedEngagement?.uuid, name: "required" }),
-  ])
-  const svelteForm = form(
-    fromDate,
-    orgUnit,
-    managerType,
-    managerLevel,
-    responsibilities,
-    engagement
-  )
-
-  // Clear any selected engagement when the user opts out.
-  $: if (noEngagement && selectedEngagement) selectedEngagement = undefined
-
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
       // Await the validation, before we continue
-      await svelteForm.validate()
-      if (!$svelteForm.valid) return
+      if (!(await fields.validate())) return
       if (result.type !== "success" || !result.data) return
 
       try {
@@ -146,51 +63,6 @@
         $error = { message: err }
       }
     }
-
-  // Datepicker bounds for the selected org unit. See the employee edit
-  // engagement form for the query pattern and its trade-offs.
-  const validities = createQuery<{
-    from: string | undefined | null
-    to: string | undefined | null
-  }>({ from: null, to: null })
-  $: if (selectedOrgUnit?.uuid) {
-    const orgUnitUuid = selectedOrgUnit.uuid
-    validities.run((signal) => getValidities(orgUnitUuid, signal))
-  } else {
-    validities.run(async () => ({ from: null, to: null }))
-  }
-
-  const facets = createQuery<FacetValidities[]>()
-  const engagements = createQuery<EngagementTitleAndUuid[]>()
-  // Only fetch when a start date is set: getClasses rejects a null date, and
-  // the facet selects are disabled without one anyway.
-  $: if (startDate) {
-    facets.run((signal) =>
-      getClasses(
-        {
-          currentDate: startDate,
-          orgUuid: selectedOrgUnit?.uuid,
-          facetUserKeys: ["manager_type", "manager_level", "responsibility"],
-        },
-        signal
-      )
-    )
-    engagements.run(async (signal) => {
-      const res = await graphQLClient(signal).request(GetEngagementsDocument, {
-        uuid: $page.params.uuid,
-        fromDate: startDate,
-        toDate: toDate,
-      })
-      return res.engagements?.objects.map((e) => e.validities[0]) ?? []
-    })
-  }
-
-  $: if ($engagements.data?.[0]?.person_response && !selectedPerson) {
-    selectedPerson = {
-      uuid: $engagements.data[0].person_response.uuid,
-      name: $engagements.data[0].person_response.current?.name ?? "",
-    }
-  }
 </script>
 
 <title
@@ -216,109 +88,11 @@
 <form method="post" class="mx-6" use:enhance={handler}>
   <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
     <div class="p-8">
-      <div class="flex flex-row gap-6">
-        <DateInput
-          bind:value={startDate}
-          bind:validationValue={$fromDate.value}
-          errors={$fromDate.errors}
-          title={capital($_("date.start_date"))}
-          id="from"
-          min={$validities.data?.from}
-          max={toDate ? toDate : $validities.data?.to}
-          required={true}
-        />
-        <DateInput
-          bind:value={toDate}
-          title={capital($_("date.end_date"))}
-          id="to"
-          min={$fromDate.value ? $fromDate.value : $validities.data?.from}
-          max={$validities.data?.to}
-        />
-      </div>
-      <Search
-        type="org-unit"
-        at={startDate}
-        bind:name={$orgUnit.value}
-        errors={$orgUnit.errors}
-        on:clear={() => ($orgUnit.value = "")}
-        bind:value={selectedOrgUnit}
-        required={true}
+      <ManagerFields
+        bind:value={values}
+        bind:this={fields}
+        personUuid={$page.params.uuid}
       />
-      <Breadcrumbs orgUnit={selectedOrgUnit} />
-      <Search type="employee" bind:value={selectedPerson} disabled required={true} />
-      {#if $engagements.error}
-        <p class="text-sm text-error">
-          {capital($_($engagements.data ? "load_error_options" : "load_error"))}
-        </p>
-      {/if}
-      <Select
-        title={capital($_("engagement", { values: { n: 1 } }))}
-        id="engagement-uuid"
-        bind:value={selectedEngagement}
-        errors={$engagement.errors}
-        iterable={$engagements.data
-          ? formatEngagementTitlesAndUuid($engagements.data)
-          : []}
-        isClearable={true}
-        disabled={!$engagements.data?.length || $engagements.error || noEngagement}
-        required={!noEngagement}
-        on:change={() => engagement.validate()}
-      />
-      <div class="-mt-2">
-        <Checkbox
-          title={capital($_("no_engagement"))}
-          id="no-engagement"
-          value="true"
-          bind:checked={noEngagement}
-          on:change={() => engagement.validate()}
-        />
-      </div>
-      {#if $facets.loading && !$facets.data}
-        <div class="flex flex-row gap-6">
-          <Skeleton extra_classes="basis-1/2" />
-          <Skeleton extra_classes="basis-1/2" />
-        </div>
-        <Skeleton />
-      {/if}
-      {#if $facets.error}
-        <p class="text-sm text-error">
-          {capital($_($facets.data ? "load_error_options" : "load_error"))}
-        </p>
-      {/if}
-      {#if $facets.data}
-        <div class="flex flex-row gap-6">
-          <Select
-            title={capital($_("manager_type"))}
-            id="manager-type"
-            bind:name={$managerType.value}
-            errors={$managerType.errors}
-            iterable={filterClassesByFacetUserKey($facets.data, "manager_type")}
-            disabled={!startDate || $facets.error}
-            extra_classes="basis-1/2"
-            required={true}
-          />
-          <Select
-            title={capital($_("manager_level"))}
-            id="manager-level"
-            bind:name={$managerLevel.value}
-            errors={$managerLevel.errors}
-            iterable={filterClassesByFacetUserKey($facets.data, "manager_level")}
-            disabled={!startDate || $facets.error}
-            extra_classes="basis-1/2"
-            required={true}
-          />
-        </div>
-        <SelectMultiple
-          bind:name={$responsibilities.value}
-          errors={$responsibilities.errors}
-          on:clear={() => ($responsibilities.value = undefined)}
-          title={capital($_("manager_responsibility"))}
-          id="responsibility"
-          iterable={filterClassesByFacetUserKey($facets.data, "responsibility")}
-          disabled={!startDate || $facets.error}
-          required={true}
-        />
-      {/if}
     </div>
   </div>
   <div class="flex py-6 gap-4">

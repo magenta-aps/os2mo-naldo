@@ -92,6 +92,24 @@ export const createDefaultItuserValues = (): ItuserValues => ({
   rolebindings: [createDefaultRolebindingValues()],
 })
 
+export type ManagerValues = {
+  fromDate: string
+  toDate: string
+  orgUnit: { uuid: string; name: string } | undefined
+  managerType: ClassValue | undefined
+  managerLevel: ClassValue | undefined
+  responsibilities: ClassValue[]
+}
+
+export const createDefaultManagerValues = (): ManagerValues => ({
+  fromDate: get(date),
+  toDate: "",
+  orgUnit: undefined,
+  managerType: undefined,
+  managerLevel: undefined,
+  responsibilities: [],
+})
+
 // Address types carry their scope (EMAIL/PHONE/DAR/...), which drives the
 // value field's validators and widget.
 export type AddressTypeValue = ClassValue & { scope?: string | null }
