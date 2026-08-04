@@ -26,6 +26,7 @@
     type EngagementTitleAndUuid,
   } from "$lib/utils/helpers"
   import type { FacetValidities } from "$lib/utils/classes"
+  import { createQuery } from "$lib/http/query"
   import { getEngagementValidities } from "$lib/http/getValidities"
   import { getClasses } from "$lib/http/getClasses"
   import Search from "$lib/components/search/Search.svelte"
@@ -136,58 +137,38 @@
       }
     }
 
-  const updateEngagements = async (
-    employeeUuid: string | undefined | null,
-    fromDate: string,
-    toDate: string
-  ) => {
-    const res = await graphQLClient().request(GetEngagementsDocument, {
-      uuid: employeeUuid,
-      fromDate: fromDate,
-      toDate: toDate,
-    })
-    return (engagements = res.engagements?.objects.map((e) => e.validities[0]))
-  }
-
-  // Logic for updating datepicker intervals
-  let validities: {
+  // Datepicker bounds for the selected engagement. See the employee edit
+  // engagement form for the query pattern and its trade-offs.
+  const validities = createQuery<{
     from: string | undefined | null
     to: string | undefined | null
-  } = { from: null, to: null }
-
-  // This needs to be done by itself, otherwise we end in an infinite loop
+  }>({ from: null, to: null })
   $: if (selectedEngagement) {
-    ;(async () => {
-      validities = await getEngagementValidities(selectedEngagement.uuid)
-    })()
+    const engagementUuid = selectedEngagement.uuid
+    validities.run((signal) => getEngagementValidities(engagementUuid, signal))
   } else {
-    validities = { from: null, to: null }
+    validities.run(async () => ({ from: null, to: null }))
   }
 
-  let facets: FacetValidities[]
-  let engagements: EngagementTitleAndUuid[]
-  let abortController: AbortController
+  const facets = createQuery<FacetValidities[]>()
+  const engagements = createQuery<EngagementTitleAndUuid[]>()
+  // Only fetch when a start date is set: getClasses rejects a null date, and
+  // both selects are disabled without one anyway.
   $: if (startDate) {
-    // Abort the previous request if a new one is about to start
-    if (abortController) abortController.abort()
-    abortController = new AbortController()
-
-    const params = {
-      currentDate: startDate,
-      orgUuid: null,
-      facetUserKeys: ["leave_type"],
-    }
-
-    ;(async () => {
-      try {
-        facets = await getClasses(params, abortController.signal)
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Request failed:", err)
-        }
-      }
-      await updateEngagements($page.params.uuid, startDate, toDate)
-    })()
+    facets.run((signal) =>
+      getClasses(
+        { currentDate: startDate, orgUuid: null, facetUserKeys: ["leave_type"] },
+        signal
+      )
+    )
+    engagements.run(async (signal) => {
+      const res = await graphQLClient(signal).request(GetEngagementsDocument, {
+        uuid: $page.params.uuid,
+        fromDate: startDate,
+        toDate: toDate,
+      })
+      return res.engagements?.objects.map((e) => e.validities[0]) ?? []
+    })
   }
 </script>
 
@@ -241,16 +222,16 @@
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={validities.from}
-            max={toDate ? toDate : validities.to}
+            min={$validities.data?.from}
+            max={toDate ? toDate : $validities.data?.to}
             required={true}
           />
           <DateInput
             bind:value={toDate}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : validities.from}
-            max={validities.to}
+            min={$fromDate.value ? $fromDate.value : $validities.data?.from}
+            max={$validities.data?.to}
           />
         </div>
         <Search
@@ -263,18 +244,32 @@
           disabled
           required={true}
         />
-        {#if facets}
+        {#if $facets.loading && !$facets.data}
+          <Skeleton />
+        {/if}
+        {#if $facets.error}
+          <p class="text-sm text-error">
+            {capital($_($facets.data ? "load_error_options" : "load_error"))}
+          </p>
+        {/if}
+        {#if $facets.data}
           <Select
             title={capital($_("leave_type"))}
             id="leave-type-uuid"
             bind:name={$leaveType.value}
             errors={$leaveType.errors}
-            iterable={filterClassesByFacetUserKey(facets, "leave_type")}
+            iterable={filterClassesByFacetUserKey($facets.data, "leave_type")}
+            disabled={!startDate || $facets.error}
             required={true}
           />
         {/if}
 
-        {#if engagements && engagements.length}
+        {#if $engagements.error}
+          <p class="text-sm text-error">
+            {capital($_($engagements.data ? "load_error_options" : "load_error"))}
+          </p>
+        {/if}
+        {#if $engagements.data?.length}
           <Select
             title={capital($_("engagement", { values: { n: 2 } }))}
             id="engagement-uuid"
@@ -282,7 +277,8 @@
             bind:value={selectedEngagement}
             errors={$engagement.errors}
             on:clear={() => ($engagement.value = "")}
-            iterable={formatEngagementTitlesAndUuid(engagements)}
+            iterable={formatEngagementTitlesAndUuid($engagements.data)}
+            disabled={!startDate || $engagements.error}
             isClearable={true}
             required={true}
           />

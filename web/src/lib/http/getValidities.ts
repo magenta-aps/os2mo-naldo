@@ -8,20 +8,20 @@ import {
 } from "./query.generated"
 import { getMinMaxValidities } from "$lib/utils/validities"
 
-export const getValidities = async (uuid: string) => {
-  const res = await graphQLClient().request(GetOrgUnitValiditiesDocument, {
+export const getValidities = async (uuid: string, signal?: AbortSignal) => {
+  const res = await graphQLClient(signal).request(GetOrgUnitValiditiesDocument, {
     uuid: uuid,
   })
   return getMinMaxValidities(res.org_units.objects[0].validities)
 }
-export const getPersonValidities = async (uuid: string) => {
-  const res = await graphQLClient().request(GetPersonValiditiesDocument, {
+export const getPersonValidities = async (uuid: string, signal?: AbortSignal) => {
+  const res = await graphQLClient(signal).request(GetPersonValiditiesDocument, {
     uuid: uuid,
   })
   return getMinMaxValidities(res.employees.objects[0].validities)
 }
-export const getEngagementValidities = async (uuid: string) => {
-  const res = await graphQLClient().request(GetEngagementValiditiesDocument, {
+export const getEngagementValidities = async (uuid: string, signal?: AbortSignal) => {
+  const res = await graphQLClient(signal).request(GetEngagementValiditiesDocument, {
     uuid: uuid,
   })
   return getMinMaxValidities(res.engagements.objects[0].validities)
@@ -32,8 +32,8 @@ export const getFacetValidities = async (uuid: string, signal?: AbortSignal) => 
   })
   return getMinMaxValidities(res.facets.objects[0].validities)
 }
-export const getItuserValidities = async (uuid: string) => {
-  const res = await graphQLClient().request(GetItuserValiditiesDocument, {
+export const getItuserValidities = async (uuid: string, signal?: AbortSignal) => {
+  const res = await graphQLClient(signal).request(GetItuserValiditiesDocument, {
     uuid: uuid,
   })
   return getMinMaxValidities(res.itusers.objects[0].validities)

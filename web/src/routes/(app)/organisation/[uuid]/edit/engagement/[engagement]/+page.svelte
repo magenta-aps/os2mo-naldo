@@ -22,6 +22,7 @@
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
+  import { createQuery } from "$lib/http/query"
   import { getValidities } from "$lib/http/getValidities"
   import { getClasses } from "$lib/http/getClasses"
 
@@ -143,39 +144,54 @@
       }
     }
 
-  let validities: {
+  // Datepicker bounds for the selected org unit. See the employee edit
+  // engagement form for the query pattern and its trade-offs.
+  const validities = createQuery<{
     from: string | undefined | null
     to: string | undefined | null
-  } = { from: null, to: null }
-
-  let facets: FacetValidities[]
-  let abortController: AbortController
-  $: if (startDate) {
-    // Abort the previous request if a new one is about to start
-    if (abortController) abortController.abort()
-    abortController = new AbortController()
-
-    const params = {
-      currentDate: startDate,
-      orgUuid: selectedOrgUnit?.uuid,
-      facetUserKeys: ["engagement_type", "engagement_job_function", "primary_type"],
-    }
-
-    ;(async () => {
-      validities = selectedOrgUnit
-        ? await getValidities(selectedOrgUnit.uuid)
-        : { from: null, to: null }
-      try {
-        facets = await getClasses(params, abortController.signal)
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Request failed:", err)
-        }
-      }
-    })()
+  }>({ from: null, to: null })
+  $: if (selectedOrgUnit?.uuid) {
+    const orgUnitUuid = selectedOrgUnit.uuid
+    validities.run((signal) => getValidities(orgUnitUuid, signal))
+  } else {
+    validities.run(async () => ({ from: null, to: null }))
   }
 
+  const facets = createQuery<FacetValidities[]>()
+  // Only fetch when a start date is set: getClasses rejects a null date, and
+  // the facet selects are disabled without one anyway.
+  $: if (startDate) {
+    facets.run((signal) =>
+      getClasses(
+        {
+          currentDate: startDate,
+          orgUuid: selectedOrgUnit?.uuid,
+          facetUserKeys: ["engagement_type", "engagement_job_function", "primary_type"],
+        },
+        signal
+      )
+    )
+  }
+
+  // Created in the script (not inline in the {#await} tag) so the result can
+  // be captured below without a side effect in the template.
+  const engagementPromise = graphQLClient().request(EngagementDocument, {
+    uuid: $page.params.engagement,
+    fromDate: $page.url.searchParams.get("from"),
+    toDate: $page.url.searchParams.get("to"),
+    currentDate: $date,
+  })
+
   let initialEngagement: any = null
+  engagementPromise.then(
+    (data) => {
+      initialEngagement = normalizeEngagement(data.engagements.objects[0].validities[0])
+    },
+    // The template's {#await} has no {:catch}, so a failed load stays on the
+    // pending branch. This handler only prevents an unhandled rejection from
+    // this second promise chain.
+    () => {}
+  )
   let hasChanges = false
   $: if (initialEngagement) {
     // Check if any of the user-editable fields have changed compared to the original values.
@@ -214,8 +230,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-<!-- TODO: Fix formatting :yikes: -->
-{#await graphQLClient().request( EngagementDocument, { uuid: $page.params.engagement, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), currentDate: $date } )}
+{#await engagementPromise}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
       <div class="p-8">
@@ -238,12 +253,6 @@
   </div>
 {:then data}
   {@const engagement = data.engagements.objects[0].validities[0]}
-  {#if !initialEngagement}
-    {@html (() => {
-      initialEngagement = normalizeEngagement(engagement)
-      return ""
-    })()}
-  {/if}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
@@ -255,8 +264,8 @@
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={validities.from}
-            max={toDate ? toDate : validities.to}
+            min={$validities.data?.from}
+            max={toDate ? toDate : $validities.data?.to}
             required={true}
           />
           <DateInput
@@ -266,8 +275,8 @@
               : null}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : validities.from}
-            max={validities.to}
+            min={$fromDate.value ? $fromDate.value : $validities.data?.from}
+            max={$validities.data?.to}
           />
         </div>
         <Search
@@ -284,7 +293,22 @@
           required={true}
         />
         <Breadcrumbs orgUnit={selectedOrgUnit} />
-        {#if facets}
+        {#if $facets.loading && !$facets.data}
+          <div class="flex flex-row gap-6">
+            <Skeleton extra_classes="basis-1/2" />
+            <Skeleton extra_classes="basis-1/2" />
+          </div>
+          <div class="flex flex-row gap-6">
+            <Skeleton extra_classes="basis-1/2" />
+            <Skeleton extra_classes="basis-1/2" />
+          </div>
+        {/if}
+        {#if $facets.error}
+          <p class="text-sm text-error">
+            {capital($_($facets.data ? "load_error_options" : "load_error"))}
+          </p>
+        {/if}
+        {#if $facets.data}
           <div class="flex flex-row gap-6">
             <Input
               title="ID"
@@ -304,7 +328,11 @@
               }}
               bind:name={$jobFunction.value}
               errors={$jobFunction.errors}
-              iterable={filterClassesByFacetUserKey(facets, "engagement_job_function")}
+              iterable={filterClassesByFacetUserKey(
+                $facets.data,
+                "engagement_job_function"
+              )}
+              disabled={!startDate || $facets.error}
               extra_classes="basis-1/2"
               required={true}
             />
@@ -339,7 +367,8 @@
               }}
               bind:name={$engagementType.value}
               errors={$engagementType.errors}
-              iterable={filterClassesByFacetUserKey(facets, "engagement_type")}
+              iterable={filterClassesByFacetUserKey($facets.data, "engagement_type")}
+              disabled={!startDate || $facets.error}
               extra_classes="basis-1/2"
               required={true}
             />
@@ -353,7 +382,8 @@
                     name: engagement.primary_response.current?.name ?? "",
                   }
                 : undefined}
-              iterable={filterClassesByFacetUserKey(facets, "primary_type")}
+              iterable={filterClassesByFacetUserKey($facets.data, "primary_type")}
+              disabled={!startDate || $facets.error}
               extra_classes="basis-1/2"
               on:clear={() => ($primary.value = "")}
               isClearable={true}

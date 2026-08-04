@@ -142,6 +142,7 @@
 	"leave_type": "orlovstype",
 	"link": "{n, plural, =0 {linket} one {link} other {links}}",
 	"load_error": "Noget gik galt",
+	"load_error_options": "valgmulighederne kunne ikke opdateres – de berørte felter er låst, indtil de kan genindlæses",
 	"loading": "henter",
 	"location": "placering",
 	"logout": "log ud",

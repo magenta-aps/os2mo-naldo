@@ -23,6 +23,7 @@
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
+  import { createQuery } from "$lib/http/query"
   import { getClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
   import { normalizeOrganisation } from "$lib/utils/normalizeForm"
@@ -133,42 +134,53 @@
       }
     }
 
-  // Logic for updating datepicker intervals
-  let validities: {
+  // Datepicker bounds for the selected parent unit. See the employee edit
+  // engagement form for the query pattern and its trade-offs.
+  const validities = createQuery<{
     from: string | undefined | null
     to: string | undefined | null
-  } = { from: null, to: null }
-
-  let facets: FacetValidities[]
-  let abortController: AbortController
-
-  $: if (startDate) {
-    const params = {
-      currentDate: startDate,
-      orgUuid: parent?.uuid ?? $page.params.uuid ?? null,
-      facetUserKeys: ["org_unit_level", "org_unit_type", "time_planning"],
-    }
-
-    // Abort the previous request if a new one is about to start
-    if (abortController) {
-      abortController.abort() // Cancel any in-progress request
-    }
-
-    abortController = new AbortController()
-    ;(async () => {
-      validities = parent ? await getValidities(parent.uuid) : { from: null, to: null }
-      try {
-        const result = await getClasses(params, abortController.signal)
-        facets = result // Update facets if the request is successful
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Request failed:", err) // Handle other errors
-        }
-      }
-    })()
+  }>({ from: null, to: null })
+  $: if (parent?.uuid) {
+    const parentUuid = parent.uuid
+    validities.run((signal) => getValidities(parentUuid, signal))
+  } else {
+    validities.run(async () => ({ from: null, to: null }))
   }
 
+  const facets = createQuery<FacetValidities[]>()
+  // Only fetch when a start date is set: getClasses rejects a null date, and
+  // the facet selects are disabled without one anyway.
+  $: if (startDate) {
+    facets.run((signal) =>
+      getClasses(
+        {
+          currentDate: startDate,
+          orgUuid: parent?.uuid ?? $page.params.uuid ?? null,
+          facetUserKeys: ["org_unit_level", "org_unit_type", "time_planning"],
+        },
+        signal
+      )
+    )
+  }
+
+  // Created in the script (not inline in the {#await} tag) so the result can
+  // be captured below without a side effect in the template.
+  const orgUnitPromise = graphQLClient().request(GetOrgUnitDocument, {
+    uuid: $page.params.uuid,
+    fromDate: $page.url.searchParams.get("from"),
+    toDate: $page.url.searchParams.get("to"),
+  })
+
   let initialOrganisation: any = null
+  orgUnitPromise.then(
+    (data) => {
+      initialOrganisation = normalizeOrganisation(data.org_units.objects[0].validities[0])
+    },
+    // The template's {#await} has no {:catch}, so a failed load stays on the
+    // pending branch. This handler only prevents an unhandled rejection from
+    // this second promise chain.
+    () => {}
+  )
   let hasChanges = false
   $: if (initialOrganisation) {
     // Check if any of the user-editable fields have changed compared to the original values.
@@ -210,7 +222,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( GetOrgUnitDocument, { uuid: $page.params.uuid, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to") } )}
+{#await orgUnitPromise}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
       <div class="p-8">
@@ -231,12 +243,6 @@
   </div>
 {:then data}
   {@const orgUnit = data.org_units.objects[0].validities[0]}
-  {#if !initialOrganisation}
-    {@html (() => {
-      initialOrganisation = normalizeOrganisation(orgUnit)
-      return ""
-    })()}
-  {/if}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
@@ -248,8 +254,8 @@
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={validities.from}
-            max={toDate ? toDate : validities.to}
+            min={$validities.data?.from}
+            max={toDate ? toDate : $validities.data?.to}
             required={true}
           />
           <DateInput
@@ -257,8 +263,8 @@
             startValue={orgUnit.validity.to ? orgUnit.validity.to.split("T")[0] : null}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : validities.from}
-            max={validities.to}
+            min={$fromDate.value ? $fromDate.value : $validities.data?.from}
+            max={$validities.data?.to}
           />
         </div>
         <Search
@@ -287,7 +293,16 @@
           startValue={orgUnit.name}
           required={true}
         />
-        {#if facets}
+        {#if $facets.loading && !$facets.data}
+          <Skeleton />
+          <Skeleton />
+        {/if}
+        {#if $facets.error}
+          <p class="text-sm text-error">
+            {capital($_($facets.data ? "load_error_options" : "load_error"))}
+          </p>
+        {/if}
+        {#if $facets.data}
           {#if env.PUBLIC_SHOW_TIME_PLANNING}
             <Select
               title={capital($_("time_planning"))}
@@ -302,7 +317,8 @@
                   }
                 : undefined}
               on:clear={() => ($timePlanning.value = "")}
-              iterable={filterClassesByFacetUserKey(facets, "time_planning")}
+              iterable={filterClassesByFacetUserKey($facets.data, "time_planning")}
+              disabled={!startDate || $facets.error}
               isClearable={true}
             />
           {/if}
@@ -322,7 +338,8 @@
                   : undefined}
                 on:clear={() => ($orgUnitLevel.value = "")}
                 extra_classes="basis-1/2"
-                iterable={filterClassesByFacetUserKey(facets, "org_unit_level")}
+                iterable={filterClassesByFacetUserKey($facets.data, "org_unit_level")}
+                disabled={!startDate || $facets.error}
                 isClearable={true}
               />
             {/if}
@@ -340,7 +357,8 @@
                 : undefined}
               on:clear={() => ($orgUnitType.value = "")}
               extra_classes="basis-1/2"
-              iterable={filterClassesByFacetUserKey(facets, "org_unit_type")}
+              iterable={filterClassesByFacetUserKey($facets.data, "org_unit_type")}
+              disabled={!startDate || $facets.error}
               isClearable={true}
               required={true}
             />

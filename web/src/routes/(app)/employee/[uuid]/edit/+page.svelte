@@ -12,6 +12,7 @@
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
   import { UpdateEmployeeDocument, EmployeeDocument } from "./query.generated"
+  import { createQuery } from "$lib/http/query"
   import { getPersonValidities } from "$lib/http/getValidities"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
@@ -94,21 +95,37 @@
       }
     }
 
-  // Logic for updating datepicker intervals
-  let validities: {
+  // Datepicker bounds for the person. See the employee edit engagement form
+  // for the query pattern and its trade-offs.
+  const validities = createQuery<{
     from: string | undefined | null
     to: string | undefined | null
-  } = { from: null, to: null }
-
-  $: {
-    ;(async () => {
-      validities = $page.params.uuid
-        ? await getPersonValidities($page.params.uuid)
-        : { from: null, to: null }
-    })()
+  }>({ from: null, to: null })
+  $: if ($page.params.uuid) {
+    const personUuid = $page.params.uuid
+    validities.run((signal) => getPersonValidities(personUuid, signal))
+  } else {
+    validities.run(async () => ({ from: null, to: null }))
   }
 
+  // Created in the script (not inline in the {#await} tag) so the result can
+  // be captured below without a side effect in the template.
+  const employeePromise = graphQLClient().request(EmployeeDocument, {
+    uuid: $page.params.uuid,
+    fromDate: $page.url.searchParams.get("from"),
+    toDate: $page.url.searchParams.get("to"),
+  })
+
   let initialEmployee: any = null
+  employeePromise.then(
+    (data) => {
+      initialEmployee = normalizeEmployee(data.employees.objects[0].validities[0])
+    },
+    // The template's {#await} has no {:catch}, so a failed load stays on the
+    // pending branch. This handler only prevents an unhandled rejection from
+    // this second promise chain.
+    () => {}
+  )
   let hasChanges = false
   $: if (initialEmployee) {
     // Check if any of the user-editable fields have changed compared to the original values.
@@ -146,7 +163,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( EmployeeDocument, { uuid: $page.params.uuid, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to") } )}
+{#await employeePromise}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
       <div class="p-8">
@@ -167,12 +184,6 @@
   </div>
 {:then data}
   {@const employee = data.employees.objects[0].validities[0]}
-  {#if !initialEmployee}
-    {@html (() => {
-      initialEmployee = normalizeEmployee(employee)
-      return ""
-    })()}
-  {/if}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
@@ -184,8 +195,8 @@
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={validities.from}
-            max={toDate ? toDate : validities.to}
+            min={$validities.data?.from}
+            max={toDate ? toDate : $validities.data?.to}
             required={true}
           />
           <DateInput
@@ -195,8 +206,8 @@
               : null}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : validities.from}
-            max={validities.to}
+            min={$fromDate.value ? $fromDate.value : $validities.data?.from}
+            max={$validities.data?.to}
           />
         </div>
         <div class="flex flex-row gap-6">

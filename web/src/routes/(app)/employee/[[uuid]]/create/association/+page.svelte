@@ -27,6 +27,7 @@
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import SelectGroup from "$lib/components/forms/shared/SelectGroup.svelte"
+  import { createQuery } from "$lib/http/query"
   import { getClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
 
@@ -148,37 +149,33 @@
       }
     }
 
-  // Logic for updating datepicker intervals
-  let validities: {
+  // Datepicker bounds for the selected org unit. See the employee edit
+  // engagement form for the query pattern and its trade-offs.
+  const validities = createQuery<{
     from: string | undefined | null
     to: string | undefined | null
-  } = { from: null, to: null }
+  }>({ from: null, to: null })
+  $: if (selectedOrgUnit?.uuid) {
+    const orgUnitUuid = selectedOrgUnit.uuid
+    validities.run((signal) => getValidities(orgUnitUuid, signal))
+  } else {
+    validities.run(async () => ({ from: null, to: null }))
+  }
 
-  let facets: FacetValidities[]
-  let abortController: AbortController
+  const facets = createQuery<FacetValidities[]>()
+  // Only fetch when a start date is set: getClasses rejects a null date, and
+  // the facet selects are disabled without one anyway.
   $: if (startDate) {
-    // Abort the previous request if a new one is about to start
-    if (abortController) abortController.abort()
-    abortController = new AbortController()
-
-    const params = {
-      currentDate: startDate,
-      orgUuid: selectedOrgUnit?.uuid,
-      facetUserKeys: ["association_type", "primary_type"],
-    }
-
-    ;(async () => {
-      validities = selectedOrgUnit
-        ? await getValidities(selectedOrgUnit.uuid)
-        : { from: null, to: null }
-      try {
-        facets = await getClasses(params, abortController.signal)
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Request failed:", err)
-        }
-      }
-    })()
+    facets.run((signal) =>
+      getClasses(
+        {
+          currentDate: startDate,
+          orgUuid: selectedOrgUnit?.uuid,
+          facetUserKeys: ["association_type", "primary_type"],
+        },
+        signal
+      )
+    )
   }
 </script>
 
@@ -233,16 +230,16 @@
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={validities.from}
-            max={toDate ? toDate : validities.to}
+            min={$validities.data?.from}
+            max={toDate ? toDate : $validities.data?.to}
             required={true}
           />
           <DateInput
             bind:value={toDate}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : validities.from}
-            max={validities.to}
+            min={$fromDate.value ? $fromDate.value : $validities.data?.from}
+            max={$validities.data?.to}
           />
         </div>
         <!-- TODO: make optional when GraphQL agrees -->
@@ -265,7 +262,18 @@
           required={true}
         />
         <Breadcrumbs orgUnit={selectedOrgUnit} />
-        {#if facets}
+        {#if $facets.loading && !$facets.data}
+          <div class="flex flex-row gap-6">
+            <Skeleton extra_classes="basis-1/2" />
+            <Skeleton extra_classes="basis-1/2" />
+          </div>
+        {/if}
+        {#if $facets.error}
+          <p class="text-sm text-error">
+            {capital($_($facets.data ? "load_error_options" : "load_error"))}
+          </p>
+        {/if}
+        {#if $facets.data}
           <div class="flex flex-row gap-6">
             <Select
               title={capital($_("association_type"))}
@@ -273,14 +281,16 @@
               bind:value={associationType}
               bind:name={$associationTypeField.value}
               errors={$associationTypeField.errors}
-              iterable={filterClassesByFacetUserKey(facets, "association_type")}
+              iterable={filterClassesByFacetUserKey($facets.data, "association_type")}
+              disabled={!startDate || $facets.error}
               required={true}
               extra_classes="basis-1/2"
             />
             <Select
               title={capital($_("primary"))}
               id="primary"
-              iterable={filterClassesByFacetUserKey(facets, "primary_type")}
+              iterable={filterClassesByFacetUserKey($facets.data, "primary_type")}
+              disabled={!startDate || $facets.error}
               extra_classes="basis-1/2"
               isClearable={true}
             />
