@@ -143,6 +143,15 @@
         .then((res) => res.itsystems.objects)
     )
   }
+
+  // The class being edited. Fetched once for the page, so it is a plain promise
+  // rather than a createQuery; named here instead of inline in the {#await} tag
+  // to keep the tag readable.
+  const classPromise = graphQLClient().request(ClassDocument, {
+    uuid: $page.params.class,
+    fromDate: $page.url.searchParams.get("from"),
+    toDate: $page.url.searchParams.get("to"),
+  })
 </script>
 
 <title
@@ -165,9 +174,22 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ClassDocument, { uuid: $page.params.class, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to") } )}
-  <!-- TODO: Should have a skeleton for the loading stage -->
-  {capital($_("loading"))}
+{#await classPromise}
+  <div class="mx-6">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
+      <div class="p-8">
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+        <Skeleton />
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+      </div>
+    </div>
+  </div>
 {:then data}
   {@const cls = data.classes.objects[0].validities[0]}
   {@const facetResponse = data.classes.objects[0].validities[0].facet_response}
@@ -287,4 +309,8 @@
     </div>
     <Error />
   </form>
+{:catch}
+  <div class="mx-6">
+    <p class="text-sm text-error">{capital($_("load_error"))}</p>
+  </div>
 {/await}
