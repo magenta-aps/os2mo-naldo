@@ -1,153 +1,26 @@
 <script lang="ts">
-  import { _ } from "svelte-i18n"
-  import { capital } from "$lib/utils/helpers"
-  import { env } from "$lib/env"
   import { employeeInfo } from "$lib/stores/employeeInfoStore"
   import { step } from "$lib/stores/stepStore"
   import Error from "$lib/components/alerts/Error.svelte"
-  import Input from "$lib/components/forms/shared/Input.svelte"
   import OnboardingFormButtons from "$lib/components/userflow/OnboardingFormButtons.svelte"
-  import CprLookup from "$lib/components/forms/shared/CPRLookup.svelte"
-  import CPRInput from "$lib/components/userflow/CPRInput.svelte"
-  import { isValidCpr } from "$lib/utils/cpr"
+  import EmployeeFields from "$lib/components/forms/entity/EmployeeFields.svelte"
 
-  $: {
-    const name = $employeeInfo.cprNumber?.name
-
-    if (name && name.trim() !== "") {
-      $employeeInfo.firstName = name.split(" ").slice(0, -1).join(" ")
-      $employeeInfo.lastName = name.split(" ").slice(-1).join(" ")
-    } else if (name === undefined) {
-      // name should only be undefined when SP is enabled, therefore we can clear the names when this is true
-      $employeeInfo.firstName = ""
-      $employeeInfo.lastName = ""
-    }
-  }
-  $: cpr = $employeeInfo?.cprNumber?.cpr_no ?? ""
-  $: cprErrors =
-    $employeeInfo.validated === false
-      ? cpr.length === 0
-        ? ["required"]
-        : !isValidCpr(cpr)
-        ? ["pattern"]
-        : []
-      : []
+  let fields: EmployeeFields
 </script>
 
 <form
   on:submit|preventDefault={async () => {
-    if (await employeeInfo.validateForm()) {
+    const isValid = await fields.validate()
+    // The stamped flag drives the Stepper checkmark and the summary.
+    employeeInfo.update((employee) => ({ ...employee, validated: isValid }))
+    if (isValid) {
       step.updateStep("inc")
     }
   }}
 >
   <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
     <div class="p-8">
-      {#if env.PUBLIC_ENABLE_SP}
-        <CprLookup
-          title={capital($_("cpr_number"))}
-          id="cpr-number"
-          bind:value={$employeeInfo.cprNumber}
-          bind:cprNumber={$employeeInfo.cprNumber.cpr_no}
-          errors={cprErrors}
-        />
-        <!-- If we get a response with empty name property, it means that a fictional CPR-number has been entered. -->
-        <!-- Therefore we allow typing a name, rather than making the input read-only. -->
-        {#if $employeeInfo.cprNumber && $employeeInfo.cprNumber.name === ""}
-          <div class="flex flex-row gap-6">
-            <Input
-              title={capital($_("givenname", { values: { n: 2 } }))}
-              id="first-name"
-              bind:value={$employeeInfo.firstName}
-              errors={$employeeInfo.validated === false && !$employeeInfo.firstName
-                ? ["required"]
-                : []}
-              extra_classes="basis-1/2"
-              required={true}
-            />
-            <Input
-              title={capital($_("surname"))}
-              id="last-name"
-              bind:value={$employeeInfo.lastName}
-              errors={$employeeInfo.validated === false && !$employeeInfo.lastName
-                ? ["required"]
-                : []}
-              extra_classes="basis-1/2"
-              required={true}
-            />
-          </div>
-        {:else}
-          <div class="flex flex-row gap-6">
-            <Input
-              title={capital($_("givenname", { values: { n: 2 } }))}
-              id="first-name"
-              bind:value={$employeeInfo.firstName}
-              errors={$employeeInfo.validated === false && !$employeeInfo.firstName
-                ? ["required"]
-                : []}
-              extra_classes="basis-1/2"
-              required={true}
-              readonly
-            />
-            <Input
-              title={capital($_("surname"))}
-              id="last-name"
-              bind:value={$employeeInfo.lastName}
-              errors={$employeeInfo.validated === false && !$employeeInfo.lastName
-                ? ["required"]
-                : []}
-              extra_classes="basis-1/2"
-              required={true}
-              readonly
-            />
-          </div>
-        {/if}
-      {:else}
-        <CPRInput
-          title={capital($_("cpr_number"))}
-          id="cpr-number"
-          startValue={$employeeInfo.cprNumber.cpr_no}
-          bind:cprObject={$employeeInfo.cprNumber}
-          errors={cprErrors}
-          required={true}
-        />
-        <div class="flex flex-row gap-6">
-          <Input
-            title={capital($_("givenname", { values: { n: 2 } }))}
-            id="first-name"
-            bind:value={$employeeInfo.firstName}
-            errors={$employeeInfo.validated === false && !$employeeInfo.firstName
-              ? ["required"]
-              : []}
-            extra_classes="basis-1/2"
-            required={true}
-          />
-          <Input
-            title={capital($_("surname"))}
-            id="last-name"
-            bind:value={$employeeInfo.lastName}
-            errors={$employeeInfo.validated === false && !$employeeInfo.lastName
-              ? ["required"]
-              : []}
-            extra_classes="basis-1/2"
-            required={true}
-          />
-        </div>
-      {/if}
-      <div class="flex flex-row gap-6">
-        <Input
-          title={capital($_("nickname_givenname", { values: { n: 2 } }))}
-          id="nickname-first-name"
-          bind:value={$employeeInfo.nicknameFirstname}
-          extra_classes="basis-1/2"
-        />
-        <Input
-          title={capital($_("nickname_surname"))}
-          id="nickname-last-name"
-          bind:value={$employeeInfo.nicknameLastname}
-          extra_classes="basis-1/2"
-        />
-      </div>
+      <EmployeeFields bind:value={$employeeInfo} bind:this={fields} />
     </div>
   </div>
   <OnboardingFormButtons />
