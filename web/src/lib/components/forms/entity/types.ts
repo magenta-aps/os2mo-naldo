@@ -2,6 +2,16 @@
 // createDefaultXValues() object, the wizard binds a store item of the same
 // shape plus its own extras.
 
+import { get } from "svelte/store"
+import { date } from "$lib/stores/date"
+
+// Mirrors the shared Select's Value shape, where uuid is nullable.
+export type ClassValue = {
+  uuid: string | null
+  name: string
+  user_key?: string | null
+}
+
 export type EmployeeValues = {
   // Matches CprLookup's response shape; `name` is "" for fictional CPRs
   // (typed name) and non-empty for looked-up ones (derived name).
@@ -18,4 +28,28 @@ export const createDefaultEmployeeValues = (): EmployeeValues => ({
   lastName: "",
   nicknameFirstname: "",
   nicknameLastname: "",
+})
+
+export type EngagementValues = {
+  fromDate: string
+  toDate: string
+  orgUnit: { uuid: string; name: string } | undefined
+  user_key: string
+  jobFunction: ClassValue | undefined
+  engagementType: ClassValue | undefined
+  primary: ClassValue | undefined
+  extension1: string
+  extension4: string
+}
+
+export const createDefaultEngagementValues = (): EngagementValues => ({
+  fromDate: get(date),
+  toDate: "",
+  orgUnit: undefined,
+  user_key: "",
+  jobFunction: undefined,
+  engagementType: undefined,
+  primary: undefined,
+  extension1: "",
+  extension4: "",
 })
