@@ -1,6 +1,6 @@
-import { isValidCpr } from "$lib/utils/cpr"
-import { writable } from "svelte/store"
 import { v4 as uuidv4 } from "uuid"
+import { isValidCpr } from "$lib/utils/cpr"
+import { createSingleStepStore } from "$lib/stores/createStepStore"
 
 export type EmployeeInfo = {
   uuid: string
@@ -31,27 +31,7 @@ export const validateEmployee = (employee: EmployeeInfo): boolean => {
   )
 }
 
-export const employeeInfo = (() => {
-  const defaultValue: EmployeeInfo = createDefaultEmployee()
-
-  const { subscribe, update, set } = writable<EmployeeInfo>(defaultValue)
-
-  return {
-    subscribe,
-    set,
-    update,
-    reset: () => {
-      set(createDefaultEmployee())
-    },
-    validateForm: () => {
-      let isValid = false
-      update((employee) => {
-        const validated = validateEmployee(employee)
-        isValid = validated
-
-        return { ...employee, validated }
-      })
-      return isValid
-    },
-  }
-})()
+export const employeeInfo = createSingleStepStore(
+  createDefaultEmployee,
+  validateEmployee
+)
