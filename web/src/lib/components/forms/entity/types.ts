@@ -58,3 +58,25 @@ export const createDefaultEngagementValues = (): EngagementValues => ({
   extension1: "",
   extension4: "",
 })
+
+// Address types carry their scope (EMAIL/PHONE/DAR/...), which drives the
+// value field's validators and widget.
+export type AddressTypeValue = ClassValue & { scope?: string | null }
+
+export type AddressValues = {
+  fromDate: string
+  toDate: string
+  visibility: ClassValue | undefined
+  addressType: AddressTypeValue | undefined
+  addressValue: { name?: string; value: string }
+  user_key: string
+}
+
+export const createDefaultAddressValues = (): AddressValues => ({
+  fromDate: get(date),
+  toDate: "",
+  visibility: undefined,
+  addressType: undefined,
+  addressValue: { name: "", value: "" },
+  user_key: "",
+})
