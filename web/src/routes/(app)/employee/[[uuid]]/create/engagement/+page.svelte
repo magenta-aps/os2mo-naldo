@@ -1,10 +1,7 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
-  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
-  import Input from "$lib/components/forms/shared/Input.svelte"
-  import Select from "$lib/components/forms/shared/Select.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
   import { base } from "$app/paths"
@@ -13,19 +10,15 @@
   import { CreateEngagementDocument } from "./query.generated"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
-  import { date } from "$lib/stores/date"
   import type { SubmitFunction } from "./$types"
-  import type { FacetValidities } from "$lib/utils/classes"
-  import { filterClassesByFacetUserKey } from "$lib/utils/classes"
-  import Search from "$lib/components/search/Search.svelte"
-  import { form, field } from "svelte-forms"
-  import { required } from "svelte-forms/validators"
-  import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
-  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { createQuery } from "$lib/http/query"
-  import { getClasses } from "$lib/http/getClasses"
-  import { getValidities } from "$lib/http/getValidities"
-  import { env } from "$lib/env"
+  import EngagementFields from "$lib/components/forms/entity/EngagementFields.svelte"
+  import {
+    createDefaultEngagementValues,
+    type EngagementValues,
+  } from "$lib/components/forms/entity/types"
+
+  let values: EngagementValues = createDefaultEngagementValues()
+  let fields: EngagementFields
 
   gql`
     mutation CreateEngagement($input: EngagementCreateInput!, $date: DateTime!) {
@@ -42,25 +35,11 @@
     }
   `
 
-  let startDate: string = $date
-  let toDate: string
-  let selectedOrgUnit: {
-    uuid: string
-    name: string
-  }
-
-  const fromDate = field("from", "", [required()])
-  const orgUnit = field("org_unit", "", [required()])
-  const jobFunction = field("job_function", "", [required()])
-  const engagementType = field("engagement_type", "", [required()])
-  const svelteForm = form(fromDate, orgUnit, jobFunction, engagementType)
-
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
       // Await the validation, before we continue
-      await svelteForm.validate()
-      if (!$svelteForm.valid) return
+      if (!(await fields.validate())) return
       if (result.type !== "success" || !result.data) return
       try {
         const mutation = await graphQLClient().request(CreateEngagementDocument, {
@@ -84,35 +63,6 @@
         $error = { message: err }
       }
     }
-
-  // Datepicker bounds for the selected org unit. See the employee edit
-  // engagement form for the query pattern and its trade-offs.
-  const validities = createQuery<{
-    from: string | undefined | null
-    to: string | undefined | null
-  }>({ from: null, to: null })
-  $: if (selectedOrgUnit?.uuid) {
-    const orgUnitUuid = selectedOrgUnit.uuid
-    validities.run((signal) => getValidities(orgUnitUuid, signal))
-  } else {
-    validities.run(async () => ({ from: null, to: null }))
-  }
-
-  const facets = createQuery<FacetValidities[]>()
-  // Only fetch when a start date is set: getClasses rejects a null date, and
-  // the facet selects are disabled without one anyway.
-  $: if (startDate) {
-    facets.run((signal) =>
-      getClasses(
-        {
-          currentDate: startDate,
-          orgUuid: selectedOrgUnit?.uuid,
-          facetUserKeys: ["engagement_type", "engagement_job_function", "primary_type"],
-        },
-        signal
-      )
-    )
-  }
 </script>
 
 <title
@@ -138,109 +88,7 @@
 <form method="post" class="mx-6" use:enhance={handler}>
   <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
     <div class="p-8">
-      <div class="flex flex-row gap-6">
-        <DateInput
-          bind:value={startDate}
-          bind:validationValue={$fromDate.value}
-          errors={$fromDate.errors}
-          title={capital($_("date.start_date"))}
-          id="from"
-          min={$validities.data?.from}
-          max={toDate ? toDate : $validities.data?.to}
-          required={true}
-        />
-        <DateInput
-          bind:value={toDate}
-          title={capital($_("date.end_date"))}
-          id="to"
-          min={$fromDate.value ? $fromDate.value : $validities.data?.from}
-          max={$validities.data?.to}
-        />
-      </div>
-      <Search
-        type="org-unit"
-        at={startDate}
-        bind:name={$orgUnit.value}
-        errors={$orgUnit.errors}
-        on:clear={() => ($orgUnit.value = "")}
-        bind:value={selectedOrgUnit}
-        required={true}
-      />
-      <Breadcrumbs orgUnit={selectedOrgUnit} />
-
-      {#if $facets.loading && !$facets.data}
-        <div class="flex flex-row gap-6">
-          <Skeleton extra_classes="basis-1/2" />
-          <Skeleton extra_classes="basis-1/2" />
-        </div>
-        <div class="flex flex-row gap-6">
-          <Skeleton extra_classes="basis-1/2" />
-          <Skeleton extra_classes="basis-1/2" />
-        </div>
-      {/if}
-      {#if $facets.error}
-        <p class="text-sm text-error">
-          {capital($_($facets.data ? "load_error_options" : "load_error"))}
-        </p>
-      {/if}
-      {#if $facets.data}
-        <div class="flex flex-row gap-6">
-          <Input title="ID" id="user-key" extra_classes="basis-1/2" />
-          <Select
-            title={env.PUBLIC_SHOW_EXTENSION_1
-              ? capital($_("job_code"))
-              : capital($_("job_function", { values: { n: 1 } }))}
-            id="job-function"
-            bind:name={$jobFunction.value}
-            errors={$jobFunction.errors}
-            iterable={filterClassesByFacetUserKey(
-              $facets.data,
-              "engagement_job_function"
-            )}
-            disabled={!startDate || $facets.error}
-            required={true}
-            extra_classes="basis-1/2"
-          />
-        </div>
-        {#if env.PUBLIC_SHOW_EXTENSION_1 || env.PUBLIC_SHOW_EXTENSION_4}
-          <div class="flex flex-row gap-6">
-            {#if env.PUBLIC_SHOW_EXTENSION_1}
-              <Input
-                title={capital($_("job_function", { values: { n: 1 } }))}
-                id="extension-1"
-                extra_classes="basis-1/2"
-              />
-            {/if}
-            {#if env.PUBLIC_SHOW_EXTENSION_4}
-              <Input
-                title={capital($_("department_code"))}
-                id="extension-4"
-                extra_classes="basis-1/2"
-              />
-            {/if}
-          </div>
-        {/if}
-        <div class="flex flex-row gap-6">
-          <Select
-            title={capital($_("engagement_type"))}
-            id="engagement-type"
-            bind:name={$engagementType.value}
-            errors={$engagementType.errors}
-            iterable={filterClassesByFacetUserKey($facets.data, "engagement_type")}
-            disabled={!startDate || $facets.error}
-            required={true}
-            extra_classes="basis-1/2"
-          />
-          <Select
-            title={capital($_("primary"))}
-            id="primary"
-            iterable={filterClassesByFacetUserKey($facets.data, "primary_type")}
-            disabled={!startDate || $facets.error}
-            extra_classes="basis-1/2"
-            isClearable={true}
-          />
-        </div>
-      {/if}
+      <EngagementFields bind:value={values} bind:this={fields} />
     </div>
   </div>
   <div class="flex py-6 gap-4">

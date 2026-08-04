@@ -5,6 +5,18 @@
 // Keeping the shapes here, next to the field groups, is what stops the two
 // consumers from drifting apart again.
 
+import { get } from "svelte/store"
+import { date } from "$lib/stores/date"
+
+// Class selections mirror the shared Select's Value shape exactly (uuid is
+// nullable there); GraphQL calls the third field user_key, so we do too (this
+// also settles the old userkey/user_key drift between the wizard stores).
+export type ClassValue = {
+  uuid: string | null
+  name: string
+  user_key?: string | null
+}
+
 export type EmployeeValues = {
   // Matches CprLookup's response shape; `name` is "" for fictional CPRs
   // (typed name) and non-empty for looked-up ones (derived name).
@@ -21,4 +33,28 @@ export const createDefaultEmployeeValues = (): EmployeeValues => ({
   lastName: "",
   nicknameFirstname: "",
   nicknameLastname: "",
+})
+
+export type EngagementValues = {
+  fromDate: string
+  toDate: string
+  orgUnit: { uuid: string; name: string } | undefined
+  user_key: string
+  jobFunction: ClassValue | undefined
+  engagementType: ClassValue | undefined
+  primary: ClassValue | undefined
+  extension1: string
+  extension4: string
+}
+
+export const createDefaultEngagementValues = (): EngagementValues => ({
+  fromDate: get(date),
+  toDate: "",
+  orgUnit: undefined,
+  user_key: "",
+  jobFunction: undefined,
+  engagementType: undefined,
+  primary: undefined,
+  extension1: "",
+  extension4: "",
 })
