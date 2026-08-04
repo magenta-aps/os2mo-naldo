@@ -1,29 +1,24 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
-  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
-  import Select from "$lib/components/forms/shared/Select.svelte"
-  import Input from "$lib/components/forms/shared/Input.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
   import { CreateAddressDocument } from "./query.generated"
-  import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
-  import { date } from "$lib/stores/date"
   import type { SubmitFunction } from "./$types"
-  import { form, field } from "svelte-forms"
-  import { required, email, pattern } from "svelte-forms/validators"
-  import DarSearch from "$lib/components/forms/shared/DARSearch.svelte"
-  import type { FacetValidities } from "$lib/utils/classes"
-  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { createQuery } from "$lib/http/query"
-  import { getClasses } from "$lib/http/getClasses"
-  import { getPersonValidities } from "$lib/http/getValidities"
+  import AddressFields from "$lib/components/forms/entity/AddressFields.svelte"
+  import {
+    createDefaultAddressValues,
+    type AddressValues,
+  } from "$lib/components/forms/entity/types"
+
+  let values: AddressValues = createDefaultAddressValues()
+  let fields: AddressFields
 
   gql`
     mutation CreateAddress($input: AddressCreateInput!, $date: DateTime!) {
@@ -41,96 +36,34 @@
     }
   `
 
-  let startDate: string = $date
-  let toDate: string
-  let addressType: { name: string; user_key: string; uuid: string; scope: string }
-  $: addressTypeUuid = addressType?.uuid
-
-  // update the field depending on address-type
-  const fromDate = field("from", "", [required()])
-  const addressTypeField = field("address_type", "", [required()])
-  let addressField = field("", "")
-  $: svelteForm = form(fromDate, addressTypeField, addressField)
-
-  // Derive validators from the address type's scope, not its name. The name is
-  // customer-configurable, so matching on it left custom-named types in the
-  // default branch where the field was never recreated — the value field didn't
-  // clear and the validators didn't update when switching type.
-  $: if (addressType) {
-    switch (addressType.scope) {
-      case "EMAIL":
-        addressField = field(addressType.name, "", [required(), email()])
-        break
-      case "PHONE":
-        addressField = field(addressType.name, "", [required(), pattern(/^\+?\d+$/)])
-        break
-      default:
-        // DAR, TEXT and any other scope: value required only
-        addressField = field(addressType.name, "", [required()])
-        break
-    }
-  }
-
   const handler: SubmitFunction =
     () =>
     async ({ result }) => {
       // Await the validation, before we continue
-      await svelteForm.validate()
-      if ($svelteForm.valid) {
-        if (result.type === "success" && result.data) {
-          try {
-            const mutation = await graphQLClient().request(CreateAddressDocument, {
-              input: result.data,
-              date: result.data.validity.from,
-            })
-            $success = {
-              message: capital(
-                $_("success_create_item", {
-                  values: {
-                    item: $_("address", { values: { n: 0 } }),
-                    name: mutation.address_create.current?.person_response?.current
-                      ?.name,
-                  },
-                })
-              ),
-              uuid: $page.params.uuid,
-              type: "employee",
-            }
-          } catch (err) {
-            $error = { message: err }
+      if (!(await fields.validate())) return
+      if (result.type === "success" && result.data) {
+        try {
+          const mutation = await graphQLClient().request(CreateAddressDocument, {
+            input: result.data,
+            date: result.data.validity.from,
+          })
+          $success = {
+            message: capital(
+              $_("success_create_item", {
+                values: {
+                  item: $_("address", { values: { n: 0 } }),
+                  name: mutation.address_create.current?.person_response?.current?.name,
+                },
+              })
+            ),
+            uuid: $page.params.uuid,
+            type: "employee",
           }
+        } catch (err) {
+          $error = { message: err }
         }
       }
     }
-
-  // Datepicker bounds for the person. See the employee edit engagement form
-  // for the query pattern and its trade-offs.
-  const validities = createQuery<{
-    from: string | undefined | null
-    to: string | undefined | null
-  }>({ from: null, to: null })
-  $: if ($page.params.uuid) {
-    const personUuid = $page.params.uuid
-    validities.run((signal) => getPersonValidities(personUuid, signal))
-  } else {
-    validities.run(async () => ({ from: null, to: null }))
-  }
-
-  const facets = createQuery<FacetValidities[]>()
-  // Only fetch when a start date is set: getClasses rejects a null date, and
-  // the facet selects are disabled without one anyway.
-  $: if (startDate) {
-    facets.run((signal) =>
-      getClasses(
-        {
-          currentDate: startDate,
-          orgUuid: null,
-          facetUserKeys: ["employee_address_type", "visibility"],
-        },
-        signal
-      )
-    )
-  }
 </script>
 
 <title
@@ -156,83 +89,11 @@
 <form method="post" class="mx-6" use:enhance={handler}>
   <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
     <div class="p-8">
-      <div class="flex flex-row gap-6">
-        <DateInput
-          bind:value={startDate}
-          bind:validationValue={$fromDate.value}
-          errors={$fromDate.errors}
-          title={capital($_("date.start_date"))}
-          id="from"
-          min={$validities.data?.from}
-          max={toDate ? toDate : $validities.data?.to}
-          required={true}
-        />
-        <DateInput
-          bind:value={toDate}
-          title={capital($_("date.end_date"))}
-          id="to"
-          min={$fromDate.value ? $fromDate.value : $validities.data?.from}
-          max={$validities.data?.to}
-        />
-      </div>
-      {#if $facets.loading && !$facets.data}
-        <div class="flex flex-row gap-6">
-          <Skeleton extra_classes="basis-1/2" />
-          <Skeleton extra_classes="basis-1/2" />
-        </div>
-      {/if}
-      {#if $facets.error}
-        <p class="text-sm text-error">
-          {capital($_($facets.data ? "load_error_options" : "load_error"))}
-        </p>
-      {/if}
-      {#if $facets.data}
-        <div class="flex flex-row gap-6">
-          <Select
-            title={capital($_("visibility"))}
-            id="visibility"
-            iterable={filterClassesByFacetUserKey($facets.data, "visibility")}
-            disabled={!startDate || $facets.error}
-            extra_classes="basis-1/2"
-            isClearable={true}
-          />
-          <Select
-            title={capital($_("address_type"))}
-            id="address-type"
-            bind:value={addressType}
-            bind:name={$addressTypeField.value}
-            errors={$addressTypeField.errors}
-            iterable={filterClassesByFacetUserKey(
-              $facets.data,
-              "employee_address_type"
-            )}
-            disabled={!startDate || $facets.error}
-            extra_classes="basis-1/2"
-            required={true}
-          />
-          <input hidden name="address-type-uuid" bind:value={addressTypeUuid} />
-        </div>
-      {/if}
-      <Input title={capital($_("description"))} id="user-key" />
-      {#if addressType}
-        {#if addressType.scope === "DAR"}
-          <DarSearch
-            title={addressType.name}
-            id="value"
-            bind:darName={$addressField.value}
-            errors={$addressField.errors}
-            required={true}
-          />
-        {:else}
-          <Input
-            title={addressType.name}
-            id="value"
-            bind:value={$addressField.value}
-            errors={$addressField.errors}
-            required={true}
-          />
-        {/if}
-      {/if}
+      <AddressFields
+        bind:value={values}
+        bind:this={fields}
+        personUuid={$page.params.uuid}
+      />
     </div>
   </div>
   <div class="flex py-6 gap-4">
