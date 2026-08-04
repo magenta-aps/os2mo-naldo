@@ -1,26 +1,10 @@
-import { get } from "svelte/store"
-import { date } from "$lib/stores/date"
-import { createMultiStepStore } from "$lib/stores/createStepStore"
+import {
+  createDefaultManagerValues,
+  type ManagerValues,
+} from "$lib/components/forms/entity/types"
+import { createMultiStepStore, type Validatable } from "$lib/stores/createStepStore"
 
-export type ManagerInfo = {
-  fromDate: string
-  toDate: string
-  orgUnit: { uuid: string; name: string } | undefined
-  managerType: { uuid: string; name: string; userkey: string }
-  managerLevel: { uuid: string; name: string; userkey: string }
-  responsibilities: { uuid: string; name: string; userkey: string }[]
-  validated?: boolean
-}
-
-export const createDefaultManager = (): ManagerInfo => ({
-  fromDate: get(date),
-  toDate: "",
-  orgUnit: undefined,
-  managerType: { uuid: "", name: "", userkey: "" },
-  managerLevel: { uuid: "", name: "", userkey: "" },
-  responsibilities: [],
-  validated: undefined,
-})
+export type ManagerInfo = ManagerValues & Validatable
 
 export const validateManager = (manager: ManagerInfo): boolean => {
   return (
@@ -32,10 +16,7 @@ export const validateManager = (manager: ManagerInfo): boolean => {
   )
 }
 
-const store = createMultiStepStore(createDefaultManager, validateManager)
-
-export const managerInfo = {
-  ...store,
-  addManager: store.addItem,
-  removeManager: store.removeItem,
-}
+export const managerInfo = createMultiStepStore<ManagerInfo>(
+  createDefaultManagerValues,
+  validateManager
+)
