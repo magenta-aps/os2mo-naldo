@@ -59,6 +59,39 @@ export const createDefaultEngagementValues = (): EngagementValues => ({
   extension4: "",
 })
 
+export type RolebindingValues = {
+  // `ituser dates == rolebinding dates` on creation, so rolebindings carry no
+  // dates of their own here.
+  role: ClassValue | undefined
+}
+
+export const createDefaultRolebindingValues = (): RolebindingValues => ({
+  role: undefined,
+})
+
+export type ItuserValues = {
+  fromDate: string
+  toDate: string
+  itSystem: ClassValue | undefined
+  // The account name.
+  user_key: string
+  externalId: string
+  notes: string
+  primary: ClassValue | undefined
+  rolebindings: RolebindingValues[]
+}
+
+export const createDefaultItuserValues = (): ItuserValues => ({
+  fromDate: get(date),
+  toDate: "",
+  itSystem: undefined,
+  user_key: "",
+  externalId: "",
+  notes: "",
+  primary: undefined,
+  rolebindings: [createDefaultRolebindingValues()],
+})
+
 // Address types carry their scope (EMAIL/PHONE/DAR/...), which drives the
 // value field's validators and widget.
 export type AddressTypeValue = ClassValue & { scope?: string | null }
