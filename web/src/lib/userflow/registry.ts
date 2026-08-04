@@ -4,7 +4,7 @@ import { stepConfigs, type StepConfig } from "$lib/userflow/stepIds"
 import EmployeeStep from "$lib/components/userflow/EmployeeStep.svelte"
 import EntityStep from "$lib/components/userflow/EntityStep.svelte"
 import EngagementFields from "$lib/components/forms/entity/EngagementFields.svelte"
-import ItuserStep from "$lib/components/userflow/ItuserStep.svelte"
+import ItuserFields from "$lib/components/forms/entity/ItuserFields.svelte"
 import ManagerStep from "$lib/components/userflow/ManagerStep.svelte"
 import AddressFields from "$lib/components/forms/entity/AddressFields.svelte"
 import SummaryStep from "$lib/components/userflow/SummaryStep.svelte"
@@ -47,7 +47,11 @@ const wiring: Record<StepConfig["id"], StepWiring> = {
     props: { fields: EngagementFields, store: engagementInfo, entityKey: "engagement" },
     valid: multiValid(engagementInfo),
   },
-  ituser: { component: ItuserStep, valid: multiValid(ituserInfo) },
+  ituser: {
+    component: EntityStep,
+    props: { fields: ItuserFields, store: ituserInfo, entityKey: "ituser" },
+    valid: multiValid(ituserInfo),
+  },
   manager: { component: ManagerStep, valid: multiValid(managerInfo) },
   address: {
     component: EntityStep,
