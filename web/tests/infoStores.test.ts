@@ -108,7 +108,7 @@ describe("validateItuser", () => {
   const valid = {
     fromDate: "2020-01-01",
     itSystem: { uuid: "s1" },
-    userkey: "alice",
+    user_key: "alice",
   } as unknown as ItuserInfo
 
   it("accepts a complete ituser", () => {
@@ -125,8 +125,8 @@ describe("validateItuser", () => {
     )
   })
 
-  it("rejects without userkey", () => {
-    expect(validateItuser({ ...valid, userkey: "" })).toBe(false)
+  it("rejects without user_key", () => {
+    expect(validateItuser({ ...valid, user_key: "" })).toBe(false)
   })
 })
 
