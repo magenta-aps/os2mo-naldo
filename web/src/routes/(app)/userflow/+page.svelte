@@ -16,6 +16,14 @@
   <Stepper />
 
   <div class="mt-8">
-    <svelte:component this={steps[$step - 1].component} />
+    <!-- Keyed on the step: steps 2-5 share the EntityStep component, and
+         svelte:component only remounts when `this` changes — without the key,
+         local state (selected tab, field forms) would leak across steps. -->
+    {#key $step}
+      <svelte:component
+        this={steps[$step - 1].component}
+        {...steps[$step - 1].props ?? {}}
+      />
+    {/key}
   </div>
 </div>

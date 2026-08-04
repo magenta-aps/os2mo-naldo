@@ -87,10 +87,10 @@
       if (!engagement.validated) continue
       engagementData.push({
         person: employeeUUID,
-        user_key: engagement.userkey,
+        user_key: engagement.user_key,
         org_unit: engagement.orgUnit?.uuid,
-        engagement_type: engagement.engagementType.uuid,
-        job_function: engagement.jobFunction.uuid,
+        engagement_type: engagement.engagementType?.uuid,
+        job_function: engagement.jobFunction?.uuid,
         primary: engagement.primary?.uuid || null,
         validity: {
           from: engagement.fromDate,
