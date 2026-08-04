@@ -20,6 +20,8 @@
   import { required, email, pattern } from "svelte-forms/validators"
   import DarSearch from "$lib/components/forms/shared/DARSearch.svelte"
   import type { FacetValidities } from "$lib/utils/classes"
+  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
+  import { createQuery } from "$lib/http/query"
   import { getClasses } from "$lib/http/getClasses"
   import { getPersonValidities } from "$lib/http/getValidities"
 
@@ -101,38 +103,33 @@
       }
     }
 
-  // Logic for updating datepicker intervals
-  let validities: {
+  // Datepicker bounds for the person. See the employee edit engagement form
+  // for the query pattern and its trade-offs.
+  const validities = createQuery<{
     from: string | undefined | null
     to: string | undefined | null
-  } = { from: null, to: null }
+  }>({ from: null, to: null })
+  $: if ($page.params.uuid) {
+    const personUuid = $page.params.uuid
+    validities.run((signal) => getPersonValidities(personUuid, signal))
+  } else {
+    validities.run(async () => ({ from: null, to: null }))
+  }
 
-  let facets: FacetValidities[]
-  let abortController: AbortController
+  const facets = createQuery<FacetValidities[]>()
+  // Only fetch when a start date is set: getClasses rejects a null date, and
+  // the facet selects are disabled without one anyway.
   $: if (startDate) {
-    // Abort the previous request if a new one is about to start
-    if (abortController) abortController.abort()
-    abortController = new AbortController()
-
-    // Make sure `currentDate` isn't sent if startDate is null.
-    const params = {
-      currentDate: startDate,
-      orgUuid: null,
-      facetUserKeys: ["employee_address_type", "visibility"],
-    }
-
-    ;(async () => {
-      validities = $page.params.uuid
-        ? await getPersonValidities($page.params.uuid)
-        : { from: null, to: null }
-      try {
-        facets = await getClasses(params, abortController.signal)
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Request failed:", err)
-        }
-      }
-    })()
+    facets.run((signal) =>
+      getClasses(
+        {
+          currentDate: startDate,
+          orgUuid: null,
+          facetUserKeys: ["employee_address_type", "visibility"],
+        },
+        signal
+      )
+    )
   }
 </script>
 
@@ -166,24 +163,36 @@
           errors={$fromDate.errors}
           title={capital($_("date.start_date"))}
           id="from"
-          min={validities.from}
-          max={toDate ? toDate : validities.to}
+          min={$validities.data?.from}
+          max={toDate ? toDate : $validities.data?.to}
           required={true}
         />
         <DateInput
           bind:value={toDate}
           title={capital($_("date.end_date"))}
           id="to"
-          min={$fromDate.value ? $fromDate.value : validities.from}
-          max={validities.to}
+          min={$fromDate.value ? $fromDate.value : $validities.data?.from}
+          max={$validities.data?.to}
         />
       </div>
-      {#if facets}
+      {#if $facets.loading && !$facets.data}
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+      {/if}
+      {#if $facets.error}
+        <p class="text-sm text-error">
+          {capital($_($facets.data ? "load_error_options" : "load_error"))}
+        </p>
+      {/if}
+      {#if $facets.data}
         <div class="flex flex-row gap-6">
           <Select
             title={capital($_("visibility"))}
             id="visibility"
-            iterable={filterClassesByFacetUserKey(facets, "visibility")}
+            iterable={filterClassesByFacetUserKey($facets.data, "visibility")}
+            disabled={!startDate || $facets.error}
             extra_classes="basis-1/2"
             isClearable={true}
           />
@@ -193,7 +202,8 @@
             bind:value={addressType}
             bind:name={$addressTypeField.value}
             errors={$addressTypeField.errors}
-            iterable={filterClassesByFacetUserKey(facets, "employee_address_type")}
+            iterable={filterClassesByFacetUserKey($facets.data, "employee_address_type")}
+            disabled={!startDate || $facets.error}
             extra_classes="basis-1/2"
             required={true}
           />

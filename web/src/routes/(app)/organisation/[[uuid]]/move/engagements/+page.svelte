@@ -19,6 +19,7 @@
     type GetEngagementsQuery,
   } from "./query.generated"
   import Select from "$lib/components/forms/shared/Select.svelte"
+  import { createQuery } from "$lib/http/query"
   import { getValidities } from "$lib/http/getValidities"
   import { getMinMaxValidities } from "$lib/utils/validities"
 
@@ -91,41 +92,38 @@
       }
     }
 
-  // Logic for updating datepicker intervals
-  let validities: {
+  // Datepicker bounds for the selected org unit. See the employee edit
+  // engagement form for the query pattern and its trade-offs.
+  const validities = createQuery<{
     from: string | undefined | null
     to: string | undefined | null
-  } = { from: null, to: null }
+  }>({ from: null, to: null })
+  $: if (orgUnit?.uuid) {
+    const orgUnitUuid = orgUnit.uuid
+    validities.run((signal) => getValidities(orgUnitUuid, signal))
+  } else {
+    validities.run(async () => ({ from: null, to: null }))
+  }
 
-  let abortController: AbortController
-  $: if (startDate) {
-    // Abort the previous request if a new one is about to start
-    if (abortController) {
-      abortController.abort()
-    }
-
-    abortController = new AbortController()
-    ;(async () => {
-      validities = orgUnit
-        ? await getValidities(orgUnit.uuid)
-        : { from: null, to: null }
-      if (orgUnit) {
-        try {
-          await updateEngagements(orgUnit?.uuid, startDate, abortController.signal)
-        } catch (err: any) {
-          if (err.name !== "AbortError") {
-            console.error("Request failed:", err)
-          }
-        }
-      }
-    })()
+  const engagements = createQuery<Engagements[]>([])
+  // Only fetch when a start date and an org unit are set; the list resets
+  // whenever either is cleared.
+  $: if (startDate && orgUnit?.uuid) {
+    const orgUnitUuid = orgUnit.uuid
+    engagements.run(async (signal) => {
+      const res = await graphQLClient(signal).request(GetEngagementsDocument, {
+        org_unit: orgUnitUuid,
+        currentDate: startDate,
+      })
+      return res.engagements?.objects ?? []
+    })
+  } else {
+    engagements.run(async () => [])
   }
 
   const fromDate = field("from", "", [required()])
   const orgUnitField = field("org_unit", "", [required()])
   const svelteForm = form(fromDate, orgUnitField)
-
-  let engagements: Engagements[]
 
   let orgUnit: {
     uuid: string
@@ -136,19 +134,6 @@
     name: string
   }
   let selectedEngagements: string[] = []
-
-  const updateEngagements = async (
-    orgUnitUuid: string | undefined | null,
-    date: string,
-    signal?: AbortSignal
-  ) => {
-    const res = await graphQLClient(signal).request(GetEngagementsDocument, {
-      org_unit: orgUnitUuid,
-      currentDate: date,
-    })
-
-    engagements = res.engagements?.objects
-  }
 
   const toggleSelectAll = (engagements: Engagements[]) => {
     selectedEngagements =
@@ -178,8 +163,8 @@
           errors={$fromDate.errors}
           title={capital($_("date.start_date"))}
           id="from"
-          min={validities.from}
-          max={validities.to}
+          min={$validities.data?.from}
+          max={$validities.data?.to}
           required={true}
         />
       </div>
@@ -192,13 +177,20 @@
           errors={$orgUnitField.errors}
           on:clear={() => {
             $orgUnitField.value = ""
-            engagements = []
           }}
           required={true}
         />
       </div>
       <div class="text-base-content pb-3">
-        {#if engagements && engagements.length}
+        {#if $engagements.error}
+          <p class="text-sm text-error">
+            {capital(
+              $_($engagements.data?.length ? "load_error_options" : "load_error")
+            )}
+          </p>
+        {/if}
+        {#if $engagements.data?.length}
+          {@const engagements = $engagements.data}
           {#key engagements}
             <fieldset>
               <legend class="text-sm pb-1">

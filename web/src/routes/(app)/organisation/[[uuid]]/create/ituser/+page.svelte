@@ -19,6 +19,7 @@
   import type { FacetValidities } from "$lib/utils/classes"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import { formatITSystemNames } from "$lib/utils/helpers"
+  import { createQuery } from "$lib/http/query"
   import { getPrimaryClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
   import { form, field } from "svelte-forms"
@@ -101,37 +102,32 @@
       }
     }
 
-  // Logic for updating datepicker intervals
-  let validities: {
+  // Datepicker bounds for the org unit. See the employee edit engagement form
+  // for the query pattern and its trade-offs.
+  const validities = createQuery<{
     from: string | undefined | null
     to: string | undefined | null
-  } = { from: null, to: null }
+  }>({ from: null, to: null })
+  $: if ($page.params.uuid) {
+    const orgUnitUuid = $page.params.uuid
+    validities.run((signal) => getValidities(orgUnitUuid, signal))
+  } else {
+    validities.run(async () => ({ from: null, to: null }))
+  }
 
-  let facets: FacetValidities[]
-  let abortController: AbortController
+  const facets = createQuery<FacetValidities[]>()
+  // Only fetch when a start date is set: the query rejects a null date, and
+  // the primary select is disabled without one anyway.
   $: if (startDate) {
-    // Abort the previous request if a new one is about to start
-    if (abortController) abortController.abort()
-    abortController = new AbortController()
-
-    // Make sure `currentDate` isn't sent if startDate is null.
-    const params = {
-      fromDate: startDate,
-      primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY,
-    }
-
-    ;(async () => {
-      validities = $page.params.uuid
-        ? await getValidities($page.params.uuid)
-        : { from: null, to: null }
-      try {
-        facets = await getPrimaryClasses(params, abortController.signal)
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Request failed:", err)
-        }
-      }
-    })()
+    facets.run((signal) =>
+      getPrimaryClasses(
+        {
+          fromDate: startDate,
+          primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY,
+        },
+        signal
+      )
+    )
   }
 </script>
 
@@ -183,16 +179,16 @@
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={validities.from}
-            max={toDate ? toDate : validities.to}
+            min={$validities.data?.from}
+            max={toDate ? toDate : $validities.data?.to}
             required={true}
           />
           <DateInput
             bind:value={toDate}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : validities.from}
-            max={validities.to}
+            min={$fromDate.value ? $fromDate.value : $validities.data?.from}
+            max={$validities.data?.to}
           />
         </div>
         <div class="flex flex-row gap-6">
@@ -214,11 +210,20 @@
             required={true}
           />
         </div>
-        {#if facets}
+        {#if $facets.loading && !$facets.data}
+          <Skeleton />
+        {/if}
+        {#if $facets.error}
+          <p class="text-sm text-error">
+            {capital($_($facets.data ? "load_error_options" : "load_error"))}
+          </p>
+        {/if}
+        {#if $facets.data}
           <Select
             title={capital($_("primary"))}
             id="primary"
-            iterable={filterClassesByFacetUserKey(facets, "primary_type")}
+            iterable={filterClassesByFacetUserKey($facets.data, "primary_type")}
+            disabled={!startDate || $facets.error}
             isClearable={true}
           />
         {/if}
