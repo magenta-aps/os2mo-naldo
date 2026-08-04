@@ -1,19 +1,19 @@
-import type { ComponentType } from "svelte"
-import { derived, readable, type Readable } from "svelte/store"
-import { stepConfigs, type StepConfig } from "$lib/userflow/stepIds"
-import EmployeeStep from "$lib/components/userflow/EmployeeStep.svelte"
-import EntityStep from "$lib/components/userflow/EntityStep.svelte"
+import AddressFields from "$lib/components/forms/entity/AddressFields.svelte"
 import EngagementFields from "$lib/components/forms/entity/EngagementFields.svelte"
 import ItuserFields from "$lib/components/forms/entity/ItuserFields.svelte"
-import ManagerStep from "$lib/components/userflow/ManagerStep.svelte"
-import AddressFields from "$lib/components/forms/entity/AddressFields.svelte"
+import ManagerFields from "$lib/components/forms/entity/ManagerFields.svelte"
+import EmployeeStep from "$lib/components/userflow/EmployeeStep.svelte"
+import EntityStep from "$lib/components/userflow/EntityStep.svelte"
 import SummaryStep from "$lib/components/userflow/SummaryStep.svelte"
+import { addressInfo } from "$lib/stores/addressInfoStore"
+import type { Validatable } from "$lib/stores/createStepStore"
 import { employeeInfo } from "$lib/stores/employeeInfoStore"
 import { engagementInfo } from "$lib/stores/engagementInfoStore"
 import { ituserInfo } from "$lib/stores/ituserInfoStore"
 import { managerInfo } from "$lib/stores/managerInfoStore"
-import { addressInfo } from "$lib/stores/addressInfoStore"
-import type { Validatable } from "$lib/stores/createStepStore"
+import { stepConfigs, type StepConfig } from "$lib/userflow/stepIds"
+import type { ComponentType } from "svelte"
+import { derived, readable, type Readable } from "svelte/store"
 
 // The non-serialisable half of a step. Named because `wiring` below holds
 // exactly this, with the StepConfig half coming from stepConfigs.
@@ -52,7 +52,11 @@ const wiring: Record<StepConfig["id"], StepWiring> = {
     props: { fields: ItuserFields, store: ituserInfo, entityKey: "ituser" },
     valid: multiValid(ituserInfo),
   },
-  manager: { component: ManagerStep, valid: multiValid(managerInfo) },
+  manager: {
+    component: EntityStep,
+    props: { fields: ManagerFields, store: managerInfo, entityKey: "manager" },
+    valid: multiValid(managerInfo),
+  },
   address: {
     component: EntityStep,
     props: { fields: AddressFields, store: addressInfo, entityKey: "address" },

@@ -137,9 +137,9 @@
       managerData.push({
         person: employeeUUID,
         org_unit: manager.orgUnit?.uuid,
-        manager_type: manager.managerType.uuid,
-        manager_level: manager.managerLevel.uuid,
-        responsibility: manager.responsibilities.map(
+        manager_type: manager.managerType?.uuid,
+        manager_level: manager.managerLevel?.uuid,
+        responsibility: (manager.responsibilities ?? []).map(
           (responsibility) => responsibility.uuid
         ),
         validity: {

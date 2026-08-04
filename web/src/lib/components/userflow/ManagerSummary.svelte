@@ -39,7 +39,7 @@
           <div class="grid grid-cols-2">
             <span>{capital($_("manager_responsibility"))}:</span>
             <ul>
-              {#each manager.responsibilities as responsibility}
+              {#each manager.responsibilities ?? [] as responsibility}
                 <li>
                   • {responsibility.name}
                 </li>
