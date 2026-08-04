@@ -111,6 +111,7 @@
   <Input
     title={capital($_("cpr_number"))}
     id="{idPrefix}cpr-number"
+    placeholder={capital($_("enter_cpr"))}
     bind:value={value.cprNumber.cpr_no}
     bind:cprName={$cprField.value}
     errors={$cprField.errors}
