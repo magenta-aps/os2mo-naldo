@@ -22,6 +22,8 @@
   import { formatITSystemNames, type ITSystem } from "$lib/utils/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
+  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
+  import { createQuery } from "$lib/http/query"
   import { getFacetValidities } from "$lib/http/getValidities"
   import { facetStore } from "$lib/stores/facetStore"
   import { AddressScope, isAddressTypeFacet } from "$lib/constants/addresses"
@@ -114,45 +116,32 @@
 
   let chosenItSystem: { name: string; uuid: string; user_key?: string } | undefined =
     undefined
-  let itSystems: ITSystem[] | undefined = undefined
 
   const fromDate = field("from", "", [required()])
   const name = field("name", "", [required()])
   const userKey = field("user_key", "", [required()])
   const svelteForm = form(fromDate, name, userKey)
 
-  // Logic for updating datepicker intervals
-  let validities: {
+  // Datepicker bounds for the chosen facet.
+  const validities = createQuery<{
     from: string | undefined | null
     to: string | undefined | null
-  } = { from: null, to: null }
-
+  }>({ from: null, to: null })
   $: if (chosenFacet) {
-    ;(async () => {
-      validities = await getFacetValidities(chosenFacet.uuid)
-    })()
+    const facetUuid = chosenFacet.uuid
+    validities.run((signal) => getFacetValidities(facetUuid, signal))
   } else {
-    validities = { from: null, to: null }
+    validities.run(async () => ({ from: null, to: null }))
   }
 
-  let itSystemController: AbortController
-  $: if (chosenFacet && chosenFacet?.user_key === "role" && !itSystems && startDate) {
-    if (itSystemController) itSystemController.abort()
-    itSystemController = new AbortController()
-    ;(async () => {
-      try {
-        const res = await graphQLClient(itSystemController.signal).request(
-          GetItSystemsDocument,
-          {
-            fromDate: startDate,
-          }
-        )
+  const itSystems = createQuery<ITSystem[]>()
+  $: if (chosenFacet?.user_key === "role" && startDate) {
+    itSystems.run((signal) =>
+      graphQLClient(signal)
+        .request(GetItSystemsDocument, { fromDate: startDate })
         // Map to the format the Select component expects
-        itSystems = res.itsystems.objects
-      } catch (err: any) {
-        if (err.name !== "AbortError") console.error("Failed to fetch IT Systems:", err)
-      }
-    })()
+        .then((res) => res.itsystems.objects)
+    )
   }
 </script>
 
@@ -193,8 +182,8 @@
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={validities.from}
-            max={toDate ? toDate : validities.to}
+            min={$validities.data?.from}
+            max={toDate ? toDate : $validities.data?.to}
             required={true}
           />
           <DateInput
@@ -202,8 +191,8 @@
             startValue={cls.validity.to ? cls.validity.to.split("T")[0] : null}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : validities.from}
-            max={validities.to}
+            min={$fromDate.value ? $fromDate.value : $validities.data?.from}
+            max={$validities.data?.to}
           />
         </div>
         <Select
@@ -224,7 +213,15 @@
           disabled
         />
 
-        {#if itSystems}
+        {#if $itSystems.loading && !$itSystems.data}
+          <Skeleton />
+        {/if}
+        {#if $itSystems.error}
+          <p class="text-sm text-error">
+            {capital($_($itSystems.data ? "load_error_options" : "load_error"))}
+          </p>
+        {/if}
+        {#if $itSystems.data}
           <Select
             title={capital($_("itsystem", { values: { n: 1 } }))}
             id="itsystem"
@@ -235,7 +232,8 @@
                   name: cls.it_system_response.current.name,
                 }
               : undefined}
-            iterable={formatITSystemNames(itSystems)}
+            iterable={formatITSystemNames($itSystems.data)}
+            disabled={$itSystems.error}
             required={true}
           />
         {/if}

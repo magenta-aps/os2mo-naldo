@@ -18,7 +18,8 @@
   import { formatITSystemNames, type ITSystem } from "$lib/utils/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
-  import { onMount } from "svelte"
+  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
+  import { createQuery } from "$lib/http/query"
   import { getFacets } from "$lib/http/getFacets"
   import { getFacetValidities } from "$lib/http/getValidities"
   import { facetStore } from "$lib/stores/facetStore"
@@ -85,84 +86,42 @@
   let startDate: string = $date
   let toDate: string
   let chosenFacet: { name: string; uuid: string; user_key: string }
-  let facets: { name: string; uuid: string; user_key: string }[]
 
   let chosenItSystem: { name: string; uuid: string; user_key?: string } | undefined =
     undefined
-  let itSystems: ITSystem[] | undefined = undefined
 
-  // Logic for updating datepicker intervals
-  let validities: {
+  // The facet list is date-filtered, so it refetches with the start date. With a
+  // facet in the route it resolves to that one facet, which then seeds the
+  // (disabled) select below.
+  const facets = createQuery<{ name: string; uuid: string; user_key: string }[]>()
+  $: if (startDate) {
+    const facetUuid = $page.params.facet ?? null
+    facets.run((signal) => getFacets({ uuid: facetUuid, fromDate: startDate }, signal))
+  }
+  $: if ($page.params.facet && $facets.data?.length && !chosenFacet) {
+    chosenFacet = $facets.data[0]
+  }
+
+  // Datepicker bounds for the chosen facet.
+  const validities = createQuery<{
     from: string | undefined | null
     to: string | undefined | null
-  } = { from: null, to: null }
-
-  onMount(async () => {
-    facets = await getFacets({
-      uuid: $page.params.facet ?? null,
-      fromDate: startDate,
-    })
-    if ($page.params.facet) {
-      chosenFacet = facets[0] ?? null
-    }
-  })
-
-  let facetController: AbortController
-  $: if (!$page.params.facet && startDate) {
-    if (facetController) facetController.abort()
-    facetController = new AbortController()
-    ;(async () => {
-      try {
-        facets = await getFacets(
-          { uuid: null, fromDate: startDate },
-          facetController?.signal
-        )
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Request failed:", err) // Handle other errors
-        }
-      }
-    })()
-  }
-
-  let validitiesController: AbortController
+  }>({ from: null, to: null })
   $: if (chosenFacet) {
-    if (validitiesController) validitiesController.abort()
-    validitiesController = new AbortController()
-    ;(async () => {
-      try {
-        validities = await getFacetValidities(
-          chosenFacet?.uuid,
-          validitiesController?.signal
-        )
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Request failed:", err) // Handle other errors
-        }
-      }
-    })()
+    const facetUuid = chosenFacet.uuid
+    validities.run((signal) => getFacetValidities(facetUuid, signal))
   } else {
-    validities = { from: null, to: null }
+    validities.run(async () => ({ from: null, to: null }))
   }
 
-  let itSystemController: AbortController
-  $: if (chosenFacet && chosenFacet?.user_key === "role" && !itSystems && startDate) {
-    if (itSystemController) itSystemController.abort()
-    itSystemController = new AbortController()
-    ;(async () => {
-      try {
-        const res = await graphQLClient(itSystemController.signal).request(
-          GetItSystemsDocument,
-          {
-            fromDate: startDate,
-          }
-        )
+  const itSystems = createQuery<ITSystem[]>()
+  $: if (chosenFacet?.user_key === "role" && startDate) {
+    itSystems.run((signal) =>
+      graphQLClient(signal)
+        .request(GetItSystemsDocument, { fromDate: startDate })
         // Map to the format the Select component expects
-        itSystems = res.itsystems.objects
-      } catch (err: any) {
-        if (err.name !== "AbortError") console.error("Failed to fetch IT Systems:", err)
-      }
-    })()
+        .then((res) => res.itsystems.objects)
+    )
   }
 </script>
 
@@ -196,37 +155,54 @@
           errors={$fromDate.errors}
           title={capital($_("date.start_date"))}
           id="from"
-          min={validities.from}
-          max={toDate ? toDate : validities.to}
+          min={$validities.data?.from}
+          max={toDate ? toDate : $validities.data?.to}
           required={true}
         />
         <DateInput
           bind:value={toDate}
           title={capital($_("date.end_date"))}
           id="to"
-          min={$fromDate.value ? $fromDate.value : validities.from}
-          max={validities.to}
+          min={$fromDate.value ? $fromDate.value : $validities.data?.from}
+          max={$validities.data?.to}
         />
       </div>
 
-      {#if facets && facets.length}
+      {#if $facets.loading && !$facets.data}
+        <Skeleton />
+      {/if}
+      {#if $facets.error}
+        <p class="text-sm text-error">
+          {capital($_($facets.data ? "load_error_options" : "load_error"))}
+        </p>
+      {/if}
+      {#if $facets.data?.length}
         <Select
           title={capital($_("facet", { values: { n: 1 } }))}
           id="facet"
           bind:value={chosenFacet}
           bind:name={$facetField.value}
           errors={$facetField.errors}
-          iterable={facets}
-          disabled={$page.params.facet ? true : false}
+          iterable={$facets.data}
+          disabled={!!$page.params.facet || $facets.error}
           required={true}
         />
       {/if}
-      {#if itSystems}
+      {#if $itSystems.loading && !$itSystems.data}
+        <Skeleton />
+      {/if}
+      {#if $itSystems.error}
+        <p class="text-sm text-error">
+          {capital($_($itSystems.data ? "load_error_options" : "load_error"))}
+        </p>
+      {/if}
+      {#if $itSystems.data}
         <Select
           title={capital($_("itsystem", { values: { n: 1 } }))}
           id="itsystem"
           bind:value={chosenItSystem}
-          iterable={formatITSystemNames(itSystems)}
+          iterable={formatITSystemNames($itSystems.data)}
+          disabled={$itSystems.error}
           required={true}
         />
       {/if}
