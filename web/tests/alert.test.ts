@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
-import { get } from "svelte/store"
 import { warning } from "$lib/stores/alert"
+import { get } from "svelte/store"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 describe("alert store dismissal", () => {
   beforeEach(() => {

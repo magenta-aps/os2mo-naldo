@@ -1,6 +1,6 @@
 import type { EmployeeCreateInput } from "$lib/graphql/types"
-import type { Actions, RequestEvent } from "@sveltejs/kit"
 import { normalizeCpr } from "$lib/utils/cpr"
+import type { Actions, RequestEvent } from "@sveltejs/kit"
 
 export const actions: Actions = {
   default: async ({ request }: RequestEvent): Promise<EmployeeCreateInput> => {

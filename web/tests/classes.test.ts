@@ -1,9 +1,9 @@
-import { describe, it, expect } from "vitest"
 import {
+  filterClassByUserKey,
   filterClassesByFacetUserKey,
   filterClassUuidByUserKey,
-  filterClassByUserKey,
 } from "$lib/utils/classes"
+import { describe, expect, it } from "vitest"
 
 describe("filterClassesByFacetUserKey", () => {
   const facets = [

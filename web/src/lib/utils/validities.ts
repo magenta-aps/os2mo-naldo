@@ -1,11 +1,11 @@
+import type { OpenValidity, Validity } from "$lib/graphql/types"
 import {
+  differenceInCalendarDays,
   format,
+  formatISO,
   isValid,
   parseISO,
-  formatISO,
-  differenceInCalendarDays,
 } from "date-fns"
-import type { OpenValidity, Validity } from "$lib/graphql/types"
 
 export const getMinMaxValidities = (
   validities: { validity: Validity | OpenValidity }[] | undefined | null

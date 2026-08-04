@@ -1,8 +1,8 @@
+import { addressInfo } from "$lib/stores/addressInfoStore"
 import { employeeInfo } from "$lib/stores/employeeInfoStore"
 import { engagementInfo } from "$lib/stores/engagementInfoStore"
 import { ituserInfo } from "$lib/stores/ituserInfoStore"
 import { managerInfo } from "$lib/stores/managerInfoStore"
-import { addressInfo } from "$lib/stores/addressInfoStore"
 import { step } from "$lib/stores/stepStore"
 
 // Keeping this, since it might come in handy

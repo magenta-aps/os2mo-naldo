@@ -1,7 +1,3 @@
-import { _ } from "svelte-i18n"
-import { capital } from "$lib/utils/helpers"
-import { get } from "svelte/store"
-
 // This should replace the `Facet`-type at some point
 export type FacetValidities = {
   validities: {

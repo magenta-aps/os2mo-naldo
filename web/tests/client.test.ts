@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 // `$lib/env` reads the environment on import, so the base url has to be set first
 process.env.PUBLIC_BASE_URL = "http://mo.example"

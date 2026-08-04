@@ -1,7 +1,9 @@
 import { graphQLClient } from "$lib/http/client"
-import { FacetsAndClassesDocument } from "./query.generated"
-import { GetPrimaryClassesDocument } from "./query.generated"
-import { GetRoleClassesDocument } from "./query.generated"
+import {
+  FacetsAndClassesDocument,
+  GetPrimaryClassesDocument,
+  GetRoleClassesDocument,
+} from "./query.generated"
 
 export const getClasses = async (
   variables: {

@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest"
 import { formatDate, formatDateTime } from "$lib/utils/date"
+import { describe, expect, it } from "vitest"
 
 // Both helpers anchor display to Europe/Copenhagen regardless of the
 // incoming timezone offset, so the tests use inputs with mixed offsets to

@@ -1,8 +1,5 @@
-import { env } from "$lib/env"
-import { date } from "$lib/stores/date"
 import { keycloak } from "$lib/auth/keycloak"
-import { _ } from "svelte-i18n"
-import { get } from "svelte/store"
+import { env } from "$lib/env"
 
 export type ITUserITSystemName = {
   uuid: string

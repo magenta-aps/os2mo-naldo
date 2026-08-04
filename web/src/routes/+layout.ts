@@ -1,9 +1,9 @@
 import { browser } from "$app/environment"
+import { env } from "$lib/env"
 import "$lib/i18n" // Import to initialize. Important :)
+import { redirect } from "@sveltejs/kit"
 import { locale, waitLocale } from "svelte-i18n"
 import type { LayoutLoad } from "./$types"
-import { redirect } from "@sveltejs/kit"
-import { env } from "$lib/env"
 
 export const load: LayoutLoad = async ({ url }) => {
   // Redirect if not true

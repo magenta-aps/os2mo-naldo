@@ -1,5 +1,4 @@
 import { graphQLClient } from "$lib/http/client"
-import { gql } from "graphql-request"
 import { GetParentDocument } from "./query.generated"
 
 const fetchParent = async (uuid: string, currentDate: string) => {

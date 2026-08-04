@@ -193,7 +193,10 @@
             id="job-function"
             bind:name={$jobFunction.value}
             errors={$jobFunction.errors}
-            iterable={filterClassesByFacetUserKey($facets.data, "engagement_job_function")}
+            iterable={filterClassesByFacetUserKey(
+              $facets.data,
+              "engagement_job_function"
+            )}
             disabled={!startDate || $facets.error}
             required={true}
             extra_classes="basis-1/2"

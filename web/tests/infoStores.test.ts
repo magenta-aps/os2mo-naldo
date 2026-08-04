@@ -1,4 +1,3 @@
-import { describe, it, expect } from "vitest"
 import { validateAddress, type AddressInfo } from "$lib/stores/addressInfoStore"
 import { validateEmployee, type EmployeeInfo } from "$lib/stores/employeeInfoStore"
 import {
@@ -7,6 +6,7 @@ import {
 } from "$lib/stores/engagementInfoStore"
 import { validateItuser, type ItuserInfo } from "$lib/stores/ituserInfoStore"
 import { validateManager, type ManagerInfo } from "$lib/stores/managerInfoStore"
+import { describe, expect, it } from "vitest"
 
 // The validate* functions in the InfoStore modules are pure: they take a
 // plain info object and return a bool. Each has its own "required fields"

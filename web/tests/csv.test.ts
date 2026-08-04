@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest"
 import { json2csv } from "$lib/utils/csv"
 import type { Field, SelectedQuery } from "$lib/utils/insights"
+import { describe, expect, it } from "vitest"
 
 // Helper: build a Field with simple, data-local getHeaders/getValues so the
 // tests stay independent of svelte-i18n. `getValues` pulls from a fixed key

@@ -1,5 +1,5 @@
-import { writable, type Readable } from "svelte/store"
 import { onDestroy } from "svelte"
+import { writable, type Readable } from "svelte/store"
 
 export type QueryState<T> = {
   // Last successful value. Intentionally kept on failure, so when `error` is

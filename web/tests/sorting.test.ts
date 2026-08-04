@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest"
 import { getValueAtPath, sortData } from "$lib/utils/sorting"
+import { describe, expect, it } from "vitest"
 
 describe("getValueAtPath", () => {
   it("returns a top-level value", () => {

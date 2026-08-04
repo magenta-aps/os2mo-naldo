@@ -1,8 +1,8 @@
 import { env } from "$lib/env"
-import { _ } from "svelte-i18n"
-import { get } from "svelte/store"
 import { capital } from "$lib/utils/helpers"
 import type { MainQuery } from "$lib/utils/insights"
+import { _ } from "svelte-i18n"
+import { get } from "svelte/store"
 
 const t = (key: string, vars = {}) => capital(get(_)(key, vars))
 

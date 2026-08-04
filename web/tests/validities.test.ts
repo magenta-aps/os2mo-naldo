@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest"
 import { findClosestValidity } from "$lib/utils/validities"
+import { describe, expect, it } from "vitest"
 
 // In GraphQL v29, `validity.to` is exclusive: `to` is the first instant AFTER
 // the validity ends. A validity with `to == filterDate` is NOT active on

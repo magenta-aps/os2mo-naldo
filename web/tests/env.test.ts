@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest"
 import { bool, environment, json } from "$lib/env"
+import { describe, expect, it } from "vitest"
 
 // These parsers are tested in isolation from the env singleton so we don't
 // need to mock `$env/dynamic/public`. They each map an optional string env

@@ -1,6 +1,6 @@
-import { get } from "svelte/store"
 import type { OpenValidity, Validity } from "$lib/graphql/types"
 import { date } from "$lib/stores/date"
+import { get } from "svelte/store"
 
 export const tenseToValidity = (
   tense: Tense,

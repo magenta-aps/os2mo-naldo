@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach } from "vitest"
-import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
 import { date } from "$lib/stores/date"
+import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
+import { beforeEach, describe, expect, it } from "vitest"
 
 // In GraphQL v29, `validity.to` is exclusive: it is the first instant AFTER
 // the validity ends. A validity ending "yesterday" therefore has

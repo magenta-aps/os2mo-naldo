@@ -1,12 +1,12 @@
 import { graphQLClient } from "$lib/http/client"
+import { getMinMaxValidities } from "$lib/utils/validities"
 import {
-  GetOrgUnitValiditiesDocument,
-  GetPersonValiditiesDocument,
   GetEngagementValiditiesDocument,
   GetFacetValiditiesDocument,
   GetItuserValiditiesDocument,
+  GetOrgUnitValiditiesDocument,
+  GetPersonValiditiesDocument,
 } from "./query.generated"
-import { getMinMaxValidities } from "$lib/utils/validities"
 
 export const getValidities = async (uuid: string, signal?: AbortSignal) => {
   const res = await graphQLClient(signal).request(GetOrgUnitValiditiesDocument, {

@@ -1,4 +1,4 @@
-import { parseISO, isEqual, isAfter, compareAsc } from "date-fns"
+import { compareAsc, isAfter, isEqual, parseISO } from "date-fns"
 
 // ==========================================
 // VIS-TIMELINE DEFINITIONS

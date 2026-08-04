@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest"
 import { CPR_PATTERN, isValidCpr, normalizeCpr } from "$lib/utils/cpr"
+import { describe, expect, it } from "vitest"
 
 describe("CPR_PATTERN", () => {
   it("accepts 10 digits", () => {
