@@ -1,6 +1,6 @@
+import { isValidCpr } from "$lib/utils/cpr"
 import { writable } from "svelte/store"
 import { v4 as uuidv4 } from "uuid"
-import { isValidCpr } from "$lib/utils/cpr"
 
 export type EmployeeInfo = {
   uuid: string

@@ -256,7 +256,9 @@
         id="engagement-uuid"
         bind:value={selectedEngagement}
         errors={$engagement.errors}
-        iterable={$engagements.data ? formatEngagementTitlesAndUuid($engagements.data) : []}
+        iterable={$engagements.data
+          ? formatEngagementTitlesAndUuid($engagements.data)
+          : []}
         isClearable={true}
         disabled={!$engagements.data?.length || $engagements.error || noEngagement}
         required={!noEngagement}

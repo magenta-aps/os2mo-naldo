@@ -1,4 +1,3 @@
-import { describe, it, expect } from "vitest"
 import {
   capital,
   formatITSystemNames,
@@ -8,6 +7,7 @@ import {
   shouldSuffixSDCode,
   upperCase,
 } from "$lib/utils/helpers"
+import { describe, expect, it } from "vitest"
 
 describe("isUUID", () => {
   it("accepts a valid UUID v4", () => {

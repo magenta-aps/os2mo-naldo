@@ -202,7 +202,10 @@
             bind:value={addressType}
             bind:name={$addressTypeField.value}
             errors={$addressTypeField.errors}
-            iterable={filterClassesByFacetUserKey($facets.data, "employee_address_type")}
+            iterable={filterClassesByFacetUserKey(
+              $facets.data,
+              "employee_address_type"
+            )}
             disabled={!startDate || $facets.error}
             extra_classes="basis-1/2"
             required={true}

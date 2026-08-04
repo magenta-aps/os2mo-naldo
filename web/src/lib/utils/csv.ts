@@ -1,6 +1,6 @@
-import { get } from "svelte/store"
-import { _ } from "svelte-i18n"
 import type { SelectedQuery } from "$lib/utils/insights"
+import { _ } from "svelte-i18n"
+import { get } from "svelte/store"
 
 const SEPARATOR = ";"
 

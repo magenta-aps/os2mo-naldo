@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest"
 import { isRetryableError } from "$lib/http/pagination"
+import { describe, expect, it } from "vitest"
 
 // Pins the retry predicate extracted from paginateQuery. These three
 // classes of failure were added to the retry list in #68989 after

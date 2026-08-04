@@ -1,5 +1,4 @@
 import type { AssociationUpdateInput } from "$lib/graphql/types"
-import type { UnpackedClass } from "$lib/utils/helpers"
 import type { Actions, RequestEvent } from "@sveltejs/kit"
 
 export const actions: Actions = {

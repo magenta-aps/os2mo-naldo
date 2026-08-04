@@ -1,9 +1,9 @@
-import { describe, it, expect } from "vitest"
 import {
-  getITUserITSystemName,
   getEngagementTitlesAndUuid,
   getITSystemNames,
+  getITUserITSystemName,
 } from "$lib/utils/display"
+import { describe, expect, it } from "vitest"
 
 describe("getITUserITSystemName", () => {
   it("formats itsystem name and user_key", () => {

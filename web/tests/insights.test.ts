@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 
 /**
  * Tests that verify the _response data extraction patterns used in mainQueries.ts.

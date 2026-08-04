@@ -1,16 +1,16 @@
-import { describe, it, expect } from "vitest"
 import {
-  normalizeEngagement,
-  normalizeAssociation,
-  normalizeITUser,
   normalizeAddress,
-  normalizeManager,
-  normalizeOwner,
-  normalizeLeave,
+  normalizeAssociation,
+  normalizeEngagement,
+  normalizeITUser,
   normalizeKLE,
+  normalizeLeave,
+  normalizeManager,
   normalizeOrganisation,
+  normalizeOwner,
   normalizeRolebinding,
 } from "$lib/utils/normalizeForm"
+import { describe, expect, it } from "vitest"
 
 describe("normalizeEngagement", () => {
   it("extracts expected fields", () => {

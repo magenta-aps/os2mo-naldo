@@ -1,5 +1,5 @@
-import { env } from "$lib/env"
 import { keycloak } from "$lib/auth/keycloak"
+import { env } from "$lib/env"
 import { GraphQLClient } from "graphql-request"
 import { v4 as uuidv4 } from "uuid"
 

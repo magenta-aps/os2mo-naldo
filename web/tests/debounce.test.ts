@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 
 // `debounce` maintains a module-level `lastCalledAt` and only resolves when
 // at least 1000ms have passed since the last call. When a call is rejected,

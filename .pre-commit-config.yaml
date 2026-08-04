@@ -5,7 +5,7 @@ repos:
       - id: prettier
         files: \.(ts|js|svelte|css|html)$
         exclude: types\.ts$|query\.generated\.ts$
-        args: [--config, web/.prettierrc, --plugin-search-dir=./web, --write]
+        args: [--config, web/.prettierrc, --write]
         additional_dependencies:
           - prettier@2.8.8
           - prettier-plugin-svelte@2.10.1

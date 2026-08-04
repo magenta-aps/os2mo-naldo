@@ -221,7 +221,9 @@
       </div>
       {#if $itUserOptions.error}
         <p class="text-sm text-error">
-          {capital($_($itUserOptions.data?.length ? "load_error_options" : "load_error"))}
+          {capital(
+            $_($itUserOptions.data?.length ? "load_error_options" : "load_error")
+          )}
         </p>
       {/if}
       <Select

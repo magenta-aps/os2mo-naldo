@@ -174,7 +174,9 @@
   let initialOrganisation: any = null
   orgUnitPromise.then(
     (data) => {
-      initialOrganisation = normalizeOrganisation(data.org_units.objects[0].validities[0])
+      initialOrganisation = normalizeOrganisation(
+        data.org_units.objects[0].validities[0]
+      )
     },
     // The template's {#await} has no {:catch}, so a failed load stays on the
     // pending branch. This handler only prevents an unhandled rejection from
