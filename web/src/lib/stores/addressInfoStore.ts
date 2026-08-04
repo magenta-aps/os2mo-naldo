@@ -1,5 +1,6 @@
+import { get } from "svelte/store"
 import { date } from "$lib/stores/date"
-import { get, writable } from "svelte/store"
+import { createMultiStepStore } from "$lib/stores/createStepStore"
 
 export type AddressInfo = {
   fromDate: string
@@ -27,33 +28,10 @@ export const validateAddress = (address: AddressInfo): boolean => {
   )
 }
 
-export const addressInfo = (() => {
-  const defaultValue: AddressInfo[] = [createDefaultAddress()]
+const store = createMultiStepStore(createDefaultAddress, validateAddress)
 
-  const { subscribe, update, set } = writable<AddressInfo[]>(defaultValue)
-
-  return {
-    subscribe,
-    set,
-    update,
-    reset: () => {
-      set([createDefaultAddress()])
-    },
-    addAddress: () => update((addresses) => [...addresses, createDefaultAddress()]),
-    removeAddress: (addressIndex: number) =>
-      update((addresses) => addresses.toSpliced(addressIndex, 1)),
-    validateForm: () => {
-      let isValid = false
-
-      update((addresses) => {
-        const updated = addresses.map((address) => {
-          return { ...address, validated: validateAddress(address) }
-        })
-        isValid = updated.every((address) => address.validated)
-
-        return updated
-      })
-      return isValid
-    },
-  }
-})()
+export const addressInfo = {
+  ...store,
+  addAddress: store.addItem,
+  removeAddress: store.removeItem,
+}

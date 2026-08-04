@@ -22,5 +22,5 @@ export const resetUserflowStores = () => {
       }
     }
   )
-  step.updateStep(1)
+  step.reset()
 }

@@ -1,10 +1,13 @@
 <script lang="ts">
-  import { step } from "$lib/stores/stepStore"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
   import Button from "$lib/components/shared/Button.svelte"
+  import { step } from "$lib/stores/stepStore"
+  import { stepConfigs } from "$lib/userflow/stepIds"
   import { resetUserflowStores } from "$lib/stores/resetStores"
-  export let isFirst: boolean = false
+
+  $: isFirst = $step === 1
+  $: skippable = stepConfigs[$step - 1].skippable
 </script>
 
 {#if isFirst}
@@ -21,12 +24,14 @@
         on:click={() => step.updateStep("dec")}
       />
       <Button type="submit" title={capital($_("next"))} />
-      <Button
-        type="button"
-        title={capital($_("skip"))}
-        outline={true}
-        on:click={() => step.updateStep("inc")}
-      />
+      {#if skippable}
+        <Button
+          type="button"
+          title={capital($_("skip"))}
+          outline={true}
+          on:click={() => step.updateStep("inc")}
+        />
+      {/if}
     </div>
     <Button
       type="button"
