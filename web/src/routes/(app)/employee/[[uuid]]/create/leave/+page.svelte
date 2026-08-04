@@ -165,7 +165,7 @@
       const res = await graphQLClient(signal).request(GetEngagementsDocument, {
         uuid: $page.params.uuid,
         fromDate: startDate,
-        toDate: toDate,
+        toDate: toDate || null,
       })
       return res.engagements?.objects.map((e) => e.validities[0]) ?? []
     })
