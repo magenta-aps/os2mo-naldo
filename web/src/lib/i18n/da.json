@@ -122,6 +122,7 @@
 	"hide_cpr": "skjul CPR-nummer",
 	"home": "hjem",
 	"id": "id",
+	"incomplete_items_warning": "følgende er ufuldstændige og bliver ikke oprettet:",
 	"infinity": "uendelig",
 	"include_children_text": "Søg på enkelt enhed / Med underenheder",
 	"inherited_manager": "nedarvet leder fra {org_unit}",

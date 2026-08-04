@@ -122,6 +122,7 @@
 	"hide_cpr": "hide CPR number",
 	"home": "home",
 	"id": "id",
+	"incomplete_items_warning": "the following are incomplete and will not be created:",
 	"infinity": "infinity",
 	"include_children_text": "Search for single unit / Including children",
 	"inherited_manager": "inherited manager from {org_unit}",

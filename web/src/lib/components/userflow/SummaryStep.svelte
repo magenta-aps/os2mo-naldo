@@ -1,21 +1,13 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { get } from "svelte/store"
   import { capital } from "$lib/utils/helpers"
-  import EmployeeSummary from "$lib/components/userflow/EmployeeSummary.svelte"
-  import EngagementSummary from "$lib/components/userflow/EngagementSummary.svelte"
-  import ItuserSummary from "$lib/components/userflow/ItuserSummary.svelte"
-  import ManagerSummary from "$lib/components/userflow/ManagerSummary.svelte"
-  import AddressSummary from "$lib/components/userflow/AddressSummary.svelte"
-  import type { EmployeeCreateInput } from "$lib/graphql/types"
-  import type { EngagementCreateInput } from "$lib/graphql/types"
-  import type { ItUserCreateInput } from "$lib/graphql/types"
-  import type { RoleBindingCreateInput } from "$lib/graphql/types"
-  import type { ManagerCreateInput } from "$lib/graphql/types"
-  import type { AddressCreateInput } from "$lib/graphql/types"
+  import { env } from "$lib/env"
   import { date } from "$lib/stores/date"
   import { gql } from "graphql-request"
   import Error from "$lib/components/alerts/Error.svelte"
   import Button from "$lib/components/shared/Button.svelte"
+  import SummaryCard from "$lib/components/userflow/SummaryCard.svelte"
   import { success, error } from "$lib/stores/alert"
   import { employeeInfo } from "$lib/stores/employeeInfoStore"
   import { engagementInfo } from "$lib/stores/engagementInfoStore"
@@ -25,7 +17,7 @@
   import { graphQLClient } from "$lib/http/client"
   import { UserFlowCreateDocument } from "./query.generated"
   import { resetUserflowStores } from "$lib/stores/resetStores"
-  import { normalizeCpr } from "$lib/utils/cpr"
+  import { buildUserflowPayload, getUserflowUuids } from "$lib/userflow/mappers"
 
   gql`
     mutation UserFlowCreate(
@@ -71,108 +63,37 @@
     }
   `
 
+  // Demote-only re-stamp: items approved by their step but since edited into
+  // invalidity land in the warning list below instead of being submitted.
+  // Never promotes — skipped items stay skipped, and the field groups'
+  // validators (which gate Next) are stricter than the store rules.
+  employeeInfo.revalidate()
+  engagementInfo.revalidate()
+  ituserInfo.revalidate()
+  managerInfo.revalidate()
+  addressInfo.revalidate()
+
+  // Minted once per wizard run, keyed by item identity; see mappers.ts for
+  // the retry semantics.
+  const uuids = getUserflowUuids(
+    get(ituserInfo).map((item, index) => item._key ?? `index-${index}`)
+  )
+
+  $: ({ payload, skipped } = buildUserflowPayload(
+    {
+      employee: $employeeInfo,
+      engagements: $engagementInfo,
+      itusers: $ituserInfo,
+      managers: $managerInfo,
+      addresses: $addressInfo,
+    },
+    uuids
+  ))
+
   const submitForm = async () => {
-    const employeeUUID = $employeeInfo.uuid
-    const employeeData: EmployeeCreateInput = {
-      uuid: employeeUUID,
-      cpr_number: normalizeCpr($employeeInfo.cprNumber.cpr_no),
-      given_name: $employeeInfo.firstName,
-      surname: $employeeInfo.lastName,
-      nickname_given_name: $employeeInfo.nicknameFirstname,
-      nickname_surname: $employeeInfo.nicknameLastname,
-    }
-
-    const engagementData: EngagementCreateInput[] = []
-    for (const engagement of $engagementInfo) {
-      if (!engagement.validated) continue
-      engagementData.push({
-        person: employeeUUID,
-        user_key: engagement.user_key,
-        org_unit: engagement.orgUnit?.uuid,
-        engagement_type: engagement.engagementType?.uuid,
-        job_function: engagement.jobFunction?.uuid,
-        primary: engagement.primary?.uuid || null,
-        validity: {
-          from: engagement.fromDate,
-          to: engagement.toDate || null,
-        },
-      })
-    }
-
-    const ituserData: ItUserCreateInput[] = []
-    const rolebindingData: RoleBindingCreateInput[] = []
-
-    for (const ituser of $ituserInfo) {
-      if (!ituser.validated) continue
-      ituserData.push({
-        person: employeeUUID,
-        uuid: ituser.uuid,
-        itsystem: ituser.itSystem?.uuid,
-        user_key: ituser.user_key,
-        note: ituser.notes,
-        primary: ituser.primary?.uuid || null,
-        validity: {
-          from: ituser.fromDate,
-          to: ituser.toDate || null,
-        },
-      })
-
-      const rolebindings = ituser.rolebindings
-        .filter((rb) => rb.role?.uuid)
-        .map((rb) => ({
-          ituser: ituser.uuid,
-          role: rb.role?.uuid,
-          validity: {
-            from: ituser.fromDate,
-            to: ituser.toDate || null,
-          },
-        }))
-
-      rolebindingData.push(...rolebindings)
-    }
-
-    const managerData: ManagerCreateInput[] = []
-    for (const manager of $managerInfo) {
-      if (!manager.validated) continue
-      managerData.push({
-        person: employeeUUID,
-        org_unit: manager.orgUnit?.uuid,
-        manager_type: manager.managerType?.uuid,
-        manager_level: manager.managerLevel?.uuid,
-        responsibility: manager.responsibilities.map(
-          (responsibility) => responsibility.uuid
-        ),
-        validity: {
-          from: manager.fromDate,
-          to: manager.toDate ? manager.toDate : null,
-        },
-      })
-    }
-
-    const addressData: AddressCreateInput[] = []
-    for (const address of $addressInfo) {
-      if (!address.validated) continue
-      addressData.push({
-        person: employeeUUID,
-        address_type: address.addressType?.uuid,
-        value: address.addressValue.value,
-        user_key: address.user_key,
-        visibility: address.visibility?.uuid,
-        validity: {
-          from: address.fromDate,
-          to: address.toDate ? address.toDate : null,
-        },
-      })
-    }
-
     try {
       const mutation = await graphQLClient().request(UserFlowCreateDocument, {
-        employeeInput: employeeData,
-        engagementInput: engagementData,
-        ituserInput: ituserData,
-        rolebindingInput: rolebindingData,
-        managerInput: managerData,
-        addressInput: addressData,
+        ...payload,
         date: $date,
       })
       $success = {
@@ -191,17 +112,196 @@
       $error = { message: err }
     }
   }
+
+  const dash = (value: string | undefined | null) => value ?? ""
+
+  $: employeeSections = [
+    {
+      rows: [
+        {
+          label: capital($_("cpr_number")),
+          value:
+            $employeeInfo.validated === true
+              ? $employeeInfo.cprNumber.cpr_no.trim().slice(0, 6)
+              : "",
+        },
+        {
+          label: capital($_("givenname", { values: { n: 2 } })),
+          value: $employeeInfo.validated === true ? $employeeInfo.firstName : "",
+        },
+        {
+          label: capital($_("surname", { values: { n: 2 } })),
+          value: $employeeInfo.validated === true ? $employeeInfo.lastName : "",
+        },
+        {
+          label: capital($_("nickname_givenname", { values: { n: 2 } })),
+          value:
+            $employeeInfo.validated === true ? $employeeInfo.nicknameFirstname : "",
+        },
+        {
+          label: capital($_("nickname_surname", { values: { n: 2 } })),
+          value: $employeeInfo.validated === true ? $employeeInfo.nicknameLastname : "",
+        },
+      ],
+    },
+  ]
+
+  $: engagementSections = $engagementInfo
+    .map((engagement, index) => ({ engagement, index }))
+    .filter(({ engagement }) => engagement.validated === true)
+    .map(({ engagement, index }) => ({
+      subtitle: `${capital($_("engagement", { values: { n: 1 } }))} ${index + 1}`,
+      rows: [
+        { label: capital($_("date.start_date")), value: engagement.fromDate },
+        { label: capital($_("date.end_date")), value: engagement.toDate },
+        {
+          label: capital($_("unit", { values: { n: 1 } })),
+          value: dash(engagement.orgUnit?.name),
+        },
+        {
+          label: env.PUBLIC_SHOW_EXTENSION_1
+            ? capital($_("job_code"))
+            : capital($_("job_function", { values: { n: 1 } })),
+          value: dash(engagement.jobFunction?.name),
+        },
+        {
+          label: capital($_("engagement_type", { values: { n: 1 } })),
+          value: dash(engagement.engagementType?.name),
+        },
+        { label: capital($_("id")), value: engagement.user_key },
+        ...(env.PUBLIC_SHOW_EXTENSION_1
+          ? [
+              {
+                label: capital($_("job_function", { values: { n: 1 } })),
+                value: engagement.extension1,
+              },
+            ]
+          : []),
+        ...(env.PUBLIC_SHOW_EXTENSION_4
+          ? [
+              {
+                label: capital($_("department_code")),
+                value: engagement.extension4,
+              },
+            ]
+          : []),
+        { label: capital($_("primary")), value: dash(engagement.primary?.name) },
+      ],
+    }))
+
+  $: ituserSections = $ituserInfo
+    .map((ituser, index) => ({ ituser, index }))
+    .filter(({ ituser }) => ituser.validated === true)
+    .map(({ ituser, index }) => ({
+      subtitle: `${capital($_("ituser", { values: { n: 1 } }))} ${index + 1}`,
+      rows: [
+        { label: capital($_("date.start_date")), value: ituser.fromDate },
+        { label: capital($_("date.end_date")), value: ituser.toDate },
+        {
+          label: capital($_("itsystem", { values: { n: 1 } })),
+          value: dash(ituser.itSystem?.name),
+        },
+        { label: capital($_("account_name")), value: ituser.user_key },
+        { label: capital($_("external_id")), value: ituser.externalId },
+        { label: capital($_("primary")), value: dash(ituser.primary?.name) },
+        { label: capital($_("notes")), value: ituser.notes },
+        // Rendered as one bulleted row, like manager responsibilities: the
+        // roles belong to this IT user and read as a collection.
+        {
+          label: capital($_("rolebinding", { values: { n: 2 } })),
+          value: ituser.rolebindings
+            .filter((rolebinding) => rolebinding.role?.uuid)
+            .map((rolebinding) => rolebinding.role?.name ?? ""),
+        },
+      ],
+    }))
+
+  $: managerSections = $managerInfo
+    .map((manager, index) => ({ manager, index }))
+    .filter(({ manager }) => manager.validated === true)
+    .map(({ manager, index }) => ({
+      subtitle: `${capital($_("manager", { values: { n: 1 } }))} ${index + 1}`,
+      rows: [
+        { label: capital($_("date.start_date")), value: manager.fromDate },
+        { label: capital($_("date.end_date")), value: manager.toDate },
+        {
+          label: capital($_("unit", { values: { n: 1 } })),
+          value: dash(manager.orgUnit?.name),
+        },
+        {
+          label: capital($_("manager_type")),
+          value: dash(manager.managerType?.name),
+        },
+        {
+          label: capital($_("manager_level")),
+          value: dash(manager.managerLevel?.name),
+        },
+        {
+          label: capital($_("manager_responsibility")),
+          value: manager.responsibilities.map((responsibility) => responsibility.name),
+        },
+      ],
+    }))
+
+  $: addressSections = $addressInfo
+    .map((address, index) => ({ address, index }))
+    .filter(({ address }) => address.validated === true)
+    .map(({ address, index }) => ({
+      subtitle: `${capital($_("address", { values: { n: 1 } }))} ${index + 1}`,
+      rows: [
+        { label: capital($_("date.start_date")), value: address.fromDate },
+        { label: capital($_("date.end_date")), value: address.toDate },
+        { label: capital($_("visibility")), value: dash(address.visibility?.name) },
+        { label: capital($_("description")), value: address.user_key },
+        {
+          label: capital($_("address_type", { values: { n: 1 } })),
+          value: dash(address.addressType?.name),
+        },
+        {
+          label: capital(dash(address.addressType?.name)),
+          value: address.addressValue.name
+            ? address.addressValue.name
+            : address.addressValue.value,
+        },
+      ],
+    }))
+
+  const entityLabel = (entityKey: string, index: number) =>
+    `${capital($_(entityKey, { values: { n: 1 } }))} ${index + 1}`
 </script>
 
 <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
   <div class="p-8 space-y-5">
-    <EmployeeSummary />
-    <EngagementSummary />
-    <ItuserSummary />
-    <ManagerSummary />
-    <AddressSummary />
+    <SummaryCard
+      title={capital($_("employee", { values: { n: 1 } }))}
+      sections={employeeSections}
+    />
+    <SummaryCard
+      title={capital($_("engagement", { values: { n: 2 } }))}
+      sections={engagementSections}
+    />
+    <SummaryCard
+      title={capital($_("ituser", { values: { n: 2 } }))}
+      sections={ituserSections}
+    />
+    <SummaryCard
+      title={capital($_("manager", { values: { n: 2 } }))}
+      sections={managerSections}
+    />
+    <SummaryCard
+      title={capital($_("address", { values: { n: 2 } }))}
+      sections={addressSections}
+    />
   </div>
 </div>
+{#if skipped.length}
+  <div class="sm:w-full md:w-3/4 xl:w-1/2 alert alert-warning rounded-sm mt-4">
+    <span>
+      {capital($_("incomplete_items_warning"))}
+      {skipped.map((item) => entityLabel(item.entityKey, item.index)).join(", ")}
+    </span>
+  </div>
+{/if}
 <div class="sm:w-full md:w-3/4 xl:w-1/2 flex justify-between py-6 gap-4">
   <Button
     type="submit"
