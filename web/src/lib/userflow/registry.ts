@@ -6,7 +6,7 @@ import EntityStep from "$lib/components/userflow/EntityStep.svelte"
 import EngagementFields from "$lib/components/forms/entity/EngagementFields.svelte"
 import ItuserStep from "$lib/components/userflow/ItuserStep.svelte"
 import ManagerStep from "$lib/components/userflow/ManagerStep.svelte"
-import AddressStep from "$lib/components/userflow/AddressStep.svelte"
+import AddressFields from "$lib/components/forms/entity/AddressFields.svelte"
 import SummaryStep from "$lib/components/userflow/SummaryStep.svelte"
 import { employeeInfo } from "$lib/stores/employeeInfoStore"
 import { engagementInfo } from "$lib/stores/engagementInfoStore"
@@ -52,7 +52,11 @@ const wiring: Record<
   },
   ituser: { component: ItuserStep, valid: multiValid(ituserInfo) },
   manager: { component: ManagerStep, valid: multiValid(managerInfo) },
-  address: { component: AddressStep, valid: multiValid(addressInfo) },
+  address: {
+    component: EntityStep,
+    props: { fields: AddressFields, store: addressInfo, entityKey: "address" },
+    valid: multiValid(addressInfo),
+  },
   summary: { component: SummaryStep, valid: never },
 }
 

@@ -28,7 +28,7 @@
           </div>
           <div class="grid grid-cols-2">
             <span>{capital($_("description"))}:</span>
-            <span>{address.userkey ? address.userkey : ""}</span>
+            <span>{address.user_key ? address.user_key : ""}</span>
           </div>
           <div class="grid grid-cols-2">
             <span>
@@ -37,7 +37,7 @@
             <span>{address.addressType?.name}</span>
           </div>
           <div class="grid grid-cols-2">
-            <span>{capital($_(address.addressType.name))}:</span>
+            <span>{capital($_(address.addressType?.name ?? ""))}:</span>
             <span
               >{!!address.addressValue.name
                 ? address.addressValue.name

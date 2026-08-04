@@ -154,9 +154,9 @@
       if (!address.validated) continue
       addressData.push({
         person: employeeUUID,
-        address_type: address.addressType.uuid,
+        address_type: address.addressType?.uuid,
         value: address.addressValue.value,
-        user_key: address.userkey,
+        user_key: address.user_key,
         visibility: address.visibility?.uuid,
         validity: {
           from: address.fromDate,

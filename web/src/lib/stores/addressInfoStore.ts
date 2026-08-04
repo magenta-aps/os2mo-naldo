@@ -1,37 +1,33 @@
-import { get } from "svelte/store"
-import { date } from "$lib/stores/date"
-import { createMultiStepStore } from "$lib/stores/createStepStore"
+import {
+  createDefaultAddressValues,
+  type AddressValues,
+} from "$lib/components/forms/entity/types"
+import { createMultiStepStore, type Validatable } from "$lib/stores/createStepStore"
 
-export type AddressInfo = {
-  fromDate: string
-  toDate: string
-  visibility: { uuid: string; name: string; userkey: string } | undefined
-  addressType: { uuid: string; name: string; userkey: string; scope: string }
-  addressValue: { name?: string; value: string }
-  userkey: string
-  validated?: boolean
-}
+export type AddressInfo = AddressValues & Validatable
 
-export const createDefaultAddress = (): AddressInfo => ({
-  fromDate: get(date),
-  toDate: "",
-  visibility: undefined,
-  addressType: { uuid: "", name: "", userkey: "", scope: "" },
-  addressValue: { name: "", value: "" },
-  userkey: "",
-  validated: undefined,
-})
+// Mirrors svelte-forms' email() so the store rule matches AddressFields'
+// scope-derived validators — otherwise the summary's demote-only re-stamp
+// can't catch a value edited into invalidity after the step was approved.
+const EMAIL_PATTERN =
+  /^[a-zA-Z0-9_+&*-]+(?:\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,7}$/
+const PHONE_PATTERN = /^\+?\d+$/
 
 export const validateAddress = (address: AddressInfo): boolean => {
-  return (
-    !!address.fromDate && !!address.addressType?.uuid && !!address.addressValue.value
-  )
+  if (!address.fromDate || !address.addressType?.uuid || !address.addressValue.value) {
+    return false
+  }
+  switch (address.addressType.scope) {
+    case "EMAIL":
+      return EMAIL_PATTERN.test(address.addressValue.value)
+    case "PHONE":
+      return PHONE_PATTERN.test(address.addressValue.value)
+    default:
+      return true
+  }
 }
 
-const store = createMultiStepStore(createDefaultAddress, validateAddress)
-
-export const addressInfo = {
-  ...store,
-  addAddress: store.addItem,
-  removeAddress: store.removeItem,
-}
+export const addressInfo = createMultiStepStore<AddressInfo>(
+  createDefaultAddressValues,
+  validateAddress
+)
