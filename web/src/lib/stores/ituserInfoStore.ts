@@ -1,19 +1,15 @@
-import { v4 as uuidv4 } from "uuid"
-import { env } from "$lib/env"
-import { createMultiStepStore } from "$lib/stores/createStepStore"
 import {
   createDefaultItuserValues,
   type ItuserValues,
 } from "$lib/components/forms/entity/types"
+import { env } from "$lib/env"
+import { createMultiStepStore, type Validatable } from "$lib/stores/createStepStore"
 
-// The wizard-only extras: a client-generated uuid so rolebindings in the same
-// UserFlowCreate mutation can reference their IT user, and the
-// Skattestyrelsen-deployment default account name.
-export type ItuserInfo = ItuserValues & { uuid: string; validated?: boolean }
+// The wizard-only extra: the Skattestyrelsen-deployment default account name.
+export type ItuserInfo = ItuserValues & Validatable
 
 export const createDefaultItuser = (): ItuserInfo => ({
   ...createDefaultItuserValues(),
-  uuid: uuidv4(),
   ...(env.PUBLIC_SKATTESTYRELSEN_USERFLOW && { user_key: "nanoq-brugernavn" }),
 })
 
