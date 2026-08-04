@@ -43,7 +43,7 @@
           </div>
           <div class="grid grid-cols-2">
             <span>{capital($_("id"))}:</span>
-            <span>{engagement.userkey ? engagement.userkey : ""}</span>
+            <span>{engagement.user_key ? engagement.user_key : ""}</span>
           </div>
           <div class="grid grid-cols-2">
             <span>{capital($_("primary"))}:</span>

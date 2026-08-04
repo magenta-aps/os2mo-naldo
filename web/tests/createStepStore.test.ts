@@ -85,11 +85,32 @@ describe("createMultiStepStore", () => {
     store.addItem()
     store.addItem()
     store.set([
-      { name: "", validated: true }, // stale approval, now invalid -> demoted
-      { name: "ok", validated: undefined }, // skipped, valid data -> untouched
-      { name: "", validated: false }, // rejected -> untouched
+      { name: "", validated: true, _key: "a" }, // stale approval, now invalid -> demoted
+      { name: "ok", validated: undefined, _key: "b" }, // skipped, valid data -> untouched
+      { name: "", validated: false, _key: "c" }, // rejected -> untouched
     ])
     store.revalidate()
     expect(get(store).map((item) => item.validated)).toEqual([false, undefined, false])
+  })
+
+  // What the wizard actually calls: EntityStep validates each tab through its
+  // field group and stamps the results here.
+  it("setValidated stamps flags positionally and keeps unflagged items", () => {
+    const store = createMultiStepStore(createDefault, validate)
+    store.addItem()
+    store.addItem()
+    store.setValidated([true, false])
+    expect(get(store).map((item) => item.validated)).toEqual([true, false, undefined])
+
+    store.setValidated([false])
+    expect(get(store).map((item) => item.validated)).toEqual([false, false, undefined])
+  })
+
+  it("removeItem drops the item's key with it", () => {
+    const store = createMultiStepStore(createDefault, validate)
+    store.addItem()
+    const keys = get(store).map((item) => item._key)
+    store.removeItem(0)
+    expect(get(store).map((item) => item._key)).toEqual([keys[1]])
   })
 })
