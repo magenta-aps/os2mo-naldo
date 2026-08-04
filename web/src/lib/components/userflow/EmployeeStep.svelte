@@ -150,6 +150,6 @@
       </div>
     </div>
   </div>
-  <OnboardingFormButtons isFirst={true} />
+  <OnboardingFormButtons />
   <Error />
 </form>

@@ -1,26 +1,23 @@
+import { STEP_COUNT } from "$lib/userflow/stepIds"
 import { writable } from "svelte/store"
 
+// 1-based index into the userflow's step registry, clamped to its length.
 const createStepStore = () => {
-  let initialStep = 1
+  const { subscribe, update, set } = writable<number>(1)
 
-  const { subscribe, update, set } = writable<number>(initialStep)
-
-  const updateStep = (action: "inc" | "dec" | "res" | number) =>
-    update((step) => {
-      const newStep =
-        action === "inc" && step < 6
-          ? step + 1
-          : action === "dec" && step > 1
-          ? step - 1
-          : typeof action === "number"
-          ? (step = action)
-          : 1
-      return newStep
-    })
+  const updateStep = (action: "inc" | "dec" | number) =>
+    update((step) =>
+      action === "inc"
+        ? Math.min(step + 1, STEP_COUNT)
+        : action === "dec"
+        ? Math.max(step - 1, 1)
+        : Math.min(Math.max(action, 1), STEP_COUNT)
+    )
 
   return {
     subscribe,
     updateStep,
+    reset: () => set(1),
   }
 }
 

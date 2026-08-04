@@ -1,5 +1,6 @@
+import { get } from "svelte/store"
 import { date } from "$lib/stores/date"
-import { get, writable } from "svelte/store"
+import { createMultiStepStore } from "$lib/stores/createStepStore"
 
 export type ManagerInfo = {
   fromDate: string
@@ -31,33 +32,10 @@ export const validateManager = (manager: ManagerInfo): boolean => {
   )
 }
 
-export const managerInfo = (() => {
-  const defaultValue: ManagerInfo[] = [createDefaultManager()]
+const store = createMultiStepStore(createDefaultManager, validateManager)
 
-  const { subscribe, update, set } = writable<ManagerInfo[]>(defaultValue)
-
-  return {
-    subscribe,
-    set,
-    update,
-    reset: () => {
-      set([createDefaultManager()])
-    },
-    addManager: () => update((managers) => [...managers, createDefaultManager()]),
-    removeManager: (managerIndex: number) =>
-      update((managers) => managers.toSpliced(managerIndex, 1)),
-    validateForm: () => {
-      let isValid = false
-
-      update((managers) => {
-        const updated = managers.map((manager) => {
-          return { ...manager, validated: validateManager(manager) }
-        })
-        isValid = updated.every((manager) => manager.validated)
-
-        return updated
-      })
-      return isValid
-    },
-  }
-})()
+export const managerInfo = {
+  ...store,
+  addManager: store.addItem,
+  removeManager: store.removeItem,
+}

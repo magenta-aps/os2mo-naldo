@@ -1,5 +1,6 @@
+import { get } from "svelte/store"
 import { date } from "$lib/stores/date"
-import { get, writable } from "svelte/store"
+import { createMultiStepStore } from "$lib/stores/createStepStore"
 
 export type EngagementInfo = {
   fromDate: string
@@ -32,34 +33,10 @@ export const validateEngagement = (engagement: EngagementInfo): boolean => {
   )
 }
 
-export const engagementInfo = (() => {
-  const defaultValue: EngagementInfo[] = [createDefaultEngagement()]
+const store = createMultiStepStore(createDefaultEngagement, validateEngagement)
 
-  const { subscribe, update, set } = writable<EngagementInfo[]>(defaultValue)
-
-  return {
-    subscribe,
-    set,
-    update,
-    reset: () => {
-      set([createDefaultEngagement()])
-    },
-    addEngagement: () =>
-      update((engagements) => [...engagements, createDefaultEngagement()]),
-    removeEngagement: (engagementIndex: number) =>
-      update((engagements) => engagements.toSpliced(engagementIndex, 1)),
-    validateForm: () => {
-      let isValid = false
-
-      update((engagements) => {
-        const updated = engagements.map((engagement) => {
-          return { ...engagement, validated: validateEngagement(engagement) }
-        })
-        isValid = updated.every((engagement) => engagement.validated)
-
-        return updated
-      })
-      return isValid
-    },
-  }
-})()
+export const engagementInfo = {
+  ...store,
+  addEngagement: store.addItem,
+  removeEngagement: store.removeItem,
+}

@@ -1,71 +1,42 @@
 <script lang="ts">
+  import { derived } from "svelte/store"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
   import { step } from "$lib/stores/stepStore"
-  import { employeeInfo } from "$lib/stores/employeeInfoStore"
-  import { engagementInfo } from "$lib/stores/engagementInfoStore"
-  import { ituserInfo } from "$lib/stores/ituserInfoStore"
-  import { managerInfo } from "$lib/stores/managerInfoStore"
-  import { addressInfo } from "$lib/stores/addressInfoStore"
+  import { steps } from "$lib/userflow/registry"
 
-  $: items = [
-    {
-      name: `${capital(
-        $_("create_item", { values: { item: $_("employee", { values: { n: 1 } }) } })
-      )}*`,
-      count: 1,
-      valid: $employeeInfo.validated,
-    },
-    {
-      name: `${capital(
-        $_("create_item", { values: { item: $_("engagement", { values: { n: 1 } }) } })
-      )}`,
-      count: 2,
-      valid: $engagementInfo.every((engagement) => engagement.validated),
-    },
-    {
-      name: `${capital(
-        $_("create_item", { values: { item: $_("ituser", { values: { n: 1 } }) } })
-      )}`,
-      count: 3,
-      valid: $ituserInfo.every((ituser) => ituser.validated),
-    },
-    {
-      name: `${capital(
-        $_("create_item", { values: { item: $_("manager", { values: { n: 1 } }) } })
-      )}`,
-      count: 4,
-      valid: $managerInfo.every((manager) => manager.validated),
-    },
-    {
-      name: `${capital(
-        $_("create_item", { values: { item: $_("address", { values: { n: 1 } }) } })
-      )}`,
-      count: 5,
-      valid: $addressInfo.every((address) => address.validated),
-    },
-    { name: `${capital($_("summary"))}`, count: 6, valid: false },
-  ]
+  // Combined so the markup can index it: $-prefix auto-subscription only works
+  // on top-level identifiers.
+  const stepValidity = derived(
+    steps.map((stepDef) => stepDef.valid),
+    (values) => values
+  )
 </script>
 
 <div
   class="whitespace-wrap block xl:tabs tabs-border xxl:whitespace-nowrap w-full flex"
 >
-  {#each items as item}
+  {#each steps as stepDef, index}
+    {@const count = index + 1}
     <button
-      data-sveltekit-replacestate
       class="tab flex-1 text-center text-base hover:no-underline
-        {item.count === $step ? 'tab-active text-primary' : 'text-base-content'}"
+        {count === $step ? 'tab-active text-primary' : 'text-base-content'}"
       on:click={() => {
-        if (item.count === 1) {
-          step.updateStep(item.count)
-        } else if ($employeeInfo.validated === true) {
-          step.updateStep(item.count)
+        // The rest of the wizard creates against the employee, so no other step
+        // is reachable until it validates.
+        if (count === 1 || $stepValidity[0] === true) {
+          step.updateStep(count)
         }
       }}
     >
-      {`${item.count}. ${capital($_(item.name))}`}
-      {item.valid ? "✓" : ""}
+      {count}. {stepDef.entityKey
+        ? capital(
+            $_("create_item", {
+              values: { item: $_(stepDef.entityKey, { values: { n: 1 } }) },
+            })
+          )
+        : capital($_(stepDef.id))}{stepDef.required ? "*" : ""}
+      {$stepValidity[index] ? "✓" : ""}
     </button>
   {/each}
 </div>
@@ -73,8 +44,8 @@
 <style>
   .tab.tab-active:not(.tab-disabled):not([disabled]),
   .tab:is(input:checked) {
-    /* this doesn't do anything, apart from making sure border-color isn't overwritten.. 
-      it could say `border-color:pink` and it would still be primary because of `text-primary` */
+    /* Keeps daisyUI from overwriting the active tab's border colour;
+       the value itself is irrelevant because of `text-primary`. */
     /* https://github.com/saadeghi/daisyui/issues/2643 */
     border-color: var(--primary) !important;
   }
