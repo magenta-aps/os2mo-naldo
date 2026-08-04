@@ -2,7 +2,8 @@ import type { ComponentType } from "svelte"
 import { derived, readable, type Readable } from "svelte/store"
 import { stepConfigs, type StepConfig } from "$lib/userflow/stepIds"
 import EmployeeStep from "$lib/components/userflow/EmployeeStep.svelte"
-import EngagementStep from "$lib/components/userflow/EngagementStep.svelte"
+import EntityStep from "$lib/components/userflow/EntityStep.svelte"
+import EngagementFields from "$lib/components/forms/entity/EngagementFields.svelte"
 import ItuserStep from "$lib/components/userflow/ItuserStep.svelte"
 import ManagerStep from "$lib/components/userflow/ManagerStep.svelte"
 import AddressStep from "$lib/components/userflow/AddressStep.svelte"
@@ -18,6 +19,8 @@ import type { Validatable } from "$lib/stores/createStepStore"
 // exactly this, with the StepConfig half coming from stepConfigs.
 type StepWiring = {
   component: ComponentType
+  // Props for the component (the generic EntityStep needs its wiring).
+  props?: Record<string, unknown>
   // Drives the Stepper's checkmark; undefined until the step is visited.
   valid: Readable<boolean | undefined>
 }
@@ -39,7 +42,11 @@ const never: Readable<boolean | undefined> = readable(undefined)
 
 const wiring: Record<StepConfig["id"], StepWiring> = {
   employee: { component: EmployeeStep, valid: singleValid(employeeInfo) },
-  engagement: { component: EngagementStep, valid: multiValid(engagementInfo) },
+  engagement: {
+    component: EntityStep,
+    props: { fields: EngagementFields, store: engagementInfo, entityKey: "engagement" },
+    valid: multiValid(engagementInfo),
+  },
   ituser: { component: ItuserStep, valid: multiValid(ituserInfo) },
   manager: { component: ManagerStep, valid: multiValid(managerInfo) },
   address: { component: AddressStep, valid: multiValid(addressInfo) },
