@@ -23,7 +23,7 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
-  import { formatITUserITSystemName, type UnpackedClass } from "$lib/utils/helpers"
+  import { formatITUserITSystemNames, type UnpackedClass } from "$lib/utils/helpers"
   import { createQuery } from "$lib/http/query"
   import { getItuserValidities } from "$lib/http/getValidities"
   import { getRoleClasses } from "$lib/http/getClasses"
@@ -154,7 +154,7 @@
         fromDate: at,
       })
       return (
-        formatITUserITSystemName(
+        formatITUserITSystemNames(
           res.employees.objects[0]?.validities?.flatMap((v) => v.itusers ?? [])
         ) ?? []
       )
