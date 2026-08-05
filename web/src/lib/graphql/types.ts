@@ -11978,7 +11978,11 @@ export type Mutation = {
   /** Creates a list of managers. */
   managers_create: Array<ManagerResponse>;
   /**
-   * Creates the root-organisation.
+   * Sets the municipality code of the root-organisation.
+   *
+   * The root-organisation always exists, so - in spite of the name -
+   * this does not actually create anything.
+   *
    * @deprecated The root organisation concept will be removed in a future version of OS2mo.
    */
   org_create: Organisation;
