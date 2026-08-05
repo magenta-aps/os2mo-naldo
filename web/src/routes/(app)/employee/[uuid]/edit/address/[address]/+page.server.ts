@@ -1,3 +1,4 @@
+import { env } from "$lib/env"
 import type { AddressUpdateInput } from "$lib/graphql/types"
 import type { Actions, RequestEvent } from "@sveltejs/kit"
 
@@ -6,6 +7,7 @@ export const actions: Actions = {
     const data = await request.formData()
     const addressType = data.get("address-type-uuid")
     const visibility = data.get("visibility")
+    const ituser = data.get("it-user-uuid")
     const userKey = data.get("user-key") as string
     const value = data.get("value") as string
     const startDate = data.get("from")
@@ -17,6 +19,7 @@ export const actions: Actions = {
       user_key: userKey,
       value: value,
       ...(visibility && { visibility: visibility }),
+      ...(env.PUBLIC_SHOW_ITUSER_CONNECTIONS && { ituser: ituser || null }),
       validity: { from: startDate, ...(endDate && { to: endDate }) },
     }
   },
