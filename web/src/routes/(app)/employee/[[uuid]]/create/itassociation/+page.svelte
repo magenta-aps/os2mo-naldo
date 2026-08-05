@@ -11,7 +11,7 @@
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
-  import { formatITUserITSystemName } from "$lib/utils/helpers"
+  import { formatITUserITSystemNames } from "$lib/utils/helpers"
   import { getValidities } from "$lib/http/getValidities"
   import {
     FacetClassesAndEmployeeDocument,
@@ -246,7 +246,7 @@
             id="it-user-uuid"
             bind:name={$itUser.value}
             errors={$itUser.errors}
-            iterable={formatITUserITSystemName(itusers ? itusers : [])}
+            iterable={formatITUserITSystemNames(itusers ? itusers : [])}
             required={true}
             extra_classes="basis-1/2"
           />
