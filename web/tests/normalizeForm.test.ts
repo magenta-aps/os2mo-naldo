@@ -83,6 +83,12 @@ describe("normalizeITUser", () => {
         user_key: "bruce",
         primary_response: { current: { name: "Primær" } },
         external_id: "ext-123",
+        engagements_responses: {
+          objects: [
+            { validities: [{ uuid: "e-2" }] },
+            { validities: [{ uuid: "e-1" }] },
+          ],
+        },
       },
       "some note"
     )
@@ -93,7 +99,20 @@ describe("normalizeITUser", () => {
       primary: "Primær",
       external_id: "ext-123",
       note: "some note",
+      engagements: ["e-1", "e-2"],
     })
+  })
+
+  it("returns empty engagements when none present", () => {
+    const result = normalizeITUser(
+      {
+        validity: { to: null },
+        itsystem_response: { current: null },
+        primary_response: { current: null },
+      },
+      null
+    )
+    expect(result.engagements).toEqual([])
   })
 })
 
@@ -105,6 +124,12 @@ describe("normalizeAddress", () => {
       name: "test@example.com",
       user_key: "test@example.com",
       visibility_response: { current: { name: "Offentlig" } },
+      ituser: [
+        {
+          user_key: "bruce",
+          itsystem_response: { current: { name: "Active Directory" } },
+        },
+      ],
     })
     expect(result).toEqual({
       to: "2025-01-01",
@@ -112,7 +137,17 @@ describe("normalizeAddress", () => {
       value: "test@example.com",
       user_key: "test@example.com",
       visibility: "Offentlig",
+      ituser: "Active Directory, bruce",
     })
+  })
+
+  it("returns empty ituser when none linked", () => {
+    const result = normalizeAddress({
+      validity: { to: null },
+      address_type_response: { current: null },
+      visibility_response: { current: null },
+    })
+    expect(result.ituser).toEqual("")
   })
 })
 
