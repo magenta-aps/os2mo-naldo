@@ -10,7 +10,8 @@
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
-  import { CreateAddressDocument } from "./query.generated"
+  import { CreateAddressDocument, EmployeeItUsersDocument } from "./query.generated"
+  import { formatITUserITSystemNames } from "$lib/utils/helpers"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
@@ -24,8 +25,32 @@
   import { createQuery } from "$lib/http/query"
   import { getClasses } from "$lib/http/getClasses"
   import { getPersonValidities } from "$lib/http/getValidities"
+  import { env } from "$lib/env"
 
   gql`
+    query EmployeeITUsers($employee: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+      itusers(
+        filter: {
+          employee: { uuids: $employee }
+          from_date: $fromDate
+          to_date: $toDate
+        }
+      ) {
+        objects {
+          validities {
+            itsystem_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
+            }
+            user_key
+            uuid
+          }
+        }
+      }
+    }
+
     mutation CreateAddress($input: AddressCreateInput!, $date: DateTime!) {
       address_create(input: $input) {
         current(at: $date) {
@@ -131,6 +156,22 @@
       )
     )
   }
+
+  const itusers = createQuery<ReturnType<typeof formatITUserITSystemNames>>()
+  $: if (env.PUBLIC_SHOW_ITUSER_CONNECTIONS && $page.params.uuid && startDate) {
+    const personUuid = $page.params.uuid
+    itusers.run((signal) =>
+      graphQLClient(signal)
+        .request(EmployeeItUsersDocument, {
+          employee: personUuid,
+          fromDate: startDate,
+          toDate: toDate,
+        })
+        .then((res) =>
+          formatITUserITSystemNames(res.itusers?.objects.map((e) => e.validities[0]))
+        )
+    )
+  }
 </script>
 
 <title
@@ -212,6 +253,27 @@
           />
           <input hidden name="address-type-uuid" bind:value={addressTypeUuid} />
         </div>
+      {/if}
+      {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
+        {#if $itusers.error}
+          <p class="text-sm text-error">
+            {capital($_($itusers.data?.length ? "load_error_options" : "load_error"))}
+          </p>
+        {/if}
+        {#if $itusers.data?.length}
+          <Select
+            title={capital($_("ituser", { values: { n: 1 } }))}
+            id="it-user-uuid"
+            iterable={$itusers.data}
+            isClearable={true}
+          />
+        {:else}
+          <Select
+            title={capital($_("ituser", { values: { n: 1 } }))}
+            id="it-user-uuid"
+            disabled
+          />
+        {/if}
       {/if}
       <Input title={capital($_("description"))} id="user-key" />
       {#if addressType}
