@@ -16,16 +16,23 @@
   import { graphQLClient } from "$lib/http/client"
   import {
     ItSystemsDocument,
+    GetEngagementsDocument,
     CreateItUserDocument,
     CreateItUserAndRolebindingDocument,
     GetItSystemRolesDocument,
   } from "./query.generated"
+  import SelectMultiple from "$lib/components/forms/shared/SelectMultiple.svelte"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
   import type { FacetValidities } from "$lib/utils/classes"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
-  import { formatITSystemNames, type UnpackedClass } from "$lib/utils/helpers"
+  import {
+    formatITSystemNames,
+    formatEngagementTitlesAndUuid,
+    type EngagementTitleAndUuid,
+    type UnpackedClass,
+  } from "$lib/utils/helpers"
   import { createQuery } from "$lib/http/query"
   import { getPrimaryClasses } from "$lib/http/getClasses"
   import { getPersonValidities } from "$lib/http/getValidities"
@@ -43,6 +50,27 @@
           current(at: $currentDate) {
             name
             uuid
+          }
+        }
+      }
+    }
+    query GetEngagements($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+      engagements(
+        filter: { employees: $uuid, from_date: $fromDate, to_date: $toDate }
+      ) {
+        objects {
+          validities {
+            org_unit_response {
+              current(at: $fromDate) {
+                name
+              }
+            }
+            uuid
+            job_function_response {
+              current(at: $fromDate) {
+                name
+              }
+            }
           }
         }
       }
@@ -246,6 +274,26 @@
       )
     )
   }
+
+  let selectedEngagements: { uuid: string; name: string }[] | undefined = undefined
+  const engagements = createQuery<EngagementTitleAndUuid[]>()
+  $: if (env.PUBLIC_SHOW_ITUSER_CONNECTIONS && $page.params.uuid && startDate) {
+    const personUuid = $page.params.uuid
+    engagements.run((signal) =>
+      graphQLClient(signal)
+        .request(GetEngagementsDocument, {
+          uuid: personUuid,
+          fromDate: startDate,
+          toDate: toDate,
+        })
+        .then(
+          (res) =>
+            res.engagements?.objects
+              .map((e) => e.validities[0])
+              .filter(Boolean) as EngagementTitleAndUuid[]
+        )
+    )
+  }
 </script>
 
 <title
@@ -334,6 +382,29 @@
             required={true}
           />
         </div>
+        {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
+          {#if $engagements.error}
+            <p class="text-sm text-error">
+              {capital(
+                $_($engagements.data?.length ? "load_error_options" : "load_error")
+              )}
+            </p>
+          {/if}
+          {#if $engagements.data?.length}
+            <SelectMultiple
+              title={capital($_("engagement", { values: { n: 2 } }))}
+              id="engagements"
+              bind:value={selectedEngagements}
+              iterable={formatEngagementTitlesAndUuid($engagements.data)}
+            />
+          {:else}
+            <SelectMultiple
+              title={capital($_("engagement", { values: { n: 2 } }))}
+              id="engagements"
+              disabled
+            />
+          {/if}
+        {/if}
         {#if $facets.loading && !$facets.data}
           <Skeleton />
         {/if}
