@@ -3,7 +3,6 @@ import { employeeInfo } from "$lib/stores/employeeInfoStore"
 import { engagementInfo } from "$lib/stores/engagementInfoStore"
 import { ituserInfo } from "$lib/stores/ituserInfoStore"
 import { managerInfo } from "$lib/stores/managerInfoStore"
-import { step } from "$lib/stores/stepStore"
 import { resetUserflowUuids } from "$lib/userflow/mappers"
 
 export const resetUserflowStores = () => {
@@ -14,6 +13,5 @@ export const resetUserflowStores = () => {
       }
     }
   )
-  step.reset()
   resetUserflowUuids()
 }
