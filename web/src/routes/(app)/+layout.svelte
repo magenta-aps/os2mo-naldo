@@ -30,7 +30,9 @@
   >
 </svelte:head>
 
-<div class="flex min-h-screen">
+<!-- The non-prod banner is fixed to the viewport bottom; pad the content so
+     it can't cover a page's last element. -->
+<div class="flex min-h-screen" class:pb-8={env.PUBLIC_ENVIRONMENT !== "prod"}>
   <div class="drawer lg:drawer-open">
     <input id="my-drawer-4" type="checkbox" class="drawer-toggle" />
     <div class="drawer-content">
