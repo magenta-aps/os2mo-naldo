@@ -166,7 +166,7 @@
             id="user-key"
             bind:value={$userKey.value}
             startValue={itsystem.user_key}
-            errors={$name.errors}
+            errors={$userKey.errors}
             extra_classes="basis-1/2"
             required={true}
           />
