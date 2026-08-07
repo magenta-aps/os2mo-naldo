@@ -106,6 +106,14 @@ export const normalizeKLE = (k: any) => {
   }
 }
 
+export const normalizeItSystem = (i: any) => {
+  return {
+    to: i.validity?.to ?? null,
+    name: i.name ?? null,
+    user_key: i.user_key ?? "",
+  }
+}
+
 export const normalizeRolebinding = (r: any) => {
   return {
     to: r.validity?.to ?? null,

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { ValidityBounds } from "$lib/utils/validities"
   import { Temporal } from "temporal-polyfill"
   import { lastValidDay, moValidityTo } from "$lib/utils/date"
   import { _ } from "svelte-i18n"
@@ -63,8 +62,6 @@
         }
       }
     }
-
-  let validities: ValidityBounds = { from: null, to: null }
 </script>
 
 <title
@@ -96,8 +93,6 @@
         errors={$toDate.errors}
         title={capital($_("date.end_date"))}
         id="to"
-        min={validities.from}
-        max={validities.to}
         required={true}
       />
     </div>

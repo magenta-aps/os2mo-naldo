@@ -4,6 +4,7 @@ import {
   normalizeAddress,
   normalizeAssociation,
   normalizeEngagement,
+  normalizeItSystem,
   normalizeITUser,
   normalizeKLE,
   normalizeLeave,
@@ -258,6 +259,32 @@ describe("normalizeOrganisation", () => {
       org_unit_level: "Niveau 3",
       time_planning: "Norm",
       user_key: "IT",
+    })
+  })
+})
+
+describe("normalizeItSystem", () => {
+  it("extracts expected fields", () => {
+    expect(
+      sent(
+        normalizeItSystem({
+          validity: { to: startOfDay(day("2025-06-01")) },
+          name: "Active Directory",
+          user_key: "AD",
+        })
+      )
+    ).toEqual({
+      to: "2025-06-01T00:00:00+02:00",
+      name: "Active Directory",
+      user_key: "AD",
+    })
+  })
+
+  it("handles null/missing fields", () => {
+    expect(normalizeItSystem({ validity: { to: null }, name: null })).toEqual({
+      to: null,
+      name: null,
+      user_key: "",
     })
   })
 })
