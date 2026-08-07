@@ -17,8 +17,8 @@
   import { required } from "svelte-forms/validators"
   import { getFacets } from "$lib/http/getFacets"
   import { facetStore } from "$lib/stores/facetStore"
-  import { onMount } from "svelte"
   import { getFacetValidities } from "$lib/http/getValidities"
+  import { createQuery } from "$lib/http/query"
 
   gql`
     mutation TerminateClass($input: ClassTerminateInput!, $date: DateTime!) {
@@ -67,22 +67,27 @@
       }
     }
 
-  let validities: {
+  const facets = createQuery<{ name: string; uuid: string; user_key: string }[]>()
+  $: if ($page.params.facet) {
+    const facetUuid = $page.params.facet
+    const fromDate = $date
+    facets.run((signal) => getFacets({ uuid: facetUuid, fromDate }, signal))
+  }
+
+  $: if ($facets.data) {
+    facet = $facets.data[0] ?? null
+  }
+
+  const validities = createQuery<{
     from: string | undefined | null
     to: string | undefined | null
-  } = { from: null, to: null }
-
-  onMount(async () => {
-    validities = await getFacetValidities($page.params.facet ?? null)
-
-    let facets = await getFacets({
-      uuid: $page.params.facet ?? null,
-      fromDate: $date,
-    })
-    if ($page.params.facet) {
-      facet = facets[0] ?? null
-    }
-  })
+  }>({ from: null, to: null })
+  $: if (facet) {
+    const facetUuid = facet.uuid
+    validities.run((signal) => getFacetValidities(facetUuid, signal))
+  } else {
+    validities.run(async () => ({ from: null, to: null }))
+  }
 </script>
 
 <title
@@ -114,8 +119,8 @@
         errors={$toDate.errors}
         title={capital($_("date.end_date"))}
         id="to"
-        min={validities.from}
-        max={validities.to}
+        min={$validities.data?.from}
+        max={$validities.data?.to}
         required={true}
       />
     </div>
