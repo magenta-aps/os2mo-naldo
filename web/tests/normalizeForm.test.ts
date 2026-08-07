@@ -1,6 +1,7 @@
 import {
   normalizeAddress,
   normalizeAssociation,
+  normalizeClass,
   normalizeEngagement,
   normalizeITUser,
   normalizeKLE,
@@ -218,6 +219,37 @@ describe("normalizeOrganisation", () => {
       time_planning: "Norm",
       user_key: "IT",
     })
+  })
+})
+
+describe("normalizeClass", () => {
+  it("extracts expected fields", () => {
+    expect(
+      normalizeClass({
+        validity: { to: "2025-06-01T00:00:00" },
+        name: "Ansat",
+        user_key: "ansat",
+        it_system_response: { current: { name: "Active Directory" } },
+        scope: "EMAIL",
+      })
+    ).toEqual({
+      to: "2025-06-01",
+      name: "Ansat",
+      user_key: "ansat",
+      itsystem: "Active Directory",
+      scope: "EMAIL",
+    })
+  })
+
+  it("handles null/missing fields", () => {
+    expect(
+      normalizeClass({
+        validity: { to: null },
+        name: null,
+        it_system_response: null,
+        scope: null,
+      })
+    ).toEqual({ to: null, name: null, user_key: "", itsystem: "", scope: "" })
   })
 })
 

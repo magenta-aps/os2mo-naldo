@@ -103,6 +103,16 @@ export const normalizeKLE = (k: any) => {
   }
 }
 
+export const normalizeClass = (c: any) => {
+  return {
+    to: c.validity?.to?.split("T")[0] ?? null,
+    name: c.name ?? null,
+    user_key: c.user_key ?? "",
+    itsystem: c.it_system_response?.current?.name ?? "",
+    scope: c.scope ?? "",
+  }
+}
+
 export const normalizeRolebinding = (r: any) => {
   return {
     to: r.validity?.to?.split("T")[0] ?? null,
