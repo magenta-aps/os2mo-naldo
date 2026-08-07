@@ -63,11 +63,6 @@
 
   let startDate: string = $date
   let toDate: string
-
-  let validities: {
-    from: string | undefined | null
-    to: string | undefined | null
-  } = { from: null, to: null }
 </script>
 
 <title
@@ -100,16 +95,14 @@
           errors={$fromDate.errors}
           title={capital($_("date.start_date"))}
           id="from"
-          min={validities.from}
-          max={toDate ? toDate : validities.to}
+          max={toDate ? toDate : undefined}
           required={true}
         />
         <DateInput
           bind:value={toDate}
           title={capital($_("date.end_date"))}
           id="to"
-          min={$fromDate.value ? $fromDate.value : validities.from}
-          max={validities.to}
+          min={$fromDate.value ? $fromDate.value : undefined}
         />
       </div>
 

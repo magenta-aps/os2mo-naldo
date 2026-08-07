@@ -58,11 +58,6 @@
         }
       }
     }
-
-  let validities: {
-    from: string | undefined | null
-    to: string | undefined | null
-  } = { from: null, to: null }
 </script>
 
 <title
@@ -94,8 +89,6 @@
         errors={$toDate.errors}
         title={capital($_("date.end_date"))}
         id="to"
-        min={validities.from}
-        max={validities.to}
         required={true}
       />
     </div>
