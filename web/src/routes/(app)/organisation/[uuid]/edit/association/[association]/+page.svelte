@@ -44,13 +44,13 @@
             uuid
             person_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 name
               }
             }
             org_unit_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 name
                 validity {
                   from
@@ -74,7 +74,7 @@
             }
             substitute_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 name
                 validity {
                   from
@@ -234,7 +234,7 @@
     fromDate: $page.url.searchParams.get("from"),
     toDate: $page.url.searchParams.get("to"),
     getConfederations: env.PUBLIC_ENABLE_CONFEDERATIONS,
-    currentDate: $date,
+    currentDate: startDate,
   })
 
   let initialAssociation: any = null
@@ -335,6 +335,7 @@
         </div>
         <Search
           type="org-unit"
+          at={startDate}
           bind:value={selectedOrgUnit}
           startValue={{
             uuid: association.org_unit_response.uuid,

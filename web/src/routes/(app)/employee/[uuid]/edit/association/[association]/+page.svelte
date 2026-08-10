@@ -45,13 +45,13 @@
             uuid
             person_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 name
               }
             }
             org_unit_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 name
                 validity {
                   from
@@ -75,7 +75,7 @@
             }
             substitute_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 name
                 validity {
                   from
@@ -235,7 +235,7 @@
     fromDate: $page.url.searchParams.get("from"),
     toDate: $page.url.searchParams.get("to"),
     getConfederations: env.PUBLIC_ENABLE_CONFEDERATIONS,
-    currentDate: $date,
+    currentDate: startDate,
   })
 
   let initialAssociation: any = null
@@ -337,6 +337,7 @@
         <!-- TODO: make optional when GraphQL agrees -->
         <Search
           type="employee"
+          at={startDate}
           startValue={{
             uuid: association.person_response?.uuid,
             name: association.person_response?.current?.name ?? "",
