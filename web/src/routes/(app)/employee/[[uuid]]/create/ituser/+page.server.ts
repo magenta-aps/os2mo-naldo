@@ -1,3 +1,4 @@
+import { env } from "$lib/env"
 import type { ItUserCreateInput, RoleBindingCreateInput } from "$lib/graphql/types"
 import type { Actions, RequestEvent } from "@sveltejs/kit"
 import { v4 as uuidv4 } from "uuid"
@@ -38,7 +39,8 @@ export const actions: Actions = {
         ...(primary && { primary: primary }),
         ...(externalId && { external_id: externalId }),
         ...(notes && { note: notes }),
-        ...(engagements.length && { engagements: engagements }),
+        ...(env.PUBLIC_SHOW_ITUSER_CONNECTIONS &&
+          engagements.length && { engagements: engagements }),
         validity: { from: startDate, ...(endDate && { to: endDate }) },
       },
       rolebindingInput: roles.map((role: string) => ({

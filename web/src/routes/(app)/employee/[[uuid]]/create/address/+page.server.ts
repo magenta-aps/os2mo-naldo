@@ -1,3 +1,4 @@
+import { env } from "$lib/env"
 import type { AddressCreateInput } from "$lib/graphql/types"
 import type { Actions, RequestEvent } from "@sveltejs/kit"
 import { v4 as uuidv4 } from "uuid"
@@ -21,7 +22,7 @@ export const actions: Actions = {
       user_key: userKey || addressUuid,
       value: value,
       ...(visibility && { visibility: visibility }),
-      ...(ituser && { ituser: ituser }),
+      ...(env.PUBLIC_SHOW_ITUSER_CONNECTIONS && ituser && { ituser: ituser }),
       validity: { from: startDate, ...(endDate && { to: endDate }) },
     }
   },
