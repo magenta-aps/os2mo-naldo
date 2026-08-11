@@ -1,3 +1,5 @@
+import { formatITUserITSystemName } from "./helpers"
+
 export const normalizeEmployee = (e: any) => {
   return {
     to: e.validity?.to?.split("T")[0] ?? null,
@@ -66,9 +68,7 @@ export const normalizeAddress = (a: any) => {
     value: a.name ?? null,
     user_key: a.user_key ?? "",
     visibility: a.visibility_response?.current?.name ?? "",
-    ituser: a.ituser?.[0]?.itsystem_response?.current?.name
-      ? `${a.ituser[0].itsystem_response.current.name}, ${a.ituser[0].user_key}`
-      : "",
+    ituser: a.ituser?.[0] ? formatITUserITSystemName(a.ituser[0]).name : "",
   }
 }
 

@@ -168,7 +168,9 @@
           toDate: toDate,
         })
         .then((res) =>
-          formatITUserITSystemNames(res.itusers?.objects.map((e) => e.validities[0]))
+          formatITUserITSystemNames(
+            res.itusers?.objects.map((e) => e.validities[0]).filter(Boolean)
+          )
         )
     )
   }
