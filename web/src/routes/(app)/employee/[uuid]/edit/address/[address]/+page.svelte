@@ -219,17 +219,24 @@
   }
 
   const itusers = createQuery<ReturnType<typeof formatITUserITSystemNames>>()
+  // Scope options to the effective date so moving the date drops itusers
+  // that aren't valid then (Select prunes selections that leave the options).
+  // A historical address can default its end date into the past, so drop the
+  // upper bound when it would invert the from > to range.
   $: if (env.PUBLIC_SHOW_ITUSER_CONNECTIONS && $page.params.uuid && startDate) {
     const personUuid = $page.params.uuid
+    const to = toDate && toDate >= startDate ? toDate : null
     itusers.run((signal) =>
       graphQLClient(signal)
         .request(EmployeeItUsersDocument, {
           employee: personUuid,
           fromDate: startDate,
-          toDate: toDate,
+          toDate: to,
         })
         .then((res) =>
-          formatITUserITSystemNames(res.itusers?.objects.map((e) => e.validities[0]))
+          formatITUserITSystemNames(
+            res.itusers?.objects.map((e) => e.validities[0]).filter(Boolean)
+          )
         )
     )
   }

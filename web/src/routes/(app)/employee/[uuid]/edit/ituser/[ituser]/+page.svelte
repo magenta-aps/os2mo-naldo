@@ -216,18 +216,19 @@
 
   let selectedEngagements: { uuid: string; name: string }[] | undefined = undefined
   const engagements = createQuery<EngagementTitleAndUuid[]>()
-  // Scope options to the ituser's own validity period (from the URL), not the
-  // editable start date. That keeps the option list consistent with the linked
-  // engagements shown, and avoids an invalid from > to range for a historical
-  // ituser (start date defaults to today, end date to the ituser's past end).
-  $: if (env.PUBLIC_SHOW_ITUSER_CONNECTIONS && $page.params.uuid) {
+  // Scope options to the effective date so moving the date drops engagements
+  // that aren't valid then (SelectMultiple prunes selections that leave the
+  // options). A historical ituser can default its end date into the past, so
+  // drop the upper bound when it would invert the from > to range.
+  $: if (env.PUBLIC_SHOW_ITUSER_CONNECTIONS && $page.params.uuid && startDate) {
     const personUuid = $page.params.uuid
+    const to = toDate && toDate >= startDate ? toDate : null
     engagements.run((signal) =>
       graphQLClient(signal)
         .request(GetEngagementsDocument, {
           uuid: personUuid,
-          fromDate: $page.url.searchParams.get("from"),
-          toDate: $page.url.searchParams.get("to"),
+          fromDate: startDate,
+          toDate: to,
         })
         .then(
           (res) =>
