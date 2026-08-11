@@ -63,17 +63,17 @@
                 name
               }
             }
-            engagements_responses(filter: { from_date: $fromDate, to_date: $toDate }) {
+            engagements_responses(filter: { from_date: $currentDate }) {
               objects {
                 validities {
                   uuid
                   job_function_response {
-                    current(at: $fromDate) {
+                    current(at: $currentDate) {
                       name
                     }
                   }
                   org_unit_response {
-                    current(at: $fromDate) {
+                    current(at: $currentDate) {
                       name
                     }
                   }
