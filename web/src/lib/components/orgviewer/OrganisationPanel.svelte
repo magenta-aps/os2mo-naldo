@@ -86,22 +86,24 @@
 </script>
 
 {#await request}
-  <p>{capital($_("loading"))}...</p>
+  <p class="p-4 text-base-content/60">{capital($_("loading"))}...</p>
 {:then detail}
   {#if detail}
-    <article>
-      <header>
-        <a href={`${base}/orgviewer/tree/${detail.uuid}/${rootUuid}`} id="orgtitle">
-          {detail.name}
+    <article class="card border border-base-300 bg-base-100 p-4">
+      <header class="mb-3 border-b border-base-300 pb-3">
+        <a href={`${base}/orgviewer/tree/${detail.uuid}/${rootUuid}`} id="orgtitle" class="hover:no-underline">
+          <h2 class="m-0">{detail.name}</h2>
         </a>
       </header>
 
-      <div>
+      <div class="space-y-4">
         <AddressList addresses={detail.addresses} />
 
         {#if includeEngagements}
           <section>
-            <p>{capital($_("manager", { values: { n: 2 } }))}</p>
+            <p class="mb-1 text-sm font-semibold tracking-wide text-base-content/60 uppercase">
+              {capital($_("manager", { values: { n: 2 } }))}
+            </p>
             <ManagerList
               managers={detail.managers}
               {rootUuid}
@@ -110,7 +112,9 @@
           </section>
 
           <section>
-            <p>{capital($_("employee", { values: { n: 2 } }))}</p>
+            <p class="mb-1 text-sm font-semibold tracking-wide text-base-content/60 uppercase">
+              {capital($_("employee", { values: { n: 2 } }))}
+            </p>
             <PersonList
               people={detail.engagements}
               relationType="engagement"
@@ -125,7 +129,9 @@
 
         {#if includeAssociations}
           <section>
-            <p>{capital($_("association", { values: { n: 2 } }))}</p>
+            <p class="mb-1 text-sm font-semibold tracking-wide text-base-content/60 uppercase">
+              {capital($_("association", { values: { n: 2 } }))}
+            </p>
             <PersonList
               people={detail.associations}
               relationType="association"
@@ -139,5 +145,5 @@
     </article>
   {/if}
 {:catch error}
-  <p role="alert" class="text-error">{capital($_("orgviewer.error_loading_unit"))}</p>
+  <p role="alert" class="p-4 text-error">{capital($_("orgviewer.error_loading_unit"))}</p>
 {/await}

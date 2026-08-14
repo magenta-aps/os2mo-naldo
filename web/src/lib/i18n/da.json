@@ -209,6 +209,7 @@
 		"search_results_count": "{n} søgeresultater",
 		"search_title": "søg efter organisation eller person",
 		"search_type_person": "person",
+		"select_a_unit": "vælg en organisationsenhed i træet til venstre",
 		"show_children": "vis {n} underenheder",
 		"work_address": "arbejdsadresse"
 	},

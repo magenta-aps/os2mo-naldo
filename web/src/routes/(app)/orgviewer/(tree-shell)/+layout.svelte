@@ -12,11 +12,13 @@
   $: focusedUuid = $page.params.uuid
 </script>
 
-<div class="flex min-h-screen">
-  <nav class="w-80 shrink-0 overflow-auto">
+<div class="flex gap-4 p-4">
+  <nav
+    class="max-h-[calc(100vh-6rem)] w-72 shrink-0 overflow-auto rounded-box border border-base-300 bg-base-100 p-3"
+  >
     <OrgViewerTree {rootUuid} {focusedUuid} />
   </nav>
-  <main class="flex-1 overflow-auto">
+  <main class="min-w-0 flex-1">
     <slot />
   </main>
 </div>

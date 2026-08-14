@@ -10,20 +10,19 @@
 </script>
 
 {#if managers.length}
-  <ul>
+  <ul class="divide-y divide-base-300">
     {#each managers as manager (manager.org_unit_uuid + manager.manager_type.uuid)}
-      <li>
-        <dt>{manager.manager_type.name}</dt>
+      <li class="flex items-center justify-between gap-2 py-1.5">
+        <span class="text-sm text-base-content/60">{manager.manager_type.name}</span>
         {#if manager.employee[0]}
-          <dd>
-            <a
-              href={`${base}/orgviewer/person/${manager.employee[0].uuid}/${manager.org_unit_uuid}/${rootUuid}`}
-            >
-              {employeeDisplayName(manager.employee[0], showNickname)}
-            </a>
-          </dd>
+          <a
+            class="font-medium"
+            href={`${base}/orgviewer/person/${manager.employee[0].uuid}/${manager.org_unit_uuid}/${rootUuid}`}
+          >
+            {employeeDisplayName(manager.employee[0], showNickname)}
+          </a>
         {:else}
-          <dd>{capital($_("vacant"))}</dd>
+          <span class="text-base-content/60 italic">{capital($_("vacant"))}</span>
         {/if}
       </li>
     {/each}

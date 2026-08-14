@@ -72,50 +72,68 @@
   })
 </script>
 
-<section>
-  <h2>{capital($_("orgviewer.search_title"))}</h2>
+<section class="mx-auto max-w-4xl p-4">
+  <h2 class="text-center">{capital($_("orgviewer.search_title"))}</h2>
 
-  <form on:submit|preventDefault={search}>
-    <div>
-      <label>
-        <input type="radio" bind:group={searchType} value="org_unit" />
+  <form
+    on:submit|preventDefault={search}
+    class="mt-4 flex flex-wrap items-center justify-center gap-4"
+  >
+    <div class="flex gap-4">
+      <label class="label cursor-pointer gap-2">
+        <input type="radio" class="radio radio-primary radio-sm" bind:group={searchType} value="org_unit" />
         {capital($_("organisation"))}
       </label>
-      <label>
-        <input type="radio" bind:group={searchType} value="employee" />
+      <label class="label cursor-pointer gap-2">
+        <input type="radio" class="radio radio-primary radio-sm" bind:group={searchType} value="employee" />
         {capital($_("orgviewer.search_type_person"))}
       </label>
     </div>
 
     <label for="search-input" class="sr-only">{capital($_("search"))}</label>
-    <input type="search" id="search-input" bind:value={query} {placeholder} bind:this={searchInput} />
-    <input type="submit" value={capital($_("search"))} />
+    <input
+      type="search"
+      id="search-input"
+      bind:value={query}
+      {placeholder}
+      bind:this={searchInput}
+      class="input input-bordered input-sm w-full max-w-xs rounded text-base font-normal"
+    />
+    <button type="submit" class="btn btn-primary btn-sm rounded-sm font-normal normal-case">
+      {capital($_("search"))}
+    </button>
   </form>
 
   {#if results && results.length > 0}
-    <div>
-      <h3 class="oc-search-results-header" tabindex="-1">
+    <div class="mt-6">
+      <h3 class="text-center" tabindex="-1">
         {$_("orgviewer.search_results_count", { values: { n: results.length } })}
       </h3>
-      <ul>
+      <ul class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {#each results as result (result.uuid)}
-          <li>
+          <li class="card border border-base-300 bg-base-100 p-3">
             {#if result.kind === "org_unit"}
-              <a href={`${base}/orgviewer/orgunit/${result.uuid}`}>
-                <span>{capital($_("unit", { values: { n: 1 } }))}</span><br />
-                {result.name}<br />
+              <a href={`${base}/orgviewer/orgunit/${result.uuid}`} class="hover:no-underline">
+                <div class="text-xs tracking-wide text-base-content/60 uppercase">
+                  {capital($_("unit", { values: { n: 1 } }))}
+                </div>
+                <div class="font-medium">{result.name}</div>
                 {#each visiblePhoneNumbers(result.addresses) as phone}
-                  <div>{phone}</div>
+                  <div class="text-sm text-base-content/60">{phone}</div>
                 {/each}
               </a>
             {:else}
-              <a href={`${base}/orgviewer/person/${result.uuid}`}>
-                <span>{capital($_("orgviewer.search_type_person"))}</span><br />
-                {env.PUBLIC_ORGVIEWER_SHOW_NICKNAME && result.nickname
-                  ? result.nickname
-                  : result.name}<br />
+              <a href={`${base}/orgviewer/person/${result.uuid}`} class="hover:no-underline">
+                <div class="text-xs tracking-wide text-base-content/60 uppercase">
+                  {capital($_("orgviewer.search_type_person"))}
+                </div>
+                <div class="font-medium">
+                  {env.PUBLIC_ORGVIEWER_SHOW_NICKNAME && result.nickname
+                    ? result.nickname
+                    : result.name}
+                </div>
                 {#each visiblePhoneNumbers(result.addresses) as phone}
-                  <div>{phone}</div>
+                  <div class="text-sm text-base-content/60">{phone}</div>
                 {/each}
               </a>
             {/if}
@@ -124,6 +142,6 @@
       </ul>
     </div>
   {:else if results}
-    <p>{capital($_("orgviewer.no_search_results"))}</p>
+    <p class="mt-6 text-center text-base-content/60">{capital($_("orgviewer.no_search_results"))}</p>
   {/if}
 </section>

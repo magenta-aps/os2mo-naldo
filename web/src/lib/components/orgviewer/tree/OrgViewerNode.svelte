@@ -92,17 +92,18 @@
     : []
 </script>
 
-<li id={`node-${uuid}`} class="m-0 p-0 rounded-md {$page.params.uuid === uuid ? 'bg-accent' : ''}">
+<li id={`node-${uuid}`} class="m-0 rounded-md p-0 {$page.params.uuid === uuid ? 'bg-accent' : ''}">
   <div
-    class="py-2 flex items-center gap-1"
+    class="flex items-center gap-1 rounded-md py-1.5 pr-2 hover:bg-base-200"
     style="padding-left: {indent}px"
     id={$page.params.uuid === uuid ? "active" : ""}
   >
     {#if loading}
-      <div class="w-5 h-5 loading loading-spinner" />
+      <div class="loading loading-spinner h-5 w-5" />
     {:else if has_children || child_count > 0}
       <button
         type="button"
+        class="shrink-0 text-base-content/60 hover:text-primary"
         on:click|preventDefault={toggleOpen}
         aria-expanded={open}
         title={open
@@ -112,17 +113,17 @@
         <Icon icon={keyboardArrowDownRounded} width="20" height="20" rotate={open ? 0 : 3} />
       </button>
     {:else}
-      <div class="w-5 h-5" />
+      <div class="h-5 w-5 shrink-0" />
     {/if}
 
     <a
-      class="flex-1 hover:no-underline"
+      class="min-w-0 flex-1 hover:no-underline"
       href={`${base}/orgviewer/orgunit/${uuid}/${rootUuid}`}
       title={name}
     >
-      <p class="text-sm text-base-content wrap-break-word">{name}</p>
+      <p class="truncate text-sm text-base-content">{name}</p>
       {#if !env.PUBLIC_ORGVIEWER_REMOVE_PERSON_COUNT}
-        <p class="text-xs opacity-60">
+        <p class="text-xs text-base-content/60">
           {#if personCounts.engagements !== undefined}
             {personCounts.engagements}
             {$_("orgviewer.employees_count", { values: { n: personCounts.engagements } })}
@@ -136,11 +137,12 @@
     </a>
 
     {#if !env.PUBLIC_ORGVIEWER_REMOVE_CHILDREN_COUNT && has_children}
-      <span class="text-xs opacity-60">{child_count}</span>
+      <span class="text-xs text-base-content/60">{child_count}</span>
     {/if}
 
     {#if uuid !== rootUuid}
       <a
+        class="shrink-0 text-base-content/60 hover:text-primary"
         href={`${base}/orgviewer/tree/${uuid}/${uuid}`}
         title={capital($_("orgviewer.focus_unit", { values: { name } }))}
       >

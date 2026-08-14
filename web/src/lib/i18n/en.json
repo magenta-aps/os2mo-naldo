@@ -209,6 +209,7 @@
 		"search_results_count": "{n} search results",
 		"search_title": "search for organisation or person",
 		"search_type_person": "person",
+		"select_a_unit": "select an organisation unit in the tree on the left",
 		"show_children": "show {n} subunits",
 		"work_address": "work address"
 	},

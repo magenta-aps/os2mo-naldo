@@ -2,6 +2,7 @@
   import { base } from "$app/paths"
   import { goto } from "$app/navigation"
   import AddressList from "$lib/components/orgviewer/AddressList.svelte"
+  import InfoRow from "$lib/components/orgviewer/InfoRow.svelte"
   import { env } from "$lib/env"
   import { graphQLClient } from "$lib/http/client"
   import { capital } from "$lib/utils/helpers"
@@ -60,7 +61,7 @@
 </script>
 
 {#await request}
-  <p>{capital($_("loading"))}...</p>
+  <p class="p-4 text-base-content/60">{capital($_("loading"))}...</p>
 {:then person}
   {#if person}
     {@const displayName = employeeName(person)}
@@ -70,61 +71,65 @@
     {@const association = includeAssociations
       ? findRelationForOrgUnit(person.associations, orgUuid)
       : undefined}
-    <article>
-      <header>
+    <article class="card border border-base-300 bg-base-100 p-4">
+      <header class="mb-3 border-b border-base-300 pb-3">
         {#if orgUuid}
-          <a href={`${base}/orgviewer/orgunit/${orgUuid}/${rootUuid}`} id="persontitle">
-            {displayName}
+          <a
+            href={`${base}/orgviewer/orgunit/${orgUuid}/${rootUuid}`}
+            id="persontitle"
+            class="hover:no-underline"
+          >
+            <h2 class="m-0">{displayName}</h2>
           </a>
+        {:else}
+          <h2 class="m-0" id="persontitle">{displayName}</h2>
         {/if}
       </header>
 
-      <div>
-        <dl>
-          <dt>{capital($_("name"))}</dt>
-          <dd>{displayName}</dd>
-
-          {#if engagement}
-            <dt>{engagement.engagement_type.name}</dt>
+      <div class="space-y-1.5">
+        {#if engagement}
+          <InfoRow label={engagement.engagement_type.name}>
             {#if env.PUBLIC_ORGVIEWER_SHOW_EXTENSION_3_VIBORG && engagement.extension_3}
-              <dd>{engagement.extension_3}</dd>
+              {engagement.extension_3}
             {:else if env.PUBLIC_ORGVIEWER_SHOW_EXTENSION_1 && engagement.extension_1}
-              <dd>{engagement.extension_1}</dd>
+              {engagement.extension_1}
             {:else}
-              <dd>{engagement.job_function.name}</dd>
+              {engagement.job_function.name}
             {/if}
+          </InfoRow>
+        {/if}
+
+        {#if association}
+          <InfoRow label={capital($_("association", { values: { n: 1 } }))}>
+            {association.association_type.name}
+          </InfoRow>
+
+          {#if association.substitute[0]}
+            <InfoRow label={capital($_("substitute"))}>
+              <a href={`${base}/orgviewer/person/${association.substitute[0].uuid}`}>
+                {employeeName(association.substitute[0])}
+              </a>
+            </InfoRow>
           {/if}
 
-          {#if association}
-            <dt>{capital($_("association", { values: { n: 1 } }))}</dt>
-            <dd>{association.association_type.name}</dd>
-
-            {#if association.substitute[0]}
-              <dt>{capital($_("substitute"))}</dt>
-              <dd>
-                <a href={`${base}/orgviewer/person/${association.substitute[0].uuid}`}>
-                  {employeeName(association.substitute[0])}
-                </a>
-              </dd>
-            {/if}
-
-            {#if association.dynamic_class}
-              <dt>{capital($_("class", { values: { n: 1 } }))}</dt>
-              <dd>
-                {#if association.dynamic_class.parent}{association.dynamic_class.parent
-                    .name} / {/if}{association.dynamic_class.name}
-              </dd>
-            {/if}
+          {#if association.dynamic_class}
+            <InfoRow label={capital($_("class", { values: { n: 1 } }))}>
+              {#if association.dynamic_class.parent}{association.dynamic_class.parent
+                  .name} / {/if}{association.dynamic_class.name}
+            </InfoRow>
           {/if}
+        {/if}
 
-          <dt>{capital($_("orgviewer.work_address"))}</dt>
-          <dd><WorkAddress uuid={person.uuid} /></dd>
-        </dl>
+        <InfoRow label={capital($_("orgviewer.work_address"))}>
+          <WorkAddress uuid={person.uuid} />
+        </InfoRow>
+      </div>
 
+      <div class="mt-4 border-t border-base-300 pt-3">
         <AddressList addresses={person.addresses} />
       </div>
     </article>
   {/if}
 {:catch error}
-  <p role="alert" class="text-error">{capital($_("orgviewer.error_loading_person"))}</p>
+  <p role="alert" class="p-4 text-error">{capital($_("orgviewer.error_loading_person"))}</p>
 {/await}

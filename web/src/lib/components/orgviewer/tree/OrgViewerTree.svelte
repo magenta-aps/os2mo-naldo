@@ -1,11 +1,12 @@
 <script lang="ts">
   import { base } from "$app/paths"
-  import { env } from "$lib/env"
   import { graphQLClient } from "$lib/http/client"
   import { fetchParentTree } from "$lib/http/parentTree"
   import { date } from "$lib/stores/date"
   import { capital } from "$lib/utils/helpers"
   import { _ } from "svelte-i18n"
+  import Icon from "@iconify/svelte"
+  import arrowBackRounded from "@iconify/icons-material-symbols/arrow-back-rounded"
   import type { OrgViewerUnit } from "./orgViewerTree"
   import OrgViewerNode from "./OrgViewerNode.svelte"
   import { OrgViewerUnitByUuidDocument } from "./queries"
@@ -54,33 +55,35 @@
     }
   }
 
-  $: layoutClass =
-    env.PUBLIC_ORGVIEWER_TREE_LAYOUT === "horizontal" ||
-    env.PUBLIC_ORGVIEWER_TREE_LAYOUT === "hybrid"
-      ? "oc-layout-horizontal"
-      : "oc-layout-vertical"
+  // NOTE: PUBLIC_ORGVIEWER_TREE_LAYOUT's "horizontal"/"hybrid" modes aren't
+  // visually implemented - the legacy app's dedicated SCSS for those was
+  // never ported. Only the vertical layout below is styled.
 </script>
 
-<div class={layoutClass}>
+<div class="space-y-1">
   {#await request}
-    <div role="status" class="max-w-sm animate-pulse">
-      <div class="mb-2.5 h-10 rounded-sm bg-base-100 max-w-4 dark:bg-accent" />
-      <span class="sr-only">{capital($_("loading"))}...</span>
+    <div role="status" class="animate-pulse space-y-2">
+      <div class="h-8 rounded-sm bg-base-200" />
+      <div class="ml-6 h-8 rounded-sm bg-base-200" />
+      <div class="ml-6 h-8 rounded-sm bg-base-200" />
     </div>
+    <span class="sr-only">{capital($_("loading"))}...</span>
   {:then result}
     {#if result}
       {#if result.root.parent}
-        <nav>
-          <a href={`${base}/orgviewer/tree/${rootUuid}/${result.root.parent.uuid}`}>
-            {capital($_("orgviewer.level_up"))}
-          </a>
-        </nav>
+        <a
+          href={`${base}/orgviewer/tree/${rootUuid}/${result.root.parent.uuid}`}
+          class="btn btn-outline btn-sm mb-2 rounded-sm font-normal normal-case"
+        >
+          <Icon icon={arrowBackRounded} width="16" height="16" />
+          {capital($_("orgviewer.level_up"))}
+        </a>
       {/if}
-      <ul>
+      <ul class="space-y-0.5">
         <OrgViewerNode {...result.root} {rootUuid} breadcrumbs={result.breadcrumbs} />
       </ul>
     {/if}
   {:catch error}
-    <p role="alert" class="text-error">{capital($_("orgviewer.error_loading_tree"))}</p>
+    <p role="alert" class="text-sm text-error">{capital($_("orgviewer.error_loading_tree"))}</p>
   {/await}
 </div>
