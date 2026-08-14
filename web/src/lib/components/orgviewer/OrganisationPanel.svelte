@@ -1,7 +1,7 @@
 <script lang="ts">
   import { base } from "$app/paths"
   import { env } from "$lib/env"
-  import { orgviewerGraphQLClient } from "$lib/http/orgviewerClient"
+  import { graphQLClient } from "$lib/http/client"
   import { capital } from "$lib/utils/helpers"
   import { _ } from "svelte-i18n"
   import AddressList from "./AddressList.svelte"
@@ -40,7 +40,7 @@
     includeAssoc: boolean,
     includeEng: boolean
   ): Promise<Detail | null> => {
-    const res = await orgviewerGraphQLClient().request(OrgViewerUnitDetailDocument, {
+    const res = await graphQLClient().request(OrgViewerUnitDetailDocument, {
       uuid: [unitUuid],
       includeAssociations: includeAssoc,
       includeEngagements: includeEng,

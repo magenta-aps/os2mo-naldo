@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { orgviewerGraphQLClient } from "$lib/http/orgviewerClient"
+  import { graphQLClient } from "$lib/http/client"
   import { OrgViewerPersonWorkAddressDocument } from "./queries"
 
   export let uuid: string
 
   const fetchWorkAddress = async (personUuid: string): Promise<string | undefined> => {
-    const res = await orgviewerGraphQLClient().request(OrgViewerPersonWorkAddressDocument, {
+    const res = await graphQLClient().request(OrgViewerPersonWorkAddressDocument, {
       uuid: [personUuid],
     })
     const addresses =

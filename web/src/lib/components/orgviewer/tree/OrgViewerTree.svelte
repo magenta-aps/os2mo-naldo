@@ -1,8 +1,9 @@
 <script lang="ts">
   import { base } from "$app/paths"
   import { env } from "$lib/env"
-  import { orgviewerGraphQLClient } from "$lib/http/orgviewerClient"
-  import { fetchOrgViewerParentTree } from "$lib/http/orgviewerParentTree"
+  import { graphQLClient } from "$lib/http/client"
+  import { fetchParentTree } from "$lib/http/parentTree"
+  import { date } from "$lib/stores/date"
   import { capital } from "$lib/utils/helpers"
   import { _ } from "svelte-i18n"
   import type { OrgViewerUnit } from "./orgViewerTree"
@@ -22,7 +23,7 @@
   const resolveBreadcrumbs = async (uuid: string, focused?: string): Promise<string[]> => {
     if (!focused || focused === uuid) return []
 
-    const ancestors = await fetchOrgViewerParentTree(focused)
+    const ancestors = await fetchParentTree(focused, $date)
     const rootIndex = ancestors.findIndex((a) => a.uuid === uuid)
     if (rootIndex === -1) return []
 
@@ -33,7 +34,7 @@
   }
 
   const fetchRoot = async (uuid: string, focused?: string): Promise<RootResult> => {
-    const res = await orgviewerGraphQLClient().request(OrgViewerUnitByUuidDocument, {
+    const res = await graphQLClient().request(OrgViewerUnitByUuidDocument, {
       uuid: [uuid],
     })
     const root = res.org_units.objects[0]?.validities[0]

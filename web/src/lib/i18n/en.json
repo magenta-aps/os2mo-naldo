@@ -198,6 +198,7 @@
 		"enter_organisation": "enter organisation",
 		"enter_person": "enter person",
 		"employees_count": "{n, plural, one {employee} other {employees}}",
+		"error_loading_person": "could not load the person",
 		"error_loading_tree": "could not load the organisation tree",
 		"error_loading_unit": "could not load the organisation unit",
 		"focus_unit": "show only {name}",

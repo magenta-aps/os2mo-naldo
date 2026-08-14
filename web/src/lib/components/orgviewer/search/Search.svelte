@@ -1,7 +1,7 @@
 <script lang="ts">
   import { base } from "$app/paths"
   import { env } from "$lib/env"
-  import { orgviewerGraphQLClient } from "$lib/http/orgviewerClient"
+  import { graphQLClient } from "$lib/http/client"
   import { capital } from "$lib/utils/helpers"
   import { onMount } from "svelte"
   import { _ } from "svelte-i18n"
@@ -28,7 +28,7 @@
   const search = async () => {
     try {
       if (searchType === "org_unit") {
-        const res = await orgviewerGraphQLClient().request(OrgViewerOrgUnitSearchDocument, {
+        const res = await graphQLClient().request(OrgViewerOrgUnitSearchDocument, {
           query,
           ancestor: [env.PUBLIC_ORGVIEWER_ROOT_UUID],
         })
@@ -43,7 +43,7 @@
           }))
       } else {
         const relationType = env.PUBLIC_ORGVIEWER_ORG_PERSON_RELATION
-        const res = await orgviewerGraphQLClient().request(OrgViewerEmployeeSearchDocument, {
+        const res = await graphQLClient().request(OrgViewerEmployeeSearchDocument, {
           query,
           includeEngagements: relationType === "engagement" || relationType === "both",
           includeAssociations: relationType === "association" || relationType === "both",

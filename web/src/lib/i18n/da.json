@@ -198,6 +198,7 @@
 		"enter_organisation": "indtast organisation",
 		"enter_person": "indtast person",
 		"employees_count": "{n, plural, one {ansat} other {ansatte}}",
+		"error_loading_person": "kunne ikke indlæse personen",
 		"error_loading_tree": "kunne ikke indlæse organisationstræet",
 		"error_loading_unit": "kunne ikke indlæse organisationsenheden",
 		"focus_unit": "vis kun {name}",

@@ -127,9 +127,10 @@ export const env = {
   PUBLIC_ENABLE_THEMING: bool(dynamicEnv["PUBLIC_ENABLE_THEMING"]),
   PUBLIC_ENVIRONMENT: environment(dynamicEnv["PUBLIC_ENVIRONMENT"]),
 
-  // orgviewer: a public, unauthenticated read-only org-chart viewer ported
-  // from the standalone os2orgviewer app, mounted under /orgviewer. Kept in
-  // its own PUBLIC_ORGVIEWER_* namespace so its deploy config stays
+  // orgviewer: a read-only org-chart viewer ported from the standalone
+  // os2orgviewer app, mounted under /orgviewer. Sits behind the same
+  // Keycloak login and PBAC-scoped GraphQL access as the rest of this app.
+  // Kept in its own PUBLIC_ORGVIEWER_* namespace so its deploy config stays
   // independent of the rest of this app's PUBLIC_SHOW_*/PUBLIC_ENABLE_* flags.
   PUBLIC_ORGVIEWER_ROOT_UUID: dynamicEnv["PUBLIC_ORGVIEWER_ROOT_UUID"] ?? "",
   PUBLIC_ORGVIEWER_TITLE: dynamicEnv["PUBLIC_ORGVIEWER_TITLE"] ?? "OS2mo Orgviewer",

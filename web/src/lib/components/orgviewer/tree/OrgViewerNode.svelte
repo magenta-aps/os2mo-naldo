@@ -2,7 +2,7 @@
   import { base } from "$app/paths"
   import { page } from "$app/stores"
   import { env } from "$lib/env"
-  import { orgviewerGraphQLClient } from "$lib/http/orgviewerClient"
+  import { graphQLClient } from "$lib/http/client"
   import { capital } from "$lib/utils/helpers"
   import { _ } from "svelte-i18n"
   import Icon from "@iconify/svelte"
@@ -25,8 +25,8 @@
   export let engagements: OrgViewerUnit["engagements"] = []
   export let rootUuid: string
   // Ancestor uuids between the focused (URL) org unit and this node,
-  // nearest-ancestor-first - see $lib/http/orgviewerParentTree.ts. Ported
-  // from Node.svelte's identical breadcrumbs/expandToActiveChild pattern.
+  // nearest-ancestor-first - see $lib/http/parentTree.ts. Ported from
+  // Node.svelte's identical breadcrumbs/expandToActiveChild pattern.
   export let breadcrumbs: string[] = []
   export let indent = 8
 
@@ -35,7 +35,7 @@
   let children: OrgViewerUnit[] | undefined = undefined
 
   const fetchChildren = async (): Promise<OrgViewerUnit[]> => {
-    const res = await orgviewerGraphQLClient().request(OrgViewerUnitChildrenDocument, {
+    const res = await graphQLClient().request(OrgViewerUnitChildrenDocument, {
       uuid: [uuid],
     })
     const raw = res.org_units.objects.map((o) => o.validities[0])
