@@ -32,6 +32,44 @@ export const json = <T>(value: string | undefined, defaultValue: T): T => {
   }
 }
 
+export type OrgviewerTreeLayout = "horizontal" | "hybrid" | "vertical"
+const VALID_TREE_LAYOUTS: OrgviewerTreeLayout[] = ["horizontal", "hybrid", "vertical"]
+
+export const treeLayout = (
+  value: string | undefined,
+  defaultValue: OrgviewerTreeLayout = "vertical"
+): OrgviewerTreeLayout => {
+  if (!value) return defaultValue
+  if (VALID_TREE_LAYOUTS.includes(value as OrgviewerTreeLayout))
+    return value as OrgviewerTreeLayout
+  throw new Error(
+    `Invalid PUBLIC_ORGVIEWER_TREE_LAYOUT: "${value}". Must be one of: ${VALID_TREE_LAYOUTS.join(
+      ", "
+    )}`
+  )
+}
+
+export type OrgPersonRelation = "engagement" | "association" | "both"
+const VALID_ORG_PERSON_RELATIONS: OrgPersonRelation[] = [
+  "engagement",
+  "association",
+  "both",
+]
+
+export const personRelation = (
+  value: string | undefined,
+  defaultValue: OrgPersonRelation = "engagement"
+): OrgPersonRelation => {
+  if (!value) return defaultValue
+  if (VALID_ORG_PERSON_RELATIONS.includes(value as OrgPersonRelation))
+    return value as OrgPersonRelation
+  throw new Error(
+    `Invalid PUBLIC_ORGVIEWER_ORG_PERSON_RELATION: "${value}". Must be one of: ${VALID_ORG_PERSON_RELATIONS.join(
+      ", "
+    )}`
+  )
+}
+
 export const env = {
   // lists
   PUBLIC_NAVLINKS: json<{ href: string; text: string }[]>(
@@ -88,4 +126,56 @@ export const env = {
   PUBLIC_ENABLE_RSD_SEARCH: bool(dynamicEnv["PUBLIC_ENABLE_RSD_SEARCH"]),
   PUBLIC_ENABLE_THEMING: bool(dynamicEnv["PUBLIC_ENABLE_THEMING"]),
   PUBLIC_ENVIRONMENT: environment(dynamicEnv["PUBLIC_ENVIRONMENT"]),
+
+  // orgviewer: a public, unauthenticated read-only org-chart viewer ported
+  // from the standalone os2orgviewer app, mounted under /orgviewer. Kept in
+  // its own PUBLIC_ORGVIEWER_* namespace so its deploy config stays
+  // independent of the rest of this app's PUBLIC_SHOW_*/PUBLIC_ENABLE_* flags.
+  PUBLIC_ORGVIEWER_ROOT_UUID: dynamicEnv["PUBLIC_ORGVIEWER_ROOT_UUID"] ?? "",
+  PUBLIC_ORGVIEWER_TITLE: dynamicEnv["PUBLIC_ORGVIEWER_TITLE"] ?? "OS2mo Orgviewer",
+  PUBLIC_ORGVIEWER_TREE_LAYOUT: treeLayout(dynamicEnv["PUBLIC_ORGVIEWER_TREE_LAYOUT"]),
+  PUBLIC_ORGVIEWER_ORG_PERSON_RELATION: personRelation(
+    dynamicEnv["PUBLIC_ORGVIEWER_ORG_PERSON_RELATION"]
+  ),
+  PUBLIC_ORGVIEWER_HIDE_ORG_UNIT_UUIDS: json<string[]>(
+    dynamicEnv["PUBLIC_ORGVIEWER_HIDE_ORG_UNIT_UUIDS"],
+    []
+  ),
+  PUBLIC_ORGVIEWER_HIDE_ORG_UNITS_BY_NAME: json<string[]>(
+    dynamicEnv["PUBLIC_ORGVIEWER_HIDE_ORG_UNITS_BY_NAME"],
+    []
+  ),
+  PUBLIC_ORGVIEWER_HIDE_ORG_UNIT_LEVELS: json<string[]>(
+    dynamicEnv["PUBLIC_ORGVIEWER_HIDE_ORG_UNIT_LEVELS"],
+    []
+  ),
+  PUBLIC_ORGVIEWER_SORT_SPECIFIC_UNITS_TO_BOTTOM: json<string[]>(
+    dynamicEnv["PUBLIC_ORGVIEWER_SORT_SPECIFIC_UNITS_TO_BOTTOM"],
+    []
+  ),
+  PUBLIC_ORGVIEWER_REMOVE_ENGAGEMENT_TYPE_UUID: json<string[]>(
+    dynamicEnv["PUBLIC_ORGVIEWER_REMOVE_ENGAGEMENT_TYPE_UUID"],
+    []
+  ),
+  PUBLIC_ORGVIEWER_REMOVE_CHILDREN_COUNT: bool(
+    dynamicEnv["PUBLIC_ORGVIEWER_REMOVE_CHILDREN_COUNT"]
+  ),
+  PUBLIC_ORGVIEWER_REMOVE_PERSON_COUNT: bool(
+    dynamicEnv["PUBLIC_ORGVIEWER_REMOVE_PERSON_COUNT"]
+  ),
+  PUBLIC_ORGVIEWER_REMOVE_MANAGER_ENGAGEMENT: bool(
+    dynamicEnv["PUBLIC_ORGVIEWER_REMOVE_MANAGER_ENGAGEMENT"]
+  ),
+  PUBLIC_ORGVIEWER_REMOVE_ORG_UNIT_EMAIL: bool(
+    dynamicEnv["PUBLIC_ORGVIEWER_REMOVE_ORG_UNIT_EMAIL"]
+  ),
+  PUBLIC_ORGVIEWER_HIDDEN_ADDRESS_TYPE_USER_KEYS: json<string[]>(
+    dynamicEnv["PUBLIC_ORGVIEWER_HIDDEN_ADDRESS_TYPE_USER_KEYS"],
+    []
+  ),
+  PUBLIC_ORGVIEWER_SHOW_NICKNAME: bool(dynamicEnv["PUBLIC_ORGVIEWER_SHOW_NICKNAME"]),
+  PUBLIC_ORGVIEWER_SHOW_EXTENSION_1: bool(dynamicEnv["PUBLIC_ORGVIEWER_SHOW_EXTENSION_1"]),
+  PUBLIC_ORGVIEWER_SHOW_EXTENSION_3_VIBORG: bool(
+    dynamicEnv["PUBLIC_ORGVIEWER_SHOW_EXTENSION_3_VIBORG"]
+  ),
 }
