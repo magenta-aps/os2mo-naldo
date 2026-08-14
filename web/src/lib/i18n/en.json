@@ -202,7 +202,8 @@
 		"hide_children": "hide {n} subunits",
 		"level_up": "level up",
 		"no_details_found": "no details found",
-		"show_children": "show {n} subunits"
+		"show_children": "show {n} subunits",
+		"work_address": "work address"
 	},
 	"owner": "{n, plural, =0 {the owner} one {owner} other {owners}}",
 	"parent": "parent unit",

@@ -202,7 +202,8 @@
 		"hide_children": "skjul {n} underenheder",
 		"level_up": "niveau op",
 		"no_details_found": "ingen detaljer fundet",
-		"show_children": "vis {n} underenheder"
+		"show_children": "vis {n} underenheder",
+		"work_address": "arbejdsadresse"
 	},
 	"owner": "{n, plural, =0 {ejeren} one {ejer} other {ejere}}",
 	"parent": "overenhed",
