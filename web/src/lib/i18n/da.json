@@ -190,6 +190,15 @@
 	"org_unit_type": "enhedstype",
 	"organisation": "organisation",
 	"organisation_overview": "organisationsoverblik",
+	"orgviewer": {
+		"associated_count": "{n, plural, one {tilknyttet} other {tilknyttede}}",
+		"employees_count": "{n, plural, one {ansat} other {ansatte}}",
+		"error_loading_tree": "kunne ikke indlæse organisationstræet",
+		"focus_unit": "vis kun {name}",
+		"hide_children": "skjul {n} underenheder",
+		"level_up": "niveau op",
+		"show_children": "vis {n} underenheder"
+	},
 	"owner": "{n, plural, =0 {ejeren} one {ejer} other {ejere}}",
 	"parent": "overenhed",
 	"parent_response": "overenhed",
