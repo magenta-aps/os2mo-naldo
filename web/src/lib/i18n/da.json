@@ -192,11 +192,16 @@
 	"organisation_overview": "organisationsoverblik",
 	"orgviewer": {
 		"associated_count": "{n, plural, one {tilknyttet} other {tilknyttede}}",
+		"committee_documents": "udvalgets dokumenter",
+		"documents": "dokumenter",
+		"email": "e-mail",
 		"employees_count": "{n, plural, one {ansat} other {ansatte}}",
 		"error_loading_tree": "kunne ikke indlæse organisationstræet",
+		"error_loading_unit": "kunne ikke indlæse organisationsenheden",
 		"focus_unit": "vis kun {name}",
 		"hide_children": "skjul {n} underenheder",
 		"level_up": "niveau op",
+		"no_details_found": "ingen detaljer fundet",
 		"show_children": "vis {n} underenheder"
 	},
 	"owner": "{n, plural, =0 {ejeren} one {ejer} other {ejere}}",

@@ -192,11 +192,16 @@
 	"organisation_overview": "organisation overview",
 	"orgviewer": {
 		"associated_count": "{n, plural, one {associated} other {associated}}",
+		"committee_documents": "committee documents",
+		"documents": "documents",
+		"email": "email",
 		"employees_count": "{n, plural, one {employee} other {employees}}",
 		"error_loading_tree": "could not load the organisation tree",
+		"error_loading_unit": "could not load the organisation unit",
 		"focus_unit": "show only {name}",
 		"hide_children": "hide {n} subunits",
 		"level_up": "level up",
+		"no_details_found": "no details found",
 		"show_children": "show {n} subunits"
 	},
 	"owner": "{n, plural, =0 {the owner} one {owner} other {owners}}",
