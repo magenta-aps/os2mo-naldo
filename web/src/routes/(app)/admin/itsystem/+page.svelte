@@ -7,23 +7,6 @@
   import TableTensesWrapper from "$lib/components/tables/TableTensesWrapper.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
-  import Icon from "@iconify/svelte"
-  import infoOutlineRounded from "@iconify/icons-material-symbols/info-outline-rounded"
-  import { date } from "$lib/stores/date"
-  import { facetStore } from "$lib/stores/facetStore"
-  import { getFacets } from "$lib/http/getFacets"
-  import { onMount } from "svelte"
-
-  let roleFacet: { name: string; uuid: string; user_key: string } | undefined
-
-  onMount(async () => {
-    const facets = await getFacets({ uuid: null, fromDate: $date })
-    roleFacet = facets.find((f) => f.user_key === "role")
-  })
-
-  const goToRoles = () => {
-    if (roleFacet) facetStore.set(roleFacet)
-  }
 </script>
 
 <HeadTitle type="admin" />
@@ -33,15 +16,6 @@
     <h1 class="pb-4">
       {capital($_("itsystem", { values: { n: 2 } }))}
     </h1>
-
-    {#if roleFacet}
-      <p class="text-sm text-base-content/70 pb-2">
-        {$_("itsystem_roles_hint")}
-        <a href="{base}/admin/facet" on:click={goToRoles}
-          >{capital($_("manage_roles"))}</a
-        >.
-      </p>
-    {/if}
 
     <div class="flex justify-between">
       <TenseTabs />
@@ -61,7 +35,6 @@
       headers={[
         { title: capital($_("name")), sortPath: "name" },
         { title: capital($_("user_key")), sortPath: "user_key" },
-        { title: capital($_("role", { values: { n: 2 } })), sortPath: "user_key" },
         { title: capital($_("date.date")), sortPath: "validity.from" },
       ]}
     />
