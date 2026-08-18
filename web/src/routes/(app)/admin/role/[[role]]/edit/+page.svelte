@@ -37,7 +37,12 @@
       }
     }
 
-    query Role($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+    query Role(
+      $uuid: [UUID!]
+      $fromDate: DateTime
+      $toDate: DateTime
+      $currentDate: DateTime
+    ) {
       classes(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
           validities {
@@ -47,7 +52,7 @@
             facet_uuid
             it_system_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 name
               }
             }
@@ -122,6 +127,13 @@
   let chosenItSystem: { name: string; uuid: string; user_key?: string } | undefined
   let itSystems: ITSystem[] | undefined
 
+  const queryVariables = {
+    uuid: $page.params.role,
+    fromDate: $page.url.searchParams.get("from"),
+    toDate: $page.url.searchParams.get("to"),
+    currentDate: startDate,
+  }
+
   // Logic for updating datepicker intervals
   let validities: {
     from: string | undefined | null
@@ -176,7 +188,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( RoleDocument, { uuid: $page.params.role, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to") } )}
+{#await graphQLClient().request(RoleDocument, queryVariables)}
   <!-- TODO: Should have a skeleton for the loading stage -->
   {capital($_("loading"))}
 {:then data}
