@@ -29,6 +29,8 @@
   import { tenseFilter } from "$lib/utils/tenses"
   import { env } from "$lib/env"
 
+  const UNKNOWN_ORG_UNIT_NAME = "Ukendt"
+
   // Tabs
   let items = [
     { label: "unit", value: "unit", n: 1 },
@@ -149,7 +151,7 @@
     </div>
     <Tabs {activeItem} {items} on:tabChange={tabChange} />
     <div class="flex justify-between">
-      <TenseTabs />
+      <TenseTabs disablePast={orgUnit.name === UNKNOWN_ORG_UNIT_NAME} />
       {#if activeItem === OrgTab.IT}
         <Button
           type="button"
