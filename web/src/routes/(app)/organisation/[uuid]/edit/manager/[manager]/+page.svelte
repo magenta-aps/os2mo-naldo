@@ -36,14 +36,19 @@
   } from "$lib/utils/display"
 
   gql`
-    query Manager($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+    query Manager(
+      $uuid: [UUID!]
+      $fromDate: DateTime
+      $toDate: DateTime
+      $currentDate: DateTime
+    ) {
       managers(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
           validities {
             uuid
             person_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 name
               }
             }
@@ -76,7 +81,7 @@
             }
             org_unit_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 name
                 validity {
                   from
@@ -257,6 +262,7 @@
     uuid: $page.params.manager,
     fromDate: $page.url.searchParams.get("from"),
     toDate: $page.url.searchParams.get("to"),
+    currentDate: startDate,
   })
 
   let initialManager: any = null

@@ -22,13 +22,18 @@
   import { normalizeOwner } from "$lib/utils/normalizeForm"
 
   gql`
-    query Owner($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+    query Owner(
+      $uuid: [UUID!]
+      $fromDate: DateTime
+      $toDate: DateTime
+      $currentDate: DateTime
+    ) {
       owners(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
           validities {
             owner_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 name
               }
             }
@@ -115,6 +120,7 @@
     uuid: $page.params.owner,
     fromDate: $page.url.searchParams.get("from"),
     toDate: $page.url.searchParams.get("to"),
+    currentDate: startDate,
   })
 
   let initialOwner: any = null

@@ -30,7 +30,12 @@
   import { normalizeEngagement } from "$lib/utils/normalizeForm"
 
   gql`
-    query Engagement($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+    query Engagement(
+      $uuid: [UUID!]
+      $fromDate: DateTime
+      $toDate: DateTime
+      $currentDate: DateTime
+    ) {
       engagements(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
           validities {
@@ -66,7 +71,7 @@
             }
             org_unit_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 name
               }
             }
@@ -179,7 +184,7 @@
     uuid: $page.params.engagement,
     fromDate: $page.url.searchParams.get("from"),
     toDate: $page.url.searchParams.get("to"),
-    currentDate: $date,
+    currentDate: startDate,
   })
 
   let initialEngagement: any = null

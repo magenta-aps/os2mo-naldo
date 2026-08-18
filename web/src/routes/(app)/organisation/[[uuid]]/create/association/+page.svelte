@@ -228,6 +228,7 @@
         </div>
         <Search
           type="org-unit"
+          at={startDate}
           startValue={{
             uuid: orgUnit ? orgUnit.uuid : undefined,
             name: orgUnit ? orgUnit.name : "",

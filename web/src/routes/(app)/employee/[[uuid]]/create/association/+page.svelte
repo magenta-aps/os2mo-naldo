@@ -245,6 +245,7 @@
         <!-- TODO: make optional when GraphQL agrees -->
         <Search
           type="employee"
+          at={startDate}
           startValue={{
             uuid: employee ? employee.uuid : undefined,
             name: employee ? employee.name : "",
