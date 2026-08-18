@@ -8,6 +8,7 @@ interface SuccessAlert {
     | "organisation"
     | "class"
     | "itsystem"
+    | "role"
     | "clipboard"
     | "connections"
 }

@@ -20,7 +20,8 @@
       $success.type == "organisation" ||
       $success.type == "employee" ||
       $success.type == "class" ||
-      $success.type == "itsystem"
+      $success.type == "itsystem" ||
+      $success.type == "role"
     ) {
       setTimeout(() => {
         if ($success.uuid) {
@@ -32,6 +33,8 @@
           setTimeout(() => goto(`${base}/admin/facet`), 200)
         } else if ($success.type == "itsystem") {
           setTimeout(() => goto(`${base}/admin/itsystem`), 200)
+        } else if ($success.type == "role") {
+          setTimeout(() => goto(`${base}/admin/role`), 200)
         } else {
           setTimeout(() => goto(`${base}/`), 200)
         }
