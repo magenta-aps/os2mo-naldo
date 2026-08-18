@@ -104,8 +104,7 @@
           : []),
         { title: capital($_("date.date")), sortPath: "validity.from" },
       ]}
-      {facetUuid}
-      {isRoleFacet}
+      props={{ facetUuid, isRoleFacet }}
     />
   </main>
 </div>
