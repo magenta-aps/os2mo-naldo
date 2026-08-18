@@ -205,6 +205,7 @@
 	"role": "{n, plural, =0 {the role} one {role} other {roles}}",
 	"role_type": "role type",
 	"rolebinding": "{n, plural, =0 {the rolebinding} one {rolebinding} other {rolebindings}}",
+	"roles_text": "A role describes the rights an IT user can be granted in an IT system, for example 'AD Read' or 'SAP Admin'. A role always belongs to exactly one IT system, and is granted to an IT user through a rolebinding. Here you get an overview of each IT system's roles, and can create, edit and terminate them.",
 	"root": "root unit",
 	"save": "save",
 	"scope": "scope",

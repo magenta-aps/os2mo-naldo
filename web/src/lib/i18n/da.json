@@ -205,6 +205,7 @@
 	"role": "{n, plural, =0 {rollen} one {rolle} other {roller}}",
 	"role_type": "rolletype",
 	"rolebinding": "{n, plural, =0 {rollebindingen} one {rollebinding} other {rollebindinger}}",
+	"roles_text": "En rolle beskriver de rettigheder, en IT-bruger kan få i et IT-system, fx 'AD Læs' eller 'SAP Administrator'. Roller hører altid til ét IT-system, og de tildeles en IT-bruger via en rollebinding. Her kan du få overblik over hvert IT-systems roller og oprette, redigere og afslutte dem.",
 	"root": "rodenhed",
 	"save": "gem",
 	"scope": "scope",
