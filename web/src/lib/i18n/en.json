@@ -269,8 +269,8 @@
 	},
 	"validity": "validity",
 	"visibility": "visibility",
-	"roles_itsystem_hint": "Roles can be connected to IT systems.",
-	"manage_itsystems": "manage IT systems",
+	"roles_own_module_hint": "Roles are classes too, but they are managed on their own, because they belong to an IT system.",
+	"manage_roles": "manage roles",
 	"manage_connections": "manage connections",
 	"welcome_message": "Welcome to GIR"
 }

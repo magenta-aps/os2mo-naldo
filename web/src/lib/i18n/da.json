@@ -269,8 +269,8 @@
 	},
 	"validity": "gyldighed",
 	"visibility": "synlighed",
-	"roles_itsystem_hint": "Roller kan forbindes til IT-systemer.",
-	"manage_itsystems": "administrér IT-systemer",
+	"roles_own_module_hint": "Roller er også klasser, men de administreres for sig, fordi de hører til et IT-system.",
+	"manage_roles": "administrér roller",
 	"manage_connections": "administrér sammenkoblinger",
 	"welcome_message": "Velkommen til MO"
 }

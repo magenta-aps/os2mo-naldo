@@ -14,17 +14,14 @@
   import { date } from "$lib/stores/date"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import type { SubmitFunction } from "./$types"
-  import {
-    GetItSystemsDocument,
-    UpdateClassDocument,
-    ClassDocument,
-  } from "./query.generated"
-  import { formatITSystemNames, type ITSystem } from "$lib/utils/helpers"
+  import { UpdateClassDocument, ClassDocument } from "./query.generated"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import { getFacetValidities } from "$lib/http/getValidities"
   import { facetStore } from "$lib/stores/facetStore"
   import { AddressScope, isAddressTypeFacet } from "$lib/constants/addresses"
+  import { isRoleFacet } from "$lib/utils/roles"
+  import { goto } from "$app/navigation"
 
   gql`
     query Class($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
@@ -41,29 +38,10 @@
                 user_key
               }
             }
-            it_system_response {
-              uuid
-              current(at: $fromDate) {
-                user_key
-                name
-              }
-            }
             validity {
               from
               to
             }
-          }
-        }
-      }
-    }
-
-    query GetITSystems($fromDate: DateTime!) {
-      itsystems {
-        objects {
-          current(at: $fromDate) {
-            name
-            uuid
-            user_key
           }
         }
       }
@@ -112,10 +90,6 @@
   let toDate: string
   let chosenFacet: { name: string; uuid: string; user_key: string }
 
-  let chosenItSystem: { name: string; uuid: string; user_key?: string } | undefined =
-    undefined
-  let itSystems: ITSystem[] | undefined = undefined
-
   const fromDate = field("from", "", [required()])
   const name = field("name", "", [required()])
   const userKey = field("user_key", "", [required()])
@@ -135,25 +109,19 @@
     validities = { from: null, to: null }
   }
 
-  let itSystemController: AbortController
-  $: if (chosenFacet && chosenFacet?.user_key === "role" && !itSystems && startDate) {
-    if (itSystemController) itSystemController.abort()
-    itSystemController = new AbortController()
-    ;(async () => {
-      try {
-        const res = await graphQLClient(itSystemController.signal).request(
-          GetItSystemsDocument,
-          {
-            fromDate: startDate,
-          }
-        )
-        // Map to the format the Select component expects
-        itSystems = res.itsystems.objects
-      } catch (err: any) {
-        if (err.name !== "AbortError") console.error("Failed to fetch IT Systems:", err)
+  const dataPromise = graphQLClient()
+    .request(ClassDocument, {
+      uuid: $page.params.class,
+      fromDate: $page.url.searchParams.get("from"),
+      toDate: $page.url.searchParams.get("to"),
+    })
+    .then((data) => {
+      const facet = data.classes.objects[0].validities[0].facet_response
+      if (isRoleFacet(facet.current?.user_key)) {
+        goto(`${base}/admin/role/${$page.params.class}/edit${$page.url.search}`)
       }
-    })()
-  }
+      return data
+    })
 </script>
 
 <title
@@ -176,7 +144,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ClassDocument, { uuid: $page.params.class, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to") } )}
+{#await dataPromise}
   <!-- TODO: Should have a skeleton for the loading stage -->
   {capital($_("loading"))}
 {:then data}
@@ -224,21 +192,6 @@
           disabled
         />
 
-        {#if itSystems}
-          <Select
-            title={capital($_("itsystem", { values: { n: 1 } }))}
-            id="itsystem"
-            bind:value={chosenItSystem}
-            startValue={cls.it_system_response?.current
-              ? {
-                  uuid: cls.it_system_response.uuid,
-                  name: cls.it_system_response.current.name,
-                }
-              : undefined}
-            iterable={formatITSystemNames(itSystems)}
-            required={true}
-          />
-        {/if}
         {#if isAddressTypeFacet(facetResponse.current?.user_key)}
           <Select
             title={capital($_("scope"))}

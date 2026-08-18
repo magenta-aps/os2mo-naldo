@@ -14,19 +14,18 @@
   import Icon from "@iconify/svelte"
   import infoOutlineRounded from "@iconify/icons-material-symbols/info-outline-rounded"
   import { getFacets } from "$lib/http/getFacets"
+  import { isRoleFacet, withoutRoleFacet } from "$lib/utils/roles"
 
   let facet: { name: string; uuid: string; user_key: string }
   let facetUuid: string
   let facets: { name: string; uuid: string; user_key: string }[]
-
-  $: isRoleFacet = facet?.user_key === "role"
 
   const updateFacet = () => {
     facetUuid = facet.uuid
   }
 
   onMount(async () => {
-    if ($facetStore.uuid) {
+    if ($facetStore.uuid && !isRoleFacet($facetStore.user_key)) {
       facet = {
         name: $facetStore.name,
         user_key: $facetStore.user_key,
@@ -34,7 +33,7 @@
       }
       facetUuid = $facetStore.uuid
     }
-    facets = await getFacets({ uuid: null, fromDate: $date })
+    facets = withoutRoleFacet(await getFacets({ uuid: null, fromDate: $date }))
   })
 </script>
 
@@ -63,12 +62,10 @@
       />
     </div>
 
-    {#if isRoleFacet}
-      <p class="text-sm text-base-content/70 pb-2">
-        {$_("roles_itsystem_hint")}
-        <a href="{base}/admin/itsystem">{capital($_("manage_itsystems"))}</a>.
-      </p>
-    {/if}
+    <p class="text-sm text-base-content/70 pb-2">
+      {$_("roles_own_module_hint")}
+      <a href="{base}/admin/role">{capital($_("manage_roles"))}</a>.
+    </p>
     {#if facetUuid}
       <p>{$_("facets.description." + facet.user_key)}</p>
     {/if}
@@ -94,17 +91,9 @@
       headers={[
         { title: capital($_("name")), sortPath: "name" },
         { title: capital($_("user_key")), sortPath: "user_key" },
-        ...(isRoleFacet
-          ? [
-              {
-                title: capital($_("itsystem", { values: { n: 1 } })),
-                sortPath: "it_system.name",
-              },
-            ]
-          : []),
         { title: capital($_("date.date")), sortPath: "validity.from" },
       ]}
-      props={{ facetUuid, isRoleFacet }}
+      props={{ facetUuid }}
     />
   </main>
 </div>

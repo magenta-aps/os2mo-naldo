@@ -1,3 +1,9 @@
+export const isRoleFacet = (userKey: string | undefined | null): boolean =>
+  userKey === "role"
+
+export const withoutRoleFacet = <T extends { user_key: string }>(facets: T[]): T[] =>
+  facets.filter((facet) => !isRoleFacet(facet.user_key))
+
 export type RoleITSystem = {
   uuid: string
   current?: { name: string } | null

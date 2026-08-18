@@ -22,7 +22,6 @@
 
   export let tense: Tense
   export let facetUuid: string
-  export let isRoleFacet: boolean = false
 
   gql`
     query Class($facetUuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
@@ -35,12 +34,6 @@
             user_key
             uuid
             facet_uuid
-            it_system_response {
-              uuid
-              current(at: $fromDate) {
-                name
-              }
-            }
             validity {
               from
               to
@@ -85,9 +78,6 @@
     >
       <td class="text-sm p-4">{cls.name}</td>
       <td class="text-sm p-4">{cls.user_key}</td>
-      {#if isRoleFacet}
-        <td class="text-sm p-4">{cls.it_system_response?.current?.name ?? ""}</td>
-      {/if}
       <ValidityTableCell validity={cls.validity} />
       <td class="flex p-4 gap-2 justify-end">
         <a href={`${base}/auditlog/${cls.uuid}`}>

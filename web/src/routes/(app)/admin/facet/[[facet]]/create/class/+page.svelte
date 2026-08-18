@@ -14,8 +14,7 @@
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import type { SubmitFunction } from "./$types"
-  import { GetItSystemsDocument, CreateClassDocument } from "./query.generated"
-  import { formatITSystemNames, type ITSystem } from "$lib/utils/helpers"
+  import { CreateClassDocument } from "./query.generated"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import { onMount } from "svelte"
@@ -23,19 +22,10 @@
   import { getFacetValidities } from "$lib/http/getValidities"
   import { facetStore } from "$lib/stores/facetStore"
   import { AddressScope, isAddressTypeFacet } from "$lib/constants/addresses"
+  import { isRoleFacet, withoutRoleFacet } from "$lib/utils/roles"
+  import { goto } from "$app/navigation"
 
   gql`
-    query GetITSystems($fromDate: DateTime!) {
-      itsystems {
-        objects {
-          current(at: $fromDate) {
-            name
-            uuid
-            user_key
-          }
-        }
-      }
-    }
     mutation CreateClass($input: ClassCreateInput!, $date: DateTime!) {
       class_create(input: $input) {
         current(at: $date) {
@@ -87,10 +77,6 @@
   let chosenFacet: { name: string; uuid: string; user_key: string }
   let facets: { name: string; uuid: string; user_key: string }[]
 
-  let chosenItSystem: { name: string; uuid: string; user_key?: string } | undefined =
-    undefined
-  let itSystems: ITSystem[] | undefined = undefined
-
   // Logic for updating datepicker intervals
   let validities: {
     from: string | undefined | null
@@ -98,13 +84,18 @@
   } = { from: null, to: null }
 
   onMount(async () => {
-    facets = await getFacets({
+    const found = await getFacets({
       uuid: $page.params.facet ?? null,
       fromDate: startDate,
     })
     if ($page.params.facet) {
-      chosenFacet = facets[0] ?? null
+      chosenFacet = found[0] ?? null
+      if (isRoleFacet(chosenFacet?.user_key)) {
+        goto(`${base}/admin/role/create`)
+        return
+      }
     }
+    facets = withoutRoleFacet(found)
   })
 
   let facetController: AbortController
@@ -113,9 +104,8 @@
     facetController = new AbortController()
     ;(async () => {
       try {
-        facets = await getFacets(
-          { uuid: null, fromDate: startDate },
-          facetController?.signal
+        facets = withoutRoleFacet(
+          await getFacets({ uuid: null, fromDate: startDate }, facetController?.signal)
         )
       } catch (err: any) {
         if (err.name !== "AbortError") {
@@ -143,26 +133,6 @@
     })()
   } else {
     validities = { from: null, to: null }
-  }
-
-  let itSystemController: AbortController
-  $: if (chosenFacet && chosenFacet?.user_key === "role" && !itSystems && startDate) {
-    if (itSystemController) itSystemController.abort()
-    itSystemController = new AbortController()
-    ;(async () => {
-      try {
-        const res = await graphQLClient(itSystemController.signal).request(
-          GetItSystemsDocument,
-          {
-            fromDate: startDate,
-          }
-        )
-        // Map to the format the Select component expects
-        itSystems = res.itsystems.objects
-      } catch (err: any) {
-        if (err.name !== "AbortError") console.error("Failed to fetch IT Systems:", err)
-      }
-    })()
   }
 </script>
 
@@ -218,15 +188,6 @@
           errors={$facetField.errors}
           iterable={facets}
           disabled={$page.params.facet ? true : false}
-          required={true}
-        />
-      {/if}
-      {#if itSystems}
-        <Select
-          title={capital($_("itsystem", { values: { n: 1 } }))}
-          id="itsystem"
-          bind:value={chosenItSystem}
-          iterable={formatITSystemNames(itSystems)}
           required={true}
         />
       {/if}
