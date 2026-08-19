@@ -95,6 +95,12 @@ export const isUUID = (value: string) => {
 
 // Decides whether a unit name should be suffixed with its SD user_key in
 // tree views. Extracted so it's testable without mocking `env`.
+// A unit's user_key holds its SD department code, but non-SD units carry a
+// placeholder (a UUID or "-") that should not be shown as a code.
+export const isRealSDCode = (user_key: string): boolean => {
+  return user_key !== "-" && !isUUID(user_key)
+}
+
 export const shouldSuffixSDCode = (
   name: string,
   user_key: string,
@@ -102,9 +108,7 @@ export const shouldSuffixSDCode = (
 ): boolean => {
   if (!showSDCode) return false
   if (name === user_key) return false
-  if (user_key === "-") return false
-  if (isUUID(user_key)) return false
-  return true
+  return isRealSDCode(user_key)
 }
 
 export const checkSDIdentifier = (name: string, user_key: string) => {

@@ -190,6 +190,9 @@
         table={OrgUnitTable}
         headers={[
           { title: capital($_("unit", { values: { n: 1 } })), sortPath: "name" },
+          ...(env.PUBLIC_SHOW_SD_CODE_IN_TREES
+            ? [{ title: capital($_("department_code")), sortPath: "user_key" }]
+            : []),
           {
             title: capital($_("org_unit_type")),
             sortPath: "unit_type_response.current.name",

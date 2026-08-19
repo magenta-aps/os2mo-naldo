@@ -3,6 +3,7 @@ import {
   formatITSystemNames,
   formatITUserITSystemName,
   formatKleNumberTitleAndUuid,
+  isRealSDCode,
   isUUID,
   shouldSuffixSDCode,
   upperCase,
@@ -87,6 +88,20 @@ describe("shouldSuffixSDCode", () => {
     expect(
       shouldSuffixSDCode("Name", "e0f496c4-bb51-47af-baeb-3fb771c51a9f", true)
     ).toBe(false)
+  })
+})
+
+describe("isRealSDCode", () => {
+  it("accepts a meaningful SD code", () => {
+    expect(isRealSDCode("ABC123")).toBe(true)
+  })
+
+  it("rejects the 'no value' placeholder '-'", () => {
+    expect(isRealSDCode("-")).toBe(false)
+  })
+
+  it("rejects a UUID (auto-generated, not an SD code)", () => {
+    expect(isRealSDCode("e0f496c4-bb51-47af-baeb-3fb771c51a9f")).toBe(false)
   })
 })
 
