@@ -14,7 +14,12 @@
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import type { SubmitFunction } from "./$types"
-  import { GetItSystemsDocument, CreateClassDocument } from "./query.generated"
+  import {
+    GetItSystemsDocument,
+    GetConfederationsDocument,
+    CreateClassDocument,
+  } from "./query.generated"
+  import { env } from "$lib/env"
   import { formatITSystemNames, type ITSystem } from "$lib/utils/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
@@ -36,6 +41,16 @@
         }
       }
     }
+    query GetConfederations($fromDate: DateTime!) {
+      classes(filter: { facet: { user_keys: "confederation" }, from_date: $fromDate }) {
+        objects {
+          current(at: $fromDate) {
+            name
+            uuid
+          }
+        }
+      }
+    }
     mutation CreateClass($input: ClassCreateInput!, $date: DateTime!) {
       class_create(input: $input) {
         current(at: $date) {
@@ -52,6 +67,20 @@
       await svelteForm.validate()
       if ($svelteForm.valid) {
         if (result.type === "success" && result.data) {
+          // `required` on the parent Select is only visual — enforce it here,
+          // since a trade union without a confederation parent is unusable.
+          if (
+            env.PUBLIC_ENABLE_CONFEDERATIONS &&
+            chosenFacet?.user_key === "trade_union" &&
+            !result.data.parent_uuid
+          ) {
+            $error = {
+              message: $_("validation.is_required", {
+                values: { field: capital($_("facets.name.confederation")) },
+              }),
+            }
+            return
+          }
           try {
             const mutation = await graphQLClient().request(CreateClassDocument, {
               input: result.data,
@@ -90,6 +119,7 @@
   let chosenItSystem: { name: string; uuid: string; user_key?: string } | undefined =
     undefined
   let itSystems: ITSystem[] | undefined = undefined
+  let confederations: { name: string; uuid: string }[] | undefined = undefined
 
   // Logic for updating datepicker intervals
   let validities: {
@@ -164,6 +194,32 @@
       }
     })()
   }
+
+  let confederationController: AbortController
+  $: if (
+    env.PUBLIC_ENABLE_CONFEDERATIONS &&
+    chosenFacet?.user_key === "trade_union" &&
+    !confederations &&
+    startDate
+  ) {
+    if (confederationController) confederationController.abort()
+    confederationController = new AbortController()
+    ;(async () => {
+      try {
+        const res = await graphQLClient(confederationController.signal).request(
+          GetConfederationsDocument,
+          { fromDate: startDate }
+        )
+        confederations = res.classes.objects
+          .map((cls) => cls.current)
+          .filter((current): current is NonNullable<typeof current> => current != null)
+          .sort((a, b) => a.name.localeCompare(b.name, "da", { sensitivity: "base" }))
+      } catch (err: any) {
+        if (err.name !== "AbortError")
+          console.error("Failed to fetch confederations:", err)
+      }
+    })()
+  }
 </script>
 
 <title
@@ -235,6 +291,14 @@
           title={capital($_("scope"))}
           id="scope"
           iterable={AddressScope.map((scope) => ({ uuid: scope, name: scope }))}
+          required={true}
+        />
+      {/if}
+      {#if env.PUBLIC_ENABLE_CONFEDERATIONS && chosenFacet?.user_key === "trade_union" && confederations}
+        <Select
+          title={capital($_("facets.name.confederation"))}
+          id="parent"
+          iterable={confederations}
           required={true}
         />
       {/if}
