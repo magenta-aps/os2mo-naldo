@@ -14,12 +14,15 @@
   import Icon from "@iconify/svelte"
   import infoOutlineRounded from "@iconify/icons-material-symbols/info-outline-rounded"
   import { getFacets } from "$lib/http/getFacets"
+  import { env } from "$lib/env"
 
   let facet: { name: string; uuid: string; user_key: string }
   let facetUuid: string
   let facets: { name: string; uuid: string; user_key: string }[]
 
   $: isRoleFacet = facet?.user_key === "role"
+  $: isTradeUnionFacet =
+    env.PUBLIC_ENABLE_CONFEDERATIONS && facet?.user_key === "trade_union"
 
   const updateFacet = () => {
     facetUuid = facet.uuid
@@ -102,10 +105,19 @@
               },
             ]
           : []),
+        ...(isTradeUnionFacet
+          ? [
+              {
+                title: capital($_("facets.name.confederation")),
+                sortPath: "parent_response.current.name",
+              },
+            ]
+          : []),
         { title: capital($_("date.date")), sortPath: "validity.from" },
       ]}
       {facetUuid}
       {isRoleFacet}
+      {isTradeUnionFacet}
     />
   </main>
 </div>

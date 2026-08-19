@@ -11,6 +11,7 @@
   // Specific for admin interface
   export let facetUuid: string | undefined = undefined
   export let isRoleFacet: boolean = false
+  export let isTradeUnionFacet: boolean = false
 </script>
 
 <DetailTable {headers}>
@@ -21,7 +22,13 @@
         colSpan={15}>{capital($_("future"))}</th
       >
     </tr>
-    <svelte:component this={table} tense="future" {facetUuid} {isRoleFacet} />
+    <svelte:component
+      this={table}
+      tense="future"
+      {facetUuid}
+      {isRoleFacet}
+      {isTradeUnionFacet}
+    />
   {/if}
   {#if $tenses.present}
     <tr>
@@ -30,7 +37,13 @@
         colSpan={15}>{capital($_("present"))}</th
       ></tr
     >
-    <svelte:component this={table} tense="present" {facetUuid} {isRoleFacet} />
+    <svelte:component
+      this={table}
+      tense="present"
+      {facetUuid}
+      {isRoleFacet}
+      {isTradeUnionFacet}
+    />
   {/if}
   {#if $tenses.past}
     <tr>
@@ -39,6 +52,12 @@
         colSpan={15}>{capital($_("past"))}</th
       >
     </tr>
-    <svelte:component this={table} tense="past" {facetUuid} {isRoleFacet} />
+    <svelte:component
+      this={table}
+      tense="past"
+      {facetUuid}
+      {isRoleFacet}
+      {isTradeUnionFacet}
+    />
   {/if}
 </DetailTable>
