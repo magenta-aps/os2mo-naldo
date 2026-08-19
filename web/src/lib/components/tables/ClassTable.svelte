@@ -23,6 +23,7 @@
   export let tense: Tense
   export let facetUuid: string
   export let isRoleFacet: boolean = false
+  export let isTradeUnionFacet: boolean = false
 
   gql`
     query Class($facetUuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
@@ -36,6 +37,12 @@
             uuid
             facet_uuid
             it_system_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
+            }
+            parent_response {
               uuid
               current(at: $fromDate) {
                 name
@@ -93,6 +100,9 @@
       <td class="text-sm p-4">{cls.user_key}</td>
       {#if isRoleFacet}
         <td class="text-sm p-4">{cls.it_system_response?.current?.name ?? ""}</td>
+      {/if}
+      {#if isTradeUnionFacet}
+        <td class="text-sm p-4">{cls.parent_response?.current?.name ?? ""}</td>
       {/if}
       <td class="text-sm p-4">{cls.owner_response?.current?.name ?? ""}</td>
       <ValidityTableCell validity={cls.validity} />
