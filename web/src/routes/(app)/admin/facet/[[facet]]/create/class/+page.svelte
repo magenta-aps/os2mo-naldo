@@ -20,6 +20,9 @@
   import Search from "$lib/components/search/Search.svelte"
   import type { SubmitFunction } from "./$types"
   import { GetItSystemsDocument, CreateClassDocument } from "./query.generated"
+  import { env } from "$lib/env"
+  import { createQuery } from "$lib/http/query"
+  import { getConfederations } from "$lib/http/getClasses"
   import { formatITSystemNames, type ITSystem } from "$lib/utils/helpers"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
@@ -87,7 +90,11 @@
   const facetField = field("facet", "", [required()])
   const name = field("name", "", [required()])
   const userKey = field("user_key", "", [required()])
-  const svelteForm = form(fromDate, name, userKey)
+  // Only a trade union has a parent; the Select is hidden for every other facet.
+  const parentField = field("parent", "", [
+    (val) => ({ valid: !isTradeUnion || !!val, name: "required" }),
+  ])
+  const svelteForm = form(fromDate, name, userKey, parentField)
 
   let startDate: Temporal.ZonedDateTime | null | undefined = moValidityFrom($date)
   let toDate: Temporal.ZonedDateTime | null | undefined
@@ -169,6 +176,16 @@
       }
     })()
   }
+
+  $: isTradeUnion =
+    env.PUBLIC_ENABLE_CONFEDERATIONS && chosenFacet?.user_key === "trade_union"
+
+  // Refetched on every start date change: the parent must be valid on it.
+  const confederations = createQuery<Awaited<ReturnType<typeof getConfederations>>>()
+  $: if (isTradeUnion && startDate) {
+    const at = startDate
+    confederations.run((signal) => getConfederations(at, signal))
+  }
 </script>
 
 <title
@@ -242,6 +259,22 @@
           iterable={AddressScope.map((scope) => ({ uuid: scope, name: scope }))}
           required={true}
         />
+      {/if}
+      {#if isTradeUnion}
+        <Select
+          title={capital($_("facets.name.confederation"))}
+          id="parent"
+          bind:name={$parentField.value}
+          errors={$parentField.errors}
+          iterable={$confederations.data}
+          disabled={$confederations.error && !$confederations.data}
+          required={true}
+        />
+        {#if $confederations.error}
+          <p class="text-sm text-error">
+            {capital($_($confederations.data ? "load_error_options" : "load_error"))}
+          </p>
+        {/if}
       {/if}
       <div class="flex flex-row gap-6">
         <Input

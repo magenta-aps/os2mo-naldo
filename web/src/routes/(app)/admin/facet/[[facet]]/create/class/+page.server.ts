@@ -10,6 +10,7 @@ export const actions: Actions = {
     const itsystem = data.get("itsystem")
     const scope = data.get("scope") as string | null
     const owner = data.get("org-unit-uuid")
+    const parent = data.get("parent")
     const startDate = data.get("from") as string
     const endDate = data.get("to") as string | null
 
@@ -20,6 +21,7 @@ export const actions: Actions = {
       ...(itsystem && { it_system_uuid: itsystem }),
       ...(scope && { scope: scope }),
       ...(owner && { owner: owner }),
+      ...(parent && { parent_uuid: parent }),
       validity: { from: startDate, ...(endDate && { to: endDate }) },
     }
   },
