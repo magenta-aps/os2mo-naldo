@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/utils/helpers"
+  import { capital, isMeaningfulUserKey } from "$lib/utils/helpers"
   import ValidityTableCell from "$lib/components/shared/ValidityTableCell.svelte"
   import { base } from "$app/paths"
   import { page } from "$app/stores"
@@ -32,6 +32,7 @@
           validities {
             name
             uuid
+            user_key
             unit_type_response {
               uuid
               current(at: $fromDate) {
@@ -101,6 +102,11 @@
         leading-5 border-t border-base-300 text-base-content"
     >
       <td class="text-sm p-4">{org_unit.name}</td>
+      {#if env.PUBLIC_SHOW_SD_CODE_IN_TREES}
+        <td class="text-sm p-4">
+          {isMeaningfulUserKey(org_unit.user_key) ? org_unit.user_key : ""}
+        </td>
+      {/if}
       <td class="text-sm p-4"
         >{org_unit.unit_type_response?.current?.name ?? capital($_("not_set"))}</td
       >
