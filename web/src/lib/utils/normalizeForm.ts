@@ -20,17 +20,6 @@ export const normalizeOrganisation = (o: any) => {
   }
 }
 
-export const normalizeEngagement = (e: any) => {
-  return {
-    to: e.validity?.to?.split("T")[0] ?? null,
-    org_unit: e.org_unit_response?.uuid ?? null,
-    job_function: e.job_function_response?.current?.name ?? null,
-    engagement_type: e.engagement_type_response?.current?.name ?? null,
-    user_key: e.user_key ?? null,
-    primary: e.primary_response?.current?.name ?? "",
-  }
-}
-
 export const normalizeAssociation = (a: any) => {
   return {
     to: a.validity?.to?.split("T")[0] ?? null,

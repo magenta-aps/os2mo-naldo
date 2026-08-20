@@ -1,7 +1,6 @@
 import {
   normalizeAddress,
   normalizeAssociation,
-  normalizeEngagement,
   normalizeITUser,
   normalizeKLE,
   normalizeLeave,
@@ -11,45 +10,6 @@ import {
   normalizeRolebinding,
 } from "$lib/utils/normalizeForm"
 import { describe, expect, it } from "vitest"
-
-describe("normalizeEngagement", () => {
-  it("extracts expected fields", () => {
-    const result = normalizeEngagement({
-      validity: { to: "2023-03-03T00:00:00" },
-      org_unit_response: { uuid: "ou-1", current: { name: "Skole" } },
-      job_function_response: { current: { name: "Specialist" } },
-      engagement_type_response: { current: { name: "Ansat" } },
-      user_key: "12345",
-      primary_response: { current: { name: "Primær" } },
-    })
-    expect(result).toEqual({
-      to: "2023-03-03",
-      org_unit: "ou-1",
-      job_function: "Specialist",
-      engagement_type: "Ansat",
-      user_key: "12345",
-      primary: "Primær",
-    })
-  })
-
-  it("handles null/missing fields", () => {
-    const result = normalizeEngagement({
-      validity: { to: null },
-      org_unit_response: { uuid: undefined, current: null },
-      job_function_response: { current: null },
-      engagement_type_response: { current: null },
-      primary_response: { current: null },
-    })
-    expect(result).toEqual({
-      to: null,
-      org_unit: null,
-      job_function: null,
-      engagement_type: null,
-      user_key: null,
-      primary: "",
-    })
-  })
-})
 
 describe("normalizeAssociation", () => {
   it("extracts expected fields", () => {

@@ -63,6 +63,50 @@ export const createDefaultEngagementValues = (): EngagementValues => ({
   extension4: "",
 })
 
+// Seeds the field group from an existing engagement for the edit forms. The
+// start date deliberately stays the current viewing date: an edit applies
+// from that date, not from the row's original start.
+// A related object whose name does not resolve at the row's date falls back
+// to its uuid: the Select component clears a value whose name is empty, which
+// would silently drop a perfectly valid selection.
+const toSelected = (response: any) =>
+  response
+    ? { uuid: response.uuid, name: response.current?.name ?? response.uuid }
+    : undefined
+
+export const engagementToValues = (e: any): EngagementValues => ({
+  fromDate: get(date),
+  toDate: e.validity?.to?.split("T")[0] ?? "",
+  orgUnit: toSelected(e.org_unit_response),
+  person: undefined,
+  user_key: e.user_key ?? "",
+  jobFunction: toSelected(e.job_function_response),
+  engagementType: toSelected(e.engagement_type_response),
+  primary: toSelected(e.primary_response),
+  extension1: e.extension_1 ?? "",
+  extension4: e.extension_4 ?? "",
+})
+
+// Change detection for the edit forms. Any editable field differing counts as
+// a change; the end date only counts when cleared, first set, or extended —
+// the shortening case belongs to the terminate flow.
+export const engagementValuesChanged = (
+  current: EngagementValues,
+  initial: EngagementValues
+): boolean => {
+  const editableChanged =
+    current.orgUnit?.uuid !== initial.orgUnit?.uuid ||
+    current.jobFunction?.uuid !== initial.jobFunction?.uuid ||
+    current.engagementType?.uuid !== initial.engagementType?.uuid ||
+    current.primary?.uuid !== initial.primary?.uuid ||
+    current.user_key !== initial.user_key ||
+    current.extension1 !== initial.extension1 ||
+    current.extension4 !== initial.extension4
+  const toDateExtended =
+    current.toDate === "" ? initial.toDate !== "" : current.toDate > initial.toDate
+  return editableChanged || toDateExtended
+}
+
 export type RolebindingValues = {
   // `ituser dates == rolebinding dates` on creation, so rolebindings carry no
   // dates of their own here.
