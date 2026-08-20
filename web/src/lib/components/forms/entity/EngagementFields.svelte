@@ -26,12 +26,20 @@
   // Input names derive from ids, but only the route (idPrefix="") submits
   // formData, so prefixed names are harmless.
   export let idPrefix = ""
+  // Names the FIXED side of the engagement. "employee" (the default) renders
+  // the org-unit picker (create-from-employee and the wizard); "org-unit"
+  // renders the person picker instead — seed `value.orgUnit` with the route's
+  // unit so the date bounds and class options still key off it.
+  export let anchor: "employee" | "org-unit" = "employee"
 
   // Fields are seeded from the bound value: on a wizard tab remount the
   // facet-gated selects only sync their names once the classes load, and
   // validation must not depend on that round-trip.
   const fromDateField = field("from", "", [required()])
-  const orgUnitField = field("org_unit", value.orgUnit?.name ?? "", [required()])
+  const anchorField =
+    anchor === "employee"
+      ? field("org_unit", value.orgUnit?.name ?? "", [required()])
+      : field("employee", value.person?.name ?? "", [required()])
   const jobFunctionField = field("job_function", value.jobFunction?.name ?? "", [
     required(),
   ])
@@ -42,7 +50,7 @@
   )
   const svelteForm = form(
     fromDateField,
-    orgUnitField,
+    anchorField,
     jobFunctionField,
     engagementTypeField
   )
@@ -108,17 +116,30 @@
     max={$validities.data?.to}
   />
 </div>
-<Search
-  type="org-unit"
-  at={value.fromDate}
-  bind:name={$orgUnitField.value}
-  errors={$orgUnitField.errors}
-  on:clear={() => ($orgUnitField.value = "")}
-  bind:value={value.orgUnit}
-  id="{idPrefix}org-unit-uuid"
-  required={true}
-/>
-<Breadcrumbs orgUnit={value.orgUnit} />
+{#if anchor === "employee"}
+  <Search
+    type="org-unit"
+    at={value.fromDate}
+    bind:name={$anchorField.value}
+    errors={$anchorField.errors}
+    on:clear={() => ($anchorField.value = "")}
+    bind:value={value.orgUnit}
+    id="{idPrefix}org-unit-uuid"
+    required={true}
+  />
+  <Breadcrumbs orgUnit={value.orgUnit} />
+{:else}
+  <Search
+    type="employee"
+    at={value.fromDate}
+    bind:name={$anchorField.value}
+    errors={$anchorField.errors}
+    on:clear={() => ($anchorField.value = "")}
+    bind:value={value.person}
+    id="{idPrefix}employee-uuid"
+    required={true}
+  />
+{/if}
 
 {#if $facets.loading && !$facets.data}
   <div class="flex flex-row gap-6">

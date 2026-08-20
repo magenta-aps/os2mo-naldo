@@ -39,6 +39,9 @@ export type EngagementValues = {
   fromDate: string
   toDate: string
   orgUnit: { uuid: string; name: string } | undefined
+  // Only used with `anchor="org-unit"` (creating from an org unit's page,
+  // where the person is picked and the unit comes from the route).
+  person: { uuid: string; name: string } | undefined
   user_key: string
   jobFunction: ClassValue | undefined
   engagementType: ClassValue | undefined
@@ -51,6 +54,7 @@ export const createDefaultEngagementValues = (): EngagementValues => ({
   fromDate: get(date),
   toDate: "",
   orgUnit: undefined,
+  person: undefined,
   user_key: "",
   jobFunction: undefined,
   engagementType: undefined,
