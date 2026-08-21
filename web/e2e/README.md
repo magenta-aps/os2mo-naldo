@@ -45,3 +45,17 @@ node e2e/smoke-crawl.cjs --only create/class  # filter routes by substring
 Any nonzero exit is a failure (a run that hit a frozen page exits 137 — it
 has to SIGKILL its own process group to escape the wedged renderer).
 Run it before merging anything that touches forms or shared form components.
+
+# Refetch check
+
+Asserts the date→options pipeline actually reacts: it seeds a job-function
+class valid only from a near-future date (via the API), then verifies the
+class is absent from the engagement create form at today's date, appears when
+the GLOBAL date picker moves into its validity (re-entering the form via SPA
+navigation, like a real user — the date store does not survive full reloads),
+and vanishes when the date moves back. The probe class is deleted afterwards;
+the form itself is mutation-blocked.
+
+```bash
+node e2e/refetch-check.cjs
+```
