@@ -10,7 +10,9 @@
 //
 // All GraphQL mutations are blocked at the network layer, so the crawler can
 // never write to MO. See e2e/README.md for prerequisites.
-// Usage: node e2e/smoke-crawl.cjs [--only <substring>]
+// Usage: node e2e/smoke-crawl.cjs [--only <substring>] [--headed]
+//   --headed opens a visible browser and slows interactions down, so you can
+//   watch exactly what the crawler does to each form.
 const { chromium } = require("@playwright/test")
 const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a)
 setTimeout(() => {
@@ -80,7 +82,11 @@ const resolveRoutes = async () => {
   let routes = await resolveRoutes()
   const onlyIdx = process.argv.indexOf("--only")
   if (onlyIdx !== -1) routes = routes.filter((r) => r.includes(process.argv[onlyIdx + 1]))
-  let browser = await chromium.launch({ args: ["--no-sandbox"] })
+  const HEADED = process.argv.includes("--headed")
+  const launchOpts = HEADED
+    ? { headless: false, slowMo: 300 }
+    : { args: ["--no-sandbox"] }
+  let browser = await chromium.launch(launchOpts)
   const results = []
   let pageErrors = []
   let page
@@ -100,7 +106,7 @@ const resolveRoutes = async () => {
       try {
         browser.process()?.kill("SIGKILL")
       } catch (e2) {}
-      browser = await chromium.launch({ args: ["--no-sandbox"] })
+      browser = await chromium.launch(launchOpts)
       ctx = await browser.newContext()
     }
     const p = await ctx.newPage()
