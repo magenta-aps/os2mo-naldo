@@ -9,6 +9,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "e2e": "node e2e/smoke-crawl.cjs && node e2e/refetch-check.cjs",
+    "verify": "vitest run && node e2e/smoke-crawl.cjs && node e2e/refetch-check.cjs",
     "generate": "graphql-codegen && svelte-kit sync",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",

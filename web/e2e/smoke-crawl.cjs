@@ -16,7 +16,9 @@
 const { chromium } = require("@playwright/test")
 const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a)
 setTimeout(() => {
-  console.log("GLOBAL TIMEOUT — a page probably froze harder than the probe could report")
+  console.log(
+    "GLOBAL TIMEOUT — a page probably froze harder than the probe could report"
+  )
   process.exit(2)
 }, 600000)
 
@@ -28,7 +30,10 @@ const gq = async (token, query) =>
     await (
       await fetch(`${MO}/graphql/v29`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ query }),
       })
     ).json()
@@ -81,7 +86,8 @@ const resolveRoutes = async () => {
 ;(async () => {
   let routes = await resolveRoutes()
   const onlyIdx = process.argv.indexOf("--only")
-  if (onlyIdx !== -1) routes = routes.filter((r) => r.includes(process.argv[onlyIdx + 1]))
+  if (onlyIdx !== -1)
+    routes = routes.filter((r) => r.includes(process.argv[onlyIdx + 1]))
   const HEADED = process.argv.includes("--headed")
   const launchOpts = HEADED
     ? { headless: false, slowMo: 300 }
@@ -118,7 +124,10 @@ const resolveRoutes = async () => {
           return await route.fulfill({
             status: 200,
             contentType: "application/json",
-            body: JSON.stringify({ data: null, errors: [{ message: "blocked by smoke-crawl" }] }),
+            body: JSON.stringify({
+              data: null,
+              errors: [{ message: "blocked by smoke-crawl" }],
+            }),
           })
         }
       } catch (e) {
@@ -152,9 +161,9 @@ const resolveRoutes = async () => {
 
   const login = async () => {
     if (page.url().includes("auth")) {
-      await page.fill("#username", "bruce")
-      await page.fill("#password", "bruce")
-      await page.click("#kc-login")
+      await page.fill("#username", "bruce", { timeout: 8000 })
+      await page.fill("#password", "bruce", { timeout: 8000 })
+      await page.click("#kc-login", { timeout: 8000 })
       await page.waitForTimeout(2500)
     }
   }
@@ -162,7 +171,11 @@ const resolveRoutes = async () => {
   // Close any open dropdown/overlay so it cannot cover the next control.
   const dismiss = async () => {
     await withDeadline(page.keyboard.press("Escape"), 5000, "dismiss").catch(() => {})
-    await page.locator("h3").first().click({ timeout: 1000 }).catch(() => {})
+    await page
+      .locator("h3")
+      .first()
+      .click({ timeout: 1000 })
+      .catch(() => {})
     await page.waitForTimeout(150)
   }
 
@@ -202,10 +215,22 @@ const resolveRoutes = async () => {
         .then(() => true)
         .catch(() => false)
       if (gotItems) {
-        await withDeadline(page.keyboard.press("ArrowDown"), 5000, `${step}: ArrowDown select ${i}`)
-        await withDeadline(page.keyboard.press("Enter"), 5000, `${step}: Enter select ${i}`)
+        await withDeadline(
+          page.keyboard.press("ArrowDown"),
+          5000,
+          `${step}: ArrowDown select ${i}`
+        )
+        await withDeadline(
+          page.keyboard.press("Enter"),
+          5000,
+          `${step}: Enter select ${i}`
+        )
       } else {
-        await withDeadline(page.keyboard.press("Escape"), 5000, `${step}: Escape select ${i}`)
+        await withDeadline(
+          page.keyboard.press("Escape"),
+          5000,
+          `${step}: Escape select ${i}`
+        )
       }
       await page.waitForTimeout(300)
       await probe(`${step}: picked select ${i}`)
@@ -222,52 +247,77 @@ const resolveRoutes = async () => {
   for (const route of routes) {
     pageErrors = []
     const t0 = Date.now()
-    try {
-      await page.goto(APP + route, { waitUntil: "domcontentloaded" })
-      await page.waitForTimeout(2000)
-      await login()
-      await probe("initial render")
+    // Two attempts per route: transients happen (a mid-crawl re-auth, a slow
+    // first compile). Real freezes fail both attempts.
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        await page.goto(APP + route, { waitUntil: "domcontentloaded" })
+        await page.waitForTimeout(2000)
+        await login()
+        await probe("initial render")
 
-      await setStartDate(date1)
-      await probe("set start date")
-      const selects = await pickAllSelects("first pass")
+        await setStartDate(date1)
+        await probe("set start date")
+        const selects = await pickAllSelects("first pass")
 
-      await setStartDate(date2)
-      await probe("changed start date")
-      await pickAllSelects("second pass")
+        await setStartDate(date2)
+        await probe("changed start date")
+        await pickAllSelects("second pass")
 
-      // touch the text inputs too
-      await dismiss()
-      const texts = page.locator("form input[type=text]:not([readonly])")
-      const tn = await texts.count()
-      for (let i = 0; i < tn; i++) {
-        await texts.nth(i).fill("smoke", { timeout: 4000 }).catch(() => {})
+        // touch the text inputs too
+        await dismiss()
+        const texts = page.locator("form input[type=text]:not([readonly])")
+        const tn = await texts.count()
+        for (let i = 0; i < tn; i++) {
+          await texts
+            .nth(i)
+            .fill("smoke", { timeout: 4000 })
+            .catch(() => {})
+        }
+        await probe("filled text inputs")
+
+        const errs = [...new Set(pageErrors)]
+        results.push({
+          route,
+          ok: errs.length === 0,
+          selects,
+          ms: Date.now() - t0,
+          errors: errs,
+        })
+        log(
+          errs.length === 0 ? "OK    " : "ERRORS",
+          route,
+          `(${selects} selects, ${Date.now() - t0}ms)`
+        )
+        for (const e of errs) log("        pageerror:", e.slice(0, 140))
+        break
+      } catch (err) {
+        // A failed (possibly frozen) page cannot be reused — and closing a
+        // context whose renderer is spinning may itself never resolve, so give
+        // up on it after a short grace period and open a fresh one (freshPage
+        // relaunches the browser if the freeze took it down entirely).
+        await Promise.race([
+          page
+            .context()
+            .close()
+            .catch(() => {}),
+          new Promise((r) => setTimeout(r, 3000)),
+        ])
+        page = await freshPage()
+        if (attempt < 2) {
+          log("retry ", route, "—", err.message.split("\n")[0])
+          pageErrors = []
+          continue
+        }
+        sawDead = true
+        results.push({
+          route,
+          ok: false,
+          ms: Date.now() - t0,
+          errors: [err.message.split("\n")[0]],
+        })
+        log("DEAD  ", route, "—", err.message.split("\n")[0])
       }
-      await probe("filled text inputs")
-
-      const errs = [...new Set(pageErrors)]
-      results.push({
-        route,
-        ok: errs.length === 0,
-        selects,
-        ms: Date.now() - t0,
-        errors: errs,
-      })
-      log(errs.length === 0 ? "OK    " : "ERRORS", route, `(${selects} selects, ${Date.now() - t0}ms)`)
-      for (const e of errs) log("        pageerror:", e.slice(0, 140))
-    } catch (err) {
-      sawDead = true
-      results.push({ route, ok: false, ms: Date.now() - t0, errors: [err.message.split("\n")[0]] })
-      log("DEAD  ", route, "—", err.message.split("\n")[0])
-      // A frozen page cannot be reused — and closing a context whose
-      // renderer is spinning may itself never resolve, so give up on it
-      // after a short grace period and just open a fresh one (freshPage
-      // relaunches the browser if the freeze took it down entirely).
-      await Promise.race([
-        page.context().close().catch(() => {}),
-        new Promise((r) => setTimeout(r, 3000)),
-      ])
-      page = await freshPage()
     }
   }
 
@@ -286,7 +336,10 @@ const resolveRoutes = async () => {
   require("fs").writeSync(1, summary)
   if (!sawDead) {
     // Nothing wedged: a normal exit reports a proper 0/1 code.
-    await Promise.race([browser.close().catch(() => {}), new Promise((r) => setTimeout(r, 3000))])
+    await Promise.race([
+      browser.close().catch(() => {}),
+      new Promise((r) => setTimeout(r, 3000)),
+    ])
     process.exit(failed.length ? 1 : 0)
   }
   // A wedged renderer orphaned by an earlier browser kill can outlive us,

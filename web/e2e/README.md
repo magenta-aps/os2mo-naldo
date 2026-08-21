@@ -59,3 +59,13 @@ the form itself is mutation-blocked.
 ```bash
 node e2e/refetch-check.cjs
 ```
+
+# Running everything
+
+```bash
+yarn verify   # unit tests, then smoke crawl, then refetch check — stops at first failure
+yarn e2e      # just the two browser tools
+```
+
+The payload harness is not part of `verify` — it needs a baseline ref and a
+diff, so it stays a per-conversion ritual (see above).
