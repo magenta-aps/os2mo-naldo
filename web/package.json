@@ -28,6 +28,8 @@
     "@playwright/test": "^1.47.2",
     "@sveltejs/kit": "^2.8.3",
     "@tailwindcss/postcss": "^4.1.18",
+    "@testing-library/svelte": "^4",
+    "jsdom": "^24",
     "postcss": "^8.4.33",
     "svelte": "^4.2.19",
     "svelte-check": "^3.6.2",
