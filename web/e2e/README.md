@@ -27,3 +27,21 @@ diff payloads-old.json payloads-new.json
 Identical files mean the refactor preserved every form's submitted payload.
 A diff is not necessarily a failure — but it must be explainable, deliberate,
 and called out in the MR description.
+
+# Smoke crawler
+
+Catches the bug classes nothing else does: reactive infinite loops (a frozen
+main thread), render crashes, and dead controls. It crawls every form route,
+and per form: sets the start date, opens and picks every select, changes the
+start date (re-running the option refetches, where update loops live), and
+picks again — with a responsiveness probe after every step. All mutations are
+blocked at the network layer.
+
+```bash
+node e2e/smoke-crawl.cjs                    # full crawl, ~0 on success
+node e2e/smoke-crawl.cjs --only create/class  # filter routes by substring
+```
+
+Any nonzero exit is a failure (a run that hit a frozen page exits 137 — it
+has to SIGKILL its own process group to escape the wedged renderer).
+Run it before merging anything that touches forms or shared form components.
