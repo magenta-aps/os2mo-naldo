@@ -69,6 +69,57 @@ export const resolveFixture = (): Promise<Fixture> =>
     }
   }))
 
+// One editable object per detail type AND owner side, with the owner uuid
+// and start date the edit route needs. The seed guarantees one of each on
+// the fixture person/unit, so resolution is a single owner-filtered query
+// per pair; a missing pair resolves to undefined and its smoke test skips.
+export type EditTarget = { uuid: string; owner: string; from: string }
+export type EditTargets = Partial<
+  Record<string, { person?: EditTarget; unit?: EditTarget }>
+>
+
+const EDIT_SIDES: Record<string, { collection: string; sides: ("person" | "unit")[] }> =
+  {
+    address: { collection: "addresses", sides: ["person", "unit"] },
+    ituser: { collection: "itusers", sides: ["person", "unit"] },
+    manager: { collection: "managers", sides: ["person", "unit"] },
+    association: { collection: "associations", sides: ["person", "unit"] },
+    // A rolebinding's owner side is its ituser's.
+    rolebinding: { collection: "rolebindings", sides: ["person", "unit"] },
+    leave: { collection: "leaves", sides: ["person"] },
+    kle: { collection: "kles", sides: ["unit"] },
+    owner: { collection: "owners", sides: ["unit"] },
+  }
+
+let editTargets: Promise<EditTargets> | undefined
+export const resolveEditTargets = (): Promise<EditTargets> =>
+  (editTargets ??= (async () => {
+    const fixture = await resolveFixture()
+    const targets: EditTargets = {}
+    for (const [type, { collection, sides }] of Object.entries(EDIT_SIDES)) {
+      for (const side of sides) {
+        const owner = side === "person" ? fixture.person : fixture.unit
+        const filterKey = side === "person" ? "employees" : "org_units"
+        const filter =
+          type === "rolebinding"
+            ? `ituser: { ${filterKey}: $owner }`
+            : `${filterKey}: $owner`
+        const data = await moGraphql(
+          `query ($owner: [UUID!]) { ${collection}(filter: { ${filter} }, limit: 1) { objects { uuid validities { validity { from } } } } }`,
+          { owner: [owner] }
+        ).catch(() => null)
+        const match = data?.[collection]?.objects?.[0]
+        if (!match) continue
+        ;(targets[type] ??= {})[side] = {
+          uuid: match.uuid,
+          owner,
+          from: match.validities[0].validity.from.split("T")[0],
+        }
+      }
+    }
+    return targets
+  })())
+
 export const login = async (page: Page) => {
   const username = page.locator("#username")
   const firstQuery = () =>

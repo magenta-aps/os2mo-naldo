@@ -4,8 +4,10 @@ import {
   blockMutations,
   dismiss,
   login,
+  resolveEditTargets,
   resolveFixture,
   trackPageErrors,
+  type EditTargets,
   type Fixture,
 } from "./helpers"
 
@@ -14,7 +16,39 @@ import {
 // frozen page hangs the next interaction until the test timeout kills the
 // worker — that IS the freeze detection.
 
-const ROUTES: Record<string, (f: Fixture) => string> = {
+// Edit routes for every detail type, on each owner side the type supports.
+const EDIT_FORMS: Record<string, ("person" | "unit")[]> = {
+  address: ["person", "unit"],
+  ituser: ["person", "unit"],
+  manager: ["person", "unit"],
+  association: ["person", "unit"],
+  rolebinding: ["person", "unit"],
+  leave: ["person"],
+  kle: ["unit"],
+  owner: ["unit"],
+}
+
+const sidedEditRoutes = () => {
+  const routes: Record<string, (f: Fixture, t: EditTargets) => string | null> = {}
+  for (const [type, sides] of Object.entries(EDIT_FORMS)) {
+    for (const side of sides) {
+      const base = side === "person" ? "employee" : "organisation"
+      routes[`${base === "employee" ? "employee" : "org"} edit ${type}`] = (
+        fixture,
+        targets
+      ) => {
+        const target = targets[type]?.[side]
+        return target
+          ? `/${base}/${target.owner}/edit/${type}/${target.uuid}?from=${target.from}`
+          : null
+      }
+    }
+  }
+  return routes
+}
+
+// Returning null skips the test (the fixture lacks that object type).
+const ROUTES: Record<string, (f: Fixture, t: EditTargets) => string | null> = {
   "employee create engagement": (fixture) =>
     `/employee/${fixture.person}/create/engagement`,
   "employee create address": (fixture) => `/employee/${fixture.person}/create/address`,
@@ -36,6 +70,10 @@ const ROUTES: Record<string, (f: Fixture) => string> = {
     `/employee/${fixture.person}/edit/engagement/${fixture.engagement}?from=${fixture.from}`,
   "org edit engagement": (fixture) =>
     `/organisation/${fixture.unit}/edit/engagement/${fixture.engagement}?from=${fixture.from}`,
+  "employee edit": (fixture) => `/employee/${fixture.person}/edit`,
+  "org edit unit": (fixture) =>
+    `/organisation/${fixture.unit}/edit/unit?from=${fixture.from}`,
+  ...sidedEditRoutes(),
   "admin classifications": () => `/admin/facet`,
   "admin create class": () => `/admin/facet/create/class`,
   "admin create itsystem": () => `/admin/itsystem/create`,
@@ -80,9 +118,11 @@ const pickAllSelects = async (page: Page) => {
 
 for (const [name, urlFor] of Object.entries(ROUTES)) {
   test(name, async ({ page }) => {
+    const url = urlFor(await resolveFixture(), await resolveEditTargets())
+    test.skip(!url, "fixture has no object of this type")
     const errors = trackPageErrors(page)
     await blockMutations(page)
-    await page.goto(path(await resolveFixture()))
+    await page.goto(url!)
     await login(page)
     // Guard against vacuous passes: a page that rendered nothing must fail.
     if (name !== "admin classifications") {
