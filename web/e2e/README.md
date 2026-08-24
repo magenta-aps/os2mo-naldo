@@ -12,7 +12,9 @@ or shared form components.
 
 **Prerequisites:** the frontend dev server on `localhost:5173`
 (`docker compose up -d` in this repo), MO + Keycloak on `localhost:5000`,
-a fixture with at least one engagement.
+a fixture with at least one engagement. After resetting MO to a minimal
+fixture, run `node e2e/seed.cjs` — it idempotently creates the facets and
+classes the forms need.
 
 ## Commands
 
