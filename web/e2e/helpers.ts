@@ -206,6 +206,28 @@ export const pickFirstOption = async (page: Page, nth = 0) => {
   await page.waitForTimeout(300)
 }
 
+// SelectMultiple has no #select wrapper — target its inner input by the id
+// the form gave the component. Matched by suffix: the wizard prefixes ids
+// with "{entityKey}-{index}-", the routes don't.
+export const pickMultiFirstOption = async (page: Page, idSuffix: string) => {
+  await page.locator(`form input[id$="${idSuffix}"]`).click({ timeout: 8000 })
+  await page.locator(".list-item").first().waitFor({ timeout: 8000 })
+  await page.keyboard.press("ArrowDown")
+  await page.keyboard.press("Enter")
+  await page.waitForTimeout(300)
+}
+
+// Types into the select to filter, then picks the first match — for options
+// that must be a specific one (pickFirstOption takes whatever comes first).
+export const pickOptionByText = async (page: Page, nth: number, text: string) => {
+  await page.locator(`form #select >> nth=${nth}`).click({ timeout: 8000 })
+  await page.keyboard.type(text)
+  await page.locator(".list-item").first().waitFor({ timeout: 8000 })
+  await page.keyboard.press("ArrowDown")
+  await page.keyboard.press("Enter")
+  await page.waitForTimeout(300)
+}
+
 // Types into the form's Search field and picks the first result.
 export const searchAndPick = async (page: Page, text: string) => {
   await page.locator("form input[type=text]").first().fill(text)

@@ -38,6 +38,14 @@ pickable, is cleared again as a stale selection, and vanishes when the date
 moves back. The class is deleted afterwards; if a crashed run leaves it
 behind, its user_key is prefixed `refetch-probe-`.
 
+## userflow.spec.ts
+
+Fills every step of the onboarding wizard (employee, engagement, ituser with
+a rolebinding, manager, address) and asserts the captured `UserFlowCreate`
+variables: every detail must reference the employee's client-generated uuid,
+the rolebinding must reference the ituser's, and each must carry what was
+picked on its step.
+
 ## payloads.spec.ts
 
 Records what the engagement forms would submit. Skipped unless
