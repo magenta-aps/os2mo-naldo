@@ -156,6 +156,7 @@
 	"move": "flyt",
 	"move_root": "flyttes til roden",
 	"name": "navn",
+	"name_history": "navnehistorik",
 	"no_current_name": "intet nuværende navn",
 	"navigation": {
 		"connections": "Organisationssammenkobling",

@@ -1,5 +1,5 @@
 import type { OpenValidity, Validity } from "$lib/graphql/types"
-import { format, formatISO, isValid, parseISO } from "date-fns"
+import { format, formatISO, isValid, parseISO, subDays } from "date-fns"
 
 export const getMinMaxValidities = (
   validities: { validity: Validity | OpenValidity }[] | undefined | null
@@ -59,6 +59,60 @@ export const formatQueryDates = (validity: Validity | OpenValidity): string => {
   }
 
   return `?${formattedFrom || formattedTo}`
+}
+
+// Clamp a date into a validity range, so a lookup on a referenced object
+// (e.g. an engagement's org_unit) lands inside the referencing row's own
+// validity and can't return a name the object only carried outside it. `validity.to` is exclusive (v29), so the upper clamp is the
+// day before `to`. Compares date portions like `tenseFilter` does.
+export const clampDateToValidity = (
+  date: string,
+  validity: Validity | OpenValidity
+): string => {
+  const fromDay = validity.from?.split("T")[0]
+  const toDay = validity.to?.split("T")[0]
+
+  if (fromDay && date < fromDay) {
+    return fromDay
+  }
+  if (toDay && date >= toDay) {
+    return format(subDays(parseISO(toDay), 1), "yyyy-MM-dd")
+  }
+  return date
+}
+
+// findClosestValidity, restricted to `range`: looks up at `date` clamped into
+// the range, so the result is a validity that overlapped it.
+export const findClosestValidityWithin = (
+  validities: any,
+  range: Validity | OpenValidity,
+  date: string
+) => {
+  if (!validities || !validities.length) {
+    return null
+  }
+  return findClosestValidity(validities, clampDateToValidity(date, range))
+}
+
+// All validities overlapping `range`, e.g. every name a referenced org_unit
+// has had within the referencing row's own validity. `to` is exclusive (v29),
+// so validities merely touching at an endpoint do not overlap.
+export const filterValiditiesInRange = (
+  validities: any[],
+  range: Validity | OpenValidity
+) => {
+  const rangeFrom = range.from ? parseISO(range.from) : null
+  const rangeTo = range.to ? parseISO(range.to) : null
+
+  return validities.filter((object) => {
+    const from = parseISO(object.validity.from)
+    const to = object.validity.to ? parseISO(object.validity.to) : null
+
+    if (rangeTo && isValid(rangeTo) && isValid(from) && from >= rangeTo) return false
+    if (to && isValid(to) && rangeFrom && isValid(rangeFrom) && to <= rangeFrom)
+      return false
+    return true
+  })
 }
 
 // Setting `validities: any` to avoid having to create the types in `Search.svelte` by hand

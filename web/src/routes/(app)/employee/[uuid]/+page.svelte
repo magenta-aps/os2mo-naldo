@@ -186,7 +186,7 @@
         headers={[
           {
             title: capital($_("unit", { values: { n: 1 } })),
-            sortPath: "org_unit_response.current.name",
+            sortPath: "org_unit_name",
           },
           ...(env.PUBLIC_SHOW_EXTENSION_4
             ? [{ title: capital($_("department_code")), sortPath: "extension_4" }]

@@ -9,7 +9,8 @@
   import { EngagementsDocument, type EngagementsQuery } from "./query.generated"
   import { date } from "$lib/stores/date"
   import { getITUserITSystemName } from "$lib/utils/display"
-  import { findClosestValidity } from "$lib/utils/validities"
+  import { findClosestValidity, findClosestValidityWithin } from "$lib/utils/validities"
+  import NameWithHistory from "$lib/components/shared/NameWithHistory.svelte"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { sortData } from "$lib/utils/sorting"
@@ -21,7 +22,10 @@
   import { updateGlobalNavigation } from "$lib/stores/navigation"
   import { env } from "$lib/env"
 
-  type Engagements = EngagementsQuery["engagements"]["objects"][0]["validities"]
+  type Engagement = EngagementsQuery["engagements"]["objects"][0]["validities"][0]
+  // `org_unit_name` is precomputed so column sorting matches the displayed name
+  type EngagementRow = Engagement & { org_unit_name?: string | null }
+  type Engagements = EngagementRow[]
 
   export let tense: Tense
 
@@ -94,8 +98,12 @@
             }
             org_unit_response @skip(if: $isOrg) {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             managers(inherit: $inherit, exclude_self: true) @skip(if: $isOrg) {
@@ -143,7 +151,16 @@
           if (isOrg && obj.org_unit_uuid !== uuid) return false
           return true
         })
-        engagements.push(...filtered)
+        engagements.push(
+          ...filtered.map((obj) => ({
+            ...obj,
+            org_unit_name: findClosestValidityWithin(
+              obj.org_unit_response?.validities,
+              obj.validity,
+              $date
+            )?.name,
+          }))
+        )
       }
       return engagements
     })
@@ -165,12 +182,14 @@
             >{engagement.person_response.current?.name}</a
           >
         {:else}
-          <a
+          <NameWithHistory
+            id={engagement.uuid}
+            validities={engagement.org_unit_response?.validities}
+            rowValidity={engagement.validity}
+            fallback={engagement.org_unit_response?.uuid}
             href="{base}/organisation/{engagement.org_unit_response?.uuid}"
             on:click={() => updateGlobalNavigation(engagement.org_unit_response?.uuid)}
-            >{engagement.org_unit_response?.current?.name ??
-              engagement.org_unit_response?.uuid}</a
-          >
+          />
         {/if}
       </td>
       {#if env.PUBLIC_SHOW_EXTENSION_4}

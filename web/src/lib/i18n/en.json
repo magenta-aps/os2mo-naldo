@@ -156,6 +156,7 @@
 	"move": "move",
 	"move_root": "is moved to the root",
 	"name": "name",
+	"name_history": "name history",
 	"no_current_name": "no current name",
 	"navigation": {
 		"connections": "Connecting organisations",
