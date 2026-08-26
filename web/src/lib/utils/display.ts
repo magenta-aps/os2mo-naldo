@@ -31,6 +31,29 @@ export const getEngagementTitlesAndUuid = (engagements: EngagementTitleAndUuid[]
   }))
 }
 
+// Used for the manager table's "Engagement" column: job title (extension_1
+// stands in for job_function once SD-code mode, `showJobFunctionUserKey`, is
+// on, since job_function is then just a code) plus org unit.
+export type ManagerEngagement = {
+  extension_1?: string | null
+  org_unit_response?: { current?: { name: string } | null }
+  job_function_response?: { current?: { name: string; user_key: string } | null }
+}
+
+export const getManagerEngagementDisplay = (
+  engagement: ManagerEngagement,
+  showJobFunctionUserKey: boolean,
+  showExtension1: boolean
+) => {
+  const jobFunction = engagement.job_function_response?.current
+  const jobTitle = !showJobFunctionUserKey
+    ? jobFunction?.name
+    : showExtension1 && engagement.extension_1
+    ? engagement.extension_1
+    : jobFunction && `${jobFunction.user_key} - ${jobFunction.name}`
+  return `${jobTitle}, ${engagement.org_unit_response?.current?.name}`
+}
+
 export type KleNumberTitleAndUuid = {
   uuid: string
   name: string
