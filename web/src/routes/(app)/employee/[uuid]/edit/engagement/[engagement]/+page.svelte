@@ -103,13 +103,17 @@
   const engagementType = field("engagement_type", "", [required()])
   const userKey = field("user_key", "", [])
   const primary = field("primary", "", [])
+  const extension1 = field("extension_1", "", [])
+  const extension4 = field("extension_4", "", [])
   const svelteForm = form(
     fromDate,
     orgUnit,
     jobFunction,
     engagementType,
     userKey,
-    primary
+    primary,
+    extension1,
+    extension4
   )
 
   const handler: SubmitFunction =
@@ -210,7 +214,9 @@
       $jobFunction.value !== initialEngagement.job_function ||
       $engagementType.value !== initialEngagement.engagement_type ||
       $userKey.value !== initialEngagement.user_key ||
-      $primary.value !== initialEngagement.primary
+      $primary.value !== initialEngagement.primary ||
+      $extension1.value !== initialEngagement.extension_1 ||
+      $extension4.value !== initialEngagement.extension_4
 
     const toDateExtended =
       toDate === ""
@@ -352,16 +358,22 @@
                 <Input
                   title={capital($_("job_function", { values: { n: 1 } }))}
                   id="extension-1"
+                  bind:value={$extension1.value}
                   startValue={engagement.extension_1}
-                  extra_classes="basis-1/2"
+                  extra_classes={env.PUBLIC_SHOW_EXTENSION_4
+                    ? "basis-1/2"
+                    : "basis-full"}
                 />
               {/if}
               {#if env.PUBLIC_SHOW_EXTENSION_4}
                 <Input
                   title={capital($_("department_code"))}
                   id="extension-4"
+                  bind:value={$extension4.value}
                   startValue={engagement.extension_4}
-                  extra_classes="basis-1/2"
+                  extra_classes={env.PUBLIC_SHOW_EXTENSION_1
+                    ? "basis-1/2"
+                    : "basis-full"}
                 />
               {/if}
             </div>
