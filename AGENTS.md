@@ -15,7 +15,10 @@ next to the code they describe.
 
 - `yarn test` — unit tests (CI runs these on every push)
 - `yarn verify` — unit tests plus the e2e suite in `web/e2e/README.md`.
-  **Required before any MR that touches forms or shared form components.**
+  CI runs the same e2e suite on every MR against a MO spun up in the
+  pipeline, so the pipeline is the gate. Agents run `yarn verify` locally
+  before pushing changes to forms or shared form components anyway — it is
+  much faster than waiting for the pipeline.
 - Form rewrites additionally run the payload capture on both refs
   (`PAYLOAD_LABEL=old|new yarn e2e payloads`); the diff goes in the MR
   description.

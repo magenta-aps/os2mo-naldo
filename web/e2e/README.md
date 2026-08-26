@@ -6,15 +6,18 @@ submitted payloads, working selects and refetches, no freezes). All tests log
 in as `bruce` and block GraphQL mutations from the page, so forms can never
 write to MO.
 
-These run locally only — there is no MO in CI. They may become a CI job
-later; until then, run `yarn verify` before sending an MR that touches forms
-or shared form components.
+The same suite runs in CI (the `E2E tests` job): MO, Keycloak and the
+database start as GitLab services via os2mo's integration-test template, the
+frontend is served with `yarn build && yarn preview`, and `seed.cjs`
+bootstraps the empty database. All URLs come from `MO_URL`, `KEYCLOAK_URL`
+and `BASE_URL`, defaulting to the local dev setup. The pipeline is the
+gate; running locally is optional, just much faster feedback.
 
-**Prerequisites:** the frontend dev server on `localhost:5173`
-(`docker compose up -d` in this repo), MO + Keycloak on `localhost:5000`,
-a fixture with at least one engagement. After resetting MO to a minimal
-fixture, run `node e2e/seed.cjs` — it idempotently creates the facets and
-classes the forms need.
+**Prerequisites locally:** the frontend dev server on `localhost:5173`
+(`docker compose up -d` in this repo), MO + Keycloak on `localhost:5000`.
+After resetting MO, run `node e2e/seed.cjs` — it idempotently creates the
+facets and classes the forms need, and on a completely empty database also
+the organisation, an org unit, an employee and an engagement.
 
 ## Commands
 
@@ -49,7 +52,8 @@ picked on its step.
 ## payloads.spec.ts
 
 Records what the engagement forms would submit. Skipped unless
-`PAYLOAD_LABEL` is set. Run on two refs — the `new` run diffs against the
+`PAYLOAD_LABEL` is set, and excluded from CI entirely — a skip in the CI
+report therefore always means the seed is broken. Run on two refs — the `new` run diffs against the
 old file; any difference must be deliberate and mentioned in the MR.
 
 ```
