@@ -1,11 +1,5 @@
 import type { OpenValidity, Validity } from "$lib/graphql/types"
-import {
-  differenceInCalendarDays,
-  format,
-  formatISO,
-  isValid,
-  parseISO,
-} from "date-fns"
+import { format, formatISO, isValid, parseISO } from "date-fns"
 
 export const getMinMaxValidities = (
   validities: { validity: Validity | OpenValidity }[] | undefined | null
@@ -74,8 +68,11 @@ export const findClosestValidity = (validities: any, date: string) => {
     return validities[0]
   }
 
-  let closestValidity = null
-  let closestDistance = Infinity // Initialize to a very large number
+  // Preference order: the validity active on `date`; otherwise the latest past
+  // one (the last name the object actually carried); a future one only when the
+  // object doesn't exist yet at all on `date`.
+  let latestPast = null
+  let earliestFuture = null
   const filterDate = parseISO(date)
 
   for (const object of validities) {
@@ -87,19 +84,17 @@ export const findClosestValidity = (validities: any, date: string) => {
       return object
     }
 
-    // Calculate the distance input `date`
-    const fromDistance = Math.abs(differenceInCalendarDays(fromDate, filterDate))
-    const toDistance = toDate
-      ? Math.abs(differenceInCalendarDays(toDate, filterDate))
-      : Infinity
-    const minDistance = Math.min(fromDistance, toDistance) // Find the minimum distance
-
-    // Update the closest validity if this one is closer
-    if (minDistance < closestDistance) {
-      closestDistance = minDistance
-      closestValidity = object
+    if (fromDate > filterDate) {
+      if (!earliestFuture || fromDate < parseISO(earliestFuture.validity.from)) {
+        earliestFuture = object
+      }
+    } else {
+      // Not active and not in the future, so `toDate` is set and in the past
+      if (!latestPast || toDate! > parseISO(latestPast.validity.to)) {
+        latestPast = object
+      }
     }
   }
 
-  return closestValidity
+  return latestPast ?? earliestFuture
 }
