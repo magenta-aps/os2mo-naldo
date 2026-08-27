@@ -17,6 +17,7 @@
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import Search from "$lib/components/search/Search.svelte"
+  import { findClosestValidity } from "$lib/utils/validities"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import { page } from "$app/stores"
@@ -30,6 +31,10 @@
           validities {
             name
             uuid
+            validity {
+              from
+              to
+            }
           }
         }
       }
@@ -161,7 +166,12 @@
       // date, so arriving from "manage connections" never opens contextless.
       fromDate: null,
     })
-    const orgUnit = res.org_units.objects[0]?.validities[0]
+    // Full history is returned; pick the validity for the start date so the
+    // prefilled label shows the name that applies then.
+    const validities = res.org_units.objects[0]?.validities
+    const orgUnit = validities?.length
+      ? findClosestValidity(validities, startDate)
+      : undefined
     if (orgUnit) {
       originOrgUnit = { uuid: orgUnit.uuid, name: orgUnit.name }
     }
