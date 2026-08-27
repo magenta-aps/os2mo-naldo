@@ -2,6 +2,7 @@ import {
   getEngagementTitlesAndUuid,
   getITSystemNames,
   getITUserITSystemName,
+  getManagerEngagementDisplay,
 } from "$lib/utils/display"
 import { describe, expect, it } from "vitest"
 
@@ -58,5 +59,45 @@ describe("getITSystemNames", () => {
       { uuid: "a", name: "Active Directory" },
       { uuid: "b", name: "SAP" },
     ])
+  })
+})
+
+describe("getManagerEngagementDisplay", () => {
+  const engagement = {
+    extension_1: "Skoleleder",
+    org_unit_response: { current: { name: "Haderslev skole" } },
+    job_function_response: { current: { name: "Specialist", user_key: "SPEC" } },
+  }
+
+  it("shows plain job_function name and org unit when SD-code mode is off", () => {
+    expect(getManagerEngagementDisplay(engagement, false, true)).toBe(
+      "Specialist, Haderslev skole"
+    )
+  })
+
+  it("shows extension_1 when SD-code mode and extension_1 are both on", () => {
+    expect(getManagerEngagementDisplay(engagement, true, true)).toBe(
+      "Skoleleder, Haderslev skole"
+    )
+  })
+
+  it("falls back to the user_key - name composite when extension_1 is off", () => {
+    expect(getManagerEngagementDisplay(engagement, true, false)).toBe(
+      "SPEC - Specialist, Haderslev skole"
+    )
+  })
+
+  it("falls back to the composite when extension_1 is on but unset", () => {
+    const withoutExtension = { ...engagement, extension_1: null }
+    expect(getManagerEngagementDisplay(withoutExtension, true, true)).toBe(
+      "SPEC - Specialist, Haderslev skole"
+    )
+  })
+
+  it("does not render 'undefined - undefined' when job_function_response is missing", () => {
+    const withoutJobFunction = { ...engagement, job_function_response: undefined }
+    expect(getManagerEngagementDisplay(withoutJobFunction, true, false)).toBe(
+      "undefined, Haderslev skole"
+    )
   })
 })

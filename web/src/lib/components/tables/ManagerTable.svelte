@@ -18,6 +18,7 @@
   import { updateGlobalNavigation } from "$lib/stores/navigation"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
+  import { getManagerEngagementDisplay } from "$lib/utils/display"
 
   export let tense: Tense
 
@@ -75,6 +76,7 @@
             engagement_response {
               uuid
               current(at: $fromDate) {
+                extension_1
                 org_unit_response {
                   uuid
                   current(at: $fromDate) {
@@ -84,6 +86,7 @@
                 job_function_response {
                   current(at: $fromDate) {
                     name
+                    user_key
                   }
                 }
               }
@@ -175,8 +178,11 @@
       </td>
       <td class="text-sm p-4">
         {#if manager.engagement_response?.current}
-          {manager.engagement_response.current.job_function_response?.current?.name}, {manager
-            .engagement_response.current.org_unit_response?.current?.name}
+          {getManagerEngagementDisplay(
+            manager.engagement_response.current,
+            env.PUBLIC_SHOW_JOB_FUNCTION_USER_KEY,
+            env.PUBLIC_SHOW_EXTENSION_1
+          )}
         {/if}
       </td>
       <td class="text-sm p-4">

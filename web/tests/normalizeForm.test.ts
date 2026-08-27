@@ -21,6 +21,8 @@ describe("normalizeEngagement", () => {
       engagement_type_response: { current: { name: "Ansat" } },
       user_key: "12345",
       primary_response: { current: { name: "Primær" } },
+      extension_1: "Skoleleder",
+      extension_4: "42",
     })
     expect(result).toEqual({
       to: "2023-03-03",
@@ -29,6 +31,8 @@ describe("normalizeEngagement", () => {
       engagement_type: "Ansat",
       user_key: "12345",
       primary: "Primær",
+      extension_1: "Skoleleder",
+      extension_4: "42",
     })
   })
 
@@ -47,6 +51,8 @@ describe("normalizeEngagement", () => {
       engagement_type: null,
       user_key: null,
       primary: "",
+      extension_1: "",
+      extension_4: "",
     })
   })
 })
