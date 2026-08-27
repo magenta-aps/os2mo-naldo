@@ -189,7 +189,7 @@
             sortPath: "org_unit_response.current.name",
           },
           ...(env.PUBLIC_SHOW_EXTENSION_4
-            ? [{ title: capital($_("department_code")), sortPath: "sd_code" }]
+            ? [{ title: capital($_("department_code")), sortPath: "extension_4" }]
             : []),
           { title: upperCase($_("id")), sortPath: "user_key" },
           ...(env.PUBLIC_SHOW_EXTENSION_1
@@ -202,7 +202,9 @@
             : []),
           {
             title: capital($_("job_function", { values: { n: 1 } })),
-            sortPath: "job_function_response.current.name",
+            sortPath: env.PUBLIC_SHOW_EXTENSION_1
+              ? "extension_1"
+              : "job_function_response.current.name",
           },
           {
             title: capital($_("engagement_type")),
