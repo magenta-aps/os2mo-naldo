@@ -28,6 +28,10 @@ variables:
   if: "$CI_MERGE_REQUEST_IID"
 
 include:
+  # os2mo's language-agnostic backing services (postgres, keycloak + realm
+  # with the dev users and the dipex client, rabbitmq) for the E2E job.
+  - project: "rammearkitektur/os2mo"
+    file: "gitlab-ci-templates/integration-test-meta.v1.yml"
   - project: "labs/salt-automation"
     file:
       - gitlab-ci-templates/common/no-interrupt-meta.v1.yml
@@ -73,6 +77,113 @@ Unit tests:
     - cd web/
     - yarn
     - yarn test
+
+E2E tests:
+  # Ships the browser and its OS packages — no playwright install step.
+  # Keep the tag in lockstep with @playwright/test in web/package.json.
+  # Deliberately no node_modules cache: uploading it after every job costs
+  # more than the install it saves.
+  image: mcr.microsoft.com/playwright:v1.47.2-jammy
+  stage: test
+  variables:
+    # Where the tests and the browser reach the stack. The browser runs in
+    # the job container, which resolves the service aliases (mo, keycloak).
+    BASE_URL: "http://localhost:4173"
+    MO_URL: "http://mo:5000"
+    KEYCLOAK_URL: "http://keycloak:8080/auth"
+    # Frontend runtime config, read by $env/dynamic/public when the preview
+    # server starts. The flags mirror docker-compose.yml so CI exercises the
+    # same forms the local dev setup does.
+    PUBLIC_BASE_URL: "http://mo:5000"
+    PUBLIC_KEYCLOAK_URL: "http://keycloak:8080/auth"
+    PUBLIC_KEYCLOAK_REALM: "mo"
+    PUBLIC_KEYCLOAK_CLIENT_ID: "mo-frontend"
+    PUBLIC_DAR_ACCESS_ADDRESSES: "true"
+    PUBLIC_SHOW_ADMIN_PANEL: "true"
+    PUBLIC_SHOW_INSIGHTS: "true"
+    PUBLIC_PRIMARY_CLASS_USER_KEY: "primary"
+    PUBLIC_SHOW_ROLEBINDINGS: "true"
+    PUBLIC_INHERIT_MANAGER: "true"
+    PUBLIC_SHOW_CPR_NUMBER: "true"
+    PUBLIC_SHOW_KLE: "true"
+    PUBLIC_SHOW_TIME_PLANNING: "true"
+    PUBLIC_SHOW_ORG_UNIT_LEVEL: "true"
+    PUBLIC_SHOW_PRIMARY_ENGAGEMENT: "true"
+    PUBLIC_SHOW_PRIMARY_ASSOCIATION: "true"
+    PUBLIC_SHOW_IT_ASSOCIATIONS_TAB: "true"
+    PUBLIC_DISABLE_IT_USER_EDIT_FORM: "false"
+    PUBLIC_SHOW_EMPLOYEE_BIRTHDAY_IN_SEARCH: "true"
+    PUBLIC_SEARCH_INFINITY: "false"
+    PUBLIC_DOCS_LINK: "true"
+    PUBLIC_ONBOARDING_LINK: "true"
+    PUBLIC_SHOW_SD_CODE_IN_TREES: "false"
+    PUBLIC_SHOW_JOB_FUNCTION_USER_KEY: "false"
+    PUBLIC_SHOW_EXTENSION_1: "false"
+    PUBLIC_SHOW_EXTENSION_4: "false"
+    PUBLIC_SHOW_ITUSER_CONNECTIONS: "true"
+    PUBLIC_ENABLE_CONFEDERATIONS: "true"
+    PUBLIC_ENABLE_CLASS_TERMINATION: "true"
+    PUBLIC_SKATTESTYRELSEN_USERFLOW: "true"
+    PUBLIC_ENABLE_SP: "false"
+    PUBLIC_ENABLE_RSD_SEARCH: "true"
+    PUBLIC_ENVIRONMENT: "dev"
+  services:
+    - !reference [.services:mo-backing, services]
+    # The MO backend itself. Its variables are copied from the template's
+    # .variables:mo — `!reference` into a service's `variables` does not
+    # survive being include'd from another repo (documented in the template).
+    - name: magentaaps/os2mo:latest
+      alias: mo
+      variables:
+        DB_HOST: "mox-db"
+        DB_NAME: "mox"
+        DB_USER: "mox"
+        DB_PASSWORD: "mox"
+        KEYCLOAK_SCHEMA: "http"
+        KEYCLOAK_PORT: 8080
+        KEYCLOAK_AUTH_SERVER_URL: "http://keycloak:8080/auth/"
+        KEYCLOAK_VERIFY_AUDIENCE: "false"
+        ENVIRONMENT: "testing"
+        LORA_AUTH: "false"
+        INSECURE_ENABLE_TESTING_API: "true"
+        AMQP_ENABLE: "true"
+        AMQP_URL: "amqp://guest:guest@msg-broker:5672/"
+      # Services have no restart policy and no start ordering; retry until
+      # the backing services it needs are up.
+      entrypoint:
+        - "sh"
+        - "-c"
+        - |
+          while ! ./docker/start.sh; do
+            sleep 1
+          done
+  before_script:
+    - !reference [.services:mo-backing, before_script]
+    # The playwright image has node but not yarn.
+    - npm install --global yarn
+    - cd web/
+    - yarn
+    - yarn build
+    - yarn preview &
+    - until curl -sf -o /dev/null http://localhost:4173; do sleep 1; done
+    - until curl -sf -o /dev/null http://mo:5000/health/ready; do echo "waiting for MO..."; sleep 5; done
+  script:
+    - node e2e/seed.cjs
+    - yarn e2e
+  artifacts:
+    when: always
+    paths:
+      - web/test-results/
+    reports:
+      junit: web/test-results/junit.xml
+    expire_in: 7 days
+  rules:
+    # MRs only pay for the job when it can be affected; master always runs it.
+    - <<: *if-merge-request
+      changes:
+        - web/**/*
+        - .gitlab-ci.yml
+    - <<: *if-default-branch-refs
 
 SvelteKit build:
   image: node:20

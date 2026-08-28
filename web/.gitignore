@@ -7,3 +7,6 @@ node_modules
 .env.*
 !.env.example
 *yarn-error.log
+payloads-*.json
+test-results/
+e2e/.auth/
