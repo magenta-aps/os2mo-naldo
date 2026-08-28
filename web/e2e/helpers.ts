@@ -189,7 +189,7 @@ export const dismiss = async (page: Page) => {
 
 // Opens the nth Select in the form and returns its option texts.
 export const selectOptions = async (page: Page, nth = 0): Promise<string[]> => {
-  await page.locator(`form #select >> nth=${nth}`).click({ timeout: 8000 })
+  await page.locator(`form #select:visible >> nth=${nth}`).click({ timeout: 8000 })
   await page.locator(".list-item").first().waitFor({ timeout: 8000 })
   const texts = await page.locator(".list-item").allInnerTexts()
   await page.keyboard.press("Escape")
@@ -199,7 +199,7 @@ export const selectOptions = async (page: Page, nth = 0): Promise<string[]> => {
 
 // Opens the nth Select and picks its first option.
 export const pickFirstOption = async (page: Page, nth = 0) => {
-  await page.locator(`form #select >> nth=${nth}`).click({ timeout: 8000 })
+  await page.locator(`form #select:visible >> nth=${nth}`).click({ timeout: 8000 })
   await page.locator(".list-item").first().waitFor({ timeout: 8000 })
   await page.keyboard.press("ArrowDown")
   await page.keyboard.press("Enter")
@@ -210,7 +210,7 @@ export const pickFirstOption = async (page: Page, nth = 0) => {
 // the form gave the component. Matched by suffix: the wizard prefixes ids
 // with "{entityKey}-{index}-", the routes don't.
 export const pickMultiFirstOption = async (page: Page, idSuffix: string) => {
-  await page.locator(`form input[id$="${idSuffix}"]`).click({ timeout: 8000 })
+  await page.locator(`form input[id$="${idSuffix}"]:visible`).click({ timeout: 8000 })
   await page.locator(".list-item").first().waitFor({ timeout: 8000 })
   await page.keyboard.press("ArrowDown")
   await page.keyboard.press("Enter")
@@ -220,7 +220,7 @@ export const pickMultiFirstOption = async (page: Page, idSuffix: string) => {
 // Types into the select to filter, then picks the first match — for options
 // that must be a specific one (pickFirstOption takes whatever comes first).
 export const pickOptionByText = async (page: Page, nth: number, text: string) => {
-  await page.locator(`form #select >> nth=${nth}`).click({ timeout: 8000 })
+  await page.locator(`form #select:visible >> nth=${nth}`).click({ timeout: 8000 })
   await page.keyboard.type(text)
   await page.locator(".list-item").first().waitFor({ timeout: 8000 })
   await page.keyboard.press("ArrowDown")
@@ -230,7 +230,7 @@ export const pickOptionByText = async (page: Page, nth: number, text: string) =>
 
 // Types into the form's Search field and picks the first result.
 export const searchAndPick = async (page: Page, text: string) => {
-  await page.locator("form input[type=text]").first().fill(text)
+  await page.locator("form input[type=text]:visible").first().fill(text)
   await page.locator(".list-item").first().waitFor({ timeout: 15000 })
   await page.keyboard.press("ArrowDown")
   await page.keyboard.press("Enter")

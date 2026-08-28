@@ -62,6 +62,12 @@ test("onboarding wizard submits a coherent batch", async ({ page }) => {
   await searchAndPick(page, fixture.unitName)
   await pickFirstOption(page, 0) // job function
   await pickFirstOption(page, 1) // engagement type
+  // Second engagement on its own tab, exercising the multi-tab machinery.
+  await page.locator('button[aria-label="Add engagement"]').click()
+  await page.waitForTimeout(500)
+  await searchAndPick(page, fixture.unitName)
+  await pickFirstOption(page, 0)
+  await pickFirstOption(page, 1)
   await next()
 
   // Step 3: ituser — the system with a linked role, an account name, a role.
@@ -101,12 +107,13 @@ test("onboarding wizard submits a coherent batch", async ({ page }) => {
 
   // Every detail must reference the employee's client-generated uuid and
   // carry what was picked on its step.
-  expect(captured.engagementInput).toHaveLength(1)
-  const engagement = captured.engagementInput[0]
-  expect(engagement.person).toBe(employee.uuid)
-  expect(engagement.org_unit).toBe(fixture.unit)
-  expect(engagement.job_function).toBeTruthy()
-  expect(engagement.engagement_type).toBeTruthy()
+  expect(captured.engagementInput).toHaveLength(2)
+  for (const engagement of captured.engagementInput) {
+    expect(engagement.person).toBe(employee.uuid)
+    expect(engagement.org_unit).toBe(fixture.unit)
+    expect(engagement.job_function).toBeTruthy()
+    expect(engagement.engagement_type).toBeTruthy()
+  }
 
   expect(captured.ituserInput).toHaveLength(1)
   const ituser = captured.ituserInput[0]

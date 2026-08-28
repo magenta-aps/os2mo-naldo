@@ -5,12 +5,14 @@ import {
   blockMutations,
   login,
   pickFirstOption,
+  pickMultiFirstOption,
+  pickOptionByText,
   resolveFixture,
   searchAndPick,
 } from "./helpers"
 
-// Captures what each engagement form would submit, without letting the
-// mutation reach MO. Run with PAYLOAD_LABEL=old on the baseline ref, then
+// Captures what the create and edit forms would submit, without letting
+// the mutation reach MO. Run with PAYLOAD_LABEL=old on the baseline ref, then
 // PAYLOAD_LABEL=new on the branch — the "new" run diffs against the old file.
 const LABEL = process.env.PAYLOAD_LABEL
 const OUT_FILE = `payloads-${LABEL}.json`
@@ -78,6 +80,51 @@ test("org edit", async ({ page }) => {
   await login(page)
   await page.waitForTimeout(1000)
   await page.fill("form input[name=user-key]", "E2E-EDITED")
+  await submit(page)
+})
+
+test("employee create address", async ({ page }) => {
+  const fixture = await resolveFixture()
+  await blockMutations(page, capture("employee-create-address"))
+  await page.goto(`/employee/${fixture.person}/create/address`)
+  await login(page)
+  await pickFirstOption(page, 0) // visibility
+  await pickOptionByText(page, 1, "Email") // the seeded EMAIL-scope type
+  await page.fill('form input[name$="value"]', "payload@example.org")
+  await submit(page)
+})
+
+test("employee create ituser", async ({ page }) => {
+  const fixture = await resolveFixture()
+  await blockMutations(page, capture("employee-create-ituser"))
+  await page.goto(`/employee/${fixture.person}/create/ituser`)
+  await login(page)
+  await pickFirstOption(page, 0) // it system
+  await page.fill('form input[name$="account-name"]', "E2E-ACCOUNT")
+  await submit(page)
+})
+
+test("employee create manager", async ({ page }) => {
+  const fixture = await resolveFixture()
+  await blockMutations(page, capture("employee-create-manager"))
+  await page.goto(`/employee/${fixture.person}/create/manager`)
+  await login(page)
+  await searchAndPick(page, fixture.unitName)
+  // The engagement link demands a conscious choice; opt out.
+  await page.locator('form input[id$="no-engagement"]').check()
+  await pickFirstOption(page, 1) // manager type (0 is the engagement select)
+  await pickFirstOption(page, 2) // manager level
+  await pickMultiFirstOption(page, "responsibility")
+  await submit(page)
+})
+
+test("create employee", async ({ page }) => {
+  await blockMutations(page, capture("create-employee"))
+  await page.goto("/employee/create/employee")
+  await login(page)
+  await page.fill("form input[name=cpr-number]", "0101904111")
+  await page.fill("form input[name=first-name]", "Payload")
+  await page.fill("form input[name=last-name]", "Testesen")
   await submit(page)
 })
 
