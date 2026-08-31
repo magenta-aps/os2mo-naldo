@@ -31,10 +31,9 @@ describe("findClosestValidity", () => {
   })
 
   it("does not match a validity with to == today as active (ended yesterday — v29 boundary)", () => {
-    // Regression test for [#69277]: the old `>=` check incorrectly treated
-    // to == TODAY as still-active. Under v29 exclusive semantics it ended the
-    // day before. `endedYesterday` still comes back here, but only via the
-    // distance fallback (distance(to, TODAY) == 0), not as the active match.
+    // Regression test for [#69277]: under v29 exclusive semantics a validity
+    // with to == TODAY ended the day before. `endedYesterday` comes back here
+    // via the latest-past fallback, as a non-active validity.
     const endedYesterday = validity("2015-01-01", TODAY)
     const other = validity("2025-01-01", "2030-01-01")
     expect(findClosestValidity([endedYesterday, other], TODAY)).toBe(endedYesterday)
@@ -46,10 +45,32 @@ describe("findClosestValidity", () => {
     expect(findClosestValidity([past, openEnded], TODAY)).toBe(openEnded)
   })
 
-  it("falls back to the validity closest to the filter date when none is active", () => {
+  it("falls back to the latest past validity when none is active", () => {
     const old = validity("1990-01-01", "1995-01-01")
     const recent = validity("2010-01-01", "2015-01-01")
     const future = validity("2030-01-01", "2035-01-01")
     expect(findClosestValidity([old, recent, future], TODAY)).toBe(recent)
+  })
+
+  it("prefers the latest past validity over a nearer future one (last known name)", () => {
+    // The future validity is much closer in time (1 year vs. 5), yet the last
+    // name the object actually carried is still the expected label.
+    const past = validity("2010-01-01", "2015-01-01")
+    const nearFuture = validity("2021-01-01", "2025-01-01")
+    expect(findClosestValidity([past, nearFuture], TODAY)).toBe(past)
+  })
+
+  it("returns the latest past validity, not the oldest, for a terminated object", () => {
+    const oldest = validity("1990-01-01", "1995-01-01")
+    const latest = validity("2010-01-01", "2015-01-01")
+    expect(findClosestValidity([oldest, latest], TODAY)).toBe(latest)
+    // Order in the input list must not matter
+    expect(findClosestValidity([latest, oldest], TODAY)).toBe(latest)
+  })
+
+  it("returns the earliest future validity when the object does not exist yet", () => {
+    const near = validity("2025-01-01", "2030-01-01")
+    const far = validity("2030-01-01", null)
+    expect(findClosestValidity([far, near], TODAY)).toBe(near)
   })
 })
