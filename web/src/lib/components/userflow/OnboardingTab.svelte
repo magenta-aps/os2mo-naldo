@@ -32,14 +32,16 @@
           class="btn btn-xs btn-circle btn-ghost text-base-content hover:bg-error"
           type="button"
           aria-label={`Remove ${label} ${i + 1}`}
-          on:click={async (e) => {
+          on:click={(e) => {
             e.preventDefault()
             e.stopPropagation()
-            // Don't let your LSP fool you, this `await` does indeed have effect.
-            await removeItem(i)
-            if (selectedIndex >= items.length) {
-              setSelectedIndex(Math.max(0, items.length - 1))
-            }
+            // Derived from pre-removal indices, so it never depends on `items`
+            // having refreshed yet. The `items.length > 1` guard keeps last >= 0.
+            const last = items.length - 2
+            setSelectedIndex(
+              Math.min(i < selectedIndex ? selectedIndex - 1 : selectedIndex, last)
+            )
+            removeItem(i)
           }}
         >
           <Icon
@@ -54,12 +56,13 @@
 
   <button
     class="btn btn-sm btn-ghost px-2"
-    on:click={async (e) => {
+    on:click={(e) => {
       e.preventDefault()
       e.stopPropagation()
-      // Don't let your LSP fool you, this `await` does indeed have effect.
-      await addItem()
-      setSelectedIndex(items.length - 1)
+      // Read before adding, for the same reason as the removal handler above.
+      const appended = items.length
+      addItem()
+      setSelectedIndex(appended)
     }}
     aria-label={`Add ${label}`}
   >
