@@ -363,6 +363,7 @@
           </p>
         {/if}
         {#each rolebindings as rolebinding, index}
+          {@const isLast = index === rolebindings.length - 1}
           {#if $itSystemRoles.data?.length}
             {#key $itSystemRoles.data}
               <Select
@@ -381,21 +382,20 @@
               disabled
             />
           {/if}
-          {#if rolebindings.length > 1}
-            <CircleButton
-              on:click={() => {
-                removeRolebinding(index)
-              }}
-              icon={removeRounded}
-            />
-          {/if}
-          {#if index === rolebindings.length - 1}
-            <CircleButton
-              on:click={() => addRolebinding()}
-              icon={addRounded}
-              extraClasses="mb-4"
-            />
-          {:else}
+          <div class="flex items-center gap-2" class:mb-4={isLast}>
+            {#if rolebindings.length > 1}
+              <CircleButton
+                on:click={() => {
+                  removeRolebinding(index)
+                }}
+                icon={removeRounded}
+              />
+            {/if}
+            {#if isLast}
+              <CircleButton on:click={() => addRolebinding()} icon={addRounded} />
+            {/if}
+          </div>
+          {#if !isLast}
             <div class="divider p-0 m-0 my-2 w-full" />
           {/if}
         {/each}
