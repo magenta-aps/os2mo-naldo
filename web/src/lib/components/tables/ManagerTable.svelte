@@ -19,6 +19,7 @@
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
   import { getManagerEngagementDisplay } from "$lib/utils/display"
+  import { findClosestValidityWithin } from "$lib/utils/validities"
 
   export let tense: Tense
 
@@ -27,7 +28,10 @@
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
 
-  type Managers = ManagersQuery["managers"]["objects"][0]["validities"]
+  type Manager = ManagersQuery["managers"]["objects"][0]["validities"][0]
+  type EngagementState = NonNullable<Manager["engagement_response"]>["validities"][0]
+  type ManagerRow = Manager & { engagement_state?: EngagementState }
+  type Managers = ManagerRow[]
 
   gql`
     query Managers(
@@ -75,7 +79,7 @@
             }
             engagement_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 extension_1
                 org_unit_response {
                   uuid
@@ -88,6 +92,10 @@
                     name
                     user_key
                   }
+                }
+                validity {
+                  from
+                  to
                 }
               }
             }
@@ -130,7 +138,16 @@
           if (!isOrg && !obj.person_response) return false
           return true
         })
-        managers.push(...filtered)
+        managers.push(
+          ...filtered.map((obj) => ({
+            ...obj,
+            engagement_state: findClosestValidityWithin(
+              obj.engagement_response?.validities,
+              obj.validity,
+              $date
+            ),
+          }))
+        )
       }
       return managers
     })
@@ -177,9 +194,9 @@
         {/if}
       </td>
       <td class="text-sm p-4">
-        {#if manager.engagement_response?.current}
+        {#if manager.engagement_state}
           {getManagerEngagementDisplay(
-            manager.engagement_response.current,
+            manager.engagement_state,
             env.PUBLIC_SHOW_JOB_FUNCTION_USER_KEY,
             env.PUBLIC_SHOW_EXTENSION_1
           )}
