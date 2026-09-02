@@ -94,10 +94,25 @@ describe("getManagerEngagementDisplay", () => {
     )
   })
 
-  it("does not render 'undefined - undefined' when job_function_response is missing", () => {
+  it("renders only the org unit when job_function_response is missing", () => {
     const withoutJobFunction = { ...engagement, job_function_response: undefined }
     expect(getManagerEngagementDisplay(withoutJobFunction, true, false)).toBe(
-      "undefined, Haderslev skole"
+      "Haderslev skole"
     )
+  })
+
+  it("renders only the job title when org_unit_response is missing", () => {
+    const withoutOrgUnit = { ...engagement, org_unit_response: undefined }
+    expect(getManagerEngagementDisplay(withoutOrgUnit, false, false)).toBe("Specialist")
+  })
+
+  it("renders an empty string when neither half resolves", () => {
+    expect(
+      getManagerEngagementDisplay(
+        { job_function_response: undefined, org_unit_response: undefined },
+        false,
+        false
+      )
+    ).toBe("")
   })
 })
