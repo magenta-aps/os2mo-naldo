@@ -17,6 +17,7 @@
   import { formatQueryDates } from "$lib/utils/validities"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
+  import NameWithHistory from "$lib/components/shared/NameWithHistory.svelte"
 
   type OrgUnits = OrgUnitQuery["org_units"]["objects"][0]["validities"]
 
@@ -45,8 +46,12 @@
             }
             parent_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             time_planning_response {
@@ -106,9 +111,13 @@
       {/if}
       <td class="text-sm p-4">
         {#if org_unit.parent_response}
-          <a href="{base}/organisation/{org_unit.parent_response.uuid}">
-            {org_unit.parent_response.current?.name ?? org_unit.parent_response.uuid}
-          </a>
+          <NameWithHistory
+            id={org_unit.uuid}
+            validities={org_unit.parent_response.validities}
+            rowValidity={org_unit.validity}
+            fallback={org_unit.parent_response.uuid}
+            href="{base}/organisation/{org_unit.parent_response.uuid}"
+          />
         {:else}
           {capital(
             $_("no_item", { values: { item: $_("parent", { values: { n: 1 } }) } })

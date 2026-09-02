@@ -1,4 +1,9 @@
-import { findClosestValidity } from "$lib/utils/validities"
+import {
+  clampDateToValidity,
+  filterValiditiesInRange,
+  findClosestValidityWithin,
+  findClosestValidity,
+} from "$lib/utils/validities"
 import { describe, expect, it } from "vitest"
 
 // In GraphQL v29, `validity.to` is exclusive: `to` is the first instant AFTER
@@ -72,5 +77,100 @@ describe("findClosestValidity", () => {
     const near = validity("2025-01-01", "2030-01-01")
     const far = validity("2030-01-01", null)
     expect(findClosestValidity([far, near], TODAY)).toBe(near)
+  })
+})
+
+describe("clampDateToValidity", () => {
+  it("returns the date unchanged when inside the validity", () => {
+    expect(
+      clampDateToValidity(TODAY, validity("2010-01-01", "2030-01-01").validity)
+    ).toBe(TODAY)
+  })
+
+  it("clamps a date before the validity to its first day", () => {
+    expect(clampDateToValidity(TODAY, validity("2025-01-01", null).validity)).toBe(
+      "2025-01-01"
+    )
+  })
+
+  it("clamps a date after the validity to its last valid day (day before exclusive `to`)", () => {
+    expect(
+      clampDateToValidity(TODAY, validity("2000-01-01", "2010-01-01").validity)
+    ).toBe("2009-12-31")
+  })
+
+  it("treats a date equal to the exclusive `to` as outside the validity", () => {
+    expect(
+      clampDateToValidity("2010-01-01", validity("2000-01-01", "2010-01-01").validity)
+    ).toBe("2009-12-31")
+  })
+
+  it("returns the date unchanged for a fully open validity", () => {
+    expect(clampDateToValidity(TODAY, { from: null, to: null })).toBe(TODAY)
+  })
+})
+
+describe("findClosestValidityWithin", () => {
+  it("returns null when no validities are given", () => {
+    expect(
+      findClosestValidityWithin(null, validity("2010-01-01", null).validity, TODAY)
+    ).toBe(null)
+    expect(
+      findClosestValidityWithin([], validity("2010-01-01", null).validity, TODAY)
+    ).toBe(null)
+  })
+
+  it("resolves the name valid at the view date when the row covers it", () => {
+    const oldName = validity("2000-01-01", "2015-01-01")
+    const newName = validity("2015-01-01", null)
+    const row = validity("2010-01-01", null).validity
+    expect(findClosestValidityWithin([oldName, newName], row, TODAY)).toBe(newName)
+  })
+
+  it("resolves within a past row instead of at the view date", () => {
+    // Row ended 2010 (exclusive `to`); the object was renamed in 2015. The
+    // name shown must be the one from the row's own period, not today's.
+    const duringRow = validity("2000-01-01", "2015-01-01")
+    const afterRow = validity("2015-01-01", null)
+    const pastRow = validity("2005-01-01", "2010-01-01").validity
+    expect(findClosestValidityWithin([duringRow, afterRow], pastRow, TODAY)).toBe(
+      duringRow
+    )
+  })
+
+  it("resolves within a future row instead of at the view date", () => {
+    const current = validity("2000-01-01", "2025-01-01")
+    const upcoming = validity("2025-01-01", null)
+    const futureRow = validity("2026-01-01", null).validity
+    expect(findClosestValidityWithin([current, upcoming], futureRow, TODAY)).toBe(
+      upcoming
+    )
+  })
+})
+
+describe("filterValiditiesInRange", () => {
+  const names = [
+    validity("2000-01-01", "2005-01-01"),
+    validity("2005-01-01", "2015-01-01"),
+    validity("2015-01-01", null),
+  ]
+
+  it("keeps only validities overlapping the range", () => {
+    const row = validity("2006-01-01", "2016-01-01").validity
+    expect(filterValiditiesInRange(names, row)).toEqual([names[1], names[2]])
+  })
+
+  it("excludes validities merely touching the range at an endpoint (exclusive `to`)", () => {
+    const row = validity("2005-01-01", "2015-01-01").validity
+    expect(filterValiditiesInRange(names, row)).toEqual([names[1]])
+  })
+
+  it("keeps everything for a fully open range", () => {
+    expect(filterValiditiesInRange(names, { from: null, to: null })).toEqual(names)
+  })
+
+  it("keeps open-ended validities for an open-ended range", () => {
+    const row = validity("2020-01-01", null).validity
+    expect(filterValiditiesInRange(names, row)).toEqual([names[2]])
   })
 })
