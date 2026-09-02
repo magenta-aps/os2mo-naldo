@@ -43,6 +43,10 @@ next to the code they describe.
   array clears a prefilled selection.
 - Never seed a Select value with an empty name (`{ uuid, name: "" }`) — the
   component drops it. Fall back to the uuid when a name does not resolve.
+- A seeded-but-empty value (`[]`, `{ cpr_no: "" }`) is truthy, so a shared
+  component reads it as a real selection and writes back through `bind:`.
+  That write validates the field on mount, painting an untouched form red.
+  Seed `undefined` until the user picks.
 - Data fetching in forms goes through `createQuery` (`$lib/http/query.ts`);
   the employee edit engagement form is the reference implementation.
 - GraphQL v29 `validity.to` is exclusive: `to == date` means it ended the
