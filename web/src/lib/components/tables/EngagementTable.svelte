@@ -23,8 +23,14 @@
   import { env } from "$lib/env"
 
   type Engagement = EngagementsQuery["engagements"]["objects"][0]["validities"][0]
-  // `org_unit_name` is precomputed so column sorting matches the displayed name
-  type EngagementRow = Engagement & { org_unit_name?: string | null }
+  type OrgUnitNames = NonNullable<
+    EngagementsQuery["referencedUnits"]
+  >["objects"][0]["validities"]
+  type EngagementRow = Engagement & {
+    org_unit_names: OrgUnitNames
+    // Precomputed so column sorting matches the displayed name
+    org_unit_name?: string | null
+  }
   type Engagements = EngagementRow[]
 
   export let tense: Tense
@@ -34,6 +40,9 @@
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
 
+  // `referencedUnits` selects the rows' org units by the same filter rather than
+  // by uuid, so their names resolve in this one request instead of needing the
+  // engagement response first.
   // Use deprecated filter, because `employee`/`org_unit` filters will query for every object, if uuid is set to null
   // TODO: When https://redmine.magenta.dk/issues/62968 is fixed, add date-filters to classes
   gql`
@@ -98,13 +107,6 @@
             }
             org_unit_response @skip(if: $isOrg) {
               uuid
-              validities(start: null, end: null) {
-                name
-                validity {
-                  from
-                  to
-                }
-              }
             }
             managers(inherit: $inherit, exclude_self: true) @skip(if: $isOrg) {
               person_response {
@@ -127,6 +129,22 @@
           }
         }
       }
+      referencedUnits: org_units(
+        filter: {
+          engagement: { employees: $employee, from_date: $fromDate, to_date: $toDate }
+        }
+      ) @skip(if: $isOrg) {
+        objects {
+          uuid
+          validities(start: null, end: null) {
+            name
+            validity {
+              from
+              to
+            }
+          }
+        }
+      }
     }
   `
 
@@ -139,6 +157,11 @@
       ...tenseToValidity(tense, $date),
     })
     .then((res) => {
+      // Each unit appears once in the response however many rows point at it
+      const namesByUuid = new Map<string, OrgUnitNames>(
+        res.referencedUnits?.objects.map((unit) => [unit.uuid, unit.validities])
+      )
+
       const engagements: Engagements = []
 
       // Filters and flattens the data
@@ -152,14 +175,18 @@
           return true
         })
         engagements.push(
-          ...filtered.map((obj) => ({
-            ...obj,
-            org_unit_name: findClosestValidityWithin(
-              obj.org_unit_response?.validities,
-              obj.validity,
-              $date
-            )?.name,
-          }))
+          ...filtered.map((obj) => {
+            const org_unit_names = namesByUuid.get(obj.org_unit_response?.uuid) ?? []
+            return {
+              ...obj,
+              org_unit_names: org_unit_names,
+              org_unit_name: findClosestValidityWithin(
+                org_unit_names,
+                obj.validity,
+                $date
+              )?.name,
+            }
+          })
         )
       }
       return engagements
@@ -184,7 +211,7 @@
         {:else}
           <NameWithHistory
             id={engagement.uuid}
-            validities={engagement.org_unit_response?.validities}
+            validities={engagement.org_unit_names}
             rowValidity={engagement.validity}
             fallback={engagement.org_unit_response?.uuid}
             href="{base}/organisation/{engagement.org_unit_response?.uuid}"
