@@ -42,7 +42,8 @@
 
   // `referencedUnits` selects the rows' org units by the same filter rather than
   // by uuid, so their names resolve in this one request instead of needing the
-  // engagement response first.
+  // engagement response first. Its dates must be unbounded: rows reference units
+  // that no longer exist, and `validities` can't widen a filtered-out unit.
   // Use deprecated filter, because `employee`/`org_unit` filters will query for every object, if uuid is set to null
   // TODO: When https://redmine.magenta.dk/issues/62968 is fixed, add date-filters to classes
   gql`
@@ -131,6 +132,8 @@
       }
       referencedUnits: org_units(
         filter: {
+          from_date: null
+          to_date: null
           engagement: { employees: $employee, from_date: $fromDate, to_date: $toDate }
         }
       ) @skip(if: $isOrg) {
