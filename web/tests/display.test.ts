@@ -1,8 +1,8 @@
 import {
+  getEngagementDisplay,
   getEngagementTitlesAndUuid,
   getITSystemNames,
   getITUserITSystemName,
-  getManagerEngagementDisplay,
 } from "$lib/utils/display"
 import { describe, expect, it } from "vitest"
 
@@ -62,7 +62,7 @@ describe("getITSystemNames", () => {
   })
 })
 
-describe("getManagerEngagementDisplay", () => {
+describe("getEngagementDisplay", () => {
   const engagement = {
     extension_1: "Skoleleder",
     org_unit_response: { current: { name: "Haderslev skole" } },
@@ -70,45 +70,45 @@ describe("getManagerEngagementDisplay", () => {
   }
 
   it("shows plain job_function name and org unit when SD-code mode is off", () => {
-    expect(getManagerEngagementDisplay(engagement, false, true)).toBe(
+    expect(getEngagementDisplay(engagement, false, true)).toBe(
       "Specialist, Haderslev skole"
     )
   })
 
   it("shows extension_1 when SD-code mode and extension_1 are both on", () => {
-    expect(getManagerEngagementDisplay(engagement, true, true)).toBe(
+    expect(getEngagementDisplay(engagement, true, true)).toBe(
       "Skoleleder, Haderslev skole"
     )
   })
 
   it("falls back to the user_key - name composite when extension_1 is off", () => {
-    expect(getManagerEngagementDisplay(engagement, true, false)).toBe(
+    expect(getEngagementDisplay(engagement, true, false)).toBe(
       "SPEC - Specialist, Haderslev skole"
     )
   })
 
   it("falls back to the composite when extension_1 is on but unset", () => {
     const withoutExtension = { ...engagement, extension_1: null }
-    expect(getManagerEngagementDisplay(withoutExtension, true, true)).toBe(
+    expect(getEngagementDisplay(withoutExtension, true, true)).toBe(
       "SPEC - Specialist, Haderslev skole"
     )
   })
 
   it("renders only the org unit when job_function_response is missing", () => {
     const withoutJobFunction = { ...engagement, job_function_response: undefined }
-    expect(getManagerEngagementDisplay(withoutJobFunction, true, false)).toBe(
+    expect(getEngagementDisplay(withoutJobFunction, true, false)).toBe(
       "Haderslev skole"
     )
   })
 
   it("renders only the job title when org_unit_response is missing", () => {
     const withoutOrgUnit = { ...engagement, org_unit_response: undefined }
-    expect(getManagerEngagementDisplay(withoutOrgUnit, false, false)).toBe("Specialist")
+    expect(getEngagementDisplay(withoutOrgUnit, false, false)).toBe("Specialist")
   })
 
   it("renders an empty string when neither half resolves", () => {
     expect(
-      getManagerEngagementDisplay(
+      getEngagementDisplay(
         { job_function_response: undefined, org_unit_response: undefined },
         false,
         false

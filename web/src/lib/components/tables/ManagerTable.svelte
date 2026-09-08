@@ -18,7 +18,7 @@
   import { updateGlobalNavigation } from "$lib/stores/navigation"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
-  import { getManagerEngagementDisplay } from "$lib/utils/display"
+  import { getEngagementDisplay } from "$lib/utils/display"
   import { findClosestValidityWithin } from "$lib/utils/validities"
 
   export let tense: Tense
@@ -195,7 +195,7 @@
       </td>
       <td class="text-sm p-4">
         {#if manager.engagement_state}
-          {getManagerEngagementDisplay(
+          {getEngagementDisplay(
             manager.engagement_state,
             env.PUBLIC_SHOW_JOB_FUNCTION_USER_KEY,
             env.PUBLIC_SHOW_EXTENSION_1

@@ -31,16 +31,17 @@ export const getEngagementTitlesAndUuid = (engagements: EngagementTitleAndUuid[]
   }))
 }
 
-// Manager table's "Engagement" column. In SD-code mode job_function is just a
-// code, so extension_1 stands in for it as the job title.
-export type ManagerEngagement = {
+// An engagement rendered as one line of text, for the tables that show it as a
+// relation. In SD-code mode job_function is just a code, so extension_1 stands
+// in for it as the job title.
+export type EngagementDisplay = {
   extension_1?: string | null
   org_unit_response?: { current?: { name: string } | null }
   job_function_response?: { current?: { name: string; user_key: string } | null }
 }
 
-export const getManagerEngagementDisplay = (
-  engagement: ManagerEngagement,
+export const getEngagementDisplay = (
+  engagement: EngagementDisplay,
   showJobFunctionUserKey: boolean,
   showExtension1: boolean
 ) => {
