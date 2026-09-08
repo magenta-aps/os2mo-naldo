@@ -27,7 +27,15 @@ export type EngagementTitleAndUuid = {
 export const getEngagementTitlesAndUuid = (engagements: EngagementTitleAndUuid[]) => {
   return engagements.map((engagement) => ({
     uuid: engagement.uuid,
-    name: `${engagement.job_function_response?.current?.name}, ${engagement.org_unit_response?.current?.name}`,
+    // Either half can be absent when a unit or job function no longer resolves,
+    // and Select drops an option with an empty name.
+    name:
+      [
+        engagement.job_function_response?.current?.name,
+        engagement.org_unit_response?.current?.name,
+      ]
+        .filter(Boolean)
+        .join(", ") || engagement.uuid,
   }))
 }
 
