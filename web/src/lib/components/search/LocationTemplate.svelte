@@ -1,7 +1,10 @@
 <script lang="ts">
+  import { suffixUserKey } from "$lib/utils/helpers"
+
   export let orgUnit:
     | {
         name: string
+        user_key?: string
         ancestors?: { name: string }[]
       }
     | undefined
@@ -26,7 +29,7 @@
 
     {#if includeUnit}
       <span class="text-base-content/80">/</span>
-      <span class="text-primary">{orgUnit.name}</span>
+      <span class="text-primary">{suffixUserKey(orgUnit.name, orgUnit.user_key)}</span>
     {/if}
   </div>
 {/if}

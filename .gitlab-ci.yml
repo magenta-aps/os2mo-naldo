@@ -112,7 +112,7 @@ E2E tests:
     PUBLIC_SHOW_PRIMARY_ASSOCIATION: "true"
     PUBLIC_SHOW_IT_ASSOCIATIONS_TAB: "true"
     PUBLIC_DISABLE_IT_USER_EDIT_FORM: "false"
-    PUBLIC_SHOW_EMPLOYEE_BIRTHDAY_IN_SEARCH: "true"
+    PUBLIC_SEARCH_BIRTHDAY: "true"
     PUBLIC_SEARCH_INFINITY: "false"
     PUBLIC_DOCS_LINK: "true"
     PUBLIC_ONBOARDING_LINK: "true"
@@ -125,7 +125,6 @@ E2E tests:
     PUBLIC_ENABLE_CLASS_TERMINATION: "true"
     PUBLIC_SKATTESTYRELSEN_USERFLOW: "true"
     PUBLIC_ENABLE_SP: "false"
-    PUBLIC_ENABLE_RSD_SEARCH: "true"
     PUBLIC_ENVIRONMENT: "dev"
   services:
     - !reference [.services:mo-backing, services]

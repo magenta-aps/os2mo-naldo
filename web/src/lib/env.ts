@@ -66,9 +66,6 @@ export const env = {
   PUBLIC_DISABLE_IT_USER_EDIT_FORM: bool(
     dynamicEnv["PUBLIC_DISABLE_IT_USER_EDIT_FORM"]
   ),
-  PUBLIC_SHOW_EMPLOYEE_BIRTHDAY_IN_SEARCH: bool(
-    dynamicEnv["PUBLIC_SHOW_EMPLOYEE_BIRTHDAY_IN_SEARCH"]
-  ),
   PUBLIC_SHOW_ADMIN_PANEL: bool(dynamicEnv["PUBLIC_SHOW_ADMIN_PANEL"]),
   PUBLIC_SHOW_INSIGHTS: bool(dynamicEnv["PUBLIC_SHOW_INSIGHTS"]),
   PUBLIC_SHOW_ROLEBINDINGS: bool(dynamicEnv["PUBLIC_SHOW_ROLEBINDINGS"]),
@@ -85,7 +82,18 @@ export const env = {
   PUBLIC_ENABLE_CLASS_TERMINATION: bool(dynamicEnv["PUBLIC_ENABLE_CLASS_TERMINATION"]),
   PUBLIC_SKATTESTYRELSEN_USERFLOW: bool(dynamicEnv["PUBLIC_SKATTESTYRELSEN_USERFLOW"]),
   PUBLIC_ENABLE_SP: bool(dynamicEnv["PUBLIC_ENABLE_SP"]),
-  PUBLIC_ENABLE_RSD_SEARCH: bool(dynamicEnv["PUBLIC_ENABLE_RSD_SEARCH"]),
   PUBLIC_ENABLE_THEMING: bool(dynamicEnv["PUBLIC_ENABLE_THEMING"]),
   PUBLIC_ENVIRONMENT: environment(dynamicEnv["PUBLIC_ENVIRONMENT"]),
+}
+
+// Which fields a search result adds to the name: none by default, "primary"
+// or "*" for the relations, address type user-keys for the addresses.
+export const searchFields = {
+  addressTypes: json<string[]>(dynamicEnv["PUBLIC_SEARCH_ADDRESS_TYPES"], []),
+  engagements: dynamicEnv["PUBLIC_SEARCH_ENGAGEMENTS"] ?? "",
+  itusers: dynamicEnv["PUBLIC_SEARCH_ITUSERS"] ?? "",
+  birthday: bool(dynamicEnv["PUBLIC_SEARCH_BIRTHDAY"]),
+  engagementId: bool(dynamicEnv["PUBLIC_SEARCH_ENGAGEMENT_ID"]),
+  unitType: bool(dynamicEnv["PUBLIC_SEARCH_UNIT_TYPE"]),
+  unitId: bool(dynamicEnv["PUBLIC_SEARCH_UNIT_ID"]),
 }
