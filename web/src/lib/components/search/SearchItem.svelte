@@ -1,16 +1,39 @@
 <script lang="ts">
-  import { _ } from "svelte-i18n"
-  import { env } from "$lib/env"
+  import { searchFields } from "$lib/env"
   import type { EmployeeSearchQuery, OrgUnitSearchQuery } from "./query.generated"
   type Employee = EmployeeSearchQuery["employees"]["objects"][0]["validities"][0]
   type OrgUnit = OrgUnitSearchQuery["org_units"]["objects"][0]["validities"][0]
   import AddressTemplate from "$lib/components/search/AddressTemplate.svelte"
   import LocationTemplate from "$lib/components/search/LocationTemplate.svelte"
-  import { isUUID } from "$lib/utils/helpers"
+  import { isMeaningfulUserKey, isUUID, suffixUserKey } from "$lib/utils/helpers"
+  import { findClosestValidity, findClosestValidityWithin } from "$lib/utils/validities"
+
+  type Engagement = NonNullable<
+    Employee["engagements_response"]
+  >["objects"][0]["validities"][0]
 
   type SearchItem = Employee | OrgUnit
   export let item: SearchItem
   export let type: string
+  export let date: string
+
+  // An all-time search returns relations that have ended, for which MO has no
+  // current state.
+  const closestValidities = <T>(
+    response: { objects: { validities: T[] }[] } | null | undefined,
+    date: string
+  ): T[] =>
+    (response?.objects ?? []).flatMap((object) => {
+      const validity = findClosestValidity(object.validities, date)
+      return validity ? [validity] : []
+    })
+
+  const engagementOrgUnit = (engagement: Engagement, date: string) =>
+    findClosestValidityWithin(
+      engagement.org_unit_response.validities,
+      engagement.validity,
+      date
+    ) ?? undefined
 
   /**
    * Type guard to check if a given object is of type LazyEmployee or LazyOrgUnit.
@@ -23,21 +46,7 @@
   const isOrgUnit = (obj: SearchItem, type: string): obj is OrgUnit => {
     return type === "org-unit"
   }
-  /**
-   * Type guard to check if a given object is of type (Lazy)Employee or (Lazy)OrgUnit.
-   * @param obj The object to check.
-   * @returns employee birthdate if true, otherwise ""
-   */
-  // A _response field holds one entry per relation, each resolved to its state
-  // on the searched date.
-  const currentObjects = <T>(
-    response: { objects: { current?: T | null }[] } | null | undefined
-  ): T[] =>
-    (response?.objects ?? []).flatMap((object) =>
-      object.current ? [object.current] : []
-    )
-
-  const returnCPR = (obj: SearchItem): string => {
+  const birthday = (obj: SearchItem): string => {
     if ("cpr_number" in obj && obj.cpr_number) {
       return `(${obj.cpr_number.trim().slice(0, 6)})`
     }
@@ -48,43 +57,55 @@
 <div class="flex items-center cursor-pointer text-ellipsis">
   <div class="text-ellipsis">
     <div class="inline-block text-base-content">
-      {item.name}
-      {#if type === "employee" && env.PUBLIC_SHOW_EMPLOYEE_BIRTHDAY_IN_SEARCH}{returnCPR(
-          item
-        )}{/if}
+      {isOrgUnit(item, type) ? suffixUserKey(item.name, item.user_key) : item.name}
+      {#if type === "employee" && searchFields.birthday}{birthday(item)}{/if}
     </div>
-    {#if isEmployee(item, type) && env.PUBLIC_ENABLE_RSD_SEARCH}
-      <!-- Show employee engagement locations (RSD behaviour)-->
-      {#each currentObjects(item.engagements_response) as engagement}
-        <LocationTemplate
-          orgUnit={engagement.org_unit_response?.current
-            ? {
-                name: engagement.org_unit_response.current.name,
-                ancestors: engagement.org_unit_response.current.ancestors,
-              }
-            : undefined}
-          showCurrentName={true}
+    {#if isEmployee(item, type)}
+      {#each closestValidities(item.itusers_response, date).filter((ituser) => !isUUID(ituser.user_key)) as ituser}
+        <div class="text-sm text-primary">
+          <span>{ituser.user_key}</span>
+        </div>
+      {/each}
+      {#each closestValidities(item.addresses_response, date) as address}
+        <AddressTemplate
+          {address}
+          type={findClosestValidityWithin(
+            address.address_type_response.validities,
+            address.validity,
+            date
+          ).name}
         />
       {/each}
+      {#each closestValidities(item.engagements_response, date) as engagement}
+        <LocationTemplate
+          orgUnit={engagementOrgUnit(engagement, date)}
+          showCurrentName={true}
+        />
+        {#if isMeaningfulUserKey(engagement.user_key)}
+          <div class="text-xs text-base-content/80">{engagement.user_key}</div>
+        {/if}
+      {/each}
     {:else if isOrgUnit(item, type)}
-      <!-- Show org_unit locations (General behaviour) -->
       <LocationTemplate orgUnit={item} showCurrentName={false} />
-    {/if}
-
-    {#if !env.PUBLIC_ENABLE_RSD_SEARCH}
-      {#if isEmployee(item, type)}
-        <!-- Show employee itusers (Non-RSD behaviour) -->
-        {#each currentObjects(item.itusers_response) as ituser}
-          {#if !isUUID(ituser.user_key)}
-            <div class="text-sm text-primary">
-              <span>{ituser.user_key}</span>
-            </div>
-          {/if}
-        {/each}
+      {#if item.unit_type_response}
+        {@const unitType = findClosestValidityWithin(
+          item.unit_type_response.validities,
+          item.validity,
+          date
+        )}
+        {#if unitType}
+          <div class="text-xs text-base-content/80">{unitType.name}</div>
+        {/if}
       {/if}
-      <!-- Show addresses (Non-RSD behaviour) -->
-      {#each currentObjects(item.addresses_response) as address}
-        <AddressTemplate {address} />
+      {#each closestValidities(item.addresses_response, date) as address}
+        <AddressTemplate
+          {address}
+          type={findClosestValidityWithin(
+            address.address_type_response.validities,
+            address.validity,
+            date
+          ).name}
+        />
       {/each}
     {/if}
   </div>

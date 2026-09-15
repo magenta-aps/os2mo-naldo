@@ -18,20 +18,23 @@
     type EmployeeSearchQuery,
     type OrgUnitSearchQuery,
   } from "./query.generated"
-  import { env } from "$lib/env"
+  import { env, searchFields } from "$lib/env"
 
   gql`
     query OrgUnitSearch(
       $orgUnitFilter: OrganisationUnitFilter!
-      $defaultSearch: Boolean = true
+      $addressFilter: OrgUnitboundaddressfilter
       $limit: int
-      $date: DateTime
+      $showAddresses: Boolean = true
+      $showUnitType: Boolean = false
+      $showUnitId: Boolean = false
     ) {
       org_units(filter: $orgUnitFilter, limit: $limit) {
         objects {
           validities {
             name
             uuid
+            user_key @include(if: $showUnitId)
             ancestors {
               name
             }
@@ -39,10 +42,18 @@
               from
               to
             }
-            addresses_response(filter: { from_date: $date })
-              @include(if: $defaultSearch) {
+            unit_type_response @include(if: $showUnitType) {
+              validities(start: null, end: null) {
+                name
+                validity {
+                  from
+                  to
+                }
+              }
+            }
+            addresses_response(filter: $addressFilter) @include(if: $showAddresses) {
               objects {
-                current(at: $date) {
+                validities {
                   ...AddressDetails
                 }
               }
@@ -54,37 +65,71 @@
 
     query EmployeeSearch(
       $employeeFilter: EmployeeFilter!
-      $defaultSearch: Boolean = true
+      $addressFilter: EmployeeBoundAddressFilter
+      $itUserFilter: EmployeeBoundITUserFilter
+      $engagementFilter: EmployeeBoundEngagementFilter
       $limit: int
-      $date: DateTime
+      $showAddresses: Boolean = true
+      $showItAccounts: Boolean = true
+      $showEngagements: Boolean = true
+      $showEngagementId: Boolean = false
+      $showUnitId: Boolean = false
+      $showBirthday: Boolean = false
     ) {
       employees(filter: $employeeFilter, limit: $limit) {
         objects {
           validities {
             name
             uuid
-            cpr_number
+            cpr_number @include(if: $showBirthday)
             validity {
               from
               to
             }
-            itusers_response(filter: { from_date: $date })
-              @include(if: $defaultSearch) {
+            itusers_response(filter: $itUserFilter) @include(if: $showItAccounts) {
               objects {
-                current(at: $date) {
+                validities {
                   user_key
+                  validity {
+                    from
+                    to
+                  }
                 }
               }
             }
-            addresses_response(filter: { from_date: $date })
-              @include(if: $defaultSearch) {
+            addresses_response(filter: $addressFilter) @include(if: $showAddresses) {
               objects {
-                current(at: $date) {
+                validities {
                   ...AddressDetails
                 }
               }
             }
-            ...RsdSearch @skip(if: $defaultSearch)
+            engagements_response(filter: $engagementFilter)
+              @include(if: $showEngagements) {
+              objects {
+                validities {
+                  user_key @include(if: $showEngagementId)
+                  validity {
+                    from
+                    to
+                  }
+                  org_unit_response {
+                    uuid
+                    validities(start: null, end: null) {
+                      name
+                      user_key @include(if: $showUnitId)
+                      ancestors {
+                        name
+                      }
+                      validity {
+                        from
+                        to
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -113,10 +158,18 @@
     }
 
     fragment AddressDetails on Address {
+      validity {
+        from
+        to
+      }
       address_type_response {
         uuid
-        current(at: $date) {
+        validities(start: null, end: null) {
           name
+          validity {
+            from
+            to
+          }
         }
       }
       resolve {
@@ -128,24 +181,6 @@
           __typename
           value
           value2
-        }
-      }
-    }
-
-    fragment RsdSearch on Employee {
-      engagements_response(filter: { from_date: $date }) {
-        objects {
-          current(at: $date) {
-            org_unit_response {
-              uuid
-              current(at: $date) {
-                name
-                ancestors {
-                  name
-                }
-              }
-            }
-          }
         }
       }
     }
@@ -223,6 +258,41 @@
   }
   $: revalidateSelection(at)
 
+  // A relation resolves at today's date unless its own filter says otherwise.
+  // MO reads a missing to_date as from_date plus a millisecond, an explicit
+  // null as unbounded.
+  type SearchInterval = { from_date: string } | { from_date: null; to_date: null }
+
+  const addressFilter = (interval: SearchInterval) =>
+    searchFields.addressTypes.includes("*")
+      ? interval
+      : { ...interval, address_type: { user_keys: searchFields.addressTypes } }
+
+  const employeeFieldVariables = (interval: SearchInterval) => ({
+    showAddresses: !!searchFields.addressTypes.length,
+    showItAccounts: !!searchFields.itAccounts,
+    showEngagements: !!searchFields.engagements,
+    showBirthday: searchFields.birthday,
+    showEngagementId: searchFields.engagementId,
+    showUnitId: searchFields.unitId,
+    addressFilter: addressFilter(interval),
+    itUserFilter:
+      searchFields.itAccounts === "*"
+        ? interval
+        : { ...interval, primary: { user_keys: [env.PUBLIC_PRIMARY_CLASS_USER_KEY] } },
+    engagementFilter:
+      searchFields.engagements === "*"
+        ? interval
+        : { ...interval, primary: { user_keys: [env.PUBLIC_PRIMARY_CLASS_USER_KEY] } },
+  })
+
+  const orgUnitFieldVariables = (interval: SearchInterval) => ({
+    showAddresses: !!searchFields.addressTypes.length,
+    showUnitType: searchFields.unitType,
+    showUnitId: searchFields.unitId,
+    addressFilter: addressFilter(interval),
+  })
+
   const itemId = "uuid" // Used by the component to differentiate between items
 
   let items: SearchItems
@@ -247,26 +317,19 @@
 
     let res: EmployeeSearchQuery | OrgUnitSearchQuery
 
+    const interval: SearchInterval =
+      env.PUBLIC_SEARCH_INFINITY && action === "goto"
+        ? { from_date: null, to_date: null }
+        : { from_date: atDate }
+
     switch (type) {
       case "employee":
-        let employeeFilter
-        if (env.PUBLIC_SEARCH_INFINITY && action === "goto") {
-          employeeFilter = {
-            from_date: null,
-            to_date: null,
-            query: filterText,
-          }
-        } else {
-          employeeFilter = { from_date: atDate, query: filterText }
-        }
-
         res = await graphQLClient(abortController.signal).request(
           EmployeeSearchDocument,
           {
-            employeeFilter: employeeFilter,
-            defaultSearch: !env.PUBLIC_ENABLE_RSD_SEARCH,
+            employeeFilter: { ...interval, query: filterText },
             limit: 30,
-            date: atDate,
+            ...employeeFieldVariables(interval),
           }
         )
 
@@ -277,23 +340,12 @@
         }
 
       case "org-unit":
-        let orgUnitFilter
-        if (env.PUBLIC_SEARCH_INFINITY && action === "goto") {
-          orgUnitFilter = {
-            from_date: null,
-            to_date: null,
-            query: filterText,
-          }
-        } else {
-          orgUnitFilter = { from_date: atDate, query: filterText }
-        }
-
         res = await graphQLClient(abortController.signal).request(
           OrgUnitSearchDocument,
           {
-            orgUnitFilter: orgUnitFilter,
+            orgUnitFilter: { ...interval, query: filterText },
             limit: 30,
-            date: atDate,
+            ...orgUnitFieldVariables(interval),
           }
         )
 
@@ -365,7 +417,7 @@
       }}
     >
       <div slot="item" let:item>
-        <SearchItem {item} {type} />
+        <SearchItem {item} {type} date={at || $date} />
       </div>
 
       <div slot="selection" let:selection>

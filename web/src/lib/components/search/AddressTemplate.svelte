@@ -1,18 +1,16 @@
 <script lang="ts">
-  import { _ } from "svelte-i18n"
-
   export let address: {
-    address_type_response: { uuid: string; current?: { name: string } | null }
     resolve: any
   }
+  export let type: string
 </script>
 
 <div class="text-primary text-sm">
   <span>
     {#if address.resolve.__typename === "DefaultAddress"}
-      {address.address_type_response.current?.name}: {address.resolve.value}
+      {type}: {address.resolve.value}
     {:else if address.resolve.__typename === "MultifieldAddress"}
-      {address.address_type_response.current?.name}: {address.resolve.value}
+      {type}: {address.resolve.value}
       {address.resolve.value2}
     {/if}
   </span>
