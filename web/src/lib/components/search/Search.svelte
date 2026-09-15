@@ -39,8 +39,13 @@
               from
               to
             }
-            addresses @include(if: $defaultSearch) {
-              ...AddressDetails
+            addresses_response(filter: { from_date: $date })
+              @include(if: $defaultSearch) {
+              objects {
+                current(at: $date) {
+                  ...AddressDetails
+                }
+              }
             }
           }
         }
@@ -63,11 +68,21 @@
               from
               to
             }
-            itusers @include(if: $defaultSearch) {
-              user_key
+            itusers_response(filter: { from_date: $date })
+              @include(if: $defaultSearch) {
+              objects {
+                current(at: $date) {
+                  user_key
+                }
+              }
             }
-            addresses @include(if: $defaultSearch) {
-              ...AddressDetails
+            addresses_response(filter: { from_date: $date })
+              @include(if: $defaultSearch) {
+              objects {
+                current(at: $date) {
+                  ...AddressDetails
+                }
+              }
             }
             ...RsdSearch @skip(if: $defaultSearch)
           }
@@ -118,13 +133,17 @@
     }
 
     fragment RsdSearch on Employee {
-      engagements {
-        org_unit_response {
-          uuid
+      engagements_response(filter: { from_date: $date }) {
+        objects {
           current(at: $date) {
-            name
-            ancestors {
-              name
+            org_unit_response {
+              uuid
+              current(at: $date) {
+                name
+                ancestors {
+                  name
+                }
+              }
             }
           }
         }
