@@ -93,25 +93,21 @@ export const isUUID = (value: string) => {
   return uuidRegex.test(value)
 }
 
-// Decides whether a unit name should be suffixed with its SD user_key in
-// tree views. Extracted so it's testable without mocking `env`.
-export const shouldSuffixSDCode = (
-  name: string,
-  user_key: string,
-  showSDCode: boolean
+// Whether a user-key says anything the name does not: MO fills an unset one
+// with a uuid, SD with "-", and some installations with the name again.
+export const isMeaningfulUserKey = (
+  user_key: string | undefined,
+  name = ""
 ): boolean => {
-  if (!showSDCode) return false
-  if (name === user_key) return false
+  if (!user_key) return false
+  if (user_key === name) return false
   if (user_key === "-") return false
   if (isUUID(user_key)) return false
   return true
 }
 
-export const checkSDIdentifier = (name: string, user_key: string) => {
-  return shouldSuffixSDCode(name, user_key, env.PUBLIC_SHOW_SD_CODE_IN_TREES)
-    ? `${name} (${user_key})`
-    : name
-}
+export const suffixUserKey = (name: string, user_key: string | undefined): string =>
+  isMeaningfulUserKey(user_key, name) ? `${name} (${user_key})` : name
 
 export const capital = (str: string) => {
   return str.replace(/(^|\s)\S/, (l) => l.toLocaleUpperCase())

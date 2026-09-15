@@ -3,8 +3,8 @@ import {
   formatITSystemNames,
   formatITUserITSystemName,
   formatKleNumberTitleAndUuid,
+  isMeaningfulUserKey,
   isUUID,
-  shouldSuffixSDCode,
   upperCase,
 } from "$lib/utils/helpers"
 import { describe, expect, it } from "vitest"
@@ -64,29 +64,21 @@ describe("capital", () => {
   })
 })
 
-describe("shouldSuffixSDCode", () => {
-  // Extracted from `checkSDIdentifier` so the predicate can be tested
-  // without mocking $env/dynamic/public.
-  it("returns false when the SD-code flag is off", () => {
-    expect(shouldSuffixSDCode("Name", "user_key", false)).toBe(false)
+describe("isMeaningfulUserKey", () => {
+  it("accepts a code that differs from the name", () => {
+    expect(isMeaningfulUserKey("ABC123", "Name")).toBe(true)
+    expect(isMeaningfulUserKey("12345")).toBe(true)
   })
 
-  it("returns true when flag is on and user_key is a meaningful distinct code", () => {
-    expect(shouldSuffixSDCode("Name", "ABC123", true)).toBe(true)
+  it("rejects the placeholders MO and SD leave behind", () => {
+    expect(isMeaningfulUserKey(undefined)).toBe(false)
+    expect(isMeaningfulUserKey("")).toBe(false)
+    expect(isMeaningfulUserKey("-")).toBe(false)
+    expect(isMeaningfulUserKey("0b5936f0-7dc5-4c62-a55f-4c0f4e29d8bb")).toBe(false)
   })
 
-  it("returns false when name equals user_key (nothing to add)", () => {
-    expect(shouldSuffixSDCode("ABC123", "ABC123", true)).toBe(false)
-  })
-
-  it("returns false when user_key is the 'no value' placeholder '-'", () => {
-    expect(shouldSuffixSDCode("Name", "-", true)).toBe(false)
-  })
-
-  it("returns false when user_key is itself a UUID (auto-generated, not an SD code)", () => {
-    expect(
-      shouldSuffixSDCode("Name", "e0f496c4-bb51-47af-baeb-3fb771c51a9f", true)
-    ).toBe(false)
+  it("rejects a code that is just the name again", () => {
+    expect(isMeaningfulUserKey("Name", "Name")).toBe(false)
   })
 })
 
