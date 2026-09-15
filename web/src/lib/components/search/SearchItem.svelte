@@ -28,6 +28,15 @@
    * @param obj The object to check.
    * @returns employee birthdate if true, otherwise ""
    */
+  // A _response field holds one entry per relation, each resolved to its state
+  // on the searched date.
+  const currentObjects = <T>(
+    response: { objects: { current?: T | null }[] } | null | undefined
+  ): T[] =>
+    (response?.objects ?? []).flatMap((object) =>
+      object.current ? [object.current] : []
+    )
+
   const returnCPR = (obj: SearchItem): string => {
     if ("cpr_number" in obj && obj.cpr_number) {
       return `(${obj.cpr_number.trim().slice(0, 6)})`
@@ -46,7 +55,7 @@
     </div>
     {#if isEmployee(item, type) && env.PUBLIC_ENABLE_RSD_SEARCH}
       <!-- Show employee engagement locations (RSD behaviour)-->
-      {#each item.engagements as engagement}
+      {#each currentObjects(item.engagements_response) as engagement}
         <LocationTemplate
           orgUnit={engagement.org_unit_response?.current
             ? {
@@ -65,7 +74,7 @@
     {#if !env.PUBLIC_ENABLE_RSD_SEARCH}
       {#if isEmployee(item, type)}
         <!-- Show employee itusers (Non-RSD behaviour) -->
-        {#each item.itusers ?? [] as ituser}
+        {#each currentObjects(item.itusers_response) as ituser}
           {#if !isUUID(ituser.user_key)}
             <div class="text-sm text-primary">
               <span>{ituser.user_key}</span>
@@ -74,7 +83,7 @@
         {/each}
       {/if}
       <!-- Show addresses (Non-RSD behaviour) -->
-      {#each item.addresses ?? [] as address}
+      {#each currentObjects(item.addresses_response) as address}
         <AddressTemplate {address} />
       {/each}
     {/if}
