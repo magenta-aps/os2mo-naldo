@@ -68,6 +68,7 @@ export type Scalars = {
    */
   EventToken: { input: any; output: any; }
   UUID: { input: any; output: any; }
+  /** Represents a file upload. */
   Upload: { input: any; output: any; }
   int: { input: any; output: any; }
 };
@@ -164,6 +165,7 @@ export type AccessLogFilter = {
    *
    * Can be one of:
    * * `"AccessLog"`
+   * * `"Actor"`
    * * `"Bruger"`
    * * `"Facet"`
    * * `"ItSystem"`
@@ -205,6 +207,7 @@ export type AccessLogFilter = {
 
 export enum AccessLogModel {
   AccessLog = 'ACCESS_LOG',
+  Actor = 'ACTOR',
   Class = 'CLASS',
   Facet = 'FACET',
   ItSystem = 'IT_SYSTEM',
@@ -270,6 +273,45 @@ export type ActorEvent_NamespacesArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<OwnersBoundNamespaceFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+/** Actor filter. */
+export type ActorFilter = {
+  /**
+   * UUID filter limiting which entries are returned.
+   *
+   * | `uuids`      | Elements returned                            |
+   * |--------------|----------------------------------------------|
+   * | not provided | All                                          |
+   * | `null`       | All                                          |
+   * | `[]`         | None                                         |
+   * | `"x"`        | `["x"]` or `[]` (`*`)                        |
+   * | `["x", "y"]` | `["x", "y"]`, `["x"]`, `["y"]` or `[]` (`*`) |
+   *
+   * `*`: Elements returned depends on which elements were found.
+   *
+   */
+  uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
+/** Result page in cursor-based pagination. */
+export type ActorPaged = {
+  __typename?: 'ActorPaged';
+  /**
+   * List of results.
+   *
+   * The number of elements is defined by the `limit` argument.
+   *
+   */
+  objects: Array<Actor>;
+  /**
+   * Container for page information.
+   *
+   * Contains the cursors necessary to fetch other pages.
+   * Contains information on when to stop iteration.
+   *
+   */
+  page_info: PageInfo;
 };
 
 /**
@@ -2582,6 +2624,12 @@ export type Class = {
   owner?: Maybe<Scalars['UUID']['output']>;
   /**
    *
+   * The organisation unit that owns this class.
+   *
+   */
+  owner_response?: Maybe<OrganisationUnitResponse>;
+  /**
+   *
    * Parent class.
    *
    * Almost always `null` as class hierarchies are rare.
@@ -4043,6 +4091,7 @@ export type EmployeeBoundEngagementFilter = {
   job_function?: InputMaybe<ClassFilter>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  primary?: InputMaybe<ClassFilter>;
   registration?: InputMaybe<EngagementRegistrationFilter>;
   registration_time?: InputMaybe<Scalars['DateTime']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
@@ -4059,6 +4108,7 @@ export type EmployeeBoundItUserFilter = {
   itsystem_uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  primary?: InputMaybe<ClassFilter>;
   registration?: InputMaybe<ItUserRegistrationFilter>;
   registration_time?: InputMaybe<Scalars['DateTime']['input']>;
   rolebinding?: InputMaybe<RoleBindingFilter>;
@@ -4131,6 +4181,13 @@ export type EmployeeFilter = {
   cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  /**
+   * IT-user filter limiting which entries are returned.
+   *
+   * Set to `null` to only return employees without any IT-users.
+   *
+   */
+  ituser?: InputMaybe<ItUserFilter>;
   /** Owner filter limiting which entries are returned. */
   owner?: InputMaybe<OwnerFilter>;
   /**
@@ -4986,6 +5043,7 @@ export type EngagementBoundItUserFilter = {
   itsystem_uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  primary?: InputMaybe<ClassFilter>;
   registration?: InputMaybe<ItUserRegistrationFilter>;
   registration_time?: InputMaybe<Scalars['DateTime']['input']>;
   rolebinding?: InputMaybe<RoleBindingFilter>;
@@ -5166,6 +5224,13 @@ export type EngagementFilter = {
    * @deprecated Replaced by the 'org_unit' filter
    */
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Primary class filter limiting which entries are returned.
+   *
+   * Set to `null` to only return engagements without a primary class.
+   *
+   */
+  primary?: InputMaybe<ClassFilter>;
   /**
    * Registration filter limiting which entries are returned.
    *
@@ -8313,6 +8378,13 @@ export type ItUserFilter = {
    * @deprecated Replaced by the 'org_unit' filter
    */
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Primary class filter limiting which entries are returned.
+   *
+   * Set to `null` to only return IT users without a primary class.
+   *
+   */
+  primary?: InputMaybe<ClassFilter>;
   /**
    * Registration filter limiting which entries are returned.
    *
@@ -11700,6 +11772,25 @@ export type Mutation = {
   addresses_create: Array<AddressResponse>;
   /** Creates an association. */
   association_create: AssociationResponse;
+  /**
+   * Deletes an association.
+   * **Warning**:
+   * This mutator does bitemporal deletion, **not** temporal termination.
+   * Do **not** use this mutator **unless** you **fully understand** its implications.
+   *
+   * Bitemporal deletion and temporal termination are **very** different operations and should **not** be confused.
+   * If you do not know which of the operations you need, you most likely need temporal termination.
+   *
+   * Bitemporal deletion works on the bitemporal time-axis, and should **only** be used by clients that **fully understand** the underlying bitemporal model, including how a bitemporal delete affects the registration history.
+   *
+   * After this call the deleted entity will no longer show up in **any** temporal listing.
+   *
+   * Note:
+   * It is currently the callers responsibility to ensure that references are dealt with before doing bitemporal deletions.
+   * Failure to do so **will** leave dangling references breaking temporal foreign-keys, and potentially breaking invariants in the data.
+   *
+   */
+  association_delete: AssociationResponse;
   /** Refresh associations. */
   association_refresh: UuidPaged;
   /** Terminates an association */
@@ -11934,6 +12025,25 @@ export type Mutation = {
   itusers_create: Array<ItUserResponse>;
   /** Creates a KLE annotation. */
   kle_create: KleResponse;
+  /**
+   * Deletes a KLE annotation.
+   * **Warning**:
+   * This mutator does bitemporal deletion, **not** temporal termination.
+   * Do **not** use this mutator **unless** you **fully understand** its implications.
+   *
+   * Bitemporal deletion and temporal termination are **very** different operations and should **not** be confused.
+   * If you do not know which of the operations you need, you most likely need temporal termination.
+   *
+   * Bitemporal deletion works on the bitemporal time-axis, and should **only** be used by clients that **fully understand** the underlying bitemporal model, including how a bitemporal delete affects the registration history.
+   *
+   * After this call the deleted entity will no longer show up in **any** temporal listing.
+   *
+   * Note:
+   * It is currently the callers responsibility to ensure that references are dealt with before doing bitemporal deletions.
+   * Failure to do so **will** leave dangling references breaking temporal foreign-keys, and potentially breaking invariants in the data.
+   *
+   */
+  kle_delete: KleResponse;
   /** Refresh KLEs. */
   kle_refresh: UuidPaged;
   /** Terminates a KLE annotation. */
@@ -11942,6 +12052,25 @@ export type Mutation = {
   kle_update: KleResponse;
   /** Creates a leave. */
   leave_create: LeaveResponse;
+  /**
+   * Deletes a leave.
+   * **Warning**:
+   * This mutator does bitemporal deletion, **not** temporal termination.
+   * Do **not** use this mutator **unless** you **fully understand** its implications.
+   *
+   * Bitemporal deletion and temporal termination are **very** different operations and should **not** be confused.
+   * If you do not know which of the operations you need, you most likely need temporal termination.
+   *
+   * Bitemporal deletion works on the bitemporal time-axis, and should **only** be used by clients that **fully understand** the underlying bitemporal model, including how a bitemporal delete affects the registration history.
+   *
+   * After this call the deleted entity will no longer show up in **any** temporal listing.
+   *
+   * Note:
+   * It is currently the callers responsibility to ensure that references are dealt with before doing bitemporal deletions.
+   * Failure to do so **will** leave dangling references breaking temporal foreign-keys, and potentially breaking invariants in the data.
+   *
+   */
+  leave_delete: LeaveResponse;
   /** Refresh leaves. */
   leave_refresh: UuidPaged;
   /** Terminates a leave. */
@@ -11978,7 +12107,11 @@ export type Mutation = {
   /** Creates a list of managers. */
   managers_create: Array<ManagerResponse>;
   /**
-   * Creates the root-organisation.
+   * Sets the municipality code of the root-organisation.
+   *
+   * The root-organisation always exists, so - in spite of the name -
+   * this does not actually create anything.
+   *
    * @deprecated The root organisation concept will be removed in a future version of OS2mo.
    */
   org_create: Organisation;
@@ -12011,6 +12144,25 @@ export type Mutation = {
   org_unit_update: OrganisationUnitResponse;
   /** Creates an owner. */
   owner_create: OwnerResponse;
+  /**
+   * Deletes an owner.
+   * **Warning**:
+   * This mutator does bitemporal deletion, **not** temporal termination.
+   * Do **not** use this mutator **unless** you **fully understand** its implications.
+   *
+   * Bitemporal deletion and temporal termination are **very** different operations and should **not** be confused.
+   * If you do not know which of the operations you need, you most likely need temporal termination.
+   *
+   * Bitemporal deletion works on the bitemporal time-axis, and should **only** be used by clients that **fully understand** the underlying bitemporal model, including how a bitemporal delete affects the registration history.
+   *
+   * After this call the deleted entity will no longer show up in **any** temporal listing.
+   *
+   * Note:
+   * It is currently the callers responsibility to ensure that references are dealt with before doing bitemporal deletions.
+   * Failure to do so **will** leave dangling references breaking temporal foreign-keys, and potentially breaking invariants in the data.
+   *
+   */
+  owner_delete: OwnerResponse;
   /** Refresh owners. */
   owner_refresh: UuidPaged;
   /** Terminates an owner. */
@@ -12057,26 +12209,17 @@ export type Mutation = {
    *
    * How to do this is client-specific, but below is an example using [curl](https://curl.se/):
    * ```console
-   * curl https://{{MO_URL}}/graphql/v7 \
+   * curl https://{{MO_URL}}/graphql/v30 \
    *   -H "Authorization: Bearer {{TOKEN}}" \
-   *   -F operations="{\"query\": \"{{QUERY}}\", \
-   *       \"variables\": {\"file\": null}}" \
+   *   -F operations='{"query": "mutation($file: Upload!) { upload_file(file_store: EXPORTS, file: $file, force: false) }", "variables": {"file": null}}' \
    *   -F map='{"file": ["variables.file"]}' \
    *   -F file=@myfile.txt
    * ```
    * Where:
-   * * `myfile.txt` is the file to upload.
    * * `{{MO_URL}}` is the base-url for the OS2mo instance to upload the file to.
    * * `{{TOKEN}}` is a valid JWT-token acquired from Keycloak.
-   * * `{{QUERY}}` is the upload query:
-   * ```gql
-   * mutation($file: Upload!) {
-   *   upload_file(
-   *     file_store: EXPORTS,
-   *     file: $file
-   *   )
-   * }
-   * ```
+   * * `myfile.txt` is the file to upload. The filename is taken from this
+   *   multipart part; there is no separate filename argument.
    *
    * Note:
    * As GraphiQL does not support sending multipart form-data payloads, it is unfortunately not possible to upload files from GraphiQL.
@@ -12174,6 +12317,18 @@ export type MutationAddresses_CreateArgs = {
  */
 export type MutationAssociation_CreateArgs = {
   input: AssociationCreateInput;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationAssociation_DeleteArgs = {
+  uuid: Scalars['UUID']['input'];
 };
 
 
@@ -12821,6 +12976,18 @@ export type MutationKle_CreateArgs = {
  * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
  *
  */
+export type MutationKle_DeleteArgs = {
+  uuid: Scalars['UUID']['input'];
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
 export type MutationKle_RefreshArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   exchange?: InputMaybe<Scalars['String']['input']>;
@@ -12866,6 +13033,18 @@ export type MutationKle_UpdateArgs = {
  */
 export type MutationLeave_CreateArgs = {
   input: LeaveCreateInput;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationLeave_DeleteArgs = {
+  uuid: Scalars['UUID']['input'];
 };
 
 
@@ -13079,6 +13258,18 @@ export type MutationOrg_Unit_UpdateArgs = {
  */
 export type MutationOwner_CreateArgs = {
   input: OwnerCreateInput;
+};
+
+
+/**
+ * Entrypoint for all modification-operations.
+ *
+ * **Warning**:
+ * Do **not** use any `*_delete`-mutators without **thoroughly** understanding its implications and the documentation.
+ *
+ */
+export type MutationOwner_DeleteArgs = {
+  uuid: Scalars['UUID']['input'];
 };
 
 
@@ -13421,6 +13612,7 @@ export type OrgUnitboundengagementfilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   ituser?: InputMaybe<ItUserFilter>;
   job_function?: InputMaybe<ClassFilter>;
+  primary?: InputMaybe<ClassFilter>;
   registration?: InputMaybe<EngagementRegistrationFilter>;
   registration_time?: InputMaybe<Scalars['DateTime']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
@@ -13437,6 +13629,7 @@ export type OrgUnitboundituserfilter = {
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   itsystem?: InputMaybe<ItSystemFilter>;
   itsystem_uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  primary?: InputMaybe<ClassFilter>;
   registration?: InputMaybe<ItUserRegistrationFilter>;
   registration_time?: InputMaybe<Scalars['DateTime']['input']>;
   rolebinding?: InputMaybe<RoleBindingFilter>;
@@ -15911,6 +16104,15 @@ export type Query = {
    *
    */
   access_log: AccessLogPaged;
+  /**
+   * Get a list of actors.
+   *
+   * Actors are the users and integrations that read and change data in
+   * OS2mo. This is the data-source backing the `actor` / `actor_object`
+   * fields exposed on access log entries and registrations.
+   *
+   */
+  actors: ActorPaged;
   /** Get addresses. */
   addresses: AddressResponsePaged;
   /** Get associations. */
@@ -16016,6 +16218,14 @@ export type Query = {
 export type QueryAccess_LogArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<AccessLogFilter>;
+  limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Entrypoint for all read-operations */
+export type QueryActorsArgs = {
+  cursor?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<ActorFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
 };
 
@@ -17791,6 +18001,7 @@ export type UuidsBoundClassFilter = {
 export type UuidsBoundEmployeeFilter = {
   cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
+  ituser?: InputMaybe<ItUserFilter>;
   owner?: InputMaybe<OwnerFilter>;
   query?: InputMaybe<Scalars['String']['input']>;
   registration?: InputMaybe<EmployeeRegistrationFilter>;
@@ -17808,6 +18019,7 @@ export type UuidsBoundEngagementFilter = {
   job_function?: InputMaybe<ClassFilter>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  primary?: InputMaybe<ClassFilter>;
   registration?: InputMaybe<EngagementRegistrationFilter>;
   registration_time?: InputMaybe<Scalars['DateTime']['input']>;
   to_date?: InputMaybe<Scalars['DateTime']['input']>;
@@ -17844,6 +18056,7 @@ export type UuidsBoundItUserFilter = {
   itsystem_uuids?: InputMaybe<Array<Scalars['UUID']['input']>>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  primary?: InputMaybe<ClassFilter>;
   registration?: InputMaybe<ItUserRegistrationFilter>;
   registration_time?: InputMaybe<Scalars['DateTime']['input']>;
   rolebinding?: InputMaybe<RoleBindingFilter>;
