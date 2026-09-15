@@ -6,7 +6,8 @@
   import Icon from "@iconify/svelte"
   import keyboardArrowDownRounded from "@iconify/icons-material-symbols/keyboard-arrow-down-rounded"
   import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
-  import { checkSDIdentifier } from "$lib/utils/helpers"
+  import { suffixUserKey } from "$lib/utils/helpers"
+  import { env } from "$lib/env"
 
   type Child = {
     uuid: string
@@ -110,7 +111,7 @@
     {/if}
     <Checkbox
       id={uuid}
-      title={checkSDIdentifier(name, user_key)}
+      title={env.PUBLIC_SHOW_SD_CODE_IN_TREES ? suffixUserKey(name, user_key) : name}
       value={uuid}
       checked={selectedDestinationOrgs.includes(uuid)}
       on:change={() => onToggleDestination(uuid)}

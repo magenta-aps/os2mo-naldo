@@ -13,7 +13,8 @@
   } from "./query.generated"
   import Icon from "@iconify/svelte"
   import keyboardArrowDownRounded from "@iconify/icons-material-symbols/keyboard-arrow-down-rounded"
-  import { checkSDIdentifier } from "$lib/utils/helpers"
+  import { suffixUserKey } from "$lib/utils/helpers"
+  import { env } from "$lib/env"
 
   export let name = ""
   export let user_key = ""
@@ -172,7 +173,7 @@
         <div class="w-5 h-5" />
       {/if}
       <p class="text-sm text-base-content wrap-break-word">
-        {checkSDIdentifier(name, user_key)}
+        {env.PUBLIC_SHOW_SD_CODE_IN_TREES ? suffixUserKey(name, user_key) : name}
       </p>
     </div>
   </li>
