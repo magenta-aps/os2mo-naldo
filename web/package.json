@@ -9,12 +9,13 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "playwright test",
-    "verify": "vitest run && playwright test",
-    "generate": "graphql-codegen && svelte-kit sync",
+    "verify": "vitest run && yarn validate:queries && playwright test",
+    "generate": "graphql-codegen && svelte-kit sync && yarn validate:queries",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --check --plugin-search-dir=. .",
-    "format": "prettier --write --plugin-search-dir=. ."
+    "format": "prettier --write --plugin-search-dir=. .",
+    "validate:queries": "node scripts/validate-queries.mjs"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.2",

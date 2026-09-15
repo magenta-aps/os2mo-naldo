@@ -14,6 +14,9 @@ next to the code they describe.
 ## Verification
 
 - `yarn test` — unit tests (CI runs these on every push)
+- `yarn validate:queries` — checks every generated document against the
+  running MO's schema. `yarn generate` runs it, since codegen itself accepts
+  documents the server rejects (unused variables, for one).
 - `yarn verify` — unit tests plus the e2e suite in `web/e2e/README.md`.
   CI runs the same e2e suite on every MR against a MO spun up in the
   pipeline, so the pipeline is the gate. Agents run `yarn verify` locally
