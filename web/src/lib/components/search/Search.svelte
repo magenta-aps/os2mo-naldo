@@ -358,13 +358,21 @@
     spinner = false
   }
 
+  // The dropdown grows past the field only when its content needs the room,
+  // so the field's own width is its floor.
+  let fieldWidth = 0
+
   const floatingConfig = {
     placement: "bottom-start",
     strategy: "fixed",
   }
 </script>
 
-<div class="w-full {extra_classes} {action === 'select' ? 'pb-3' : ''}">
+<div
+  class="w-full {extra_classes} {action === 'select' ? 'pb-3' : ''}"
+  style="--list-min-width: {fieldWidth}px"
+  bind:clientWidth={fieldWidth}
+>
   <div class={action === "select" ? "pb-1" : ""}>
     {#if action === "select"}
       <label for="autocomplete" class="text-sm text-base-content pb-1">
@@ -388,6 +396,7 @@
       --border-radius="0.25rem"
       --padding="0 0.75rem 0 0.75rem"
       id="autocomplete"
+      listAutoWidth={false}
       loadOptions={searchItems}
       {floatingConfig}
       {disabled}
@@ -440,3 +449,13 @@
 {#if action === "select" && value}
   <input hidden {id} name={id} bind:value={value.uuid} />
 {/if}
+
+<style>
+  /* The dropdown is pinned to the field's width by default, which cuts the
+     organisational path off. Let it take the width of its content, never
+     narrower than the field and never wider than the viewport can show. */
+  div :global(.svelte-select-list) {
+    min-width: var(--list-min-width, 0);
+    max-width: min(90vw, 40rem);
+  }
+</style>
