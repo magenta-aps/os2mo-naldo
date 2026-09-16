@@ -63,12 +63,12 @@
                 ancestors: engagement.org_unit_response.current.ancestors,
               }
             : undefined}
-          showCurrentName={true}
+          includeUnit={true}
         />
       {/each}
     {:else if isOrgUnit(item, type)}
       <!-- Show org_unit locations (General behaviour) -->
-      <LocationTemplate orgUnit={item} showCurrentName={false} />
+      <LocationTemplate orgUnit={item} includeUnit={false} />
     {/if}
 
     {#if !env.PUBLIC_ENABLE_RSD_SEARCH}
