@@ -39,8 +39,13 @@
               from
               to
             }
-            addresses @include(if: $defaultSearch) {
-              ...AddressDetails
+            addresses_response(filter: { from_date: $date })
+              @include(if: $defaultSearch) {
+              objects {
+                current(at: $date) {
+                  ...AddressDetails
+                }
+              }
             }
           }
         }
@@ -63,11 +68,21 @@
               from
               to
             }
-            itusers @include(if: $defaultSearch) {
-              user_key
+            itusers_response(filter: { from_date: $date })
+              @include(if: $defaultSearch) {
+              objects {
+                current(at: $date) {
+                  user_key
+                }
+              }
             }
-            addresses @include(if: $defaultSearch) {
-              ...AddressDetails
+            addresses_response(filter: { from_date: $date })
+              @include(if: $defaultSearch) {
+              objects {
+                current(at: $date) {
+                  ...AddressDetails
+                }
+              }
             }
             ...RsdSearch @skip(if: $defaultSearch)
           }
@@ -118,13 +133,17 @@
     }
 
     fragment RsdSearch on Employee {
-      engagements {
-        org_unit_response {
-          uuid
+      engagements_response(filter: { from_date: $date }) {
+        objects {
           current(at: $date) {
-            name
-            ancestors {
-              name
+            org_unit_response {
+              uuid
+              current(at: $date) {
+                name
+                ancestors {
+                  name
+                }
+              }
             }
           }
         }
@@ -287,13 +306,20 @@
     spinner = false
   }
 
+  // The dropdown grows past the field only when its content needs the room,
+  // so the field's own width is its floor.
+  let fieldWidth = 0
+
   const floatingConfig = {
     placement: "bottom-start",
     strategy: "fixed",
   }
 </script>
 
-<div class="w-full {extra_classes} {action === 'select' ? 'pb-3' : ''}">
+<div
+  class="w-full {extra_classes} {action === 'select' ? 'pb-3' : ''}"
+  bind:clientWidth={fieldWidth}
+>
   <div class={action === "select" ? "pb-1" : ""}>
     {#if action === "select"}
       <label for="autocomplete" class="text-sm text-base-content pb-1">
@@ -302,6 +328,7 @@
       </label>
     {/if}
     <SvelteSelect
+      --list-min-width="{fieldWidth}px"
       --font-size="1rem"
       --height="2rem"
       --loading-height="1.5rem"
@@ -317,6 +344,7 @@
       --border-radius="0.25rem"
       --padding="0 0.75rem 0 0.75rem"
       id="autocomplete"
+      listAutoWidth={false}
       loadOptions={searchItems}
       {floatingConfig}
       {disabled}
@@ -369,3 +397,21 @@
 {#if action === "select" && value}
   <input hidden {id} name={id} bind:value={value.uuid} />
 {/if}
+
+<style>
+  /* The dropdown is pinned to the field's width by default, which cuts the
+     organisational path off. Let it take the width of its content, never
+     narrower than the field and never wider than the viewport can show. */
+  div :global(.svelte-select-list) {
+    min-width: var(--list-min-width, 0);
+    max-width: min(90vw, 40rem);
+  }
+
+  /* Items are nowrap-with-ellipsis by default, which drops whatever sits at
+     the end of the line — the unit's code, most of the path. */
+  div :global(.svelte-select-list .item) {
+    /* svelte-select repeats its scope class to win on specificity. */
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+  }
+</style>
