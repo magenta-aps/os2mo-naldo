@@ -11,7 +11,7 @@
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { sortData } from "$lib/utils/sorting"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
-  import { findClosestValidity } from "$lib/utils/validities"
+  import { findClosestValidityWithin } from "$lib/utils/validities"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
@@ -31,8 +31,16 @@
 
   const uuid = $page.params.uuid
 
+  // Dates on the engagement lookup filter the engagement's own validity, so a
+  // date-filtered lookup drops an engagement that ended before the shown period
+  // instead of narrowing it.
   gql`
-    query OrgUnitITUsers($orgUnit: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+    query OrgUnitITUsers(
+      $orgUnit: [UUID!]
+      $fromDate: DateTime
+      $toDate: DateTime
+      $showConnections: Boolean = false
+    ) {
       byEngagement: itusers(
         filter: {
           engagement: { org_unit: { uuids: $orgUnit } }
@@ -51,25 +59,28 @@
                 name
               }
             }
-            engagements(filter: { from_date: $fromDate, to_date: $toDate }) {
-              validities {
-                org_unit_response {
-                  uuid
-                  current(at: $fromDate) {
-                    name
-                    user_key
+            engagements_responses(filter: { from_date: null, to_date: null })
+              @include(if: $showConnections) {
+              objects {
+                validities(start: null, end: null) {
+                  org_unit_response {
+                    uuid
+                    current(at: $fromDate) {
+                      name
+                      user_key
+                    }
                   }
-                }
-                extension_1
-                job_function_response {
-                  current(at: $fromDate) {
-                    user_key
-                    name
+                  extension_1
+                  job_function_response {
+                    current(at: $fromDate) {
+                      user_key
+                      name
+                    }
                   }
-                }
-                validity {
-                  from
-                  to
+                  validity {
+                    from
+                    to
+                  }
                 }
               }
             }
@@ -123,6 +134,7 @@
   $: dataPromise = graphQLClient()
     .request(OrgUnitItUsersDocument, {
       orgUnit: uuid,
+      showConnections: env.PUBLIC_SHOW_ITUSER_CONNECTIONS,
       ...tenseToValidity(tense, $date),
     })
     .then((res) => {
@@ -157,10 +169,16 @@
       <td class="text-sm p-4">{ituser.external_id ?? ""}</td>
       {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
         <td class="text-sm p-4">
-          {#if "engagements" in ituser}
-            {#each ituser.engagements as engagement}
-              {#if engagement.validities && engagement.validities.length}
-                {@const state = findClosestValidity(engagement.validities, $date)}
+          <!-- engagements_responses is absent both on the by-org-unit half of the
+               query and when @include leaves it out -->
+          {#if "engagements_responses" in ituser && ituser.engagements_responses}
+            {#each ituser.engagements_responses.objects as engagement}
+              {@const state = findClosestValidityWithin(
+                engagement.validities,
+                ituser.validity,
+                $date
+              )}
+              {#if state}
                 <div>
                   {getEngagementDisplay(
                     state,
