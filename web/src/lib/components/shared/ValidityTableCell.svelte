@@ -28,4 +28,5 @@
       {formatDate(validity.to)}
     {/if}
   </div>
+  <slot />
 </td>
