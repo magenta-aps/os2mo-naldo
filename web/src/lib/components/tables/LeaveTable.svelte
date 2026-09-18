@@ -17,6 +17,7 @@
   import { formatQueryDates } from "$lib/utils/validities"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
+  import { getEngagementDisplay } from "$lib/utils/display"
 
   export let tense: Tense
 
@@ -48,6 +49,7 @@
             engagement_response {
               uuid
               current(at: $fromDate) {
+                extension_1
                 org_unit_response {
                   uuid
                   current(at: $fromDate) {
@@ -56,6 +58,7 @@
                 }
                 job_function_response {
                   current(at: $fromDate) {
+                    user_key
                     name
                   }
                 }
@@ -101,8 +104,14 @@
         {leave.leave_type_response?.current?.name}
       </td>
       <td class="text-sm p-4">
-        {leave.engagement_response?.current?.job_function_response?.current?.name}, {leave
-          .engagement_response?.current?.org_unit_response?.current?.name}
+        {#if leave.engagement_response?.current}
+          {getEngagementDisplay(
+            leave.engagement_response.current,
+            leave.engagement_response.current.org_unit_response?.current?.name,
+            env.PUBLIC_SHOW_JOB_FUNCTION_USER_KEY,
+            env.PUBLIC_SHOW_EXTENSION_1
+          )}
+        {/if}
       </td>
       <ValidityTableCell validity={leave.validity} />
       <td class="flex p-4 gap-2 justify-end">
