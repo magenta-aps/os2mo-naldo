@@ -36,12 +36,14 @@ export const getEngagementTitlesAndUuid = (engagements: EngagementTitleAndUuid[]
 // in for it as the job title.
 export type EngagementDisplay = {
   extension_1?: string | null
-  org_unit_response?: { current?: { name: string } | null }
   job_function_response?: { current?: { name: string; user_key: string } | null }
 }
 
+// `orgUnitName` is the caller's to resolve: a row referencing an engagement
+// needs the unit's name during that engagement, not its name today.
 export const getEngagementDisplay = (
   engagement: EngagementDisplay,
+  orgUnitName: string | null | undefined,
   showJobFunctionUserKey: boolean,
   showExtension1: boolean
 ) => {
@@ -52,9 +54,7 @@ export const getEngagementDisplay = (
     ? engagement.extension_1
     : jobFunction && `${jobFunction.user_key} - ${jobFunction.name}`
   // Either half can be absent on a partially resolved engagement.
-  return [jobTitle, engagement.org_unit_response?.current?.name]
-    .filter(Boolean)
-    .join(", ")
+  return [jobTitle, orgUnitName].filter(Boolean).join(", ")
 }
 
 export type KleNumberTitleAndUuid = {

@@ -197,6 +197,7 @@
         {#if manager.engagement_state}
           {getEngagementDisplay(
             manager.engagement_state,
+            manager.engagement_state.org_unit_response?.current?.name,
             env.PUBLIC_SHOW_JOB_FUNCTION_USER_KEY,
             env.PUBLIC_SHOW_EXTENSION_1
           )}
