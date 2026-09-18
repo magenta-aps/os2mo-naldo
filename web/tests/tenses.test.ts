@@ -1,5 +1,5 @@
 import { date } from "$lib/stores/date"
-import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
+import { spellTenseFilter, tenseFilter, tenseToValidity } from "$lib/utils/tenses"
 import { beforeEach, describe, expect, it } from "vitest"
 
 // In GraphQL v29, `validity.to` is exclusive: it is the first instant AFTER
@@ -92,5 +92,83 @@ describe("tenseToValidity", () => {
 
   it("maps future to today as lower bound and null upper bound", () => {
     expect(tenseToValidity("future", TODAY)).toEqual({ fromDate: TODAY, toDate: null })
+  })
+})
+
+describe("spellTenseFilter", () => {
+  const spell = (from: string | null, to: string | null) => ({ from, to })
+
+  describe("one spell", () => {
+    it("is past once it has ended", () => {
+      expect(spellTenseFilter([spell("2000-01-01", "2010-01-01")], "past", TODAY)).toBe(
+        true
+      )
+    })
+
+    it("is past when to == today (it ended the day before)", () => {
+      expect(spellTenseFilter([spell("2000-01-01", TODAY)], "past", TODAY)).toBe(true)
+    })
+
+    it("is present when to == tomorrow (its last day is today)", () => {
+      expect(spellTenseFilter([spell("2000-01-01", TOMORROW)], "present", TODAY)).toBe(
+        true
+      )
+    })
+
+    it("is present while open-ended and started", () => {
+      expect(spellTenseFilter([spell("2000-01-01", null)], "present", TODAY)).toBe(true)
+    })
+
+    it("is future before it starts", () => {
+      expect(spellTenseFilter([spell(TOMORROW, null)], "future", TODAY)).toBe(true)
+    })
+  })
+
+  // The reason this reads spells rather than one outer span: an object that
+  // stopped existing and came back must not count as present through the gap.
+  describe("a gap between two spells", () => {
+    const gapped = [spell("2015-01-01", "2019-01-01"), spell("2025-01-01", null)]
+
+    it("is present while the later spell is running", () => {
+      expect(spellTenseFilter(gapped, "present", "2026-01-01")).toBe(true)
+    })
+
+    it("is present while the earlier spell is running", () => {
+      expect(spellTenseFilter(gapped, "present", "2016-01-01")).toBe(true)
+    })
+
+    it("is not present on a date inside the gap", () => {
+      expect(spellTenseFilter(gapped, "present", "2020-01-01")).toBe(false)
+    })
+
+    it("is past on a date inside the gap, where a spell has ended", () => {
+      expect(spellTenseFilter(gapped, "past", "2020-01-01")).toBe(true)
+    })
+
+    it("is not future on a date inside the gap", () => {
+      expect(spellTenseFilter(gapped, "future", "2020-01-01")).toBe(false)
+    })
+
+    it("is future before either spell starts", () => {
+      expect(spellTenseFilter(gapped, "future", "2010-01-01")).toBe(true)
+    })
+  })
+
+  // One row per engagement: whatever its shape, it belongs to exactly one section
+  it("puts an object in exactly one section, gap or no gap", () => {
+    const cases = [
+      [spell("2015-01-01", null)],
+      [spell("2015-01-01", "2019-01-01"), spell("2025-01-01", null)],
+      [spell("2015-01-01", "2019-01-01")],
+      [spell(TOMORROW, null)],
+    ]
+    for (const spells of cases) {
+      for (const on of [TODAY, "2020-01-01", "2016-01-01", "2030-01-01"]) {
+        const sections = (["past", "present", "future"] as Tense[]).filter((tense) =>
+          spellTenseFilter(spells, tense, on)
+        )
+        expect(sections).toHaveLength(1)
+      }
+    }
   })
 })
