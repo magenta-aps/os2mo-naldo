@@ -78,8 +78,12 @@
                 extension_1
                 org_unit_response {
                   uuid
-                  current(at: $fromDate) {
+                  validities(start: null, end: null) {
                     name
+                    validity {
+                      from
+                      to
+                    }
                   }
                 }
                 job_function_response {
@@ -186,9 +190,15 @@
       </td>
       <td class="text-sm p-4">
         {#if manager.engagement_state}
+          {@const unitName =
+            findClosestValidityWithin(
+              manager.engagement_state.org_unit_response?.validities,
+              manager.engagement_state.validity,
+              $date
+            )?.name ?? manager.engagement_state.org_unit_response?.uuid}
           {getEngagementDisplay(
             manager.engagement_state,
-            manager.engagement_state.org_unit_response?.current?.name,
+            unitName,
             env.PUBLIC_SHOW_JOB_FUNCTION_USER_KEY,
             env.PUBLIC_SHOW_EXTENSION_1
           )}
