@@ -10,7 +10,7 @@
   import { date } from "$lib/stores/date"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { sortData } from "$lib/utils/sorting"
-  import { findClosestValidity } from "$lib/utils/validities"
+  import { findClosestValidityWithin } from "$lib/utils/validities"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
@@ -26,8 +26,16 @@
 
   const uuid = $page.params.uuid
 
+  // Dates on the engagement lookup filter the engagement's own validity, so a
+  // date-filtered lookup drops an engagement that ended before the shown period
+  // instead of narrowing it.
   gql`
-    query EmployeeITUsers($employee: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+    query EmployeeITUsers(
+      $employee: [UUID!]
+      $fromDate: DateTime
+      $toDate: DateTime
+      $showConnections: Boolean = false
+    ) {
       itusers(
         filter: {
           employee: { uuids: $employee }
@@ -46,25 +54,28 @@
               }
             }
             external_id
-            engagements(filter: { from_date: $fromDate, to_date: $toDate }) {
-              validities {
-                org_unit_response {
-                  uuid
-                  current(at: $fromDate) {
-                    name
-                    user_key
+            engagements_responses(filter: { from_date: null, to_date: null })
+              @include(if: $showConnections) {
+              objects {
+                validities(start: null, end: null) {
+                  org_unit_response {
+                    uuid
+                    current(at: $fromDate) {
+                      name
+                      user_key
+                    }
                   }
-                }
-                extension_1
-                job_function_response {
-                  current(at: $fromDate) {
-                    user_key
-                    name
+                  extension_1
+                  job_function_response {
+                    current(at: $fromDate) {
+                      user_key
+                      name
+                    }
                   }
-                }
-                validity {
-                  from
-                  to
+                  validity {
+                    from
+                    to
+                  }
                 }
               }
             }
@@ -87,6 +98,7 @@
   $: dataPromise = graphQLClient()
     .request(EmployeeItUsersDocument, {
       employee: uuid,
+      showConnections: env.PUBLIC_SHOW_ITUSER_CONNECTIONS,
       ...tenseToValidity(tense, $date),
     })
     .then((res) => {
@@ -119,19 +131,26 @@
       <td class="text-sm p-4">{ituser.external_id ?? ""}</td>
       {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
         <td class="text-sm p-4">
-          {#each ituser.engagements as engagement}
-            {#if engagement.validities && engagement.validities.length}
-              {@const state = findClosestValidity(engagement.validities, $date)}
-              <div>
-                {getEngagementDisplay(
-                  state,
-                  state.org_unit_response?.current?.name,
-                  env.PUBLIC_SHOW_JOB_FUNCTION_USER_KEY,
-                  env.PUBLIC_SHOW_EXTENSION_1
-                )}
-              </div>
-            {/if}
-          {/each}
+          <!-- Make sure ituser.engagements_responses is present (needed since adding @include to query) -->
+          {#if ituser.engagements_responses}
+            {#each ituser.engagements_responses.objects as engagement}
+              {@const state = findClosestValidityWithin(
+                engagement.validities,
+                ituser.validity,
+                $date
+              )}
+              {#if state}
+                <div>
+                  {getEngagementDisplay(
+                    state,
+                    state.org_unit_response?.current?.name,
+                    env.PUBLIC_SHOW_JOB_FUNCTION_USER_KEY,
+                    env.PUBLIC_SHOW_EXTENSION_1
+                  )}
+                </div>
+              {/if}
+            {/each}
+          {/if}
         </td>
       {/if}
       <td class="text-sm p-4">{ituser.primary_response?.current?.name ?? ""}</td>

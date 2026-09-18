@@ -3,7 +3,7 @@
   import { capital } from "$lib/utils/helpers"
   import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
-  import { EmployeeLeavesDocument, type EmployeeLeavesQuery } from "./query.generated"
+  import { EmployeeLeavesDocument } from "./query.generated"
   import ValidityTableCell from "$lib/components/shared/ValidityTableCell.svelte"
   import { base } from "$app/paths"
   import { date } from "$lib/stores/date"
@@ -14,7 +14,7 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
-  import { formatQueryDates } from "$lib/utils/validities"
+  import { findClosestValidityWithin, formatQueryDates } from "$lib/utils/validities"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
   import { getEngagementDisplay } from "$lib/utils/display"
@@ -22,8 +22,9 @@
   export let tense: Tense
 
   const uuid = $page.params.uuid
-  type Leaves = EmployeeLeavesQuery["leaves"]["objects"][0]["validities"]
 
+  // Dates on the engagement lookup filter the engagement's own validity, so a
+  // date-filtered lookup drops an engagement that ended before the leave.
   gql`
     query EmployeeLeaves(
       $employee_uuid: [UUID!]
@@ -48,7 +49,7 @@
             }
             engagement_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 extension_1
                 org_unit_response {
                   uuid
@@ -61,6 +62,10 @@
                     user_key
                     name
                   }
+                }
+                validity {
+                  from
+                  to
                 }
               }
             }
@@ -75,19 +80,22 @@
       employee_uuid: uuid,
       ...tenseToValidity(tense, $date),
     })
-    .then((res) => {
-      const leaves: Leaves = []
-
-      // Filters and flattens the data
-      for (const outer of res.leaves.objects) {
-        // TODO: Remove when GraphQL is able to do this for us
-        const filtered = outer.validities.filter((obj) => {
-          return tenseFilter(obj, tense)
-        })
-        leaves.push(...filtered)
-      }
-      return leaves
-    })
+    // Filters and flattens the data
+    .then((res) =>
+      res.leaves.objects.flatMap((outer) =>
+        outer.validities
+          // TODO: Remove when GraphQL is able to do this for us
+          .filter((obj) => tenseFilter(obj, tense))
+          .map((obj) => ({
+            ...obj,
+            engagement_state: findClosestValidityWithin(
+              obj.engagement_response?.validities,
+              obj.validity,
+              $date
+            ),
+          }))
+      )
+    )
 </script>
 
 {#await dataPromise}
@@ -104,10 +112,10 @@
         {leave.leave_type_response?.current?.name}
       </td>
       <td class="text-sm p-4">
-        {#if leave.engagement_response?.current}
+        {#if leave.engagement_state}
           {getEngagementDisplay(
-            leave.engagement_response.current,
-            leave.engagement_response.current.org_unit_response?.current?.name,
+            leave.engagement_state,
+            leave.engagement_state.org_unit_response?.current?.name,
             env.PUBLIC_SHOW_JOB_FUNCTION_USER_KEY,
             env.PUBLIC_SHOW_EXTENSION_1
           )}
