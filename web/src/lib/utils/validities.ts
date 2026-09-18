@@ -1,9 +1,11 @@
 import type { OpenValidity, Validity } from "$lib/graphql/types"
 import { format, formatISO, isValid, parseISO, subDays } from "date-fns"
 
-export const getMinMaxValidities = (
-  validities: { validity: Validity | OpenValidity }[] | undefined | null
-) => {
+// The helpers below read nothing but `validity`, and return the element they
+// were given, so the caller keeps its own generated type.
+type HasValidity = { validity: Validity | OpenValidity }
+
+export const getMinMaxValidities = (validities: HasValidity[] | undefined | null) => {
   // This handles optional person/org_unit validities
   // Changed this from error to warning, since this isn't always an error
   // For example when we create objects without specifying uuid (org_unit and leave)
@@ -83,11 +85,11 @@ export const clampDateToValidity = (
 
 // findClosestValidity, restricted to `range`: looks up at `date` clamped into
 // the range, so the result is a validity that overlapped it.
-export const findClosestValidityWithin = (
-  validities: any,
+export const findClosestValidityWithin = <T extends HasValidity>(
+  validities: T[] | null | undefined,
   range: Validity | OpenValidity,
   date: string
-) => {
+): T | null => {
   if (!validities || !validities.length) {
     return null
   }
@@ -97,10 +99,10 @@ export const findClosestValidityWithin = (
 // All validities overlapping `range`, e.g. every name a referenced org_unit
 // has had within the referencing row's own validity. `to` is exclusive (v29),
 // so validities merely touching at an endpoint do not overlap.
-export const filterValiditiesInRange = (
-  validities: any[],
+export const filterValiditiesInRange = <T extends HasValidity>(
+  validities: T[],
   range: Validity | OpenValidity
-) => {
+): T[] => {
   const rangeFrom = range.from ? parseISO(range.from) : null
   const rangeTo = range.to ? parseISO(range.to) : null
 

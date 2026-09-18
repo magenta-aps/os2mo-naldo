@@ -6,7 +6,7 @@
   import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
-  import { ManagersDocument, type ManagersQuery } from "./query.generated"
+  import { ManagersDocument } from "./query.generated"
   import { date } from "$lib/stores/date"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { sortData } from "$lib/utils/sorting"
@@ -27,11 +27,6 @@
   const isOrg = $page.url.pathname?.startsWith("/organisation")
   const employee = isOrg ? null : uuid
   const org_unit = isOrg ? uuid : null
-
-  type Manager = ManagersQuery["managers"]["objects"][0]["validities"][0]
-  type EngagementState = NonNullable<Manager["engagement_response"]>["validities"][0]
-  type ManagerRow = Manager & { engagement_state?: EngagementState }
-  type Managers = ManagerRow[]
 
   gql`
     query Managers(
@@ -126,20 +121,18 @@
       inherit: !isOrg ? false : env.PUBLIC_INHERIT_MANAGER,
       ...tenseToValidity(tense, $date),
     })
-    .then((res) => {
-      const managers: Managers = []
-
-      // Filters and flattens the data
-      for (const outer of res.managers.objects) {
-        const filtered = outer.validities.filter((obj) => {
-          if (!tenseFilter(obj, tense)) return false
-          // Filter out vacant manager-roles for employees
-          // TODO: Do this with GraphQL, when following issues are resolved (#65031) (#65303)
-          if (!isOrg && !obj.person_response) return false
-          return true
-        })
-        managers.push(
-          ...filtered.map((obj) => ({
+    // Filters and flattens the data
+    .then((res) =>
+      res.managers.objects.flatMap((outer) =>
+        outer.validities
+          .filter((obj) => {
+            if (!tenseFilter(obj, tense)) return false
+            // Filter out vacant manager-roles for employees
+            // TODO: Do this with GraphQL, when following issues are resolved (#65031) (#65303)
+            if (!isOrg && !obj.person_response) return false
+            return true
+          })
+          .map((obj) => ({
             ...obj,
             engagement_state: findClosestValidityWithin(
               obj.engagement_response?.validities,
@@ -147,10 +140,8 @@
               $date
             ),
           }))
-        )
-      }
-      return managers
-    })
+      )
+    )
 </script>
 
 {#await dataPromise}
