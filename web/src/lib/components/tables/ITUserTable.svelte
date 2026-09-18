@@ -16,7 +16,7 @@
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import { formatQueryDates } from "$lib/utils/validities"
-  import { getEngagementTitlesAndUuid } from "$lib/utils/display"
+  import { getEngagementDisplay } from "$lib/utils/display"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
 
@@ -55,7 +55,7 @@
                     user_key
                   }
                 }
-                uuid
+                extension_1
                 job_function_response {
                   current(at: $fromDate) {
                     user_key
@@ -121,9 +121,15 @@
         <td class="text-sm p-4">
           {#each ituser.engagements as engagement}
             {#if engagement.validities && engagement.validities.length}
-              {#each getEngagementTitlesAndUuid( [findClosestValidity(engagement.validities, $date)] ) as nameObj}
-                <div>{nameObj.name}</div>
-              {/each}
+              {@const state = findClosestValidity(engagement.validities, $date)}
+              <div>
+                {getEngagementDisplay(
+                  state,
+                  state.org_unit_response?.current?.name,
+                  env.PUBLIC_SHOW_JOB_FUNCTION_USER_KEY,
+                  env.PUBLIC_SHOW_EXTENSION_1
+                )}
+              </div>
             {/if}
           {/each}
         </td>
