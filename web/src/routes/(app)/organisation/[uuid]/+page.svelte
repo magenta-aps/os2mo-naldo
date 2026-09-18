@@ -338,7 +338,7 @@
           { title: capital($_("name")), sortPath: "person_response.current.name" },
           {
             title: capital($_("engagement", { values: { n: 1 } })),
-            sortPath: "engagement_response.current.job_function_response.current.name",
+            sortPath: "engagement_state.job_function_response.current.name",
           },
           { title: capital($_("manager_responsibility")) },
           {
