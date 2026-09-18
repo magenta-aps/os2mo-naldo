@@ -60,9 +60,12 @@
                 validities(start: null, end: null) {
                   org_unit_response {
                     uuid
-                    current(at: $fromDate) {
+                    validities(start: null, end: null) {
                       name
-                      user_key
+                      validity {
+                        from
+                        to
+                      }
                     }
                   }
                   extension_1
@@ -140,10 +143,16 @@
                 $date
               )}
               {#if state}
+                {@const unitName =
+                  findClosestValidityWithin(
+                    state.org_unit_response?.validities,
+                    state.validity,
+                    $date
+                  )?.name ?? state.org_unit_response?.uuid}
                 <div>
                   {getEngagementDisplay(
                     state,
-                    state.org_unit_response?.current?.name,
+                    unitName,
                     env.PUBLIC_SHOW_JOB_FUNCTION_USER_KEY,
                     env.PUBLIC_SHOW_EXTENSION_1
                   )}
