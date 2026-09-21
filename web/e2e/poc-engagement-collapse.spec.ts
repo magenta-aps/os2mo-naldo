@@ -28,9 +28,17 @@ const injectSlices = (page: Page, slices: Slice[]) =>
       target.validities = slices.map((slice) => ({
         ...template,
         user_key: slice.key ?? template.user_key,
+        // The query resolves a class through its own validities, not `current`,
+        // so the injected name is given the slice's own validity to sit in
         job_function_response: {
           ...template.job_function_response,
-          current: { ...template.job_function_response.current, name: slice.job },
+          validities: [
+            {
+              name: slice.job,
+              user_key: slice.job,
+              validity: { from: iso(slice.from), to: iso(slice.to) },
+            },
+          ],
         },
         validity: { from: iso(slice.from), to: iso(slice.to) },
       }))

@@ -12,7 +12,8 @@
   import { getITUserITSystemName } from "$lib/utils/display"
   import { findClosestValidity, findClosestValidityWithin } from "$lib/utils/validities"
   import { formatQueryDates } from "$lib/utils/validities"
-  import type { Field, Period } from "$lib/utils/changes"
+  import type { Field } from "$lib/utils/changes"
+  import type { OpenValidity, Validity } from "$lib/graphql/types"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
@@ -22,6 +23,14 @@
   import { tenses } from "$lib/stores/tenses"
 
   type Engagement = EngagementsQuery["engagements"]["objects"][0]["validities"][0]
+  // What a row reads off a referenced object. Not generic: the slot hands the
+  // period back untyped, since Svelte 4 has no generic components, so this is
+  // where precision stops.
+  type NamedValidity = {
+    name?: string | null
+    user_key?: string | null
+    validity: Validity | OpenValidity
+  }
   type OrgUnitNames = NonNullable<
     EngagementsQuery["referencedUnits"]
   >["objects"][0]["validities"]
@@ -36,9 +45,9 @@
     query Engagements(
       $employee: [UUID!]
       $org_unit: [UUID!]
+      $at: DateTime
       $fromDate: DateTime
       $toDate: DateTime
-      $at: DateTime
       $inherit: Boolean = true
       $isOrg: Boolean = false
     ) {
@@ -58,23 +67,35 @@
             org_unit_uuid
             person_response {
               uuid
-              current(at: $at) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             job_function_response {
               uuid
-              current(at: $at) {
+              validities(start: null, end: null) {
                 name
                 user_key
+                validity {
+                  from
+                  to
+                }
               }
             }
             extension_1
             extension_4
             engagement_type_response {
               uuid
-              current(at: $at) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             itusers(filter: { from_date: null, to_date: null }) {
@@ -100,8 +121,12 @@
             managers(inherit: $inherit, exclude_self: true) @skip(if: $isOrg) {
               person_response {
                 uuid
-                current(at: $at) {
+                validities(start: null, end: null) {
                   name
+                  validity {
+                    from
+                    to
+                  }
                 }
               }
             }
@@ -111,8 +136,12 @@
             }
             primary_response {
               uuid
-              current(at: $at) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
           }
@@ -166,6 +195,16 @@
         res.referencedUnits?.objects.map((unit) => [unit.uuid, unit.validities])
       )
 
+      // A referenced object's value as it stood within the referencing
+      // validity. `current` cannot do this: it resolves once for the whole
+      // query, so a since-renamed class reads under one name at every date on
+      // screen. This is the rule the org unit name already follows.
+      const within = (
+        response: { validities: NamedValidity[] } | null | undefined,
+        validity: Validity | OpenValidity
+      ): NamedValidity | null =>
+        findClosestValidityWithin(response?.validities, validity, $date)
+
       const unitNames = (obj: Engagement) =>
         namesByUuid.get(obj.org_unit_response?.uuid) ?? []
 
@@ -182,7 +221,7 @@
         isOrg
           ? {
               label: capital($_("employee", { values: { n: 1 } })),
-              value: obj.person_response.current?.name,
+              value: within(obj.person_response, obj.validity)?.name,
             }
           : { label: capital($_("unit", { values: { n: 1 } })), value: unitName(obj) },
         ...(env.PUBLIC_SHOW_EXTENSION_4
@@ -194,23 +233,23 @@
           : []),
         {
           label: capital($_("job_function", { values: { n: 1 } })),
-          value: obj.job_function_response.current?.name,
+          value: within(obj.job_function_response, obj.validity)?.name,
         },
         {
           label: capital($_("engagement_type")),
-          value: obj.engagement_type_response?.current?.name,
+          value: within(obj.engagement_type_response, obj.validity)?.name,
         },
         ...(env.PUBLIC_SHOW_PRIMARY_ENGAGEMENT
           ? [
               {
                 label: capital($_("primary")),
-                value: obj.primary_response?.current?.name,
+                value: within(obj.primary_response, obj.validity)?.name,
               },
             ]
           : []),
       ]
 
-      return { objects: res.engagements.objects, unitNames, fields }
+      return { objects: res.engagements.objects, unitNames, fields, within }
     })
 </script>
 
@@ -237,7 +276,7 @@
     <td class="text-sm p-4">
       {#if isOrg}
         <a href="{base}/employee/{period.object.person_response.uuid}"
-          >{period.object.person_response.current?.name}</a
+          >{data.within(period.object.person_response, period.object.validity)?.name}</a
         >
       {:else}
         <NameWithHistory
@@ -256,17 +295,24 @@
       </td>
     {/if}
     <td class="text-sm p-4">{period.object.user_key}</td>
+    {@const jobFunction = data.within(
+      period.object.job_function_response,
+      period.object.validity
+    )}
     <td class="text-sm p-4"
       >{env.PUBLIC_SHOW_JOB_FUNCTION_USER_KEY
-        ? `${period.object.job_function_response.current?.user_key} - ${period.object.job_function_response.current?.name}`
-        : period.object.job_function_response.current?.name}</td
+        ? `${jobFunction?.user_key} - ${jobFunction?.name}`
+        : jobFunction?.name}</td
     >
     {#if env.PUBLIC_SHOW_EXTENSION_1}
       <td class="text-sm p-4"
         >{period.object.extension_1 ? period.object.extension_1 : ""}</td
       >
     {/if}
-    <td class="text-sm p-4">{period.object.engagement_type_response?.current?.name}</td>
+    <td class="text-sm p-4"
+      >{data.within(period.object.engagement_type_response, period.object.validity)
+        ?.name}</td
+    >
     {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
       <td class="text-sm p-4">
         {#each period.object.itusers as ituser}
@@ -290,7 +336,8 @@
                 <li>
                   {#if manager.person_response}
                     <a href="{base}/employee/{manager.person_response.uuid}">
-                      • {manager.person_response.current?.name}
+                      • {data.within(manager.person_response, period.object.validity)
+                        ?.name}
                     </a>
                   {:else}
                     • {capital($_("vacant"))}
@@ -301,7 +348,10 @@
             <!-- If there's only 1 manager and it's not vacant -->
           {:else if period.object.managers[0] && period.object.managers[0].person_response}
             <a href="{base}/employee/{period.object.managers[0].person_response.uuid}">
-              {period.object.managers[0].person_response.current?.name}
+              {data.within(
+                period.object.managers[0].person_response,
+                period.object.validity
+              )?.name}
             </a>
             <!-- 1 vacant manager -->
           {:else if period.object.managers[0]}
@@ -315,7 +365,10 @@
       </td>
     {/if}
     {#if env.PUBLIC_SHOW_PRIMARY_ENGAGEMENT}
-      <td class="text-sm p-4">{period.object.primary_response?.current?.name ?? ""}</td>
+      <td class="text-sm p-4"
+        >{data.within(period.object.primary_response, period.object.validity)?.name ??
+          ""}</td
+      >
     {/if}
 
     <svelte:fragment slot="actions" let:uuid={id} let:period>
