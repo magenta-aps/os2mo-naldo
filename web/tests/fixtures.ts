@@ -63,6 +63,8 @@ export const ituser = (patch: Partial<ItuserInfo> = {}): ItuserInfo => ({
   notes: "",
   primary: undefined,
   rolebindings: [{ role: { uuid: "r1", name: "Role" } }],
+  // The wizard never renders the engagement picker, so this stays unset.
+  engagements: undefined,
   validated: true,
   ...patch,
 })
