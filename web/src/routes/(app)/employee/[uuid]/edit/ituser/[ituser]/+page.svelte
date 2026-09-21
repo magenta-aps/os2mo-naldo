@@ -13,7 +13,13 @@
   import { base } from "$app/paths"
   import { page } from "$app/stores"
   import { gql } from "graphql-request"
-  import { ItUserAndItSystemsDocument, UpdateItUserDocument } from "./query.generated"
+  import {
+    ItUserAndItSystemsDocument,
+    GetEngagementsDocument,
+    UpdateItUserDocument,
+    type ItUserAndItSystemsQuery,
+  } from "./query.generated"
+  import SelectMultiple from "$lib/components/forms/shared/SelectMultiple.svelte"
   import type { SubmitFunction } from "./$types"
   import { date } from "$lib/stores/date"
   import { form, field } from "svelte-forms"
@@ -22,7 +28,11 @@
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
   import type { FacetValidities } from "$lib/utils/classes"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
-  import { formatITSystemNames } from "$lib/utils/helpers"
+  import {
+    formatITSystemNames,
+    formatEngagementTitlesAndUuid,
+    type EngagementTitleAndUuid,
+  } from "$lib/utils/helpers"
   import { createQuery } from "$lib/http/query"
   import { getPrimaryClasses } from "$lib/http/getClasses"
   import { getPersonValidities } from "$lib/http/getValidities"
@@ -37,7 +47,7 @@
     ) {
       itusers(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
-          validities {
+          validities(start: $currentDate, end: $toDate) {
             uuid
             user_key
             external_id
@@ -52,6 +62,23 @@
               uuid
               current(at: $fromDate) {
                 name
+              }
+            }
+            engagements_responses(filter: { from_date: $currentDate }) {
+              objects {
+                validities {
+                  uuid
+                  job_function_response {
+                    current(at: $currentDate) {
+                      name
+                    }
+                  }
+                  org_unit_response {
+                    current(at: $currentDate) {
+                      name
+                    }
+                  }
+                }
               }
             }
             validity {
@@ -69,6 +96,28 @@
           current(at: $currentDate) {
             name
             uuid
+          }
+        }
+      }
+    }
+
+    query GetEngagements($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+      engagements(
+        filter: { employees: $uuid, from_date: $fromDate, to_date: $toDate }
+      ) {
+        objects {
+          validities {
+            org_unit_response {
+              current(at: $fromDate) {
+                name
+              }
+            }
+            uuid
+            job_function_response {
+              current(at: $fromDate) {
+                name
+              }
+            }
           }
         }
       }
@@ -166,27 +215,62 @@
     )
   }
 
-  // Created in the script (not inline in the {#await} tag) so the result can
-  // be captured below without a side effect in the template.
-  const itUserPromise = graphQLClient().request(ItUserAndItSystemsDocument, {
-    uuid: $page.params.ituser,
-    fromDate: $page.url.searchParams.get("from"),
-    toDate: $page.url.searchParams.get("to"),
-    currentDate: $date,
-  })
+  let selectedEngagements: { uuid: string; name: string }[] | undefined = undefined
+  // Drop the selection when the effective date moves so the multi-select
+  // re-initializes from the record's engagements at the new date (a set value
+  // would otherwise shadow the new startValue). This only resets on a date
+  // change, not on every render.
+  $: if (startDate) {
+    selectedEngagements = undefined
+  }
+  const engagements = createQuery<EngagementTitleAndUuid[]>()
+  // Scope options to the ituser's own validity period (from the URL), not the
+  // editable start date. That keeps the option list consistent with the linked
+  // engagements shown, and avoids an invalid from > to range for a historical
+  // ituser (start date defaults to today, end date to the ituser's past end).
+  $: if (env.PUBLIC_SHOW_ITUSER_CONNECTIONS && $page.params.uuid) {
+    const personUuid = $page.params.uuid
+    engagements.run((signal) =>
+      graphQLClient(signal)
+        .request(GetEngagementsDocument, {
+          uuid: personUuid,
+          fromDate: $page.url.searchParams.get("from"),
+          toDate: $page.url.searchParams.get("to"),
+        })
+        .then(
+          (res) =>
+            res.engagements?.objects
+              .map((e) => e.validities[0])
+              .filter(Boolean) as EngagementTitleAndUuid[]
+        )
+    )
+  }
 
+  // Created in the script (not inline in the {#await} tag) so the result can
+  // be captured below without a side effect in the template. Reactive on the
+  // effective date so the record's engagements (and picker names) re-resolve
+  // when the start date moves; the URL from/to only locates the record.
+  let itUserPromise: Promise<ItUserAndItSystemsQuery>
   let initialITUser: any = null
-  itUserPromise.then(
-    (data) => {
-      const itUser = data.itusers.objects[0].validities[0]
-      const notes = data.itusers.objects[0].registrations
-      initialITUser = normalizeITUser(itUser, notes[notes.length - 1].note)
-    },
-    // The template's {#await} has no {:catch}, so a failed load stays on the
-    // pending branch. This handler only prevents an unhandled rejection from
-    // this second promise chain.
-    () => {}
-  )
+  $: if (startDate) {
+    itUserPromise = graphQLClient().request(ItUserAndItSystemsDocument, {
+      uuid: $page.params.ituser,
+      fromDate: $page.url.searchParams.get("from"),
+      toDate: $page.url.searchParams.get("to"),
+      currentDate: startDate,
+    })
+    itUserPromise.then(
+      (data) => {
+        const itUser = data.itusers.objects[0].validities[0]
+        const notes = data.itusers.objects[0].registrations
+        initialITUser = normalizeITUser(itUser, notes[notes.length - 1].note)
+      },
+      // The template's {#await} has no {:catch}, so a failed load stays on the
+      // pending branch. This handler only prevents an unhandled rejection from
+      // this second promise chain.
+      () => {}
+    )
+  }
   let hasChanges = false
   $: if (initialITUser) {
     // Check if any of the user-editable fields have changed compared to the original values.
@@ -197,9 +281,15 @@
       $externalIdField.value !== initialITUser.external_id ||
       $noteField.value !== initialITUser.note
 
+    // Gated on the flag so a hidden field can't report a false change.
+    const engagementsChanged =
+      env.PUBLIC_SHOW_ITUSER_CONNECTIONS &&
+      JSON.stringify((selectedEngagements ?? []).map((e) => e.uuid).sort()) !==
+        JSON.stringify(initialITUser.engagements)
+
     const toDateExtended =
       toDate === "" ? initialITUser.to !== null : toDate > (initialITUser.to ?? null)
-    hasChanges = editableChanged || toDateExtended
+    hasChanges = editableChanged || engagementsChanged || toDateExtended
   }
 </script>
 
@@ -247,6 +337,9 @@
   This might be the wanted behaviour, as the note is always updated? -->
   {@const note = notes[notes.length - 1].note}
   {@const itSystems = data.itsystems.objects}
+  {@const currentEngagements = formatEngagementTitlesAndUuid(
+    itUser.engagements_responses.objects.map((e) => e.validities[0]).filter(Boolean)
+  )}
   {@const disableForm = env.PUBLIC_DISABLE_IT_USER_EDIT_FORM}
 
   <form method="post" class="mx-6" use:enhance={handler}>
@@ -304,6 +397,31 @@
             disabled={disableForm}
           />
         </div>
+        {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
+          {#if $engagements.error}
+            <p class="text-sm text-error">
+              {capital(
+                $_($engagements.data?.length ? "load_error_options" : "load_error")
+              )}
+            </p>
+          {/if}
+          {#if $engagements.data?.length}
+            <SelectMultiple
+              title={capital($_("engagement", { values: { n: 2 } }))}
+              id="engagements"
+              bind:value={selectedEngagements}
+              startValue={currentEngagements}
+              iterable={formatEngagementTitlesAndUuid($engagements.data)}
+              disabled={disableForm}
+            />
+          {:else}
+            <SelectMultiple
+              title={capital($_("engagement", { values: { n: 2 } }))}
+              id="engagements"
+              disabled
+            />
+          {/if}
+        {/if}
         {#if $facets.loading && !$facets.data}
           <Skeleton />
         {/if}
