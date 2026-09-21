@@ -124,6 +124,9 @@ export type AddressValues = {
   addressType: AddressTypeValue | undefined
   addressValue: { name?: string; value: string }
   user_key: string
+  // Route-only; the wizard leaves this unset, so the userflow payload never
+  // carries it. See ItuserValues.engagements.
+  ituser: ClassValue | undefined
 }
 
 export const createDefaultAddressValues = (): AddressValues => ({
@@ -133,4 +136,5 @@ export const createDefaultAddressValues = (): AddressValues => ({
   addressType: undefined,
   addressValue: { name: "", value: "" },
   user_key: "",
+  ituser: undefined,
 })

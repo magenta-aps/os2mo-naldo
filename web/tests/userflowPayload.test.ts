@@ -72,6 +72,8 @@ const address = (patch: Partial<AddressInfo> = {}): AddressInfo => ({
   addressType: { uuid: "at1", name: "Email", scope: "EMAIL" },
   addressValue: { name: "", value: "a@b.dk" },
   user_key: "desc",
+  // The wizard never renders the IT-user picker, so this stays unset.
+  ituser: undefined,
   validated: true,
   ...patch,
 })

@@ -1,7 +1,11 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { get } from "svelte/store"
-  import { capital } from "$lib/utils/helpers"
+  import { capital, formatITUserITSystemNames } from "$lib/utils/helpers"
+  import { env } from "$lib/env"
+  import { gql } from "graphql-request"
+  import { graphQLClient } from "$lib/http/client"
+  import { PersonItusersDocument } from "./query.generated"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
@@ -16,9 +20,37 @@
   import { getPersonValidities } from "$lib/http/getValidities"
   import type { AddressValues } from "$lib/components/forms/entity/types"
 
+  gql`
+    query PersonItusers($employee: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+      itusers(
+        filter: {
+          employee: { uuids: $employee }
+          from_date: $fromDate
+          to_date: $toDate
+        }
+      ) {
+        objects {
+          validities {
+            itsystem_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
+            }
+            user_key
+            uuid
+          }
+        }
+      }
+    }
+  `
+
   // Shared by the address create route and the userflow wizard; see types.ts.
   export let value: AddressValues
   // Route-only: the wizard's person does not exist yet, so its bounds stay open.
+  // Also gates the IT-user link block — a wizard address belongs to the new
+  // employee, whose IT users are created in the same mutation and are not
+  // referenceable yet.
   export let personUuid: string | undefined = undefined
   // De-duplicates DOM ids when several instances are mounted (wizard tabs).
   export let idPrefix = ""
@@ -39,6 +71,7 @@
 
   // Projected to primitives so unrelated keystrokes don't refire the blocks below.
   $: fromDate = value.fromDate
+  $: toDate = value.toDate
   $: addressTypeUuid = value.addressType?.uuid
   $: addressTypeScope = value.addressType?.scope
   $: addressTypeName = value.addressType?.name
@@ -87,6 +120,27 @@
     validities.run((signal) => getPersonValidities(uuid, signal))
   } else {
     validities.run(async () => ({ from: null, to: null }))
+  }
+
+  // Scoped to the address's own dates, so an IT user that is not valid then
+  // cannot be linked. Select prunes a selection that leaves the options, so
+  // moving the dates drops one that no longer applies.
+  const itusers = createQuery<ReturnType<typeof formatITUserITSystemNames>>()
+  $: if (env.PUBLIC_SHOW_ITUSER_CONNECTIONS && personUuid && fromDate) {
+    const uuid = personUuid
+    const from = fromDate
+    // A cleared end-date input is "", which the server rejects as a DateTime.
+    const to = toDate || null
+    itusers.run(async (signal) => {
+      const res = await graphQLClient(signal).request(PersonItusersDocument, {
+        employee: uuid,
+        fromDate: from,
+        toDate: to,
+      })
+      return formatITUserITSystemNames(
+        res.itusers?.objects.map((i) => i.validities[0]).filter(Boolean)
+      )
+    })
   }
 
   const facets = createQuery<FacetValidities[]>()
@@ -160,6 +214,21 @@
     />
     <input hidden name="{idPrefix}address-type-uuid" value={addressTypeUuid} />
   </div>
+{/if}
+{#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS && personUuid}
+  {#if $itusers.error}
+    <p class="text-sm text-error">
+      {capital($_($itusers.data?.length ? "load_error_options" : "load_error"))}
+    </p>
+  {/if}
+  <Select
+    title={capital($_("ituser", { values: { n: 1 } }))}
+    id="{idPrefix}it-user-uuid"
+    bind:value={value.ituser}
+    iterable={$itusers.data}
+    disabled={!$itusers.data?.length || $itusers.error}
+    isClearable={true}
+  />
 {/if}
 <Input
   title={capital($_("description"))}
