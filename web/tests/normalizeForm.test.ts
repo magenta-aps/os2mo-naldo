@@ -146,6 +146,12 @@ describe("normalizeAddress", () => {
         name: "test@example.com",
         user_key: "test@example.com",
         visibility_response: { current: { name: "Offentlig" } },
+        ituser: [
+          {
+            user_key: "bruce",
+            itsystem_response: { current: { name: "Active Directory" } },
+          },
+        ],
       })
     )
     expect(result).toEqual({
@@ -154,7 +160,35 @@ describe("normalizeAddress", () => {
       value: "test@example.com",
       user_key: "test@example.com",
       visibility: "Offentlig",
+      ituser: "Active Directory, bruce",
     })
+  })
+
+  it("returns empty ituser when none linked", () => {
+    const result = normalizeAddress({
+      validity: { to: null },
+      address_type_response: { current: null },
+      visibility_response: { current: null },
+    })
+    expect(result.ituser).toEqual("")
+  })
+
+  // Must match what the form's Select shows, or the unchanged form reports a
+  // pending edit.
+  it("falls back to the itsystem uuid when the itsystem name is null", () => {
+    const result = normalizeAddress({
+      validity: { to: null },
+      address_type_response: { current: null },
+      visibility_response: { current: null },
+      ituser: [
+        {
+          uuid: "it-1",
+          user_key: "bruce",
+          itsystem_response: { uuid: "s-1", current: null },
+        },
+      ],
+    })
+    expect(result.ituser).toEqual("s-1, bruce")
   })
 })
 

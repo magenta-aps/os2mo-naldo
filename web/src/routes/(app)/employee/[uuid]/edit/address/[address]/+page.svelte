@@ -16,7 +16,15 @@
   import { base } from "$app/paths"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
-  import { AddressAndFacetsDocument, UpdateAddressDocument } from "./query.generated"
+  import {
+    AddressAndFacetsDocument,
+    EmployeeItUsersDocument,
+    UpdateAddressDocument,
+  } from "./query.generated"
+  import {
+    formatITUserITSystemName,
+    formatITUserITSystemNames,
+  } from "$lib/utils/helpers"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
@@ -31,6 +39,7 @@
   import { required, email, pattern } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { normalizeAddress } from "$lib/utils/normalizeForm"
+  import { env } from "$lib/env"
 
   gql`
     query AddressAndFacets(
@@ -54,6 +63,16 @@
             }
             name
             value
+            ituser(filter: { from_date: $fromDate, to_date: $toDate }) {
+              uuid
+              user_key
+              itsystem_response {
+                uuid
+                current(at: $fromDate) {
+                  name
+                }
+              }
+            }
             visibility_response {
               uuid
               current(at: $currentDate) {
@@ -65,6 +84,29 @@
               from
               to
             }
+          }
+        }
+      }
+    }
+
+    query EmployeeITUsers($employee: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+      itusers(
+        filter: {
+          employee: { uuids: $employee }
+          from_date: $fromDate
+          to_date: $toDate
+        }
+      ) {
+        objects {
+          validities {
+            itsystem_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
+            }
+            user_key
+            uuid
           }
         }
       }
@@ -96,6 +138,7 @@
   const addressTypeField = field("address_type", "", [required()])
   const visibility = field("visibility", "", [])
   const description = field("description", "", [])
+  const ituserField = field("ituser", "", [])
 
   let addressField = field("", "")
   $: svelteForm = form(
@@ -103,7 +146,8 @@
     addressTypeField,
     addressField,
     visibility,
-    description
+    description,
+    ituserField
   )
 
   // Derive validators from the address type's scope, not its name. The name is
@@ -184,6 +228,27 @@
     )
   }
 
+  const itusers = createQuery<ReturnType<typeof formatITUserITSystemNames>>()
+  $: if (env.PUBLIC_SHOW_ITUSER_CONNECTIONS && $page.params.uuid && startDate) {
+    const personUuid = $page.params.uuid
+    const from = startDate
+    // An ended address seeds its end before the default start, and MO rejects
+    // from > to; null is an open end, where undefined would mean from + 1 ms.
+    const to =
+      toDate && Temporal.ZonedDateTime.compare(toDate, from) >= 0 ? toDate : null
+    itusers.run((signal) =>
+      graphQLClient(signal)
+        .request(EmployeeItUsersDocument, {
+          employee: personUuid,
+          fromDate: from,
+          toDate: to,
+        })
+        .then((res) =>
+          formatITUserITSystemNames(res.itusers?.objects.map((e) => e.validities[0]))
+        )
+    )
+  }
+
   // Created in the script (not inline in the {#await} tag) so the result can
   // be captured below without a side effect in the template.
   const addressPromise = graphQLClient().request(AddressAndFacetsDocument, {
@@ -210,7 +275,9 @@
       $addressTypeField.value !== initialAddress.address_type ||
       $addressField.value !== initialAddress.value ||
       $visibility.value !== initialAddress.visibility ||
-      $description.value !== initialAddress.user_key
+      $description.value !== initialAddress.user_key ||
+      (env.PUBLIC_SHOW_ITUSER_CONNECTIONS &&
+        $ituserField.value !== initialAddress.ituser)
 
     const toDateExtended = isLaterEnd(toDate, initialAddress.to)
     hasChanges = editableChanged || toDateExtended
@@ -256,6 +323,9 @@
   </div>
 {:then data}
   {@const address = data.addresses.objects[0].validities[0]}
+  {@const currentItuser = address.ituser?.[0]
+    ? formatITUserITSystemName(address.ituser[0])
+    : undefined}
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
       <div class="p-8">
@@ -332,6 +402,30 @@
             />
             <input hidden name="address-type-uuid" bind:value={addressTypeUuid} />
           </div>
+        {/if}
+        {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
+          {#if $itusers.error}
+            <p class="text-sm text-error">
+              {capital($_($itusers.data?.length ? "load_error_options" : "load_error"))}
+            </p>
+          {/if}
+          {#if $itusers.data?.length}
+            <Select
+              title={capital($_("ituser", { values: { n: 1 } }))}
+              id="it-user-uuid"
+              bind:name={$ituserField.value}
+              startValue={currentItuser}
+              iterable={$itusers.data}
+              isClearable={true}
+              on:clear={() => ($ituserField.value = "")}
+            />
+          {:else}
+            <Select
+              title={capital($_("ituser", { values: { n: 1 } }))}
+              id="it-user-uuid"
+              disabled
+            />
+          {/if}
         {/if}
         <Input
           startValue={address.user_key}
