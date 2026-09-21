@@ -10,11 +10,13 @@
   // drawer re-renders them as they stood then.
   import { onDestroy } from "svelte"
   import { _ } from "svelte-i18n"
+  import { capital } from "$lib/utils/helpers"
   import ValidityTableCell from "$lib/components/shared/ValidityTableCell.svelte"
   import ChangeHistoryRow from "$lib/components/tables/ChangeHistoryRow.svelte"
   import { getColumnLock } from "$lib/components/shared/columnLock"
   import { splitOnGaps, toPeriods, type Field, type Period } from "$lib/utils/changes"
   import { spellTenseFilter } from "$lib/utils/tenses"
+  import { tenses } from "$lib/stores/tenses"
   import { findClosestValidityWithin, getMinMaxValidities } from "$lib/utils/validities"
   import { sortData } from "$lib/utils/sorting"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
@@ -27,7 +29,6 @@
 
   // As MO returns them: one entry per uuid, each holding its validities
   export let objects: Validities[]
-  export let tense: Tense
   // The columns this table shows, in column order, for one validity
   export let fields: (object: any) => Field[]
   // Per period, so an edit opens on the dates of the period it was asked from
@@ -60,7 +61,12 @@
     for (const open of Object.values(expanded)) if (open) columnLock?.release()
   })
 
-  $: rows = objects.flatMap((object) => {
+  // Every object once, whatever sections are on screen. The periods do not
+  // depend on the tense, so folding them per section would be the same work
+  // three times over.
+  // Every object once, whatever sections are on screen. None of this depends on
+  // the tense, so folding it per section would be the same work three times.
+  $: prepared = objects.flatMap((object) => {
     const slices = object.validities.filter(include)
     if (!slices.length) return []
 
@@ -68,83 +74,96 @@
     // sections read the spells rather than their outer span, so a gap cannot
     // make the row claim to be present through it.
     const spells = splitOnGaps(slices)
-    if (!spellTenseFilter(spells.map(getMinMaxValidities), tense, $date)) return []
-
     // Periods per spell, so the one starting a spell reads as a start rather
     // than as a diff against values from before the gap.
     const periods = spells.flatMap((spell) => toPeriods(spell, fields))
     const span = getMinMaxValidities(slices)
+    const shown =
+      findClosestValidityWithin(periods, span, $date) ?? periods[periods.length - 1]
 
     return [
       {
         uuid: object.uuid,
+        spells: spells.map(getMinMaxValidities),
         periods,
-        shown:
-          findClosestValidityWithin(periods, span, $date) ??
-          periods[periods.length - 1],
+        shown,
         // Named `validity` so a table's existing `validity.from` sort path keeps
         // addressing the row
         validity: span,
+        // Spread so the other column sort paths address the values on screen
+        ...(shown.object as object),
       },
     ]
   })
 
-  // Sorting reads the values on screen, so it sorts by what the row displays
-  $: sorted = sortData(
-    rows.map((row) => ({ ...row, ...(row.shown.object as object) })),
-    $sortKey,
-    $sortDirection
-  )
+  // Future first, as the tense tabs read
+  const ORDER: Tense[] = ["future", "present", "past"]
+
+  $: sections = ORDER.filter((tense) => $tenses[tense]).map((tense) => ({
+    tense,
+    rows: sortData(
+      prepared.filter((row) => spellTenseFilter(row.spells, tense, $date)),
+      $sortKey,
+      $sortDirection
+    ),
+  }))
 </script>
 
-{#each sorted as row, i (row.uuid)}
-  {@const preview = previewed[row.uuid]}
-  {@const period = preview ?? row.shown}
-  <tr
-    class="{preview ? 'bg-accent' : i % 2 === 0 ? '' : 'bg-base-200'}
+{#each sections as section (section.tense)}
+  <tr>
+    <th class="px-4 py-3 text-left font-bold text-base-content bg-base-200" colspan={15}
+      >{capital($_(section.tense))}</th
+    >
+  </tr>
+  {#each section.rows as row, i (row.uuid)}
+    {@const preview = previewed[row.uuid]}
+    {@const period = preview ?? row.shown}
+    <tr
+      class="{preview ? 'bg-accent' : i % 2 === 0 ? '' : 'bg-base-200'}
     leading-5 border-t border-base-300 text-base-content"
-  >
-    <slot {period} {preview} uuid={row.uuid} />
+    >
+      <slot {period} {preview} uuid={row.uuid} />
 
-    <!-- While previewing, the period's own dates rather than the object's
+      <!-- While previewing, the period's own dates rather than the object's
          lifetime, so the row reads as one coherent snapshot of that period -->
-    <ValidityTableCell validity={preview ? period.validity : row.validity}>
-      {#if row.periods.length > 1}
-        <button
-          type="button"
-          class="mt-2 inline-flex items-center gap-1.5 rounded-sm border px-2 py-1 text-xs text-primary
+      <ValidityTableCell validity={preview ? period.validity : row.validity}>
+        {#if row.periods.length > 1}
+          <button
+            type="button"
+            class="mt-2 inline-flex items-center gap-1.5 rounded-sm border px-2 py-1 text-xs text-primary
             {expanded[row.uuid] ? 'border-primary bg-accent' : 'border-base-300'}"
-          aria-expanded={expanded[row.uuid] ? true : false}
-          on:click={() => toggleExpanded(row.uuid)}
-        >
-          <Icon
-            icon={expanded[row.uuid]
-              ? keyboardArrowUpRounded
-              : keyboardArrowDownRounded}
-            width="16"
-            height="16"
-          />
-          {$_("change_count", { values: { n: row.periods.length - 1 } })}
-        </button>
-      {/if}
-    </ValidityTableCell>
+            aria-expanded={expanded[row.uuid] ? true : false}
+            on:click={() => toggleExpanded(row.uuid)}
+          >
+            <Icon
+              icon={expanded[row.uuid]
+                ? keyboardArrowUpRounded
+                : keyboardArrowDownRounded}
+              width="16"
+              height="16"
+            />
+            {$_("change_count", { values: { n: row.periods.length - 1 } })}
+          </button>
+        {/if}
+      </ValidityTableCell>
 
-    <slot name="actions" uuid={row.uuid} {period} />
-  </tr>
+      <slot name="actions" uuid={row.uuid} {period} />
+    </tr>
 
-  {#if expanded[row.uuid] && row.periods.length > 1}
-    <!-- `shown` follows the preview, so the marked period is always the one the
+    {#if expanded[row.uuid] && row.periods.length > 1}
+      <!-- `shown` follows the preview, so the marked period is always the one the
          row above is actually rendering -->
-    <ChangeHistoryRow
-      periods={row.periods}
-      shown={period}
-      on:preview={(e) => (previewed[row.uuid] = e.detail)}
-      editHref={(p) => editHref(row.uuid, p)}
-      auditHref={auditHref(row.uuid)}
-    />
-  {/if}
-{:else}
-  <tr class="leading-5 border-t border-base-300 text-base-content">
-    <td class="text-sm p-4"><slot name="empty" /></td>
-  </tr>
+      <ChangeHistoryRow
+        periods={row.periods}
+        shown={period}
+        on:preview={(e) => (previewed[row.uuid] = e.detail)}
+        editHref={(p) => editHref(row.uuid, p)}
+        auditHref={auditHref(row.uuid)}
+      />
+    {/if}
+  {:else}
+    <tr class="leading-5 border-t border-base-300 text-base-content">
+      <td class="text-sm p-4"><slot name="empty" /></td>
+    </tr>
+  {/each}
 {/each}

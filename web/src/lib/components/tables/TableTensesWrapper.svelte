@@ -11,34 +11,43 @@
   // Specific for admin interface
   export let facetUuid: string | undefined = undefined
   export let isRoleFacet: boolean = false
+
+  // A table built on TemporalRows fetches once and renders its own sections, so
+  // it is mounted once rather than once per tense. The rest are still mounted
+  // three times, each fetching for its own section.
+  export let ownSections: boolean = false
 </script>
 
 <DetailTable {headers}>
-  {#if $tenses.future}
-    <tr>
-      <th
-        class="px-4 py-3 text-left font-bold text-base-content bg-base-200"
-        colSpan={15}>{capital($_("future"))}</th
+  {#if ownSections}
+    <svelte:component this={table} {facetUuid} {isRoleFacet} />
+  {:else}
+    {#if $tenses.future}
+      <tr>
+        <th
+          class="px-4 py-3 text-left font-bold text-base-content bg-base-200"
+          colSpan={15}>{capital($_("future"))}</th
+        >
+      </tr>
+      <svelte:component this={table} tense="future" {facetUuid} {isRoleFacet} />
+    {/if}
+    {#if $tenses.present}
+      <tr>
+        <th
+          class="px-4 py-3 text-left font-bold text-base-content bg-base-200"
+          colSpan={15}>{capital($_("present"))}</th
+        ></tr
       >
-    </tr>
-    <svelte:component this={table} tense="future" {facetUuid} {isRoleFacet} />
-  {/if}
-  {#if $tenses.present}
-    <tr>
-      <th
-        class="px-4 py-3 text-left font-bold text-base-content bg-base-200"
-        colSpan={15}>{capital($_("present"))}</th
-      ></tr
-    >
-    <svelte:component this={table} tense="present" {facetUuid} {isRoleFacet} />
-  {/if}
-  {#if $tenses.past}
-    <tr>
-      <th
-        class="px-4 py-3 text-left font-bold text-base-content bg-base-200"
-        colSpan={15}>{capital($_("past"))}</th
-      >
-    </tr>
-    <svelte:component this={table} tense="past" {facetUuid} {isRoleFacet} />
+      <svelte:component this={table} tense="present" {facetUuid} {isRoleFacet} />
+    {/if}
+    {#if $tenses.past}
+      <tr>
+        <th
+          class="px-4 py-3 text-left font-bold text-base-content bg-base-200"
+          colSpan={15}>{capital($_("past"))}</th
+        >
+      </tr>
+      <svelte:component this={table} tense="past" {facetUuid} {isRoleFacet} />
+    {/if}
   {/if}
 </DetailTable>

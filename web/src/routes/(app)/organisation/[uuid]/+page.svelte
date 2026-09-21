@@ -231,6 +231,7 @@
       />
     {:else if activeItem === OrgTab.ENGAGEMENT}
       <TableTensesWrapper
+        ownSections
         table={EngagementTable}
         headers={[
           { title: capital($_("name")), sortPath: "person_response.current.name" },

@@ -182,6 +182,7 @@
       />
     {:else if activeItem === EmployeeTab.ENGAGEMENT}
       <TableTensesWrapper
+        ownSections
         table={EngagementTable}
         headers={[
           {

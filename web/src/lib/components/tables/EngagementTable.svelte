@@ -12,7 +12,6 @@
   import { getITUserITSystemName } from "$lib/utils/display"
   import { findClosestValidity, findClosestValidityWithin } from "$lib/utils/validities"
   import { formatQueryDates } from "$lib/utils/validities"
-  import { tenseToValidity } from "$lib/utils/tenses"
   import type { Field, Period } from "$lib/utils/changes"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
@@ -20,13 +19,12 @@
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { updateGlobalNavigation } from "$lib/stores/navigation"
   import { env } from "$lib/env"
+  import { tenses } from "$lib/stores/tenses"
 
   type Engagement = EngagementsQuery["engagements"]["objects"][0]["validities"][0]
   type OrgUnitNames = NonNullable<
     EngagementsQuery["referencedUnits"]
   >["objects"][0]["validities"]
-
-  export let tense: Tense
 
   const uuid = $page.params.uuid
   const isOrg = $page.url.pathname?.startsWith("/organisation")
@@ -40,6 +38,7 @@
       $org_unit: [UUID!]
       $fromDate: DateTime
       $toDate: DateTime
+      $at: DateTime
       $inherit: Boolean = true
       $isOrg: Boolean = false
     ) {
@@ -59,13 +58,13 @@
             org_unit_uuid
             person_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $at) {
                 name
               }
             }
             job_function_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $at) {
                 name
                 user_key
               }
@@ -74,17 +73,17 @@
             extension_4
             engagement_type_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $at) {
                 name
               }
             }
-            itusers(filter: { from_date: $fromDate, to_date: $toDate }) {
+            itusers(filter: { from_date: null, to_date: null }) {
               validities {
                 user_key
                 uuid
                 itsystem_response {
                   uuid
-                  current(at: $fromDate) {
+                  current(at: $at) {
                     user_key
                     name
                   }
@@ -101,7 +100,7 @@
             managers(inherit: $inherit, exclude_self: true) @skip(if: $isOrg) {
               person_response {
                 uuid
-                current(at: $fromDate) {
+                current(at: $at) {
                   name
                 }
               }
@@ -112,7 +111,7 @@
             }
             primary_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $at) {
                 name
               }
             }
@@ -140,13 +139,26 @@
     }
   `
 
+  // Only what the enabled sections can show. Present alone narrows to the
+  // engagements running on the chosen date, which is the default view and by
+  // far the most common; past or future can reach any engagement ever, so
+  // either one widens the window to everything.
+  // `toDate` is left off for present, not nulled: a null end means unbounded,
+  // which would widen the window to every engagement from the date onwards.
+  let queryWindow: { fromDate: string | null; toDate?: string | null }
+  $: queryWindow =
+    $tenses.past || $tenses.future
+      ? { fromDate: null, toDate: null }
+      : { fromDate: $date }
+
   $: dataPromise = graphQLClient()
     .request(EngagementsDocument, {
       org_unit: org_unit,
       employee: employee,
       inherit: env.PUBLIC_INHERIT_MANAGER,
       isOrg: isOrg,
-      ...tenseToValidity(tense, $date),
+      at: $date,
+      ...queryWindow,
     })
     .then((res) => {
       // Each unit appears once in the response however many rows point at it
@@ -212,7 +224,6 @@
        TODO: Do this with GraphQL, when following issues are resolved (#65031) (#65303) -->
   <TemporalRows
     objects={data.objects}
-    {tense}
     fields={data.fields}
     include={(validity) => !isOrg || validity.org_unit_uuid === uuid}
     editHref={(id, period) =>
