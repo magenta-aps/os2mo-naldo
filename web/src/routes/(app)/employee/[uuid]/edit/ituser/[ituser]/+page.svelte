@@ -18,7 +18,12 @@
   import { base } from "$app/paths"
   import { page } from "$app/stores"
   import { gql } from "graphql-request"
-  import { ItUserAndItSystemsDocument, UpdateItUserDocument } from "./query.generated"
+  import {
+    ItUserAndItSystemsDocument,
+    GetEngagementsDocument,
+    UpdateItUserDocument,
+  } from "./query.generated"
+  import SelectMultiple from "$lib/components/forms/shared/SelectMultiple.svelte"
   import type { SubmitFunction } from "./$types"
   import { date } from "$lib/stores/date"
   import { form, field } from "svelte-forms"
@@ -27,7 +32,11 @@
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
   import type { FacetValidities } from "$lib/utils/classes"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
-  import { formatITSystemNames } from "$lib/utils/helpers"
+  import {
+    formatITSystemNames,
+    formatEngagementTitlesAndUuid,
+    type EngagementTitleAndUuid,
+  } from "$lib/utils/helpers"
   import { createQuery } from "$lib/http/query"
   import { getPrimaryClasses } from "$lib/http/getClasses"
   import { getPersonValidities } from "$lib/http/getValidities"
@@ -59,6 +68,23 @@
                 name
               }
             }
+            engagements_responses(filter: { from_date: $currentDate }) {
+              objects {
+                validities {
+                  uuid
+                  job_function_response {
+                    current(at: $currentDate) {
+                      name
+                    }
+                  }
+                  org_unit_response {
+                    current(at: $currentDate) {
+                      name
+                    }
+                  }
+                }
+              }
+            }
             validity {
               from
               to
@@ -74,6 +100,28 @@
           current(at: $currentDate) {
             name
             uuid
+          }
+        }
+      }
+    }
+
+    query GetEngagements($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+      engagements(
+        filter: { employees: $uuid, from_date: $fromDate, to_date: $toDate }
+      ) {
+        objects {
+          validities {
+            org_unit_response {
+              current(at: $fromDate) {
+                name
+              }
+            }
+            uuid
+            job_function_response {
+              current(at: $fromDate) {
+                name
+              }
+            }
           }
         }
       }
@@ -171,6 +219,31 @@
     )
   }
 
+  const engagements = createQuery<EngagementTitleAndUuid[]>()
+  $: if (env.PUBLIC_SHOW_ITUSER_CONNECTIONS && $page.params.uuid && startDate) {
+    const personUuid = $page.params.uuid
+    const from = startDate
+    // An ended ituser seeds its end before the default start, and MO rejects
+    // from > to; null is an open end, where undefined would mean from + 1 ms.
+    const to =
+      toDate && Temporal.ZonedDateTime.compare(toDate, from) >= 0 ? toDate : null
+    engagements.run((signal) =>
+      graphQLClient(signal)
+        .request(GetEngagementsDocument, {
+          uuid: personUuid,
+          fromDate: from,
+          toDate: to,
+        })
+        .then(
+          (res) =>
+            res.engagements?.objects
+              .map((e) => e.validities[0])
+              .filter(Boolean) as EngagementTitleAndUuid[]
+        )
+    )
+  }
+
+  let selectedEngagements: { uuid: string; name: string }[] | undefined = undefined
   // Created in the script (not inline in the {#await} tag) so the result can
   // be captured below without a side effect in the template.
   const itUserPromise = graphQLClient().request(ItUserAndItSystemsDocument, {
@@ -202,8 +275,15 @@
       $externalIdField.value !== initialITUser.external_id ||
       $noteField.value !== initialITUser.note
 
+    // Gated on the flag so a hidden field can't report a false change.
+    const engagementsChanged =
+      env.PUBLIC_SHOW_ITUSER_CONNECTIONS &&
+      !!selectedEngagements &&
+      JSON.stringify(selectedEngagements.map((e) => e.uuid).sort()) !==
+        JSON.stringify(initialITUser.engagements)
+
     const toDateExtended = isLaterEnd(toDate, initialITUser.to)
-    hasChanges = editableChanged || toDateExtended
+    hasChanges = editableChanged || engagementsChanged || toDateExtended
   }
 </script>
 
@@ -251,6 +331,9 @@
   This might be the wanted behaviour, as the note is always updated? -->
   {@const note = notes[notes.length - 1].note}
   {@const itSystems = data.itsystems.objects}
+  {@const currentEngagements = formatEngagementTitlesAndUuid(
+    itUser.engagements_responses.objects.map((e) => e.validities[0]).filter(Boolean)
+  )}
   {@const disableForm = env.PUBLIC_DISABLE_IT_USER_EDIT_FORM}
 
   <form method="post" class="mx-6" use:enhance={handler}>
@@ -308,6 +391,31 @@
             disabled={disableForm}
           />
         </div>
+        {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
+          {#if $engagements.error}
+            <p class="text-sm text-error">
+              {capital(
+                $_($engagements.data?.length ? "load_error_options" : "load_error")
+              )}
+            </p>
+          {/if}
+          {#if $engagements.data?.length}
+            <SelectMultiple
+              title={capital($_("engagement", { values: { n: 2 } }))}
+              id="engagements"
+              bind:value={selectedEngagements}
+              startValue={currentEngagements}
+              iterable={formatEngagementTitlesAndUuid($engagements.data)}
+              disabled={disableForm}
+            />
+          {:else}
+            <SelectMultiple
+              title={capital($_("engagement", { values: { n: 2 } }))}
+              id="engagements"
+              disabled
+            />
+          {/if}
+        {/if}
         {#if $facets.loading && !$facets.data}
           <Skeleton />
         {/if}

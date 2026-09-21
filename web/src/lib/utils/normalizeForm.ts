@@ -53,6 +53,11 @@ export const normalizeITUser = (i: any, note: string | null | undefined) => {
     primary: i.primary_response?.current?.name ?? "",
     external_id: i.external_id ?? "",
     note: note ?? "",
+    engagements:
+      i.engagements_responses?.objects
+        ?.map((e: any) => e.validities[0]?.uuid)
+        .filter(Boolean)
+        .sort() ?? [],
   }
 }
 

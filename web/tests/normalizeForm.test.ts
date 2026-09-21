@@ -103,6 +103,12 @@ describe("normalizeITUser", () => {
           user_key: "bruce",
           primary_response: { current: { name: "Primær" } },
           external_id: "ext-123",
+          engagements_responses: {
+            objects: [
+              { validities: [{ uuid: "e-2" }] },
+              { validities: [{ uuid: "e-1" }] },
+            ],
+          },
         },
         "some note"
       )
@@ -114,7 +120,20 @@ describe("normalizeITUser", () => {
       primary: "Primær",
       external_id: "ext-123",
       note: "some note",
+      engagements: ["e-1", "e-2"],
     })
+  })
+
+  it("returns empty engagements when none present", () => {
+    const result = normalizeITUser(
+      {
+        validity: { to: null },
+        itsystem_response: { current: null },
+        primary_response: { current: null },
+      },
+      null
+    )
+    expect(result.engagements).toEqual([])
   })
 })
 
