@@ -74,6 +74,10 @@ export type ItuserValues = {
   notes: string
   primary: ClassValue | undefined
   rolebindings: RolebindingValues[]
+  // Route-only, and undefined rather than [] while nothing is selected; see
+  // ManagerValues.responsibilities. The wizard leaves this unset, so the
+  // userflow payload never carries it.
+  engagements: ClassValue[] | undefined
 }
 
 export const createDefaultItuserValues = (): ItuserValues => ({
@@ -85,6 +89,7 @@ export const createDefaultItuserValues = (): ItuserValues => ({
   notes: "",
   primary: undefined,
   rolebindings: [createDefaultRolebindingValues()],
+  engagements: undefined,
 })
 
 export type ManagerValues = {

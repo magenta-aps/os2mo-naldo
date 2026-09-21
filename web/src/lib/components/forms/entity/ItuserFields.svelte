@@ -1,7 +1,12 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { get } from "svelte/store"
-  import { capital, formatITSystemNames } from "$lib/utils/helpers"
+  import {
+    capital,
+    formatITSystemNames,
+    formatEngagementTitlesAndUuid,
+    type EngagementTitleAndUuid,
+  } from "$lib/utils/helpers"
   import type { UnpackedClass } from "$lib/utils/helpers"
   import { env } from "$lib/env"
   import { gql } from "graphql-request"
@@ -9,6 +14,7 @@
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
+  import SelectMultiple from "$lib/components/forms/shared/SelectMultiple.svelte"
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import CircleButton from "$lib/components/shared/CircleButton.svelte"
@@ -21,7 +27,11 @@
   import { createQuery } from "$lib/http/query"
   import { getPrimaryClasses } from "$lib/http/getClasses"
   import { getPersonValidities } from "$lib/http/getValidities"
-  import { ItSystemsDocument, GetItSystemRolesDocument } from "./query.generated"
+  import {
+    ItSystemsDocument,
+    GetItSystemRolesDocument,
+    GetEngagementsDocument,
+  } from "./query.generated"
   import {
     createDefaultRolebindingValues,
     type ClassValue,
@@ -61,6 +71,9 @@
   // Shared by the ituser create route and the userflow wizard; see types.ts.
   export let value: ItuserValues
   // Route-only: the wizard's person does not exist yet, so its bounds stay open.
+  // Also gates the engagement-link block — a wizard IT user belongs to the new
+  // employee, whose engagements are created in the same mutation and are not
+  // referenceable yet.
   export let personUuid: string | undefined = undefined
   // De-duplicates DOM ids when several instances are mounted (wizard tabs).
   export let idPrefix = ""
@@ -84,6 +97,7 @@
 
   // Projected to primitives so unrelated keystrokes don't refire the blocks below.
   $: fromDate = value.fromDate
+  $: toDate = value.toDate
   $: itSystemUuid = value.itSystem?.uuid
 
   const itSystems = createQuery<ClassValue[] | undefined>()
@@ -114,6 +128,25 @@
     })
   } else {
     itSystemRoles.run(async () => [])
+  }
+
+  // Scoped to the IT user's own dates, so an engagement that is not valid then
+  // cannot be linked. SelectMultiple prunes selections that leave the options,
+  // so moving the dates drops the ones that no longer apply.
+  const engagements = createQuery<EngagementTitleAndUuid[]>()
+  $: if (env.PUBLIC_SHOW_ITUSER_CONNECTIONS && personUuid && fromDate) {
+    const uuid = personUuid
+    const from = fromDate
+    // A cleared end-date input is "", which the server rejects as a DateTime.
+    const to = toDate || null
+    engagements.run(async (signal) => {
+      const res = await graphQLClient(signal).request(GetEngagementsDocument, {
+        uuid: uuid,
+        fromDate: from,
+        toDate: to,
+      })
+      return res.engagements?.objects.map((e) => e.validities[0]) ?? []
+    })
   }
 
   // TODO: once ITUsers link to engagements, these bounds need to come from
@@ -206,6 +239,20 @@
     required={true}
   />
 </div>
+{#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS && personUuid}
+  {#if $engagements.error}
+    <p class="text-sm text-error">
+      {capital($_($engagements.data?.length ? "load_error_options" : "load_error"))}
+    </p>
+  {/if}
+  <SelectMultiple
+    title={capital($_("engagement", { values: { n: 2 } }))}
+    id="{idPrefix}engagements"
+    bind:value={value.engagements}
+    iterable={$engagements.data ? formatEngagementTitlesAndUuid($engagements.data) : []}
+    disabled={!$engagements.data?.length || $engagements.error}
+  />
+{/if}
 {#if $facets.loading && !$facets.data}
   <Skeleton />
 {/if}
