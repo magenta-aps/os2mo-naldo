@@ -1,3 +1,5 @@
+import { formatITUserITSystemName } from "./helpers"
+
 export const normalizeEmployee = (e: any) => {
   return {
     to: e.validity?.to?.split("T")[0] ?? null,
@@ -68,9 +70,9 @@ export const normalizeAddress = (a: any) => {
     value: a.name ?? null,
     user_key: a.user_key ?? "",
     visibility: a.visibility_response?.current?.name ?? "",
-    ituser: a.ituser?.[0]?.itsystem_response?.current?.name
-      ? `${a.ituser[0].itsystem_response.current.name}, ${a.ituser[0].user_key}`
-      : "",
+    // Same formatter as the form's Select, so an itsystem whose name does not
+    // resolve falls back to its uuid on both sides and compares equal.
+    ituser: a.ituser?.[0] ? formatITUserITSystemName(a.ituser[0]).name : "",
   }
 }
 
