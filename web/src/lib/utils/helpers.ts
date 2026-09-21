@@ -26,8 +26,8 @@ export const formatITUserITSystemNames = (itusers: ITUserITSystemName[] | undefi
 // Used to display both job_function-name and org-name on a single line, for example, in a dropdown select.
 export type EngagementTitleAndUuid = {
   uuid: string
-  job_function_response: { current?: { name: string } | null }
-  org_unit_response: { current?: { name: string } | null }
+  job_function_response?: { current?: { name: string } | null }
+  org_unit_response?: { current?: { name: string } | null }
   person_response?: { uuid: string; current?: { name: string } | null } | null
 }
 
@@ -36,7 +36,15 @@ export const formatEngagementTitlesAndUuid = (
 ) => {
   return engagements.map((engagement) => ({
     uuid: engagement.uuid,
-    name: `${engagement.job_function_response.current?.name}, ${engagement.org_unit_response.current?.name}`,
+    // Either half can be absent when a unit or job function no longer resolves,
+    // and Select drops an option with an empty name.
+    name:
+      [
+        engagement.job_function_response?.current?.name,
+        engagement.org_unit_response?.current?.name,
+      ]
+        .filter(Boolean)
+        .join(", ") || engagement.uuid,
   }))
 }
 
