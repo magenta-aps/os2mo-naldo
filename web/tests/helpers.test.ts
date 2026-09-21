@@ -1,5 +1,6 @@
 import {
   capital,
+  formatEngagementTitlesAndUuid,
   formatITSystemNames,
   formatITUserITSystemName,
   formatITUserITSystemNames,
@@ -106,6 +107,51 @@ describe("formatKleNumberTitleAndUuid", () => {
 
   it("returns empty array when input is empty", () => {
     expect(formatKleNumberTitleAndUuid([])).toEqual([])
+  })
+})
+
+describe("formatEngagementTitlesAndUuid", () => {
+  it("formats job function and org unit names", () => {
+    const result = formatEngagementTitlesAndUuid([
+      {
+        uuid: "eng-1",
+        job_function_response: { current: { name: "Specialist" } },
+        org_unit_response: { current: { name: "Haderslev skole" } },
+      },
+    ])
+    expect(result).toEqual([{ uuid: "eng-1", name: "Specialist, Haderslev skole" }])
+  })
+
+  it("renders only the half that resolves", () => {
+    const result = formatEngagementTitlesAndUuid([
+      {
+        uuid: "eng-1",
+        job_function_response: { current: { name: "Specialist" } },
+        org_unit_response: { current: null },
+      },
+      {
+        uuid: "eng-2",
+        job_function_response: undefined,
+        org_unit_response: { current: { name: "Sjølund skole" } },
+      },
+    ])
+    expect(result).toEqual([
+      { uuid: "eng-1", name: "Specialist" },
+      { uuid: "eng-2", name: "Sjølund skole" },
+    ])
+  })
+
+  // Select drops an option whose name is empty, so a wholly unresolved
+  // engagement must still carry a label.
+  it("falls back to the uuid when neither half resolves", () => {
+    const result = formatEngagementTitlesAndUuid([
+      {
+        uuid: "eng-1",
+        job_function_response: undefined,
+        org_unit_response: undefined,
+      },
+    ])
+    expect(result).toEqual([{ uuid: "eng-1", name: "eng-1" }])
   })
 })
 
