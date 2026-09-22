@@ -1,6 +1,7 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import SvelteSelect from "svelte-select"
+  import { afterUpdate } from "svelte"
 
   type Value = {
     uuid: string | null
@@ -21,6 +22,23 @@
   $: if (value) {
     name = value.map((val) => val.name)
   }
+
+  // Mirrors Select: when the options update and a selected item is no longer one
+  // of them, drop it. Done in afterUpdate (not a reactive $:) and deferred with a
+  // setTimeout, so the change lands on a clean tick rather than looping with
+  // svelte-select's internal value handling. Guarded on a non-empty list so an
+  // as-yet-unloaded (empty) iterable can't wipe a startValue selection.
+  afterUpdate(() => {
+    if (
+      value &&
+      iterable?.length &&
+      value.some((val) => !iterable?.some((item) => item.uuid === val.uuid))
+    ) {
+      setTimeout(() => {
+        value = value?.filter((val) => iterable?.some((item) => item.uuid === val.uuid))
+      }, 1)
+    }
+  })
 
   const itemId = "uuid" // Used by the component to differentiate between items
 
