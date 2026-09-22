@@ -46,6 +46,36 @@ describe("getEngagementTitlesAndUuid", () => {
       { uuid: "eng-2", name: "Timelønnet lærer, Sjølund skole" },
     ])
   })
+
+  it("renders only the half that resolves", () => {
+    const result = getEngagementTitlesAndUuid([
+      {
+        uuid: "eng-1",
+        job_function_response: { current: { name: "Specialist" } },
+        org_unit_response: { current: null },
+      },
+      {
+        uuid: "eng-2",
+        job_function_response: undefined,
+        org_unit_response: { current: { name: "Sjølund skole" } },
+      },
+    ])
+    expect(result).toEqual([
+      { uuid: "eng-1", name: "Specialist" },
+      { uuid: "eng-2", name: "Sjølund skole" },
+    ])
+  })
+
+  it("falls back to the uuid when neither half resolves", () => {
+    const result = getEngagementTitlesAndUuid([
+      {
+        uuid: "eng-1",
+        job_function_response: undefined,
+        org_unit_response: undefined,
+      },
+    ])
+    expect(result).toEqual([{ uuid: "eng-1", name: "eng-1" }])
+  })
 })
 
 describe("getITSystemNames", () => {

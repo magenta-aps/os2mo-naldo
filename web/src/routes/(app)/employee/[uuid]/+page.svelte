@@ -343,7 +343,7 @@
           },
           {
             title: capital($_("engagement", { values: { n: 1 } })),
-            sortPath: "engagement_response.current.job_function_response.current.name",
+            sortPath: "engagement_state.job_function_response.current.name",
           },
           { title: capital($_("date.date")), sortPath: "validity.from" },
         ]}
@@ -358,7 +358,7 @@
           },
           {
             title: capital($_("engagement", { values: { n: 1 } })),
-            sortPath: "engagement_response.current.job_function_response.current.name",
+            sortPath: "engagement_state.job_function_response.current.name",
           },
           { title: capital($_("manager_responsibility")) },
           {
