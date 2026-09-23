@@ -67,11 +67,19 @@ export const FAR_PAST = new Date("1900-01-01")
 export const FAR_FUTURE = new Date("2099-12-31")
 
 /**
+ * Strips the "<type>__" alias prefix and the _response(s) suffix so translation
+ * keys stay clean. The query aliases a field as "<type>__<field>" when its type
+ * differs between registration types, since GraphQL cannot merge those.
+ */
+const toLabel = (key: string): string =>
+  key.replace(/^[a-z]+__/, "").replace(/_responses?$/, "")
+
+/**
  * Parses a validity block into nullable from/to dates.
- * Handles the 'person_validity' and 'class_validity' aliases.
  */
 const parseValidity = (block: any): { from: Date | null; to: Date | null } => {
-  const v = block.validity ?? block.person_validity ?? block.class_validity
+  const key = Object.keys(block).find((k) => toLabel(k) === "validity")
+  const v = key ? block[key] : undefined
   return {
     from: v?.from ? parseISO(v.from) : null,
     to: v?.to ? parseISO(v.to) : null,
@@ -222,16 +230,9 @@ export const transformAuditLog = (rawData: any[]): Registration[] => {
 
       // Iterate over every key in the block (person, address, etc.)
       Object.keys(validityBlock).forEach((key) => {
-        // Skip metadata keys, they aren't timeline rows
-        if (key === "validity" || key === "person_validity" || key === "class_validity")
-          return
-
-        // Strip _response suffix and GraphQL alias prefixes so translation keys stay clean
-        // The second replace turns e.g. "owner_person" → "person" and "owner_org_unit" → "org_unit"
-        // while leaving keys like "association_type" or "manager_level" untouched.
-        const label = key
-          .replace(/_response$/, "")
-          .replace(/^(?:association|manager|owner)_(?=person|org_unit)/, "")
+        const label = toLabel(key)
+        // The validity is the block's period, not a timeline row
+        if (label === "validity") return
 
         if (!registration.timelines[label]) {
           registration.timelines[label] = []
