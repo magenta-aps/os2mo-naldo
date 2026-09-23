@@ -16,6 +16,7 @@
     type Registration,
     type TimelineItem,
     type TimelineGroup,
+    type TimelineListItem,
   } from "./timeline"
   import "./timeline.css"
 
@@ -48,7 +49,10 @@
 
         const item = items.get(id) as unknown as TimelineItem
         if (item && item.tooltipData?.value) {
-          const text = item.tooltipData.uuid || item.tooltipData.value
+          const text =
+            item.tooltipData.items?.map((listItem) => listItem.uuid).join(", ") ||
+            item.tooltipData.uuid ||
+            item.tooltipData.value
           navigator.clipboard.writeText(text).then(() => {
             // Simple Visual Feedback
             const original = item.content
@@ -138,14 +142,21 @@
           const translatedValue =
             entry.value === "not_set" ? capital($_(entry.value)) : entry.value
 
-          const linkIcon = entry.uuid
-            ? ` <a href="${base}/auditlog/${entry.uuid}" data-sveltekit-reload>&#8599;</a>`
-            : ""
+          const linkIcon = (uuid?: string) =>
+            uuid
+              ? ` <a href="${base}/auditlog/${uuid}" data-sveltekit-reload>&#8599;</a>`
+              : ""
+
+          const content = entry.items
+            ? entry.items
+                .map((listItem) => listItem.value + linkIcon(listItem.uuid))
+                .join(", ")
+            : translatedValue + linkIcon(entry.uuid)
 
           items.add({
             id: `${rowId}-${i}`,
             group: rowId, // Connects this block to the sub-row created above
-            content: translatedValue + linkIcon,
+            content,
             start: entry.start ?? FAR_PAST,
             end: entry.end ?? FAR_FUTURE,
             type: "range",
@@ -157,6 +168,7 @@
               attribute: translatedKey,
               value: translatedValue,
               uuid: entry.uuid,
+              items: entry.items,
               start: entry.start,
               end: entry.end,
               note: reg.note,
@@ -212,14 +224,29 @@
             ? format(d.start, "dd-MM-yyyy")
             : `-${$_("infinity")}`
           const endStr = d.end ? format(d.end, "dd-MM-yyyy") : $_("infinity")
+          const nameNote = (uuid: string | undefined, value: string) =>
+            uuid && uuid === value ? $_("no_current_name") : $_("current_name")
 
           return `
             <div class="timeline-tooltip">
               <div class="tooltip-header">${d.actor}</div>
               <div class="tooltip-attr">${d.attribute}</div>
-              <div class="tooltip-new">${d.value} (${
-            d.uuid && d.uuid === d.value ? $_("no_current_name") : $_("current_name")
-          })</div>
+              ${
+                d.items
+                  ? d.items
+                      .map(
+                        (listItem: TimelineListItem) =>
+                          `<div class="tooltip-new">${listItem.value} (${nameNote(
+                            listItem.uuid,
+                            listItem.value
+                          )})</div>`
+                      )
+                      .join("")
+                  : `<div class="tooltip-new">${d.value} (${nameNote(
+                      d.uuid,
+                      d.value
+                    )})</div>`
+              }
               ${
                 d.uuid && d.uuid !== d.value
                   ? `<div class="tooltip-uuid">${d.uuid}</div>`
