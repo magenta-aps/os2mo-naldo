@@ -44,6 +44,8 @@
   // by uuid, so their names resolve in this one request instead of needing the
   // engagement response first. Its dates must be unbounded: rows reference units
   // that no longer exist, and `validities` can't widen a filtered-out unit.
+  // `managers` without a filter only finds the managers of today, so it gets the
+  // tense's dates.
   // Use deprecated filter, because `employee`/`org_unit` filters will query for every object, if uuid is set to null
   // TODO: When https://redmine.magenta.dk/issues/62968 is fixed, add date-filters to classes
   gql`
@@ -109,7 +111,11 @@
             org_unit_response @skip(if: $isOrg) {
               uuid
             }
-            managers(inherit: $inherit, exclude_self: true) @skip(if: $isOrg) {
+            managers(
+              filter: { from_date: $fromDate, to_date: $toDate }
+              inherit: $inherit
+              exclude_self: true
+            ) @skip(if: $isOrg) {
               person_response {
                 uuid
                 current(at: $fromDate) {
