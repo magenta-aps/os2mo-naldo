@@ -1,4 +1,5 @@
 import type { OpenValidity, Validity } from "$lib/graphql/types"
+import { lastValidDay } from "$lib/utils/date"
 import { format, formatISO, isValid, parseISO, subDays } from "date-fns"
 
 // The helpers below read nothing but `validity`, and return the element they
@@ -34,9 +35,10 @@ export const getMinMaxValidities = (validities: HasValidity[] | undefined | null
       maxDate = toDate
     }
   }
+  // Date inputs take the last valid day, not the exclusive `to`.
   return {
     from: minDate ? format(minDate, "yyyy-MM-dd") : undefined,
-    to: maxDate ? format(maxDate, "yyyy-MM-dd") : undefined,
+    to: maxDate ? lastValidDay(maxDate.toISOString()) : undefined,
   }
 }
 

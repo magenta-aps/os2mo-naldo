@@ -1,8 +1,9 @@
 import {
   clampDateToValidity,
   filterValiditiesInRange,
-  findClosestValidityWithin,
   findClosestValidity,
+  findClosestValidityWithin,
+  getMinMaxValidities,
 } from "$lib/utils/validities"
 import { describe, expect, it } from "vitest"
 
@@ -172,5 +173,38 @@ describe("filterValiditiesInRange", () => {
   it("keeps open-ended validities for an open-ended range", () => {
     const row = validity("2020-01-01", null).validity
     expect(filterValiditiesInRange(names, row)).toEqual([names[2]])
+  })
+})
+
+describe("getMinMaxValidities", () => {
+  it("returns the last valid day of the latest validity as `to`", () => {
+    const validities = [
+      {
+        validity: {
+          from: "2020-01-01T00:00:00+01:00",
+          to: "2021-01-01T00:00:00+01:00",
+        },
+      },
+      {
+        validity: {
+          from: "2021-01-01T00:00:00+01:00",
+          to: "2024-04-04T00:00:00+02:00",
+        },
+      },
+    ]
+    expect(getMinMaxValidities(validities).to).toBe("2024-04-03")
+  })
+
+  it("returns no `to` when any validity is open-ended", () => {
+    const validities = [
+      { validity: { from: "2020-01-01T00:00:00+01:00", to: null } },
+      {
+        validity: {
+          from: "2021-01-01T00:00:00+01:00",
+          to: "2024-04-04T00:00:00+02:00",
+        },
+      },
+    ]
+    expect(getMinMaxValidities(validities).to).toBeUndefined()
   })
 })
