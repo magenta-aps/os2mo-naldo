@@ -15,7 +15,7 @@ import { describe, expect, it } from "vitest"
 describe("normalizeEngagement", () => {
   it("extracts expected fields", () => {
     const result = normalizeEngagement({
-      validity: { to: "2023-03-03T00:00:00" },
+      validity: { to: "2023-03-03T00:00:00+01:00" },
       org_unit_response: { uuid: "ou-1", current: { name: "Skole" } },
       job_function_response: { current: { name: "Specialist" } },
       engagement_type_response: { current: { name: "Ansat" } },
@@ -60,7 +60,7 @@ describe("normalizeEngagement", () => {
 describe("normalizeAssociation", () => {
   it("extracts expected fields", () => {
     const result = normalizeAssociation({
-      validity: { to: "2025-12-31T00:00:00" },
+      validity: { to: "2025-12-31T00:00:00+01:00" },
       person_response: { uuid: "p-1", current: { name: "Bruce" } },
       org_unit_response: { uuid: "ou-1", current: { name: "IT" } },
       association_type_response: { current: { name: "Projektleder" } },
@@ -84,7 +84,7 @@ describe("normalizeITUser", () => {
   it("extracts expected fields", () => {
     const result = normalizeITUser(
       {
-        validity: { to: "2024-06-01T00:00:00" },
+        validity: { to: "2024-06-01T00:00:00+02:00" },
         itsystem_response: { current: { name: "Active Directory" } },
         user_key: "bruce",
         primary_response: { current: { name: "Primær" } },
@@ -106,7 +106,7 @@ describe("normalizeITUser", () => {
 describe("normalizeAddress", () => {
   it("extracts expected fields", () => {
     const result = normalizeAddress({
-      validity: { to: "2025-01-01T00:00:00" },
+      validity: { to: "2025-01-01T00:00:00+01:00" },
       address_type_response: { current: { name: "Email" } },
       name: "test@example.com",
       user_key: "test@example.com",
@@ -154,7 +154,7 @@ describe("normalizeOwner", () => {
   it("extracts uuid from owner_response", () => {
     expect(
       normalizeOwner({
-        validity: { to: "2025-01-01T00:00:00" },
+        validity: { to: "2025-01-01T00:00:00+01:00" },
         owner_response: { uuid: "p-1" },
       })
     ).toEqual({ to: "2025-01-01", person: "p-1" })
@@ -172,7 +172,7 @@ describe("normalizeLeave", () => {
   it("extracts expected fields", () => {
     expect(
       normalizeLeave({
-        validity: { to: "2024-01-01T00:00:00" },
+        validity: { to: "2024-01-01T00:00:00+01:00" },
         leave_type_response: { current: { name: "Barsel" } },
         engagement_response: { uuid: "eng-1" },
       })
@@ -231,7 +231,7 @@ describe("normalizeRolebinding", () => {
   it("extracts role name", () => {
     expect(
       normalizeRolebinding({
-        validity: { to: "2025-06-01T00:00:00" },
+        validity: { to: "2025-06-01T00:00:00+02:00" },
         role_response: { current: { name: "Admin" } },
       })
     ).toEqual({ to: "2025-06-01", role: "Admin" })
