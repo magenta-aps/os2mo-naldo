@@ -1,4 +1,5 @@
 import type { OrganisationUnitUpdateInput } from "$lib/graphql/types"
+import { exclusiveTo } from "$lib/utils/date"
 import type { Actions, RequestEvent } from "@sveltejs/kit"
 
 export const actions: Actions = {
@@ -7,7 +8,7 @@ export const actions: Actions = {
     const orgUnit = data.get("org-unit-uuid")
     const parent = data.get("select-parent-org-tree")
     const startDate = data.get("from")
-    const endDate = data.get("to")
+    const endDate = exclusiveTo(data.get("to") as string | null)
 
     return {
       uuid: orgUnit,

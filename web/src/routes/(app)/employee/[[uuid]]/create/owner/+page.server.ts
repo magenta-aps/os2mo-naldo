@@ -1,4 +1,5 @@
 import type { OwnerCreateInput } from "$lib/graphql/types"
+import { exclusiveTo } from "$lib/utils/date"
 import type { Actions, RequestEvent } from "@sveltejs/kit"
 
 export const actions: Actions = {
@@ -6,7 +7,7 @@ export const actions: Actions = {
     const data = await request.formData()
     const ownerUuid = data.get("employee-uuid")
     const startDate = data.get("from")
-    const endDate = data.get("to")
+    const endDate = exclusiveTo(data.get("to") as string | null)
 
     return {
       person: params.uuid,
