@@ -8,7 +8,11 @@
   import { page } from "$app/stores"
   import { ManagersDocument } from "./query.generated"
   import { date } from "$lib/stores/date"
-  import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
+  import {
+    filterTenseToValidity,
+    tenseFilter,
+    tenseToValidity,
+  } from "$lib/utils/tenses"
   import { sortData } from "$lib/utils/sorting"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import Icon from "@iconify/svelte"
@@ -31,7 +35,7 @@
   gql`
     query Managers(
       $employee: [UUID!]
-      $org_unit: [UUID!]
+      $org_unit: OrganisationUnitFilter
       $fromDate: DateTime
       $toDate: DateTime
       $inherit: Boolean = true
@@ -39,7 +43,7 @@
       managers(
         filter: {
           employees: $employee
-          org_units: $org_unit
+          org_unit: $org_unit
           from_date: $fromDate
           to_date: $toDate
         }
@@ -118,7 +122,12 @@
 
   $: dataPromise = graphQLClient()
     .request(ManagersDocument, {
-      org_unit: org_unit,
+      // The unit filter gets its own validity, as MO checks the unit's
+      // validity when walking the tree for inherited managers. Omitted for
+      // employees, where an empty unit filter would match every unit.
+      org_unit: org_unit
+        ? { uuids: [org_unit], ...filterTenseToValidity(tense, $date) }
+        : undefined,
       employee: employee,
       // Don't set inherit flag if employee, to avoid:
       // "The inherit flag requires an organizational unit filter"
