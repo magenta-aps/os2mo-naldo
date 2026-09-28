@@ -29,12 +29,10 @@
 
   const uuid = $page.params.uuid
   const isOrg = $page.url.pathname?.startsWith("/organisation")
-  const employee = isOrg ? null : uuid
-  const org_unit = isOrg ? uuid : null
 
   gql`
     query Managers(
-      $employee: [UUID!]
+      $employee: EmployeeFilter
       $org_unit: OrganisationUnitFilter
       $fromDate: DateTime
       $toDate: DateTime
@@ -42,7 +40,7 @@
     ) {
       managers(
         filter: {
-          employees: $employee
+          employee: $employee
           org_unit: $org_unit
           from_date: $fromDate
           to_date: $toDate
@@ -125,10 +123,11 @@
       // The unit filter gets its own validity, as MO checks the unit's
       // validity when walking the tree for inherited managers. Omitted for
       // employees, where an empty unit filter would match every unit.
-      org_unit: org_unit
-        ? { uuids: [org_unit], ...filterTenseToValidity(tense, $date) }
+      org_unit: isOrg
+        ? { uuids: [uuid], ...filterTenseToValidity(tense, $date) }
         : undefined,
-      employee: employee,
+      // Omitted for units: `employee: null` returns only vacant managers.
+      employee: isOrg ? undefined : { uuids: [uuid] },
       // Don't set inherit flag if employee, to avoid:
       // "The inherit flag requires an organizational unit filter"
       inherit: !isOrg ? false : env.PUBLIC_INHERIT_MANAGER,

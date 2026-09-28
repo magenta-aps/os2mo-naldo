@@ -37,7 +37,7 @@
   // all time explicitly.
   gql`
     query OrgUnitITUsers(
-      $orgUnit: [UUID!]
+      $orgUnit: [UUID!]!
       $fromDate: DateTime
       $toDate: DateTime
       $showConnections: Boolean = false

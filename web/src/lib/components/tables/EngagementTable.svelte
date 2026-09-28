@@ -42,8 +42,6 @@
 
   const uuid = $page.params.uuid
   const isOrg = $page.url.pathname?.startsWith("/organisation")
-  const employee = isOrg ? null : uuid
-  const org_unit = isOrg ? uuid : null
 
   // `referencedUnits` selects the rows' org units by the same filter rather than
   // by uuid, so their names resolve in this one request instead of needing the
@@ -52,12 +50,11 @@
   // `managers` without a filter only finds the managers of today, so it gets the
   // tense's dates. Their names come from `validities`, as a past manager's
   // employee can have no `current`.
-  // Use deprecated filter, because `employee`/`org_unit` filters will query for every object, if uuid is set to null
   // TODO: When https://redmine.magenta.dk/issues/62968 is fixed, add date-filters to classes
   gql`
     query Engagements(
-      $employee: [UUID!]
-      $org_unit: [UUID!]
+      $employee: EmployeeFilter
+      $org_unit: OrganisationUnitFilter
       $fromDate: DateTime
       $toDate: DateTime
       $inherit: Boolean = true
@@ -65,8 +62,8 @@
     ) {
       engagements(
         filter: {
-          employees: $employee
-          org_units: $org_unit
+          employee: $employee
+          org_unit: $org_unit
           from_date: $fromDate
           to_date: $toDate
         }
@@ -155,7 +152,7 @@
         filter: {
           from_date: null
           to_date: null
-          engagement: { employees: $employee, from_date: $fromDate, to_date: $toDate }
+          engagement: { employee: $employee, from_date: $fromDate, to_date: $toDate }
         }
       ) @skip(if: $isOrg) {
         objects {
@@ -201,8 +198,10 @@
 
   $: dataPromise = graphQLClient()
     .request(EngagementsDocument, {
-      org_unit: org_unit,
-      employee: employee,
+      // The filter for the other page is left out, as a unit filter without
+      // uuids matches every unit.
+      org_unit: isOrg ? { uuids: [uuid] } : undefined,
+      employee: isOrg ? undefined : { uuids: [uuid] },
       inherit: env.PUBLIC_INHERIT_MANAGER,
       isOrg: isOrg,
       ...tenseToValidity(tense, $date),

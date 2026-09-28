@@ -33,9 +33,13 @@
   const uuid = $page.params.uuid
 
   gql`
-    query RelatedUnits($org_unit: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+    query RelatedUnits($org_unit: [UUID!]!, $fromDate: DateTime, $toDate: DateTime) {
       related_units(
-        filter: { org_units: $org_unit, from_date: $fromDate, to_date: $toDate }
+        filter: {
+          org_unit: { uuids: $org_unit }
+          from_date: $fromDate
+          to_date: $toDate
+        }
       ) {
         objects {
           validities {
