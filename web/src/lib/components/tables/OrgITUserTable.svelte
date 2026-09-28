@@ -33,7 +33,8 @@
 
   // Dates on the engagement lookup filter the engagement's own validity, so a
   // date-filtered lookup drops an engagement that ended before the shown period
-  // instead of narrowing it.
+  // instead of narrowing it. Left out, they default to now, so the lookup spans
+  // all time explicitly.
   gql`
     query OrgUnitITUsers(
       $orgUnit: [UUID!]
@@ -43,7 +44,7 @@
     ) {
       byEngagement: itusers(
         filter: {
-          engagement: { org_unit: { uuids: $orgUnit } }
+          engagement: { org_unit: { uuids: $orgUnit }, from_date: null, to_date: null }
           from_date: $fromDate
           to_date: $toDate
         }
