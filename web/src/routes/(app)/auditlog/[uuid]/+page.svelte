@@ -7,6 +7,7 @@
   import { DataSet } from "vis-data/peer"
   import "vis-timeline/styles/vis-timeline-graph2d.min.css"
   import { format, subYears, addYears, min, max } from "date-fns"
+  import { formatLastValidDay } from "$lib/utils/date"
   import { base } from "$app/paths"
   import { getAuditlog } from "$lib/http/getAuditlog"
   import {
@@ -211,7 +212,9 @@
           const startStr = d.start
             ? format(d.start, "dd-MM-yyyy")
             : `-${$_("infinity")}`
-          const endStr = d.end ? format(d.end, "dd-MM-yyyy") : $_("infinity")
+          const endStr = d.end
+            ? formatLastValidDay(d.end.toISOString())
+            : $_("infinity")
 
           return `
             <div class="timeline-tooltip">
