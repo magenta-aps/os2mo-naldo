@@ -9,7 +9,11 @@
   import { EngagementsDocument, type EngagementsQuery } from "./query.generated"
   import { date } from "$lib/stores/date"
   import { getITUserITSystemName } from "$lib/utils/display"
-  import { findClosestValidity, findClosestValidityWithin } from "$lib/utils/validities"
+  import {
+    filterValiditiesInRange,
+    findClosestValidity,
+    findClosestValidityWithin,
+  } from "$lib/utils/validities"
   import NameWithHistory from "$lib/components/shared/NameWithHistory.svelte"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
@@ -26,6 +30,7 @@
   type OrgUnitNames = NonNullable<
     EngagementsQuery["referencedUnits"]
   >["objects"][0]["validities"]
+  type Manager = NonNullable<Engagement["managers"]>[0]
   type EngagementRow = Engagement & {
     org_unit_names: OrgUnitNames
     // Precomputed so column sorting matches the displayed name
@@ -44,6 +49,9 @@
   // by uuid, so their names resolve in this one request instead of needing the
   // engagement response first. Its dates must be unbounded: rows reference units
   // that no longer exist, and `validities` can't widen a filtered-out unit.
+  // `managers` without a filter only finds the managers of today, so it gets the
+  // tense's dates. Their names come from `validities`, as a past manager's
+  // employee can have no `current`.
   // Use deprecated filter, because `employee`/`org_unit` filters will query for every object, if uuid is set to null
   // TODO: When https://redmine.magenta.dk/issues/62968 is fixed, add date-filters to classes
   gql`
@@ -109,12 +117,25 @@
             org_unit_response @skip(if: $isOrg) {
               uuid
             }
-            managers(inherit: $inherit, exclude_self: true) @skip(if: $isOrg) {
+            managers(
+              filter: { from_date: $fromDate, to_date: $toDate }
+              inherit: $inherit
+              exclude_self: true
+            ) @skip(if: $isOrg) {
+              uuid
               person_response {
                 uuid
-                current(at: $fromDate) {
+                validities(start: null, end: null) {
                   name
+                  validity {
+                    from
+                    to
+                  }
                 }
+              }
+              validity {
+                from
+                to
               }
             }
             validity {
@@ -151,6 +172,33 @@
     }
   `
 
+  // `managers` returns every validity of each manager in the tense, also
+  // outside the engagement's own. Deduplicated on the manager uuid, as one
+  // person can be several managers, keeping the validity closest to the
+  // selected date like NameWithHistory does. MO decides inheritance for the
+  // whole tense, so inherited managers are missing where the unit has its own
+  // manager in only part of it.
+  const managersDuringEngagement = (engagement: Engagement) => {
+    if (!engagement.managers) return undefined
+    const managers = filterValiditiesInRange(engagement.managers, engagement.validity)
+    const uuids = [...new Set(managers.map((manager) => manager.uuid))]
+    return uuids.map(
+      (uuid) =>
+        findClosestValidityWithin(
+          managers.filter((manager) => manager.uuid === uuid),
+          engagement.validity,
+          $date
+        )!
+    )
+  }
+
+  const managerName = (manager: Manager) =>
+    findClosestValidityWithin(
+      manager.person_response?.validities,
+      manager.validity,
+      $date
+    )?.name
+
   $: dataPromise = graphQLClient()
     .request(EngagementsDocument, {
       org_unit: org_unit,
@@ -182,6 +230,7 @@
             const org_unit_names = namesByUuid.get(obj.org_unit_response?.uuid) ?? []
             return {
               ...obj,
+              managers: managersDuringEngagement(obj),
               org_unit_names: org_unit_names,
               org_unit_name: findClosestValidityWithin(
                 org_unit_names,
@@ -262,7 +311,7 @@
                   <li>
                     {#if manager.person_response}
                       <a href="{base}/employee/{manager.person_response.uuid}">
-                        • {manager.person_response.current?.name}
+                        • {managerName(manager)}
                       </a>
                     {:else}
                       • {capital($_("vacant"))}
@@ -273,7 +322,7 @@
               <!-- If there's only 1 manager and it's not vacant -->
             {:else if engagement.managers[0] && engagement.managers[0].person_response}
               <a href="{base}/employee/{engagement.managers[0].person_response.uuid}">
-                {engagement.managers[0].person_response.current?.name}
+                {managerName(engagement.managers[0])}
               </a>
               <!-- 1 vacant manager -->
             {:else if engagement.managers[0]}
