@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { lastValidDay } from "$lib/utils/date"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
@@ -244,9 +245,7 @@
           />
           <DateInput
             bind:value={toDate}
-            startValue={rolebinding.validity.to
-              ? rolebinding.validity.to.split("T")[0]
-              : null}
+            startValue={lastValidDay(rolebinding.validity.to)}
             title={capital($_("date.end_date"))}
             id="to"
             min={$fromDate.value ? $fromDate.value : $validities.data?.from}
