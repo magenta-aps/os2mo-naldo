@@ -1,4 +1,5 @@
 import type { ItSystemUpdateInput } from "$lib/graphql/types"
+import { exclusiveTo } from "$lib/utils/date"
 import type { Actions, RequestEvent } from "@sveltejs/kit"
 
 export const actions: Actions = {
@@ -7,7 +8,7 @@ export const actions: Actions = {
     const name = data.get("name") as string
     const userKey = data.get("user-key") as string
     const startDate = data.get("from")
-    const endDate = data.get("to")
+    const endDate = exclusiveTo(data.get("to") as string | null)
 
     return {
       uuid: params.itsystem,

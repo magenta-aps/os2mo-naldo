@@ -1,4 +1,5 @@
 import type { ItAssociationCreateInput } from "$lib/graphql/types"
+import { exclusiveTo } from "$lib/utils/date"
 import type { Actions, RequestEvent } from "@sveltejs/kit"
 
 export const actions: Actions = {
@@ -12,7 +13,7 @@ export const actions: Actions = {
     const primary = data.get("primary") ? data.get("primary") : data.get("non-primary")
     const jobFunction = data.get("job-function")
     const startDate = data.get("from")
-    const endDate = data.get("to")
+    const endDate = exclusiveTo(data.get("to") as string | null)
 
     return {
       person: params.uuid,

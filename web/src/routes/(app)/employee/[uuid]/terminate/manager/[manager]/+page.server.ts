@@ -1,4 +1,5 @@
 import type { ManagerTerminateInput } from "$lib/graphql/types"
+import { exclusiveTo } from "$lib/utils/date"
 import type { Actions, RequestEvent } from "@sveltejs/kit"
 
 export const actions: Actions = {
@@ -7,7 +8,7 @@ export const actions: Actions = {
     params,
   }: RequestEvent): Promise<ManagerTerminateInput> => {
     const data = await request.formData()
-    const toDate = data.get("to")
+    const toDate = exclusiveTo(data.get("to") as string | null)
 
     return {
       uuid: params.manager,

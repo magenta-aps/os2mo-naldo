@@ -1,4 +1,5 @@
 import type { KleUpdateInput } from "$lib/graphql/types"
+import { exclusiveTo } from "$lib/utils/date"
 import type { UnpackedClass } from "$lib/utils/helpers"
 import type { Actions, RequestEvent } from "@sveltejs/kit"
 
@@ -14,7 +15,7 @@ export const actions: Actions = {
       JSON.parse(data.get("kle-aspects") as string) as UnpackedClass
     ).map((v) => v.uuid)
     const startDate = data.get("from")
-    const endDate = data.get("to")
+    const endDate = exclusiveTo(data.get("to") as string | null)
 
     return {
       uuid: params.kle,

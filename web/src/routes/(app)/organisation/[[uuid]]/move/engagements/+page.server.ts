@@ -1,4 +1,5 @@
 import type { EngagementUpdateInput } from "$lib/graphql/types"
+import { exclusiveTo } from "$lib/utils/date"
 import type { Actions, RequestEvent } from "@sveltejs/kit"
 
 export const actions: Actions = {
@@ -14,7 +15,7 @@ export const actions: Actions = {
       ...(orgUnitUuid && { org_unit: orgUnitUuid }),
       validity: {
         from: startDate,
-        ...(endDates[i] && { to: endDates[i] }),
+        ...(endDates[i] && { to: exclusiveTo(endDates[i]) }),
       },
     }))
 
