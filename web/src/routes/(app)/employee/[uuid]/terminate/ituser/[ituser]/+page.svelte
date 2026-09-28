@@ -66,7 +66,7 @@
           try {
             const mutation = await graphQLClient().request(TerminateItUserDocument, {
               input: result.data,
-              date: result.data.to,
+              date: $toDate.value,
             })
 
             $success = {

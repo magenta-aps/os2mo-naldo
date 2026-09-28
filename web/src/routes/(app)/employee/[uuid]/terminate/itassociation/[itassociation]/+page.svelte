@@ -74,7 +74,7 @@
               TerminateItAssociationDocument,
               {
                 input: result.data,
-                date: result.data.to,
+                date: $toDate.value,
               }
             )
             $success = {
