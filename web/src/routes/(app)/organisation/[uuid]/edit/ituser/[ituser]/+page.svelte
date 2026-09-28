@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { lastValidDay } from "$lib/utils/date"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
   import { env } from "$lib/env"
@@ -267,7 +268,7 @@
           />
           <DateInput
             bind:value={toDate}
-            startValue={itUser.validity.to ? itUser.validity.to.split("T")[0] : null}
+            startValue={lastValidDay(itUser.validity.to)}
             title={capital($_("date.end_date"))}
             id="to"
             min={$fromDate.value ? $fromDate.value : $validities.data?.from}
