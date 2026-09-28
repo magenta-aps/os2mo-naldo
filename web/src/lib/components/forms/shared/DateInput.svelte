@@ -5,7 +5,7 @@
   export let name = id
   export let value: string | number | undefined
   export let validationValue: string | number | undefined = undefined
-  export let startValue: string | number | undefined = undefined
+  export let startValue: string | number | null | undefined = undefined
   value = startValue ? startValue : value
   export let required = false
   export let disabled = false
