@@ -26,7 +26,13 @@
 
   gql`
     query Kle($org_unit: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
-      kles(filter: { org_units: $org_unit, from_date: $fromDate, to_date: $toDate }) {
+      kles(
+        filter: {
+          org_unit: { uuids: $org_unit }
+          from_date: $fromDate
+          to_date: $toDate
+        }
+      ) {
         objects {
           validities {
             uuid

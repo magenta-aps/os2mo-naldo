@@ -29,7 +29,7 @@
     query ITAssociations($employee: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
       associations(
         filter: {
-          employees: $employee
+          employee: { uuids: $employee }
           it_association: true
           from_date: $fromDate
           to_date: $toDate

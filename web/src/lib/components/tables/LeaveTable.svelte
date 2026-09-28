@@ -32,7 +32,11 @@
       $toDate: DateTime
     ) {
       leaves(
-        filter: { employees: $employee_uuid, from_date: $fromDate, to_date: $toDate }
+        filter: {
+          employee: { uuids: $employee_uuid }
+          from_date: $fromDate
+          to_date: $toDate
+        }
       ) {
         objects {
           validities {
