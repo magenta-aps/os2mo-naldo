@@ -35,7 +35,7 @@ export const getMinMaxValidities = (validities: HasValidity[] | undefined | null
   }
   return {
     from: minFrom,
-    to: maxTo ?? undefined,
+    to: maxTo ? dayBefore(maxTo) : undefined,
   }
 }
 

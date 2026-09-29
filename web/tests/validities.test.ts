@@ -178,13 +178,13 @@ describe("filterValiditiesInRange", () => {
 })
 
 describe("getMinMaxValidities", () => {
-  it("returns the earliest `from` and the latest `to`", () => {
+  it("returns the earliest `from` and the last valid day of the latest `to`", () => {
     expect(
       getMinMaxValidities([
         validity("2021-01-01", "2024-04-04"),
         validity("2020-01-01", "2021-01-01"),
       ])
-    ).toEqual({ from: "2020-01-01", to: "2024-04-04" })
+    ).toEqual({ from: "2020-01-01", to: "2024-04-03" })
   })
 
   it("returns no `to` when any validity is open-ended", () => {
