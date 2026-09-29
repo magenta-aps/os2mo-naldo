@@ -368,7 +368,7 @@
           />
           <DateInput
             bind:value={toDate}
-            startValue={manager.validity.to ? manager.validity.to.split("T")[0] : null}
+            startValue={manager.validity.to}
             title={capital($_("date.end_date"))}
             id="to"
             min={$fromDate.value ? $fromDate.value : $validities.data?.from}

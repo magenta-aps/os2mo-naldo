@@ -1,19 +1,19 @@
 import {
   clampDateToValidity,
   filterValiditiesInRange,
-  findClosestValidityWithin,
   findClosestValidity,
+  findClosestValidityWithin,
 } from "$lib/utils/validities"
 import { describe, expect, it } from "vitest"
 
-// In GraphQL v29, `validity.to` is exclusive: `to` is the first instant AFTER
+// In GraphQL v29, `validity.to` is exclusive: `to` is the first day AFTER
 // the validity ends. A validity with `to == filterDate` is NOT active on
 // filterDate — its last valid day was the day before.
 const TODAY = "2020-01-01"
 const TOMORROW = "2020-01-02"
 
 const validity = (from: string, to: string | null) => ({
-  validity: { from: `${from}T00:00:00+02:00`, to: to ? `${to}T00:00:00+02:00` : null },
+  validity: { from, to },
 })
 
 describe("findClosestValidity", () => {

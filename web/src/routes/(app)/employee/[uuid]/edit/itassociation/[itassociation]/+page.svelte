@@ -280,9 +280,7 @@
           />
           <DateInput
             bind:value={toDate}
-            startValue={itassociation.validity.to
-              ? itassociation.validity.to.split("T")[0]
-              : null}
+            startValue={itassociation.validity.to}
             title={capital($_("date.end_date"))}
             id="to"
             min={$fromDate.value ? $fromDate.value : validities.from}

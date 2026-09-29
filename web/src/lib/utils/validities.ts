@@ -71,8 +71,8 @@ export const clampDateToValidity = (
   date: string,
   validity: Validity | OpenValidity
 ): string => {
-  const fromDay = validity.from?.split("T")[0]
-  const toDay = validity.to?.split("T")[0]
+  const fromDay = validity.from
+  const toDay = validity.to
 
   if (fromDay && date < fromDay) {
     return fromDay

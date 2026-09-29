@@ -86,8 +86,8 @@
     for (const outer of res.org_units.objects) {
       // Look for present
       orgUnits = outer.validities.filter((obj) => {
-        const fromDate = obj.validity.from.split("T")[0]
-        const toDate = obj.validity.to?.split("T")[0]
+        const fromDate = obj.validity.from
+        const toDate = obj.validity.to
         return globalDate >= fromDate && (!toDate || globalDate < toDate)
       })
       if (orgUnits.length > 0) break

@@ -244,9 +244,7 @@
           />
           <DateInput
             bind:value={toDate}
-            startValue={rolebinding.validity.to
-              ? rolebinding.validity.to.split("T")[0]
-              : null}
+            startValue={rolebinding.validity.to}
             title={capital($_("date.end_date"))}
             id="to"
             min={$fromDate.value ? $fromDate.value : $validities.data?.from}

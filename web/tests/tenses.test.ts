@@ -2,7 +2,7 @@ import { date } from "$lib/stores/date"
 import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
 import { beforeEach, describe, expect, it } from "vitest"
 
-// In GraphQL v29, `validity.to` is exclusive: it is the first instant AFTER
+// In GraphQL v29, `validity.to` is exclusive: it is the first day AFTER
 // the validity ends. A validity ending "yesterday" therefore has
 // `to = today`. The boundary must count as past, not as present.
 const TODAY = "2020-01-01"
@@ -10,7 +10,7 @@ const YESTERDAY = "2019-12-31"
 const TOMORROW = "2020-01-02"
 
 const validity = ({ from, to }: { from: string; to: string | null }) => ({
-  validity: { from: `${from}T00:00:00+02:00`, to: to ? `${to}T00:00:00+02:00` : null },
+  validity: { from, to },
 })
 
 describe("tenseFilter", () => {
