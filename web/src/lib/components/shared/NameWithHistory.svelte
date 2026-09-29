@@ -2,7 +2,7 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
   import { date } from "$lib/stores/date"
-  import { formatDay } from "$lib/utils/date"
+  import { dayBefore, formatDay } from "$lib/utils/date"
   import {
     findClosestValidityWithin,
     filterValiditiesInRange,
@@ -48,7 +48,7 @@
           ...history.map(
             (item) =>
               `${item.name ?? fallback ?? ""} (${formatDay(item.validity.from)} – ${
-                item.validity.to ? formatDay(item.validity.to) : ""
+                item.validity.to ? formatDay(dayBefore(item.validity.to)) : ""
               })`
           ),
         ].join("\n")
