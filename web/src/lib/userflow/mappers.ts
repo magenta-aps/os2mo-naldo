@@ -13,6 +13,7 @@ import type { EngagementInfo } from "$lib/stores/engagementInfoStore"
 import type { ItuserInfo } from "$lib/stores/ituserInfoStore"
 import type { ManagerInfo } from "$lib/stores/managerInfoStore"
 import { normalizeCpr } from "$lib/utils/cpr"
+import { dayAfter } from "$lib/utils/date"
 import { v4 as uuidv4 } from "uuid"
 
 // Client-side, so children can reference their parent inside one mutation.
@@ -139,7 +140,7 @@ export const buildUserflowPayload = (
       ...(engagement.extension4 && { extension_4: engagement.extension4 }),
       validity: {
         from: engagement.fromDate,
-        to: engagement.toDate || null,
+        to: dayAfter(engagement.toDate),
       },
     })
   })
@@ -162,7 +163,7 @@ export const buildUserflowPayload = (
       primary: ituser.primary?.uuid || null,
       validity: {
         from: ituser.fromDate,
-        to: ituser.toDate || null,
+        to: dayAfter(ituser.toDate),
       },
     })
 
@@ -174,7 +175,7 @@ export const buildUserflowPayload = (
           role: rolebinding.role?.uuid,
           validity: {
             from: ituser.fromDate,
-            to: ituser.toDate || null,
+            to: dayAfter(ituser.toDate),
           },
         }))
     )
@@ -196,7 +197,7 @@ export const buildUserflowPayload = (
       ),
       validity: {
         from: manager.fromDate,
-        to: manager.toDate ? manager.toDate : null,
+        to: dayAfter(manager.toDate),
       },
     })
   })
@@ -215,7 +216,7 @@ export const buildUserflowPayload = (
       visibility: address.visibility?.uuid,
       validity: {
         from: address.fromDate,
-        to: address.toDate ? address.toDate : null,
+        to: dayAfter(address.toDate),
       },
     })
   })

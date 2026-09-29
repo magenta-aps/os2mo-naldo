@@ -185,7 +185,8 @@ describe("buildUserflowPayload", () => {
           primary: "p1",
           extension_1: "007",
           extension_4: "42",
-          validity: { from: "2020-01-01", to: "2021-01-01" },
+          // `to` is the day after the picked end date.
+          validity: { from: "2020-01-01", to: "2021-01-02" },
         },
       ],
       ituserInput: [
@@ -340,7 +341,7 @@ describe("buildUserflowPayload", () => {
 
   // The exhaustive test above pins a manager with no end date and one
   // responsibility; this covers the other side of both.
-  it("keeps a manager's end date and maps every responsibility", () => {
+  it("sends the day after a manager's end date and maps every responsibility", () => {
     const { payload } = buildUserflowPayload(
       stores({
         managers: [
@@ -356,7 +357,7 @@ describe("buildUserflowPayload", () => {
       uuidsFor(1)
     )
     expect(payload.managerInput[0].responsibility).toEqual(["r1", "r2"])
-    expect(payload.managerInput[0].validity.to).toBe("2021-01-01")
+    expect(payload.managerInput[0].validity.to).toBe("2021-01-02")
   })
 })
 
