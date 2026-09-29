@@ -1,4 +1,5 @@
 import type { RoleBindingUpdateInput } from "$lib/graphql/types"
+import { dayAfter } from "$lib/utils/date"
 import type { Actions, RequestEvent } from "@sveltejs/kit"
 
 export const actions: Actions = {
@@ -10,7 +11,7 @@ export const actions: Actions = {
     const ituserUuid = data.get("it-user-uuid")
     const roleUuid = data.get("it-system-role-uuid")
     const startDate = data.get("from")
-    const endDate = data.get("to")
+    const endDate = dayAfter(data.get("to") as string | null)
 
     return {
       uuid: params.rolebinding,

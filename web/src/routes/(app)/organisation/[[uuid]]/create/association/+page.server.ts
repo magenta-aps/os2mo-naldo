@@ -1,4 +1,5 @@
 import type { AssociationCreateInput } from "$lib/graphql/types"
+import { dayAfter } from "$lib/utils/date"
 import type { Actions, RequestEvent } from "@sveltejs/kit"
 
 export const actions: Actions = {
@@ -13,7 +14,7 @@ export const actions: Actions = {
     const substitute = data.get("substitute")
     const tradeUnion = data.get("trade-union")
     const startDate = data.get("from")
-    const endDate = data.get("to")
+    const endDate = dayAfter(data.get("to") as string | null)
 
     return {
       org_unit: params.uuid,

@@ -1,4 +1,5 @@
 import type { LeaveCreateInput } from "$lib/graphql/types"
+import { dayAfter } from "$lib/utils/date"
 import type { Actions, RequestEvent } from "@sveltejs/kit"
 
 export const actions: Actions = {
@@ -9,7 +10,7 @@ export const actions: Actions = {
     const engagementUuid = data.get("engagement-uuid")
     const leaveTypeUuid = data.get("leave-type-uuid")
     const startDate = data.get("from")
-    const endDate = data.get("to")
+    const endDate = dayAfter(data.get("to") as string | null)
 
     return {
       person: employeeUuid,

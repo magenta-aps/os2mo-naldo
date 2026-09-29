@@ -1,4 +1,5 @@
 import type { EngagementUpdateInput } from "$lib/graphql/types"
+import { dayAfter } from "$lib/utils/date"
 import type { Actions, RequestEvent } from "@sveltejs/kit"
 
 export const actions: Actions = {
@@ -15,7 +16,7 @@ export const actions: Actions = {
     const extension_4 = data.get("extension-4") as string
     const primary = data.get("primary")
     const startDate = data.get("from")
-    const endDate = data.get("to")
+    const endDate = dayAfter(data.get("to") as string | null)
 
     return {
       uuid: params.engagement,

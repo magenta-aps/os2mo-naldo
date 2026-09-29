@@ -1,4 +1,5 @@
 import type { ManagerCreateInput } from "$lib/graphql/types"
+import { dayAfter } from "$lib/utils/date"
 import type { UnpackedClass } from "$lib/utils/helpers"
 import type { Actions, RequestEvent } from "@sveltejs/kit"
 
@@ -18,7 +19,7 @@ export const actions: Actions = {
     ).map((v) => v.uuid)
     const engagementUuid = data.get("engagement-uuid")
     const startDate = data.get("from")
-    const endDate = data.get("to")
+    const endDate = dayAfter(data.get("to") as string | null)
 
     return {
       person: params.uuid,

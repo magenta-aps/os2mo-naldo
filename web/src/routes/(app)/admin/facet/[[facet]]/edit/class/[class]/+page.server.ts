@@ -1,4 +1,5 @@
 import type { ClassUpdateInput } from "$lib/graphql/types"
+import { dayAfter } from "$lib/utils/date"
 import type { Actions, RequestEvent } from "@sveltejs/kit"
 
 export const actions: Actions = {
@@ -9,7 +10,7 @@ export const actions: Actions = {
     const itsystem = data.get("itsystem")
     const scope = data.get("scope") as string | null
     const startDate = data.get("from")
-    const endDate = data.get("to")
+    const endDate = dayAfter(data.get("to") as string | null)
 
     return {
       uuid: params.class,
