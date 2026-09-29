@@ -1,5 +1,6 @@
 import { keycloak } from "$lib/auth/keycloak"
 import { env } from "$lib/env"
+import { convertValiditiesToDays } from "$lib/http/validityDays"
 import { GraphQLClient } from "graphql-request"
 import { v4 as uuidv4 } from "uuid"
 
@@ -17,7 +18,7 @@ export const graphQLClient = (signal?: AbortSignal) => {
     if (err instanceof Error) Object.assign(err, { requestId })
   }
 
-  return new GraphQLClient(`${env.PUBLIC_BASE_URL}/graphql/v29`, {
+  const client = new GraphQLClient(`${env.PUBLIC_BASE_URL}/graphql/v29`, {
     headers: {
       "Content-Type": "application/json",
       Authorization: "Bearer " + keycloak?.token,
@@ -33,4 +34,10 @@ export const graphQLClient = (signal?: AbortSignal) => {
         throw err
       }),
   })
+
+  // Every MO response passes here, so validities are converted exactly once.
+  const request = client.request.bind(client)
+  client.request = (async (...args: Parameters<typeof request>) =>
+    convertValiditiesToDays(await request(...args))) as typeof client.request
+  return client
 }

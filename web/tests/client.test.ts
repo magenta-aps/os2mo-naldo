@@ -28,6 +28,18 @@ describe("graphQLClient", () => {
     vi.restoreAllMocks()
   })
 
+  it("converts validities in the response to Copenhagen days", async () => {
+    vi.stubGlobal(
+      "fetch",
+      respondWith({
+        data: { validity: { from: "2024-10-27T23:00:00Z", to: null } },
+      })
+    )
+    expect(await graphQLClient().request(QUERY)).toEqual({
+      validity: { from: "2024-10-28", to: null },
+    })
+  })
+
   it("sends an X-Request-ID header, which MO binds to its logs", async () => {
     await graphQLClient().request(QUERY)
     expect(sentRequestId(fetch as any)).toBeTruthy()
