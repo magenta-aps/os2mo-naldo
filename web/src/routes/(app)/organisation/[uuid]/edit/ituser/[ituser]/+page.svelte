@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { dayBefore } from "$lib/utils/date"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
   import { env } from "$lib/env"
@@ -267,7 +268,7 @@
           />
           <DateInput
             bind:value={toDate}
-            startValue={itUser.validity.to}
+            startValue={dayBefore(itUser.validity.to)}
             title={capital($_("date.end_date"))}
             id="to"
             min={$fromDate.value ? $fromDate.value : $validities.data?.from}
