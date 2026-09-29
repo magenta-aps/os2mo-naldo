@@ -1,8 +1,9 @@
 import type { OpenValidity, Validity } from "$lib/graphql/types"
-import { format, formatISO, isValid, parseISO, subDays } from "date-fns"
+import { dayBefore } from "$lib/utils/date"
 
 // The helpers below read nothing but `validity`, and return the element they
-// were given, so the caller keeps its own generated type.
+// were given, so the caller keeps its own generated type. Validity bounds are
+// yyyy-MM-dd days, which compare correctly as strings.
 type HasValidity = { validity: Validity | OpenValidity }
 
 export const getMinMaxValidities = (validities: HasValidity[] | undefined | null) => {
@@ -17,40 +18,30 @@ export const getMinMaxValidities = (validities: HasValidity[] | undefined | null
     }
   }
 
-  let minDate
-  let maxDate
+  let minFrom: string | undefined
+  // null once any validity is open-ended
+  let maxTo: string | null | undefined
 
-  for (const validity of validities) {
-    const fromDate = parseISO(validity.validity.from)
-    const toDate = validity.validity.to ? parseISO(validity.validity.to) : null
-
-    if (isValid(fromDate) && (!minDate || fromDate < minDate)) {
-      minDate = fromDate
+  for (const { validity } of validities) {
+    if (validity.from && (!minFrom || validity.from < minFrom)) {
+      minFrom = validity.from
     }
 
-    if (!isValid(toDate) || maxDate === null) {
-      maxDate = null
-    } else if (maxDate === undefined || toDate! > maxDate) {
-      maxDate = toDate
+    if (!validity.to || maxTo === null) {
+      maxTo = null
+    } else if (maxTo === undefined || validity.to > maxTo) {
+      maxTo = validity.to
     }
   }
   return {
-    from: minDate ? format(minDate, "yyyy-MM-dd") : undefined,
-    to: maxDate ? format(maxDate, "yyyy-MM-dd") : undefined,
+    from: minFrom,
+    to: maxTo ?? undefined,
   }
 }
 
 export const formatQueryDates = (validity: Validity | OpenValidity): string => {
-  const from = parseISO(validity.from)
-  const to = parseISO(validity.to)
-
-  // If date is not valid, set to null (we never return null, it's just to make it clearer than an empty string)
-  const formattedFrom = isValid(from)
-    ? `from=${encodeURIComponent(formatISO(from, { representation: "complete" }))}`
-    : null
-  const formattedTo = isValid(to)
-    ? `to=${encodeURIComponent(formatISO(to, { representation: "complete" }))}`
-    : null
+  const formattedFrom = validity.from ? `from=${validity.from}` : null
+  const formattedTo = validity.to ? `to=${validity.to}` : null
 
   if (!formattedFrom && !formattedTo) {
     return ""
@@ -66,19 +57,16 @@ export const formatQueryDates = (validity: Validity | OpenValidity): string => {
 // Clamp a date into a validity range, so a lookup on a referenced object
 // (e.g. an engagement's org_unit) lands inside the referencing row's own
 // validity and can't return a name the object only carried outside it. `validity.to` is exclusive (v29), so the upper clamp is the
-// day before `to`. Compares date portions like `tenseFilter` does.
+// day before `to`.
 export const clampDateToValidity = (
   date: string,
   validity: Validity | OpenValidity
 ): string => {
-  const fromDay = validity.from
-  const toDay = validity.to
-
-  if (fromDay && date < fromDay) {
-    return fromDay
+  if (validity.from && date < validity.from) {
+    return validity.from
   }
-  if (toDay && date >= toDay) {
-    return format(subDays(parseISO(toDay), 1), "yyyy-MM-dd")
+  if (validity.to && date >= validity.to) {
+    return dayBefore(validity.to)!
   }
   return date
 }
@@ -103,16 +91,9 @@ export const filterValiditiesInRange = <T extends HasValidity>(
   validities: T[],
   range: Validity | OpenValidity
 ): T[] => {
-  const rangeFrom = range.from ? parseISO(range.from) : null
-  const rangeTo = range.to ? parseISO(range.to) : null
-
-  return validities.filter((object) => {
-    const from = parseISO(object.validity.from)
-    const to = object.validity.to ? parseISO(object.validity.to) : null
-
-    if (rangeTo && isValid(rangeTo) && isValid(from) && from >= rangeTo) return false
-    if (to && isValid(to) && rangeFrom && isValid(rangeFrom) && to <= rangeFrom)
-      return false
+  return validities.filter(({ validity }) => {
+    if (range.to && validity.from && validity.from >= range.to) return false
+    if (validity.to && range.from && validity.to <= range.from) return false
     return true
   })
 }
@@ -129,24 +110,21 @@ export const findClosestValidity = (validities: any, date: string) => {
   // object doesn't exist yet at all on `date`.
   let latestPast = null
   let earliestFuture = null
-  const filterDate = parseISO(date)
-
   for (const object of validities) {
-    const fromDate = parseISO(object.validity.from)
-    const toDate = object.validity.to ? parseISO(object.validity.to) : null
+    const { from, to } = object.validity
 
     // Check if the validity is active on input `date`
-    if (fromDate <= filterDate && (!toDate || toDate > filterDate)) {
+    if (from <= date && (!to || to > date)) {
       return object
     }
 
-    if (fromDate > filterDate) {
-      if (!earliestFuture || fromDate < parseISO(earliestFuture.validity.from)) {
+    if (from > date) {
+      if (!earliestFuture || from < earliestFuture.validity.from) {
         earliestFuture = object
       }
     } else {
-      // Not active and not in the future, so `toDate` is set and in the past
-      if (!latestPast || toDate! > parseISO(latestPast.validity.to)) {
+      // Not active and not in the future, so `to` is set and in the past
+      if (!latestPast || to > latestPast.validity.to) {
         latestPast = object
       }
     }

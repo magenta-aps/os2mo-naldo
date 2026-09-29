@@ -3,6 +3,8 @@ import {
   filterValiditiesInRange,
   findClosestValidity,
   findClosestValidityWithin,
+  formatQueryDates,
+  getMinMaxValidities,
 } from "$lib/utils/validities"
 import { describe, expect, it } from "vitest"
 
@@ -172,5 +174,37 @@ describe("filterValiditiesInRange", () => {
   it("keeps open-ended validities for an open-ended range", () => {
     const row = validity("2020-01-01", null).validity
     expect(filterValiditiesInRange(names, row)).toEqual([names[2]])
+  })
+})
+
+describe("getMinMaxValidities", () => {
+  it("returns the earliest `from` and the latest `to`", () => {
+    expect(
+      getMinMaxValidities([
+        validity("2021-01-01", "2024-04-04"),
+        validity("2020-01-01", "2021-01-01"),
+      ])
+    ).toEqual({ from: "2020-01-01", to: "2024-04-04" })
+  })
+
+  it("returns no `to` when any validity is open-ended", () => {
+    expect(
+      getMinMaxValidities([
+        validity("2020-01-01", null),
+        validity("2021-01-01", "2024-04-04"),
+      ]).to
+    ).toBeUndefined()
+  })
+})
+
+describe("formatQueryDates", () => {
+  it("puts both bounds in the query string", () => {
+    expect(formatQueryDates({ from: "2020-01-01", to: "2024-04-04" })).toBe(
+      "?from=2020-01-01&to=2024-04-04"
+    )
+  })
+
+  it("leaves out an open end", () => {
+    expect(formatQueryDates({ from: "2020-01-01", to: null })).toBe("?from=2020-01-01")
   })
 })
