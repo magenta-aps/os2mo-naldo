@@ -12,6 +12,7 @@ import {
 } from "$lib/utils/normalizeForm"
 import { describe, expect, it } from "vitest"
 
+// A `to` normalizes to the day before: the last valid day.
 describe("normalizeEngagement", () => {
   it("extracts expected fields", () => {
     const result = normalizeEngagement({
@@ -25,7 +26,7 @@ describe("normalizeEngagement", () => {
       extension_4: "42",
     })
     expect(result).toEqual({
-      to: "2023-03-03",
+      to: "2023-03-02",
       org_unit: "ou-1",
       job_function: "Specialist",
       engagement_type: "Ansat",
@@ -69,7 +70,7 @@ describe("normalizeAssociation", () => {
       trade_union_response: { current: { name: "FOA" } },
     })
     expect(result).toEqual({
-      to: "2025-12-31",
+      to: "2025-12-30",
       person: "p-1",
       org_unit: "ou-1",
       association_type: "Projektleder",
@@ -93,7 +94,7 @@ describe("normalizeITUser", () => {
       "some note"
     )
     expect(result).toEqual({
-      to: "2024-06-01",
+      to: "2024-05-31",
       itsystem: "Active Directory",
       user_key: "bruce",
       primary: "Primær",
@@ -113,7 +114,7 @@ describe("normalizeAddress", () => {
       visibility_response: { current: { name: "Offentlig" } },
     })
     expect(result).toEqual({
-      to: "2025-01-01",
+      to: "2024-12-31",
       address_type: "Email",
       value: "test@example.com",
       user_key: "test@example.com",
@@ -157,7 +158,7 @@ describe("normalizeOwner", () => {
         validity: { to: "2025-01-01" },
         owner_response: { uuid: "p-1" },
       })
-    ).toEqual({ to: "2025-01-01", person: "p-1" })
+    ).toEqual({ to: "2024-12-31", person: "p-1" })
   })
 
   it("handles null owner_response", () => {
@@ -176,7 +177,7 @@ describe("normalizeLeave", () => {
         leave_type_response: { current: { name: "Barsel" } },
         engagement_response: { uuid: "eng-1" },
       })
-    ).toEqual({ to: "2024-01-01", leave_type: "Barsel", engagement: "eng-1" })
+    ).toEqual({ to: "2023-12-31", leave_type: "Barsel", engagement: "eng-1" })
   })
 })
 
@@ -234,6 +235,6 @@ describe("normalizeRolebinding", () => {
         validity: { to: "2025-06-01" },
         role_response: { current: { name: "Admin" } },
       })
-    ).toEqual({ to: "2025-06-01", role: "Admin" })
+    ).toEqual({ to: "2025-05-31", role: "Admin" })
   })
 })

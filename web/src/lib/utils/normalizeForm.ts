@@ -1,6 +1,8 @@
+import { dayBefore } from "$lib/utils/date"
+
 export const normalizeEmployee = (e: any) => {
   return {
-    to: e.validity?.to ?? null,
+    to: dayBefore(e.validity?.to),
     first_name: e.given_name ?? null,
     last_name: e.surname ?? null,
     nick_first_name: e.nickname_givenname ?? null,
@@ -10,7 +12,7 @@ export const normalizeEmployee = (e: any) => {
 
 export const normalizeOrganisation = (o: any) => {
   return {
-    to: o.validity?.to ?? null,
+    to: dayBefore(o.validity?.to),
     name: o.name ?? null,
     parent: o.parent_response?.uuid ?? undefined,
     unit_type: o.unit_type_response?.current?.name ?? null,
@@ -22,7 +24,7 @@ export const normalizeOrganisation = (o: any) => {
 
 export const normalizeEngagement = (e: any) => {
   return {
-    to: e.validity?.to ?? null,
+    to: dayBefore(e.validity?.to),
     org_unit: e.org_unit_response?.uuid ?? null,
     job_function: e.job_function_response?.current?.name ?? null,
     engagement_type: e.engagement_type_response?.current?.name ?? null,
@@ -35,7 +37,7 @@ export const normalizeEngagement = (e: any) => {
 
 export const normalizeAssociation = (a: any) => {
   return {
-    to: a.validity?.to ?? null,
+    to: dayBefore(a.validity?.to),
     person: a.person_response?.uuid ?? null,
     org_unit: a.org_unit_response?.uuid ?? null,
     association_type: a.association_type_response?.current?.name ?? null,
@@ -47,7 +49,7 @@ export const normalizeAssociation = (a: any) => {
 
 export const normalizeITUser = (i: any, note: string | null | undefined) => {
   return {
-    to: i.validity?.to ?? null,
+    to: dayBefore(i.validity?.to),
     itsystem: i.itsystem_response?.current?.name ?? null,
     user_key: i.user_key ?? "",
     primary: i.primary_response?.current?.name ?? "",
@@ -58,7 +60,7 @@ export const normalizeITUser = (i: any, note: string | null | undefined) => {
 
 export const normalizeAddress = (a: any) => {
   return {
-    to: a.validity?.to ?? null,
+    to: dayBefore(a.validity?.to),
     address_type: a.address_type_response?.current?.name ?? null,
     value: a.name ?? null,
     user_key: a.user_key ?? "",
@@ -68,7 +70,7 @@ export const normalizeAddress = (a: any) => {
 
 export const normalizeManager = (m: any) => {
   return {
-    to: m.validity?.to ?? null,
+    to: dayBefore(m.validity?.to),
     person: m.person_response?.uuid ?? undefined,
     org_unit: m.org_unit_response?.uuid ?? null,
     manager_type: m.manager_type_response?.current?.name ?? null,
@@ -82,14 +84,14 @@ export const normalizeManager = (m: any) => {
 
 export const normalizeOwner = (o: any) => {
   return {
-    to: o.validity?.to ?? null,
+    to: dayBefore(o.validity?.to),
     person: o.owner_response?.uuid ?? undefined,
   }
 }
 
 export const normalizeLeave = (l: any) => {
   return {
-    to: l.validity?.to ?? null,
+    to: dayBefore(l.validity?.to),
     leave_type: l.leave_type_response?.current?.name ?? null,
     engagement: l.engagement_response?.uuid ?? null,
   }
@@ -97,7 +99,7 @@ export const normalizeLeave = (l: any) => {
 
 export const normalizeKLE = (k: any) => {
   return {
-    to: k.validity?.to ?? null,
+    to: dayBefore(k.validity?.to),
     kle_number: k.kle_number_response?.current
       ? `${k.kle_number_response.current.user_key} - ${k.kle_number_response.current.name}`
       : null,
@@ -107,7 +109,7 @@ export const normalizeKLE = (k: any) => {
 
 export const normalizeRolebinding = (r: any) => {
   return {
-    to: r.validity?.to ?? null,
+    to: dayBefore(r.validity?.to),
     role: r.role_response?.current?.name ?? undefined,
   }
 }
