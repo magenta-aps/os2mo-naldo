@@ -2,10 +2,28 @@
 # requires no authentication (os2mo#58898), so `yarn generate` just works.
 schema: "http://127.0.0.1:5001/graphql/v29/schema.graphql"
 inputValueDeprecation: true
+# MO sends DateTime as ISO strings; the GraphQL client converts the ones in
+# responses to Temporal.ZonedDateTime, and writes Temporal values in variables
+# the way MO reads them (see src/lib/http/dateTimes.ts).
+config:
+  scalars:
+    DateTime:
+      input: string | import("temporal-polyfill").Temporal.PlainDate | import("temporal-polyfill").Temporal.ZonedDateTime
+      output: import("temporal-polyfill").Temporal.ZonedDateTime
 generates:
   src/lib/graphql/types.ts:
     plugins:
       - typescript
+  src/lib/graphql/dateTimeFields.generated.ts:
+    documents:
+      - "**/*.{svelte,ts}"
+    plugins:
+      - ./codegen/dateTimeFields.cjs
+    config:
+      # Operation names repeat across routes; this output only reads them.
+      skipDocumentsValidation:
+        skipDuplicateValidation: true
+        ignoreRules: [UniqueOperationNamesRule, UniqueFragmentNamesRule]
   src/:
     documents:
       - "**/*.{svelte,ts}"

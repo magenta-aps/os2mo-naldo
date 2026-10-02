@@ -8,7 +8,7 @@ export type ItSystemQueryVariables = Types.Exact<{
 }>;
 
 
-export type ItSystemQuery = { itsystems: { objects: Array<{ validities: Array<{ uuid: any, user_key: string, name: string, validity: { from?: any | null, to?: any | null } }> }> } };
+export type ItSystemQuery = { itsystems: { objects: Array<{ validities: Array<{ uuid: any, user_key: string, name: string, validity: { from?: import("temporal-polyfill").Temporal.ZonedDateTime | null, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type UpdateItSystemMutationVariables = Types.Exact<{
   input: Types.ItSystemUpdateInput;

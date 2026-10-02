@@ -9,7 +9,7 @@ export type ItUserAndItSystemsQueryVariables = Types.Exact<{
 }>;
 
 
-export type ItUserAndItSystemsQuery = { itusers: { objects: Array<{ validities: Array<{ uuid: any, user_key: string, external_id?: string | null, primary_response?: { uuid: any, current?: { name: string, user_key: string } | null } | null, itsystem_response: { uuid: any, current?: { name: string } | null }, validity: { from: any, to?: any | null } }>, registrations: Array<{ note?: string | null }> }> }, itsystems: { objects: Array<{ current?: { name: string, uuid: any } | null }> } };
+export type ItUserAndItSystemsQuery = { itusers: { objects: Array<{ validities: Array<{ uuid: any, user_key: string, external_id?: string | null, primary_response?: { uuid: any, current?: { name: string, user_key: string } | null } | null, itsystem_response: { uuid: any, current?: { name: string } | null }, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }>, registrations: Array<{ note?: string | null }> }> }, itsystems: { objects: Array<{ current?: { name: string, uuid: any } | null }> } };
 
 export type UpdateItUserMutationVariables = Types.Exact<{
   input: Types.ItUserUpdateInput;

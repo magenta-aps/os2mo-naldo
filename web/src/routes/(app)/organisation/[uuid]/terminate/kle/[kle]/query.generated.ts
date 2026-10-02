@@ -6,7 +6,7 @@ export type KleQueryVariables = Types.Exact<{
 }>;
 
 
-export type KleQuery = { kles: { objects: Array<{ validities: Array<{ validity: { from: any, to?: any | null }, org_unit_response?: { validities: Array<{ validity: { from: any, to?: any | null } }> } | null }> }> } };
+export type KleQuery = { kles: { objects: Array<{ validities: Array<{ validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null }, org_unit_response?: { validities: Array<{ validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> } | null }> }> } };
 
 export type TerminateKleMutationVariables = Types.Exact<{
   input: Types.KleTerminateInput;

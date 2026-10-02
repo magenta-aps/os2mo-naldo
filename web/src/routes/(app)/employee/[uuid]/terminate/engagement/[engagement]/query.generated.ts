@@ -6,7 +6,7 @@ export type EngagementQueryVariables = Types.Exact<{
 }>;
 
 
-export type EngagementQuery = { engagements: { objects: Array<{ validities: Array<{ validity: { from: any, to?: any | null }, person_response: { validities: Array<{ validity: { from?: any | null, to?: any | null } }> } }> }> } };
+export type EngagementQuery = { engagements: { objects: Array<{ validities: Array<{ validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null }, person_response: { validities: Array<{ validity: { from?: import("temporal-polyfill").Temporal.ZonedDateTime | null, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> } }> }> } };
 
 export type TerminateEngagementMutationVariables = Types.Exact<{
   input: Types.EngagementTerminateInput;

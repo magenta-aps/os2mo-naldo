@@ -8,7 +8,7 @@ export type KleQueryVariables = Types.Exact<{
 }>;
 
 
-export type KleQuery = { kles: { objects: Array<{ validities: Array<{ uuid: any, kle_aspects_response: { objects: Array<{ uuid: any, current?: { name: string, user_key: string } | null }> }, kle_number_response: { uuid: any, current?: { name: string, user_key: string } | null }, validity: { from: any, to?: any | null }, org_unit_response?: { uuid: any, current?: { validity: { from: any, to?: any | null } } | null } | null }> }> } };
+export type KleQuery = { kles: { objects: Array<{ validities: Array<{ uuid: any, kle_aspects_response: { objects: Array<{ uuid: any, current?: { name: string, user_key: string } | null }> }, kle_number_response: { uuid: any, current?: { name: string, user_key: string } | null }, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null }, org_unit_response?: { uuid: any, current?: { validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } } | null } | null }> }> } };
 
 export type UpdateKleMutationVariables = Types.Exact<{
   input: Types.KleUpdateInput;

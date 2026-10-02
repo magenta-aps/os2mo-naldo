@@ -8,7 +8,7 @@ export type FacetAndOrgQueryVariables = Types.Exact<{
 }>;
 
 
-export type FacetAndOrgQuery = { org_units: { objects: Array<{ current?: { uuid: any, name: string } | null, validities: Array<{ validity: { from: any, to?: any | null } }> }> }, classes?: { objects: Array<{ current?: { name: string, top_level_facet: { uuid: any, user_key: string }, children: Array<{ name: string, user_key: string, uuid: any }> } | null }> } };
+export type FacetAndOrgQuery = { org_units: { objects: Array<{ current?: { uuid: any, name: string } | null, validities: Array<{ validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> }, classes?: { objects: Array<{ current?: { name: string, top_level_facet: { uuid: any, user_key: string }, children: Array<{ name: string, user_key: string, uuid: any }> } | null }> } };
 
 export type ConfederationsFragment = { classes?: { objects: Array<{ current?: { name: string, top_level_facet: { uuid: any, user_key: string }, children: Array<{ name: string, user_key: string, uuid: any }> } | null }> } };
 

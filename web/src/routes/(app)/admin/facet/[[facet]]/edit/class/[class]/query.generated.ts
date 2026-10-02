@@ -8,7 +8,7 @@ export type ClassQueryVariables = Types.Exact<{
 }>;
 
 
-export type ClassQuery = { classes: { objects: Array<{ validities: Array<{ uuid: any, user_key: string, name: string, scope?: string | null, facet_response: { uuid: any, current?: { user_key: string } | null }, it_system_response?: { uuid: any, current?: { user_key: string, name: string } | null } | null, validity: { from?: any | null, to?: any | null } }> }> } };
+export type ClassQuery = { classes: { objects: Array<{ validities: Array<{ uuid: any, user_key: string, name: string, scope?: string | null, facet_response: { uuid: any, current?: { user_key: string } | null }, it_system_response?: { uuid: any, current?: { user_key: string, name: string } | null } | null, validity: { from?: import("temporal-polyfill").Temporal.ZonedDateTime | null, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type GetItSystemsQueryVariables = Types.Exact<{
   fromDate: Types.Scalars['DateTime']['input'];

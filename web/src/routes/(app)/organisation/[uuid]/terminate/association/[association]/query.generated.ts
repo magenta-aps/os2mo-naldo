@@ -6,7 +6,7 @@ export type AssociationQueryVariables = Types.Exact<{
 }>;
 
 
-export type AssociationQuery = { associations: { objects: Array<{ validities: Array<{ validity: { from: any, to?: any | null }, org_unit_response: { validities: Array<{ validity: { from: any, to?: any | null } }> } }> }> } };
+export type AssociationQuery = { associations: { objects: Array<{ validities: Array<{ validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null }, org_unit_response: { validities: Array<{ validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> } }> }> } };
 
 export type TerminateAssociationMutationVariables = Types.Exact<{
   input: Types.AssociationTerminateInput;

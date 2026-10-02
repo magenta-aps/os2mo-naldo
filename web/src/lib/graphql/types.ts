@@ -57,7 +57,7 @@ export type Scalars = {
   /** Date (isoformat) */
   Date: { input: any; output: any; }
   /** Date with time (isoformat) */
-  DateTime: { input: any; output: any; }
+  DateTime: { input: string | import("temporal-polyfill").Temporal.PlainDate | import("temporal-polyfill").Temporal.ZonedDateTime; output: import("temporal-polyfill").Temporal.ZonedDateTime; }
   /**
    * Event tokens are used for event related operations, such as acknowledgment.
    *
