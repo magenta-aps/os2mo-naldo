@@ -1,7 +1,11 @@
 <script lang="ts">
+  import type { ValidityBounds } from "$lib/utils/validities"
+  import { moValidityFrom } from "$lib/utils/date"
+  import { Temporal } from "temporal-polyfill"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
-  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
+  import EndDateInput from "$lib/components/forms/shared/EndDateInput.svelte"
+  import StartDateInput from "$lib/components/forms/shared/StartDateInput.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
@@ -54,7 +58,7 @@
           try {
             const mutation = await graphQLClient().request(UpdateItSystemDocument, {
               input: result.data,
-              date: result.data.validity.from,
+              date: result.data.validity.from as string,
             })
             $success = {
               message: capital(
@@ -73,18 +77,17 @@
       }
     }
 
-  let toDate: string
+  let toDate: Temporal.ZonedDateTime | null | undefined
 
-  const fromDate = field("from", "", [required()])
+  const fromDate = field<Temporal.ZonedDateTime | null | undefined>("from", undefined, [
+    required(),
+  ])
   const name = field("name", "", [required()])
   const userKey = field("user_key", "", [required()])
   const svelteForm = form(fromDate, name, userKey)
 
   // Logic for updating datepicker intervals
-  let validities: {
-    from: string | undefined | null
-    to: string | undefined | null
-  } = { from: null, to: null }
+  let validities: ValidityBounds = { from: null, to: null }
 </script>
 
 <title
@@ -129,8 +132,8 @@
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
       <div class="p-8">
         <div class="flex flex-row gap-6">
-          <DateInput
-            startValue={$date}
+          <StartDateInput
+            startValue={moValidityFrom($date)}
             bind:value={$fromDate.value}
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
@@ -139,11 +142,9 @@
             max={toDate ? toDate : validities.to}
             required={true}
           />
-          <DateInput
+          <EndDateInput
             bind:value={toDate}
-            startValue={itsystem.validity.to
-              ? itsystem.validity.to.split("T")[0]
-              : null}
+            startValue={itsystem.validity.to}
             title={capital($_("date.end_date"))}
             id="to"
             min={$fromDate.value ? $fromDate.value : validities.from}

@@ -1,7 +1,12 @@
 <script lang="ts">
+  import { isLaterEnd } from "$lib/utils/validities"
+  import { Temporal } from "temporal-polyfill"
+  import type { ValidityBounds } from "$lib/utils/validities"
+  import { moValidityFrom } from "$lib/utils/date"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
-  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
+  import EndDateInput from "$lib/components/forms/shared/EndDateInput.svelte"
+  import StartDateInput from "$lib/components/forms/shared/StartDateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
@@ -96,14 +101,16 @@
     }
   `
 
-  let startDate: string = $date
-  let toDate: string
+  let startDate: Temporal.ZonedDateTime | null | undefined = moValidityFrom($date)
+  let toDate: Temporal.ZonedDateTime | null | undefined
   let selectedOrgUnit: {
     uuid: string
     name: string
   }
 
-  const fromDate = field("from", "", [required()])
+  const fromDate = field<Temporal.ZonedDateTime | null | undefined>("from", undefined, [
+    required(),
+  ])
   const orgUnit = field("org_unit", "", [required()])
   const jobFunction = field("job_function", "", [required()])
   const engagementType = field("engagement_type", "", [required()])
@@ -155,10 +162,7 @@
 
   // Datepicker bounds for the selected org unit. See the employee edit
   // engagement form for the query pattern and its trade-offs.
-  const validities = createQuery<{
-    from: string | undefined | null
-    to: string | undefined | null
-  }>({ from: null, to: null })
+  const validities = createQuery<ValidityBounds>({ from: null, to: null })
   $: if (selectedOrgUnit?.uuid) {
     const orgUnitUuid = selectedOrgUnit.uuid
     validities.run((signal) => getValidities(orgUnitUuid, signal))
@@ -170,10 +174,11 @@
   // Only fetch when a start date is set: getClasses rejects a null date, and
   // the facet selects are disabled without one anyway.
   $: if (startDate) {
+    const at = startDate
     facets.run((signal) =>
       getClasses(
         {
-          currentDate: startDate,
+          currentDate: at,
           orgUuid: selectedOrgUnit?.uuid,
           facetUserKeys: ["engagement_type", "engagement_job_function", "primary_type"],
         },
@@ -213,10 +218,7 @@
       $extension1.value !== initialEngagement.extension_1 ||
       $extension4.value !== initialEngagement.extension_4
 
-    const toDateExtended =
-      toDate === ""
-        ? initialEngagement.to !== null
-        : toDate > (initialEngagement.to ?? null)
+    const toDateExtended = isLaterEnd(toDate, initialEngagement.to)
     hasChanges = editableChanged || toDateExtended
   }
 </script>
@@ -269,7 +271,7 @@
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
       <div class="p-8">
         <div class="flex flex-row gap-6">
-          <DateInput
+          <StartDateInput
             bind:value={startDate}
             bind:validationValue={$fromDate.value}
             errors={$fromDate.errors}
@@ -279,11 +281,9 @@
             max={toDate ? toDate : $validities.data?.to}
             required={true}
           />
-          <DateInput
+          <EndDateInput
             bind:value={toDate}
-            startValue={engagement.validity.to
-              ? engagement.validity.to.split("T")[0]
-              : null}
+            startValue={engagement.validity.to}
             title={capital($_("date.end_date"))}
             id="to"
             min={$fromDate.value ? $fromDate.value : $validities.data?.from}

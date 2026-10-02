@@ -1,7 +1,12 @@
 <script lang="ts">
+  import { isLaterEnd } from "$lib/utils/validities"
+  import { Temporal } from "temporal-polyfill"
+  import type { ValidityBounds } from "$lib/utils/validities"
+  import { moValidityFrom } from "$lib/utils/date"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
-  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
+  import EndDateInput from "$lib/components/forms/shared/EndDateInput.svelte"
+  import StartDateInput from "$lib/components/forms/shared/StartDateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Button from "$lib/components/shared/Button.svelte"
@@ -48,10 +53,12 @@
     }
   `
 
-  let startDate: string = $date
-  let toDate: string
+  let startDate: Temporal.ZonedDateTime | null | undefined = moValidityFrom($date)
+  let toDate: Temporal.ZonedDateTime | null | undefined
 
-  const fromDate = field("from", "", [required()])
+  const fromDate = field<Temporal.ZonedDateTime | null | undefined>("from", undefined, [
+    required(),
+  ])
   const firstName = field("first_name", "", [required()])
   const lastName = field("last_name", "", [required()])
   const nickNameFirstName = field("nick_name_first_name", "", [])
@@ -97,10 +104,7 @@
 
   // Datepicker bounds for the person. See the employee edit engagement form
   // for the query pattern and its trade-offs.
-  const validities = createQuery<{
-    from: string | undefined | null
-    to: string | undefined | null
-  }>({ from: null, to: null })
+  const validities = createQuery<ValidityBounds>({ from: null, to: null })
   $: if ($page.params.uuid) {
     const personUuid = $page.params.uuid
     validities.run((signal) => getPersonValidities(personUuid, signal))
@@ -135,10 +139,7 @@
       $nickNameFirstName.value !== initialEmployee.nick_first_name ||
       $nickNameLastName.value !== initialEmployee.nick_last_name
 
-    const toDateExtended =
-      toDate === ""
-        ? initialEmployee.to !== null
-        : toDate > (initialEmployee.to ?? null)
+    const toDateExtended = isLaterEnd(toDate, initialEmployee.to)
     hasChanges = editableChanged || toDateExtended
   }
 </script>
@@ -189,7 +190,7 @@
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
       <div class="p-8">
         <div class="flex flex-row gap-6">
-          <DateInput
+          <StartDateInput
             bind:value={startDate}
             bind:validationValue={$fromDate.value}
             errors={$fromDate.errors}
@@ -199,11 +200,9 @@
             max={toDate ? toDate : $validities.data?.to}
             required={true}
           />
-          <DateInput
+          <EndDateInput
             bind:value={toDate}
-            startValue={employee?.validity.to
-              ? employee?.validity.to.split("T")[0]
-              : null}
+            startValue={employee?.validity.to}
             title={capital($_("date.end_date"))}
             id="to"
             min={$fromDate.value ? $fromDate.value : $validities.data?.from}

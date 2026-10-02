@@ -1,7 +1,12 @@
 <script lang="ts">
+  import { isLaterEnd } from "$lib/utils/validities"
+  import { Temporal } from "temporal-polyfill"
+  import type { ValidityBounds } from "$lib/utils/validities"
+  import { moValidityFrom } from "$lib/utils/date"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
-  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
+  import EndDateInput from "$lib/components/forms/shared/EndDateInput.svelte"
+  import StartDateInput from "$lib/components/forms/shared/StartDateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import { enhance } from "$app/forms"
@@ -59,14 +64,16 @@
       }
     }
   `
-  let startDate: string = $date
-  let toDate: string
+  let startDate: Temporal.ZonedDateTime | null | undefined = moValidityFrom($date)
+  let toDate: Temporal.ZonedDateTime | null | undefined
   let selectedPerson: {
     uuid: string
     name: string
   }
 
-  const fromDate = field("from", "", [required()])
+  const fromDate = field<Temporal.ZonedDateTime | null | undefined>("from", undefined, [
+    required(),
+  ])
   const svelteForm = form(fromDate)
 
   const handler: SubmitFunction =
@@ -103,10 +110,7 @@
 
   // Datepicker bounds for the org unit. See the employee edit engagement form
   // for the query pattern and its trade-offs.
-  const validities = createQuery<{
-    from: string | undefined | null
-    to: string | undefined | null
-  }>({ from: null, to: null })
+  const validities = createQuery<ValidityBounds>({ from: null, to: null })
   $: if ($page.params.uuid) {
     const orgUnitUuid = $page.params.uuid
     validities.run((signal) => getValidities(orgUnitUuid, signal))
@@ -138,8 +142,7 @@
     // Check if any of the user-editable fields have changed compared to the original values.
     const editableChanged = selectedPerson?.uuid !== initialOwner.person
 
-    const toDateExtended =
-      toDate === "" ? initialOwner.to !== null : toDate > (initialOwner.to ?? null)
+    const toDateExtended = isLaterEnd(toDate, initialOwner.to)
     hasChanges = editableChanged || toDateExtended
   }
 </script>
@@ -183,7 +186,7 @@
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
       <div class="p-8">
         <div class="flex flex-row gap-6">
-          <DateInput
+          <StartDateInput
             bind:value={startDate}
             bind:validationValue={$fromDate.value}
             errors={$fromDate.errors}
@@ -193,11 +196,9 @@
             max={toDate ? toDate : $validities.data?.to}
             required={true}
           />
-          <DateInput
+          <EndDateInput
             bind:value={toDate}
-            startValue={ownerObj.validity.to
-              ? ownerObj.validity.to.split("T")[0]
-              : null}
+            startValue={ownerObj.validity.to}
             title={capital($_("date.end_date"))}
             id="to"
             min={$fromDate.value ? $fromDate.value : $validities.data?.from}
