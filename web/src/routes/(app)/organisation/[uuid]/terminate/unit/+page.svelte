@@ -1,7 +1,9 @@
 <script lang="ts">
+  import { Temporal } from "temporal-polyfill"
+  import { lastValidDay, moValidityTo } from "$lib/utils/date"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
-  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
+  import EndDateInput from "$lib/components/forms/shared/EndDateInput.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import { enhance } from "$app/forms"
@@ -17,7 +19,9 @@
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
 
-  const toDate = field("to", "", [required()])
+  const toDate = field<Temporal.ZonedDateTime | null | undefined>("to", undefined, [
+    required(),
+  ])
   const svelteForm = form(toDate)
 
   gql`
@@ -56,7 +60,7 @@
           try {
             const mutation = await graphQLClient().request(TerminateOrgUnitDocument, {
               input: result.data,
-              date: result.data.to,
+              date: lastValidDay($toDate.value)!,
             })
 
             $success = {
@@ -112,8 +116,8 @@
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
       <div class="p-8">
         <!-- Ideally we would use validities from 'parent' if it's present, but since parent can't be a list of validities, we can't get min/max -->
-        <DateInput
-          startValue={$date}
+        <EndDateInput
+          startValue={moValidityTo($date)}
           bind:value={$toDate.value}
           title={capital($_("date.end_date"))}
           id="to"
