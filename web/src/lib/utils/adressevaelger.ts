@@ -20,11 +20,16 @@ export type AdressevaelgerHit =
 export type AddressSelection = { id: string; titel: string }
 
 export type Narrowing = {
+  missing: "house_number" | "floor_door" | "postcode"
   text: string
   caret: number
 }
 
-const narrow = (text: string): Narrowing => ({ text, caret: text.length })
+const narrow = (missing: Narrowing["missing"], text: string): Narrowing => ({
+  missing,
+  text,
+  caret: text.length,
+})
 
 // Vague searches return streets, and in address mode house numbers. Picking one
 // narrows the search instead of selecting it, like KDS's own component.
@@ -38,19 +43,20 @@ export const pick = (
     case "husnummer":
       return endpoint === "husnumre"
         ? { id: hit.id, titel: hit.titel }
-        : narrow(hit.titel)
+        : narrow("floor_door", hit.titel)
     case "navngivenvejpostnummer": {
       // A house number only matches when typed before the postcode
       const street = `${hit.vejnavn} `
       return {
+        missing: "house_number",
         text: `${street}, ${hit.postnr} ${hit.postdistrikt}`,
         caret: street.length,
       }
     }
     case "vejnavn":
-      return narrow(`${hit.titel} `)
+      return narrow("house_number", `${hit.titel} `)
     case "vejnavnhusnummer": // a partial road name and a number, in any town
-      return narrow(hit.titel)
+      return narrow("postcode", hit.titel)
   }
 }
 

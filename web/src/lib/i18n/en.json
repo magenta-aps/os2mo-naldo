@@ -268,7 +268,10 @@
 	"validation": {
 		"is_invalid": "{field} is invalid",
 		"is_required": "{field} is required",
-		"is_wrong_format": "{field} is wrong format"
+		"is_wrong_format": "{field} is wrong format",
+		"missing_floor_door": "{field} is missing floor or door",
+		"missing_house_number": "{field} is missing a house number",
+		"missing_postcode": "{field} is missing a postcode"
 	},
 	"validity": "validity",
 	"visibility": "visibility",

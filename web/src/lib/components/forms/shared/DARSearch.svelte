@@ -8,6 +8,7 @@
     searchAddresses,
     type AddressSelection,
     type AdressevaelgerHit,
+    type Narrowing,
   } from "$lib/utils/adressevaelger"
   import SvelteSelect from "svelte-select"
   import DarItem from "$lib/components/forms/shared/DARItem.svelte"
@@ -35,6 +36,7 @@
   let value: AddressSelection | AdressevaelgerHit | undefined = selected
   let filterText = ""
   let input: HTMLInputElement | undefined
+  let missing: Narrowing["missing"] | undefined
   let searchFailed = false
 
   $: if (selected) {
@@ -69,9 +71,11 @@
     const picked = pick(hit, endpoint)
     if ("id" in picked) {
       selected = picked
+      missing = undefined
       return
     }
     value = selected
+    missing = picked.missing
     filterText = picked.text
     await tick()
     input?.focus()
@@ -123,6 +127,7 @@
       on:clear
       on:clear={() => {
         selected = undefined
+        missing = undefined
         darName = undefined
       }}
       hideEmptyState={true}
@@ -142,7 +147,9 @@
   {#each errors as error}
     {#if error === "required"}
       <span class="text-xs text-error"
-        >{$_("validation.is_required", { values: { field: title } })}</span
+        >{$_(missing ? `validation.missing_${missing}` : "validation.is_required", {
+          values: { field: title },
+        })}</span
       >
     {/if}
   {/each}

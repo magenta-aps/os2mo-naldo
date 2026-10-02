@@ -41,6 +41,7 @@ describe("pick", () => {
       titel: husnummer.titel,
     })
     expect(pick(husnummer, "adresser")).toEqual({
+      missing: "floor_door",
       text: husnummer.titel,
       caret: husnummer.titel.length,
     })
@@ -48,6 +49,7 @@ describe("pick", () => {
 
   it("puts the caret before the postcode of a street", () => {
     expect(pick(street, "husnumre")).toEqual({
+      missing: "house_number",
       text: "Nr. Bjertvej , 6000 Kolding",
       caret: "Nr. Bjertvej ".length,
     })
@@ -55,6 +57,7 @@ describe("pick", () => {
 
   it("leaves room for a house number after a road name", () => {
     expect(pick(roadName, "adresser")).toEqual({
+      missing: "house_number",
       text: "Lærkestien ",
       caret: 11,
     })

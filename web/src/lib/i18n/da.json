@@ -268,7 +268,10 @@
 	"validation": {
 		"is_invalid": "{field} er ugyldigt",
 		"is_required": "{field} er obligatorisk",
-		"is_wrong_format": "{field} er forkert format"
+		"is_wrong_format": "{field} er forkert format",
+		"missing_floor_door": "{field} mangler etage eller dør",
+		"missing_house_number": "{field} mangler husnummer",
+		"missing_postcode": "{field} mangler postnummer"
 	},
 	"validity": "gyldighed",
 	"visibility": "synlighed",
