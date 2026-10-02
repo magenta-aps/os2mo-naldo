@@ -1,4 +1,5 @@
-import { compareAsc, isAfter, isEqual, parseISO } from "date-fns"
+import { toJavaScriptDate } from "$lib/utils/date"
+import { compareAsc, isAfter, isEqual } from "date-fns"
 
 // ==========================================
 // VIS-TIMELINE DEFINITIONS
@@ -67,14 +68,14 @@ export const FAR_PAST = new Date("1900-01-01")
 export const FAR_FUTURE = new Date("2099-12-31")
 
 /**
- * Parses a validity block into nullable from/to dates.
+ * Parses a validity block into nullable from/to dates, which vis-timeline draws.
  * Handles the 'person_validity' and 'class_validity' aliases.
  */
 const parseValidity = (block: any): { from: Date | null; to: Date | null } => {
   const v = block.validity ?? block.person_validity ?? block.class_validity
   return {
-    from: v?.from ? parseISO(v.from) : null,
-    to: v?.to ? parseISO(v.to) : null,
+    from: v?.from ? toJavaScriptDate(v.from) : null,
+    to: v?.to ? toJavaScriptDate(v.to) : null,
   }
 }
 
@@ -205,7 +206,7 @@ export const transformAuditLog = (rawData: any[]): Registration[] => {
 
     const uniqueGroupId = `registration-${index}`
     // Use the registration time for sorting, fallback to now if missing
-    const regTimestamp = reg.start ? parseISO(reg.start) : new Date()
+    const regTimestamp = reg.start ? toJavaScriptDate(reg.start) : new Date()
 
     const registration: Registration = {
       id: uniqueGroupId,

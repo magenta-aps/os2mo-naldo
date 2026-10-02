@@ -2,7 +2,8 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
   import { date } from "$lib/stores/date"
-  import { formatDate } from "$lib/utils/date"
+  import { formatDay, lastValidDay } from "$lib/utils/date"
+  import { Temporal } from "temporal-polyfill"
   import {
     findClosestValidityWithin,
     filterValiditiesInRange,
@@ -37,7 +38,9 @@
   // Newest first; only surfaced when the name changed during the row.
   $: history = validities
     ? filterValiditiesInRange(validities, rowValidity).sort((a, b) =>
-        (b.validity.from ?? "").localeCompare(a.validity.from ?? "")
+        a.validity.from && b.validity.from
+          ? Temporal.ZonedDateTime.compare(b.validity.from, a.validity.from)
+          : 0
       )
     : []
 
@@ -47,9 +50,9 @@
           `${capital($_("name_history"))}:`,
           ...history.map(
             (item) =>
-              `${item.name ?? fallback ?? ""} (${formatDate(item.validity.from)} – ${
-                item.validity.to ? formatDate(item.validity.to) : ""
-              })`
+              `${item.name ?? fallback ?? ""} (${formatDay(
+                item.validity.from?.toPlainDate()
+              )} – ${formatDay(lastValidDay(item.validity.to))})`
           ),
         ].join("\n")
       : undefined
