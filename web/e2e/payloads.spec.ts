@@ -66,6 +66,37 @@ test("org create", async ({ page }) => {
   await submit(page, "org-create")
 })
 
+// A fixed distance ahead, so the end date is after any start date the forms
+// default to.
+const END_DATE = new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0]
+const fillEndDate = (page: Page) =>
+  page.fill('form input[type=date][id$="to"]', END_DATE)
+
+test("employee create with end date", async ({ page }) => {
+  const fixture = await resolveFixture()
+  await blockMutations(page, capture("employee-create-end-date"))
+  await page.goto(`/employee/${fixture.person}/create/engagement`)
+  await login(page)
+  await searchAndPick(page, fixture.unitName)
+  await page.fill("form input[name=user-key]", "E2E-TEST")
+  await pickFirstOption(page, 0) // job function
+  await pickFirstOption(page, 1) // engagement type
+  await fillEndDate(page)
+  await submit(page, "employee-create-end-date")
+})
+
+test("employee terminate engagement", async ({ page }) => {
+  const fixture = await resolveFixture()
+  await blockMutations(page, capture("employee-terminate"))
+  await page.goto(
+    `/employee/${fixture.person}/terminate/engagement/${fixture.engagement}`
+  )
+  await login(page)
+  await page.waitForTimeout(1000)
+  await fillEndDate(page)
+  await submit(page, "employee-terminate")
+})
+
 test("employee edit", async ({ page }) => {
   const fixture = await resolveFixture()
   await blockMutations(page, capture("employee-edit"))
