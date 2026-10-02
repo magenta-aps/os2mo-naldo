@@ -1,3 +1,4 @@
+import { toCopenhagen } from "$lib/utils/date"
 import { getValueAtPath, sortData } from "$lib/utils/sorting"
 import { describe, expect, it } from "vitest"
 
@@ -73,5 +74,29 @@ describe("sortData", () => {
   it("sorts numerically when values are numbers", () => {
     const result = sortData(rows, "id", -1).map((r) => r.id)
     expect(result).toEqual([3, 2, 1])
+  })
+})
+
+describe("sortData with Temporal values", () => {
+  const rows = [
+    { validity: { from: toCopenhagen("2024-10-28T00:00:00+01:00") } },
+    { validity: { from: toCopenhagen("2020-01-01T00:00:00+01:00") } },
+    { validity: { from: toCopenhagen("2024-03-31T00:00:00+01:00") } },
+  ]
+  const froms = (sorted: typeof rows) =>
+    sorted.map((row) => row.validity.from.toString())
+
+  it("sorts ascending and descending", () => {
+    expect(froms(sortData(rows, "validity.from", 1))).toEqual(
+      [rows[1], rows[2], rows[0]].map((row) => row.validity.from.toString())
+    )
+    expect(froms(sortData(rows, "validity.from", -1))).toEqual(
+      [rows[0], rows[2], rows[1]].map((row) => row.validity.from.toString())
+    )
+  })
+
+  it("leaves a row without the value in place", () => {
+    const withMissing = [...rows, { validity: {} }] as typeof rows
+    expect(() => sortData(withMissing, "validity.from", 1)).not.toThrow()
   })
 })
