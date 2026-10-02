@@ -43,6 +43,10 @@ export const env = {
   PUBLIC_PRIMARY_CLASS_USER_KEY:
     dynamicEnv["PUBLIC_PRIMARY_CLASS_USER_KEY"] ?? "primary",
   PUBLIC_COMMIT_TAG: dynamicEnv["PUBLIC_COMMIT_TAG"] ?? "HEAD",
+  // KDS asks every client to send this shared token until Adressevælger
+  // gets per-user tokens.
+  PUBLIC_ADRESSEVAELGER_TOKEN:
+    dynamicEnv["PUBLIC_ADRESSEVAELGER_TOKEN"] ?? "adressevaelger123",
 
   // Keycloak config. When URL/realm/client are unset, the app starts with no
   // authentication.

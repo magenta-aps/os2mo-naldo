@@ -345,9 +345,8 @@
             <DarSearch
               title={addressType.name}
               startValue={{
-                tekst: address.name,
-                adresse: { id: address.value },
-                adgangsadresse: { id: address.value },
+                id: address.value,
+                titel: address.name,
               }}
               bind:darName={$addressField.value}
               errors={$addressField.errors}

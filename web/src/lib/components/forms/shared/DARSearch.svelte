@@ -1,12 +1,19 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { tick } from "svelte"
   import { capital } from "$lib/utils/helpers"
   import { env } from "$lib/env"
+  import {
+    pick,
+    searchAddresses,
+    type AddressSelection,
+    type AdressevaelgerHit,
+    type Narrowing,
+  } from "$lib/utils/adressevaelger"
   import SvelteSelect from "svelte-select"
   import DarItem from "$lib/components/forms/shared/DARItem.svelte"
 
-  export let startValue: DarAddressResponse | undefined = undefined
-  export let value: DarAddressResponse | undefined = startValue || undefined
+  export let startValue: { id: string; titel?: string | null } | undefined = undefined
   export let title: string
   export let darName: string | undefined | null = undefined
   export let darValue: { name?: string; value: string } | string = {
@@ -18,30 +25,61 @@
   export let disabled = false
   export let errors: string[] = []
 
-  const itemId = "tekst" // Used by the component to differentiate between items
-  const url = env.PUBLIC_DAR_ACCESS_ADDRESSES ? "adgangsadresser" : "adresser"
+  const itemId = "titel" // Used by the component to differentiate between items
+  const endpoint = env.PUBLIC_DAR_ACCESS_ADDRESSES ? "husnumre" : "adresser"
 
-  $: if (value?.tekst) {
-    darName = value.tekst
-    darValue = {
-      name: value.tekst,
-      value: value.adgangsadresse?.id ? value.adgangsadresse.id : value.adresse.id,
-    }
-  } else {
-    value = undefined
+  // `value` is what svelte-select shows, which can briefly be a narrowing hit,
+  // so the form reads `selected` instead.
+  let selected: AddressSelection | undefined = startValue?.titel
+    ? { id: startValue.id, titel: startValue.titel }
+    : undefined
+  let value: AddressSelection | AdressevaelgerHit | undefined = selected
+  let filterText = ""
+  let input: HTMLInputElement | undefined
+  let missing: Narrowing["missing"] | undefined
+  let searchFailed = false
+
+  $: if (selected) {
+    darName = selected.titel
+    darValue = { name: selected.titel, value: selected.id }
   }
 
+  let abortController: AbortController | undefined
   const fetchDAR = async (filterText: string) => {
-    if (!filterText.length) return []
-    if (filterText.length < 3) return []
+    abortController?.abort()
+    abortController = new AbortController()
+    const { signal } = abortController
     try {
-      const res = await fetch(
-        `https://api.dataforsyningen.dk/${url}/autocomplete/?q=${filterText}&global=1`
+      const hits = await searchAddresses(
+        endpoint,
+        filterText,
+        env.PUBLIC_ADRESSEVAELGER_TOKEN,
+        signal
       )
-      return (await res.json()) as Autocomplete[]
+      searchFailed = false
+      return hits
     } catch (err) {
+      if (signal.aborted) return { cancelled: true } // superseded by a newer search
       console.error(err)
+      searchFailed = true
+      return []
     }
+  }
+
+  // svelte-select has already shown the hit as the value by now
+  const handleSelect = async ({ detail: hit }: CustomEvent<AdressevaelgerHit>) => {
+    const picked = pick(hit, endpoint)
+    if ("id" in picked) {
+      selected = picked
+      missing = undefined
+      return
+    }
+    value = selected
+    missing = picked.missing
+    filterText = picked.text
+    await tick()
+    input?.focus()
+    input?.setSelectionRange(picked.caret, picked.caret)
   }
 
   const floatingConfig = {
@@ -83,8 +121,13 @@
       {disabled}
       {itemId}
       bind:value
+      bind:filterText
+      bind:input
+      on:select={handleSelect}
       on:clear
       on:clear={() => {
+        selected = undefined
+        missing = undefined
         darName = undefined
       }}
       hideEmptyState={true}
@@ -98,19 +141,20 @@
       </div>
     </SvelteSelect>
   </div>
+  {#if searchFailed}
+    <span class="text-xs text-error">{capital($_("address_search_error"))}</span>
+  {/if}
   {#each errors as error}
     {#if error === "required"}
       <span class="text-xs text-error"
-        >{$_("validation.is_required", { values: { field: title } })}</span
+        >{$_(missing ? `validation.missing_${missing}` : "validation.is_required", {
+          values: { field: title },
+        })}</span
       >
     {/if}
   {/each}
 </div>
 
-{#if value}
-  {#if env.PUBLIC_DAR_ACCESS_ADDRESSES && "adgangsadresse" in value}
-    <input hidden name={id} bind:value={value.adgangsadresse.id} />
-  {:else if "adresse" in value}
-    <input hidden name={id} bind:value={value.adresse.id} />
-  {/if}
+{#if selected}
+  <input hidden name={id} value={selected.id} />
 {/if}

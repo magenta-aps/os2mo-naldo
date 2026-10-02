@@ -145,6 +145,7 @@
 	"link": "{n, plural, =0 {the link} one {link} other {links}}",
 	"load_error": "Something went wrong",
 	"load_error_options": "the options could not be updated – the affected fields are locked until they can be reloaded",
+	"address_search_error": "the address search failed",
 	"loading": "loading",
 	"location": "location",
 	"logout": "logout",
@@ -267,7 +268,10 @@
 	"validation": {
 		"is_invalid": "{field} is invalid",
 		"is_required": "{field} is required",
-		"is_wrong_format": "{field} is wrong format"
+		"is_wrong_format": "{field} is wrong format",
+		"missing_floor_door": "{field} is missing floor or door",
+		"missing_house_number": "{field} is missing a house number",
+		"missing_postcode": "{field} is missing a postcode"
 	},
 	"validity": "validity",
 	"visibility": "visibility",
