@@ -1,6 +1,7 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { date } from "$lib/stores/date"
+  import { today } from "$lib/utils/date"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Search from "$lib/components/search/Search.svelte"
   import Icon from "@iconify/svelte"
@@ -65,7 +66,7 @@
       <DateInput
         bind:value={selectedDate}
         id="other-end-date"
-        max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
+        max={today().add({ years: 50 }).with({ month: 1, day: 1 })}
         noPadding={true}
       />
     </div>
