@@ -35,6 +35,7 @@
   let value: AddressSelection | AdressevaelgerHit | undefined = selected
   let filterText = ""
   let input: HTMLInputElement | undefined
+  let searchFailed = false
 
   $: if (selected) {
     darName = selected.titel
@@ -47,15 +48,18 @@
     abortController = new AbortController()
     const { signal } = abortController
     try {
-      return await searchAddresses(
+      const hits = await searchAddresses(
         endpoint,
         filterText,
         env.PUBLIC_ADRESSEVAELGER_TOKEN,
         signal
       )
+      searchFailed = false
+      return hits
     } catch (err) {
       if (signal.aborted) return { cancelled: true } // superseded by a newer search
       console.error(err)
+      searchFailed = true
       return []
     }
   }
@@ -132,6 +136,9 @@
       </div>
     </SvelteSelect>
   </div>
+  {#if searchFailed}
+    <span class="text-xs text-error">{capital($_("address_search_error"))}</span>
+  {/if}
   {#each errors as error}
     {#if error === "required"}
       <span class="text-xs text-error"

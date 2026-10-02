@@ -145,6 +145,7 @@
 	"link": "{n, plural, =0 {the link} one {link} other {links}}",
 	"load_error": "Something went wrong",
 	"load_error_options": "the options could not be updated – the affected fields are locked until they can be reloaded",
+	"address_search_error": "the address search failed",
 	"loading": "loading",
 	"location": "location",
 	"logout": "logout",
