@@ -12,8 +12,8 @@ export const actions: Actions = {
     const primary = data.get("primary")
     const substitute = data.get("substitute")
     const tradeUnion = data.get("trade-union")
-    const startDate = data.get("from")
-    const endDate = data.get("to")
+    const startDate = data.get("from") as string
+    const endDate = data.get("to") as string | null
 
     return {
       person: params.uuid,

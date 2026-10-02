@@ -14,8 +14,8 @@ export const actions: Actions = {
     const extension_1 = data.get("extension-1") as string
     const extension_4 = data.get("extension-4") as string
     const primary = data.get("primary")
-    const startDate = data.get("from")
-    const endDate = data.get("to")
+    const startDate = data.get("from") as string
+    const endDate = data.get("to") as string | null
 
     return {
       employee: params.uuid,

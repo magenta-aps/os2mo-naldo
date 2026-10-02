@@ -7,7 +7,7 @@ export const actions: Actions = {
     params,
   }: RequestEvent): Promise<EngagementTerminateInput> => {
     const data = await request.formData()
-    const toDate = data.get("to")
+    const toDate = data.get("to") as string
 
     return {
       uuid: params.engagement,

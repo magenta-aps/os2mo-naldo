@@ -8,8 +8,8 @@ export const actions: Actions = {
     const visibility = data.get("visibility")
     const userKey = data.get("user-key") as string
     const value = data.get("value") as string
-    const startDate = data.get("from")
-    const endDate = data.get("to")
+    const startDate = data.get("from") as string
+    const endDate = data.get("to") as string | null
 
     return {
       uuid: params.address,

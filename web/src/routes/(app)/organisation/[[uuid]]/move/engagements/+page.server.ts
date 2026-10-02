@@ -6,7 +6,7 @@ export const actions: Actions = {
     const data = await request.formData()
     const orgUnitUuid = data.get("org-unit")
     const engagements = data.getAll("engagements") as string[]
-    const startDate = data.get("from")
+    const startDate = data.get("from") as string
     const endDates = data.getAll("end-dates") as string[]
 
     const engagementInput = engagements.map((engagement, i) => ({

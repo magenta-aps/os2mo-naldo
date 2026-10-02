@@ -13,8 +13,8 @@ export const actions: Actions = {
     const timePlanning = data.get("time-planning")
     const orgType = data.get("org-type")
     const orgUnitNumber = data.get("org-unit-number") as string
-    const startDate = data.get("from")
-    const endDate = data.get("to")
+    const startDate = data.get("from") as string
+    const endDate = data.get("to") as string | null
 
     return {
       uuid: params.uuid,

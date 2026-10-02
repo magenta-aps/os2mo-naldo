@@ -9,8 +9,8 @@ export const actions: Actions = {
     const primary = data.get("primary")
     const externalId = data.get("external-id") as string
     const notes = data.get("notes") as string
-    const startDate = data.get("from")
-    const endDate = data.get("to")
+    const startDate = data.get("from") as string
+    const endDate = data.get("to") as string | null
 
     return {
       uuid: params.ituser,
