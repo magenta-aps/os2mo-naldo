@@ -1,6 +1,7 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { date } from "$lib/stores/date"
+  import { sameDate, today } from "$lib/utils/date"
   import DateInput from "$lib/components/forms/shared/DateInput.svelte"
   import Search from "$lib/components/search/Search.svelte"
   import Icon from "@iconify/svelte"
@@ -16,9 +17,10 @@
   // Debounces the global date picker to improve performance while scrolling through dates
   // A lot of components react to changes in $date, such as the org_tree
   $: if (selectedDate) {
+    const day = selectedDate
     clearTimeout(timeout)
     timeout = setTimeout(() => {
-      $date = selectedDate
+      if (!sameDate(day, $date)) $date = day
     }, 500)
   }
 </script>
@@ -65,7 +67,7 @@
       <DateInput
         bind:value={selectedDate}
         id="other-end-date"
-        max={new Date(new Date().getFullYear() + 50, 0).toISOString().split("T")[0]}
+        max={today().add({ years: 50 }).with({ month: 1, day: 1 })}
         noPadding={true}
       />
     </div>
