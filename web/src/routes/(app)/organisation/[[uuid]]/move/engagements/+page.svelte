@@ -1,7 +1,9 @@
 <script lang="ts">
+  import { Temporal } from "temporal-polyfill"
+  import type { ValidityBounds } from "$lib/utils/validities"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
-  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
+  import StartDateInput from "$lib/components/forms/shared/StartDateInput.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import { enhance } from "$app/forms"
@@ -22,6 +24,7 @@
   import { createQuery } from "$lib/http/query"
   import { getValidities } from "$lib/http/getValidities"
   import { getMinMaxValidities } from "$lib/utils/validities"
+  import { moValidityFrom, toMO } from "$lib/utils/date"
 
   type Engagements = GetEngagementsQuery["engagements"]["objects"][0]
 
@@ -62,7 +65,7 @@
     }
   `
 
-  let startDate: string = $date
+  let startDate: Temporal.ZonedDateTime | null | undefined = moValidityFrom($date)
   // FIXME: `handler: SubmitFunction` gives TS-error:
   // Argument of type 'SubmitFunction' is not assignable to parameter of type 'SubmitFunction<Record<string, unknown> | undefined, never>'.
   // Ignored for now, by removing typing and typing result to `any`.
@@ -94,10 +97,7 @@
 
   // Datepicker bounds for the selected org unit. See the employee edit
   // engagement form for the query pattern and its trade-offs.
-  const validities = createQuery<{
-    from: string | undefined | null
-    to: string | undefined | null
-  }>({ from: null, to: null })
+  const validities = createQuery<ValidityBounds>({ from: null, to: null })
   $: if (orgUnit?.uuid) {
     const orgUnitUuid = orgUnit.uuid
     validities.run((signal) => getValidities(orgUnitUuid, signal))
@@ -121,7 +121,9 @@
     engagements.run(async () => [])
   }
 
-  const fromDate = field("from", "", [required()])
+  const fromDate = field<Temporal.ZonedDateTime | null | undefined>("from", undefined, [
+    required(),
+  ])
   const orgUnitField = field("org_unit", "", [required()])
   const svelteForm = form(fromDate, orgUnitField)
 
@@ -141,6 +143,12 @@
         ? []
         : engagements.map((engagement) => engagement.current?.uuid)
   }
+
+  // The engagement's current end, kept as it is when the engagement moves.
+  const endOf = (validities: Parameters<typeof getMinMaxValidities>[0]) => {
+    const { to } = getMinMaxValidities(validities)
+    return to ? toMO(to) : ""
+  }
 </script>
 
 <title>{capital($_("navigation.move_engagements"))} | OS2mo</title>
@@ -157,7 +165,7 @@
   <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
     <div class="p-8">
       <div class="flex flex-row gap-6">
-        <DateInput
+        <StartDateInput
           bind:value={startDate}
           bind:validationValue={$fromDate.value}
           errors={$fromDate.errors}
@@ -244,9 +252,7 @@
                         id="end-dates"
                         name="end-dates"
                         hidden
-                        value={getMinMaxValidities(engagement.validities).to
-                          ? getMinMaxValidities(engagement.validities).to
-                          : null}
+                        value={endOf(engagement.validities)}
                       />
                     {/if}
                   </div>
