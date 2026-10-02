@@ -1,7 +1,9 @@
 <script lang="ts">
+  import { Temporal } from "temporal-polyfill"
+  import { lastValidDay, moValidityTo } from "$lib/utils/date"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
-  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
+  import EndDateInput from "$lib/components/forms/shared/EndDateInput.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import { enhance } from "$app/forms"
@@ -18,7 +20,9 @@
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { getMinMaxValidities } from "$lib/utils/validities"
 
-  const toDate = field("to", "", [required()])
+  const toDate = field<Temporal.ZonedDateTime | null | undefined>("to", undefined, [
+    required(),
+  ])
   const svelteForm = form(toDate)
 
   gql`
@@ -71,7 +75,7 @@
               TerminateAssociationDocument,
               {
                 input: result.data,
-                date: result.data.to,
+                date: lastValidDay($toDate.value)!,
               }
             )
             $success = {
@@ -134,8 +138,8 @@
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
       <div class="p-8">
-        <DateInput
-          startValue={$date}
+        <EndDateInput
+          startValue={moValidityTo($date)}
           bind:value={$toDate.value}
           errors={$toDate.errors}
           title={capital($_("date.end_date"))}
