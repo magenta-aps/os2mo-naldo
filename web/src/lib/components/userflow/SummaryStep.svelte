@@ -3,6 +3,7 @@
   import { capital } from "$lib/utils/helpers"
   import { env } from "$lib/env"
   import { date } from "$lib/stores/date"
+  import { firstValidDay, formatDay, lastValidDay } from "$lib/utils/date"
   import { gql } from "graphql-request"
   import Error from "$lib/components/alerts/Error.svelte"
   import Button from "$lib/components/shared/Button.svelte"
@@ -147,8 +148,14 @@
     .map(({ engagement, index }) => ({
       subtitle: `${capital($_("engagement", { values: { n: 1 } }))} ${index + 1}`,
       rows: [
-        { label: capital($_("date.start_date")), value: engagement.fromDate },
-        { label: capital($_("date.end_date")), value: engagement.toDate },
+        {
+          label: capital($_("date.start_date")),
+          value: formatDay(firstValidDay(engagement.fromDate)),
+        },
+        {
+          label: capital($_("date.end_date")),
+          value: formatDay(lastValidDay(engagement.toDate)),
+        },
         {
           label: capital($_("unit", { values: { n: 1 } })),
           value: dash(engagement.orgUnit?.name),
@@ -190,8 +197,14 @@
     .map(({ ituser, index }) => ({
       subtitle: `${capital($_("ituser", { values: { n: 1 } }))} ${index + 1}`,
       rows: [
-        { label: capital($_("date.start_date")), value: ituser.fromDate },
-        { label: capital($_("date.end_date")), value: ituser.toDate },
+        {
+          label: capital($_("date.start_date")),
+          value: formatDay(firstValidDay(ituser.fromDate)),
+        },
+        {
+          label: capital($_("date.end_date")),
+          value: formatDay(lastValidDay(ituser.toDate)),
+        },
         {
           label: capital($_("itsystem", { values: { n: 1 } })),
           value: dash(ituser.itSystem?.name),
@@ -219,8 +232,14 @@
     .map(({ manager, index }) => ({
       subtitle: `${capital($_("manager", { values: { n: 1 } }))} ${index + 1}`,
       rows: [
-        { label: capital($_("date.start_date")), value: manager.fromDate },
-        { label: capital($_("date.end_date")), value: manager.toDate },
+        {
+          label: capital($_("date.start_date")),
+          value: formatDay(firstValidDay(manager.fromDate)),
+        },
+        {
+          label: capital($_("date.end_date")),
+          value: formatDay(lastValidDay(manager.toDate)),
+        },
         {
           label: capital($_("unit", { values: { n: 1 } })),
           value: dash(manager.orgUnit?.name),
@@ -248,8 +267,14 @@
     .map(({ address, index }) => ({
       subtitle: `${capital($_("address", { values: { n: 1 } }))} ${index + 1}`,
       rows: [
-        { label: capital($_("date.start_date")), value: address.fromDate },
-        { label: capital($_("date.end_date")), value: address.toDate },
+        {
+          label: capital($_("date.start_date")),
+          value: formatDay(firstValidDay(address.fromDate)),
+        },
+        {
+          label: capital($_("date.end_date")),
+          value: formatDay(lastValidDay(address.toDate)),
+        },
         { label: capital($_("visibility")), value: dash(address.visibility?.name) },
         { label: capital($_("description")), value: address.user_key },
         {

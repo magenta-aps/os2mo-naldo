@@ -138,8 +138,8 @@ export const buildUserflowPayload = (
       ...(engagement.extension1 && { extension_1: engagement.extension1 }),
       ...(engagement.extension4 && { extension_4: engagement.extension4 }),
       validity: {
-        from: engagement.fromDate,
-        to: engagement.toDate || null,
+        from: engagement.fromDate!,
+        to: engagement.toDate ?? null,
       },
     })
   })
@@ -161,8 +161,8 @@ export const buildUserflowPayload = (
       ...(ituser.externalId && { external_id: ituser.externalId }),
       primary: ituser.primary?.uuid || null,
       validity: {
-        from: ituser.fromDate,
-        to: ituser.toDate || null,
+        from: ituser.fromDate!,
+        to: ituser.toDate ?? null,
       },
     })
 
@@ -173,8 +173,8 @@ export const buildUserflowPayload = (
           ituser: ituserUuid,
           role: rolebinding.role?.uuid,
           validity: {
-            from: ituser.fromDate,
-            to: ituser.toDate || null,
+            from: ituser.fromDate!,
+            to: ituser.toDate ?? null,
           },
         }))
     )
@@ -195,8 +195,8 @@ export const buildUserflowPayload = (
         (responsibility) => responsibility.uuid
       ),
       validity: {
-        from: manager.fromDate,
-        to: manager.toDate ? manager.toDate : null,
+        from: manager.fromDate!,
+        to: manager.toDate ?? null,
       },
     })
   })
@@ -214,8 +214,8 @@ export const buildUserflowPayload = (
       user_key: address.user_key,
       visibility: address.visibility?.uuid,
       validity: {
-        from: address.fromDate,
-        to: address.toDate ? address.toDate : null,
+        from: address.fromDate!,
+        to: address.toDate ?? null,
       },
     })
   })

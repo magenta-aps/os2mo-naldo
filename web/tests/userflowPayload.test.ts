@@ -1,3 +1,4 @@
+import { jsonSerializer } from "$lib/http/dateTimes"
 import type { AddressInfo } from "$lib/stores/addressInfoStore"
 import type { EmployeeInfo } from "$lib/stores/employeeInfoStore"
 import type { EngagementInfo } from "$lib/stores/engagementInfoStore"
@@ -13,7 +14,13 @@ import {
   resetUserflowUuids,
   type UserflowStores,
 } from "$lib/userflow/mappers"
+import { moValidityFrom, moValidityTo } from "$lib/utils/date"
+import { Temporal } from "temporal-polyfill"
 import { beforeEach, describe, expect, it } from "vitest"
+
+const day = (s: string) => Temporal.PlainDate.from(s)
+// The payload as it is sent to MO, with timestamps written out.
+const sent = (value: unknown) => JSON.parse(jsonSerializer.stringify(value))
 
 const employee = (patch: Partial<EmployeeInfo> = {}): EmployeeInfo => ({
   cprNumber: { name: "", cpr_no: "0101012345" },
@@ -26,8 +33,8 @@ const employee = (patch: Partial<EmployeeInfo> = {}): EmployeeInfo => ({
 })
 
 const engagement = (patch: Partial<EngagementInfo> = {}): EngagementInfo => ({
-  fromDate: "2020-01-01",
-  toDate: "",
+  fromDate: moValidityFrom(day("2020-01-01")),
+  toDate: undefined,
   orgUnit: { uuid: "u1", name: "Unit" },
   user_key: "E1",
   jobFunction: { uuid: "j1", name: "Job" },
@@ -40,8 +47,8 @@ const engagement = (patch: Partial<EngagementInfo> = {}): EngagementInfo => ({
 })
 
 const ituser = (patch: Partial<ItuserInfo> = {}): ItuserInfo => ({
-  fromDate: "2020-01-01",
-  toDate: "",
+  fromDate: moValidityFrom(day("2020-01-01")),
+  toDate: undefined,
   itSystem: { uuid: "s1", name: "AD" },
   user_key: "alice",
   externalId: "",
@@ -53,8 +60,8 @@ const ituser = (patch: Partial<ItuserInfo> = {}): ItuserInfo => ({
 })
 
 const manager = (patch: Partial<ManagerInfo> = {}): ManagerInfo => ({
-  fromDate: "2020-01-01",
-  toDate: "",
+  fromDate: moValidityFrom(day("2020-01-01")),
+  toDate: undefined,
   orgUnit: { uuid: "u1", name: "Unit" },
   managerType: { uuid: "mt1", name: "Type" },
   managerLevel: { uuid: "ml1", name: "Level" },
@@ -64,8 +71,8 @@ const manager = (patch: Partial<ManagerInfo> = {}): ManagerInfo => ({
 })
 
 const address = (patch: Partial<AddressInfo> = {}): AddressInfo => ({
-  fromDate: "2020-01-01",
-  toDate: "",
+  fromDate: moValidityFrom(day("2020-01-01")),
+  toDate: undefined,
   visibility: { uuid: "v1", name: "Public" },
   addressType: { uuid: "at1", name: "Email", scope: "EMAIL" },
   addressValue: { name: "", value: "a@b.dk" },
@@ -145,7 +152,7 @@ describe("buildUserflowPayload", () => {
         }),
         engagements: [
           engagement({
-            toDate: "2021-01-01",
+            toDate: moValidityTo(day("2021-01-31")),
             primary: { uuid: "p1", name: "Primary" },
             extension1: "007",
             extension4: "42",
@@ -165,7 +172,7 @@ describe("buildUserflowPayload", () => {
     )
 
     expect(incomplete).toEqual([])
-    expect(payload).toEqual({
+    expect(sent(payload)).toEqual({
       employeeInput: {
         uuid: "uuid-0",
         // Dashes are stripped before the CPR reaches MO.
@@ -185,7 +192,10 @@ describe("buildUserflowPayload", () => {
           primary: "p1",
           extension_1: "007",
           extension_4: "42",
-          validity: { from: "2020-01-01", to: "2021-01-01" },
+          validity: {
+            from: "2020-01-01T00:00:00+01:00",
+            to: "2021-02-01T00:00:00+01:00",
+          },
         },
       ],
       ituserInput: [
@@ -197,14 +207,14 @@ describe("buildUserflowPayload", () => {
           note: "a note",
           external_id: "X-1",
           primary: "p1",
-          validity: { from: "2020-01-01", to: null },
+          validity: { from: "2020-01-01T00:00:00+01:00", to: null },
         },
       ],
       rolebindingInput: [
         {
           ituser: "uuid-1",
           role: "r1",
-          validity: { from: "2020-01-01", to: null },
+          validity: { from: "2020-01-01T00:00:00+01:00", to: null },
         },
       ],
       managerInput: [
@@ -214,7 +224,7 @@ describe("buildUserflowPayload", () => {
           manager_type: "mt1",
           manager_level: "ml1",
           responsibility: ["r1"],
-          validity: { from: "2020-01-01", to: null },
+          validity: { from: "2020-01-01T00:00:00+01:00", to: null },
         },
       ],
       addressInput: [
@@ -224,7 +234,7 @@ describe("buildUserflowPayload", () => {
           value: "a@b.dk",
           user_key: "desc",
           visibility: "v1",
-          validity: { from: "2020-01-01", to: null },
+          validity: { from: "2020-01-01T00:00:00+01:00", to: null },
         },
       ],
     })
@@ -340,12 +350,12 @@ describe("buildUserflowPayload", () => {
 
   // The exhaustive test above pins a manager with no end date and one
   // responsibility; this covers the other side of both.
-  it("keeps a manager's end date and maps every responsibility", () => {
+  it("sends a manager's end date and maps every responsibility", () => {
     const { payload } = buildUserflowPayload(
       stores({
         managers: [
           manager({
-            toDate: "2021-01-01",
+            toDate: moValidityTo(day("2021-01-31")),
             responsibilities: [
               { uuid: "r1", name: "A" },
               { uuid: "r2", name: "B" },
@@ -356,7 +366,7 @@ describe("buildUserflowPayload", () => {
       uuidsFor(1)
     )
     expect(payload.managerInput[0].responsibility).toEqual(["r1", "r2"])
-    expect(payload.managerInput[0].validity.to).toBe("2021-01-01")
+    expect(sent(payload.managerInput[0].validity).to).toBe("2021-02-01T00:00:00+01:00")
   })
 })
 
@@ -413,7 +423,7 @@ describe("isEmpty helpers", () => {
 
   // Only the start date is seeded, so an end date alone is a real edit.
   it("treats an end date alone as a touch", () => {
-    const ended = { toDate: "2021-01-01" }
+    const ended = { toDate: moValidityTo(day("2020-12-31")) }
     expect(isEmptyEngagement(engagement({ ...cleanEngagement, ...ended }))).toBe(false)
     expect(isEmptyItuser(ituser({ ...cleanItuser, ...ended }))).toBe(false)
     expect(isEmptyManager(manager({ ...cleanManager, ...ended }))).toBe(false)

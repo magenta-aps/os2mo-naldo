@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { Temporal } from "temporal-polyfill"
+  import { sameMoment } from "$lib/utils/date"
+  import type { ValidityBounds } from "$lib/utils/validities"
   import { _ } from "svelte-i18n"
   import { get } from "svelte/store"
   import { capital, formatITSystemNames } from "$lib/utils/helpers"
@@ -6,7 +9,8 @@
   import { env } from "$lib/env"
   import { gql } from "graphql-request"
   import { graphQLClient } from "$lib/http/client"
-  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
+  import EndDateInput from "$lib/components/forms/shared/EndDateInput.svelte"
+  import StartDateInput from "$lib/components/forms/shared/StartDateInput.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
   import TextArea from "$lib/components/forms/shared/TextArea.svelte"
@@ -72,7 +76,11 @@
 
   // Seeded from the bound value: validation must not wait for the gated select
   // to sync its name after the systems load.
-  const fromDateField = field("from", "", [required()])
+  const fromDateField = field<Temporal.ZonedDateTime | null | undefined>(
+    "from",
+    undefined,
+    [required()]
+  )
   const itSystemField = field("it_system", value.itSystem?.name ?? "", [required()])
   const accountNameField = field("account_name", value.user_key, [required()])
   const svelteForm = form(fromDateField, itSystemField, accountNameField)
@@ -82,8 +90,10 @@
     return get(svelteForm).valid
   }
 
-  // Projected to primitives so unrelated keystrokes don't refire the blocks below.
-  $: fromDate = value.fromDate
+  // Projected out of `value`, dates only when they change, so unrelated
+  // keystrokes don't refire the blocks below.
+  let fromDate: Temporal.ZonedDateTime | null | undefined
+  $: if (!sameMoment(value.fromDate, fromDate)) fromDate = value.fromDate
   $: itSystemUuid = value.itSystem?.uuid
 
   const itSystems = createQuery<ClassValue[] | undefined>()
@@ -118,10 +128,7 @@
 
   // TODO: once ITUsers link to engagements, these bounds need to come from
   // engagement -> org_unit validities instead.
-  const validities = createQuery<{
-    from: string | undefined | null
-    to: string | undefined | null
-  }>({ from: null, to: null })
+  const validities = createQuery<ValidityBounds>({ from: null, to: null })
   $: if (personUuid) {
     const uuid = personUuid
     validities.run((signal) => getPersonValidities(uuid, signal))
@@ -133,10 +140,11 @@
   // Only fetch when a start date is set: the query rejects a null date, and
   // the primary select is disabled without one anyway.
   $: if (fromDate) {
+    const at = fromDate
     facets.run((signal) =>
       getPrimaryClasses(
         {
-          fromDate: fromDate,
+          fromDate: at,
           primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY,
         },
         signal
@@ -153,7 +161,7 @@
 </script>
 
 <div class="flex flex-row gap-6">
-  <DateInput
+  <StartDateInput
     bind:value={value.fromDate}
     bind:validationValue={$fromDateField.value}
     errors={$fromDateField.errors}
@@ -163,7 +171,7 @@
     max={value.toDate ? value.toDate : $validities.data?.to}
     required={true}
   />
-  <DateInput
+  <EndDateInput
     bind:value={value.toDate}
     title={capital($_("date.end_date"))}
     id="{idPrefix}to"
