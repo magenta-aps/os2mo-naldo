@@ -1,4 +1,5 @@
 import { env } from "$lib/env"
+import { lastValidDay, startOfDay, toMO } from "$lib/utils/date"
 import { capital } from "$lib/utils/helpers"
 import type { MainQuery } from "$lib/utils/insights"
 import { _ } from "svelte-i18n"
@@ -10,7 +11,11 @@ const validityField = {
   label: "validity",
   query: "validity { from to }",
   getHeaders: () => [t("from"), t("to")],
-  getValues: (row: any) => [row.validity?.from ?? "", row.validity?.to ?? ""],
+  getValues: (row: any) => [
+    row.validity?.from ? toMO(row.validity.from) : "",
+    // Midnight at the start of the last valid day, as MO sent it before v29.
+    row.validity?.to ? toMO(startOfDay(lastValidDay(row.validity.to)!)) : "",
+  ],
 }
 
 const subjectField = {
