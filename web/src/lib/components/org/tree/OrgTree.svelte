@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Temporal } from "temporal-polyfill"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
   import { page } from "$app/stores"
@@ -68,7 +69,7 @@
   `
 
   const fetchOrgTree = async (
-    fromDate: string,
+    fromDate: Temporal.PlainDate,
     childUuid?: string | null,
     orgUnitHierarchyUuid?: string | null,
     signal?: AbortSignal
@@ -125,7 +126,7 @@
   let abortController: AbortController
 
   // Only runs when Date changes.
-  $: if ($date && $date !== cachedDate) {
+  $: if ($date && $date.toString() !== cachedDate) {
     ;(async () => {
       try {
         const res = await getClasses({
@@ -135,7 +136,7 @@
         })
         hierarchyClasses =
           filterClassesByFacetUserKey(res, "org_unit_hierarchy")?.flat() ?? []
-        cachedDate = $date
+        cachedDate = $date.toString()
       } catch (e) {
         console.error(e)
       }

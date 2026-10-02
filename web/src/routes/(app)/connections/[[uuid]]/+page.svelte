@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { Temporal } from "temporal-polyfill"
+  import { moValidityFrom } from "$lib/utils/date"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
   import { graphQLClient } from "$lib/http/client"
@@ -14,7 +16,7 @@
     UpdateRelatedUnitsDocument,
     RelatedUnitsDocument,
   } from "./query.generated"
-  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
+  import StartDateInput from "$lib/components/forms/shared/StartDateInput.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import Search from "$lib/components/search/Search.svelte"
   import { findClosestValidity } from "$lib/utils/validities"
@@ -83,16 +85,20 @@
     }
   `
 
-  let startDate: string = $date
+  let startDate: Temporal.ZonedDateTime | null | undefined = moValidityFrom($date)
 
-  const fromDate = field("from", "", [required()])
+  const fromDate = field<Temporal.ZonedDateTime | null | undefined>("from", undefined, [
+    required(),
+  ])
   const svelteForm = form(fromDate)
 
   let originOrgUnit: { uuid: string; name: string } | undefined
 
   $: selectedOriginOrg = originOrgUnit?.uuid ?? null
 
-  const loadOrgTree = async (fromDate: string) => {
+  type FromDate = Temporal.ZonedDateTime | null | undefined
+
+  const loadOrgTree = async (fromDate: FromDate) => {
     const res = await graphQLClient().request(OrgUnitsWithChildrenDocument, {
       fromDate: fromDate,
     })
@@ -103,11 +109,12 @@
   // The root tree depends only on `fromDate`, so cache by date: switching origin
   // (same date) reuses the in-flight/resolved tree instead of refetching it.
   const orgTreeCache = new Map<string, ReturnType<typeof loadOrgTree>>()
-  const fetchOrgTree = (fromDate: string) => {
-    let cached = orgTreeCache.get(fromDate)
+  const fetchOrgTree = (fromDate: FromDate) => {
+    const key = fromDate?.toString() ?? ""
+    let cached = orgTreeCache.get(key)
     if (!cached) {
       cached = loadOrgTree(fromDate)
-      orgTreeCache.set(fromDate, cached)
+      orgTreeCache.set(key, cached)
     }
     return cached
   }
@@ -117,7 +124,7 @@
   // should be auto-expanded (= every ancestor of every destination).
   const buildState = async (
     org: { uuid: string; name: string } | undefined,
-    fromDate: string
+    fromDate: FromDate
   ) => {
     if (!org)
       return {
@@ -255,7 +262,7 @@
   <div class="rounded-sm min-w-fit bg-base-200">
     <div class="flex flex-col gap-6 p-8 sm:flex-row sm:items-start">
       <div class="flex flex-col gap-6 w-full sm:w-1/4">
-        <DateInput
+        <StartDateInput
           bind:value={startDate}
           bind:validationValue={$fromDate.value}
           errors={$fromDate.errors}

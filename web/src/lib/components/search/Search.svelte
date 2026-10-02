@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Temporal } from "temporal-polyfill"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
   import SvelteSelect from "svelte-select"
@@ -171,7 +172,8 @@
   export let extra_classes = ""
   export let disabled = false
   export let errors: string[] = []
-  export let at: string | undefined = undefined
+  export let at: Temporal.PlainDate | Temporal.ZonedDateTime | null | undefined =
+    undefined
 
   // Custom variable for loading/spinner, since aborting queries makes svelte-select set `loading = true`
   let spinner = false
@@ -191,12 +193,13 @@
   // item valid on the previous date may not exist on the new one. Resolve it
   // as-of the new date — clear it if it's gone (so the user can't submit a
   // stale selection the backend would reject) or refresh its name if it was
-  // renamed. `at === undefined` (no date binding) and `at === ""` (date
-  // cleared) both keep the value untouched.
-  let lastRevalidatedAt: string | undefined = at
-  const revalidateSelection = async (currentAt: string | undefined) => {
-    if (currentAt === lastRevalidatedAt) return
-    lastRevalidatedAt = currentAt
+  // renamed. `at === undefined` (no date binding) and `at === null` (date
+  // cleared) both keep the value untouched. Dates compare by their string form,
+  // since an equal date can arrive as a new object.
+  let lastRevalidatedAt = at?.toString()
+  const revalidateSelection = async (currentAt: typeof at) => {
+    if (currentAt?.toString() === lastRevalidatedAt) return
+    lastRevalidatedAt = currentAt?.toString()
     if (!currentAt || !value?.uuid) return
 
     const uuid = value.uuid
@@ -209,7 +212,7 @@
       const current = result.objects[0]?.current
 
       // Ignore stale responses if the date changed again or the selection moved.
-      if (currentAt !== lastRevalidatedAt || value?.uuid !== uuid) return
+      if (currentAt.toString() !== lastRevalidatedAt || value?.uuid !== uuid) return
 
       if (!current) {
         clearSelection()
@@ -232,11 +235,11 @@
     if (!filterText.length) return []
     if (filterText.length < 3) return []
 
-    // A cleared date input passes `at` as an empty string. Don't fall back to
+    // A cleared date input passes `at` as null. Don't fall back to
     // another date to search against, since a picked item might not be valid on
     // the date the user eventually chooses — require a date to be set first.
     // (`at === undefined` means no date binding at all, so `$date` is fine.)
-    if (at === "") return []
+    if (at === null) return []
     const atDate = at ?? $date
 
     spinner = true
@@ -382,7 +385,7 @@
       </div>
     </SvelteSelect>
   </div>
-  {#if at === ""}
+  {#if at === null}
     <span class="text-xs text-error">{capital($_("set_start_date_first"))}</span>
   {/if}
   {#each errors as error}

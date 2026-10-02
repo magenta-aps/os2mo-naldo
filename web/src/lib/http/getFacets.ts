@@ -1,5 +1,6 @@
 import { graphQLClient } from "$lib/http/client"
 import { capital } from "$lib/utils/helpers"
+import type { At } from "$lib/utils/validities"
 import { findClosestValidity } from "$lib/utils/validities"
 import { _, locale } from "svelte-i18n"
 import { get } from "svelte/store"
@@ -8,7 +9,7 @@ import { FacetDocument } from "./query.generated"
 export const getFacets = async (
   variables: {
     uuid: string | null
-    fromDate: string
+    fromDate: At
   },
   signal?: AbortSignal
 ) => {
