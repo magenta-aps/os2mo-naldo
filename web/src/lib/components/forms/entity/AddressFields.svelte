@@ -173,9 +173,8 @@
       id="{idPrefix}value"
       startValue={value.addressValue?.value
         ? {
-            tekst: value.addressValue.name,
-            adresse: { id: value.addressValue.value },
-            adgangsadresse: { id: value.addressValue.value },
+            id: value.addressValue.value,
+            titel: value.addressValue.name,
           }
         : undefined}
       bind:darValue={value.addressValue}

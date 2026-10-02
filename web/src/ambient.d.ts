@@ -4,17 +4,6 @@ interface Autocomplete {
   path: string[]
 }
 
-interface DarAddressResponse {
-  tekst: string | null | undefined
-  adresse: {
-    id: string
-  }
-  adgangsadresse: {
-    id: string
-  }
-}
-;[]
-
 interface CprLookupResponse {
   name: string | null | undefined
   cpr_no: string | null | undefined
