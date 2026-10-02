@@ -24,7 +24,7 @@ describe("validateAddress", () => {
   })
 
   it("rejects without fromDate", () => {
-    expect(validateAddress({ ...valid, fromDate: "" })).toBe(false)
+    expect(validateAddress({ ...valid, fromDate: null })).toBe(false)
   })
 
   it("rejects without addressType.uuid", () => {
@@ -116,7 +116,7 @@ describe("validateItuser", () => {
   })
 
   it("rejects without fromDate", () => {
-    expect(validateItuser({ ...valid, fromDate: "" })).toBe(false)
+    expect(validateItuser({ ...valid, fromDate: null })).toBe(false)
   })
 
   it("rejects without itSystem.uuid", () => {
