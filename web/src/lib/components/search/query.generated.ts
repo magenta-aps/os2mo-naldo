@@ -9,7 +9,7 @@ export type OrgUnitSearchQueryVariables = Types.Exact<{
 }>;
 
 
-export type OrgUnitSearchQuery = { org_units: { objects: Array<{ validities: Array<{ name: string, uuid: any, ancestors: Array<{ name: string }>, validity: { from: any, to?: any | null }, addresses_response?: { objects: Array<{ current?: { address_type_response: { uuid: any, current?: { name: string } | null }, resolve: { __typename: 'DefaultAddress', value: string } | { __typename: 'MultifieldAddress', value: string, value2: string } | {} } | null }> } }> }> } };
+export type OrgUnitSearchQuery = { org_units: { objects: Array<{ validities: Array<{ name: string, uuid: any, ancestors: Array<{ name: string }>, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null }, addresses_response?: { objects: Array<{ current?: { address_type_response: { uuid: any, current?: { name: string } | null }, resolve: { __typename: 'DefaultAddress', value: string } | { __typename: 'MultifieldAddress', value: string, value2: string } | {} } | null }> } }> }> } };
 
 export type EmployeeSearchQueryVariables = Types.Exact<{
   employeeFilter: Types.EmployeeFilter;
@@ -19,7 +19,7 @@ export type EmployeeSearchQueryVariables = Types.Exact<{
 }>;
 
 
-export type EmployeeSearchQuery = { employees: { objects: Array<{ validities: Array<{ name: string, uuid: any, cpr_number?: any | null, validity: { from?: any | null, to?: any | null }, itusers_response?: { objects: Array<{ current?: { user_key: string } | null }> }, addresses_response?: { objects: Array<{ current?: { address_type_response: { uuid: any, current?: { name: string } | null }, resolve: { __typename: 'DefaultAddress', value: string } | { __typename: 'MultifieldAddress', value: string, value2: string } | {} } | null }> }, engagements_response: { objects: Array<{ current?: { org_unit_response: { uuid: any, current?: { name: string, ancestors: Array<{ name: string }> } | null } } | null }> } }> }> } };
+export type EmployeeSearchQuery = { employees: { objects: Array<{ validities: Array<{ name: string, uuid: any, cpr_number?: any | null, validity: { from?: import("temporal-polyfill").Temporal.ZonedDateTime | null, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null }, itusers_response?: { objects: Array<{ current?: { user_key: string } | null }> }, addresses_response?: { objects: Array<{ current?: { address_type_response: { uuid: any, current?: { name: string } | null }, resolve: { __typename: 'DefaultAddress', value: string } | { __typename: 'MultifieldAddress', value: string, value2: string } | {} } | null }> }, engagements_response: { objects: Array<{ current?: { org_unit_response: { uuid: any, current?: { name: string, ancestors: Array<{ name: string }> } | null } } | null }> } }> }> } };
 
 export type OrgUnitAtQueryVariables = Types.Exact<{
   uuid?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;

@@ -9,7 +9,7 @@ export type EngagementQueryVariables = Types.Exact<{
 }>;
 
 
-export type EngagementQuery = { engagements: { objects: Array<{ validities: Array<{ uuid: any, user_key: string, extension_1?: string | null, extension_4?: string | null, engagement_type_response: { uuid: any, current?: { name: string } | null }, job_function_response: { uuid: any, current?: { name: string } | null }, primary_response?: { uuid: any, current?: { name: string } | null } | null, validity: { from: any, to?: any | null }, org_unit_response: { uuid: any, current?: { name: string } | null } }> }> } };
+export type EngagementQuery = { engagements: { objects: Array<{ validities: Array<{ uuid: any, user_key: string, extension_1?: string | null, extension_4?: string | null, engagement_type_response: { uuid: any, current?: { name: string } | null }, job_function_response: { uuid: any, current?: { name: string } | null }, primary_response?: { uuid: any, current?: { name: string } | null } | null, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null }, org_unit_response: { uuid: any, current?: { name: string } | null } }> }> } };
 
 export type UpdateEngagementMutationVariables = Types.Exact<{
   input: Types.EngagementUpdateInput;

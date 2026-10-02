@@ -9,7 +9,7 @@ export type GetOrgUnitQueryVariables = Types.Exact<{
 }>;
 
 
-export type GetOrgUnitQuery = { org_units: { objects: Array<{ validities: Array<{ uuid: any, name: string, user_key: string, parent_response?: { uuid: any, current?: { name: string } | null } | null, time_planning_response?: { uuid: any, current?: { user_key: string, name: string } | null } | null, unit_type_response?: { uuid: any, current?: { user_key: string, name: string } | null } | null, unit_level_response?: { uuid: any, current?: { user_key: string, name: string } | null } | null, validity: { from: any, to?: any | null } }> }> } };
+export type GetOrgUnitQuery = { org_units: { objects: Array<{ validities: Array<{ uuid: any, name: string, user_key: string, parent_response?: { uuid: any, current?: { name: string } | null } | null, time_planning_response?: { uuid: any, current?: { user_key: string, name: string } | null } | null, unit_type_response?: { uuid: any, current?: { user_key: string, name: string } | null } | null, unit_level_response?: { uuid: any, current?: { user_key: string, name: string } | null } | null, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type UpdateOrgUnitMutationVariables = Types.Exact<{
   input: Types.OrganisationUnitUpdateInput;

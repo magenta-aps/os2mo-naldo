@@ -7,7 +7,7 @@ export type ItSystemsAndOrgQueryVariables = Types.Exact<{
 }>;
 
 
-export type ItSystemsAndOrgQuery = { itsystems: { objects: Array<{ current?: { name: string, uuid: any } | null }> }, org_units: { objects: Array<{ validities: Array<{ validity: { from: any, to?: any | null } }> }> } };
+export type ItSystemsAndOrgQuery = { itsystems: { objects: Array<{ current?: { name: string, uuid: any } | null }> }, org_units: { objects: Array<{ validities: Array<{ validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type CreateItUserMutationVariables = Types.Exact<{
   input: Types.ItUserCreateInput;

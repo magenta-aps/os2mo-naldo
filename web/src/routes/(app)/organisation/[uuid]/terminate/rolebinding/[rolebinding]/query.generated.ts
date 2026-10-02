@@ -6,7 +6,7 @@ export type RolebindingQueryVariables = Types.Exact<{
 }>;
 
 
-export type RolebindingQuery = { rolebindings: { objects: Array<{ validities: Array<{ validity: { from: any, to?: any | null }, org_unit_response?: { validities: Array<{ validity: { from: any, to?: any | null } }> } | null }> }> } };
+export type RolebindingQuery = { rolebindings: { objects: Array<{ validities: Array<{ validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null }, org_unit_response?: { validities: Array<{ validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> } | null }> }> } };
 
 export type TerminateRolebindingMutationVariables = Types.Exact<{
   input: Types.RoleBindingTerminateInput;

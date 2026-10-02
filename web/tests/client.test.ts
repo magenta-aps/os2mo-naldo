@@ -28,6 +28,20 @@ describe("graphQLClient", () => {
     vi.restoreAllMocks()
   })
 
+  it("converts the response's DateTime values to moments in Copenhagen", async () => {
+    const response = {
+      engagements: {
+        objects: [{ validities: [{ validity: { from: "2024-10-27T23:00:00Z" } }] }],
+      },
+    }
+    vi.stubGlobal("fetch", respondWith({ data: response }))
+    const data = (await graphQLClient().request(
+      "query { engagements { objects { validities { validity { from } } } } }"
+    )) as any
+    const { from } = data.engagements.objects[0].validities[0].validity
+    expect(from.toString({ timeZoneName: "never" })).toBe("2024-10-28T00:00:00+01:00")
+  })
+
   it("sends an X-Request-ID header, which MO binds to its logs", async () => {
     await graphQLClient().request(QUERY)
     expect(sentRequestId(fetch as any)).toBeTruthy()

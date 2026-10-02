@@ -8,7 +8,7 @@ export type EmployeeQueryVariables = Types.Exact<{
 }>;
 
 
-export type EmployeeQuery = { employees: { objects: Array<{ validities: Array<{ given_name: string, surname: string, nickname_givenname?: string | null, nickname_surname?: string | null, cpr_number?: any | null, validity: { from?: any | null, to?: any | null } }> }> } };
+export type EmployeeQuery = { employees: { objects: Array<{ validities: Array<{ given_name: string, surname: string, nickname_givenname?: string | null, nickname_surname?: string | null, cpr_number?: any | null, validity: { from?: import("temporal-polyfill").Temporal.ZonedDateTime | null, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type UpdateEmployeeMutationVariables = Types.Exact<{
   input: Types.EmployeeUpdateInput;

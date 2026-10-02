@@ -6,7 +6,7 @@ export type OrgUnitQueryVariables = Types.Exact<{
 }>;
 
 
-export type OrgUnitQuery = { org_units: { objects: Array<{ validities: Array<{ name: string, uuid: any, validity: { from: any, to?: any | null } }> }> } };
+export type OrgUnitQuery = { org_units: { objects: Array<{ validities: Array<{ name: string, uuid: any, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type CreateOrgUnitMutationVariables = Types.Exact<{
   input: Types.OrganisationUnitCreateInput;

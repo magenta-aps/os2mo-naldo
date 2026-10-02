@@ -7,7 +7,7 @@ export type GetEngagementsQueryVariables = Types.Exact<{
 }>;
 
 
-export type GetEngagementsQuery = { engagements: { objects: Array<{ current?: { uuid: any, person_response: { uuid: any, current?: { name: string } | null } } | null, validities: Array<{ validity: { from: any, to?: any | null } }> }> } };
+export type GetEngagementsQuery = { engagements: { objects: Array<{ current?: { uuid: any, person_response: { uuid: any, current?: { name: string } | null } } | null, validities: Array<{ validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type MoveEngagementsMutationVariables = Types.Exact<{
   input: Array<Types.EngagementUpdateInput> | Types.EngagementUpdateInput;

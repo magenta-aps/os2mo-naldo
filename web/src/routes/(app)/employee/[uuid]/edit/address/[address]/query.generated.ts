@@ -8,7 +8,7 @@ export type AddressAndFacetsQueryVariables = Types.Exact<{
 }>;
 
 
-export type AddressAndFacetsQuery = { addresses: { objects: Array<{ validities: Array<{ uuid: any, user_key: string, value: string, name?: string | null, address_type_response: { uuid: any, current?: { user_key: string, name: string } | null }, visibility_response?: { uuid: any, current?: { user_key: string, name: string } | null } | null, validity: { from: any, to?: any | null } }> }> } };
+export type AddressAndFacetsQuery = { addresses: { objects: Array<{ validities: Array<{ uuid: any, user_key: string, value: string, name?: string | null, address_type_response: { uuid: any, current?: { user_key: string, name: string } | null }, visibility_response?: { uuid: any, current?: { user_key: string, name: string } | null } | null, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type UpdateAddressMutationVariables = Types.Exact<{
   input: Types.AddressUpdateInput;

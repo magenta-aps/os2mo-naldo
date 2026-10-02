@@ -7,7 +7,7 @@ export type GetEmployeeQueryVariables = Types.Exact<{
 }>;
 
 
-export type GetEmployeeQuery = { employees: { objects: Array<{ validities: Array<{ uuid: any, name: string, validity: { from?: any | null, to?: any | null } }> }> } };
+export type GetEmployeeQuery = { employees: { objects: Array<{ validities: Array<{ uuid: any, name: string, validity: { from?: import("temporal-polyfill").Temporal.ZonedDateTime | null, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type GetEngagementsQueryVariables = Types.Exact<{
   uuid?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
