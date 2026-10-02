@@ -1,21 +1,26 @@
 import { date } from "$lib/stores/date"
+import { startOfDay } from "$lib/utils/date"
 import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
+import { Temporal } from "temporal-polyfill"
 import { beforeEach, describe, expect, it } from "vitest"
 
-// In GraphQL v29, `validity.to` is exclusive: it is the first instant AFTER
+// In GraphQL v29, `validity.to` is exclusive: it is the first moment AFTER
 // the validity ends. A validity ending "yesterday" therefore has
 // `to = today`. The boundary must count as past, not as present.
 const TODAY = "2020-01-01"
 const YESTERDAY = "2019-12-31"
 const TOMORROW = "2020-01-02"
 
+const day = (s: string) => Temporal.PlainDate.from(s)
 const validity = ({ from, to }: { from: string; to: string | null }) => ({
-  validity: { from: `${from}T00:00:00+02:00`, to: to ? `${to}T00:00:00+02:00` : null },
+  validity: { from: startOfDay(day(from)), to: to ? startOfDay(day(to)) : null },
 })
+// The variables as they are sent to MO.
+const asSent = (variables: object) => JSON.parse(JSON.stringify(variables))
 
 describe("tenseFilter", () => {
   beforeEach(() => {
-    date.set(TODAY)
+    date.set(day(TODAY))
   })
 
   describe("past", () => {
@@ -83,14 +88,20 @@ describe("tenseFilter", () => {
 
 describe("tenseToValidity", () => {
   it("maps past to a null lower bound and today as upper bound", () => {
-    expect(tenseToValidity("past", TODAY)).toEqual({ fromDate: null, toDate: TODAY })
+    expect(asSent(tenseToValidity("past", day(TODAY)))).toEqual({
+      fromDate: null,
+      toDate: TODAY,
+    })
   })
 
   it("maps present to today as lower bound only", () => {
-    expect(tenseToValidity("present", TODAY)).toEqual({ fromDate: TODAY })
+    expect(asSent(tenseToValidity("present", day(TODAY)))).toEqual({ fromDate: TODAY })
   })
 
   it("maps future to today as lower bound and null upper bound", () => {
-    expect(tenseToValidity("future", TODAY)).toEqual({ fromDate: TODAY, toDate: null })
+    expect(asSent(tenseToValidity("future", day(TODAY)))).toEqual({
+      fromDate: TODAY,
+      toDate: null,
+    })
   })
 })

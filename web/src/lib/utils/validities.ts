@@ -1,11 +1,27 @@
 import type { OpenValidity, Validity } from "$lib/graphql/types"
-import { format, formatISO, isValid, parseISO, subDays } from "date-fns"
+import { firstValidDay, lastValidDay, startOfDay, toMO } from "$lib/utils/date"
+import { Temporal } from "temporal-polyfill"
+
+const { compare } = Temporal.ZonedDateTime
 
 // The helpers below read nothing but `validity`, and return the element they
 // were given, so the caller keeps its own generated type.
 type HasValidity = { validity: Validity | OpenValidity }
 
-export const getMinMaxValidities = (validities: HasValidity[] | undefined | null) => {
+// The earliest `from` and latest `to` of an object's validities, as the date
+// inputs' `min` and `max`.
+export type ValidityBounds = {
+  from?: Temporal.ZonedDateTime | null
+  to?: Temporal.ZonedDateTime | null
+}
+
+// A day, such as the global date, or a moment, such as a form's start date.
+export type At = Temporal.PlainDate | Temporal.ZonedDateTime
+const toMoment = (at: At) => (at instanceof Temporal.PlainDate ? startOfDay(at) : at)
+
+export const getMinMaxValidities = (
+  validities: HasValidity[] | undefined | null
+): ValidityBounds => {
   // This handles optional person/org_unit validities
   // Changed this from error to warning, since this isn't always an error
   // For example when we create objects without specifying uuid (org_unit and leave)
@@ -17,40 +33,32 @@ export const getMinMaxValidities = (validities: HasValidity[] | undefined | null
     }
   }
 
-  let minDate
-  let maxDate
+  let minFrom: Temporal.ZonedDateTime | undefined
+  // null once any validity is open-ended
+  let maxTo: Temporal.ZonedDateTime | null | undefined
 
-  for (const validity of validities) {
-    const fromDate = parseISO(validity.validity.from)
-    const toDate = validity.validity.to ? parseISO(validity.validity.to) : null
-
-    if (isValid(fromDate) && (!minDate || fromDate < minDate)) {
-      minDate = fromDate
+  for (const { validity } of validities) {
+    if (validity.from && (!minFrom || compare(validity.from, minFrom) < 0)) {
+      minFrom = validity.from
     }
 
-    if (!isValid(toDate) || maxDate === null) {
-      maxDate = null
-    } else if (maxDate === undefined || toDate! > maxDate) {
-      maxDate = toDate
+    if (!validity.to || maxTo === null) {
+      maxTo = null
+    } else if (maxTo === undefined || compare(validity.to, maxTo) > 0) {
+      maxTo = validity.to
     }
   }
   return {
-    from: minDate ? format(minDate, "yyyy-MM-dd") : undefined,
-    to: maxDate ? format(maxDate, "yyyy-MM-dd") : undefined,
+    from: minFrom,
+    to: maxTo ?? undefined,
   }
 }
 
 export const formatQueryDates = (validity: Validity | OpenValidity): string => {
-  const from = parseISO(validity.from)
-  const to = parseISO(validity.to)
-
-  // If date is not valid, set to null (we never return null, it's just to make it clearer than an empty string)
-  const formattedFrom = isValid(from)
-    ? `from=${encodeURIComponent(formatISO(from, { representation: "complete" }))}`
+  const formattedFrom = validity.from
+    ? `from=${encodeURIComponent(toMO(validity.from))}`
     : null
-  const formattedTo = isValid(to)
-    ? `to=${encodeURIComponent(formatISO(to, { representation: "complete" }))}`
-    : null
+  const formattedTo = validity.to ? `to=${encodeURIComponent(toMO(validity.to))}` : null
 
   if (!formattedFrom && !formattedTo) {
     return ""
@@ -63,22 +71,30 @@ export const formatQueryDates = (validity: Validity | OpenValidity): string => {
   return `?${formattedFrom || formattedTo}`
 }
 
+// Whether an edit moves an end date later: removes it, or sets it after the
+// one the form loaded.
+export const isLaterEnd = (
+  to: Temporal.ZonedDateTime | null | undefined,
+  original: Temporal.ZonedDateTime | null | undefined
+): boolean => {
+  return to ? !!original && compare(to, original) > 0 : !!original
+}
+
 // Clamp a date into a validity range, so a lookup on a referenced object
 // (e.g. an engagement's org_unit) lands inside the referencing row's own
 // validity and can't return a name the object only carried outside it. `validity.to` is exclusive (v29), so the upper clamp is the
-// day before `to`. Compares date portions like `tenseFilter` does.
+// day before `to`.
 export const clampDateToValidity = (
-  date: string,
+  date: Temporal.PlainDate,
   validity: Validity | OpenValidity
-): string => {
-  const fromDay = validity.from?.split("T")[0]
-  const toDay = validity.to?.split("T")[0]
+): Temporal.PlainDate => {
+  const moment = startOfDay(date)
 
-  if (fromDay && date < fromDay) {
-    return fromDay
+  if (validity.from && compare(moment, validity.from) < 0) {
+    return firstValidDay(validity.from)!
   }
-  if (toDay && date >= toDay) {
-    return format(subDays(parseISO(toDay), 1), "yyyy-MM-dd")
+  if (validity.to && compare(moment, validity.to) >= 0) {
+    return lastValidDay(validity.to)!
   }
   return date
 }
@@ -88,7 +104,7 @@ export const clampDateToValidity = (
 export const findClosestValidityWithin = <T extends HasValidity>(
   validities: T[] | null | undefined,
   range: Validity | OpenValidity,
-  date: string
+  date: Temporal.PlainDate
 ): T | null => {
   if (!validities || !validities.length) {
     return null
@@ -103,22 +119,15 @@ export const filterValiditiesInRange = <T extends HasValidity>(
   validities: T[],
   range: Validity | OpenValidity
 ): T[] => {
-  const rangeFrom = range.from ? parseISO(range.from) : null
-  const rangeTo = range.to ? parseISO(range.to) : null
-
-  return validities.filter((object) => {
-    const from = parseISO(object.validity.from)
-    const to = object.validity.to ? parseISO(object.validity.to) : null
-
-    if (rangeTo && isValid(rangeTo) && isValid(from) && from >= rangeTo) return false
-    if (to && isValid(to) && rangeFrom && isValid(rangeFrom) && to <= rangeFrom)
-      return false
+  return validities.filter(({ validity }) => {
+    if (range.to && validity.from && compare(validity.from, range.to) >= 0) return false
+    if (validity.to && range.from && compare(validity.to, range.from) <= 0) return false
     return true
   })
 }
 
 // Setting `validities: any` to avoid having to create the types in `Search.svelte` by hand
-export const findClosestValidity = (validities: any, date: string) => {
+export const findClosestValidity = (validities: any, date: At | null | undefined) => {
   // Return early if only 1 validity is present (this should always be the case, unless `PUBLIC_SEARCH_INFINITY: "true"`)
   if (validities.length === 1) {
     return validities[0]
@@ -129,24 +138,33 @@ export const findClosestValidity = (validities: any, date: string) => {
   // object doesn't exist yet at all on `date`.
   let latestPast = null
   let earliestFuture = null
-  const filterDate = parseISO(date)
+  // A cleared date input gives no date, which matches no validity as active or
+  // future, so the latest past one is picked.
+  const moment = date ? toMoment(date) : null
 
   for (const object of validities) {
-    const fromDate = parseISO(object.validity.from)
-    const toDate = object.validity.to ? parseISO(object.validity.to) : null
+    const { from, to } = object.validity
 
     // Check if the validity is active on input `date`
-    if (fromDate <= filterDate && (!toDate || toDate > filterDate)) {
+    if (
+      moment &&
+      from &&
+      compare(from, moment) <= 0 &&
+      (!to || compare(to, moment) > 0)
+    ) {
       return object
     }
 
-    if (fromDate > filterDate) {
-      if (!earliestFuture || fromDate < parseISO(earliestFuture.validity.from)) {
+    if (moment && from && compare(from, moment) > 0) {
+      if (!earliestFuture || compare(from, earliestFuture.validity.from) < 0) {
         earliestFuture = object
       }
     } else {
-      // Not active and not in the future, so `toDate` is set and in the past
-      if (!latestPast || toDate! > parseISO(latestPast.validity.to)) {
+      // Not active and not in the future, so `to` is set and in the past
+      if (
+        !latestPast ||
+        (to && latestPast.validity.to && compare(to, latestPast.validity.to) > 0)
+      ) {
         latestPast = object
       }
     }
