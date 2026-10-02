@@ -17,8 +17,8 @@ export const actions: Actions = {
       JSON.parse(data.get("responsibility") as string) as UnpackedClass
     ).map((v) => v.uuid)
     const engagementUuid = data.get("engagement-uuid")
-    const startDate = data.get("from")
-    const endDate = data.get("to")
+    const startDate = data.get("from") as string
+    const endDate = data.get("to") as string | null
 
     return {
       uuid: params.manager,

@@ -8,8 +8,8 @@ export const actions: Actions = {
     const last_name = data.get("last-name") as string
     const nicknameFirstName = data.get("nickname-first-name") as string
     const nicknameLastName = data.get("nickname-last-name") as string
-    const startDate = data.get("from")
-    const endDate = data.get("to")
+    const startDate = data.get("from") as string
+    const endDate = data.get("to") as string | null
 
     return {
       uuid: params.uuid,

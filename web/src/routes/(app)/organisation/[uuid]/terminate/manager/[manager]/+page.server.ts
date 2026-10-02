@@ -7,7 +7,7 @@ export const actions: Actions = {
     params,
   }: RequestEvent): Promise<ManagerTerminateInput> => {
     const data = await request.formData()
-    const toDate = data.get("to")
+    const toDate = data.get("to") as string
 
     return {
       uuid: params.manager,

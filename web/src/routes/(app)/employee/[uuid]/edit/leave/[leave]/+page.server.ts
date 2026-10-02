@@ -6,8 +6,8 @@ export const actions: Actions = {
     const data = await request.formData()
     const leaveTypeUuid = data.get("leave-type-uuid")
     const engagementUuid = data.get("engagement-uuid")
-    const startDate = data.get("from")
-    const endDate = data.get("to")
+    const startDate = data.get("from") as string
+    const endDate = data.get("to") as string | null
 
     return {
       uuid: params.leave,

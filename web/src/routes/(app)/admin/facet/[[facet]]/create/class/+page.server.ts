@@ -9,8 +9,8 @@ export const actions: Actions = {
     const userKey = data.get("user-key") as string
     const itsystem = data.get("itsystem")
     const scope = data.get("scope") as string | null
-    const startDate = data.get("from")
-    const endDate = data.get("to")
+    const startDate = data.get("from") as string
+    const endDate = data.get("to") as string | null
 
     return {
       facet_uuid: facet,

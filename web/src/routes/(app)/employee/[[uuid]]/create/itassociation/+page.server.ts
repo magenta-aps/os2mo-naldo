@@ -11,8 +11,8 @@ export const actions: Actions = {
     const itUser = data.get("it-user-uuid")
     const primary = data.get("primary") ? data.get("primary") : data.get("non-primary")
     const jobFunction = data.get("job-function")
-    const startDate = data.get("from")
-    const endDate = data.get("to")
+    const startDate = data.get("from") as string
+    const endDate = data.get("to") as string | null
 
     return {
       person: params.uuid,

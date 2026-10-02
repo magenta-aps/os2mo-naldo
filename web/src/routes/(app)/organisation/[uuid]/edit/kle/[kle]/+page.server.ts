@@ -13,8 +13,8 @@ export const actions: Actions = {
     const kleAspects = (
       JSON.parse(data.get("kle-aspects") as string) as UnpackedClass
     ).map((v) => v.uuid)
-    const startDate = data.get("from")
-    const endDate = data.get("to")
+    const startDate = data.get("from") as string
+    const endDate = data.get("to") as string | null
 
     return {
       uuid: params.kle,

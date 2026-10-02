@@ -7,7 +7,7 @@ export const actions: Actions = {
 
     const originUuid = data.get("origin")
     const destinationUuids = data.getAll("destination")
-    const startDate = data.get("from")
+    const startDate = data.get("from") as string
 
     return {
       origin: originUuid,

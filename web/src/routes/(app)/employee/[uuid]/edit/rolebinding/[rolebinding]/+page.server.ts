@@ -9,8 +9,8 @@ export const actions: Actions = {
     const data = await request.formData()
     const ituserUuid = data.get("it-user-uuid")
     const roleUuid = data.get("it-system-role-uuid")
-    const startDate = data.get("from")
-    const endDate = data.get("to")
+    const startDate = data.get("from") as string
+    const endDate = data.get("to") as string | null
 
     return {
       uuid: params.rolebinding,
