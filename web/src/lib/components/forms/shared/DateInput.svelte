@@ -1,24 +1,35 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
+  import { Temporal } from "temporal-polyfill"
+
   export let title: string | undefined = undefined
   export let id: string
+  // StartDateInput and EndDateInput pass "" and submit their own value.
   export let name = id
-  export let value: string | number | undefined
-  export let validationValue: string | number | undefined = undefined
-  export let startValue: string | number | undefined = undefined
-  value = startValue ? startValue : value
+  // null once the user clears the field; undefined before it has a value.
+  export let value: Temporal.PlainDate | null | undefined = undefined
+  export let validationValue: Temporal.PlainDate | null | undefined = undefined
+  export let startValue: Temporal.PlainDate | null | undefined = undefined
+  value = startValue ?? value
   export let required = false
   export let disabled = false
-  export let min: string | undefined | null = undefined
-  export let max: string | undefined | null = undefined
+  export let min: Temporal.PlainDate | null | undefined = undefined
+  export let max: Temporal.PlainDate | null | undefined = undefined
   export let errors: string[] = []
   // We changed from `pb-4` to having `pb-3` and `pb-1`, which messed with the navbar DateInput.
   // This is a workaround.
   export let noPadding: Boolean = false
 
-  $: {
-    validationValue = value
+  // The browser's date field holds yyyy-MM-dd text, or "" when empty.
+  let text = value?.toString() ?? ""
+  $: if ((value?.toString() ?? "") !== text) text = value?.toString() ?? ""
+
+  const onInput = (event: Event) => {
+    text = (event.currentTarget as HTMLInputElement).value
+    value = text ? Temporal.PlainDate.from(text) : null
   }
+
+  $: validationValue = value
 </script>
 
 <div class="form-control basis-1/2 {noPadding ? '' : 'pb-3'}">
@@ -32,11 +43,11 @@
     <input
       {id}
       {name}
-      bind:value
+      value={text}
+      on:input={onInput}
       type="date"
-      on:change
-      {min}
-      {max}
+      min={min?.toString()}
+      max={max?.toString()}
       class="input input-bordered input-sm rounded text-base text-base-content font-normal w-full cursor-pointer focus:outline-0 {errors.length
         ? 'input-error'
         : 'focus:input-primary'}"
