@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Temporal } from "temporal-polyfill"
   import { _ } from "svelte-i18n"
   import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
@@ -21,7 +22,7 @@
   export let indent = 0
   export let uuid = ""
   export let open = false
-  export let fromDate: string
+  export let fromDate: Temporal.ZonedDateTime | null | undefined
   export let openSet: Set<string> = new Set()
   export let selectedOriginOrg: string | null = null
   export let selectedDestinationOrgs: string[] = []

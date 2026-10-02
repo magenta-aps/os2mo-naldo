@@ -1,3 +1,4 @@
+import { Temporal } from "temporal-polyfill"
 // Should put logic from `orgTree.svelte` here
 
 export type OrgTreeItem = {
@@ -7,5 +8,5 @@ export type OrgTreeItem = {
   has_children: boolean
   orgUnitHierarchyUuid?: string | null
   breadcrumbs?: string[]
-  fromDate: string
+  fromDate: Temporal.PlainDate
 }

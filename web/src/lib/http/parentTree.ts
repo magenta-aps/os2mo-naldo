@@ -1,7 +1,8 @@
 import { graphQLClient } from "$lib/http/client"
+import { Temporal } from "temporal-polyfill"
 import { GetParentDocument } from "./query.generated"
 
-const fetchParent = async (uuid: string, currentDate: string) => {
+const fetchParent = async (uuid: string, currentDate: Temporal.PlainDate) => {
   const res = await graphQLClient().request(GetParentDocument, {
     uuid: uuid,
     currentDate: currentDate,
@@ -15,7 +16,7 @@ const fetchParent = async (uuid: string, currentDate: string) => {
 
 export const fetchParentTree = async (
   uuid: string,
-  currentDate: string
+  currentDate: Temporal.PlainDate
 ): Promise<{ name: string; uuid: any | null }[]> => {
   const parent = await fetchParent(uuid, currentDate)
 

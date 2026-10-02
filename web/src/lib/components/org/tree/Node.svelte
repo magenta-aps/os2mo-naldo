@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Temporal } from "temporal-polyfill"
   import { _ } from "svelte-i18n"
   import { base } from "$app/paths"
   import { page } from "$app/stores"
@@ -24,7 +25,7 @@
   export let uuid = ""
   export let breadcrumbs: string[] = []
   export let open = false
-  export let fromDate: string
+  export let fromDate: Temporal.PlainDate
   export let orgUnitHierarchyUuid: string | undefined | null = undefined
 
   let loading = false
