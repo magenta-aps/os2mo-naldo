@@ -1,7 +1,7 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
-  import { formatDate } from "$lib/utils/date"
+  import { formatDay, lastValidDay } from "$lib/utils/date"
 
   interface Validity {
     from?: any
@@ -17,7 +17,7 @@
       >{capital($_("date.start"))}</span
     >
     {#if validity.from}
-      {formatDate(validity.from)}
+      {formatDay(validity.from.toPlainDate())}
     {/if}
   </div>
   <div>
@@ -25,7 +25,7 @@
       >{capital($_("date.end"))}</span
     >
     {#if validity.to}
-      {formatDate(validity.to)}
+      {formatDay(lastValidDay(validity.to))}
     {/if}
   </div>
 </td>

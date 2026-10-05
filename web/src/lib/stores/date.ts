@@ -1,6 +1,4 @@
-import { formatInTimeZone } from "date-fns-tz"
+import { today } from "$lib/utils/date"
 import { writable } from "svelte/store"
 
-export const date = writable(
-  formatInTimeZone(new Date(), "Europe/Copenhagen", "yyyy-MM-dd")
-)
+export const date = writable(today())

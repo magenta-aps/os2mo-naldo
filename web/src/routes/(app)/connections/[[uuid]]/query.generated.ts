@@ -7,7 +7,7 @@ export type OrgUnitQueryVariables = Types.Exact<{
 }>;
 
 
-export type OrgUnitQuery = { org_units: { objects: Array<{ validities: Array<{ name: string, uuid: any, validity: { from: any, to?: any | null } }> }> } };
+export type OrgUnitQuery = { org_units: { objects: Array<{ validities: Array<{ name: string, uuid: any, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type OrgUnitsWithChildrenQueryVariables = Types.Exact<{
   fromDate?: Types.InputMaybe<Types.Scalars['DateTime']['input']>;
@@ -22,7 +22,7 @@ export type RelatedUnitsQueryVariables = Types.Exact<{
 }>;
 
 
-export type RelatedUnitsQuery = { related_units: { objects: Array<{ validities: Array<{ org_units_response: { objects: Array<{ uuid: any, current?: { ancestors: Array<{ uuid: any }> } | null }> }, validity: { from: any, to?: any | null } }> }> } };
+export type RelatedUnitsQuery = { related_units: { objects: Array<{ validities: Array<{ org_units_response: { objects: Array<{ uuid: any, current?: { ancestors: Array<{ uuid: any }> } | null }> }, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type UpdateRelatedUnitsMutationVariables = Types.Exact<{
   input: Types.RelatedUnitsUpdateInput;

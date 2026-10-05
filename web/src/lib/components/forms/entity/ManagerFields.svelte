@@ -1,10 +1,14 @@
 <script lang="ts">
+  import { Temporal } from "temporal-polyfill"
+  import { sameDate } from "$lib/utils/date"
+  import type { ValidityBounds } from "$lib/utils/validities"
   import { _ } from "svelte-i18n"
   import { get } from "svelte/store"
   import { capital } from "$lib/utils/helpers"
   import { gql } from "graphql-request"
   import { graphQLClient } from "$lib/http/client"
-  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
+  import EndDateInput from "$lib/components/forms/shared/EndDateInput.svelte"
+  import StartDateInput from "$lib/components/forms/shared/StartDateInput.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
   import SelectMultiple from "$lib/components/forms/shared/SelectMultiple.svelte"
   import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
@@ -81,7 +85,11 @@
 
   // Seeded from the bound value: validation must not wait for the facet-gated
   // selects to sync their names after the classes load.
-  const fromDateField = field("from", "", [required()])
+  const fromDateField = field<Temporal.ZonedDateTime | null | undefined>(
+    "from",
+    undefined,
+    [required()]
+  )
   const orgUnitField = field("org_unit", value.orgUnit?.name ?? "", [required()])
   const managerTypeField = field("manager_type", value.managerType?.name ?? "", [
     required(),
@@ -120,17 +128,17 @@
   // Clear any selected engagement when the user opts out.
   $: if (noEngagement && selectedEngagement) selectedEngagement = undefined
 
-  // Projected to primitives so unrelated keystrokes don't refire the blocks below.
-  $: fromDate = value.fromDate
-  $: toDate = value.toDate
+  // Projected out of `value`, dates only when they change, so unrelated
+  // keystrokes don't refire the blocks below.
+  let fromDate: Temporal.ZonedDateTime | null | undefined
+  $: if (!sameDate(value.fromDate, fromDate)) fromDate = value.fromDate
+  let toDate: Temporal.ZonedDateTime | null | undefined
+  $: if (!sameDate(value.toDate, toDate)) toDate = value.toDate
   $: orgUnitUuid = value.orgUnit?.uuid
 
   // Datepicker bounds for the selected org unit. See the employee edit
   // engagement form for the query pattern and its trade-offs.
-  const validities = createQuery<{
-    from: string | undefined | null
-    to: string | undefined | null
-  }>({ from: null, to: null })
+  const validities = createQuery<ValidityBounds>({ from: null, to: null })
   $: if (orgUnitUuid) {
     const uuid = orgUnitUuid
     validities.run((signal) => getValidities(uuid, signal))
@@ -142,10 +150,11 @@
   // Only fetch when a start date is set: getClasses rejects a null date, and
   // the facet selects are disabled without one anyway.
   $: if (fromDate) {
+    const at = fromDate
     facets.run((signal) =>
       getClasses(
         {
-          currentDate: fromDate,
+          currentDate: at,
           orgUuid: orgUnitUuid ?? null,
           facetUserKeys: ["manager_type", "manager_level", "responsibility"],
         },
@@ -158,7 +167,8 @@
   $: if (personUuid && fromDate) {
     const uuid = personUuid
     const from = fromDate
-    // A cleared end-date input is "", which the server rejects as a DateTime.
+    // undefined drops out of the variables, and MO reads an omitted to_date as
+    // from_date + 1 ms; null is an open end.
     const to = toDate || null
     engagements.run(async (signal) => {
       const res = await graphQLClient(signal).request(GetEngagementsDocument, {
@@ -179,7 +189,7 @@
 </script>
 
 <div class="flex flex-row gap-6">
-  <DateInput
+  <StartDateInput
     bind:value={value.fromDate}
     bind:validationValue={$fromDateField.value}
     errors={$fromDateField.errors}
@@ -189,7 +199,7 @@
     max={value.toDate ? value.toDate : $validities.data?.to}
     required={true}
   />
-  <DateInput
+  <EndDateInput
     bind:value={value.toDate}
     title={capital($_("date.end_date"))}
     id="{idPrefix}to"

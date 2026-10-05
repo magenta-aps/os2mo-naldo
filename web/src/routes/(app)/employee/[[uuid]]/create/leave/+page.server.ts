@@ -8,8 +8,8 @@ export const actions: Actions = {
     const employeeUuid = data.get("employee-uuid")
     const engagementUuid = data.get("engagement-uuid")
     const leaveTypeUuid = data.get("leave-type-uuid")
-    const startDate = data.get("from")
-    const endDate = data.get("to")
+    const startDate = data.get("from") as string
+    const endDate = data.get("to") as string | null
 
     return {
       person: employeeUuid,

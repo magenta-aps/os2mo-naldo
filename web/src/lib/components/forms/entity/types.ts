@@ -4,6 +4,8 @@
 
 import { get } from "svelte/store"
 import { date } from "$lib/stores/date"
+import { moValidityFrom } from "$lib/utils/date"
+import { Temporal } from "temporal-polyfill"
 
 // Mirrors the shared Select's Value shape, where uuid is nullable.
 export type ClassValue = {
@@ -31,8 +33,8 @@ export const createDefaultEmployeeValues = (): EmployeeValues => ({
 })
 
 export type EngagementValues = {
-  fromDate: string
-  toDate: string
+  fromDate: Temporal.ZonedDateTime | null | undefined
+  toDate: Temporal.ZonedDateTime | null | undefined
   orgUnit: { uuid: string; name: string } | undefined
   user_key: string
   jobFunction: ClassValue | undefined
@@ -43,8 +45,8 @@ export type EngagementValues = {
 }
 
 export const createDefaultEngagementValues = (): EngagementValues => ({
-  fromDate: get(date),
-  toDate: "",
+  fromDate: moValidityFrom(get(date)),
+  toDate: undefined,
   orgUnit: undefined,
   user_key: "",
   jobFunction: undefined,
@@ -65,8 +67,8 @@ export const createDefaultRolebindingValues = (): RolebindingValues => ({
 })
 
 export type ItuserValues = {
-  fromDate: string
-  toDate: string
+  fromDate: Temporal.ZonedDateTime | null | undefined
+  toDate: Temporal.ZonedDateTime | null | undefined
   itSystem: ClassValue | undefined
   // The account name.
   user_key: string
@@ -77,8 +79,8 @@ export type ItuserValues = {
 }
 
 export const createDefaultItuserValues = (): ItuserValues => ({
-  fromDate: get(date),
-  toDate: "",
+  fromDate: moValidityFrom(get(date)),
+  toDate: undefined,
   itSystem: undefined,
   user_key: "",
   externalId: "",
@@ -88,8 +90,8 @@ export const createDefaultItuserValues = (): ItuserValues => ({
 })
 
 export type ManagerValues = {
-  fromDate: string
-  toDate: string
+  fromDate: Temporal.ZonedDateTime | null | undefined
+  toDate: Temporal.ZonedDateTime | null | undefined
   orgUnit: { uuid: string; name: string } | undefined
   managerType: ClassValue | undefined
   managerLevel: ClassValue | undefined
@@ -100,8 +102,8 @@ export type ManagerValues = {
 }
 
 export const createDefaultManagerValues = (): ManagerValues => ({
-  fromDate: get(date),
-  toDate: "",
+  fromDate: moValidityFrom(get(date)),
+  toDate: undefined,
   orgUnit: undefined,
   managerType: undefined,
   managerLevel: undefined,
@@ -113,8 +115,8 @@ export const createDefaultManagerValues = (): ManagerValues => ({
 export type AddressTypeValue = ClassValue & { scope?: string | null }
 
 export type AddressValues = {
-  fromDate: string
-  toDate: string
+  fromDate: Temporal.ZonedDateTime | null | undefined
+  toDate: Temporal.ZonedDateTime | null | undefined
   visibility: ClassValue | undefined
   addressType: AddressTypeValue | undefined
   addressValue: { name?: string; value: string }
@@ -122,8 +124,8 @@ export type AddressValues = {
 }
 
 export const createDefaultAddressValues = (): AddressValues => ({
-  fromDate: get(date),
-  toDate: "",
+  fromDate: moValidityFrom(get(date)),
+  toDate: undefined,
   visibility: undefined,
   addressType: undefined,
   addressValue: { name: "", value: "" },

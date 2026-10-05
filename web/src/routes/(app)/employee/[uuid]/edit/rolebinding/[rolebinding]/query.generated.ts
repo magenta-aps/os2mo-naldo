@@ -8,7 +8,7 @@ export type RolebindingQueryVariables = Types.Exact<{
 }>;
 
 
-export type RolebindingQuery = { rolebindings: { objects: Array<{ validities: Array<{ uuid: any, ituser_response: { uuid: any, current?: { user_key: string, itsystem_response: { uuid: any, current?: { name: string } | null } } | null }, role_response: { uuid: any, current?: { user_key: string, name: string } | null }, validity: { from: any, to?: any | null } }> }> } };
+export type RolebindingQuery = { rolebindings: { objects: Array<{ validities: Array<{ uuid: any, ituser_response: { uuid: any, current?: { user_key: string, itsystem_response: { uuid: any, current?: { name: string } | null } } | null }, role_response: { uuid: any, current?: { user_key: string, name: string } | null }, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type UpdateRoleBindingMutationVariables = Types.Exact<{
   input: Types.RoleBindingUpdateInput;

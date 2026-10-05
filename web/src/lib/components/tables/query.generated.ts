@@ -9,7 +9,7 @@ export type AddressQueryVariables = Types.Exact<{
 }>;
 
 
-export type AddressQuery = { addresses: { objects: Array<{ validities: Array<{ name?: string | null, uuid: any, user_key: string, value: string, address_type_response: { uuid: any, current?: { name: string } | null }, ituser_response?: { uuid: any, validities: Array<{ user_key: string, itsystem_response: { uuid: any, current?: { user_key: string, name: string } | null }, validity: { from: any, to?: any | null } }> } | null, visibility_response?: { uuid: any, current?: { name: string } | null } | null, validity: { from: any, to?: any | null } }> }> } };
+export type AddressQuery = { addresses: { objects: Array<{ validities: Array<{ name?: string | null, uuid: any, user_key: string, value: string, address_type_response: { uuid: any, current?: { name: string } | null }, ituser_response?: { uuid: any, validities: Array<{ user_key: string, itsystem_response: { uuid: any, current?: { user_key: string, name: string } | null }, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> } | null, visibility_response?: { uuid: any, current?: { name: string } | null } | null, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type AssociationsQueryVariables = Types.Exact<{
   employee?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -19,7 +19,7 @@ export type AssociationsQueryVariables = Types.Exact<{
 }>;
 
 
-export type AssociationsQuery = { associations: { objects: Array<{ validities: Array<{ uuid: any, org_unit_response: { uuid: any, current?: { name: string } | null }, person_response?: { uuid: any, current?: { name: string } | null } | null, association_type_response?: { uuid: any, current?: { name: string } | null } | null, trade_union_response?: { uuid: any, current?: { name: string } | null } | null, substitute_response?: { uuid: any, current?: { name: string } | null } | null, primary_response?: { uuid: any, current?: { name: string } | null } | null, validity: { from: any, to?: any | null } }> }> } };
+export type AssociationsQuery = { associations: { objects: Array<{ validities: Array<{ uuid: any, org_unit_response: { uuid: any, current?: { name: string } | null }, person_response?: { uuid: any, current?: { name: string } | null } | null, association_type_response?: { uuid: any, current?: { name: string } | null } | null, trade_union_response?: { uuid: any, current?: { name: string } | null } | null, substitute_response?: { uuid: any, current?: { name: string } | null } | null, primary_response?: { uuid: any, current?: { name: string } | null } | null, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type ClassQueryVariables = Types.Exact<{
   facetUuid?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -28,7 +28,7 @@ export type ClassQueryVariables = Types.Exact<{
 }>;
 
 
-export type ClassQuery = { classes: { objects: Array<{ validities: Array<{ name: string, user_key: string, uuid: any, facet_uuid: any, it_system_response?: { uuid: any, current?: { name: string } | null } | null, validity: { from?: any | null, to?: any | null } }> }> } };
+export type ClassQuery = { classes: { objects: Array<{ validities: Array<{ name: string, user_key: string, uuid: any, facet_uuid: any, it_system_response?: { uuid: any, current?: { name: string } | null } | null, validity: { from?: import("temporal-polyfill").Temporal.ZonedDateTime | null, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type EmployeeQueryVariables = Types.Exact<{
   uuid?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -37,7 +37,7 @@ export type EmployeeQueryVariables = Types.Exact<{
 }>;
 
 
-export type EmployeeQuery = { employees: { objects: Array<{ validities: Array<{ name: string, uuid: any, nickname: string, validity: { from?: any | null, to?: any | null } }> }> } };
+export type EmployeeQuery = { employees: { objects: Array<{ validities: Array<{ name: string, uuid: any, nickname: string, validity: { from?: import("temporal-polyfill").Temporal.ZonedDateTime | null, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type EngagementsQueryVariables = Types.Exact<{
   employee?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -49,7 +49,7 @@ export type EngagementsQueryVariables = Types.Exact<{
 }>;
 
 
-export type EngagementsQuery = { engagements: { objects: Array<{ validities: Array<{ uuid: any, user_key: string, org_unit_uuid: any, extension_1?: string | null, extension_4?: string | null, person_response: { uuid: any, current?: { name: string } | null }, job_function_response: { uuid: any, current?: { name: string, user_key: string } | null }, engagement_type_response: { uuid: any, current?: { name: string } | null }, itusers: Array<{ validities: Array<{ user_key: string, uuid: any, itsystem_response: { uuid: any, current?: { user_key: string, name: string } | null }, validity: { from: any, to?: any | null } }> }>, org_unit_response?: { uuid: any }, managers?: Array<{ person_response?: { uuid: any, current?: { name: string } | null } | null }>, validity: { from: any, to?: any | null }, primary_response?: { uuid: any, current?: { name: string } | null } | null }> }> }, referencedUnits?: { objects: Array<{ uuid: any, validities: Array<{ name: string, validity: { from: any, to?: any | null } }> }> } };
+export type EngagementsQuery = { engagements: { objects: Array<{ validities: Array<{ uuid: any, user_key: string, org_unit_uuid: any, extension_1?: string | null, extension_4?: string | null, person_response: { uuid: any, current?: { name: string } | null }, job_function_response: { uuid: any, current?: { name: string, user_key: string } | null }, engagement_type_response: { uuid: any, current?: { name: string } | null }, itusers: Array<{ validities: Array<{ user_key: string, uuid: any, itsystem_response: { uuid: any, current?: { user_key: string, name: string } | null }, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }>, org_unit_response?: { uuid: any }, managers?: Array<{ person_response?: { uuid: any, current?: { name: string } | null } | null }>, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null }, primary_response?: { uuid: any, current?: { name: string } | null } | null }> }> }, referencedUnits?: { objects: Array<{ uuid: any, validities: Array<{ name: string, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type ItAssociationsQueryVariables = Types.Exact<{
   employee?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -58,7 +58,7 @@ export type ItAssociationsQueryVariables = Types.Exact<{
 }>;
 
 
-export type ItAssociationsQuery = { associations: { objects: Array<{ validities: Array<{ uuid: any, org_unit_response: { uuid: any, current?: { name: string } | null }, job_function_response?: { uuid: any, current?: { name: string } | null } | null, primary_response?: { uuid: any, current?: { name: string } | null } | null, it_user_response?: { uuid: any, current?: { user_key: string, itsystem_response: { uuid: any, current?: { name: string } | null } } | null } | null, validity: { from: any, to?: any | null } }> }> } };
+export type ItAssociationsQuery = { associations: { objects: Array<{ validities: Array<{ uuid: any, org_unit_response: { uuid: any, current?: { name: string } | null }, job_function_response?: { uuid: any, current?: { name: string } | null } | null, primary_response?: { uuid: any, current?: { name: string } | null } | null, it_user_response?: { uuid: any, current?: { user_key: string, itsystem_response: { uuid: any, current?: { name: string } | null } } | null } | null, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type ItSystemQueryVariables = Types.Exact<{
   fromDate?: Types.InputMaybe<Types.Scalars['DateTime']['input']>;
@@ -66,7 +66,7 @@ export type ItSystemQueryVariables = Types.Exact<{
 }>;
 
 
-export type ItSystemQuery = { itsystems: { objects: Array<{ validities: Array<{ name: string, user_key: string, uuid: any, roles: Array<{ validities: Array<{ name: string, user_key: string, uuid: any }> }>, validity: { from?: any | null, to?: any | null } }> }> } };
+export type ItSystemQuery = { itsystems: { objects: Array<{ validities: Array<{ name: string, user_key: string, uuid: any, roles: Array<{ validities: Array<{ name: string, user_key: string, uuid: any }> }>, validity: { from?: import("temporal-polyfill").Temporal.ZonedDateTime | null, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type EmployeeItUsersQueryVariables = Types.Exact<{
   employee?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -76,7 +76,7 @@ export type EmployeeItUsersQueryVariables = Types.Exact<{
 }>;
 
 
-export type EmployeeItUsersQuery = { itusers: { objects: Array<{ validities: Array<{ user_key: string, uuid: any, external_id?: string | null, itsystem_response: { uuid: any, current?: { name: string } | null }, engagements_responses?: { objects: Array<{ validities: Array<{ extension_1?: string | null, org_unit_response: { uuid: any, validities: Array<{ name: string, validity: { from: any, to?: any | null } }> }, job_function_response: { current?: { user_key: string, name: string } | null }, validity: { from: any, to?: any | null } }> }> }, validity: { from: any, to?: any | null }, primary_response?: { uuid: any, current?: { name: string } | null } | null }> }> } };
+export type EmployeeItUsersQuery = { itusers: { objects: Array<{ validities: Array<{ user_key: string, uuid: any, external_id?: string | null, itsystem_response: { uuid: any, current?: { name: string } | null }, engagements_responses?: { objects: Array<{ validities: Array<{ extension_1?: string | null, org_unit_response: { uuid: any, validities: Array<{ name: string, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }, job_function_response: { current?: { user_key: string, name: string } | null }, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> }, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null }, primary_response?: { uuid: any, current?: { name: string } | null } | null }> }> } };
 
 export type KleQueryVariables = Types.Exact<{
   org_unit?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -85,7 +85,7 @@ export type KleQueryVariables = Types.Exact<{
 }>;
 
 
-export type KleQuery = { kles: { objects: Array<{ validities: Array<{ uuid: any, kle_number_response: { uuid: any, current?: { name: string, user_key: string } | null }, kle_aspects_response: { objects: Array<{ uuid: any, current?: { name: string } | null }> }, validity: { from: any, to?: any | null } }> }> } };
+export type KleQuery = { kles: { objects: Array<{ validities: Array<{ uuid: any, kle_number_response: { uuid: any, current?: { name: string, user_key: string } | null }, kle_aspects_response: { objects: Array<{ uuid: any, current?: { name: string } | null }> }, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type EmployeeLeavesQueryVariables = Types.Exact<{
   employee_uuid?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -94,7 +94,7 @@ export type EmployeeLeavesQueryVariables = Types.Exact<{
 }>;
 
 
-export type EmployeeLeavesQuery = { leaves: { objects: Array<{ validities: Array<{ uuid: any, validity: { from: any, to?: any | null }, leave_type_response: { uuid: any, current?: { name: string } | null }, engagement_response: { uuid: any, validities: Array<{ extension_1?: string | null, org_unit_response: { uuid: any, validities: Array<{ name: string, validity: { from: any, to?: any | null } }> }, job_function_response: { current?: { user_key: string, name: string } | null }, validity: { from: any, to?: any | null } }> } }> }> } };
+export type EmployeeLeavesQuery = { leaves: { objects: Array<{ validities: Array<{ uuid: any, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null }, leave_type_response: { uuid: any, current?: { name: string } | null }, engagement_response: { uuid: any, validities: Array<{ extension_1?: string | null, org_unit_response: { uuid: any, validities: Array<{ name: string, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }, job_function_response: { current?: { user_key: string, name: string } | null }, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> } }> }> } };
 
 export type ManagersQueryVariables = Types.Exact<{
   employee?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -105,7 +105,7 @@ export type ManagersQueryVariables = Types.Exact<{
 }>;
 
 
-export type ManagersQuery = { managers: { objects: Array<{ validities: Array<{ uuid: any, person_response?: { uuid: any, current?: { name: string } | null } | null, org_unit_response: { uuid: any, current?: { name: string } | null }, manager_level_response?: { uuid: any, current?: { name: string } | null } | null, manager_type_response?: { uuid: any, current?: { name: string } | null } | null, engagement_response?: { uuid: any, validities: Array<{ extension_1?: string | null, org_unit_response: { uuid: any, validities: Array<{ name: string, validity: { from: any, to?: any | null } }> }, job_function_response: { current?: { name: string, user_key: string } | null }, validity: { from: any, to?: any | null } }> } | null, responsibilities_response: { objects: Array<{ uuid: any, current?: { name: string } | null }> }, validity: { from: any, to?: any | null } }> }> } };
+export type ManagersQuery = { managers: { objects: Array<{ validities: Array<{ uuid: any, person_response?: { uuid: any, current?: { name: string } | null } | null, org_unit_response: { uuid: any, current?: { name: string } | null }, manager_level_response?: { uuid: any, current?: { name: string } | null } | null, manager_type_response?: { uuid: any, current?: { name: string } | null } | null, engagement_response?: { uuid: any, validities: Array<{ extension_1?: string | null, org_unit_response: { uuid: any, validities: Array<{ name: string, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }, job_function_response: { current?: { name: string, user_key: string } | null }, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> } | null, responsibilities_response: { objects: Array<{ uuid: any, current?: { name: string } | null }> }, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type OrgUnitItUsersQueryVariables = Types.Exact<{
   orgUnit?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -115,7 +115,7 @@ export type OrgUnitItUsersQueryVariables = Types.Exact<{
 }>;
 
 
-export type OrgUnitItUsersQuery = { byEngagement: { objects: Array<{ validities: Array<{ user_key: string, uuid: any, external_id?: string | null, itsystem_response: { uuid: any, current?: { name: string } | null }, engagements_responses?: { objects: Array<{ validities: Array<{ extension_1?: string | null, org_unit_response: { uuid: any, validities: Array<{ name: string, validity: { from: any, to?: any | null } }> }, job_function_response: { current?: { user_key: string, name: string } | null }, validity: { from: any, to?: any | null } }> }> }, validity: { from: any, to?: any | null }, primary_response?: { uuid: any, current?: { name: string } | null } | null }> }> }, byOrgUnit: { objects: Array<{ validities: Array<{ user_key: string, uuid: any, external_id?: string | null, itsystem_response: { uuid: any, current?: { name: string } | null }, validity: { from: any, to?: any | null }, primary_response?: { uuid: any, current?: { name: string } | null } | null }> }> } };
+export type OrgUnitItUsersQuery = { byEngagement: { objects: Array<{ validities: Array<{ user_key: string, uuid: any, external_id?: string | null, itsystem_response: { uuid: any, current?: { name: string } | null }, engagements_responses?: { objects: Array<{ validities: Array<{ extension_1?: string | null, org_unit_response: { uuid: any, validities: Array<{ name: string, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }, job_function_response: { current?: { user_key: string, name: string } | null }, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> }, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null }, primary_response?: { uuid: any, current?: { name: string } | null } | null }> }> }, byOrgUnit: { objects: Array<{ validities: Array<{ user_key: string, uuid: any, external_id?: string | null, itsystem_response: { uuid: any, current?: { name: string } | null }, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null }, primary_response?: { uuid: any, current?: { name: string } | null } | null }> }> } };
 
 export type OrgUnitQueryVariables = Types.Exact<{
   uuid?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -124,7 +124,7 @@ export type OrgUnitQueryVariables = Types.Exact<{
 }>;
 
 
-export type OrgUnitQuery = { org_units: { objects: Array<{ validities: Array<{ name: string, uuid: any, unit_type_response?: { uuid: any, current?: { name: string } | null } | null, unit_level_response?: { uuid: any, current?: { name: string } | null } | null, parent_response?: { uuid: any, validities: Array<{ name: string, validity: { from: any, to?: any | null } }> } | null, time_planning_response?: { uuid: any, current?: { name: string } | null } | null, validity: { from: any, to?: any | null } }> }> } };
+export type OrgUnitQuery = { org_units: { objects: Array<{ validities: Array<{ name: string, uuid: any, unit_type_response?: { uuid: any, current?: { name: string } | null } | null, unit_level_response?: { uuid: any, current?: { name: string } | null } | null, parent_response?: { uuid: any, validities: Array<{ name: string, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> } | null, time_planning_response?: { uuid: any, current?: { name: string } | null } | null, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type EmployeeOwnerQueryVariables = Types.Exact<{
   uuids?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -133,7 +133,7 @@ export type EmployeeOwnerQueryVariables = Types.Exact<{
 }>;
 
 
-export type EmployeeOwnerQuery = { owners: { objects: Array<{ validities: Array<{ uuid: any, validity: { from: any, to?: any | null }, person_response?: { uuid: any, current?: { name: string } | null } | null, org_unit_response?: { uuid: any, current?: { name: string } | null } | null, owner_response?: { uuid: any, current?: { name: string } | null } | null }> }> } };
+export type EmployeeOwnerQuery = { owners: { objects: Array<{ validities: Array<{ uuid: any, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null }, person_response?: { uuid: any, current?: { name: string } | null } | null, org_unit_response?: { uuid: any, current?: { name: string } | null } | null, owner_response?: { uuid: any, current?: { name: string } | null } | null }> }> } };
 
 export type OrgUnitOwnerQueryVariables = Types.Exact<{
   uuids?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -142,7 +142,7 @@ export type OrgUnitOwnerQueryVariables = Types.Exact<{
 }>;
 
 
-export type OrgUnitOwnerQuery = { org_units: { objects: Array<{ validities: Array<{ owners: Array<{ uuid: any, validity: { from: any, to?: any | null }, person_response?: { uuid: any, current?: { name: string } | null } | null, org_unit_response?: { uuid: any, current?: { name: string } | null } | null, owner_response?: { uuid: any, current?: { name: string } | null } | null }> }> }> } };
+export type OrgUnitOwnerQuery = { org_units: { objects: Array<{ validities: Array<{ owners: Array<{ uuid: any, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null }, person_response?: { uuid: any, current?: { name: string } | null } | null, org_unit_response?: { uuid: any, current?: { name: string } | null } | null, owner_response?: { uuid: any, current?: { name: string } | null } | null }> }> }> } };
 
 export type RelatedUnitsQueryVariables = Types.Exact<{
   org_unit?: Types.InputMaybe<Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input']>;
@@ -151,7 +151,7 @@ export type RelatedUnitsQueryVariables = Types.Exact<{
 }>;
 
 
-export type RelatedUnitsQuery = { related_units: { objects: Array<{ validities: Array<{ uuid: any, org_units: Array<{ name: string, uuid: any, validity: { from: any, to?: any | null }, ancestors: Array<{ name: string, uuid: any }> }>, validity: { from: any, to?: any | null } }> }> } };
+export type RelatedUnitsQuery = { related_units: { objects: Array<{ validities: Array<{ uuid: any, org_units: Array<{ name: string, uuid: any, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null }, ancestors: Array<{ name: string, uuid: any }> }>, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type RolebindingsQueryVariables = Types.Exact<{
   filter: Types.RoleBindingFilter;
@@ -160,7 +160,7 @@ export type RolebindingsQueryVariables = Types.Exact<{
 }>;
 
 
-export type RolebindingsQuery = { rolebindings: { objects: Array<{ validities: Array<{ uuid: any, ituser_response: { uuid: any, validities: Array<{ user_key: string, itsystem_response: { uuid: any, current?: { name: string } | null }, validity: { from: any, to?: any | null } }> }, role_response: { uuid: any, current?: { name: string } | null }, validity: { from: any, to?: any | null } }> }> } };
+export type RolebindingsQuery = { rolebindings: { objects: Array<{ validities: Array<{ uuid: any, ituser_response: { uuid: any, validities: Array<{ user_key: string, itsystem_response: { uuid: any, current?: { name: string } | null }, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }, role_response: { uuid: any, current?: { name: string } | null }, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 
 export const AddressDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Address"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"org_unit"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"employee"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"fromDate"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"toDate"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addresses"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"org_units"},"value":{"kind":"Variable","name":{"kind":"Name","value":"org_unit"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"employees"},"value":{"kind":"Variable","name":{"kind":"Name","value":"employee"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"from_date"},"value":{"kind":"Variable","name":{"kind":"Name","value":"fromDate"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"to_date"},"value":{"kind":"Variable","name":{"kind":"Name","value":"toDate"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"uuid"}},{"kind":"Field","name":{"kind":"Name","value":"user_key"}},{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"address_type_response"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"uuid"}},{"kind":"Field","name":{"kind":"Name","value":"current"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"at"},"value":{"kind":"Variable","name":{"kind":"Name","value":"fromDate"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"ituser_response"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"uuid"}},{"kind":"Field","name":{"kind":"Name","value":"validities"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"start"},"value":{"kind":"Variable","name":{"kind":"Name","value":"fromDate"}}},{"kind":"Argument","name":{"kind":"Name","value":"end"},"value":{"kind":"Variable","name":{"kind":"Name","value":"toDate"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user_key"}},{"kind":"Field","name":{"kind":"Name","value":"itsystem_response"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"uuid"}},{"kind":"Field","name":{"kind":"Name","value":"current"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"at"},"value":{"kind":"Variable","name":{"kind":"Name","value":"fromDate"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user_key"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"validity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"visibility_response"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"uuid"}},{"kind":"Field","name":{"kind":"Name","value":"current"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"at"},"value":{"kind":"Variable","name":{"kind":"Name","value":"fromDate"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"validity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<AddressQuery, AddressQueryVariables>;

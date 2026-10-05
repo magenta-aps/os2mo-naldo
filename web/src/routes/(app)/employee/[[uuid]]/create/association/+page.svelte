@@ -1,8 +1,12 @@
 <script lang="ts">
+  import { Temporal } from "temporal-polyfill"
+  import { moValidityFrom } from "$lib/utils/date"
+  import type { ValidityBounds } from "$lib/utils/validities"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
   import { env } from "$lib/env"
-  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
+  import EndDateInput from "$lib/components/forms/shared/EndDateInput.svelte"
+  import StartDateInput from "$lib/components/forms/shared/StartDateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
   import Button from "$lib/components/shared/Button.svelte"
@@ -98,8 +102,8 @@
     }
   `
 
-  let startDate: string = $date
-  let toDate: string
+  let startDate: Temporal.ZonedDateTime | null | undefined = moValidityFrom($date)
+  let toDate: Temporal.ZonedDateTime | null | undefined
   let selectedOrgUnit: {
     uuid: string
     name: string
@@ -107,7 +111,9 @@
   let associationType: { name: string; user_key: string; uuid: string }
   $: associationTypeUuid = associationType?.uuid
 
-  const fromDate = field("from", "", [required()])
+  const fromDate = field<Temporal.ZonedDateTime | null | undefined>("from", undefined, [
+    required(),
+  ])
   const orgUnit = field("org_unit", "", [required()])
   const associationTypeField = field("association_type", "", [required()])
   let svelteForm = form(fromDate, orgUnit, associationTypeField)
@@ -151,10 +157,7 @@
 
   // Datepicker bounds for the selected org unit. See the employee edit
   // engagement form for the query pattern and its trade-offs.
-  const validities = createQuery<{
-    from: string | undefined | null
-    to: string | undefined | null
-  }>({ from: null, to: null })
+  const validities = createQuery<ValidityBounds>({ from: null, to: null })
   $: if (selectedOrgUnit?.uuid) {
     const orgUnitUuid = selectedOrgUnit.uuid
     validities.run((signal) => getValidities(orgUnitUuid, signal))
@@ -166,10 +169,11 @@
   // Only fetch when a start date is set: getClasses rejects a null date, and
   // the facet selects are disabled without one anyway.
   $: if (startDate) {
+    const at = startDate
     facets.run((signal) =>
       getClasses(
         {
-          currentDate: startDate,
+          currentDate: at,
           orgUuid: selectedOrgUnit?.uuid,
           facetUserKeys: ["association_type", "primary_type"],
         },
@@ -224,7 +228,7 @@
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
       <div class="p-8">
         <div class="flex flex-row gap-6">
-          <DateInput
+          <StartDateInput
             bind:value={startDate}
             bind:validationValue={$fromDate.value}
             errors={$fromDate.errors}
@@ -234,7 +238,7 @@
             max={toDate ? toDate : $validities.data?.to}
             required={true}
           />
-          <DateInput
+          <EndDateInput
             bind:value={toDate}
             title={capital($_("date.end_date"))}
             id="to"

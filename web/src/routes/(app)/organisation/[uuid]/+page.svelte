@@ -27,6 +27,8 @@
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Tabs from "$lib/components/shared/Tabs.svelte"
   import { tenseFilter } from "$lib/utils/tenses"
+  import { startOfDay } from "$lib/utils/date"
+  import { Temporal } from "temporal-polyfill"
   import { env } from "$lib/env"
 
   const UNKNOWN_ORG_UNIT_NAME = "Ukendt"
@@ -76,7 +78,7 @@
     }
   `
 
-  const fetchRelevantOrg = async (uuid: string, globalDate: string) => {
+  const fetchRelevantOrg = async (uuid: string, globalDate: Temporal.PlainDate) => {
     const res = await graphQLClient().request(OrgUnitDocument, {
       uuid: uuid,
     })
@@ -86,9 +88,12 @@
     for (const outer of res.org_units.objects) {
       // Look for present
       orgUnits = outer.validities.filter((obj) => {
-        const fromDate = obj.validity.from.split("T")[0]
-        const toDate = obj.validity.to?.split("T")[0]
-        return globalDate >= fromDate && (!toDate || globalDate < toDate)
+        const moment = startOfDay(globalDate)
+        return (
+          Temporal.ZonedDateTime.compare(obj.validity.from, moment) <= 0 &&
+          (!obj.validity.to ||
+            Temporal.ZonedDateTime.compare(obj.validity.to, moment) > 0)
+        )
       })
       if (orgUnits.length > 0) break
 
@@ -184,7 +189,7 @@
       {/if}
     </div>
   {/await}
-  {#key $date + uuidFromUrl}
+  {#key `${$date}${uuidFromUrl}`}
     {#if activeItem === OrgTab.ORG_UNIT}
       <TableTensesWrapper
         table={OrgUnitTable}

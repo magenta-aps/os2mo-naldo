@@ -1,7 +1,12 @@
 <script lang="ts">
+  import { isLaterEnd } from "$lib/utils/validities"
+  import { Temporal } from "temporal-polyfill"
+  import type { ValidityBounds } from "$lib/utils/validities"
+  import { moValidityFrom } from "$lib/utils/date"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
-  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
+  import EndDateInput from "$lib/components/forms/shared/EndDateInput.svelte"
+  import StartDateInput from "$lib/components/forms/shared/StartDateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
   import Button from "$lib/components/shared/Button.svelte"
@@ -33,8 +38,8 @@
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { normalizeLeave } from "$lib/utils/normalizeForm"
 
-  let startDate: string = $date
-  let toDate: string
+  let startDate: Temporal.ZonedDateTime | null | undefined = moValidityFrom($date)
+  let toDate: Temporal.ZonedDateTime | null | undefined
 
   let selectedPerson: {
     uuid: string
@@ -45,7 +50,9 @@
     name: string
   }
 
-  const fromDate = field("from", "", [required()])
+  const fromDate = field<Temporal.ZonedDateTime | null | undefined>("from", undefined, [
+    required(),
+  ])
   const leaveType = field("leave_type", "", [required()])
   const engagement = field("engagement", "", [required()])
   const svelteForm = form(fromDate, leaveType, engagement)
@@ -190,10 +197,7 @@
 
   // Datepicker bounds for the selected engagement. See the employee edit
   // engagement form for the query pattern and its trade-offs.
-  const validities = createQuery<{
-    from: string | undefined | null
-    to: string | undefined | null
-  }>({ from: null, to: null })
+  const validities = createQuery<ValidityBounds>({ from: null, to: null })
   $: if (selectedEngagement) {
     const engagementUuid = selectedEngagement.uuid
     validities.run((signal) => getEngagementValidities(engagementUuid, signal))
@@ -206,16 +210,17 @@
   // Only fetch when a start date is set: getClasses rejects a null date, and
   // both selects are disabled without one anyway.
   $: if (startDate) {
+    const at = startDate
     facets.run((signal) =>
       getClasses(
-        { currentDate: startDate, orgUuid: null, facetUserKeys: ["leave_type"] },
+        { currentDate: at, orgUuid: null, facetUserKeys: ["leave_type"] },
         signal
       )
     )
     engagements.run(async (signal) => {
       const res = await graphQLClient(signal).request(GetEngagementsDocument, {
         uuid: $page.params.uuid,
-        fromDate: startDate,
+        fromDate: at,
         toDate: toDate,
       })
       return res.engagements?.objects.map((e) => e.validities[0]) ?? []
@@ -247,8 +252,7 @@
       $leaveType.value !== initialLeave.leave_type ||
       selectedEngagement?.uuid !== initialLeave.engagement
 
-    const toDateExtended =
-      toDate === "" ? initialLeave.to !== null : toDate > (initialLeave.to ?? null)
+    const toDateExtended = isLaterEnd(toDate, initialLeave.to)
     hasChanges = editableChanged || toDateExtended
   }
 </script>
@@ -305,7 +309,7 @@
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
       <div class="p-8">
         <div class="flex flex-row gap-6">
-          <DateInput
+          <StartDateInput
             bind:value={startDate}
             bind:validationValue={$fromDate.value}
             errors={$fromDate.errors}
@@ -315,9 +319,9 @@
             max={toDate ? toDate : $validities.data?.to}
             required={true}
           />
-          <DateInput
+          <EndDateInput
             bind:value={toDate}
-            startValue={leave.validity.to ? leave.validity.to.split("T")[0] : null}
+            startValue={leave.validity.to}
             title={capital($_("date.end_date"))}
             id="to"
             min={$fromDate.value ? $fromDate.value : $validities.data?.from}

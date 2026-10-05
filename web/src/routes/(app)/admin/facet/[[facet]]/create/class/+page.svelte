@@ -1,7 +1,11 @@
 <script lang="ts">
+  import type { ValidityBounds } from "$lib/utils/validities"
+  import { Temporal } from "temporal-polyfill"
+  import { moValidityFrom } from "$lib/utils/date"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
-  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
+  import EndDateInput from "$lib/components/forms/shared/EndDateInput.svelte"
+  import StartDateInput from "$lib/components/forms/shared/StartDateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
   import { enhance } from "$app/forms"
@@ -55,7 +59,7 @@
           try {
             const mutation = await graphQLClient().request(CreateClassDocument, {
               input: result.data,
-              date: result.data.validity.from,
+              date: result.data.validity.from as string,
             })
             $success = {
               message: capital(
@@ -76,14 +80,16 @@
       }
     }
 
-  const fromDate = field("from", "", [required()])
+  const fromDate = field<Temporal.ZonedDateTime | null | undefined>("from", undefined, [
+    required(),
+  ])
   const facetField = field("facet", "", [required()])
   const name = field("name", "", [required()])
   const userKey = field("user_key", "", [required()])
   const svelteForm = form(fromDate, name, userKey)
 
-  let startDate: string = $date
-  let toDate: string
+  let startDate: Temporal.ZonedDateTime | null | undefined = moValidityFrom($date)
+  let toDate: Temporal.ZonedDateTime | null | undefined
   let chosenFacet: { name: string; uuid: string; user_key: string }
   let facets: { name: string; uuid: string; user_key: string }[]
 
@@ -92,15 +98,12 @@
   let itSystems: ITSystem[] | undefined = undefined
 
   // Logic for updating datepicker intervals
-  let validities: {
-    from: string | undefined | null
-    to: string | undefined | null
-  } = { from: null, to: null }
+  let validities: ValidityBounds = { from: null, to: null }
 
   onMount(async () => {
     facets = await getFacets({
       uuid: $page.params.facet ?? null,
-      fromDate: startDate,
+      fromDate: $date,
     })
     if ($page.params.facet) {
       chosenFacet = facets[0] ?? null
@@ -190,7 +193,7 @@
   <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
     <div class="p-8">
       <div class="flex flex-row gap-6">
-        <DateInput
+        <StartDateInput
           bind:value={startDate}
           bind:validationValue={$fromDate.value}
           errors={$fromDate.errors}
@@ -200,7 +203,7 @@
           max={toDate ? toDate : validities.to}
           required={true}
         />
-        <DateInput
+        <EndDateInput
           bind:value={toDate}
           title={capital($_("date.end_date"))}
           id="to"

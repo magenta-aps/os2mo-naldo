@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Temporal } from "temporal-polyfill"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
   import { page } from "$app/stores"
@@ -7,6 +8,7 @@
   import Node from "$lib/components/org/tree/Node.svelte"
   import { success } from "$lib/stores/alert"
   import { date } from "$lib/stores/date"
+  import { sameDate } from "$lib/utils/date"
   import { globalNavigation } from "$lib/stores/navigation"
   import { orgUnitHierarchyStore } from "$lib/stores/hierarchy"
   import { gql } from "graphql-request"
@@ -68,7 +70,7 @@
   `
 
   const fetchOrgTree = async (
-    fromDate: string,
+    fromDate: Temporal.PlainDate,
     childUuid?: string | null,
     orgUnitHierarchyUuid?: string | null,
     signal?: AbortSignal
@@ -120,12 +122,12 @@
   let refreshableOrgTree: Promise<OrgTreeItem[]> = Promise.resolve([]) // Start empty
 
   // --- INTERNAL TRACKING ---
-  let cachedDate: string | null = null
+  let cachedDate: Temporal.PlainDate | null = null
   let lastFetchSignature = ""
   let abortController: AbortController
 
   // Only runs when Date changes.
-  $: if ($date && $date !== cachedDate) {
+  $: if ($date && !sameDate($date, cachedDate)) {
     ;(async () => {
       try {
         const res = await getClasses({

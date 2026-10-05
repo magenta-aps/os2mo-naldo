@@ -6,7 +6,7 @@ export type EmployeeQueryVariables = Types.Exact<{
 }>;
 
 
-export type EmployeeQuery = { employees: { objects: Array<{ validities: Array<{ validity: { from?: any | null, to?: any | null } }> }> } };
+export type EmployeeQuery = { employees: { objects: Array<{ validities: Array<{ validity: { from?: import("temporal-polyfill").Temporal.ZonedDateTime | null, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type TerminateEmployeeMutationVariables = Types.Exact<{
   input: Types.EmployeeTerminateInput;

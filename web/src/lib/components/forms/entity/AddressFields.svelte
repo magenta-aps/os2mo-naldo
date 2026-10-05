@@ -1,8 +1,12 @@
 <script lang="ts">
+  import { Temporal } from "temporal-polyfill"
+  import { sameDate } from "$lib/utils/date"
+  import type { ValidityBounds } from "$lib/utils/validities"
   import { _ } from "svelte-i18n"
   import { get } from "svelte/store"
   import { capital } from "$lib/utils/helpers"
-  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
+  import EndDateInput from "$lib/components/forms/shared/EndDateInput.svelte"
+  import StartDateInput from "$lib/components/forms/shared/StartDateInput.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
   import DarSearch from "$lib/components/forms/shared/DARSearch.svelte"
@@ -25,7 +29,11 @@
 
   // Seeded from the bound value: validation must not wait for the facet-gated
   // select to sync its name after the classes load.
-  const fromDateField = field("from", "", [required()])
+  const fromDateField = field<Temporal.ZonedDateTime | null | undefined>(
+    "from",
+    undefined,
+    [required()]
+  )
   const addressTypeField = field("address_type", value.addressType?.name ?? "", [
     required(),
   ])
@@ -37,8 +45,10 @@
     return get(svelteForm).valid
   }
 
-  // Projected to primitives so unrelated keystrokes don't refire the blocks below.
-  $: fromDate = value.fromDate
+  // Projected out of `value`, dates only when they change, so unrelated
+  // keystrokes don't refire the blocks below.
+  let fromDate: Temporal.ZonedDateTime | null | undefined
+  $: if (!sameDate(value.fromDate, fromDate)) fromDate = value.fromDate
   $: addressTypeUuid = value.addressType?.uuid
   $: addressTypeScope = value.addressType?.scope
   $: addressTypeName = value.addressType?.name
@@ -78,10 +88,7 @@
 
   // Datepicker bounds for the person. See the employee edit engagement form
   // for the query pattern and its trade-offs.
-  const validities = createQuery<{
-    from: string | undefined | null
-    to: string | undefined | null
-  }>({ from: null, to: null })
+  const validities = createQuery<ValidityBounds>({ from: null, to: null })
   $: if (personUuid) {
     const uuid = personUuid
     validities.run((signal) => getPersonValidities(uuid, signal))
@@ -93,10 +100,11 @@
   // Only fetch when a start date is set: getClasses rejects a null date, and
   // the facet selects are disabled without one anyway.
   $: if (fromDate) {
+    const at = fromDate
     facets.run((signal) =>
       getClasses(
         {
-          currentDate: fromDate,
+          currentDate: at,
           orgUuid: null,
           facetUserKeys: ["employee_address_type", "visibility"],
         },
@@ -107,7 +115,7 @@
 </script>
 
 <div class="flex flex-row gap-6">
-  <DateInput
+  <StartDateInput
     bind:value={value.fromDate}
     bind:validationValue={$fromDateField.value}
     errors={$fromDateField.errors}
@@ -117,7 +125,7 @@
     max={value.toDate ? value.toDate : $validities.data?.to}
     required={true}
   />
-  <DateInput
+  <EndDateInput
     bind:value={value.toDate}
     title={capital($_("date.end_date"))}
     id="{idPrefix}to"

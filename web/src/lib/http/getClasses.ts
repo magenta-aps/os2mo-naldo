@@ -1,4 +1,5 @@
 import { graphQLClient } from "$lib/http/client"
+import type { At } from "$lib/utils/validities"
 import {
   FacetsAndClassesDocument,
   GetPrimaryClassesDocument,
@@ -7,7 +8,7 @@ import {
 
 export const getClasses = async (
   variables: {
-    currentDate: string
+    currentDate: At
     orgUuid: string | null
     facetUserKeys: string[]
   },
@@ -19,7 +20,7 @@ export const getClasses = async (
 
 export const getPrimaryClasses = async (
   variables: {
-    fromDate: string
+    fromDate: At
     primaryClass: string
   },
   signal?: AbortSignal
@@ -30,7 +31,7 @@ export const getPrimaryClasses = async (
 
 export const getRoleClasses = async (
   variables: {
-    fromDate: string
+    fromDate: At
     itSystem: string
   },
   signal?: AbortSignal

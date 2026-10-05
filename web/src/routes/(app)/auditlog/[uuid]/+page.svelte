@@ -1,4 +1,10 @@
 <script lang="ts">
+  import {
+    formatDay,
+    formatTimestamp,
+    fromJavaScriptDate,
+    lastValidDay,
+  } from "$lib/utils/date"
   import { onMount } from "svelte"
   import { page } from "$app/stores"
   import { _ } from "svelte-i18n"
@@ -6,7 +12,7 @@
   import { Timeline } from "vis-timeline/peer"
   import { DataSet } from "vis-data/peer"
   import "vis-timeline/styles/vis-timeline-graph2d.min.css"
-  import { format, subYears, addYears, min, max } from "date-fns"
+  import { subYears, addYears, min, max } from "date-fns"
   import { base } from "$app/paths"
   import { getAuditlog } from "$lib/http/getAuditlog"
   import {
@@ -94,7 +100,7 @@
       // --- A. Create the Main Header Group (The Actor) ---
       // This is the parent row that contains the user's name and registration date.
       const regDateStr = reg.registeredAt
-        ? format(reg.registeredAt, "dd-MM-yyyy HH:mm")
+        ? formatTimestamp(fromJavaScriptDate(reg.registeredAt))
         : "?"
 
       groups.add({
@@ -209,9 +215,11 @@
         template: (item: any) => {
           const d = item.tooltipData
           const startStr = d.start
-            ? format(d.start, "dd-MM-yyyy")
+            ? formatDay(fromJavaScriptDate(d.start).toPlainDate())
             : `-${$_("infinity")}`
-          const endStr = d.end ? format(d.end, "dd-MM-yyyy") : $_("infinity")
+          const endStr = d.end
+            ? formatDay(lastValidDay(fromJavaScriptDate(d.end)))
+            : $_("infinity")
 
           return `
             <div class="timeline-tooltip">

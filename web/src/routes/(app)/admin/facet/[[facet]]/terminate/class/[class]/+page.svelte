@@ -1,7 +1,10 @@
 <script lang="ts">
+  import type { ValidityBounds } from "$lib/utils/validities"
+  import { Temporal } from "temporal-polyfill"
+  import { lastValidDay, moValidityTo } from "$lib/utils/date"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
-  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
+  import EndDateInput from "$lib/components/forms/shared/EndDateInput.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import { enhance } from "$app/forms"
@@ -30,7 +33,9 @@
     }
   `
 
-  const toDate = field("to", "", [required()])
+  const toDate = field<Temporal.ZonedDateTime | null | undefined>("to", undefined, [
+    required(),
+  ])
   const svelteForm = form(toDate)
 
   let facet: { name: string; uuid: string; user_key: string }
@@ -45,7 +50,7 @@
           try {
             const mutation = await graphQLClient().request(TerminateClassDocument, {
               input: result.data,
-              date: result.data.to,
+              date: lastValidDay($toDate.value)!,
             })
 
             $success = {
@@ -67,10 +72,7 @@
       }
     }
 
-  let validities: {
-    from: string | undefined | null
-    to: string | undefined | null
-  } = { from: null, to: null }
+  let validities: ValidityBounds = { from: null, to: null }
 
   onMount(async () => {
     validities = await getFacetValidities($page.params.facet ?? null)
@@ -108,8 +110,8 @@
 <form method="post" class="mx-6" use:enhance={handler}>
   <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
     <div class="p-8">
-      <DateInput
-        startValue={$date}
+      <EndDateInput
+        startValue={moValidityTo($date)}
         bind:value={$toDate.value}
         errors={$toDate.errors}
         title={capital($_("date.end_date"))}

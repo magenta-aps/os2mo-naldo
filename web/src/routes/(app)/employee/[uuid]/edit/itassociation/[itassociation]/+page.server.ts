@@ -11,8 +11,8 @@ export const actions: Actions = {
     const itUser = data.get("it-user-uuid")
     const jobFunction = data.get("job-function")
     const primary = data.get("primary") ? data.get("primary") : data.get("non-primary")
-    const startDate = data.get("from")
-    const endDate = data.get("to")
+    const startDate = data.get("from") as string
+    const endDate = data.get("to") as string | null
 
     return {
       uuid: params.itassociation,

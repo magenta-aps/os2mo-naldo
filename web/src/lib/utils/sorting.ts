@@ -1,3 +1,5 @@
+import { Temporal } from "temporal-polyfill"
+
 /**
  * Retrieves the value at a specified path within an object.
  *
@@ -47,6 +49,16 @@ export const sortData = <T>(data: T[], sortKey: string, sortDirection: number): 
     }
     if (typeof bVal === "string") {
       bVal = bVal.toLowerCase()
+    }
+
+    // Temporal values throw when compared with < and >.
+    const aIsMoment = aVal instanceof Temporal.ZonedDateTime
+    const bIsMoment = bVal instanceof Temporal.ZonedDateTime
+    if (aIsMoment && bIsMoment) {
+      return Temporal.ZonedDateTime.compare(aVal, bVal) * sortDirection
+    }
+    if (aIsMoment || bIsMoment) {
+      return 0
     }
 
     if (aVal < bVal) {

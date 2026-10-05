@@ -6,8 +6,8 @@ export const actions: Actions = {
     const data = await request.formData()
     const orgUnit = data.get("org-unit-uuid")
     const parent = data.get("select-parent-org-tree")
-    const startDate = data.get("from")
-    const endDate = data.get("to")
+    const startDate = data.get("from") as string
+    const endDate = data.get("to") as string | null
 
     return {
       uuid: orgUnit,

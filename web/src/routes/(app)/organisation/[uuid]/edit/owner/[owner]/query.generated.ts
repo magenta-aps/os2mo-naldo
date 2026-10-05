@@ -9,7 +9,7 @@ export type OwnerQueryVariables = Types.Exact<{
 }>;
 
 
-export type OwnerQuery = { owners: { objects: Array<{ validities: Array<{ owner_response?: { uuid: any, current?: { name: string } | null } | null, validity: { from: any, to?: any | null } }> }> } };
+export type OwnerQuery = { owners: { objects: Array<{ validities: Array<{ owner_response?: { uuid: any, current?: { name: string } | null } | null, validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> }> } };
 
 export type UpdateOwnerMutationVariables = Types.Exact<{
   input: Types.OwnerUpdateInput;

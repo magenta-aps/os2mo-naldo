@@ -153,7 +153,7 @@ test("onboarding wizard submits a coherent batch", async ({ page }) => {
     page.locator(".tabs-border button.tab").nth(index)
   await stepTab(1).click()
   await page.waitForTimeout(800)
-  await page.locator('form input[name$="from"]:visible').first().fill("")
+  await page.locator('form input[type=date][id$="from"]:visible').first().fill("")
   await stepTab(5).click()
   await page.waitForTimeout(800)
 

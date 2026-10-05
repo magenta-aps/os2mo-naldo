@@ -1,7 +1,11 @@
 <script lang="ts">
+  import type { ValidityBounds } from "$lib/utils/validities"
+  import { Temporal } from "temporal-polyfill"
+  import { moValidityFrom } from "$lib/utils/date"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
-  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
+  import EndDateInput from "$lib/components/forms/shared/EndDateInput.svelte"
+  import StartDateInput from "$lib/components/forms/shared/StartDateInput.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
   import Button from "$lib/components/shared/Button.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
@@ -87,7 +91,7 @@
           try {
             const mutation = await graphQLClient().request(UpdateClassDocument, {
               input: result.data,
-              date: result.data.validity.from,
+              date: result.data.validity.from as string,
             })
             $success = {
               message: capital(
@@ -108,24 +112,23 @@
       }
     }
 
-  let startDate: string = $date
-  let toDate: string
+  let startDate: Temporal.ZonedDateTime | null | undefined = moValidityFrom($date)
+  let toDate: Temporal.ZonedDateTime | null | undefined
   let chosenFacet: { name: string; uuid: string; user_key: string }
 
   let chosenItSystem: { name: string; uuid: string; user_key?: string } | undefined =
     undefined
   let itSystems: ITSystem[] | undefined = undefined
 
-  const fromDate = field("from", "", [required()])
+  const fromDate = field<Temporal.ZonedDateTime | null | undefined>("from", undefined, [
+    required(),
+  ])
   const name = field("name", "", [required()])
   const userKey = field("user_key", "", [required()])
   const svelteForm = form(fromDate, name, userKey)
 
   // Logic for updating datepicker intervals
-  let validities: {
-    from: string | undefined | null
-    to: string | undefined | null
-  } = { from: null, to: null }
+  let validities: ValidityBounds = { from: null, to: null }
 
   $: if (chosenFacet) {
     ;(async () => {
@@ -187,7 +190,7 @@
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
       <div class="p-8">
         <div class="flex flex-row gap-6">
-          <DateInput
+          <StartDateInput
             bind:value={startDate}
             bind:validationValue={$fromDate.value}
             errors={$fromDate.errors}
@@ -197,9 +200,9 @@
             max={toDate ? toDate : validities.to}
             required={true}
           />
-          <DateInput
+          <EndDateInput
             bind:value={toDate}
-            startValue={cls.validity.to ? cls.validity.to.split("T")[0] : null}
+            startValue={cls.validity.to}
             title={capital($_("date.end_date"))}
             id="to"
             min={$fromDate.value ? $fromDate.value : validities.from}

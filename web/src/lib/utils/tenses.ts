@@ -1,11 +1,13 @@
 import type { OpenValidity, Validity } from "$lib/graphql/types"
 import { date } from "$lib/stores/date"
+import { startOfDay } from "$lib/utils/date"
 import { get } from "svelte/store"
+import { Temporal } from "temporal-polyfill"
 
 export const tenseToValidity = (
   tense: Tense,
-  date: string
-): { fromDate: string | null; toDate: string | null } | {} => {
+  date: Temporal.PlainDate
+): { fromDate: Temporal.PlainDate | null; toDate: Temporal.PlainDate | null } | {} => {
   switch (tense) {
     case "past":
       return { fromDate: null, toDate: date }
@@ -18,8 +20,10 @@ export const tenseToValidity = (
 
 export const filterTenseToValidity = (
   tense: Tense,
-  date: string
-): { from_date: string | null; to_date: string | null } | {} => {
+  date: Temporal.PlainDate
+):
+  | { from_date: Temporal.PlainDate | null; to_date: Temporal.PlainDate | null }
+  | {} => {
   switch (tense) {
     case "past":
       return { from_date: null, to_date: date }
@@ -34,13 +38,14 @@ export const tenseFilter = (
   obj: { validity: Validity | OpenValidity },
   tense: Tense
 ) => {
-  const globalDate = get(date)
+  const globalDate = startOfDay(get(date))
+  const { from, to } = obj.validity
   switch (tense) {
     case "past":
-      return globalDate >= obj.validity.to?.split("T")[0]
+      return !!to && Temporal.ZonedDateTime.compare(globalDate, to) >= 0
     case "present":
       return true
     case "future":
-      return globalDate < obj.validity.from?.split("T")[0]
+      return !!from && Temporal.ZonedDateTime.compare(globalDate, from) < 0
   }
 }

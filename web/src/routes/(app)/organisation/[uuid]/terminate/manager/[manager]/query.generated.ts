@@ -6,7 +6,7 @@ export type ManagerQueryVariables = Types.Exact<{
 }>;
 
 
-export type ManagerQuery = { managers: { objects: Array<{ validities: Array<{ validity: { from: any, to?: any | null }, org_unit_response: { validities: Array<{ validity: { from: any, to?: any | null } }> } }> }> } };
+export type ManagerQuery = { managers: { objects: Array<{ validities: Array<{ validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null }, org_unit_response: { validities: Array<{ validity: { from: import("temporal-polyfill").Temporal.ZonedDateTime, to?: import("temporal-polyfill").Temporal.ZonedDateTime | null } }> } }> }> } };
 
 export type TerminateManagerMutationVariables = Types.Exact<{
   input: Types.ManagerTerminateInput;

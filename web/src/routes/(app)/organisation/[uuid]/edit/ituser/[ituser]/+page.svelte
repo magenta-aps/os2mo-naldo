@@ -1,10 +1,15 @@
 <script lang="ts">
+  import { isLaterEnd } from "$lib/utils/validities"
+  import { Temporal } from "temporal-polyfill"
+  import type { ValidityBounds } from "$lib/utils/validities"
+  import { moValidityFrom } from "$lib/utils/date"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
   import { env } from "$lib/env"
   import { success, error } from "$lib/stores/alert"
   import { graphQLClient } from "$lib/http/client"
-  import DateInput from "$lib/components/forms/shared/DateInput.svelte"
+  import EndDateInput from "$lib/components/forms/shared/EndDateInput.svelte"
+  import StartDateInput from "$lib/components/forms/shared/StartDateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
   import Input from "$lib/components/forms/shared/Input.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
@@ -89,10 +94,12 @@
     }
   `
 
-  let startDate: string = $date
-  let toDate: string
+  let startDate: Temporal.ZonedDateTime | null | undefined = moValidityFrom($date)
+  let toDate: Temporal.ZonedDateTime | null | undefined
 
-  const fromDate = field("from", "", [required()])
+  const fromDate = field<Temporal.ZonedDateTime | null | undefined>("from", undefined, [
+    required(),
+  ])
   const itSystem = field("it_system", "", [required()])
   const accountName = field("account_name", "", [required()])
   const primary = field("primary", "", [])
@@ -141,10 +148,7 @@
 
   // Datepicker bounds for the org unit. See the employee edit engagement form
   // for the query pattern and its trade-offs.
-  const validities = createQuery<{
-    from: string | undefined | null
-    to: string | undefined | null
-  }>({ from: null, to: null })
+  const validities = createQuery<ValidityBounds>({ from: null, to: null })
   $: if ($page.params.uuid) {
     const orgUnitUuid = $page.params.uuid
     validities.run((signal) => getValidities(orgUnitUuid, signal))
@@ -156,10 +160,11 @@
   // Only fetch when a start date is set: the query rejects a null date, and
   // the primary select is disabled without one anyway.
   $: if (startDate) {
+    const at = startDate
     facets.run((signal) =>
       getPrimaryClasses(
         {
-          fromDate: startDate,
+          fromDate: at,
           primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY,
         },
         signal
@@ -198,8 +203,7 @@
       $externalIdField.value !== initialITUser.external_id ||
       $noteField.value !== initialITUser.note
 
-    const toDateExtended =
-      toDate === "" ? initialITUser.to !== null : toDate > (initialITUser.to ?? null)
+    const toDateExtended = isLaterEnd(toDate, initialITUser.to)
     hasChanges = editableChanged || toDateExtended
   }
 </script>
@@ -254,7 +258,7 @@
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
       <div class="p-8">
         <div class="flex flex-row gap-6">
-          <DateInput
+          <StartDateInput
             bind:value={startDate}
             bind:validationValue={$fromDate.value}
             errors={$fromDate.errors}
@@ -265,9 +269,9 @@
             required={true}
             disabled={disableForm}
           />
-          <DateInput
+          <EndDateInput
             bind:value={toDate}
-            startValue={itUser.validity.to ? itUser.validity.to.split("T")[0] : null}
+            startValue={itUser.validity.to}
             title={capital($_("date.end_date"))}
             id="to"
             min={$fromDate.value ? $fromDate.value : $validities.data?.from}

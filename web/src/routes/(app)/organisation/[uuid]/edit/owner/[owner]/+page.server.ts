@@ -5,8 +5,8 @@ export const actions: Actions = {
   default: async ({ request, params }: RequestEvent): Promise<OwnerUpdateInput> => {
     const data = await request.formData()
     const ownerUuid = data.get("employee-uuid")
-    const startDate = data.get("from")
-    const endDate = data.get("to")
+    const startDate = data.get("from") as string
+    const endDate = data.get("to") as string | null
 
     return {
       uuid: params.owner,
