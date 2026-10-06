@@ -97,7 +97,8 @@ export const isEmptyManager = (manager: ManagerInfo): boolean =>
   !manager.orgUnit?.uuid &&
   !manager.managerType?.uuid &&
   !manager.managerLevel?.uuid &&
-  !manager.responsibilities?.length
+  !manager.responsibilities?.length &&
+  !manager.primary?.uuid
 
 export const isEmptyAddress = (address: AddressInfo): boolean =>
   !address.toDate &&
@@ -194,6 +195,7 @@ export const buildUserflowPayload = (
       responsibility: (manager.responsibilities ?? []).map(
         (responsibility) => responsibility.uuid
       ),
+      primary: manager.primary?.uuid || null,
       validity: {
         from: manager.fromDate!,
         to: manager.toDate ?? null,
