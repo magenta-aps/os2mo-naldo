@@ -369,6 +369,14 @@
             title: capital($_("manager_level")),
             sortPath: "manager_level_response.current.name",
           },
+          ...(env.PUBLIC_SHOW_PRIMARY_MANAGER
+            ? [
+                {
+                  title: capital($_("primary")),
+                  sortPath: "primary_response.current.name",
+                },
+              ]
+            : []),
           { title: capital($_("date.date")), sortPath: "validity.from" },
         ]}
       />
