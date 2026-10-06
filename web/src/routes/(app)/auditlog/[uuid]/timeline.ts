@@ -30,6 +30,7 @@ export interface TimelineItem {
     attribute: string
     value: string
     uuid?: string
+    items?: TimelineListItem[]
     start: Date
     end: Date
     note?: string
@@ -40,12 +41,20 @@ export interface TimelineItem {
 // INTERNAL DATA MODELS
 // ==========================================
 
+// One element of a list-valued attribute (e.g. a manager's responsibilities)
+export interface TimelineListItem {
+  value: string
+  uuid?: string
+}
+
 // Represents a single block of time for a specific attribute
 export interface TimelineEntry {
   start: Date | null
   end: Date | null
   value: string
   uuid?: string
+  // Set for a non-empty list; value then joins the item values
+  items?: TimelineListItem[]
   changed?: boolean
 }
 
@@ -68,11 +77,19 @@ export const FAR_PAST = new Date("1900-01-01")
 export const FAR_FUTURE = new Date("2099-12-31")
 
 /**
+ * Strips the "<type>__" alias prefix and the _response(s) suffix so translation
+ * keys stay clean. The query aliases a field as "<type>__<field>" when its type
+ * differs between registration types, since GraphQL cannot merge those.
+ */
+const toLabel = (key: string): string =>
+  key.replace(/^[a-z]+__/, "").replace(/_responses?$/, "")
+
+/**
  * Parses a validity block into nullable from/to dates, which vis-timeline draws.
- * Handles the 'person_validity' and 'class_validity' aliases.
  */
 const parseValidity = (block: any): { from: Date | null; to: Date | null } => {
-  const v = block.validity ?? block.person_validity ?? block.class_validity
+  const key = Object.keys(block).find((k) => toLabel(k) === "validity")
+  const v = key ? block[key] : undefined
   return {
     from: v?.from ? toJavaScriptDate(v.from) : null,
     to: v?.to ? toJavaScriptDate(v.to) : null,
@@ -129,26 +146,34 @@ const extractValue = (data: any): string => {
 
 /**
  * Extracts the UUID from a data object.
- * For arrays, joins UUIDs with commas.
  */
 const extractUuid = (data: any): string | undefined => {
   if (data === null || data === undefined || typeof data !== "object") return undefined
-  // Paged _response: { objects: [...] }
-  if ("objects" in data && Array.isArray(data.objects)) {
-    return extractUuid(data.objects)
-  }
-  if (Array.isArray(data)) {
-    return (
-      data
-        .map((item) => extractUuid(item))
-        .filter(Boolean)
-        .join(", ") || undefined
-    )
-  }
-  // _response shape: if current is null, the reference doesn't exist (or is inactive)
-  if ("current" in data && !data.current) return data.uuid
   return data.uuid
 }
+
+/**
+ * Returns the elements of a list-valued attribute: a plain array or a
+ * paged _response ({ objects: [...] }). Undefined for anything else.
+ */
+const extractList = (data: any): any[] | undefined => {
+  if (Array.isArray(data)) return data
+  if (data && typeof data === "object" && Array.isArray(data.objects))
+    return data.objects
+  return undefined
+}
+
+/**
+ * What two entries are compared on. Lists compare as sets, so the same items
+ * in another order count as the same value.
+ */
+const entryIdentity = (e: TimelineEntry): string =>
+  e.items
+    ? e.items
+        .map((item) => item.uuid ?? item.value)
+        .sort()
+        .join(",")
+    : e.uuid ?? e.value
 
 /**
  * clean up the timeline.
@@ -172,10 +197,7 @@ const consolidateEntries = (entries: TimelineEntry[]): TimelineEntry[] => {
     // Check if blocks touch each other (Next starts exactly where Current ends)
     const isAdjacent = isEqual(next.start ?? FAR_PAST, current.end ?? FAR_FUTURE)
     // Check if they say the same thing (compare on UUID when available)
-    const isSameValue =
-      current.uuid && next.uuid
-        ? current.uuid === next.uuid
-        : current.value === next.value
+    const isSameValue = entryIdentity(current) === entryIdentity(next)
 
     if (isSameValue && isAdjacent) {
       // Merge: Extend the current block to encompass the next one
@@ -223,28 +245,36 @@ export const transformAuditLog = (rawData: any[]): Registration[] => {
 
       // Iterate over every key in the block (person, address, etc.)
       Object.keys(validityBlock).forEach((key) => {
-        // Skip metadata keys, they aren't timeline rows
-        if (key === "validity" || key === "person_validity" || key === "class_validity")
-          return
-
-        // Strip _response suffix and GraphQL alias prefixes so translation keys stay clean
-        // The second replace turns e.g. "owner_person" → "person" and "owner_org_unit" → "org_unit"
-        // while leaving keys like "association_type" or "manager_level" untouched.
-        const label = key
-          .replace(/_response$/, "")
-          .replace(/^(?:association|manager|owner)_(?=person|org_unit)/, "")
+        const label = toLabel(key)
+        // The validity is the block's period, not a timeline row
+        if (label === "validity") return
 
         if (!registration.timelines[label]) {
           registration.timelines[label] = []
         }
 
         // Add the entry
-        registration.timelines[label].push({
-          start: from,
-          end: to,
-          value: extractValue(validityBlock[key]),
-          uuid: extractUuid(validityBlock[key]),
-        })
+        const data = validityBlock[key]
+        const list = extractList(data)
+        const items = list?.map((item) => ({
+          value: extractValue(item),
+          uuid: extractUuid(item),
+        }))
+        registration.timelines[label].push(
+          items?.length
+            ? {
+                start: from,
+                end: to,
+                value: items.map((item) => item.value).join(", "),
+                items,
+              }
+            : {
+                start: from,
+                end: to,
+                value: extractValue(data),
+                uuid: extractUuid(data),
+              }
+        )
       })
     })
 
@@ -266,7 +296,7 @@ export const transformAuditLog = (rawData: any[]): Registration[] => {
 
     Object.keys(curr.timelines).forEach((key) => {
       const compareKey = (e: TimelineEntry) =>
-        `${e.uuid ?? e.value}|${e.start?.getTime()}|${e.end?.getTime()}`
+        `${entryIdentity(e)}|${e.start?.getTime()}|${e.end?.getTime()}`
 
       const prevSet = new Set((prev.timelines[key] || []).map(compareKey))
 
