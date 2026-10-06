@@ -27,12 +27,16 @@
   // date-filtered lookup drops an engagement that ended before the leave.
   gql`
     query EmployeeLeaves(
-      $employee_uuid: [UUID!]
+      $employee_uuid: [UUID!]!
       $fromDate: DateTime
       $toDate: DateTime
     ) {
       leaves(
-        filter: { employees: $employee_uuid, from_date: $fromDate, to_date: $toDate }
+        filter: {
+          employee: { uuids: $employee_uuid }
+          from_date: $fromDate
+          to_date: $toDate
+        }
       ) {
         objects {
           validities {

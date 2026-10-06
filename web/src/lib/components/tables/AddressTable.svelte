@@ -22,22 +22,20 @@
 
   const uuid = $page.params.uuid
   const isOrg = $page.url.pathname?.startsWith("/organisation")
-  const employee = isOrg ? null : uuid
-  const org_unit = isOrg ? uuid : null
 
   type Addresses = AddressQuery["addresses"]["objects"][0]["validities"]
 
   gql`
     query Address(
-      $org_unit: [UUID!]
-      $employee: [UUID!]
+      $org_unit: OrganisationUnitFilter
+      $employee: EmployeeFilter
       $fromDate: DateTime
       $toDate: DateTime
     ) {
       addresses(
         filter: {
-          org_units: $org_unit
-          employees: $employee
+          org_unit: $org_unit
+          employee: $employee
           from_date: $fromDate
           to_date: $toDate
         }
@@ -89,8 +87,10 @@
 
   $: dataPromise = graphQLClient()
     .request(AddressDocument, {
-      org_unit: org_unit,
-      employee: employee,
+      // The filter for the other page is left out, as a unit filter without
+      // uuids matches every unit.
+      org_unit: isOrg ? { uuids: [uuid] } : undefined,
+      employee: isOrg ? undefined : { uuids: [uuid] },
       ...tenseToValidity(tense, $date),
     })
     .then((res) => {

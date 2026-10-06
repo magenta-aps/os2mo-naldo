@@ -8,7 +8,11 @@
   import { page } from "$app/stores"
   import { ManagersDocument } from "./query.generated"
   import { date } from "$lib/stores/date"
-  import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
+  import {
+    filterTenseToValidity,
+    tenseFilter,
+    tenseToValidity,
+  } from "$lib/utils/tenses"
   import { sortData } from "$lib/utils/sorting"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import Icon from "@iconify/svelte"
@@ -25,21 +29,19 @@
 
   const uuid = $page.params.uuid
   const isOrg = $page.url.pathname?.startsWith("/organisation")
-  const employee = isOrg ? null : uuid
-  const org_unit = isOrg ? uuid : null
 
   gql`
     query Managers(
-      $employee: [UUID!]
-      $org_unit: [UUID!]
+      $employee: EmployeeFilter
+      $org_unit: OrganisationUnitFilter
       $fromDate: DateTime
       $toDate: DateTime
       $inherit: Boolean = true
     ) {
       managers(
         filter: {
-          employees: $employee
-          org_units: $org_unit
+          employee: $employee
+          org_unit: $org_unit
           from_date: $fromDate
           to_date: $toDate
         }
@@ -118,8 +120,14 @@
 
   $: dataPromise = graphQLClient()
     .request(ManagersDocument, {
-      org_unit: org_unit,
-      employee: employee,
+      // The unit filter gets its own validity, as MO checks the unit's
+      // validity when walking the tree for inherited managers. Omitted for
+      // employees, where an empty unit filter would match every unit.
+      org_unit: isOrg
+        ? { uuids: [uuid], ...filterTenseToValidity(tense, $date) }
+        : undefined,
+      // Omitted for units: `employee: null` returns only vacant managers.
+      employee: isOrg ? undefined : { uuids: [uuid] },
       // Don't set inherit flag if employee, to avoid:
       // "The inherit flag requires an organizational unit filter"
       inherit: !isOrg ? false : env.PUBLIC_INHERIT_MANAGER,

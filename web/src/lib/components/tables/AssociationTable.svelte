@@ -25,21 +25,19 @@
 
   const uuid = $page.params.uuid
   const isOrg = $page.url.pathname?.startsWith("/organisation")
-  const employee = isOrg ? null : uuid
-  const org_unit = isOrg ? uuid : null
 
   gql`
     query Associations(
-      $employee: [UUID!]
-      $org_unit: [UUID!]
+      $employee: EmployeeFilter
+      $org_unit: OrganisationUnitFilter
       $fromDate: DateTime
       $toDate: DateTime
     ) {
       associations(
         filter: {
-          employees: $employee
+          employee: $employee
           it_association: false
-          org_units: $org_unit
+          org_unit: $org_unit
           from_date: $fromDate
           to_date: $toDate
         }
@@ -95,8 +93,10 @@
 
   $: dataPromise = graphQLClient()
     .request(AssociationsDocument, {
-      org_unit: org_unit,
-      employee: employee,
+      // The filter for the other page is left out, as a unit filter without
+      // uuids matches every unit.
+      org_unit: isOrg ? { uuids: [uuid] } : undefined,
+      employee: isOrg ? undefined : { uuids: [uuid] },
       ...tenseToValidity(tense, $date),
     })
     .then((res) => {
