@@ -99,6 +99,7 @@ export type ManagerValues = {
   // bound name whenever its value is truthy, and [] is truthy, so seeding []
   // validates the field at mount and renders it red before any interaction.
   responsibilities: ClassValue[] | undefined
+  primary: ClassValue | undefined
 }
 
 export const createDefaultManagerValues = (): ManagerValues => ({
@@ -108,6 +109,7 @@ export const createDefaultManagerValues = (): ManagerValues => ({
   managerType: undefined,
   managerLevel: undefined,
   responsibilities: undefined,
+  primary: undefined,
 })
 
 // Address types carry their scope (EMAIL/PHONE/DAR/...), which drives the

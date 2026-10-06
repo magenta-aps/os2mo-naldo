@@ -280,7 +280,8 @@
 		"is_wrong_format": "{field} er forkert format",
 		"missing_floor_door": "{field} mangler etage eller dør",
 		"missing_house_number": "{field} mangler husnummer",
-		"missing_postcode": "{field} mangler postnummer"
+		"missing_postcode": "{field} mangler postnummer",
+		"primary_manager_taken": "Enheden har allerede en primær leder i perioden"
 	},
 	"validity": "gyldighed",
 	"visibility": "synlighed",
