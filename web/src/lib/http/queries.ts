@@ -673,4 +673,38 @@ gql`
       }
     }
   }
+  query PrimaryManagers(
+    $orgUnit: [UUID!]
+    $primary: UUID!
+    $fromDate: DateTime!
+    $toDate: DateTime
+  ) {
+    managers(
+      filter: {
+        org_units: $orgUnit
+        primary: { uuids: [$primary] }
+        from_date: $fromDate
+        to_date: $toDate
+      }
+    ) {
+      objects {
+        uuid
+        validities {
+          person_response {
+            uuid
+            current(at: $fromDate) {
+              name
+            }
+          }
+          primary_response {
+            uuid
+          }
+          validity {
+            from
+            to
+          }
+        }
+      }
+    }
+  }
 `

@@ -15,12 +15,15 @@
   import Search from "$lib/components/search/Search.svelte"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
+  import { getPrimaryManagers, type PrimaryManager } from "$lib/http/getPrimaryManagers"
+  import PrimaryManagerConflicts from "$lib/components/forms/entity/PrimaryManagerConflicts.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import type { FacetValidities } from "$lib/utils/classes"
-  import { filterClassesByFacetUserKey } from "$lib/utils/classes"
+  import { filterClassesByFacetUserKey, primaryClassUuid } from "$lib/utils/classes"
   import { createQuery } from "$lib/http/query"
-  import { getClasses } from "$lib/http/getClasses"
+  import { getClasses, getPrimaryClasses } from "$lib/http/getClasses"
+  import { env } from "$lib/env"
   import { getValidities } from "$lib/http/getValidities"
   import {
     formatEngagementTitlesAndUuid,
@@ -111,13 +114,26 @@
       name: "required",
     }),
   ])
+  const primaryManagers = createQuery<PrimaryManager[]>([])
+  // Queries MO again on submit: the lookup shown under the select may still be
+  // loading, or another user may have set a primary manager since. A failed
+  // query blocks too.
+  const primaryField = field("primary", "", [
+    async () => {
+      const found = await getPrimaryManagers(primaryLookup).catch(() => null)
+      return found
+        ? { valid: !found.length, name: "primary_manager_taken" }
+        : { valid: false, name: "load_error" }
+    },
+  ])
   const svelteForm = form(
     fromDateField,
     orgUnitField,
     managerTypeField,
     managerLevelField,
     responsibilitiesField,
-    engagementField
+    engagementField,
+    primaryField
   )
 
   export const validate = async (): Promise<boolean> => {
@@ -144,6 +160,32 @@
     validities.run((signal) => getValidities(uuid, signal))
   } else {
     validities.run(async () => ({ from: null, to: null }))
+  }
+
+  $: primaryUuid = primaryClassUuid(value.primary)
+  $: primaryLookup = {
+    orgUnit: orgUnitUuid,
+    primary: primaryUuid,
+    from: fromDate,
+    to: toDate,
+  }
+  $: {
+    // A submit-time error belongs to the inputs it checked.
+    primaryField.reset()
+    primaryManagers.run((signal) => getPrimaryManagers(primaryLookup, signal))
+  }
+
+  const primaryClasses = createQuery<FacetValidities[]>()
+  // Only fetch when a start date is set: the query rejects a null date, and
+  // the primary select is disabled without one anyway.
+  $: if (env.PUBLIC_SHOW_PRIMARY_MANAGER && fromDate) {
+    const at = fromDate
+    primaryClasses.run((signal) =>
+      getPrimaryClasses(
+        { fromDate: at, primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY },
+        signal
+      )
+    )
   }
 
   const facets = createQuery<FacetValidities[]>()
@@ -294,4 +336,24 @@
     disabled={!value.fromDate || $facets.error}
     required={true}
   />
+  {#if env.PUBLIC_SHOW_PRIMARY_MANAGER}
+    <Select
+      title={capital($_("primary"))}
+      id="{idPrefix}primary"
+      bind:value={value.primary}
+      iterable={$primaryClasses.data
+        ? filterClassesByFacetUserKey($primaryClasses.data, "primary_type")
+        : undefined}
+      disabled={!value.fromDate || $primaryClasses.error}
+      isClearable={true}
+      errors={$primaryManagers.data?.length
+        ? ["primary_manager_taken"]
+        : $primaryField.errors}
+    />
+    <PrimaryManagerConflicts
+      managers={$primaryManagers.data}
+      loadError={$primaryManagers.error || $primaryClasses.error}
+      errors={$primaryField.errors}
+    />
+  {/if}
 {/if}

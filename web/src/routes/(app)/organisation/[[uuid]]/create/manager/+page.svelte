@@ -19,15 +19,19 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import { filterClassesByFacetUserKey } from "$lib/utils/classes"
+  import { filterClassesByFacetUserKey, primaryClassUuid } from "$lib/utils/classes"
   import Search from "$lib/components/search/Search.svelte"
   import SelectMultiple from "$lib/components/forms/shared/SelectMultiple.svelte"
   import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
+  import { getPrimaryManagers, type PrimaryManager } from "$lib/http/getPrimaryManagers"
+  import PrimaryManagerConflicts from "$lib/components/forms/entity/PrimaryManagerConflicts.svelte"
+  import type { ClassValue } from "$lib/components/forms/entity/types"
   import { createQuery } from "$lib/http/query"
-  import { getClasses } from "$lib/http/getClasses"
+  import { getClasses, getPrimaryClasses } from "$lib/http/getClasses"
+  import { env } from "$lib/env"
   import {
     formatEngagementTitlesAndUuid,
     type EngagementTitleAndUuid,
@@ -98,12 +102,26 @@
   const engagement = field("engagement", "", [
     () => ({ valid: noEngagement || !!selectedEngagement?.uuid, name: "required" }),
   ])
+  let selectedPrimary: ClassValue | undefined
+  const primaryManagers = createQuery<PrimaryManager[]>([])
+  // Queries MO again on submit: the lookup shown under the select may still be
+  // loading, or another user may have set a primary manager since. A failed
+  // query blocks too.
+  const primary = field("primary", "", [
+    async () => {
+      const found = await getPrimaryManagers(primaryLookup).catch(() => null)
+      return found
+        ? { valid: !found.length, name: "primary_manager_taken" }
+        : { valid: false, name: "load_error" }
+    },
+  ])
   const svelteForm = form(
     fromDate,
     managerType,
     managerLevel,
     responsibilities,
-    engagement
+    engagement,
+    primary
   )
 
   // Clear any selected engagement when the user opts out.
@@ -140,6 +158,32 @@
 
   // Logic for updating datepicker intervals
   let validities: ValidityBounds = { from: null, to: null }
+
+  $: primaryUuid = primaryClassUuid(selectedPrimary)
+  $: primaryLookup = {
+    orgUnit: $page.params.uuid,
+    primary: primaryUuid,
+    from: startDate,
+    to: toDate,
+  }
+  $: {
+    // A submit-time error belongs to the inputs it checked.
+    primary.reset()
+    primaryManagers.run((signal) => getPrimaryManagers(primaryLookup, signal))
+  }
+
+  const primaryClasses = createQuery<FacetValidities[]>()
+  // Only fetch when a start date is set: the query rejects a null date, and
+  // the primary select is disabled without one anyway.
+  $: if (env.PUBLIC_SHOW_PRIMARY_MANAGER && startDate) {
+    const at = startDate
+    primaryClasses.run((signal) =>
+      getPrimaryClasses(
+        { fromDate: at, primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY },
+        signal
+      )
+    )
+  }
 
   const facets = createQuery<FacetValidities[]>()
   // Only fetch when a start date is set: getClasses rejects a null date, and
@@ -292,6 +336,26 @@
           disabled={!startDate || $facets.error}
           required={true}
         />
+        {#if env.PUBLIC_SHOW_PRIMARY_MANAGER}
+          <Select
+            title={capital($_("primary"))}
+            id="primary"
+            bind:value={selectedPrimary}
+            iterable={$primaryClasses.data
+              ? filterClassesByFacetUserKey($primaryClasses.data, "primary_type")
+              : undefined}
+            disabled={!startDate || $primaryClasses.error}
+            isClearable={true}
+            errors={$primaryManagers.data?.length
+              ? ["primary_manager_taken"]
+              : $primary.errors}
+          />
+          <PrimaryManagerConflicts
+            managers={$primaryManagers.data}
+            loadError={$primaryManagers.error || $primaryClasses.error}
+            errors={$primary.errors}
+          />
+        {/if}
       {/if}
     </div>
   </div>
