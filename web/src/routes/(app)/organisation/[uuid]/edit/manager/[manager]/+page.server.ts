@@ -1,3 +1,4 @@
+import { env } from "$lib/env"
 import type { ManagerUpdateInput } from "$lib/graphql/types"
 import type { UnpackedClass } from "$lib/utils/helpers"
 import type { Actions, RequestEvent } from "@sveltejs/kit"
@@ -17,6 +18,9 @@ export const actions: Actions = {
       JSON.parse(data.get("responsibility") as string) as UnpackedClass
     ).map((v) => v.uuid)
     const engagementUuid = data.get("engagement-uuid")
+    // An explicit null unsets the primary class. MO keeps it when omitted,
+    // which is what the form needs when primary managers are switched off.
+    const primary = data.get("primary") || null
     const startDate = data.get("from") as string
     const endDate = data.get("to") as string | null
 
@@ -28,6 +32,7 @@ export const actions: Actions = {
       manager_level: managerLevel,
       responsibility: responsibilities,
       engagement: engagementUuid,
+      ...(env.PUBLIC_SHOW_PRIMARY_MANAGER && { primary: primary }),
       validity: { from: startDate, ...(endDate && { to: endDate }) },
     }
   },

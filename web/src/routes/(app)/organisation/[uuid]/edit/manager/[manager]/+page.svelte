@@ -24,14 +24,18 @@
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import { filterClassesByFacetUserKey } from "$lib/utils/classes"
+  import { filterClassesByFacetUserKey, primaryClassUuid } from "$lib/utils/classes"
   import Search from "$lib/components/search/Search.svelte"
   import SelectMultiple from "$lib/components/forms/shared/SelectMultiple.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
-  import { getClasses } from "$lib/http/getClasses"
+  import { getPrimaryManagers, type PrimaryManager } from "$lib/http/getPrimaryManagers"
+  import PrimaryManagerConflicts from "$lib/components/forms/entity/PrimaryManagerConflicts.svelte"
+  import type { ClassValue } from "$lib/components/forms/entity/types"
+  import { getClasses, getPrimaryClasses } from "$lib/http/getClasses"
+  import { env } from "$lib/env"
   import { createQuery } from "$lib/http/query"
   import { getValidities } from "$lib/http/getValidities"
   import { normalizeManager } from "$lib/utils/normalizeForm"
@@ -78,6 +82,13 @@
                   name
                   user_key
                 }
+              }
+            }
+            primary_response {
+              uuid
+              current(at: $fromDate) {
+                name
+                user_key
               }
             }
             validity {
@@ -172,6 +183,7 @@
         name: string
       }
     | undefined
+  let selectedPrimary: ClassValue | undefined
 
   const fromDate = field<Temporal.ZonedDateTime | null | undefined>("from", undefined, [
     required(),
@@ -180,12 +192,25 @@
   const managerType = field("manager_type", "", [required()])
   const managerLevel = field("manager_level", "", [required()])
   const responsibilitiesField = field("responsibilities", undefined, [required()])
+  const primaryManagers = createQuery<PrimaryManager[]>([])
+  // Queries MO again on submit: the lookup shown under the select may still be
+  // loading, or another user may have set a primary manager since. A failed
+  // query blocks too.
+  const primary = field("primary", "", [
+    async () => {
+      const found = await getPrimaryManagers(primaryLookup).catch(() => null)
+      return found
+        ? { valid: !found.length, name: "primary_manager_taken" }
+        : { valid: false, name: "load_error" }
+    },
+  ])
   const svelteForm = form(
     fromDate,
     orgUnit,
     managerType,
     managerLevel,
-    responsibilitiesField
+    responsibilitiesField,
+    primary
   )
 
   const handler: SubmitFunction =
@@ -225,6 +250,33 @@
     validities.run((signal) => getValidities(orgUnitUuid, signal))
   } else {
     validities.run(async () => ({ from: null, to: null }))
+  }
+
+  $: primaryUuid = primaryClassUuid(selectedPrimary)
+  $: primaryLookup = {
+    orgUnit: selectedOrgUnit?.uuid,
+    primary: primaryUuid,
+    from: startDate,
+    to: toDate,
+    exclude: $page.params.manager,
+  }
+  $: {
+    // A submit-time error belongs to the inputs it checked.
+    primary.reset()
+    primaryManagers.run((signal) => getPrimaryManagers(primaryLookup, signal))
+  }
+
+  const primaryClasses = createQuery<FacetValidities[]>()
+  // Only fetch when a start date is set: the query rejects a null date, and
+  // the primary select is disabled without one anyway.
+  $: if (env.PUBLIC_SHOW_PRIMARY_MANAGER && startDate) {
+    const at = startDate
+    primaryClasses.run((signal) =>
+      getPrimaryClasses(
+        { fromDate: at, primaryClass: env.PUBLIC_PRIMARY_CLASS_USER_KEY },
+        signal
+      )
+    )
   }
 
   const facets = createQuery<FacetValidities[]>()
@@ -292,7 +344,9 @@
       $managerLevel.value !== initialManager.manager_level ||
       JSON.stringify($responsibilitiesField.value) !==
         JSON.stringify(initialManager.responsibility) ||
-      (selectedEngagement?.uuid ?? null) !== (initialManager.engagement ?? null)
+      (selectedEngagement?.uuid ?? null) !== (initialManager.engagement ?? null) ||
+      (env.PUBLIC_SHOW_PRIMARY_MANAGER &&
+        (selectedPrimary?.uuid ?? null) !== initialManager.primary)
 
     const toDateExtended = isLaterEnd(toDate, initialManager.to)
     hasChanges = editableChanged || toDateExtended
@@ -482,6 +536,35 @@
             disabled={!startDate || $facets.error}
             required={true}
           />
+          {#if env.PUBLIC_SHOW_PRIMARY_MANAGER}
+            <Select
+              title={capital($_("primary"))}
+              id="primary"
+              startValue={manager.primary_response
+                ? {
+                    uuid: manager.primary_response.uuid,
+                    name:
+                      manager.primary_response.current?.name ??
+                      manager.primary_response.uuid,
+                    user_key: manager.primary_response.current?.user_key,
+                  }
+                : undefined}
+              bind:value={selectedPrimary}
+              iterable={$primaryClasses.data
+                ? filterClassesByFacetUserKey($primaryClasses.data, "primary_type")
+                : undefined}
+              disabled={!startDate || $primaryClasses.error}
+              isClearable={true}
+              errors={$primaryManagers.data?.length
+                ? ["primary_manager_taken"]
+                : $primary.errors}
+            />
+            <PrimaryManagerConflicts
+              managers={$primaryManagers.data}
+              loadError={$primaryManagers.error || $primaryClasses.error}
+              errors={$primary.errors}
+            />
+          {/if}
         {/if}
       </div>
     </div>
