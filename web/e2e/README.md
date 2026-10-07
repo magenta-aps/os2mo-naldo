@@ -44,10 +44,28 @@ behind, its user_key is prefixed `refetch-probe-`.
 ## userflow.spec.ts
 
 Fills every step of the onboarding wizard (employee, engagement, ituser with
-a rolebinding, manager, address) and asserts the captured `UserFlowCreate`
+a rolebinding, manager with a primary class, address) and asserts the captured `UserFlowCreate`
 variables: every detail must reference the employee's client-generated uuid,
 the rolebinding must reference the ituser's, and each must carry what was
 picked on its step.
+
+## managerPrimary.spec.ts
+
+A unit has at most one primary manager role, which MO does not enforce, so
+the manager forms do. Seeds a probe person and two probe units via the API,
+one where the probe person holds two manager roles, one of them primary, and
+one without a primary manager, then asserts that:
+
+- the create forms send the primary class, or list the existing primary
+  manager and block the submit;
+- a failed lookup blocks the submit;
+- the edit forms keep a manager role's own primary and can unset it, while
+  the person's other role in the unit still conflicts.
+
+The roles belong to their own person because the smoke suite edits the fixture
+person's first manager role in parallel. The probe data is deleted afterwards;
+if a crashed run leaves it behind, the units' user_keys are prefixed
+`primary-probe-` and the person is named `Primary Probe Holder`.
 
 ## payloads.spec.ts
 
