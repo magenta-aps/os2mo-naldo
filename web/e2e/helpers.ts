@@ -69,6 +69,25 @@ export const resolveFixture = (): Promise<Fixture> =>
     }
   }))
 
+// The app picks its primary class by PUBLIC_PRIMARY_CLASS_USER_KEY, which CI
+// sets for this process too.
+const PRIMARY_CLASS_USER_KEY = process.env.PUBLIC_PRIMARY_CLASS_USER_KEY ?? "primary"
+
+export type ClassRef = { uuid: string; name: string }
+
+export const resolvePrimaryClass = async (): Promise<ClassRef> => {
+  const data = await moGraphql(
+    'query ($key: [String!]) { classes(filter: { facet: { user_keys: "primary_type" }, user_keys: $key }) { objects { uuid current { name } } } }',
+    { key: [PRIMARY_CLASS_USER_KEY] }
+  )
+  const cls = data.classes.objects[0]
+  if (!cls)
+    throw new Error(
+      `no primary_type class "${PRIMARY_CLASS_USER_KEY}" — run e2e/seed.cjs`
+    )
+  return { uuid: cls.uuid, name: cls.current.name }
+}
+
 // One editable object per detail type AND owner side, with the owner uuid
 // and start date the edit route needs. The seed guarantees one of each on
 // the fixture person/unit, so resolution is a single owner-filtered query
@@ -225,6 +244,18 @@ export const pickOptionByText = async (page: Page, nth: number, text: string) =>
   await page.locator(".list-item").first().waitFor({ timeout: 8000 })
   await page.keyboard.press("ArrowDown")
   await page.keyboard.press("Enter")
+  await page.waitForTimeout(300)
+}
+
+// Picks the option named exactly `text`, for options whose names contain one
+// another ("Primær" and "Ikke-primær").
+export const pickExactOption = async (page: Page, nth: number, text: string) => {
+  await page.locator(`form #select:visible >> nth=${nth}`).click({ timeout: 8000 })
+  await page
+    .locator(".list-item")
+    .filter({ has: page.getByText(text, { exact: true }) })
+    .first()
+    .click({ timeout: 8000 })
   await page.waitForTimeout(300)
 }
 
