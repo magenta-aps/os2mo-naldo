@@ -707,6 +707,16 @@ gql`
       }
     }
   }
+  query Confederations($fromDate: DateTime!) {
+    classes(filter: { facet: { user_keys: "confederation" }, from_date: $fromDate }) {
+      objects {
+        current(at: $fromDate) {
+          name
+          uuid
+        }
+      }
+    }
+  }
   query TradeUnions($fromDate: DateTime!) {
     classes(filter: { facet: { user_keys: "confederation" }, from_date: $fromDate }) {
       objects {
