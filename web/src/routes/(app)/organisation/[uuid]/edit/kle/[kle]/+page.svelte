@@ -32,7 +32,12 @@
   import { normalizeKLE } from "$lib/utils/normalizeForm"
 
   gql`
-    query KLE($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+    query KLE(
+      $uuid: [UUID!]
+      $fromDate: DateTime
+      $toDate: DateTime
+      $currentDate: DateTime
+    ) {
       kles(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
           validities {
@@ -40,7 +45,7 @@
             kle_aspects_response {
               objects {
                 uuid
-                current(at: $fromDate) {
+                current(at: $currentDate) {
                   name
                   user_key
                 }
@@ -48,7 +53,7 @@
             }
             kle_number_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 name
                 user_key
               }
@@ -59,7 +64,7 @@
             }
             org_unit_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 validity {
                   from
                   to
@@ -158,6 +163,7 @@
     uuid: $page.params.kle,
     fromDate: $page.url.searchParams.get("from"),
     toDate: $page.url.searchParams.get("to"),
+    currentDate: startDate,
   })
 
   let initialKLE: any = null

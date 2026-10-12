@@ -47,14 +47,14 @@
             external_id
             primary_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 name
                 user_key
               }
             }
             itsystem_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 name
                 user_key
               }

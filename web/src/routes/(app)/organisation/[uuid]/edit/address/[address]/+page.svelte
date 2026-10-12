@@ -33,7 +33,12 @@
   import { normalizeAddress } from "$lib/utils/normalizeForm"
 
   gql`
-    query AddressAndFacets($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+    query AddressAndFacets(
+      $uuid: [UUID!]
+      $fromDate: DateTime
+      $toDate: DateTime
+      $currentDate: DateTime
+    ) {
       addresses(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
           validities {
@@ -43,14 +48,14 @@
             user_key
             address_type_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 name
                 user_key
               }
             }
             visibility_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 name
                 user_key
               }
@@ -195,6 +200,7 @@
     uuid: $page.params.address,
     fromDate: $page.url.searchParams.get("from"),
     toDate: $page.url.searchParams.get("to"),
+    currentDate: startDate,
   })
 
   let initialAddress: any = null

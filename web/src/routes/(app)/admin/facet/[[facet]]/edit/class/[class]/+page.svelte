@@ -32,7 +32,12 @@
   import { AddressScope, isAddressTypeFacet } from "$lib/constants/addresses"
 
   gql`
-    query Class($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+    query Class(
+      $uuid: [UUID!]
+      $fromDate: DateTime
+      $toDate: DateTime
+      $currentDate: DateTime
+    ) {
       classes(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
           validities {
@@ -42,19 +47,19 @@
             scope
             owner_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 name
               }
             }
             facet_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 user_key
               }
             }
             it_system_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 user_key
                 name
               }
@@ -187,7 +192,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ClassDocument, { uuid: $page.params.class, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to") } )}
+{#await graphQLClient().request( ClassDocument, { uuid: $page.params.class, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), currentDate: moValidityFrom($date) } )}
   <!-- TODO: Should have a skeleton for the loading stage -->
   {capital($_("loading"))}
 {:then data}

@@ -58,26 +58,31 @@
   const svelteForm = form(fromDate, leaveType, engagement)
 
   gql`
-    query LeaveAndFacet($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+    query LeaveAndFacet(
+      $uuid: [UUID!]
+      $fromDate: DateTime
+      $toDate: DateTime
+      $currentDate: DateTime
+    ) {
       leaves(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
           validities {
             engagement_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 validity {
                   from
                   to
                 }
                 org_unit_response {
                   uuid
-                  current(at: $fromDate) {
+                  current(at: $currentDate) {
                     name
                   }
                 }
                 job_function_response {
                   uuid
-                  current(at: $fromDate) {
+                  current(at: $currentDate) {
                     name
                   }
                 }
@@ -85,7 +90,7 @@
             }
             leave_type_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 user_key
                 name
               }
@@ -96,19 +101,19 @@
             }
             person_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 name
                 engagements(filter: { from_date: $fromDate, to_date: $toDate }) {
                   uuid
                   org_unit_response {
                     uuid
-                    current(at: $fromDate) {
+                    current(at: $currentDate) {
                       name
                     }
                   }
                   job_function_response {
                     uuid
-                    current(at: $fromDate) {
+                    current(at: $currentDate) {
                       name
                     }
                   }
@@ -233,6 +238,7 @@
     uuid: $page.params.leave,
     fromDate: $page.url.searchParams.get("from"),
     toDate: $page.url.searchParams.get("to"),
+    currentDate: startDate,
   })
 
   let initialLeave: any = null
