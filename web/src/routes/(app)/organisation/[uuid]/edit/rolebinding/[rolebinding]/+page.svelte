@@ -31,17 +31,22 @@
   import { normalizeRolebinding } from "$lib/utils/normalizeForm"
 
   gql`
-    query Rolebinding($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
+    query Rolebinding(
+      $uuid: [UUID!]
+      $fromDate: DateTime
+      $toDate: DateTime
+      $currentDate: DateTime
+    ) {
       rolebindings(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
         objects {
           validities {
             uuid
             ituser_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 itsystem_response {
                   uuid
-                  current(at: $fromDate) {
+                  current(at: $currentDate) {
                     name
                   }
                 }
@@ -50,7 +55,7 @@
             }
             role_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 user_key
                 name
               }
@@ -161,6 +166,7 @@
     uuid: $page.params.rolebinding,
     fromDate: $page.url.searchParams.get("from"),
     toDate: $page.url.searchParams.get("to"),
+    currentDate: startDate,
   })
 
   let initialRolebinding: any = null

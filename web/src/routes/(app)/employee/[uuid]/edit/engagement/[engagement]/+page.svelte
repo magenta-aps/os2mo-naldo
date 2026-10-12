@@ -48,19 +48,19 @@
             user_key
             engagement_type_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 name
               }
             }
             job_function_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 name
               }
             }
             primary_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 name
               }
             }

@@ -54,21 +54,21 @@
             }
             time_planning_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 user_key
                 name
               }
             }
             unit_type_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 user_key
                 name
               }
             }
             unit_level_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 user_key
                 name
               }

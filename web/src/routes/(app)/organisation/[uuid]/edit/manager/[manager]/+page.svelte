@@ -59,14 +59,14 @@
             }
             manager_type_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 user_key
                 name
               }
             }
             manager_level_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 user_key
                 name
               }
@@ -74,7 +74,7 @@
             responsibilities_response {
               objects {
                 uuid
-                current(at: $fromDate) {
+                current(at: $currentDate) {
                   name
                   user_key
                 }
@@ -96,16 +96,16 @@
             }
             engagement_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 org_unit_response {
                   uuid
-                  current(at: $fromDate) {
+                  current(at: $currentDate) {
                     name
                   }
                 }
                 job_function_response {
                   uuid
-                  current(at: $fromDate) {
+                  current(at: $currentDate) {
                     name
                   }
                 }

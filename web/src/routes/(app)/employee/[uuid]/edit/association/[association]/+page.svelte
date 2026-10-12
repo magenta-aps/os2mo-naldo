@@ -66,14 +66,14 @@
             }
             association_type_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 user_key
                 name
               }
             }
             primary_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 user_key
                 name
               }
@@ -90,7 +90,7 @@
             }
             trade_union_response {
               uuid
-              current(at: $fromDate) {
+              current(at: $currentDate) {
                 user_key
                 name
               }
