@@ -6,6 +6,7 @@ import {
   formatTimestamp,
   fromJavaScriptDate,
   lastValidDay,
+  lastValidMoment,
   moValidityFrom,
   moValidityTo,
   sameDate,
@@ -186,6 +187,13 @@ describe("moValidityTo", () => {
   it("reverses lastValidDay", () => {
     const to = toCopenhagen("2024-11-01T00:00:00+01:00")
     expect(toMO(moValidityTo(lastValidDay(to)!))).toBe(toMO(to))
+  })
+})
+
+describe("lastValidMoment", () => {
+  it("is 23.59 on the last valid day, also across a change to winter time", () => {
+    const to = toCopenhagen("2024-10-28T00:00:00+01:00")
+    expect(formatTimestamp(lastValidMoment(to))).toMatch(/^27\.10\.2024,? 23\.59$/)
   })
 })
 

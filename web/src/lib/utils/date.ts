@@ -78,6 +78,12 @@ export const lastValidDay = (
   return to ? assertMidnight(to).subtract({ days: 1 }).toPlainDate() : null
 }
 
+// The moment just before `validity.to`; shown to the minute, that is 23.59 on
+// the last valid day.
+export const lastValidMoment = (to: Temporal.ZonedDateTime): Temporal.ZonedDateTime => {
+  return to.subtract({ nanoseconds: 1 })
+}
+
 export const moValidityFrom = (
   firstDay: Temporal.PlainDate
 ): Temporal.ZonedDateTime => {
