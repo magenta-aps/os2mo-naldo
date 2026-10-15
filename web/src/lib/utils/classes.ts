@@ -1,3 +1,5 @@
+import { env } from "$lib/env"
+
 // This should replace the `Facet`-type at some point
 export type FacetValidities = {
   validities: {
@@ -54,3 +56,12 @@ export const filterClassByUserKey = (classes: Class[], user_key: string) => {
   }
   return foundClass.validities[0]
 }
+
+// The chosen class's uuid if it is the primary class, which a unit may give
+// only one manager role; undefined for "non-primary" and anything else.
+export const primaryClassUuid = (
+  value: { uuid: string | null; user_key?: string | null } | undefined
+) =>
+  value?.uuid && value.user_key === env.PUBLIC_PRIMARY_CLASS_USER_KEY
+    ? value.uuid
+    : undefined

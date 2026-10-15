@@ -66,6 +66,7 @@ const manager = (patch: Partial<ManagerInfo> = {}): ManagerInfo => ({
   managerType: { uuid: "mt1", name: "Type" },
   managerLevel: { uuid: "ml1", name: "Level" },
   responsibilities: [{ uuid: "r1", name: "A" }],
+  primary: undefined,
   validated: true,
   ...patch,
 })
@@ -165,7 +166,7 @@ describe("buildUserflowPayload", () => {
             primary: { uuid: "p1", name: "Primary" },
           }),
         ],
-        managers: [manager()],
+        managers: [manager({ primary: { uuid: "p1", name: "Primary" } })],
         addresses: [address()],
       }),
       uuidsFor(1)
@@ -224,6 +225,7 @@ describe("buildUserflowPayload", () => {
           manager_type: "mt1",
           manager_level: "ml1",
           responsibility: ["r1"],
+          primary: "p1",
           validity: { from: "2020-01-01T00:00:00+01:00", to: null },
         },
       ],

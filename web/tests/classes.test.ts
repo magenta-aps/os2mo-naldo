@@ -1,7 +1,9 @@
+import { env } from "$lib/env"
 import {
   filterClassByUserKey,
   filterClassesByFacetUserKey,
   filterClassUuidByUserKey,
+  primaryClassUuid,
 } from "$lib/utils/classes"
 import { describe, expect, it } from "vitest"
 
@@ -101,5 +103,22 @@ describe("filterClassByUserKey", () => {
       user_key: "primary",
       name: "Primær",
     })
+  })
+})
+
+describe("primaryClassUuid", () => {
+  it("returns the uuid of the primary class", () => {
+    const primary = { uuid: "p1", user_key: env.PUBLIC_PRIMARY_CLASS_USER_KEY }
+    expect(primaryClassUuid(primary)).toBe("p1")
+  })
+
+  it("returns undefined for any other class", () => {
+    expect(primaryClassUuid({ uuid: "n1", user_key: "non-primary" })).toBeUndefined()
+  })
+
+  it("returns undefined when nothing is picked", () => {
+    expect(primaryClassUuid(undefined)).toBeUndefined()
+    const noUuid = { uuid: null, user_key: env.PUBLIC_PRIMARY_CLASS_USER_KEY }
+    expect(primaryClassUuid(noUuid)).toBeUndefined()
   })
 })

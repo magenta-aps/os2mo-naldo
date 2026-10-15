@@ -4091,6 +4091,7 @@ export type EmployeeBoundManagerFilter = {
   manager_type?: InputMaybe<ClassFilter>;
   org_unit?: InputMaybe<OrganisationUnitFilter>;
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  primary?: InputMaybe<ClassFilter>;
   registration?: InputMaybe<ManagerRegistrationFilter>;
   registration_time?: InputMaybe<Scalars['DateTime']['input']>;
   responsibility?: InputMaybe<ClassFilter>;
@@ -10896,6 +10897,12 @@ export type Manager = {
   person_response?: Maybe<EmployeeResponse>;
   /**
    *
+   * Marks which managerial position is primary (if any).
+   *
+   */
+  primary_response?: Maybe<ClassResponse>;
+  /**
+   *
    * Responsibilities that the manager takes care of.
    *
    * Examples:
@@ -11040,6 +11047,8 @@ export type ManagerCreateInput = {
   org_unit: Scalars['UUID']['input'];
   /** UUID of the manager as person. */
   person?: InputMaybe<Scalars['UUID']['input']>;
+  /** Primary field of the manager object */
+  primary?: InputMaybe<Scalars['UUID']['input']>;
   /** UUID of the managers responsibilities. */
   responsibility: Array<Scalars['UUID']['input']>;
   /** Extra info or uuid. */
@@ -11111,6 +11120,13 @@ export type ManagerFilter = {
    * @deprecated Replaced by the 'org_unit' filter
    */
   org_units?: InputMaybe<Array<Scalars['UUID']['input']>>;
+  /**
+   * Primary class filter limiting which entries are returned.
+   *
+   * Set to `null` to only return managers without a primary class.
+   *
+   */
+  primary?: InputMaybe<ClassFilter>;
   /**
    * Registration filter limiting which entries are returned.
    *
@@ -11647,6 +11663,7 @@ export type ManagerUpdateInput = {
   manager_type?: InputMaybe<Scalars['UUID']['input']>;
   org_unit?: InputMaybe<Scalars['UUID']['input']>;
   person?: InputMaybe<Scalars['UUID']['input']>;
+  primary?: InputMaybe<Scalars['UUID']['input']>;
   responsibility?: InputMaybe<Array<Scalars['UUID']['input']>>;
   user_key?: InputMaybe<Scalars['String']['input']>;
   uuid: Scalars['UUID']['input'];
@@ -13478,6 +13495,7 @@ export type OrgUnitboundmanagerfilter = {
   exclude?: InputMaybe<EmployeeFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   manager_type?: InputMaybe<ClassFilter>;
+  primary?: InputMaybe<ClassFilter>;
   registration?: InputMaybe<ManagerRegistrationFilter>;
   registration_time?: InputMaybe<Scalars['DateTime']['input']>;
   responsibility?: InputMaybe<ClassFilter>;

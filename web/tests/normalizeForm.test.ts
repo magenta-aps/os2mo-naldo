@@ -155,6 +155,7 @@ describe("normalizeManager", () => {
           ],
         },
         engagement_response: { uuid: "eng-1" },
+        primary_response: { uuid: "prim-1" },
       })
     )
     expect(result).toEqual({
@@ -165,6 +166,7 @@ describe("normalizeManager", () => {
       manager_level: "Niveau 4",
       responsibility: ["Personale: ansættelse", "Personale: øvrige"],
       engagement: "eng-1",
+      primary: "prim-1",
     })
   })
 })

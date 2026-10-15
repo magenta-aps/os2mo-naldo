@@ -4,10 +4,12 @@ import {
   dismiss,
   login,
   moGraphql,
+  pickExactOption,
   pickFirstOption,
   pickMultiFirstOption,
   pickOptionByText,
   resolveFixture,
+  resolvePrimaryClass,
   searchAndPick,
   trackPageErrors,
 } from "./helpers"
@@ -34,6 +36,7 @@ test("onboarding wizard submits a coherent batch", async ({ page }) => {
   test.slow()
   const fixture = await resolveFixture()
   const roleSystem = await resolveRoleSystem()
+  const primary = await resolvePrimaryClass()
   expect(
     roleSystem,
     "no role class linked to an IT system — run e2e/seed.cjs"
@@ -89,6 +92,7 @@ test("onboarding wizard submits a coherent batch", async ({ page }) => {
   await pickFirstOption(page, 1) // manager level
   await pickMultiFirstOption(page, "responsibility")
   await dismiss(page) // the multi-select leaves its list open
+  await pickExactOption(page, 2, primary.name)
   await next()
 
   // Step 5: address — the seeded EMAIL-scope type, so the value validates
@@ -136,6 +140,7 @@ test("onboarding wizard submits a coherent batch", async ({ page }) => {
   expect(manager.manager_type).toBeTruthy()
   expect(manager.manager_level).toBeTruthy()
   expect(manager.responsibility).not.toHaveLength(0)
+  expect(manager.primary).toBe(primary.uuid)
 
   expect(captured.addressInput).toHaveLength(1)
   const address = captured.addressInput[0]

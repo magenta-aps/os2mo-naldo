@@ -74,6 +74,12 @@
                 name
               }
             }
+            primary_response {
+              uuid
+              current(at: $fromDate) {
+                name
+              }
+            }
             engagement_response {
               uuid
               validities(start: null, end: null) {
@@ -223,6 +229,9 @@
       </td>
       <td class="text-sm p-4">{manager.manager_type_response?.current?.name}</td>
       <td class="text-sm p-4">{manager.manager_level_response?.current?.name}</td>
+      {#if env.PUBLIC_SHOW_PRIMARY_MANAGER}
+        <td class="text-sm p-4">{manager.primary_response?.current?.name ?? ""}</td>
+      {/if}
       <ValidityTableCell validity={manager.validity} />
       <td class="flex p-4 gap-2 justify-end">
         <a href={`${base}/auditlog/${manager.uuid}`}>

@@ -77,6 +77,7 @@ export const normalizeManager = (m: any) => {
       (r: any) => r.current?.name
     ),
     engagement: m.engagement_response?.uuid ?? null,
+    primary: m.primary_response?.uuid ?? null,
   }
 }
 

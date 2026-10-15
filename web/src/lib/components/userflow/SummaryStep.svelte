@@ -258,6 +258,9 @@
             (responsibility) => responsibility.name
           ),
         },
+        ...(env.PUBLIC_SHOW_PRIMARY_MANAGER
+          ? [{ label: capital($_("primary")), value: dash(manager.primary?.name) }]
+          : []),
       ],
     }))
 

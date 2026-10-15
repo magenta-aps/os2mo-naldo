@@ -280,7 +280,8 @@
 		"is_wrong_format": "{field} is wrong format",
 		"missing_floor_door": "{field} is missing floor or door",
 		"missing_house_number": "{field} is missing a house number",
-		"missing_postcode": "{field} is missing a postcode"
+		"missing_postcode": "{field} is missing a postcode",
+		"primary_manager_taken": "The unit already has a primary manager in this period"
 	},
 	"validity": "validity",
 	"visibility": "visibility",
