@@ -151,8 +151,14 @@
       </td>
       <td class="text-sm p-4">{association.association_type_response?.current?.name}</td
       >
-      <td class="text-sm p-4">{association.substitute_response?.current?.name ?? ""}</td
-      >
+      <td class="text-sm p-4">
+        {#if association.substitute_response}
+          <a href="{base}/employee/{association.substitute_response.uuid}">
+            {association.substitute_response.current?.name ??
+              association.substitute_response.uuid}
+          </a>
+        {/if}
+      </td>
       {#if env.PUBLIC_ENABLE_CONFEDERATIONS}
         <td class="text-sm p-4"
           >{association.trade_union_response?.current?.name ?? ""}</td
