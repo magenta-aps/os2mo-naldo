@@ -31,7 +31,11 @@
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { createQuery } from "$lib/http/query"
   import { getValidities } from "$lib/http/getValidities"
-  import { getClasses } from "$lib/http/getClasses"
+  import {
+    getClasses,
+    getTradeUnions,
+    type TradeUnionGroup,
+  } from "$lib/http/getClasses"
   import SelectGroup from "$lib/components/forms/shared/SelectGroup.svelte"
   import { normalizeAssociation } from "$lib/utils/normalizeForm"
 
@@ -40,7 +44,6 @@
       $uuid: [UUID!]
       $fromDate: DateTime
       $toDate: DateTime
-      $getConfederations: Boolean!
       $currentDate: DateTime!
     ) {
       associations(filter: { uuids: $uuid, from_date: $fromDate, to_date: $toDate }) {
@@ -97,26 +100,6 @@
             validity {
               from
               to
-            }
-          }
-        }
-      }
-      ...Confederations
-    }
-    fragment Confederations on Query {
-      classes(filter: { facet: { user_keys: "confederation" } })
-        @include(if: $getConfederations) {
-        objects {
-          current(at: $currentDate) {
-            top_level_facet {
-              uuid
-              user_key
-            }
-            name
-            children {
-              name
-              user_key
-              uuid
             }
           }
         }
@@ -232,13 +215,18 @@
     )
   }
 
+  const tradeUnions = createQuery<TradeUnionGroup[]>()
+  $: if (env.PUBLIC_ENABLE_CONFEDERATIONS && startDate) {
+    const at = startDate
+    tradeUnions.run((signal) => getTradeUnions(at, signal))
+  }
+
   // Created in the script (not inline in the {#await} tag) so the result can
   // be captured below without a side effect in the template.
   const associationPromise = graphQLClient().request(AssociationAndFacetDocument, {
     uuid: $page.params.association,
     fromDate: $page.url.searchParams.get("from"),
     toDate: $page.url.searchParams.get("to"),
-    getConfederations: env.PUBLIC_ENABLE_CONFEDERATIONS,
     currentDate: startDate,
   })
 
@@ -288,7 +276,6 @@
   </div>
 {:then data}
   {@const association = data.associations.objects[0].validities[0]}
-  {@const topLevelFacets = data.classes?.objects}
 
   <title
     >{capital(
@@ -431,7 +418,7 @@
               id="trade-union"
               title={$_("trade_union")}
               bind:name={$tradeUnion.value}
-              iterable={topLevelFacets}
+              iterable={$tradeUnions.data}
               startValue={association.trade_union_response
                 ? {
                     uuid: association.trade_union_response.uuid,
@@ -442,6 +429,11 @@
               on:clear={() => ($tradeUnion.value = "")}
               isClearable={true}
             />
+            {#if $tradeUnions.error}
+              <p class="text-sm text-error">
+                {capital($_($tradeUnions.data ? "load_error_options" : "load_error"))}
+              </p>
+            {/if}
           {/if}
         {/if}
       </div>
