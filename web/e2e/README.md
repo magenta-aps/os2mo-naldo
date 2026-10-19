@@ -67,6 +67,22 @@ person's first manager role in parallel. The probe data is deleted afterwards;
 if a crashed run leaves it behind, the units' user_keys are prefixed
 `primary-probe-` and the person is named `Primary Probe Holder`.
 
+## tradeUnions.spec.ts
+
+The association forms list the trade unions valid on the form's start date,
+grouped by confederation. Seeds a probe confederation with one trade union
+valid today and one valid only 60 days out, plus an association on the
+fixture person and unit with the first one, then asserts that:
+
+- the create forms offer the future trade union only from its start date,
+  post it when picked, and drop it, posted and shown alike, when the start
+  date moves back;
+- the edit forms keep the association's trade union and offer the future one
+  at a later start date.
+
+The probe data is deleted afterwards; if a crashed run leaves it behind, the
+classes' user_keys are prefixed `tradeunion-probe-`.
+
 ## payloads.spec.ts
 
 Records what the engagement forms would submit. Skipped unless
