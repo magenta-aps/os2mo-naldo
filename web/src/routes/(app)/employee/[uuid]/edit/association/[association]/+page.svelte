@@ -428,7 +428,7 @@
                     name: association.trade_union_response.current?.name ?? "",
                   }
                 : undefined}
-              on:clear={() => ($substitute.value = "")}
+              on:clear={() => ($tradeUnion.value = "")}
               isClearable={true}
             />
             {#if $tradeUnions.error}
