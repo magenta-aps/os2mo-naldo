@@ -27,6 +27,9 @@ const FACETS = {
   org_unit_hierarchy: { name: "Linjeorganisation", user_key: "linjeorg" },
   time_planning: { name: "Fuldtid", user_key: "fuldtid" },
   role: { name: "Bruger", user_key: "bruger" },
+  confederation: { name: "FH", user_key: "fh" },
+  // The association forms only list a trade union under its confederation.
+  trade_union: { name: "3F", user_key: "3f", parent: "confederation" },
 }
 
 const moGraphql = async (token, query, variables) => {
@@ -53,12 +56,13 @@ const moGraphql = async (token, query, variables) => {
 
   const existing = await moGraphql(
     token,
-    "{ facets { objects { uuid current { user_key classes { name } } } } }"
+    "{ facets { objects { uuid current { user_key classes { uuid name } } } } }"
   )
   const facetsByUserKey = Object.fromEntries(
     existing.facets.objects.map((facet) => [facet.current.user_key, facet])
   )
 
+  const seededClass = {}
   for (const [key, seedClass] of Object.entries(FACETS)) {
     let facet = facetsByUserKey[key]?.uuid
     if (!facet) {
@@ -71,20 +75,27 @@ const moGraphql = async (token, query, variables) => {
       ).facet_create.uuid
       console.log("created facet", key)
     }
-    if (facetsByUserKey[key]?.current?.classes?.length) continue
-    await moGraphql(
-      token,
-      "mutation ($input: ClassCreateInput!) { class_create(input: $input) { uuid } }",
-      {
-        input: {
-          facet_uuid: facet,
-          name: seedClass.name,
-          user_key: seedClass.user_key,
-          ...(seedClass.scope && { scope: seedClass.scope }),
-          validity: { from: "1900-01-01" },
-        },
-      }
-    )
+    const existingClass = facetsByUserKey[key]?.current?.classes?.[0]?.uuid
+    if (existingClass) {
+      seededClass[key] = existingClass
+      continue
+    }
+    seededClass[key] = (
+      await moGraphql(
+        token,
+        "mutation ($input: ClassCreateInput!) { class_create(input: $input) { uuid } }",
+        {
+          input: {
+            facet_uuid: facet,
+            name: seedClass.name,
+            user_key: seedClass.user_key,
+            ...(seedClass.scope && { scope: seedClass.scope }),
+            ...(seedClass.parent && { parent_uuid: seededClass[seedClass.parent] }),
+            validity: { from: "1900-01-01" },
+          },
+        }
+      )
+    ).class_create.uuid
     console.log("created class", seedClass.name, "in", key)
   }
   const facets = await moGraphql(
