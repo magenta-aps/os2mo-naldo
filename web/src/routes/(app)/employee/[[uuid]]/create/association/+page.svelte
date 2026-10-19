@@ -32,15 +32,15 @@
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import SelectGroup from "$lib/components/forms/shared/SelectGroup.svelte"
   import { createQuery } from "$lib/http/query"
-  import { getClasses } from "$lib/http/getClasses"
+  import {
+    getClasses,
+    getTradeUnions,
+    type TradeUnionGroup,
+  } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
 
   gql`
-    query FacetAndEmployee(
-      $uuid: [UUID!]
-      $getConfederations: Boolean!
-      $currentDate: DateTime!
-    ) {
+    query FacetAndEmployee($uuid: [UUID!], $currentDate: DateTime!) {
       facets(filter: { user_keys: ["association_type", "primary_type"] }) {
         objects {
           validities {
@@ -63,26 +63,6 @@
           current(at: $currentDate) {
             uuid
             name
-          }
-        }
-      }
-      ...Confederations
-    }
-    fragment Confederations on Query {
-      classes(filter: { facet: { user_keys: "confederation" } })
-        @include(if: $getConfederations) {
-        objects {
-          current(at: $currentDate) {
-            top_level_facet {
-              uuid
-              user_key
-            }
-            name
-            children {
-              name
-              user_key
-              uuid
-            }
           }
         }
       }
@@ -181,6 +161,12 @@
       )
     )
   }
+
+  const tradeUnions = createQuery<TradeUnionGroup[]>()
+  $: if (env.PUBLIC_ENABLE_CONFEDERATIONS && startDate) {
+    const at = startDate
+    tradeUnions.run((signal) => getTradeUnions(at, signal))
+  }
 </script>
 
 <title
@@ -203,7 +189,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( FacetAndEmployeeDocument, { uuid: $page.params.uuid, getConfederations: env.PUBLIC_ENABLE_CONFEDERATIONS, currentDate: $date } )}
+{#await graphQLClient().request( FacetAndEmployeeDocument, { uuid: $page.params.uuid, currentDate: $date } )}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
       <div class="p-8">
@@ -222,7 +208,6 @@
   </div>
 {:then data}
   {@const employee = data.employees.objects[0].current}
-  {@const topLevelFacets = data.classes?.objects}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
@@ -314,8 +299,13 @@
             <SelectGroup
               id="trade-union"
               title={$_("trade_union")}
-              iterable={topLevelFacets ? topLevelFacets : []}
+              iterable={$tradeUnions.data}
             />
+            {#if $tradeUnions.error}
+              <p class="text-sm text-error">
+                {capital($_($tradeUnions.data ? "load_error_options" : "load_error"))}
+              </p>
+            {/if}
           {/if}
         {/if}
       </div>

@@ -2,7 +2,8 @@
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
   import SvelteSelect from "svelte-select"
-  import type { Class } from "$lib/graphql/types"
+  import { afterUpdate } from "svelte"
+  import type { TradeUnionGroup } from "$lib/http/getClasses"
 
   type Value = {
     uuid: string | null
@@ -13,7 +14,8 @@
   export let title: string | undefined = undefined
   export let id: string
   export let name: string | undefined = undefined
-  export let iterable: any[] | undefined
+  // Each group's children are its options.
+  export let iterable: TradeUnionGroup[] | undefined
   export let required = false
   export let placeholder: string = ""
   export let disabled = false
@@ -34,23 +36,27 @@
     strategy: "fixed",
   }
 
-  // Flattening data
-  if (iterable) {
-    iterable = iterable
-      .flatMap((group) => {
-        if (group.current) {
-          const parent = group.current
-          const groupName = parent.name
-          return parent.children.map((child: Class) => ({
-            group: groupName,
-            label: child.name,
-            uuid: child.uuid,
-          }))
-        }
-        return [] // If `current` is null or undefined, return an empty array
-      })
-      .sort((a, b) => (a.label > b.label ? 1 : -1))
-  }
+  $: items = iterable
+    ?.flatMap((group) =>
+      group.children.map((child) => ({
+        group: group.name,
+        label: child.name,
+        uuid: child.uuid,
+      }))
+    )
+    .sort((a, b) => (a.label > b.label ? 1 : -1))
+
+  // A refetch for a new date can drop the selected option. Cleared after the
+  // update, not in a `$:` statement: `value` is bound to SvelteSelect. Without
+  // the timeout SvelteSelect keeps displaying the cleared selection.
+  afterUpdate(() => {
+    if (value && items && !items.some((item) => item.uuid === value?.uuid)) {
+      setTimeout(() => {
+        value = undefined
+        name = ""
+      }, 1)
+    }
+  })
 
   const groupBy = (item: any) => item.group
 </script>
@@ -83,7 +89,7 @@
       clearable={isClearable}
       {placeholder}
       groupHeaderSelectable={false}
-      items={iterable}
+      {items}
       {groupBy}
       searchable={false}
       bind:value
