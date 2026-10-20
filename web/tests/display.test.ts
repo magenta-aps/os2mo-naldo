@@ -3,6 +3,7 @@ import {
   getEngagementTitlesAndUuid,
   getITSystemNames,
   getITUserITSystemName,
+  getManagerRoleTitleAndUuid,
 } from "$lib/utils/display"
 import { describe, expect, it } from "vitest"
 
@@ -75,6 +76,45 @@ describe("getEngagementTitlesAndUuid", () => {
       },
     ])
     expect(result).toEqual([{ uuid: "eng-1", name: "eng-1" }])
+  })
+})
+
+describe("getManagerRoleTitleAndUuid", () => {
+  it("names a role by its holder, unit and type", () => {
+    expect(
+      getManagerRoleTitleAndUuid({
+        uuid: "manager-1",
+        person_response: { current: { name: "Bruce Lee" } },
+        org_unit_response: { current: { name: "Skole og Børn" } },
+        manager_type_response: { current: { name: "Direktør" } },
+      }).name
+    ).toBe("Bruce Lee, Skole og Børn, Direktør")
+  })
+
+  it("names a vacant role by its unit and type", () => {
+    expect(
+      getManagerRoleTitleAndUuid({
+        uuid: "manager-1",
+        org_unit_response: { current: { name: "Skole og Børn" } },
+        manager_type_response: { current: { name: "Direktør" } },
+      })
+    ).toEqual({ uuid: "manager-1", name: "Skole og Børn, Direktør" })
+  })
+
+  it("leaves out a type that does not resolve", () => {
+    expect(
+      getManagerRoleTitleAndUuid({
+        uuid: "manager-1",
+        org_unit_response: { current: { name: "Skole og Børn" } },
+        manager_type_response: null,
+      }).name
+    ).toBe("Skole og Børn")
+  })
+
+  it("falls back to the uuid when nothing resolves", () => {
+    expect(
+      getManagerRoleTitleAndUuid({ uuid: "manager-1", org_unit_response: {} }).name
+    ).toBe("manager-1")
   })
 })
 

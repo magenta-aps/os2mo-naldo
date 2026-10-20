@@ -58,6 +58,7 @@
 	"entire_organisation": "entire organisation",
 	"estimated_time_remaining": "estimated time remaining",
 	"explicit_manager": "manually chosen manager",
+	"explicit_manager_hint": "without a choice, the engagement is linked to the unit's manager",
 	"external_id": "external ID",
 	"facet": "{n, plural, =0 {the facet} one {facet} other {facets}}",
 	"facets": {
@@ -224,6 +225,7 @@
 	"search": "search",
 	"search_for": {
 		"address": "Search for address",
+		"manager": "Search for manager",
 		"organisation": "Search for organisation",
 		"person": "Search for person"
 	},

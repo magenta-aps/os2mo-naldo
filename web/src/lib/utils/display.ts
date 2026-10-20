@@ -39,6 +39,28 @@ export const getEngagementTitlesAndUuid = (engagements: EngagementTitleAndUuid[]
   }))
 }
 
+// Searched by holder or unit, so a role is named by its holder, unit and type. A
+// vacant role has no holder.
+export type ManagerRoleTitleAndUuid = {
+  uuid: string
+  person_response?: { current?: { name: string } | null } | null
+  org_unit_response?: { current?: { name: string } | null }
+  manager_type_response?: { current?: { name: string } | null } | null
+}
+
+export const getManagerRoleTitleAndUuid = (role: ManagerRoleTitleAndUuid) => ({
+  uuid: role.uuid,
+  // Select drops an option with an empty name.
+  name:
+    [
+      role.person_response?.current?.name,
+      role.org_unit_response?.current?.name,
+      role.manager_type_response?.current?.name,
+    ]
+      .filter(Boolean)
+      .join(", ") || role.uuid,
+})
+
 // An engagement rendered as one line of text, for the tables that show it as a
 // relation. In SD-code mode job_function is just a code, so extension_1 stands
 // in for it as the job title.

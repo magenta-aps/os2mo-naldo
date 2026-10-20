@@ -58,6 +58,7 @@
 	"entire_organisation": "bruttoorganisation",
 	"estimated_time_remaining": "estimeret tid tilbage",
 	"explicit_manager": "manuelt valgt leder",
+	"explicit_manager_hint": "uden valg knyttes engagementet til enhedens leder",
 	"external_id": "eksternt ID",
 	"facet": "{n, plural, =0 {facetten} one {facet} other {facetter}}",
 	"facets": {
@@ -224,6 +225,7 @@
 	"search": "søg",
 	"search_for": {
 		"address": "Søg efter adresse",
+		"manager": "Søg efter leder",
 		"organisation": "Søg efter organisation",
 		"person": "Søg efter person"
 	},
