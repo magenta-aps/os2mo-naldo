@@ -60,6 +60,7 @@
 	"entire_organisation": "bruttoorganisation",
 	"estimated_time_remaining": "estimeret tid tilbage",
 	"explicit_manager": "eksplicit leder",
+	"explicit_manager_hint": "uden en eksplicit leder bruges lederen af engagementets enhed",
 	"external_id": "eksternt ID",
 	"facet": "{n, plural, =0 {facetten} one {facet} other {facetter}}",
 	"facets": {
@@ -161,6 +162,7 @@
 	"manager_address_type": "adressetype for leder",
 	"manager_email": "leder email",
 	"manager_level": "lederniveau",
+	"manager_role": "lederrolle",
 	"manager_responsibility": "ledelsesansvar",
 	"manager_type": "ledertype",
 	"mo": "Medarbejder - Organisation",

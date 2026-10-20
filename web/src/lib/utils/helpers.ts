@@ -48,6 +48,26 @@ export const formatEngagementTitlesAndUuid = (
   }))
 }
 
+// One person's managers differ by unit and type, so both name one in a
+// select.
+export type ManagerTitleAndUuid = {
+  uuid: string
+  org_unit_response?: { current?: { name: string } | null }
+  manager_type_response?: { current?: { name: string } | null } | null
+}
+
+export const formatManagerTitleAndUuid = (manager: ManagerTitleAndUuid) => ({
+  uuid: manager.uuid,
+  // Select drops an option with an empty name.
+  name:
+    [
+      manager.org_unit_response?.current?.name,
+      manager.manager_type_response?.current?.name,
+    ]
+      .filter(Boolean)
+      .join(", ") || manager.uuid,
+})
+
 export type KleNumberTitleAndUuid = {
   uuid: string
   name: string

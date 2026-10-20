@@ -5,6 +5,7 @@ import {
   formatITUserITSystemName,
   formatITUserITSystemNames,
   formatKleNumberTitleAndUuid,
+  formatManagerTitleAndUuid,
   isMeaningfulUserKey,
   isUUID,
   upperCase,
@@ -103,6 +104,34 @@ describe("formatKleNumberTitleAndUuid", () => {
 
   it("returns empty array when input is empty", () => {
     expect(formatKleNumberTitleAndUuid([])).toEqual([])
+  })
+})
+
+describe("formatManagerTitleAndUuid", () => {
+  it("names a manager by its unit and type", () => {
+    expect(
+      formatManagerTitleAndUuid({
+        uuid: "manager-1",
+        org_unit_response: { current: { name: "Skole og Børn" } },
+        manager_type_response: { current: { name: "Direktør" } },
+      })
+    ).toEqual({ uuid: "manager-1", name: "Skole og Børn, Direktør" })
+  })
+
+  it("leaves out a type that does not resolve", () => {
+    expect(
+      formatManagerTitleAndUuid({
+        uuid: "manager-1",
+        org_unit_response: { current: { name: "Skole og Børn" } },
+        manager_type_response: null,
+      }).name
+    ).toBe("Skole og Børn")
+  })
+
+  it("falls back to the uuid when nothing resolves", () => {
+    expect(
+      formatManagerTitleAndUuid({ uuid: "manager-1", org_unit_response: {} }).name
+    ).toBe("manager-1")
   })
 })
 
