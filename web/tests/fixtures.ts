@@ -46,6 +46,8 @@ export const engagement = (patch: Partial<EngagementInfo> = {}): EngagementInfo 
   jobFunction: { uuid: "j1", name: "Job" },
   engagementType: { uuid: "t1", name: "Type" },
   primary: undefined,
+  explicitManagerPerson: undefined,
+  explicitManager: undefined,
   extension1: "",
   extension4: "",
   validated: true,
