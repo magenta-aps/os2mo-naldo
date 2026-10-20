@@ -39,6 +39,23 @@ export const getEngagementTitlesAndUuid = (engagements: EngagementTitleAndUuid[]
   }))
 }
 
+// One person's manager roles differ by unit and type, so both name a role in a
+// select.
+export type ManagerRoleTitleAndUuid = {
+  uuid: string
+  org_unit_response?: { current?: { name: string } | null }
+  manager_type_response?: { current?: { name: string } | null } | null
+}
+
+export const getManagerRoleTitleAndUuid = (role: ManagerRoleTitleAndUuid) => ({
+  uuid: role.uuid,
+  // Select drops an option with an empty name.
+  name:
+    [role.org_unit_response?.current?.name, role.manager_type_response?.current?.name]
+      .filter(Boolean)
+      .join(", ") || role.uuid,
+})
+
 // An engagement rendered as one line of text, for the tables that show it as a
 // relation. In SD-code mode job_function is just a code, so extension_1 stands
 // in for it as the job title.
