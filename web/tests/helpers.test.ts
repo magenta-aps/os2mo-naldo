@@ -1,7 +1,9 @@
 import {
   capital,
+  formatEngagementTitlesAndUuid,
   formatITSystemNames,
   formatITUserITSystemName,
+  formatITUserITSystemNames,
   formatKleNumberTitleAndUuid,
   isMeaningfulUserKey,
   isUUID,
@@ -108,6 +110,51 @@ describe("formatKleNumberTitleAndUuid", () => {
   })
 })
 
+describe("formatEngagementTitlesAndUuid", () => {
+  it("formats job function and org unit names", () => {
+    const result = formatEngagementTitlesAndUuid([
+      {
+        uuid: "eng-1",
+        job_function_response: { current: { name: "Specialist" } },
+        org_unit_response: { current: { name: "Haderslev skole" } },
+      },
+    ])
+    expect(result).toEqual([{ uuid: "eng-1", name: "Specialist, Haderslev skole" }])
+  })
+
+  it("renders only the half that resolves", () => {
+    const result = formatEngagementTitlesAndUuid([
+      {
+        uuid: "eng-1",
+        job_function_response: { current: { name: "Specialist" } },
+        org_unit_response: { current: null },
+      },
+      {
+        uuid: "eng-2",
+        job_function_response: undefined,
+        org_unit_response: { current: { name: "Sjølund skole" } },
+      },
+    ])
+    expect(result).toEqual([
+      { uuid: "eng-1", name: "Specialist" },
+      { uuid: "eng-2", name: "Sjølund skole" },
+    ])
+  })
+
+  // Select drops an option whose name is empty, so a wholly unresolved
+  // engagement must still carry a label.
+  it("falls back to the uuid when neither half resolves", () => {
+    const result = formatEngagementTitlesAndUuid([
+      {
+        uuid: "eng-1",
+        job_function_response: undefined,
+        org_unit_response: undefined,
+      },
+    ])
+    expect(result).toEqual([{ uuid: "eng-1", name: "eng-1" }])
+  })
+})
+
 describe("formatITSystemNames", () => {
   it("filters out entries with null current, maps to flat shape, sorts by name", () => {
     const result = formatITSystemNames([
@@ -130,8 +177,28 @@ describe("formatITSystemNames", () => {
 })
 
 describe("formatITUserITSystemName", () => {
-  it("formats 'itsystem-name, user_key' per entry, preserving order", () => {
-    const result = formatITUserITSystemName([
+  it("formats 'itsystem-name, user_key' for a single ituser", () => {
+    const result = formatITUserITSystemName({
+      uuid: "u1",
+      user_key: "bruce",
+      itsystem_response: { uuid: "s1", current: { name: "AD" } },
+    })
+    expect(result).toEqual({ uuid: "u1", name: "AD, bruce", itsystem: { uuid: "s1" } })
+  })
+
+  it("falls back to itsystem uuid when current is null", () => {
+    const result = formatITUserITSystemName({
+      uuid: "u1",
+      user_key: "bruce",
+      itsystem_response: { uuid: "s1", current: null },
+    })
+    expect(result.name).toBe("s1, bruce")
+  })
+})
+
+describe("formatITUserITSystemNames", () => {
+  it("maps the singular formatter over a list, preserving order", () => {
+    const result = formatITUserITSystemNames([
       {
         uuid: "u1",
         user_key: "bruce",
@@ -149,18 +216,7 @@ describe("formatITUserITSystemName", () => {
     ])
   })
 
-  it("falls back to itsystem uuid when current is null", () => {
-    const result = formatITUserITSystemName([
-      {
-        uuid: "u1",
-        user_key: "bruce",
-        itsystem_response: { uuid: "s1", current: null },
-      },
-    ])
-    expect(result?.[0].name).toBe("s1, bruce")
-  })
-
   it("returns undefined when input is undefined", () => {
-    expect(formatITUserITSystemName(undefined)).toBeUndefined()
+    expect(formatITUserITSystemNames(undefined)).toBeUndefined()
   })
 })

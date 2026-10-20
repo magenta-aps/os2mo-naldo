@@ -27,7 +27,7 @@
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
-  import { formatITUserITSystemName } from "$lib/utils/helpers"
+  import { formatITUserITSystemNames } from "$lib/utils/helpers"
   import removeRounded from "@iconify/icons-material-symbols/remove-rounded"
   import addRounded from "@iconify/icons-material-symbols/add-rounded"
 
@@ -153,7 +153,7 @@
         fromDate: at,
       })
       return (
-        formatITUserITSystemName(
+        formatITUserITSystemNames(
           res.org_units.objects[0]?.validities?.flatMap((v) => v.itusers ?? [])
         ) ?? []
       )
