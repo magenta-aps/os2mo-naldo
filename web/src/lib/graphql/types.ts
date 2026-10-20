@@ -4044,6 +4044,7 @@ export type EmployeeBoundAssociationFilter = {
 
 export type EmployeeBoundEngagementFilter = {
   engagement_type?: InputMaybe<ClassFilter>;
+  explicit_manager?: InputMaybe<ManagerFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   ituser?: InputMaybe<ItUserFilter>;
   job_function?: InputMaybe<ClassFilter>;
@@ -4650,6 +4651,8 @@ export type Engagement = {
    *
    */
   engagement_type_uuid: Scalars['UUID']['output'];
+  /** This field can be used to point the engagement to a specific manager anywhere in the organisation. Note that this field is independent of the 'managers' field. */
+  explicit_manager?: Maybe<ManagerResponse>;
   /** Optional extra information. */
   extension_1?: Maybe<Scalars['String']['output']>;
   /** Optional extra information. */
@@ -5008,6 +5011,8 @@ export type EngagementCreateInput = {
    */
   employee?: InputMaybe<Scalars['UUID']['input']>;
   engagement_type: Scalars['UUID']['input'];
+  /** UUID of the explicit manager related to the engagement. */
+  explicit_manager?: InputMaybe<Scalars['UUID']['input']>;
   /**
    * Arbitrary value extension fields.
    *
@@ -5143,6 +5148,16 @@ export type EngagementFilter = {
    *
    */
   engagement_type?: InputMaybe<ClassFilter>;
+  /**
+   * Explicit manager filter limiting which entries are returned.
+   *
+   * * Omitted (`UNSET`): no filtering on explicit manager.
+   * * `null`: only engagements without an explicit manager.
+   * * A `ManagerFilter`: only engagements whose explicit manager
+   *   matches the nested filter.
+   *
+   */
+  explicit_manager?: InputMaybe<ManagerFilter>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   /** ITUser filter limiting which entries are returned. */
@@ -5706,6 +5721,8 @@ export type EngagementUpdateInput = {
   employee?: InputMaybe<Scalars['UUID']['input']>;
   /** UUID of the engagement type. */
   engagement_type?: InputMaybe<Scalars['UUID']['input']>;
+  /** UUID of the explicit manager related to the engagement. */
+  explicit_manager?: InputMaybe<Scalars['UUID']['input']>;
   /**
    * Arbitrary value extension fields.
    *
@@ -13441,6 +13458,7 @@ export type OrgUnitboundengagementfilter = {
   employee?: InputMaybe<EmployeeFilter>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   engagement_type?: InputMaybe<ClassFilter>;
+  explicit_manager?: InputMaybe<ManagerFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   ituser?: InputMaybe<ItUserFilter>;
   job_function?: InputMaybe<ClassFilter>;
@@ -17827,6 +17845,7 @@ export type UuidsBoundEngagementFilter = {
   employee?: InputMaybe<EmployeeFilter>;
   employees?: InputMaybe<Array<Scalars['UUID']['input']>>;
   engagement_type?: InputMaybe<ClassFilter>;
+  explicit_manager?: InputMaybe<ManagerFilter>;
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   ituser?: InputMaybe<ItUserFilter>;
   job_function?: InputMaybe<ClassFilter>;
