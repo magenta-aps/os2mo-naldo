@@ -40,6 +40,7 @@ const engagement = (patch: Partial<EngagementInfo> = {}): EngagementInfo => ({
   jobFunction: { uuid: "j1", name: "Job" },
   engagementType: { uuid: "t1", name: "Type" },
   primary: undefined,
+  explicitManager: undefined,
   extension1: "",
   extension4: "",
   validated: true,
@@ -155,6 +156,7 @@ describe("buildUserflowPayload", () => {
           engagement({
             toDate: moValidityTo(day("2021-01-31")),
             primary: { uuid: "p1", name: "Primary" },
+            explicitManager: { uuid: "m2", name: "Unit, Director" },
             extension1: "007",
             extension4: "42",
           }),
@@ -191,6 +193,7 @@ describe("buildUserflowPayload", () => {
           engagement_type: "t1",
           job_function: "j1",
           primary: "p1",
+          explicit_manager: "m2",
           extension_1: "007",
           extension_4: "42",
           validity: {

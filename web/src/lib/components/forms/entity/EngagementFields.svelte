@@ -13,6 +13,7 @@
   import Search from "$lib/components/search/Search.svelte"
   import Breadcrumbs from "$lib/components/org/Breadcrumbs.svelte"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
+  import ExplicitManagerSelect from "$lib/components/forms/shared/ExplicitManagerSelect.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import type { FacetValidities } from "$lib/utils/classes"
@@ -201,3 +202,8 @@
     />
   </div>
 {/if}
+<ExplicitManagerSelect
+  bind:value={value.explicitManager}
+  at={fromDate}
+  {idPrefix}
+/>

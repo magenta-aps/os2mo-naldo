@@ -77,6 +77,7 @@ export const isEmptyEngagement = (engagement: EngagementInfo): boolean =>
   !engagement.jobFunction?.uuid &&
   !engagement.engagementType?.uuid &&
   !engagement.primary?.uuid &&
+  !engagement.explicitManager?.uuid &&
   !engagement.user_key &&
   !engagement.extension1 &&
   !engagement.extension4
@@ -136,6 +137,9 @@ export const buildUserflowPayload = (
       engagement_type: engagement.engagementType?.uuid,
       job_function: engagement.jobFunction?.uuid,
       primary: engagement.primary?.uuid || null,
+      ...(engagement.explicitManager?.uuid && {
+        explicit_manager: engagement.explicitManager.uuid,
+      }),
       ...(engagement.extension1 && { extension_1: engagement.extension1 }),
       ...(engagement.extension4 && { extension_4: engagement.extension4 }),
       validity: {
