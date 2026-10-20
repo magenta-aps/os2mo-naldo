@@ -30,6 +30,8 @@
   import { createQuery } from "$lib/http/query"
   import { getValidities } from "$lib/http/getValidities"
   import { getClasses } from "$lib/http/getClasses"
+  import ExplicitManagerSelect from "$lib/components/forms/shared/ExplicitManagerSelect.svelte"
+  import type { ClassValue } from "$lib/components/forms/entity/types"
 
   import { env } from "$lib/env"
   import { normalizeEngagement } from "$lib/utils/normalizeForm"
@@ -76,6 +78,31 @@
             }
             extension_1
             extension_4
+            explicit_manager {
+              uuid
+              validities(start: null, end: null) {
+                person_response {
+                  uuid
+                  current(at: $currentDate) {
+                    name
+                  }
+                }
+                org_unit_response {
+                  current(at: $currentDate) {
+                    name
+                  }
+                }
+                manager_type_response {
+                  current(at: $currentDate) {
+                    name
+                  }
+                }
+                validity {
+                  from
+                  to
+                }
+              }
+            }
           }
         }
       }
@@ -101,6 +128,8 @@
     uuid: string
     name: string
   }
+  let explicitManagerPerson: { uuid: string; name: string } | undefined
+  let explicitManager: ClassValue | undefined
 
   const fromDate = field<Temporal.ZonedDateTime | null | undefined>("from", undefined, [
     required(),
@@ -203,7 +232,8 @@
   let initialEngagement: any = null
   engagementPromise.then(
     (data) => {
-      initialEngagement = normalizeEngagement(data.engagements.objects[0].validities[0])
+      const engagement = data.engagements.objects[0].validities[0]
+      initialEngagement = normalizeEngagement(engagement)
     },
     // The template's {#await} has no {:catch}, so a failed load stays on the
     // pending branch. This handler only prevents an unhandled rejection from
@@ -220,6 +250,7 @@
       $engagementType.value !== initialEngagement.engagement_type ||
       $userKey.value !== initialEngagement.user_key ||
       $primary.value !== initialEngagement.primary ||
+      (explicitManager?.uuid ?? null) !== initialEngagement.explicit_manager ||
       $extension1.value !== initialEngagement.extension_1 ||
       $extension4.value !== initialEngagement.extension_4
 
@@ -411,6 +442,12 @@
             />
           </div>
         {/if}
+        <ExplicitManagerSelect
+          bind:person={explicitManagerPerson}
+          bind:value={explicitManager}
+          at={startDate}
+          link={engagement.explicit_manager}
+        />
       </div>
     </div>
     <div class="flex py-6 gap-4">

@@ -31,6 +31,7 @@ describe("normalizeEngagement", () => {
         primary_response: { current: { name: "Primær" } },
         extension_1: "Skoleleder",
         extension_4: "42",
+        explicit_manager: { uuid: "m-1" },
       })
     )
     expect(result).toEqual({
@@ -42,6 +43,7 @@ describe("normalizeEngagement", () => {
       primary: "Primær",
       extension_1: "Skoleleder",
       extension_4: "42",
+      explicit_manager: "m-1",
     })
   })
 
@@ -64,6 +66,7 @@ describe("normalizeEngagement", () => {
       primary: "",
       extension_1: "",
       extension_4: "",
+      explicit_manager: null,
     })
   })
 })

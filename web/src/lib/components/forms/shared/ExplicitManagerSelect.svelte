@@ -6,6 +6,7 @@
   import { graphQLClient } from "$lib/http/client"
   import { createQuery } from "$lib/http/query"
   import { getManagerRoleTitleAndUuid } from "$lib/utils/display"
+  import { findClosestValidity, findValidityAt } from "$lib/utils/validities"
   import Search from "$lib/components/search/Search.svelte"
   import Select from "$lib/components/forms/shared/Select.svelte"
   import type { ClassValue } from "$lib/components/forms/entity/types"
@@ -18,10 +19,24 @@
   export let person: { uuid: string; name: string } | undefined = undefined
   export let at: Temporal.ZonedDateTime | null | undefined
   export let idPrefix = ""
-  // The engagement's stored role. Offered while it is still the chosen one, so
-  // a list loaded for another date cannot drop it; only the user replaces or
-  // clears it.
-  export let linked: ClassValue | undefined = undefined
+  // The engagement's stored link, as the edit forms load it. Seeds the fields,
+  // and is posted back so the action only sends an explicit manager the user
+  // changed.
+  export let link:
+    | {
+        uuid: string
+        validities: {
+          person_response?: { uuid: string; current?: { name: string } | null } | null
+          org_unit_response?: { current?: { name: string } | null }
+          manager_type_response?: { current?: { name: string } | null } | null
+          validity: {
+            from?: Temporal.ZonedDateTime | null
+            to?: Temporal.ZonedDateTime | null
+          }
+        }[]
+      }
+    | null
+    | undefined = undefined
 
   gql`
     query ManagerRoles($person: [UUID!], $fromDate: DateTime!) {
@@ -44,6 +59,23 @@
       }
     }
   `
+
+  // Named by the validity closest to the start date, also when the role is not
+  // active then, so an outdated link can still be cleared.
+  const linkedValidity = link ? findClosestValidity(link.validities, at) : null
+  const linked: ClassValue | undefined = link
+    ? linkedValidity
+      ? getManagerRoleTitleAndUuid({ ...linkedValidity, uuid: link.uuid })
+      : { uuid: link.uuid, name: link.uuid }
+    : undefined
+  if (linked && !value) {
+    value = linked
+    const holder = linkedValidity?.person_response
+    person = holder
+      ? { uuid: holder.uuid, name: holder.current?.name ?? holder.uuid }
+      : undefined
+  }
+  $: linkActive = !!link && !!findValidityAt(link.validities, at)
 
   $: personUuid = person?.uuid
   // The person search clears itself without an event when the date moves to
@@ -72,6 +104,8 @@
     })
   }
 
+  // The stored role stays an option while it is the chosen one, so a list
+  // loaded for another date cannot drop it; only the user replaces or clears it.
   $: keepLinked =
     !!linked &&
     value?.uuid === linked.uuid &&
@@ -104,4 +138,12 @@
 />
 {#if $roles.error}
   <p class="text-sm text-error">{capital($_("load_error_options"))}</p>
+{/if}
+{#if link}
+  <input hidden name="{idPrefix}explicit-manager-initial" value={link.uuid} />
+{/if}
+{#if linked && value?.uuid === linked.uuid && !linkActive}
+  <div class="alert alert-warning rounded-sm mb-3 text-sm">
+    <span>{capital($_("explicit_manager_ended"))}</span>
+  </div>
 {/if}
