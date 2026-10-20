@@ -30,6 +30,7 @@ export const normalizeEngagement = (e: any) => {
     primary: e.primary_response?.current?.name ?? "",
     extension_1: e.extension_1 ?? "",
     extension_4: e.extension_4 ?? "",
+    explicit_manager: e.explicit_manager?.uuid ?? null,
   }
 }
 

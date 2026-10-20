@@ -60,6 +60,7 @@
 	"entire_organisation": "entire organisation",
 	"estimated_time_remaining": "estimated time remaining",
 	"explicit_manager": "explicit manager",
+	"explicit_manager_ended": "the engagement's explicit manager role is not active on the start date. It is kept unless you remove it or choose a new one",
 	"explicit_manager_hint": "without an explicit manager, the manager of the engagement's unit is used",
 	"external_id": "external ID",
 	"facet": "{n, plural, =0 {the facet} one {facet} other {facets}}",
