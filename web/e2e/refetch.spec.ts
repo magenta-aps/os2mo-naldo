@@ -82,8 +82,12 @@ test("date-driven option refetching", async ({ page }) => {
     await page.waitForTimeout(1500) // let the options refetch land
   }
 
-  const hasProbe = async () =>
-    (await selectOptions(page)).some((text) => text.includes(PROBE_NAME))
+  // The explicit manager's role select renders before the facet selects load,
+  // so the first select is only the job function once that has rendered.
+  const hasProbe = async () => {
+    await page.locator('label[for="job-function"]').waitFor({ timeout: 15000 })
+    return (await selectOptions(page)).some((text) => text.includes(PROBE_NAME))
+  }
 
   expect(await hasProbe(), "probe must be absent today").toBe(false)
 
