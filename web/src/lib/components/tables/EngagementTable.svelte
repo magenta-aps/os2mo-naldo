@@ -22,6 +22,7 @@
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
+  import personCheckOutlineRounded from "@iconify/icons-material-symbols/person-check-outline-rounded"
   import { formatQueryDates } from "$lib/utils/validities"
   import { updateGlobalNavigation } from "$lib/stores/navigation"
   import { env } from "$lib/env"
@@ -31,8 +32,10 @@
     EngagementsQuery["referencedUnits"]
   >["objects"][0]["validities"]
   type Manager = NonNullable<Engagement["managers"]>[0]
+  type ExplicitManager = NonNullable<Engagement["explicit_manager"]>["validities"][0]
   type EngagementRow = Engagement & {
     org_unit_names: OrgUnitNames
+    explicitManager: ExplicitManager | null
     // Precomputed so column sorting matches the displayed name
     org_unit_name?: string | null
   }
@@ -49,7 +52,7 @@
   // that no longer exist, and `validities` can't widen a filtered-out unit.
   // `managers` without a filter only finds the managers of today, so it gets the
   // tense's dates. Their names come from `validities`, as a past manager's
-  // employee can have no `current`.
+  // employee can have no `current`. `managers` ignores `explicit_manager`.
   // TODO: When https://redmine.magenta.dk/issues/62968 is fixed, add date-filters to classes
   gql`
     query Engagements(
@@ -135,6 +138,25 @@
                 to
               }
             }
+            explicit_manager @skip(if: $isOrg) {
+              validities(start: null, end: null) {
+                uuid
+                person_response {
+                  uuid
+                  validities(start: null, end: null) {
+                    name
+                    validity {
+                      from
+                      to
+                    }
+                  }
+                }
+                validity {
+                  from
+                  to
+                }
+              }
+            }
             validity {
               from
               to
@@ -189,7 +211,7 @@
     )
   }
 
-  const managerName = (manager: Manager) =>
+  const managerName = (manager: Manager | ExplicitManager) =>
     findClosestValidityWithin(
       manager.person_response?.validities,
       manager.validity,
@@ -230,6 +252,11 @@
             return {
               ...obj,
               managers: managersDuringEngagement(obj),
+              explicitManager: findClosestValidityWithin(
+                obj.explicit_manager?.validities,
+                obj.validity,
+                $date
+              ),
               org_unit_names: org_unit_names,
               org_unit_name: findClosestValidityWithin(
                 org_unit_names,
@@ -300,8 +327,21 @@
       {/if}
       {#if !isOrg}
         <td class="text-sm p-4">
-          <!-- Make sure engagement.managers is present (needed since adding @skip to query)  -->
-          {#if engagement.managers}
+          {#if engagement.explicitManager}
+            {#if engagement.explicitManager.person_response}
+              <a
+                href="{base}/employee/{engagement.explicitManager.person_response.uuid}"
+              >
+                {managerName(engagement.explicitManager)}
+              </a>
+            {:else}
+              {capital($_("vacant"))}
+            {/if}
+            <span title={capital($_("explicit_manager"))}>
+              <Icon icon={personCheckOutlineRounded} class="inline" width="16" height="16" />
+            </span>
+            <!-- Make sure engagement.managers is present (needed since adding @skip to query)  -->
+          {:else if engagement.managers}
             <!-- If there's more than 1 manager, create a list -->
             <!-- Extra if/else logic implemented, so we can add <a>-tags to the managers -->
             {#if engagement.managers.length > 1}
