@@ -24,6 +24,7 @@
   import personAddOutlineRounded from "@iconify/icons-material-symbols/person-add-outline-rounded"
   import addCircleOutlineRounded from "@iconify/icons-material-symbols/add-circle-outline-rounded"
   import swapHorizRounded from "@iconify/icons-material-symbols/swap-horiz-rounded"
+  import personCheckOutlineRounded from "@iconify/icons-material-symbols/person-check-outline-rounded"
   import link from "@iconify/icons-material-symbols/link"
   import personOutlineRounded from "@iconify/icons-material-symbols/person-outline-rounded"
   import language from "@iconify/icons-material-symbols/language"
@@ -190,6 +191,13 @@
             title={$_("navigation.move_engagements")}
             href="{base}/organisation/move/engagements"
             icon={swapHorizRounded}
+          />
+        </li>
+        <li>
+          <NavbarButton
+            title={$_("navigation.explicit_managers")}
+            href="{base}/organisation/explicit-manager"
+            icon={personCheckOutlineRounded}
           />
         </li>
         <li>
