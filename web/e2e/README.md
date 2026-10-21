@@ -79,6 +79,8 @@ engagement pointing at it, then asserts that:
 - the create form sends the picked manager role;
 - the edit form leaves the explicit manager out of an unrelated edit, so MO
   keeps it, and sends null when it is cleared.
+- the bulk form sends the picked manager role for the checked engagements
+  only, and null when no role is picked.
 
 The staff member is a probe person because the smoke suite edits the fixture
 person's engagement in parallel. The probe data is deleted afterwards; if a
