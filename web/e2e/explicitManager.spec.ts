@@ -15,18 +15,19 @@ import {
   type Fixture,
 } from "./helpers"
 
-// Seeds a boss with a manager role in a probe unit, and a probe staff member
+// Seeds a manager with a manager role in a probe unit, and a probe staff member
 // whose engagement in the fixture unit points at that role; the smoke suite
 // edits the fixture person's own engagement in parallel. Leftovers from a
 // crashed run: a unit prefixed `explicit-probe-` and people named
-// `Explicit Probe Boss` / `Explicit Probe Staff`.
+// `Explicit Probe Manager` / `Explicit Probe Staff`.
 
 const EXPLICIT_TITLE = /Eksplicit leder|Explicit manager/
 
 let fixture: Fixture
 let unit: string
-let boss: { uuid: string; name: string }
+let manager: { uuid: string; name: string }
 let staff: string
+let staffName: string
 let managerRole: string
 let engagement: string
 
@@ -58,19 +59,20 @@ test.beforeAll(async () => {
     org_unit_type: unitType,
     validity: { from: fixture.from },
   })
-  boss = {
+  manager = {
     uuid: await createInMo("employee", "EmployeeCreateInput", {
       given_name: "Explicit Probe",
-      surname: `Boss ${suffix}`,
+      surname: `Manager ${suffix}`,
     }),
-    name: `Explicit Probe Boss ${suffix}`,
+    name: `Explicit Probe Manager ${suffix}`,
   }
+  staffName = `Explicit Probe Staff ${suffix}`
   staff = await createInMo("employee", "EmployeeCreateInput", {
     given_name: "Explicit Probe",
     surname: `Staff ${suffix}`,
   })
   managerRole = await createInMo("manager", "ManagerCreateInput", {
-    person: boss.uuid,
+    person: manager.uuid,
     org_unit: unit,
     manager_type: managerType,
     manager_level: managerLevel,
@@ -91,7 +93,7 @@ test.afterAll(async () => {
   if (engagement) await deleteInMo("engagement", engagement)
   if (managerRole) await deleteInMo("manager", managerRole)
   if (unit) await deleteInMo("org_unit", unit)
-  for (const person of [staff, boss?.uuid].filter(Boolean))
+  for (const person of [staff, manager?.uuid].filter(Boolean))
     await deleteInMo("employee", person)
 })
 
@@ -118,12 +120,23 @@ const openEditForm = async (page: Page, path: string) => {
 const managerRoleInput = (page: Page) =>
   page.locator('form input[name="explicit-manager"]')
 
-// Every Search labels its input "autocomplete", so the label's wrapper and
-// text tell the explicit manager's person search from the unit search.
-const explicitManagerSearch = (page: Page) =>
-  page
-    .locator('form div:has(> label[for="autocomplete"])', { hasText: EXPLICIT_TITLE })
-    .locator("input[type=text]")
+// Searches the manager in the explicit manager's person field, then picks the
+// manager's only manager role.
+const pickExplicitManager = async (page: Page) => {
+  await searchAndPick(page, manager.name, EXPLICIT_TITLE)
+  await pickFirstOption(page, "explicit-manager")
+  await expect(managerRoleInput(page)).toHaveValue(managerRole)
+}
+
+// The bulk form lists the fixture unit's engagements; only the staff member's
+// is checked, so the fixture person's engagement must never be sent.
+const openBulkForm = async (page: Page) => {
+  const form = await openForm(page, "/organisation/explicit-manager")
+  await searchAndPick(page, fixture.unitName)
+  const row = page.locator("#engagement-list label", { hasText: staffName })
+  await row.locator("input[type=checkbox]").check()
+  return { ...form, row }
+}
 
 for (const side of ["employee", "organisation"] as const) {
   test(`the ${side} engagement table marks the explicit manager`, async ({ page }) => {
@@ -131,25 +144,20 @@ for (const side of ["employee", "organisation"] as const) {
     const owner = side === "employee" ? staff : fixture.unit
     await page.goto(`/${side}/${owner}#engagement`)
     await login(page)
-    const cell = page.locator("td", { hasText: boss.name })
+    const cell = page.locator("td", { hasText: manager.name })
     await expect(cell).toBeVisible({ timeout: 15_000 })
     await expect(cell.getByTitle(EXPLICIT_TITLE)).toBeVisible()
     expect(errors).toEqual([])
   })
 }
 
-test("employee create sends the explicit manager", async ({ page }) => {
+test("employee engagement create sends the explicit manager", async ({ page }) => {
   const { errors, sent } = await openForm(page, `/employee/${staff}/create/engagement`)
   await searchAndPick(page, fixture.unitName)
   await pickFirstOption(page, "job-function")
   await pickFirstOption(page, "engagement-type")
 
-  await explicitManagerSearch(page).fill(boss.name)
-  await page.locator(".list-item").first().waitFor({ timeout: 15_000 })
-  await page.keyboard.press("ArrowDown")
-  await page.keyboard.press("Enter")
-  await pickFirstOption(page, "explicit-manager")
-  await expect(managerRoleInput(page)).toHaveValue(managerRole)
+  await pickExplicitManager(page)
 
   await submitForm(page)
   expect(sent, "the form must submit").toHaveLength(1)
@@ -157,7 +165,7 @@ test("employee create sends the explicit manager", async ({ page }) => {
   expect(errors).toEqual([])
 })
 
-test("employee edit keeps the explicit manager on an unrelated edit", async ({
+test("employee engagement edit keeps the explicit manager on an unrelated edit", async ({
   page,
 }) => {
   const { errors, sent } = await openEditForm(
@@ -175,7 +183,9 @@ test("employee edit keeps the explicit manager on an unrelated edit", async ({
 })
 
 for (const side of ["employee", "organisation"] as const) {
-  test(`${side} edit unsets a cleared explicit manager`, async ({ page }) => {
+  test(`${side} engagement edit unsets a cleared explicit manager`, async ({
+    page,
+  }) => {
     const owner = side === "employee" ? staff : fixture.unit
     const { errors, sent } = await openEditForm(
       page,
@@ -194,3 +204,33 @@ for (const side of ["employee", "organisation"] as const) {
     expect(errors).toEqual([])
   })
 }
+
+test("the bulk form assigns the manager to the checked engagements only", async ({
+  page,
+}) => {
+  const { errors, sent, row } = await openBulkForm(page)
+  // The current explicit manager is listed, so the user sees what changes.
+  await expect(row).toContainText(manager.name)
+  await pickExplicitManager(page)
+
+  await submitForm(page)
+  expect(sent, "the form must submit").toHaveLength(1)
+  expect(sent[0].input).toEqual([
+    expect.objectContaining({ uuid: engagement, explicit_manager: managerRole }),
+  ])
+  expect(errors).toEqual([])
+})
+
+test("the bulk form without a manager unsets it", async ({ page }) => {
+  const { errors, sent } = await openBulkForm(page)
+  await expect(page.locator("form button[type=submit]")).toHaveText(
+    /Fjern eksplicit leder|Remove explicit manager/
+  )
+
+  await submitForm(page)
+  expect(sent, "the form must submit").toHaveLength(1)
+  expect(sent[0].input).toEqual([
+    expect.objectContaining({ uuid: engagement, explicit_manager: null }),
+  ])
+  expect(errors).toEqual([])
+})
