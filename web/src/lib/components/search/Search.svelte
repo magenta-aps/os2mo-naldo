@@ -21,6 +21,7 @@
     type OrgUnitSearchQuery,
   } from "./query.generated"
   import { env } from "$lib/env"
+  import InfoTooltip from "$lib/components/shared/InfoTooltip.svelte"
 
   gql`
     query OrgUnitSearch(
@@ -173,6 +174,7 @@
   export let extra_classes = ""
   export let disabled = false
   export let errors: string[] = []
+  export let info: string | undefined = undefined
   export let at: Temporal.PlainDate | Temporal.ZonedDateTime | null | undefined =
     undefined
 
@@ -330,6 +332,7 @@
       <label for="autocomplete" class="text-sm text-base-content pb-1">
         {title ? title : ""}
         {required ? "*" : ""}
+        <InfoTooltip {info} label={title} id="{id}-info" />
       </label>
     {/if}
     <SvelteSelect
