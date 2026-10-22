@@ -6,3 +6,9 @@ updates:
       interval: weekday
       hours: "9-17"
     auto-merge: false
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekday
+      hours: "9-17"
+    auto-merge: false
