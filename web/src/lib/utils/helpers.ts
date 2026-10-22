@@ -1,5 +1,5 @@
-import { keycloak } from "$lib/auth/keycloak"
-import { env } from "$lib/env"
+import { graphQLClient } from "$lib/http/client"
+import { CprDocument } from "$lib/http/query.generated"
 
 export type ITUserITSystemName = {
   uuid: string
@@ -88,12 +88,11 @@ export type UnpackedClass = {
   user_key: string
 }[]
 
-export const cprLookup = async (cpr: string) => {
-  const res = await fetch(`${env.PUBLIC_BASE_URL}/service/e/cpr_lookup/?q=${cpr}`, {
-    headers: { Authorization: `Bearer ${keycloak.token}` },
+export const cprLookup = async (cpr: string): Promise<CprLookupResponse[]> => {
+  const res = await graphQLClient().request(CprDocument, {
+    cprNumber: cpr,
   })
-  // FIXME: Maybe return empty array, if call fails?
-  return [await res.json()]
+  return [{ cpr_no: res.cpr.cpr_number, name: res.cpr.name }]
 }
 
 export const isUUID = (value: string) => {
