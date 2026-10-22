@@ -83,7 +83,7 @@ E2E tests:
   # Keep the tag in lockstep with @playwright/test in web/package.json.
   # Deliberately no node_modules cache: uploading it after every job costs
   # more than the install it saves.
-  image: mcr.microsoft.com/playwright:v1.47.2-jammy
+  image: mcr.microsoft.com/playwright:v1.64.1-noble
   stage: test
   variables:
     # Where the tests and the browser reach the stack. The browser runs in
