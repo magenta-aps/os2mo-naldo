@@ -238,7 +238,7 @@
       <TableTensesWrapper
         table={EngagementTable}
         headers={[
-          { title: capital($_("name")), sortPath: "person_response.current.name" },
+          { title: capital($_("name")), sortPath: "person_name" },
           ...(env.PUBLIC_SHOW_EXTENSION_4
             ? [{ title: capital($_("department_code")), sortPath: "extension_4" }]
             : []),
