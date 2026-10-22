@@ -14,14 +14,24 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
-  import { formatQueryDates } from "$lib/utils/validities"
+  import { findClosestValidityWithin, formatQueryDates } from "$lib/utils/validities"
+  import NameWithHistory from "$lib/components/shared/NameWithHistory.svelte"
   import { updateGlobalNavigation } from "$lib/stores/navigation"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
 
   export let tense: Tense
 
-  type ItAssociations = ItAssociationsQuery["associations"]["objects"][0]["validities"]
+  type ItAssociation =
+    ItAssociationsQuery["associations"]["objects"][0]["validities"][0]
+  type ItUserState = NonNullable<ItAssociation["it_user_response"]>["validities"][0]
+  // Names precomputed so column sorting matches the displayed names
+  type ItAssociations = (ItAssociation & {
+    org_unit_name?: string | null
+    it_user_state?: ItUserState | null
+    it_user_name?: string | null
+    itsystem_name?: string | null
+  })[]
 
   const uuid = $page.params.uuid
 
@@ -40,8 +50,12 @@
             uuid
             org_unit_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             job_function_response {
@@ -58,14 +72,23 @@
             }
             it_user_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
+                # The account name, under the name NameWithHistory reads
+                name: user_key
                 itsystem_response {
                   uuid
-                  current(at: $fromDate) {
+                  validities(start: null, end: null) {
                     name
+                    validity {
+                      from
+                      to
+                    }
                   }
                 }
-                user_key
+                validity {
+                  from
+                  to
+                }
               }
             }
             validity {
@@ -92,7 +115,30 @@
         const filtered = outer.validities.filter((obj) => {
           return tenseFilter(obj, tense)
         })
-        itAssociations.push(...filtered)
+        itAssociations.push(
+          ...filtered.map((obj) => {
+            const itUserState = findClosestValidityWithin(
+              obj.it_user_response?.validities,
+              obj.validity,
+              $date
+            )
+            return {
+              ...obj,
+              org_unit_name: findClosestValidityWithin(
+                obj.org_unit_response.validities,
+                obj.validity,
+                $date
+              )?.name,
+              it_user_state: itUserState,
+              it_user_name: itUserState?.name,
+              itsystem_name: findClosestValidityWithin(
+                itUserState?.itsystem_response.validities,
+                obj.validity,
+                $date
+              )?.name,
+            }
+          })
+        )
       }
       return itAssociations
     })
@@ -109,19 +155,36 @@
       leading-5 border-t border-base-300 text-base-content"
     >
       <td class="text-sm p-4">
-        <a
+        <NameWithHistory
+          id="{itassociation.uuid}-org-unit"
+          validities={itassociation.org_unit_response.validities}
+          rowValidity={itassociation.validity}
+          fallback={itassociation.org_unit_response.uuid}
           href="{base}/organisation/{itassociation.org_unit_response.uuid}"
           on:click={() => updateGlobalNavigation(itassociation.org_unit_response.uuid)}
-        >
-          {itassociation.org_unit_response.current?.name ??
-            itassociation.org_unit_response.uuid}
-        </a>
+        />
       </td>
       <td class="text-sm p-4">{itassociation.job_function_response?.current?.name}</td>
-      <td class="text-sm p-4"
-        >{itassociation.it_user_response?.current?.itsystem_response?.current?.name}</td
-      >
-      <td class="text-sm p-4">{itassociation.it_user_response?.current?.user_key}</td>
+      <td class="text-sm p-4">
+        {#if itassociation.it_user_state}
+          <NameWithHistory
+            id="{itassociation.uuid}-itsystem"
+            validities={itassociation.it_user_state.itsystem_response.validities}
+            rowValidity={itassociation.validity}
+            fallback={itassociation.it_user_state.itsystem_response.uuid}
+          />
+        {/if}
+      </td>
+      <td class="text-sm p-4">
+        {#if itassociation.it_user_response}
+          <NameWithHistory
+            id="{itassociation.uuid}-it-user"
+            validities={itassociation.it_user_response.validities}
+            rowValidity={itassociation.validity}
+            fallback={itassociation.it_user_response.uuid}
+          />
+        {/if}
+      </td>
       <td class="text-sm p-4">{itassociation.primary_response?.current?.name ?? ""}</td>
       <ValidityTableCell validity={itassociation.validity} />
       <td class="flex p-4 gap-2 justify-end">
