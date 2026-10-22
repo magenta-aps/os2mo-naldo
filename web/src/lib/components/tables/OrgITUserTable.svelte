@@ -12,6 +12,7 @@
   import { sortData } from "$lib/utils/sorting"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import { findClosestValidityWithin } from "$lib/utils/validities"
+  import NameWithHistory from "$lib/components/shared/NameWithHistory.svelte"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
@@ -25,7 +26,6 @@
     OrgUnitItUsersQuery["byEngagement"]["objects"][0]["validities"][number]
   type OrgUnitITUser =
     OrgUnitItUsersQuery["byOrgUnit"]["objects"][0]["validities"][number]
-  type ITUsers = Array<EngagementITUser | OrgUnitITUser>
 
   export let tense: Tense
 
@@ -56,8 +56,12 @@
             external_id
             itsystem_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             engagements_responses(filter: { from_date: null, to_date: null })
@@ -115,8 +119,12 @@
             external_id
             itsystem_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             validity {
@@ -142,19 +150,27 @@
       ...tenseToValidity(tense, $date),
     })
     .then((res) => {
-      const itUsers: ITUsers = []
+      // Annotated as the union: inferred from the merged lists, TypeScript
+      // collapses the two shapes and the template can no longer narrow them.
+      const itUsers: (EngagementITUser | OrgUnitITUser)[] = [
+        ...res.byEngagement.objects,
+        ...res.byOrgUnit.objects,
+      ].flatMap((outer) => outer.validities)
 
-      const combinedItUsers = [...res.byEngagement.objects, ...res.byOrgUnit.objects]
-
-      // Filters and flattens the data
-      for (const outer of combinedItUsers) {
-        // TODO: Remove when GraphQL is able to do this for us
-        const filtered = outer.validities.filter((obj) => {
-          return tenseFilter(obj, tense)
-        })
-        itUsers.push(...filtered)
-      }
-      return itUsers
+      return (
+        itUsers
+          // TODO: Remove when GraphQL is able to do this for us
+          .filter((obj) => tenseFilter(obj, tense))
+          .map((obj) => ({
+            ...obj,
+            // Precomputed so column sorting matches the displayed name
+            itsystem_name: findClosestValidityWithin(
+              obj.itsystem_response.validities,
+              obj.validity,
+              $date
+            )?.name,
+          }))
+      )
     })
 </script>
 
@@ -168,7 +184,14 @@
       class="{i % 2 === 0 ? '' : 'bg-base-200'} 
         leading-5 border-t border-base-300 text-base-content"
     >
-      <td class="text-sm p-4">{ituser.itsystem_response.current?.name} </td>
+      <td class="text-sm p-4">
+        <NameWithHistory
+          id="{ituser.uuid}-itsystem"
+          validities={ituser.itsystem_response.validities}
+          rowValidity={ituser.validity}
+          fallback={ituser.itsystem_response.uuid}
+        />
+      </td>
       <td class="text-sm p-4">{ituser.user_key}</td>
       <td class="text-sm p-4">{ituser.external_id ?? ""}</td>
       {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
