@@ -274,14 +274,14 @@
       <TableTensesWrapper
         table={AssociationTable}
         headers={[
-          { title: capital($_("name")), sortPath: "person_response.current.name" },
+          { title: capital($_("name")), sortPath: "person_name" },
           {
             title: capital($_("association_type")),
             sortPath: "association_type_response.current.name",
           },
           {
             title: capital($_("substitute")),
-            sortPath: "substitute_response.current.name",
+            sortPath: "substitute_name",
           },
           ...(env.PUBLIC_ENABLE_CONFEDERATIONS
             ? [{ title: capital($_("trade_union")) }]
