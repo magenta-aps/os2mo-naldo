@@ -271,7 +271,7 @@
         headers={[
           {
             title: capital($_("unit", { values: { n: 1 } })),
-            sortPath: "org_unit_response.current.name",
+            sortPath: "org_unit_name",
           },
           {
             title: capital($_("job_function", { values: { n: 1 } })),
@@ -279,11 +279,11 @@
           },
           {
             title: capital($_("it_system")),
-            sortPath: "it_user_response.current.itsystem_response.current.name",
+            sortPath: "itsystem_name",
           },
           {
             title: capital($_("account_name")),
-            sortPath: "it_user_response.current.user_key",
+            sortPath: "it_user_name",
           },
           { title: capital($_("primary")) },
           { title: capital($_("date.date")), sortPath: "validity.from" },
