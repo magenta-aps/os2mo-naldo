@@ -354,7 +354,7 @@
         headers={[
           {
             title: capital($_("unit", { values: { n: 1 } })),
-            sortPath: "org_unit_response.current.name",
+            sortPath: "org_unit_name",
           },
           {
             title: capital($_("engagement", { values: { n: 1 } })),

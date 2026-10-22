@@ -340,7 +340,7 @@
       <TableTensesWrapper
         table={ManagerTable}
         headers={[
-          { title: capital($_("name")), sortPath: "person_response.current.name" },
+          { title: capital($_("name")), sortPath: "person_name" },
           {
             title: capital($_("engagement", { values: { n: 1 } })),
             sortPath: "engagement_state.job_function_response.current.name",

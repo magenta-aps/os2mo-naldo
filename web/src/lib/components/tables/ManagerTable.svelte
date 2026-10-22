@@ -24,6 +24,7 @@
   import { env } from "$lib/env"
   import { getEngagementDisplay } from "$lib/utils/display"
   import { findClosestValidityWithin } from "$lib/utils/validities"
+  import NameWithHistory from "$lib/components/shared/NameWithHistory.svelte"
 
   export let tense: Tense
 
@@ -52,14 +53,22 @@
             uuid
             person_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             org_unit_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             manager_level_response {
@@ -152,6 +161,17 @@
           })
           .map((obj) => ({
             ...obj,
+            // Precomputed so column sorting matches the displayed names
+            person_name: findClosestValidityWithin(
+              obj.person_response?.validities,
+              obj.validity,
+              $date
+            )?.name,
+            org_unit_name: findClosestValidityWithin(
+              obj.org_unit_response?.validities,
+              obj.validity,
+              $date
+            )?.name,
             engagement_state: findClosestValidityWithin(
               obj.engagement_response?.validities,
               obj.validity,
@@ -175,9 +195,13 @@
       <td class="text-sm p-4">
         {#if isOrg}
           {#if manager.person_response}
-            <a href="{base}/employee/{manager.person_response.uuid}">
-              {manager.person_response.current?.name}
-            </a>
+            <NameWithHistory
+              id="{manager.uuid}-person"
+              validities={manager.person_response.validities}
+              rowValidity={manager.validity}
+              fallback={manager.person_response.uuid}
+              href="{base}/employee/{manager.person_response.uuid}"
+            />
           {:else}
             {capital($_("vacant"))}
           {/if}
@@ -187,19 +211,21 @@
               title={capital(
                 $_("inherited_manager", {
                   values: {
-                    org_unit: manager.org_unit_response?.current?.name,
+                    org_unit: manager.org_unit_name ?? manager.org_unit_response?.uuid,
                   },
                 })
               )}>(*)</span
             >
           {/if}
         {:else}
-          <a
+          <NameWithHistory
+            id="{manager.uuid}-org-unit"
+            validities={manager.org_unit_response.validities}
+            rowValidity={manager.validity}
+            fallback={manager.org_unit_response.uuid}
             href="{base}/organisation/{manager.org_unit_response.uuid}"
             on:click={() => updateGlobalNavigation(manager.org_unit_response.uuid)}
-          >
-            {manager.org_unit_response.current?.name ?? manager.org_unit_response.uuid}
-          </a>
+          />
         {/if}
       </td>
       <td class="text-sm p-4">
