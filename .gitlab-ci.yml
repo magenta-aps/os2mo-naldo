@@ -63,7 +63,7 @@ Pre-commit:
     - pre-commit run --all-files
 
 Svelte-check:
-  image: node:20
+  image: node:24.22.1
   stage: lint
   script:
     - cd web/
@@ -71,7 +71,7 @@ Svelte-check:
     - yarn run check
 
 Unit tests:
-  image: node:20
+  image: node:24.22.1
   stage: test
   script:
     - cd web/
@@ -188,7 +188,7 @@ E2E tests:
     - <<: *if-default-branch-refs
 
 SvelteKit build:
-  image: node:20
+  image: node:24.22.1
   stage: build
   script:
     - cd web/
