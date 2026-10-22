@@ -14,7 +14,7 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
-  import { findClosestValidity, formatQueryDates } from "$lib/utils/validities"
+  import { findClosestValidityWithin, formatQueryDates } from "$lib/utils/validities"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
 
@@ -54,13 +54,16 @@
             }
             ituser_response {
               uuid
-              validities(start: $fromDate, end: $toDate) {
+              validities(start: null, end: null) {
                 user_key
                 itsystem_response {
                   uuid
-                  current(at: $fromDate) {
-                    user_key
+                  validities(start: null, end: null) {
                     name
+                    validity {
+                      from
+                      to
+                    }
                   }
                 }
                 validity {
@@ -127,12 +130,19 @@
       <td class="text-sm p-4">{address.name}</td>
       {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS && !isOrg}
         <td class="text-sm p-4">
-          {#if address.ituser_response?.validities?.length}
-            {@const closest = findClosestValidity(
+          {#if address.ituser_response}
+            {@const ituser = findClosestValidityWithin(
               address.ituser_response.validities,
+              address.validity,
               $date
             )}
-            {closest?.itsystem_response?.current?.name}, {closest?.user_key}
+            {#if ituser}
+              {findClosestValidityWithin(
+                ituser.itsystem_response.validities,
+                address.validity,
+                $date
+              )?.name ?? ituser.itsystem_response.uuid}, {ituser.user_key}
+            {/if}
           {/if}
         </td>
       {/if}
