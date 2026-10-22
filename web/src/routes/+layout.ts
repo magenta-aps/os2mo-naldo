@@ -16,6 +16,11 @@ export const load: LayoutLoad = async ({ url }) => {
     throw redirect(302, "/")
   }
 
+  // Redirect if not true
+  if (!env.PUBLIC_ENABLE_ROLE_AUTOMATION && url.pathname.includes("role-automation")) {
+    throw redirect(302, "/")
+  }
+
   if (browser) {
     locale.set(window.navigator.language)
   }

@@ -3,9 +3,11 @@
   import { capital } from "$lib/utils/helpers"
   import { base } from "$app/paths"
   import { page } from "$app/stores"
+  import { env } from "$lib/env"
   import Icon from "@iconify/svelte"
   import categoryIcon from "@iconify/icons-material-symbols/category-outline"
   import computerIcon from "@iconify/icons-material-symbols/computer-outline"
+  import autoModeIcon from "@iconify/icons-material-symbols/auto-mode"
 
   const adminTabs = [
     {
@@ -18,6 +20,15 @@
       path: "/admin/itsystem",
       icon: computerIcon,
     },
+    ...(env.PUBLIC_ENABLE_ROLE_AUTOMATION
+      ? [
+          {
+            name: "role_automation",
+            path: "/admin/role-automation",
+            icon: autoModeIcon,
+          },
+        ]
+      : []),
   ]
 </script>
 
