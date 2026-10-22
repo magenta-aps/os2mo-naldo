@@ -11,6 +11,7 @@
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { sortData } from "$lib/utils/sorting"
   import { findClosestValidityWithin } from "$lib/utils/validities"
+  import NameWithHistory from "$lib/components/shared/NameWithHistory.svelte"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
@@ -20,7 +21,9 @@
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
 
-  type ITUsers = EmployeeItUsersQuery["itusers"]["objects"][0]["validities"]
+  type ITUser = EmployeeItUsersQuery["itusers"]["objects"][0]["validities"][0]
+  // Precomputed so column sorting matches the displayed name
+  type ITUsers = (ITUser & { itsystem_name?: string | null })[]
 
   export let tense: Tense
 
@@ -49,8 +52,12 @@
             uuid
             itsystem_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             external_id
@@ -113,7 +120,16 @@
         const filtered = outer.validities.filter((obj) => {
           return tenseFilter(obj, tense)
         })
-        itUsers.push(...filtered)
+        itUsers.push(
+          ...filtered.map((obj) => ({
+            ...obj,
+            itsystem_name: findClosestValidityWithin(
+              obj.itsystem_response.validities,
+              obj.validity,
+              $date
+            )?.name,
+          }))
+        )
       }
       return itUsers
     })
@@ -129,7 +145,14 @@
       class="{i % 2 === 0 ? '' : 'bg-base-200'} 
       leading-5 border-t border-base-300 text-base-content"
     >
-      <td class="text-sm p-4">{ituser.itsystem_response.current?.name} </td>
+      <td class="text-sm p-4">
+        <NameWithHistory
+          id="{ituser.uuid}-itsystem"
+          validities={ituser.itsystem_response.validities}
+          rowValidity={ituser.validity}
+          fallback={ituser.itsystem_response.uuid}
+        />
+      </td>
       <td class="text-sm p-4">{ituser.user_key}</td>
       <td class="text-sm p-4">{ituser.external_id ?? ""}</td>
       {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}

@@ -302,7 +302,7 @@
           headers={[
             {
               title: capital($_("it_system")),
-              sortPath: "itsystem_response.current.name",
+              sortPath: "itsystem_name",
             },
             { title: capital($_("account_name")), sortPath: "user_key" },
             { title: capital($_("external_id")), sortPath: "external_id" },
