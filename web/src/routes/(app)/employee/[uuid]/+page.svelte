@@ -384,7 +384,7 @@
       <TableTensesWrapper
         table={OwnerTable}
         headers={[
-          { title: capital($_("name")), sortPath: "owner_response.current.name" },
+          { title: capital($_("name")), sortPath: "owner_name" },
           { title: capital($_("date.date")), sortPath: "validity.from" },
         ]}
       />
