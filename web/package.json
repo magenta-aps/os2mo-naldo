@@ -26,7 +26,7 @@
     "@iconify/icons-circle-flags": "^1.2.41",
     "@iconify/icons-material-symbols": "^1.2.58",
     "@iconify/svelte": "^4.0.2",
-    "@playwright/test": "^1.47.2",
+    "@playwright/test": "^1.64.1",
     "@sveltejs/kit": "^2.8.3",
     "@tailwindcss/postcss": "^4.1.18",
     "postcss": "^8.4.33",

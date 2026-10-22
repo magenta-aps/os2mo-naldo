@@ -63,7 +63,7 @@ Pre-commit:
     - pre-commit run --all-files
 
 Svelte-check:
-  image: node:20
+  image: node:24.22.1
   stage: lint
   script:
     - cd web/
@@ -71,7 +71,7 @@ Svelte-check:
     - yarn run check
 
 Unit tests:
-  image: node:20
+  image: node:24.22.1
   stage: test
   script:
     - cd web/
@@ -83,7 +83,7 @@ E2E tests:
   # Keep the tag in lockstep with @playwright/test in web/package.json.
   # Deliberately no node_modules cache: uploading it after every job costs
   # more than the install it saves.
-  image: mcr.microsoft.com/playwright:v1.47.2-jammy
+  image: mcr.microsoft.com/playwright:v1.64.1-noble
   stage: test
   variables:
     # Where the tests and the browser reach the stack. The browser runs in
@@ -188,7 +188,7 @@ E2E tests:
     - <<: *if-default-branch-refs
 
 SvelteKit build:
-  image: node:20
+  image: node:24.22.1
   stage: build
   script:
     - cd web/
