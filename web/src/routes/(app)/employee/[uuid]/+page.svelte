@@ -246,7 +246,7 @@
         headers={[
           {
             title: capital($_("unit", { values: { n: 1 } })),
-            sortPath: "org_unit_response.current.name",
+            sortPath: "org_unit_name",
           },
           {
             title: capital($_("association_type")),
@@ -254,7 +254,7 @@
           },
           {
             title: capital($_("substitute")),
-            sortPath: "substitute_response.current.name",
+            sortPath: "substitute_name",
           },
           ...(env.PUBLIC_ENABLE_CONFEDERATIONS
             ? [{ title: capital($_("trade_union")) }]

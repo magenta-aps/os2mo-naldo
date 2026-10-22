@@ -14,12 +14,19 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
-  import { formatQueryDates } from "$lib/utils/validities"
+  import { findClosestValidityWithin, formatQueryDates } from "$lib/utils/validities"
+  import NameWithHistory from "$lib/components/shared/NameWithHistory.svelte"
   import { updateGlobalNavigation } from "$lib/stores/navigation"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
 
-  type Associations = AssociationsQuery["associations"]["objects"][0]["validities"]
+  type Association = AssociationsQuery["associations"]["objects"][0]["validities"][0]
+  // Names precomputed so column sorting matches the displayed names
+  type Associations = (Association & {
+    org_unit_name?: string | null
+    person_name?: string | null
+    substitute_name?: string | null
+  })[]
 
   export let tense: Tense
 
@@ -47,14 +54,22 @@
             uuid
             org_unit_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             person_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             association_type_response {
@@ -71,8 +86,12 @@
             }
             substitute_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             primary_response {
@@ -112,7 +131,26 @@
           if (isOrg && obj.org_unit_response.uuid !== uuid) return false
           return true
         })
-        associations.push(...filtered)
+        associations.push(
+          ...filtered.map((obj) => ({
+            ...obj,
+            org_unit_name: findClosestValidityWithin(
+              obj.org_unit_response?.validities,
+              obj.validity,
+              $date
+            )?.name,
+            person_name: findClosestValidityWithin(
+              obj.person_response?.validities,
+              obj.validity,
+              $date
+            )?.name,
+            substitute_name: findClosestValidityWithin(
+              obj.substitute_response?.validities,
+              obj.validity,
+              $date
+            )?.name,
+          }))
+        )
       }
       return associations
     })
@@ -132,31 +170,39 @@
         {#if isOrg}
           <!-- GraphQL and Naldo doesn't allow creating vacant associations, but the old frontend did -->
           <!-- This means that some customers might have them, and therefore we need this check. -->
-          {#if association.person_response?.current?.name}
-            <a href="{base}/employee/{association.person_response.uuid}">
-              {association.person_response.current.name}
-            </a>
+          {#if association.person_response}
+            <NameWithHistory
+              id="{association.uuid}-person"
+              validities={association.person_response.validities}
+              rowValidity={association.validity}
+              fallback={association.person_response.uuid}
+              href="{base}/employee/{association.person_response.uuid}"
+            />
           {:else}
             {capital($_("vacant"))}
           {/if}
         {:else}
-          <a
+          <NameWithHistory
+            id="{association.uuid}-org-unit"
+            validities={association.org_unit_response.validities}
+            rowValidity={association.validity}
+            fallback={association.org_unit_response.uuid}
             href="{base}/organisation/{association.org_unit_response.uuid}"
             on:click={() => updateGlobalNavigation(association.org_unit_response.uuid)}
-          >
-            {association.org_unit_response.current?.name ??
-              association.org_unit_response.uuid}</a
-          >
+          />
         {/if}
       </td>
       <td class="text-sm p-4">{association.association_type_response?.current?.name}</td
       >
       <td class="text-sm p-4">
         {#if association.substitute_response}
-          <a href="{base}/employee/{association.substitute_response.uuid}">
-            {association.substitute_response.current?.name ??
-              association.substitute_response.uuid}
-          </a>
+          <NameWithHistory
+            id="{association.uuid}-substitute"
+            validities={association.substitute_response.validities}
+            rowValidity={association.validity}
+            fallback={association.substitute_response.uuid}
+            href="{base}/employee/{association.substitute_response.uuid}"
+          />
         {/if}
       </td>
       {#if env.PUBLIC_ENABLE_CONFEDERATIONS}
