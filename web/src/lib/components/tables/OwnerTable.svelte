@@ -19,13 +19,19 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
-  import { formatQueryDates } from "$lib/utils/validities"
+  import { findClosestValidityWithin, formatQueryDates } from "$lib/utils/validities"
+  import NameWithHistory from "$lib/components/shared/NameWithHistory.svelte"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
 
-  type Owners =
-    | EmployeeOwnerQuery["owners"]["objects"][0]["validities"]
-    | OrgUnitOwnerQuery["org_units"]["objects"][0]["validities"][0]["owners"]
+  type Owner =
+    | EmployeeOwnerQuery["owners"]["objects"][0]["validities"][0]
+    | OrgUnitOwnerQuery["org_units"]["objects"][0]["validities"][0]["owners"][0]
+  // Names precomputed so column sorting matches the displayed names
+  type Owners = (Owner & {
+    owner_name?: string | null
+    org_unit_name?: string | null
+  })[]
 
   export let tense: Tense
 
@@ -52,14 +58,22 @@
             }
             org_unit_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             owner_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
           }
@@ -85,14 +99,22 @@
               }
               org_unit_response {
                 uuid
-                current(at: $fromDate) {
+                validities(start: null, end: null) {
                   name
+                  validity {
+                    from
+                    to
+                  }
                 }
               }
               owner_response {
                 uuid
-                current(at: $fromDate) {
+                validities(start: null, end: null) {
                   name
+                  validity {
+                    from
+                    to
+                  }
                 }
               }
             }
@@ -101,6 +123,20 @@
       }
     }
   `
+
+  const withNames = (obj: Owner) => ({
+    ...obj,
+    owner_name: findClosestValidityWithin(
+      obj.owner_response?.validities,
+      obj.validity,
+      $date
+    )?.name,
+    org_unit_name: findClosestValidityWithin(
+      obj.org_unit_response?.validities,
+      obj.validity,
+      $date
+    )?.name,
+  })
 
   $: dataPromise = isOrg
     ? graphQLClient()
@@ -117,7 +153,7 @@
             const filtered = outer.validities[0].owners.filter((obj) => {
               return tenseFilter(obj, tense)
             })
-            owners.push(...filtered)
+            owners.push(...filtered.map(withNames))
           }
           return owners
         })
@@ -135,7 +171,7 @@
             const filtered = outer.validities.filter((obj) => {
               return tenseFilter(obj, tense)
             })
-            owners.push(...filtered)
+            owners.push(...filtered.map(withNames))
           }
           return owners
         })
@@ -153,9 +189,13 @@
     >
       <td class="text-sm p-4">
         {#if ownerObj.owner_response}
-          <a href="{base}/employee/{ownerObj.owner_response.uuid}">
-            {ownerObj.owner_response.current?.name}
-          </a>
+          <NameWithHistory
+            id="{ownerObj.uuid}-owner"
+            validities={ownerObj.owner_response.validities}
+            rowValidity={ownerObj.validity}
+            fallback={ownerObj.owner_response.uuid}
+            href="{base}/employee/{ownerObj.owner_response.uuid}"
+          />
         {:else}
           {capital($_("vacant"))}
         {/if}
@@ -165,7 +205,7 @@
             title={capital(
               $_("inherited_owner", {
                 values: {
-                  org_unit: ownerObj.org_unit_response?.current?.name,
+                  org_unit: ownerObj.org_unit_name ?? ownerObj.org_unit_response?.uuid,
                 },
               })
             )}>(*)</span
