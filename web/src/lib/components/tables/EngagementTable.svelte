@@ -8,10 +8,8 @@
   import { page } from "$app/stores"
   import { EngagementsDocument, type EngagementsQuery } from "./query.generated"
   import { date } from "$lib/stores/date"
-  import { getITUserITSystemName } from "$lib/utils/display"
   import {
     filterValiditiesInRange,
-    findClosestValidity,
     findClosestValidityWithin,
   } from "$lib/utils/validities"
   import NameWithHistory from "$lib/components/shared/NameWithHistory.svelte"
@@ -105,9 +103,12 @@
                 uuid
                 itsystem_response {
                   uuid
-                  current(at: $fromDate) {
-                    user_key
+                  validities(start: null, end: null) {
                     name
+                    validity {
+                      from
+                      to
+                    }
                   }
                 }
                 validity {
@@ -304,10 +305,19 @@
       {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
         <td class="text-sm p-4">
           {#each engagement.itusers as ituser}
-            {#if ituser.validities && ituser.validities.length}
-              {#each getITUserITSystemName( [findClosestValidity(ituser.validities, $date)] ) as nameObj}
-                <div>{nameObj.name}</div>
-              {/each}
+            {@const state = findClosestValidityWithin(
+              ituser.validities,
+              engagement.validity,
+              $date
+            )}
+            {#if state}
+              <div>
+                {findClosestValidityWithin(
+                  state.itsystem_response.validities,
+                  engagement.validity,
+                  $date
+                )?.name ?? state.itsystem_response.uuid}, {state.user_key}
+              </div>
             {/if}
           {/each}
         </td>
