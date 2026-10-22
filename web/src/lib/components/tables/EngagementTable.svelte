@@ -33,8 +33,9 @@
   type Manager = NonNullable<Engagement["managers"]>[0]
   type EngagementRow = Engagement & {
     org_unit_names: OrgUnitNames
-    // Precomputed so column sorting matches the displayed name
+    // Precomputed so column sorting matches the displayed names
     org_unit_name?: string | null
+    person_name?: string | null
   }
   type Engagements = EngagementRow[]
 
@@ -75,8 +76,12 @@
             org_unit_uuid
             person_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             job_function_response {
@@ -236,6 +241,11 @@
                 obj.validity,
                 $date
               )?.name,
+              person_name: findClosestValidityWithin(
+                obj.person_response.validities,
+                obj.validity,
+                $date
+              )?.name,
             }
           })
         )
@@ -256,9 +266,13 @@
     >
       <td class="text-sm p-4">
         {#if isOrg}
-          <a href="{base}/employee/{engagement.person_response.uuid}"
-            >{engagement.person_response.current?.name}</a
-          >
+          <NameWithHistory
+            id="{engagement.uuid}-person"
+            validities={engagement.person_response.validities}
+            rowValidity={engagement.validity}
+            fallback={engagement.person_response.uuid}
+            href="{base}/employee/{engagement.person_response.uuid}"
+          />
         {:else}
           <NameWithHistory
             id={engagement.uuid}
