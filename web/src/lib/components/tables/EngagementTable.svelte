@@ -27,7 +27,7 @@
   import { env } from "$lib/env"
 
   type Engagement = EngagementsQuery["engagements"]["objects"][0]["validities"][0]
-  type Manager = NonNullable<Engagement["managers"]>[0]
+  type Manager = Engagement["managers"][0]
 
   export let tense: Tense
 
@@ -109,7 +109,7 @@
               filter: { from_date: $fromDate, to_date: $toDate }
               inherit: $inherit
               exclude_self: true
-            ) @skip(if: $isOrg) {
+            ) {
               uuid
               person_response {
                 uuid
@@ -167,7 +167,6 @@
   // whole tense, so inherited managers are missing where the unit has its own
   // manager in only part of it.
   const managersDuringEngagement = (engagement: Engagement) => {
-    if (!engagement.managers) return undefined
     const managers = filterValiditiesInRange(engagement.managers, engagement.validity)
     const uuids = [...new Set(managers.map((manager) => manager.uuid))]
     return uuids.map(
@@ -288,42 +287,37 @@
           {/each}
         </td>
       {/if}
-      {#if !isOrg}
-        <td class="text-sm p-4">
-          <!-- Make sure engagement.managers is present (needed since adding @skip to query)  -->
-          {#if engagement.managers}
-            <!-- If there's more than 1 manager, create a list -->
-            <!-- Extra if/else logic implemented, so we can add <a>-tags to the managers -->
-            {#if engagement.managers.length > 1}
-              <ul>
-                {#each engagement.managers as manager}
-                  <li>
-                    {#if manager.person_response}
-                      <a href="{base}/employee/{manager.person_response.uuid}">
-                        • {managerName(manager)}
-                      </a>
-                    {:else}
-                      • {capital($_("vacant"))}
-                    {/if}
-                  </li>
-                {/each}
-              </ul>
-              <!-- If there's only 1 manager and it's not vacant -->
-            {:else if engagement.managers[0] && engagement.managers[0].person_response}
-              <a href="{base}/employee/{engagement.managers[0].person_response.uuid}">
-                {managerName(engagement.managers[0])}
-              </a>
-              <!-- 1 vacant manager -->
-            {:else if engagement.managers[0]}
-              {capital($_("vacant"))}
-            {/if}
-          {:else}
-            {capital(
-              $_("no_item", { values: { item: $_("manager", { values: { n: 1 } }) } })
-            )}
-          {/if}
-        </td>
-      {/if}
+      <td class="text-sm p-4">
+        {#if engagement.managers.length > 1}
+          <!-- If there's more than 1 manager, create a list -->
+          <!-- Extra if/else logic implemented, so we can add <a>-tags to the managers -->
+          <ul>
+            {#each engagement.managers as manager}
+              <li>
+                {#if manager.person_response}
+                  <a href="{base}/employee/{manager.person_response.uuid}">
+                    • {managerName(manager)}
+                  </a>
+                {:else}
+                  • {capital($_("vacant"))}
+                {/if}
+              </li>
+            {/each}
+          </ul>
+          <!-- If there's only 1 manager and it's not vacant -->
+        {:else if engagement.managers[0]?.person_response}
+          <a href="{base}/employee/{engagement.managers[0].person_response.uuid}">
+            {managerName(engagement.managers[0])}
+          </a>
+          <!-- 1 vacant manager -->
+        {:else if engagement.managers[0]}
+          {capital($_("vacant"))}
+        {:else}
+          {capital(
+            $_("no_item", { values: { item: $_("manager", { values: { n: 1 } }) } })
+          )}
+        {/if}
+      </td>
       {#if env.PUBLIC_SHOW_PRIMARY_ENGAGEMENT}
         <td class="text-sm p-4">{engagement.primary_response?.current?.name ?? ""}</td>
       {/if}
