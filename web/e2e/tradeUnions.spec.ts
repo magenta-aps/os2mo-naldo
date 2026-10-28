@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test"
-import { blockMutations, login, moGraphql, resolveFixture } from "./helpers"
+import { blockMutations, login, moGraphql, resolveFixture, selectFor } from "./helpers"
 
 // The association forms list the trade unions valid on the form's start date,
 // grouped by confederation. Seeds a probe confederation with one trade union
@@ -97,7 +97,7 @@ test.afterAll(async () => {
 })
 
 // The trade union select is the form's last.
-const tradeUnionSelect = (page: Page) => page.locator("form #select:visible").last()
+const tradeUnionSelect = (page: Page) => selectFor(page, "trade-union")
 
 const tradeUnionOptions = async (page: Page): Promise<string[]> => {
   await tradeUnionSelect(page).click({ timeout: 8000 })

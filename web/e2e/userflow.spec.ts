@@ -63,41 +63,41 @@ test("onboarding wizard submits a coherent batch", async ({ page }) => {
 
   // Step 2: engagement — pick the fixture unit and the first class options
   await searchAndPick(page, fixture.unitName)
-  await pickFirstOption(page, 0) // job function
-  await pickFirstOption(page, 1) // engagement type
+  await pickFirstOption(page, "job-function")
+  await pickFirstOption(page, "engagement-type")
   // Second engagement on its own tab, exercising the multi-tab machinery.
   await page.locator('button[aria-label="Add engagement"]').click()
   await page.waitForTimeout(500)
   await searchAndPick(page, fixture.unitName)
-  await pickFirstOption(page, 0)
-  await pickFirstOption(page, 1)
+  await pickFirstOption(page, "job-function")
+  await pickFirstOption(page, "engagement-type")
   await next()
 
   // Step 3: ituser — the system with a linked role, an account name, a role.
   // Skattestyrelsen deployments pre-seed and lock the account name. Inputs
   // are matched by name suffix: the rewritten wizard prefixes ids per tab
   // ("ituser-0-account-name"), the old one doesn't.
-  await pickOptionByText(page, 0, roleSystem!)
+  await pickOptionByText(page, "it-system", roleSystem!)
   const accountName = page.locator('form input[name$="account-name"]')
   const lockedAccount = await accountName.isDisabled()
   if (!lockedAccount) await accountName.fill("SMOKE01")
   const expectedAccount = lockedAccount ? await accountName.inputValue() : "SMOKE01"
   await page.fill('form input[name$="external-id"]', "SMOKE-EXT-01")
-  await pickFirstOption(page, 2) // role (0 = it system, 1 = primary)
+  await pickFirstOption(page, "it-system-role-uuid")
   await next()
 
   // Step 4: manager
   await searchAndPick(page, fixture.unitName)
-  await pickFirstOption(page, 0) // manager type
-  await pickFirstOption(page, 1) // manager level
+  await pickFirstOption(page, "manager-type")
+  await pickFirstOption(page, "manager-level")
   await pickMultiFirstOption(page, "responsibility")
   await dismiss(page) // the multi-select leaves its list open
-  await pickExactOption(page, 2, primary.name)
+  await pickExactOption(page, "primary", primary.name)
   await next()
 
   // Step 5: address — the seeded EMAIL-scope type, so the value validates
-  await pickFirstOption(page, 0) // visibility
-  await pickOptionByText(page, 1, "Email")
+  await pickFirstOption(page, "visibility")
+  await pickOptionByText(page, "address-type", "Email")
   await page.fill('form input[name$="value"]', "smoke@example.org")
   await next()
 

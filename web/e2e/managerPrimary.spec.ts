@@ -28,9 +28,6 @@ import {
 
 const TAKEN_MESSAGE = /allerede en primær leder|already has a primary manager/
 const LOAD_ERROR = /Noget gik galt|Something went wrong/
-// Selects in order on every manager form: engagement, manager type, manager
-// level, primary.
-const PRIMARY_SELECT = 3
 
 let fixture: Fixture
 let primary: ClassRef
@@ -134,8 +131,8 @@ const openForm = async (page: Page, path: string) => {
 // The fields every manager create form requires besides the primary class.
 const fillRequiredFields = async (page: Page) => {
   await page.check("#no-engagement")
-  await pickFirstOption(page, 1)
-  await pickFirstOption(page, 2)
+  await pickFirstOption(page, "manager-type")
+  await pickFirstOption(page, "manager-level")
   await pickMultiFirstOption(page, "responsibility")
   await dismiss(page)
 }
@@ -154,7 +151,7 @@ test("org create sends the primary class in a unit without one", async ({ page }
   )
   await fillRequiredFields(page)
   const settled = lookupSettled(page)
-  await pickExactOption(page, PRIMARY_SELECT, primary.name)
+  await pickExactOption(page, "primary", primary.name)
   await settled
   await expect(page.getByText(TAKEN_MESSAGE)).toBeHidden()
 
@@ -173,7 +170,7 @@ test("employee create lists the unit's primary manager and blocks", async ({
   )
   await searchAndPick(page, taken.name)
   await fillRequiredFields(page)
-  await pickExactOption(page, PRIMARY_SELECT, primary.name)
+  await pickExactOption(page, "primary", primary.name)
 
   const message = page.locator("form div", { hasText: TAKEN_MESSAGE }).last()
   await expect(message).toBeVisible()
@@ -194,7 +191,7 @@ test("a failed lookup blocks the submit", async ({ page }) => {
     isLookup(route.request().postData()) ? route.abort() : route.fallback()
   )
   await fillRequiredFields(page)
-  await pickExactOption(page, PRIMARY_SELECT, primary.name)
+  await pickExactOption(page, "primary", primary.name)
   await expect(page.getByText(LOAD_ERROR)).toBeVisible()
 
   await submit(page)
@@ -237,7 +234,7 @@ test("a person's other manager role in the unit conflicts", async ({ page }) => 
     page,
     `/organisation/${taken.unit}/edit/manager/${taken.otherRole}?from=${fixture.from}`
   )
-  await pickExactOption(page, PRIMARY_SELECT, primary.name)
+  await pickExactOption(page, "primary", primary.name)
 
   const message = page.locator("form div", { hasText: TAKEN_MESSAGE }).last()
   await expect(message).toBeVisible()
