@@ -21,6 +21,7 @@
     type GetEngagementsQuery,
   } from "./query.generated"
   import Select from "$lib/components/forms/shared/Select.svelte"
+  import EngagementChecklist from "$lib/components/forms/shared/EngagementChecklist.svelte"
   import { createQuery } from "$lib/http/query"
   import { getValidities } from "$lib/http/getValidities"
   import { getMinMaxValidities } from "$lib/utils/validities"
@@ -137,18 +138,23 @@
   }
   let selectedEngagements: string[] = []
 
-  const toggleSelectAll = (engagements: Engagements[]) => {
-    selectedEngagements =
-      selectedEngagements.length === engagements.length
-        ? []
-        : engagements.map((engagement) => engagement.current?.uuid)
-  }
-
   // The engagement's current end, kept as it is when the engagement moves.
   const endOf = (validities: Parameters<typeof getMinMaxValidities>[0]) => {
     const { to } = getMinMaxValidities(validities)
     return to ? toMO(to) : ""
   }
+
+  $: rows = ($engagements.data ?? []).flatMap(({ current, validities }) =>
+    current
+      ? [
+          {
+            uuid: current.uuid,
+            name: current.person_response.current?.name ?? current.person_response.uuid,
+            end: endOf(validities),
+          },
+        ]
+      : []
+  )
 </script>
 
 <title>{capital($_("navigation.move_engagements"))} | OS2mo</title>
@@ -197,69 +203,8 @@
             )}
           </p>
         {/if}
-        {#if $engagements.data?.length}
-          {@const engagements = $engagements.data}
-          {#key engagements}
-            <fieldset>
-              <legend class="text-sm pb-1">
-                {capital($_("engagement", { values: { n: 2 } }))}</legend
-              >
-              <ul
-                id="engagement-list"
-                class="max-h-48 overflow-y-auto bg-base-100 rounded-sm p-1"
-              >
-                <div class="flex text-base-content">
-                  <label
-                    class="label flex items-center gap-4 py-2 px-4 rounded-lg w-full text-sm text-base-content cursor-pointer wrap-break-word hover:bg-base-200 transition-all"
-                  >
-                    <input
-                      type="checkbox"
-                      on:click={() => toggleSelectAll(engagements)}
-                      class="checkbox checkbox-primary rounded-sm normal-case font-normal text-base text-base-100"
-                      checked={selectedEngagements.length === engagements.length}
-                      indeterminate={selectedEngagements.length > 0 &&
-                        selectedEngagements.length < engagements.length}
-                    />
-                    <span class="label-text text-base-content"
-                      >{selectedEngagements.length !== engagements.length
-                        ? capital($_("select_all"))
-                        : capital($_("deselect_all"))}</span
-                    >
-                  </label>
-                </div>
-                {#each engagements.sort((a, b) => {
-                  const nameA = a.current?.person_response?.current?.name?.toLowerCase() || ""
-                  const nameB = b.current?.person_response?.current?.name?.toLowerCase() || ""
-                  return nameA > nameB ? 1 : -1
-                }) as engagement}
-                  <div class="flex text-base-content">
-                    <label
-                      class="label flex items-center gap-4 py-2 px-4 rounded-lg w-full text-sm text-base-content cursor-pointer wrap-break-word hover:bg-base-200 transition-all"
-                    >
-                      <input
-                        type="checkbox"
-                        name="engagements"
-                        bind:group={selectedEngagements}
-                        value={engagement.current?.uuid}
-                        class="checkbox checkbox-primary rounded-sm normal-case font-normal text-base text-base-100"
-                      />
-                      <span class="label-text text-base-content"
-                        >{engagement.current?.person_response?.current?.name}</span
-                      >
-                    </label>
-                    {#if selectedEngagements.includes(engagement.current?.uuid)}
-                      <input
-                        id="end-dates"
-                        name="end-dates"
-                        hidden
-                        value={endOf(engagement.validities)}
-                      />
-                    {/if}
-                  </div>
-                {/each}
-              </ul>
-            </fieldset>
-          {/key}
+        {#if rows.length}
+          <EngagementChecklist engagements={rows} bind:selected={selectedEngagements} />
         {:else}
           <Select
             title={capital($_("engagements", { values: { n: 2 } }))}

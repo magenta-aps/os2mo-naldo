@@ -95,6 +95,13 @@ person's engagement in parallel. Leftovers from a crashed run: a unit
 prefixed `explicit-probe-` and people named `Explicit Probe Boss` /
 `Explicit Probe Staff`.
 
+## moveEngagements.spec.ts
+
+Seeds a probe person with an engagement that has an end date, in one of two
+probe units, then asserts that moving it sends the engagement, the target
+unit and the engagement's own end date. Leftovers from a crashed run: units
+prefixed `move-probe-` and a person named `Move Probe Staff`.
+
 ## tradeUnions.spec.ts
 
 The association forms list the trade unions valid on the form's start date,
