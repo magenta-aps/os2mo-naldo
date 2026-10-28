@@ -3,6 +3,7 @@ import { getMinMaxValidities } from "$lib/utils/validities"
 import {
   GetEngagementValiditiesDocument,
   GetFacetValiditiesDocument,
+  GetItSystemValiditiesDocument,
   GetItuserValiditiesDocument,
   GetOrgUnitValiditiesDocument,
   GetPersonValiditiesDocument,
@@ -31,6 +32,12 @@ export const getFacetValidities = async (uuid: string, signal?: AbortSignal) => 
     uuid: uuid,
   })
   return getMinMaxValidities(res.facets.objects[0].validities)
+}
+export const getItSystemValidities = async (uuid: string, signal?: AbortSignal) => {
+  const res = await graphQLClient(signal).request(GetItSystemValiditiesDocument, {
+    uuid: uuid,
+  })
+  return getMinMaxValidities(res.itsystems.objects[0].validities)
 }
 export const getItuserValidities = async (uuid: string, signal?: AbortSignal) => {
   const res = await graphQLClient(signal).request(GetItuserValiditiesDocument, {
