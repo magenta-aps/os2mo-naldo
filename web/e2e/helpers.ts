@@ -189,9 +189,22 @@ export const blockMutations = async (
   })
 }
 
+// Also logs both kinds of error as they happen: a test that times out waiting
+// for the page never reaches its `errors` assertion, and MO answers a failed
+// query with a 200 and an `errors` list, which no page error reports.
 export const trackPageErrors = (page: Page): string[] => {
   const errors: string[] = []
-  page.on("pageerror", (error) => errors.push(error.message.split("\n")[0]))
+  page.on("pageerror", (error) => {
+    const message = error.message.split("\n")[0]
+    console.log(`Page error: ${message}`)
+    errors.push(message)
+  })
+  page.on("response", async (response) => {
+    if (!response.url().includes("/graphql/")) return
+    const body = await response.json().catch(() => null)
+    for (const error of body?.errors ?? [])
+      console.log(`GraphQL error: ${error.message}`)
+  })
   return errors
 }
 

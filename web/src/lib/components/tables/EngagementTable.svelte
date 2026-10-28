@@ -27,16 +27,7 @@
   import { env } from "$lib/env"
 
   type Engagement = EngagementsQuery["engagements"]["objects"][0]["validities"][0]
-  type OrgUnitNames = NonNullable<
-    EngagementsQuery["referencedUnits"]
-  >["objects"][0]["validities"]
   type Manager = NonNullable<Engagement["managers"]>[0]
-  type EngagementRow = Engagement & {
-    org_unit_names: OrgUnitNames
-    // Precomputed so column sorting matches the displayed name
-    org_unit_name?: string | null
-  }
-  type Engagements = EngagementRow[]
 
   export let tense: Tense
 
@@ -208,29 +199,30 @@
     })
     .then((res) => {
       // Each unit appears once in the response however many rows point at it
-      const namesByUuid = new Map<string, OrgUnitNames>(
-        res.referencedUnits?.objects.map((unit) => [unit.uuid, unit.validities])
+      const namesByUuid = new Map(
+        res.referencedUnits?.objects.map(
+          (unit) => [unit.uuid, unit.validities] as const
+        )
       )
 
-      const engagements: Engagements = []
-
       // Filters and flattens the data
-      for (const outer of res.engagements.objects) {
-        // TODO: Remove when GraphQL is able to do this for us
-        const filtered = outer.validities.filter((obj) => {
-          if (!tenseFilter(obj, tense)) return false
-          // Check if engagement validity is in the current org_unit
-          // TODO: Do this with GraphQL, when following issues are resolved (#65031) (#65303)
-          if (isOrg && obj.org_unit_uuid !== uuid) return false
-          return true
-        })
-        engagements.push(
-          ...filtered.map((obj) => {
+      return res.engagements.objects.flatMap((outer) =>
+        outer.validities
+          // TODO: Remove when GraphQL is able to do this for us
+          .filter((obj) => {
+            if (!tenseFilter(obj, tense)) return false
+            // Check if engagement validity is in the current org_unit
+            // TODO: Do this with GraphQL, when following issues are resolved (#65031) (#65303)
+            if (isOrg && obj.org_unit_uuid !== uuid) return false
+            return true
+          })
+          .map((obj) => {
             const org_unit_names = namesByUuid.get(obj.org_unit_response?.uuid) ?? []
             return {
               ...obj,
               managers: managersDuringEngagement(obj),
               org_unit_names: org_unit_names,
+              // Precomputed so column sorting matches the displayed name
               org_unit_name: findClosestValidityWithin(
                 org_unit_names,
                 obj.validity,
@@ -238,9 +230,7 @@
               )?.name,
             }
           })
-        )
-      }
-      return engagements
+      )
     })
 </script>
 
