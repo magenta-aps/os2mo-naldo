@@ -14,6 +14,8 @@ export const actions: Actions = {
     const extension_1 = data.get("extension-1") as string
     const extension_4 = data.get("extension-4") as string
     const primary = data.get("primary")
+    const explicitManager = data.get("explicit-manager") || null
+    const initialExplicitManager = data.get("explicit-manager-initial") || null
     const startDate = data.get("from") as string
     const endDate = data.get("to") as string | null
 
@@ -26,6 +28,11 @@ export const actions: Actions = {
       extension_1: extension_1,
       extension_4: extension_4,
       ...(primary && { primary: primary }),
+      // MO keeps the link when omitted and unsets it on null. Sent only when
+      // changed, so a save cannot drop a link the form did not show.
+      ...(explicitManager !== initialExplicitManager && {
+        explicit_manager: explicitManager,
+      }),
       validity: { from: startDate, ...(endDate && { to: endDate }) },
     }
   },

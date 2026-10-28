@@ -29,6 +29,7 @@
   import { getClasses } from "$lib/http/getClasses"
   import { getValidities } from "$lib/http/getValidities"
   import { env } from "$lib/env"
+  import ExplicitManagerSelect from "$lib/components/forms/shared/ExplicitManagerSelect.svelte"
 
   gql`
     mutation CreateEngagement($input: EngagementCreateInput!, $date: DateTime!) {
@@ -237,6 +238,7 @@
           />
         </div>
       {/if}
+      <ExplicitManagerSelect at={startDate} />
     </div>
   </div>
   <div class="flex py-6 gap-4">
