@@ -9,9 +9,11 @@
   import { EngagementsDocument, type EngagementsQuery } from "./query.generated"
   import { date } from "$lib/stores/date"
   import {
+    clampDateToValidity,
     filterValiditiesInRange,
     findClosestValidity,
     findClosestValidityWithin,
+    findValidityAt,
   } from "$lib/utils/validities"
   import NameWithHistory from "$lib/components/shared/NameWithHistory.svelte"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
@@ -21,6 +23,7 @@
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
+  import personCheckOutlineRounded from "@iconify/icons-material-symbols/person-check-outline-rounded"
   import { formatQueryDates } from "$lib/utils/validities"
   import { updateGlobalNavigation } from "$lib/stores/navigation"
   import { env } from "$lib/env"
@@ -39,7 +42,7 @@
   // that no longer exist, and `validities` can't widen a filtered-out unit.
   // `managers` without a filter only finds the managers of today, so it gets the
   // tense's dates. Their names come from `validities`, as a past manager's
-  // employee can have no `current`.
+  // employee can have no `current`. `managers` ignores `explicit_manager`.
   // TODO: When https://redmine.magenta.dk/issues/62968 is fixed, add date-filters to classes
   gql`
     query Engagements(
@@ -125,6 +128,35 @@
                 to
               }
             }
+            explicit_manager {
+              validities(start: null, end: null) {
+                uuid
+                person_response {
+                  uuid
+                  validities(start: null, end: null) {
+                    name
+                    validity {
+                      from
+                      to
+                    }
+                  }
+                }
+                org_unit_response {
+                  uuid
+                  validities(start: null, end: null) {
+                    name
+                    validity {
+                      from
+                      to
+                    }
+                  }
+                }
+                validity {
+                  from
+                  to
+                }
+              }
+            }
             validity {
               from
               to
@@ -178,6 +210,7 @@
     )
   }
 
+  // Also takes the explicit manager, so its query selects the same fields.
   const managerName = (manager: Manager) =>
     findClosestValidityWithin(
       manager.person_response?.validities,
@@ -216,9 +249,24 @@
           })
           .map((obj) => {
             const org_unit_names = namesByUuid.get(obj.org_unit_response?.uuid) ?? []
+            // MO neither ends nor validates the link when its role ends, so an
+            // engagement can point at a former manager indefinitely. Only a
+            // role active on the row's date counts; otherwise the row shows the
+            // standard manager.
+            const explicitManager = findValidityAt(
+              obj.explicit_manager?.validities,
+              clampDateToValidity($date, obj.validity)
+            )
             return {
               ...obj,
               managers: managersDuringEngagement(obj),
+              explicitManager: explicitManager,
+              // A vacant explicit manager is only identifiable by its unit.
+              explicitManagerUnitName: findClosestValidityWithin(
+                explicitManager?.org_unit_response.validities,
+                obj.validity,
+                $date
+              )?.name,
               org_unit_names: org_unit_names,
               // Precomputed so column sorting matches the displayed name
               org_unit_name: findClosestValidityWithin(
@@ -288,7 +336,29 @@
         </td>
       {/if}
       <td class="text-sm p-4">
-        {#if engagement.managers.length > 1}
+        {#if engagement.explicitManager}
+          {#if engagement.explicitManager.person_response}
+            <a href="{base}/employee/{engagement.explicitManager.person_response.uuid}">
+              {managerName(engagement.explicitManager)}
+            </a>
+          {:else}
+            {@const unitUuid = engagement.explicitManager.org_unit_response.uuid}
+            <a
+              href="{base}/organisation/{unitUuid}#manager"
+              on:click={() => updateGlobalNavigation(unitUuid)}
+            >
+              {capital($_("vacant"))} ({engagement.explicitManagerUnitName ?? unitUuid})
+            </a>
+          {/if}
+          <span title={capital($_("explicit_manager"))}>
+            <Icon
+              icon={personCheckOutlineRounded}
+              class="inline"
+              width="16"
+              height="16"
+            />
+          </span>
+        {:else if engagement.managers.length > 1}
           <!-- If there's more than 1 manager, create a list -->
           <!-- Extra if/else logic implemented, so we can add <a>-tags to the managers -->
           <ul>
