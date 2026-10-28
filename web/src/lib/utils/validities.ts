@@ -126,6 +126,22 @@ export const filterValiditiesInRange = <T extends HasValidity>(
   })
 }
 
+// The validity active at `at`, or null. Unlike findClosestValidity, never
+// falls back to an ended or future one.
+export const findValidityAt = <T extends HasValidity>(
+  validities: T[] | null | undefined,
+  at: At | null | undefined
+): T | null => {
+  if (!validities || !at) return null
+  const moment = toMoment(at)
+  return (
+    validities.find(
+      ({ validity: { from, to } }) =>
+        (!from || compare(from, moment) <= 0) && (!to || compare(to, moment) > 0)
+    ) ?? null
+  )
+}
+
 // Setting `validities: any` to avoid having to create the types in `Search.svelte` by hand
 export const findClosestValidity = (validities: any, date: At | null | undefined) => {
   // Return early if only 1 validity is present (this should always be the case, unless `PUBLIC_SEARCH_INFINITY: "true"`)

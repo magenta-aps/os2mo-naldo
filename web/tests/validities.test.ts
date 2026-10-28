@@ -4,6 +4,7 @@ import {
   filterValiditiesInRange,
   findClosestValidity,
   findClosestValidityWithin,
+  findValidityAt,
   formatQueryDates,
   getMinMaxValidities,
 } from "$lib/utils/validities"
@@ -237,5 +238,31 @@ describe("formatQueryDates", () => {
     expect(formatQueryDates(validity("2020-01-01", null).validity)).toBe(
       "?from=2020-01-01T00%3A00%3A00%2B01%3A00"
     )
+  })
+})
+
+describe("findValidityAt", () => {
+  it("returns the validity active on the date", () => {
+    const active = validity("2019-01-01", null)
+    expect(
+      findValidityAt([validity("2000-01-01", "2010-01-01"), active], day(TODAY))
+    ).toBe(active)
+  })
+
+  it("returns null when the only validity ended, unlike findClosestValidity", () => {
+    expect(
+      findValidityAt([validity("2000-01-01", "2010-01-01")], day(TODAY))
+    ).toBeNull()
+  })
+
+  it("treats `to` as exclusive", () => {
+    expect(findValidityAt([validity("2000-01-01", TODAY)], day(TODAY))).toBeNull()
+  })
+
+  it("returns null for a future validity, no validities or no date", () => {
+    expect(findValidityAt([validity(TOMORROW, null)], day(TODAY))).toBeNull()
+    expect(findValidityAt([], day(TODAY))).toBeNull()
+    expect(findValidityAt(undefined, day(TODAY))).toBeNull()
+    expect(findValidityAt([validity("2000-01-01", null)], null)).toBeNull()
   })
 })
