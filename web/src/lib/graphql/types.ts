@@ -2495,6 +2495,31 @@ export type AssociationUpdateInput = {
   validity: RaValidityInput;
 };
 
+/** CPR filter. */
+export type CprFilter = {
+  /** The CPR number to look up. */
+  cpr_number: Scalars['String']['input'];
+};
+
+/** Person found by CPR lookup. */
+export type CprPerson = {
+  __typename?: 'CPRPerson';
+  /**
+   * CPR number of the person.
+   *
+   * Example: "6101501234"
+   *
+   */
+  cpr_number: Scalars['String']['output'];
+  /**
+   * Name of the person.
+   *
+   * Example: "John Doe"
+   *
+   */
+  name: Scalars['String']['output'];
+};
+
 /**
  *
  * A value in the facet sample space.
@@ -18896,6 +18921,19 @@ export type Query = {
   /** Get classes. */
   classes: ClassResponsePaged;
   /**
+   * Look up a person by their CPR number.
+   *
+   * This performs a lookup in Serviceplatformen, which must be
+   * configured (`ENABLE_SP=true`), otherwise an error is raised.
+   *
+   * Looking up "erstatningspersonnummer" CPR numbers (fictitious CPR numbers
+   * where the 'day' part of the birthdate is in the range 61-91) requires
+   * that CPR birthdate validation is disabled (`CPR_VALIDATE_BIRTHDATE=false`),
+   * otherwise such CPR numbers are rejected as invalid.
+   *
+   */
+  cpr: CprPerson;
+  /**
    * Get employees.
    * @deprecated Use 'persons' instead. Will be removed in a future version of OS2mo.
    */
@@ -19037,6 +19075,12 @@ export type QueryClassesArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<ClassFilter>;
   limit?: InputMaybe<Scalars['int']['input']>;
+};
+
+
+/** Entrypoint for all read-operations */
+export type QueryCprArgs = {
+  filter: CprFilter;
 };
 
 

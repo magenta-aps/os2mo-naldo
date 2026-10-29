@@ -746,4 +746,10 @@ gql`
       }
     }
   }
+  query Cpr($cprNumber: String!) {
+    cpr(filter: { cpr_number: $cprNumber }) {
+      cpr_number
+      name
+    }
+  }
 `
