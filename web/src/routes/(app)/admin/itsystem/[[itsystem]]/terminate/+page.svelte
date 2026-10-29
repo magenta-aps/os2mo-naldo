@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { ValidityBounds } from "$lib/utils/validities"
   import { Temporal } from "temporal-polyfill"
   import { lastValidDay, moValidityTo } from "$lib/utils/date"
+  import type { ValidityBounds } from "$lib/utils/validities"
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
   import EndDateInput from "$lib/components/forms/shared/EndDateInput.svelte"
@@ -17,6 +17,9 @@
   import { date } from "$lib/stores/date"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
+  import { page } from "$app/stores"
+  import { createQuery } from "$lib/http/query"
+  import { getItSystemValidities } from "$lib/http/getValidities"
 
   gql`
     mutation TerminateITSystem($input: ITSystemTerminateInput!, $date: DateTime!) {
@@ -32,6 +35,14 @@
     required(),
   ])
   const svelteForm = form(toDate)
+
+  // An IT system cannot end before it starts. It has no parent entity, so
+  // nothing bounds the end date from above.
+  const validities = createQuery<ValidityBounds>({ from: null, to: null })
+  $: if ($page.params.itsystem) {
+    const uuid = $page.params.itsystem
+    validities.run((signal) => getItSystemValidities(uuid, signal))
+  }
 
   const handler: SubmitFunction =
     () =>
@@ -63,8 +74,6 @@
         }
       }
     }
-
-  let validities: ValidityBounds = { from: null, to: null }
 </script>
 
 <title
@@ -96,8 +105,7 @@
         errors={$toDate.errors}
         title={capital($_("date.end_date"))}
         id="to"
-        min={validities.from}
-        max={validities.to}
+        min={$validities.data?.from}
         required={true}
       />
     </div>

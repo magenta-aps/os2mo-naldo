@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ValidityBounds } from "$lib/utils/validities"
+  import { isLaterEnd } from "$lib/utils/validities"
   import { moValidityFrom } from "$lib/utils/date"
   import { Temporal } from "temporal-polyfill"
   import { _ } from "svelte-i18n"
@@ -22,6 +22,7 @@
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
+  import { normalizeItSystem } from "$lib/utils/normalizeForm"
 
   gql`
     query ITSystem($uuid: [UUID!], $fromDate: DateTime, $toDate: DateTime) {
@@ -86,8 +87,35 @@
   const userKey = field("user_key", "", [required()])
   const svelteForm = form(fromDate, name, userKey)
 
-  // Logic for updating datepicker intervals
-  let validities: ValidityBounds = { from: null, to: null }
+  // Created in the script (not inline in the {#await} tag) so the result can
+  // be captured below without a side effect in the template.
+  const itSystemPromise = graphQLClient().request(ItSystemDocument, {
+    uuid: $page.params.itsystem,
+    fromDate: $page.url.searchParams.get("from"),
+    toDate: $page.url.searchParams.get("to"),
+  })
+
+  let initialItSystem: any = null
+  itSystemPromise.then(
+    (data) => {
+      initialItSystem = normalizeItSystem(data.itsystems.objects[0].validities[0])
+    },
+    // The template's {#await} has no {:catch}, so a failed load stays on the
+    // pending branch. This handler only prevents an unhandled rejection from
+    // this second promise chain.
+    () => {}
+  )
+
+  let hasChanges = false
+  $: if (initialItSystem) {
+    // Check if any of the user-editable fields have changed compared to the original values.
+    const editableChanged =
+      $name.value !== initialItSystem.name ||
+      $userKey.value !== initialItSystem.user_key
+
+    const toDateExtended = isLaterEnd(toDate, initialItSystem.to)
+    hasChanges = editableChanged || toDateExtended
+  }
 </script>
 
 <title
@@ -110,7 +138,7 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ItSystemDocument, { uuid: $page.params.itsystem, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to") } )}
+{#await itSystemPromise}
   <div class="mx-6">
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
       <div class="p-8">
@@ -138,8 +166,7 @@
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={validities.from}
-            max={toDate ? toDate : validities.to}
+            max={toDate}
             required={true}
           />
           <EndDateInput
@@ -147,8 +174,7 @@
             startValue={itsystem.validity.to}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : validities.from}
-            max={validities.to}
+            min={$fromDate.value}
           />
         </div>
         <div class="flex flex-row gap-6">
@@ -167,7 +193,7 @@
             id="user-key"
             bind:value={$userKey.value}
             startValue={itsystem.user_key}
-            errors={$name.errors}
+            errors={$userKey.errors}
             extra_classes="basis-1/2"
             required={true}
           />
@@ -182,6 +208,8 @@
             values: { item: $_("itsystem", { values: { n: 1 } }) },
           })
         )}
+        disabled={!hasChanges}
+        info={hasChanges ? undefined : $_("edit_tooltip")}
       />
       <Button
         type="button"

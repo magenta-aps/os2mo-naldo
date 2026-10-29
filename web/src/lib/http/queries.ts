@@ -64,6 +64,18 @@ gql`
       }
     }
   }
+  query GetItSystemValidities($uuid: [UUID!]) {
+    itsystems(filter: { uuids: $uuid, from_date: null, to_date: null }) {
+      objects {
+        validities {
+          validity {
+            from
+            to
+          }
+        }
+      }
+    }
+  }
   query GetFacetValidities($uuid: [UUID!]) {
     facets(filter: { uuids: $uuid, from_date: null, to_date: null }) {
       objects {
