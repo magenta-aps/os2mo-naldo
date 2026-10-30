@@ -3,8 +3,8 @@ import { CprDocument } from "$lib/http/query.generated"
 
 export type ITUserITSystemName = {
   uuid: string
-  user_key: string
-  itsystem_response: {
+  user_key?: string
+  itsystem_response?: {
     uuid: string
     current?: {
       name: string
@@ -14,10 +14,10 @@ export type ITUserITSystemName = {
 
 export const formatITUserITSystemName = (ituser: ITUserITSystemName) => ({
   uuid: ituser.uuid,
-  name: `${ituser.itsystem_response.current?.name ?? ituser.itsystem_response.uuid}, ${
-    ituser.user_key
-  }`,
-  itsystem: { uuid: ituser.itsystem_response.uuid },
+  name: `${
+    ituser.itsystem_response?.current?.name ?? ituser.itsystem_response?.uuid
+  }, ${ituser.user_key}`,
+  itsystem: { uuid: ituser.itsystem_response?.uuid },
 })
 
 export const formatITUserITSystemNames = (itusers: ITUserITSystemName[] | undefined) =>

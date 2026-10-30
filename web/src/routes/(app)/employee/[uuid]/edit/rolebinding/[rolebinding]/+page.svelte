@@ -4,7 +4,7 @@
   import type { ValidityBounds } from "$lib/utils/validities"
   import { moValidityFrom } from "$lib/utils/date"
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/utils/helpers"
+  import { capital, formatITUserITSystemName } from "$lib/utils/helpers"
   import EndDateInput from "$lib/components/forms/shared/EndDateInput.svelte"
   import StartDateInput from "$lib/components/forms/shared/StartDateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
@@ -24,7 +24,6 @@
   import { getItuserValidities } from "$lib/http/getValidities"
   import { getRoleClasses } from "$lib/http/getClasses"
   import { filterClassesByFacetUserKey } from "$lib/utils/classes"
-  import { getITUserITSystemName } from "$lib/utils/display"
   import { form, field } from "svelte-forms"
   import { required } from "svelte-forms/validators"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
@@ -228,13 +227,11 @@
   </div>
 {:then data}
   {@const rolebinding = data.rolebindings.objects[0].validities[0]}
-  {@const ituser = getITUserITSystemName([
-    {
-      uuid: rolebinding.ituser_response.uuid,
-      user_key: rolebinding.ituser_response.current?.user_key ?? "",
-      itsystem_response: rolebinding.ituser_response.current?.itsystem_response,
-    },
-  ])}
+  {@const ituser = formatITUserITSystemName({
+    uuid: rolebinding.ituser_response.uuid,
+    user_key: rolebinding.ituser_response.current?.user_key ?? "",
+    itsystem_response: rolebinding.ituser_response.current?.itsystem_response,
+  })}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
@@ -263,7 +260,7 @@
           <Select
             title={capital($_("ituser", { values: { n: 1 } }))}
             id="it-user-uuid"
-            startValue={ituser?.[0]}
+            startValue={ituser}
             bind:value={itUser}
             bind:name={$itUserField.value}
             errors={$itUserField.errors}

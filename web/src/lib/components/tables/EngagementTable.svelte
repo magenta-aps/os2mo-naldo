@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/utils/helpers"
+  import { capital, formatITUserITSystemName } from "$lib/utils/helpers"
   import ValidityTableCell from "$lib/components/shared/ValidityTableCell.svelte"
   import { base } from "$app/paths"
   import { graphQLClient } from "$lib/http/client"
@@ -8,7 +8,6 @@
   import { page } from "$app/stores"
   import { EngagementsDocument, type EngagementsQuery } from "./query.generated"
   import { date } from "$lib/stores/date"
-  import { getITUserITSystemName } from "$lib/utils/display"
   import {
     filterValiditiesInRange,
     findClosestValidity,
@@ -281,9 +280,10 @@
         <td class="text-sm p-4">
           {#each engagement.itusers as ituser}
             {#if ituser.validities && ituser.validities.length}
-              {#each getITUserITSystemName( [findClosestValidity(ituser.validities, $date)] ) as nameObj}
-                <div>{nameObj.name}</div>
-              {/each}
+              <div>
+                {formatITUserITSystemName(findClosestValidity(ituser.validities, $date))
+                  .name}
+              </div>
             {/if}
           {/each}
         </td>

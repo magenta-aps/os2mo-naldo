@@ -4,7 +4,11 @@
   import type { ValidityBounds } from "$lib/utils/validities"
   import { moValidityFrom } from "$lib/utils/date"
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/utils/helpers"
+  import {
+    capital,
+    formatEngagementTitlesAndUuid,
+    type EngagementTitleAndUuid,
+  } from "$lib/utils/helpers"
   import EndDateInput from "$lib/components/forms/shared/EndDateInput.svelte"
   import StartDateInput from "$lib/components/forms/shared/StartDateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
@@ -24,10 +28,6 @@
     GetEngagementsDocument,
     UpdateLeaveDocument,
   } from "./query.generated"
-  import {
-    getEngagementTitlesAndUuid,
-    type EngagementTitleAndUuid,
-  } from "$lib/utils/display"
   import type { FacetValidities } from "$lib/utils/classes"
   import { createQuery } from "$lib/http/query"
   import { getEngagementValidities } from "$lib/http/getValidities"
@@ -303,7 +303,7 @@
     uuid: leave.person_response.uuid,
     name: leave.person_response.current?.name ?? "",
   }}
-  {@const engagementStartValue = getEngagementTitlesAndUuid([
+  {@const engagementStartValue = formatEngagementTitlesAndUuid([
     {
       uuid: leave.engagement_response.uuid,
       job_function_response: leave.engagement_response.current?.job_function_response,
@@ -385,7 +385,7 @@
             bind:value={selectedEngagement}
             bind:name={$engagement.value}
             errors={$engagement.errors}
-            iterable={getEngagementTitlesAndUuid($engagements.data)}
+            iterable={formatEngagementTitlesAndUuid($engagements.data)}
             disabled={!startDate || $engagements.error}
             required={true}
           />

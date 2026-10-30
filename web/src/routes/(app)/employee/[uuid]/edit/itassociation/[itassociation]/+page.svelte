@@ -3,7 +3,11 @@
   import { moValidityFrom } from "$lib/utils/date"
   import { Temporal } from "temporal-polyfill"
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/utils/helpers"
+  import {
+    capital,
+    formatITUserITSystemName,
+    formatITUserITSystemNames,
+  } from "$lib/utils/helpers"
   import EndDateInput from "$lib/components/forms/shared/EndDateInput.svelte"
   import StartDateInput from "$lib/components/forms/shared/StartDateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
@@ -27,7 +31,6 @@
     filterClassesByFacetUserKey,
   } from "$lib/utils/classes"
   import Checkbox from "$lib/components/forms/shared/Checkbox.svelte"
-  import { getITUserITSystemName } from "$lib/utils/display"
   import { getValidities } from "$lib/http/getValidities"
   import Search from "$lib/components/search/Search.svelte"
   import { form, field } from "svelte-forms"
@@ -259,13 +262,11 @@
   {@const itusers = itassociation.person_response?.current?.itusers ?? []}
   {@const facets = data.facets.objects}
   {@const classes = data.classes.objects}
-  {@const itUserStartValue = getITUserITSystemName([
-    {
-      uuid: itassociation.it_user_response?.uuid,
-      user_key: itassociation.it_user_response?.current?.user_key ?? "",
-      itsystem_response: itassociation.it_user_response?.current?.itsystem_response,
-    },
-  ])}
+  {@const itUserStartValue = formatITUserITSystemName({
+    uuid: itassociation.it_user_response?.uuid,
+    user_key: itassociation.it_user_response?.current?.user_key ?? "",
+    itsystem_response: itassociation.it_user_response?.current?.itsystem_response,
+  })}
 
   <form method="post" class="mx-6" use:enhance={handler}>
     <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
@@ -316,10 +317,10 @@
           <Select
             title={capital($_("ituser", { values: { n: 1 } }))}
             id="it-user-uuid"
-            startValue={itUserStartValue?.[0]}
+            startValue={itUserStartValue}
             bind:name={$itUser.value}
             errors={$itUser.errors}
-            iterable={getITUserITSystemName(itusers)}
+            iterable={formatITUserITSystemNames(itusers)}
             extra_classes="basis-1/2"
             required={true}
           />
