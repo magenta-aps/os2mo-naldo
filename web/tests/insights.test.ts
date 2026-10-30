@@ -1,7 +1,6 @@
-import { startOfDay } from "$lib/utils/date"
-import { Temporal } from "temporal-polyfill"
 import { readable } from "svelte/store"
 import { describe, expect, it, vi } from "vitest"
+import { midnight } from "./fixtures"
 
 // Translation keys stand in for the translated text.
 vi.mock("svelte-i18n", () => ({ _: readable((key: string) => key) }))
@@ -19,7 +18,6 @@ const values = (operation: string, label: string, row: object) =>
   field(operation, label).getValues(row)
 
 const named = (name: string) => ({ uuid: "x", current: { name } })
-const day = (s: string) => startOfDay(Temporal.PlainDate.from(s))
 
 describe("fields that read a related object's name", () => {
   it.each([
@@ -49,7 +47,9 @@ describe("fields that read a related object's name", () => {
 
 describe("validity", () => {
   it("writes the last valid day, not MO's exclusive `to`", () => {
-    const row = { validity: { from: day("2020-01-01"), to: day("2024-11-01") } }
+    const row = {
+      validity: { from: midnight("2020-01-01"), to: midnight("2024-11-01") },
+    }
     expect(values("engagements", "validity", row)).toEqual([
       "2020-01-01T00:00:00+01:00",
       "2024-10-31T00:00:00+01:00",
@@ -57,7 +57,7 @@ describe("validity", () => {
   })
 
   it("leaves an open end empty", () => {
-    const row = { validity: { from: day("2020-01-01"), to: null } }
+    const row = { validity: { from: midnight("2020-01-01"), to: null } }
     expect(values("engagements", "validity", row)).toEqual([
       "2020-01-01T00:00:00+01:00",
       "",

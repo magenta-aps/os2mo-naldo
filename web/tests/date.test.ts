@@ -16,6 +16,7 @@ import {
 } from "$lib/utils/date"
 import { Temporal } from "temporal-polyfill"
 import { describe, expect, it } from "vitest"
+import { day } from "./fixtures"
 
 // formatDate and formatDateTime anchor display to Europe/Copenhagen regardless of the
 // incoming timezone offset, so the tests use inputs with mixed offsets to
@@ -86,8 +87,6 @@ describe("toJavaScriptDate and fromJavaScriptDate", () => {
     )
   })
 })
-
-const day = (s: string) => Temporal.PlainDate.from(s)
 
 describe("startOfDay", () => {
   it("is midnight in Copenhagen, with the offset of that day", () => {
@@ -201,7 +200,7 @@ describe("formatTimestamp", () => {
 
 describe("formatDay", () => {
   it("formats in Danish, with two-digit day and month", () => {
-    expect(formatDay(Temporal.PlainDate.from("2024-03-05"))).toBe("05.03.2024")
+    expect(formatDay(day("2024-03-05"))).toBe("05.03.2024")
   })
 
   it("is empty for no day", () => {

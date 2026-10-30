@@ -1,4 +1,3 @@
-import { jsonSerializer } from "$lib/http/dateTimes"
 import type { AddressInfo } from "$lib/stores/addressInfoStore"
 import type { EmployeeInfo } from "$lib/stores/employeeInfoStore"
 import type { EngagementInfo } from "$lib/stores/engagementInfoStore"
@@ -15,12 +14,8 @@ import {
   type UserflowStores,
 } from "$lib/userflow/mappers"
 import { moValidityFrom, moValidityTo } from "$lib/utils/date"
-import { Temporal } from "temporal-polyfill"
 import { beforeEach, describe, expect, it } from "vitest"
-
-const day = (s: string) => Temporal.PlainDate.from(s)
-// The payload as it is sent to MO, with timestamps written out.
-const sent = (value: unknown) => JSON.parse(jsonSerializer.stringify(value))
+import { day, sent } from "./fixtures"
 
 const employee = (patch: Partial<EmployeeInfo> = {}): EmployeeInfo => ({
   cprNumber: { name: "", cpr_no: "0101012345" },
