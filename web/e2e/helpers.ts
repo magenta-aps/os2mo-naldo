@@ -5,12 +5,12 @@ const GRAPHQL_VERSION = "v29"
 // Locally MO fronts Keycloak on /auth; in CI Keycloak is its own service.
 const KEYCLOAK = process.env.KEYCLOAK_URL ?? `${MO}/auth`
 
-// The published defaults of the local OS2mo dev stack — not real credentials.
+// The published defaults of the local OS2mo dev stack, not real credentials.
 const CLIENT_ID = "dipex"
 const CLIENT_SECRET = "603f1c82-d012-4d04-9382-dbe659c533fb"
 const USER = { name: "bruce", password: "bruce" }
 
-// Keycloak access tokens expire after minutes — shorter than the suite. A
+// Keycloak access tokens expire after minutes, shorter than the suite. A
 // token cached without an expiry fails the specs that run late.
 let token: { value: string; expires: number } | undefined
 const moToken = async (): Promise<string> => {
@@ -41,6 +41,48 @@ export const moGraphql = async (query: string, variables?: object) => {
   if (json.errors) throw new Error("GraphQL: " + json.errors[0].message)
   return json.data
 }
+
+// The day `offset` days from today in Copenhagen, as the date inputs take it.
+export const isoDay = (offset = 0) =>
+  new Date(Date.now() + offset * 86_400_000).toLocaleDateString("sv-SE", {
+    timeZone: "Europe/Copenhagen",
+  })
+
+export const createInMo = async (
+  type: string,
+  inputType: string,
+  input: object
+): Promise<string> =>
+  (
+    await moGraphql(
+      `mutation ($input: ${inputType}!) { ${type}_create(input: $input) { uuid } }`,
+      { input }
+    )
+  )[`${type}_create`].uuid
+
+export const deleteInMo = (type: string, uuid: string) =>
+  moGraphql(`mutation ($uuid: UUID!) { ${type}_delete(uuid: $uuid) { uuid } }`, {
+    uuid,
+  })
+
+export const facetUuid = async (userKey: string): Promise<string> =>
+  (
+    await moGraphql(
+      "query ($keys: [String!]) { facets(filter: { user_keys: $keys }) { objects { uuid } } }",
+      { keys: [userKey] }
+    )
+  ).facets.objects[0].uuid
+
+export const firstClassUuid = async (facetUserKey: string): Promise<string> =>
+  (
+    await moGraphql(
+      "query ($keys: [String!]) { classes(filter: { facet: { user_keys: $keys } }, limit: 1) { objects { uuid } } }",
+      { keys: [facetUserKey] }
+    )
+  ).classes.objects[0].uuid
+
+// A short random tag, so probe objects from parallel or crashed runs differ.
+export const probeTag = () => Math.random().toString(36).slice(2, 8)
 
 export type Fixture = {
   person: string
@@ -97,18 +139,20 @@ export type EditTargets = Partial<
   Record<string, { person?: EditTarget; unit?: EditTarget }>
 >
 
-const EDIT_SIDES: Record<string, { collection: string; sides: ("person" | "unit")[] }> =
-  {
-    address: { collection: "addresses", sides: ["person", "unit"] },
-    ituser: { collection: "itusers", sides: ["person", "unit"] },
-    manager: { collection: "managers", sides: ["person", "unit"] },
-    association: { collection: "associations", sides: ["person", "unit"] },
-    // A rolebinding's owner side is its ituser's.
-    rolebinding: { collection: "rolebindings", sides: ["person", "unit"] },
-    leave: { collection: "leaves", sides: ["person"] },
-    kle: { collection: "kles", sides: ["unit"] },
-    owner: { collection: "owners", sides: ["unit"] },
-  }
+export const EDIT_SIDES: Record<
+  string,
+  { collection: string; sides: ("person" | "unit")[] }
+> = {
+  address: { collection: "addresses", sides: ["person", "unit"] },
+  ituser: { collection: "itusers", sides: ["person", "unit"] },
+  manager: { collection: "managers", sides: ["person", "unit"] },
+  association: { collection: "associations", sides: ["person", "unit"] },
+  // A rolebinding's owner side is its ituser's.
+  rolebinding: { collection: "rolebindings", sides: ["person", "unit"] },
+  leave: { collection: "leaves", sides: ["person"] },
+  kle: { collection: "kles", sides: ["unit"] },
+  owner: { collection: "owners", sides: ["unit"] },
+}
 
 let editTargets: Promise<EditTargets> | undefined
 export const resolveEditTargets = (): Promise<EditTargets> =>
@@ -149,7 +193,7 @@ export const login = async (page: Page) => {
   // The app renders its shell (navbar included) BEFORE auth and only then
   // bounces to Keycloak, so seeing the shell proves nothing. A session is
   // proven either by the login form appearing (fill it) or by the app's
-  // first GraphQL response — queries only fire once a token is held.
+  // first GraphQL response: queries only fire once a token is held.
   const outcome = await Promise.race([
     username.waitFor({ timeout: 30_000 }).then(() => "form"),
     firstQuery().then(() => "session"),
@@ -183,7 +227,7 @@ export const blockMutations = async (
         })
       }
     } catch {
-      /* not JSON — let it through */
+      /* not JSON, let it through */
     }
     return route.continue()
   })
@@ -247,7 +291,7 @@ export const pickFirstOption = async (page: Page, field: string) => {
   await page.waitForTimeout(300)
 }
 
-// SelectMultiple has no #select wrapper — target its inner input by the id
+// SelectMultiple has no #select wrapper; target its inner input by the id
 // the form gave the component. Matched by suffix: the wizard prefixes ids
 // with "{entityKey}-{index}-", the routes don't.
 export const pickMultiFirstOption = async (page: Page, idSuffix: string) => {
@@ -258,7 +302,7 @@ export const pickMultiFirstOption = async (page: Page, idSuffix: string) => {
   await page.waitForTimeout(300)
 }
 
-// Types into the select to filter, then picks the first match — for options
+// Types into the select to filter, then picks the first match, for options
 // that must be a specific one (pickFirstOption takes whatever comes first).
 export const pickOptionByText = async (page: Page, field: string, text: string) => {
   await selectFor(page, field).click({ timeout: 8000 })

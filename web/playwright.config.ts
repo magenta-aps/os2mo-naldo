@@ -2,7 +2,7 @@ import type { PlaywrightTestConfig } from "@playwright/test"
 
 // Runs the suite in ./e2e against a frontend and a MO. The defaults target
 // the local dev setup: frontend on :5173 (docker compose up -d), MO +
-// Keycloak on :5000. CI overrides the URLs — see the E2E job in
+// Keycloak on :5000. CI overrides the URLs; see the E2E job in
 // .gitlab-ci.yml and e2e/README.md.
 const config: PlaywrightTestConfig = {
   testDir: "./e2e",

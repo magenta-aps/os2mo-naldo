@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test"
 import fs from "fs"
 import {
   blockMutations,
+  isoDay,
   login,
   pickFirstOption,
   pickMultiFirstOption,
@@ -13,7 +14,7 @@ import {
 
 // Captures what the create and edit forms would submit, without letting
 // the mutation reach MO. Run with PAYLOAD_LABEL=old on the baseline ref, then
-// PAYLOAD_LABEL=new on the branch — the "new" run diffs against the old file.
+// PAYLOAD_LABEL=new on the branch; the "new" run diffs against the old file.
 const LABEL = process.env.PAYLOAD_LABEL
 const OUT_FILE = `payloads-${LABEL}.json`
 
@@ -34,7 +35,7 @@ const submit = async (page: Page, scenario: string) => {
   await page.locator("form button[type=submit]").click()
   await page.waitForTimeout(1500)
   // These scenarios assert nothing about the form itself, so a submit the form
-  // blocked on validation would pass while recording nothing — and the diff
+  // blocked on validation would pass while recording nothing, and the diff
   // would then report a missing scenario as a payload change.
   const captured = fs.existsSync(OUT_FILE)
     ? JSON.parse(fs.readFileSync(OUT_FILE, "utf8"))[scenario]
@@ -68,7 +69,7 @@ test("org create", async ({ page }) => {
 
 // A fixed distance ahead, so the end date is after any start date the forms
 // default to.
-const END_DATE = new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0]
+const END_DATE = isoDay(30)
 const fillEndDate = (page: Page) =>
   page.fill('form input[type=date][id$="to"]', END_DATE)
 
