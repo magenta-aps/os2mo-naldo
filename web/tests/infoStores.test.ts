@@ -1,155 +1,76 @@
-import { validateAddress, type AddressInfo } from "$lib/stores/addressInfoStore"
-import { validateEmployee, type EmployeeInfo } from "$lib/stores/employeeInfoStore"
-import {
-  validateEngagement,
-  type EngagementInfo,
-} from "$lib/stores/engagementInfoStore"
-import { validateItuser, type ItuserInfo } from "$lib/stores/ituserInfoStore"
-import { validateManager, type ManagerInfo } from "$lib/stores/managerInfoStore"
+import { validateAddress } from "$lib/stores/addressInfoStore"
+import { validateEmployee } from "$lib/stores/employeeInfoStore"
+import { validateEngagement } from "$lib/stores/engagementInfoStore"
+import { validateItuser } from "$lib/stores/ituserInfoStore"
+import { validateManager } from "$lib/stores/managerInfoStore"
 import { describe, expect, it } from "vitest"
-
-// The validate* functions in the InfoStore modules are pure: they take a
-// plain info object and return a bool. Each has its own "required fields"
-// contract. Pin the contract per store.
-
-describe("validateAddress", () => {
-  const valid = {
-    fromDate: "2020-01-01",
-    addressType: { uuid: "t1" },
-    addressValue: { value: "Main St" },
-  } as unknown as AddressInfo
-
-  it("accepts a complete address", () => {
-    expect(validateAddress(valid)).toBe(true)
-  })
-
-  it("rejects without fromDate", () => {
-    expect(validateAddress({ ...valid, fromDate: null })).toBe(false)
-  })
-
-  it("rejects without addressType.uuid", () => {
-    expect(
-      validateAddress({ ...valid, addressType: { uuid: "" } } as AddressInfo)
-    ).toBe(false)
-  })
-
-  it("rejects without addressValue.value", () => {
-    expect(
-      validateAddress({
-        ...valid,
-        addressValue: { value: "" },
-      } as AddressInfo)
-    ).toBe(false)
-  })
-})
+import { address, employee, engagement, ituser, manager } from "./fixtures"
 
 describe("validateEmployee", () => {
-  const valid = {
-    firstName: "Jacob",
-    lastName: "Andersen",
-    cprNumber: { cpr_no: "0101012345" },
-  } as unknown as EmployeeInfo
-
-  it("accepts a complete employee", () => {
-    expect(validateEmployee(valid)).toBe(true)
-  })
-
-  it("rejects without firstName", () => {
-    expect(validateEmployee({ ...valid, firstName: "" })).toBe(false)
-  })
-
-  it("rejects without lastName", () => {
-    expect(validateEmployee({ ...valid, lastName: "" })).toBe(false)
-  })
-
-  it("rejects when CPR is missing", () => {
-    expect(validateEmployee({ ...valid, cprNumber: undefined } as any)).toBe(false)
-  })
-
-  it("rejects when CPR is not exactly 10 digits", () => {
-    expect(validateEmployee({ ...valid, cprNumber: { cpr_no: "12345" } } as any)).toBe(
-      false
-    )
-    expect(
-      validateEmployee({ ...valid, cprNumber: { cpr_no: "123456789a" } } as any)
-    ).toBe(false)
-  })
-
-  it("accepts CPR written with a dash separator", () => {
-    expect(
-      validateEmployee({ ...valid, cprNumber: { cpr_no: "010101-2345" } } as any)
-    ).toBe(true)
+  it.each([
+    ["complete", {}, true],
+    ["CPR with a dash", { cprNumber: { name: "", cpr_no: "010101-2345" } }, true],
+    ["no first name", { firstName: "" }, false],
+    ["no last name", { lastName: "" }, false],
+    ["short CPR", { cprNumber: { name: "", cpr_no: "12345" } }, false],
+    ["CPR with a letter", { cprNumber: { name: "", cpr_no: "123456789a" } }, false],
+  ])("%s: %s", (_, patch, expected) => {
+    expect(validateEmployee(employee(patch))).toBe(expected)
   })
 })
 
 describe("validateEngagement", () => {
-  const valid = {
-    fromDate: "2020-01-01",
-    orgUnit: { uuid: "u1" },
-    jobFunction: { uuid: "j1" },
-    engagementType: { uuid: "e1" },
-  } as unknown as EngagementInfo
-
-  it("accepts a complete engagement", () => {
-    expect(validateEngagement(valid)).toBe(true)
-  })
-
   it.each([
-    ["fromDate", { fromDate: "" }],
-    ["orgUnit.uuid", { orgUnit: { uuid: "" } }],
-    ["jobFunction.uuid", { jobFunction: { uuid: "" } }],
-    ["engagementType.uuid", { engagementType: { uuid: "" } }],
-  ])("rejects when %s is missing", (_label, patch) => {
-    expect(validateEngagement({ ...valid, ...patch } as EngagementInfo)).toBe(false)
+    ["complete", {}, true],
+    ["no start date", { fromDate: null }, false],
+    ["no unit", { orgUnit: undefined }, false],
+    ["no job function", { jobFunction: undefined }, false],
+    ["no engagement type", { engagementType: undefined }, false],
+  ])("%s: %s", (_, patch, expected) => {
+    expect(validateEngagement(engagement(patch))).toBe(expected)
   })
 })
 
 describe("validateItuser", () => {
-  const valid = {
-    fromDate: "2020-01-01",
-    itSystem: { uuid: "s1" },
-    user_key: "alice",
-  } as unknown as ItuserInfo
-
-  it("accepts a complete ituser", () => {
-    expect(validateItuser(valid)).toBe(true)
-  })
-
-  it("rejects without fromDate", () => {
-    expect(validateItuser({ ...valid, fromDate: null })).toBe(false)
-  })
-
-  it("rejects without itSystem.uuid", () => {
-    expect(validateItuser({ ...valid, itSystem: { uuid: "" } } as ItuserInfo)).toBe(
-      false
-    )
-  })
-
-  it("rejects without user_key", () => {
-    expect(validateItuser({ ...valid, user_key: "" })).toBe(false)
+  it.each([
+    ["complete", {}, true],
+    ["no start date", { fromDate: null }, false],
+    ["no IT system", { itSystem: undefined }, false],
+    ["no account name", { user_key: "" }, false],
+  ])("%s: %s", (_, patch, expected) => {
+    expect(validateItuser(ituser(patch))).toBe(expected)
   })
 })
 
 describe("validateManager", () => {
-  const valid = {
-    fromDate: "2020-01-01",
-    orgUnit: { uuid: "u1" },
-    managerType: { uuid: "t1" },
-    managerLevel: { uuid: "l1" },
-    responsibilities: [{ uuid: "r1" }],
-  } as unknown as ManagerInfo
+  it.each([
+    ["complete", {}, true],
+    ["no start date", { fromDate: null }, false],
+    ["no unit", { orgUnit: undefined }, false],
+    ["no manager type", { managerType: undefined }, false],
+    ["no manager level", { managerLevel: undefined }, false],
+    ["no responsibilities", { responsibilities: [] }, false],
+  ])("%s: %s", (_, patch, expected) => {
+    expect(validateManager(manager(patch))).toBe(expected)
+  })
+})
 
-  it("accepts a complete manager", () => {
-    expect(validateManager(valid)).toBe(true)
+describe("validateAddress", () => {
+  const typed = (scope: string, value: string) => ({
+    addressType: { uuid: "at", name: scope, scope },
+    addressValue: { name: "", value },
   })
 
   it.each([
-    ["fromDate", { fromDate: "" }],
-    ["orgUnit.uuid", { orgUnit: { uuid: "" } }],
-    ["managerType.uuid", { managerType: { uuid: "" } }],
-    ["managerLevel.uuid", { managerLevel: { uuid: "" } }],
-    ["responsibilities is empty", { responsibilities: [] }],
-  ])("rejects when %s", (_label, patch) => {
-    expect(validateManager({ ...valid, ...patch } as ManagerInfo)).toBe(false)
+    ["an email", typed("EMAIL", "a@b.dk"), true],
+    ["a malformed email", typed("EMAIL", "a@"), false],
+    ["a phone number", typed("PHONE", "+4512345678"), true],
+    ["a phone number with letters", typed("PHONE", "12 34 ab"), false],
+    ["any text for other types", typed("TEXT", "Main St 1"), true],
+    ["no start date", { fromDate: null }, false],
+    ["no address type", { addressType: undefined }, false],
+    ["no value", typed("TEXT", ""), false],
+  ])("%s: %s", (_, patch, expected) => {
+    expect(validateAddress(address(patch))).toBe(expected)
   })
 })

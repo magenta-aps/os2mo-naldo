@@ -1,8 +1,3 @@
-import type { AddressInfo } from "$lib/stores/addressInfoStore"
-import type { EmployeeInfo } from "$lib/stores/employeeInfoStore"
-import type { EngagementInfo } from "$lib/stores/engagementInfoStore"
-import type { ItuserInfo } from "$lib/stores/ituserInfoStore"
-import type { ManagerInfo } from "$lib/stores/managerInfoStore"
 import {
   buildUserflowPayload,
   isEmptyAddress,
@@ -13,69 +8,9 @@ import {
   resetUserflowUuids,
   type UserflowStores,
 } from "$lib/userflow/mappers"
-import { moValidityFrom, moValidityTo } from "$lib/utils/date"
+import { moValidityTo } from "$lib/utils/date"
 import { beforeEach, describe, expect, it } from "vitest"
-import { day, sent } from "./fixtures"
-
-const employee = (patch: Partial<EmployeeInfo> = {}): EmployeeInfo => ({
-  cprNumber: { name: "", cpr_no: "0101012345" },
-  firstName: "Jacob",
-  lastName: "Andersen",
-  nicknameFirstname: "",
-  nicknameLastname: "",
-  validated: true,
-  ...patch,
-})
-
-const engagement = (patch: Partial<EngagementInfo> = {}): EngagementInfo => ({
-  fromDate: moValidityFrom(day("2020-01-01")),
-  toDate: undefined,
-  orgUnit: { uuid: "u1", name: "Unit" },
-  user_key: "E1",
-  jobFunction: { uuid: "j1", name: "Job" },
-  engagementType: { uuid: "t1", name: "Type" },
-  primary: undefined,
-  extension1: "",
-  extension4: "",
-  validated: true,
-  ...patch,
-})
-
-const ituser = (patch: Partial<ItuserInfo> = {}): ItuserInfo => ({
-  fromDate: moValidityFrom(day("2020-01-01")),
-  toDate: undefined,
-  itSystem: { uuid: "s1", name: "AD" },
-  user_key: "alice",
-  externalId: "",
-  notes: "",
-  primary: undefined,
-  rolebindings: [{ role: { uuid: "r1", name: "Role" } }],
-  validated: true,
-  ...patch,
-})
-
-const manager = (patch: Partial<ManagerInfo> = {}): ManagerInfo => ({
-  fromDate: moValidityFrom(day("2020-01-01")),
-  toDate: undefined,
-  orgUnit: { uuid: "u1", name: "Unit" },
-  managerType: { uuid: "mt1", name: "Type" },
-  managerLevel: { uuid: "ml1", name: "Level" },
-  responsibilities: [{ uuid: "r1", name: "A" }],
-  primary: undefined,
-  validated: true,
-  ...patch,
-})
-
-const address = (patch: Partial<AddressInfo> = {}): AddressInfo => ({
-  fromDate: moValidityFrom(day("2020-01-01")),
-  toDate: undefined,
-  visibility: { uuid: "v1", name: "Public" },
-  addressType: { uuid: "at1", name: "Email", scope: "EMAIL" },
-  addressValue: { name: "", value: "a@b.dk" },
-  user_key: "desc",
-  validated: true,
-  ...patch,
-})
+import { address, day, employee, engagement, ituser, manager, sent } from "./fixtures"
 
 const stores = (patch: Partial<UserflowStores> = {}): UserflowStores => ({
   employee: employee(),
@@ -250,8 +185,8 @@ describe("buildUserflowPayload", () => {
     expect(payload.engagementInput).toHaveLength(0)
   })
 
-  // Incomplete = not validated, but not clean either — the factories fill every
-  // field. Each entity pushes separately, so one dropped push goes unnoticed.
+  // Incomplete means touched but not validated; the factories fill every field.
+  // Each entity is collected separately, so check every one.
   it("reports a touched but unvalidated item of every entity as incomplete", () => {
     const { incomplete } = buildUserflowPayload(
       stores({
