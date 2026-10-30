@@ -14,6 +14,7 @@ import {
   resolveFixture,
   resolvePrimaryClass,
   searchAndPick,
+  submitForm,
   trackPageErrors,
   type ClassRef,
   type Fixture,
@@ -117,13 +118,6 @@ const fillRequiredFields = async (page: Page) => {
   await dismiss(page)
 }
 
-// Nothing tells a form that did not submit from one that has yet to, so this
-// waits a fixed time; the suite's other submit checks do the same.
-const submit = async (page: Page) => {
-  await page.locator("form button[type=submit]").click()
-  await page.waitForTimeout(1500)
-}
-
 test("org create sends the primary class in a unit without one", async ({ page }) => {
   const { errors, sent } = await openForm(
     page,
@@ -135,7 +129,7 @@ test("org create sends the primary class in a unit without one", async ({ page }
   await settled
   await expect(page.getByText(TAKEN_MESSAGE)).toBeHidden()
 
-  await submit(page)
+  await submitForm(page)
   expect(sent, "the form must submit").toHaveLength(1)
   expect(sent[0].input.primary).toBe(primary.uuid)
   expect(errors).toEqual([])
@@ -156,7 +150,7 @@ test("employee create lists the unit's primary manager and blocks", async ({
   await expect(message).toBeVisible()
   await expect(message).toContainText(holder.name)
 
-  await submit(page)
+  await submitForm(page)
   expect(sent, "a duplicate primary manager must not be submitted").toHaveLength(0)
   expect(errors).toEqual([])
 })
@@ -174,7 +168,7 @@ test("a failed lookup blocks the submit", async ({ page }) => {
   await pickExactOption(page, "primary", primary.name)
   await expect(page.getByText(LOAD_ERROR)).toBeVisible()
 
-  await submit(page)
+  await submitForm(page)
   expect(sent, "an unchecked primary class must not be submitted").toHaveLength(0)
   expect(errors).toEqual([])
 })
@@ -202,7 +196,7 @@ for (const side of ["organisation", "employee"] as const) {
     // Select drops its hidden input when cleared; the action then sends null.
     await expect(primaryInput).toHaveCount(0)
 
-    await submit(page)
+    await submitForm(page)
     expect(sent, "the form must submit").toHaveLength(1)
     expect(sent[0].input.primary).toBeNull()
     expect(errors).toEqual([])
@@ -220,7 +214,7 @@ test("a person's other manager role in the unit conflicts", async ({ page }) => 
   await expect(message).toBeVisible()
   await expect(message).toContainText(holder.name)
 
-  await submit(page)
+  await submitForm(page)
   expect(sent, "a second primary role must not be submitted").toHaveLength(0)
   expect(errors).toEqual([])
 })

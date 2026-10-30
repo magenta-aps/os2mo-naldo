@@ -4,6 +4,7 @@ import {
   blockMutations,
   dismiss,
   EDIT_SIDES,
+  graphqlIdle,
   isoDay,
   login,
   resolveEditTargets,
@@ -75,7 +76,7 @@ const setStartDate = async (page: Page, value: string) => {
   if ((await from.count()) === 0) return
   await dismiss(page)
   await from.fill(value)
-  await page.waitForTimeout(600) // let refetches fire
+  await graphqlIdle(page)
 }
 
 const pickAllSelects = async (page: Page) => {
@@ -99,7 +100,8 @@ const pickAllSelects = async (page: Page) => {
     } else {
       await page.keyboard.press("Escape")
     }
-    await page.waitForTimeout(300)
+    // A form stuck refetching in a reactivity loop never goes quiet.
+    await graphqlIdle(page)
   }
 }
 

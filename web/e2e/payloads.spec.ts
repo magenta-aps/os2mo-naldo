@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test"
 import fs from "fs"
 import {
   blockMutations,
+  graphqlIdle,
   isoDay,
   login,
   pickFirstOption,
@@ -10,6 +11,7 @@ import {
   pickOptionByText,
   resolveFixture,
   searchAndPick,
+  submitForm,
 } from "./helpers"
 
 // Captures what the create and edit forms would submit, without letting
@@ -20,27 +22,24 @@ const OUT_FILE = `payloads-${LABEL}.json`
 
 test.skip(!LABEL, "payload capture only runs with PAYLOAD_LABEL set")
 
+const readCaptured = (): Record<string, unknown> =>
+  fs.existsSync(OUT_FILE) ? JSON.parse(fs.readFileSync(OUT_FILE, "utf8")) : {}
+
 // Each capture merges into the file immediately: a failed test restarts the
 // worker and wipes module state, so an in-memory collect-then-write loses
 // earlier scenarios.
 const capture = (scenario: string) => (variables: unknown) => {
-  const captured = fs.existsSync(OUT_FILE)
-    ? JSON.parse(fs.readFileSync(OUT_FILE, "utf8"))
-    : {}
+  const captured = readCaptured()
   captured[scenario] = variables
   fs.writeFileSync(OUT_FILE, JSON.stringify(captured, null, 2))
 }
 
 const submit = async (page: Page, scenario: string) => {
-  await page.locator("form button[type=submit]").click()
-  await page.waitForTimeout(1500)
+  await submitForm(page)
   // These scenarios assert nothing about the form itself, so a submit the form
   // blocked on validation would pass while recording nothing, and the diff
   // would then report a missing scenario as a payload change.
-  const captured = fs.existsSync(OUT_FILE)
-    ? JSON.parse(fs.readFileSync(OUT_FILE, "utf8"))[scenario]
-    : undefined
-  expect(captured, `${scenario} submitted no mutation`).toBeTruthy()
+  expect(readCaptured()[scenario], `${scenario} submitted no mutation`).toBeTruthy()
 }
 
 test("employee create", async ({ page }) => {
@@ -93,7 +92,7 @@ test("employee terminate engagement", async ({ page }) => {
     `/employee/${fixture.person}/terminate/engagement/${fixture.engagement}`
   )
   await login(page)
-  await page.waitForTimeout(1000)
+  await graphqlIdle(page)
   await fillEndDate(page)
   await submit(page, "employee-terminate")
 })
@@ -105,7 +104,7 @@ test("employee edit", async ({ page }) => {
     `/employee/${fixture.person}/edit/engagement/${fixture.engagement}?from=${fixture.from}`
   )
   await login(page)
-  await page.waitForTimeout(1000)
+  await graphqlIdle(page)
   await page.fill("form input[name=user-key]", "E2E-EDITED")
   await submit(page, "employee-edit")
 })
@@ -117,7 +116,7 @@ test("org edit", async ({ page }) => {
     `/organisation/${fixture.unit}/edit/engagement/${fixture.engagement}?from=${fixture.from}`
   )
   await login(page)
-  await page.waitForTimeout(1000)
+  await graphqlIdle(page)
   await page.fill("form input[name=user-key]", "E2E-EDITED")
   await submit(page, "org-edit")
 })
@@ -171,9 +170,7 @@ test.afterAll(() => {
   if (!LABEL) return
   // A "new" run diffs itself against an existing payloads-old.json.
   if (LABEL !== "new" || !fs.existsSync("payloads-old.json")) return
-  const captured = fs.existsSync(OUT_FILE)
-    ? JSON.parse(fs.readFileSync(OUT_FILE, "utf8"))
-    : {}
+  const captured = readCaptured()
   const old = JSON.parse(fs.readFileSync("payloads-old.json", "utf8"))
   let differs = false
   for (const key of new Set([...Object.keys(old), ...Object.keys(captured)])) {

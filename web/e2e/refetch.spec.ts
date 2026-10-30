@@ -4,6 +4,7 @@ import {
   createInMo,
   deleteInMo,
   facetUuid,
+  graphqlIdle,
   isoDay,
   login,
   probeTag,
@@ -48,14 +49,17 @@ test("date-driven option refetching", async ({ page }) => {
       a.click()
       a.remove()
     }, path)
-    await page.waitForTimeout(1200)
+    await page.waitForURL((url) => url.pathname.endsWith(path))
+    await graphqlIdle(page)
   }
 
   // Set the navbar date picker, then re-enter the form so it seeds its start
   // date from the new global date.
   const setGlobalDate = async (value: string) => {
     await page.locator(".navbar input[type=date]").fill(value)
-    await page.waitForTimeout(900) // the navbar debounces 500ms into $date
+    // The navbar writes $date on a 500ms timer nothing outside the page can
+    // see. Running short fails the form date check below, never passes it.
+    await page.waitForTimeout(900)
     await spaNav(`/employee/${fixture.person}`)
     await spaNav(formPath)
     await page.waitForFunction(
@@ -65,7 +69,7 @@ test("date-driven option refetching", async ({ page }) => {
       value,
       { timeout: 15000 }
     )
-    await page.waitForTimeout(1500) // let the options refetch land
+    await graphqlIdle(page)
   }
 
   const hasProbe = async () =>
@@ -88,7 +92,7 @@ test("date-driven option refetching", async ({ page }) => {
   // jsdom cannot reproduce, so only this test covers it. No selection = no
   // hidden input.
   await page.locator("form input[type=date]").first().fill(TODAY)
-  await page.waitForTimeout(2000)
+  await graphqlIdle(page)
   await expect(page.locator("form input[name=job-function]")).toHaveCount(0)
 
   await setGlobalDate(TODAY)
