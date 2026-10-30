@@ -62,8 +62,7 @@ one without a primary manager, then asserts that:
 - the edit forms keep a manager role's own primary and can unset it, while
   the person's other role in the unit still conflicts.
 
-The roles belong to their own person because the smoke suite edits the fixture
-person's first manager role in parallel. The probe data is deleted afterwards;
+The probe data is deleted afterwards;
 if a crashed run leaves it behind, the units' user_keys are prefixed
 `primary-probe-` and the person is named `Primary Probe Holder`.
 

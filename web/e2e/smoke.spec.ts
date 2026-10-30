@@ -3,6 +3,8 @@ import { expect, test } from "@playwright/test"
 import {
   blockMutations,
   dismiss,
+  EDIT_SIDES,
+  isoDay,
   login,
   resolveEditTargets,
   resolveFixture,
@@ -11,29 +13,15 @@ import {
   type Fixture,
 } from "./helpers"
 
-// Touches every form and fails on crashes, freezes, and dead controls.
-// Cycle: set the date, pick all selects, change the date, pick again. A
-// frozen page hangs the next interaction until the test timeout kills the
-// worker — that IS the freeze detection.
-
-// Edit routes for every detail type, on each owner side the type supports.
-const EDIT_FORMS: Record<string, ("person" | "unit")[]> = {
-  address: ["person", "unit"],
-  ituser: ["person", "unit"],
-  manager: ["person", "unit"],
-  association: ["person", "unit"],
-  rolebinding: ["person", "unit"],
-  leave: ["person"],
-  kle: ["unit"],
-  owner: ["unit"],
-}
+// A frozen page hangs the next interaction until the test timeout kills the
+// worker; that is the freeze detection.
 
 const sidedEditRoutes = () => {
   const routes: Record<string, (f: Fixture, t: EditTargets) => string | null> = {}
-  for (const [type, sides] of Object.entries(EDIT_FORMS)) {
+  for (const [type, { sides }] of Object.entries(EDIT_SIDES)) {
     for (const side of sides) {
       const base = side === "person" ? "employee" : "organisation"
-      routes[`${base === "employee" ? "employee" : "org"} edit ${type}`] = (
+      routes[`${side === "person" ? "employee" : "org"} edit ${type}`] = (
         fixture,
         targets
       ) => {
@@ -79,9 +67,8 @@ const ROUTES: Record<string, (f: Fixture, t: EditTargets) => string | null> = {
   "admin create itsystem": () => `/admin/itsystem/create`,
 }
 
-const iso = (d: Date) => d.toISOString().split("T")[0]
-const DATE1 = iso(new Date())
-const DATE2 = iso(new Date(Date.now() + 40 * 86400000))
+const DATE1 = isoDay()
+const DATE2 = isoDay(40)
 
 const setStartDate = async (page: Page, value: string) => {
   const from = page.locator("form input[type=date]").first()

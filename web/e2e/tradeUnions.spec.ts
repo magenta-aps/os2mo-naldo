@@ -1,38 +1,33 @@
 import { expect, test, type Page } from "@playwright/test"
-import { blockMutations, login, moGraphql, resolveFixture, selectFor } from "./helpers"
-
-// The association forms list the trade unions valid on the form's start date,
-// grouped by confederation. Seeds a probe confederation with one trade union
-// valid today and one valid from FUTURE via the API; the forms themselves are
-// mutation-blocked.
+import {
+  blockMutations,
+  createInMo,
+  deleteInMo,
+  facetUuid,
+  firstClassUuid,
+  isoDay,
+  login,
+  pickExactOption,
+  probeTag,
+  resolveFixture,
+  selectOptions,
+} from "./helpers"
 
 // 60 days out: past every fixture class, inside every unit's validity.
-const FUTURE = new Date(Date.now() + 60 * 86400000).toISOString().split("T")[0]
-const TODAY = new Date().toISOString().split("T")[0]
-const TAG = Math.random().toString(36).slice(2, 8)
+const FUTURE = isoDay(60)
+const TODAY = isoDay()
+const TAG = probeTag()
 const NOW_NAME = `Probe Now ${TAG}`
 const FUTURE_NAME = `Probe Future ${TAG}`
 
+// Created parents first, so deleting in reverse removes children first.
 const classes: string[] = []
 let nowUuid: string
 let futureUuid: string
-let associationUuid: string
-
-const facetUuid = async (userKey: string): Promise<string> =>
-  (
-    await moGraphql(
-      "query ($keys: [String!]) { facets(filter: { user_keys: $keys }) { objects { uuid } } }",
-      { keys: [userKey] }
-    )
-  ).facets.objects[0].uuid
+let associationUuid: string | undefined
 
 const createClass = async (input: object): Promise<string> => {
-  const uuid = (
-    await moGraphql(
-      "mutation ($input: ClassCreateInput!) { class_create(input: $input) { uuid } }",
-      { input }
-    )
-  ).class_create.uuid
+  const uuid = await createInMo("class", "ClassCreateInput", input)
   classes.push(uuid)
   return uuid
 }
@@ -61,52 +56,21 @@ test.beforeAll(async () => {
   })
 
   const fixture = await resolveFixture()
-  const associationType = (
-    await moGraphql(
-      '{ classes(filter: { facet: { user_keys: "association_type" } }, limit: 1) { objects { uuid } } }'
-    )
-  ).classes.objects[0].uuid
-  associationUuid = (
-    await moGraphql(
-      "mutation ($input: AssociationCreateInput!) { association_create(input: $input) { uuid } }",
-      {
-        input: {
-          person: fixture.person,
-          org_unit: fixture.unit,
-          association_type: associationType,
-          trade_union: nowUuid,
-          validity: { from: fixture.from },
-        },
-      }
-    )
-  ).association_create.uuid
+  associationUuid = await createInMo("association", "AssociationCreateInput", {
+    person: fixture.person,
+    org_unit: fixture.unit,
+    association_type: await firstClassUuid("association_type"),
+    trade_union: nowUuid,
+    validity: { from: fixture.from },
+  })
 })
 
 test.afterAll(async () => {
-  await moGraphql(
-    "mutation ($uuid: UUID!) { association_delete(uuid: $uuid) { uuid } }",
-    {
-      uuid: associationUuid,
-    }
-  )
-  // Children before their confederation.
-  for (const uuid of classes.reverse())
-    await moGraphql("mutation ($uuid: UUID!) { class_delete(uuid: $uuid) { uuid } }", {
-      uuid,
-    })
+  if (associationUuid) await deleteInMo("association", associationUuid)
+  for (const uuid of classes.reverse()) await deleteInMo("class", uuid)
 })
 
-// The trade union select is the form's last.
-const tradeUnionSelect = (page: Page) => selectFor(page, "trade-union")
-
-const tradeUnionOptions = async (page: Page): Promise<string[]> => {
-  await tradeUnionSelect(page).click({ timeout: 8000 })
-  await page.locator(".list-item").first().waitFor({ timeout: 8000 })
-  const texts = await page.locator(".list-item").allInnerTexts()
-  await page.keyboard.press("Escape")
-  await page.waitForTimeout(200)
-  return texts.map((text) => text.trim())
-}
+const tradeUnionOptions = (page: Page) => selectOptions(page, "trade-union")
 
 const setStartDate = async (page: Page, value: string) => {
   await page.locator("form input[type=date]").first().fill(value)
@@ -134,12 +98,7 @@ for (const side of ["employee", "organisation"] as const) {
     await setStartDate(page, FUTURE)
     expect(await tradeUnionOptions(page)).toContain(FUTURE_NAME)
 
-    await tradeUnionSelect(page).click()
-    await page
-      .locator(".list-item")
-      .filter({ has: page.getByText(FUTURE_NAME, { exact: true }) })
-      .click()
-    await page.waitForTimeout(400)
+    await pickExactOption(page, "trade-union", FUTURE_NAME)
     await expect(posted(page)).toHaveValue(futureUuid)
 
     // Moving back drops the future trade union: neither posted nor shown.

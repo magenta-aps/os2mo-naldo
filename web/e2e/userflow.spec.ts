@@ -14,12 +14,6 @@ import {
   trackPageErrors,
 } from "./helpers"
 
-// Walks the onboarding wizard end to end — employee, engagement, ituser
-// (incl. a rolebinding), manager, address — and submits at the summary. The
-// wizard submits ONE combined UserFlowCreate mutation with client-generated
-// uuids; capturing it verifies the whole store→mapper→mutation wiring,
-// including the cross-references between the created objects.
-
 // The ituser step's role select only lists roles linked to the chosen IT
 // system, so the test must pick a system that has one (the seed links one).
 const resolveRoleSystem = async (): Promise<string | undefined> => {
@@ -32,7 +26,7 @@ const resolveRoleSystem = async (): Promise<string | undefined> => {
 
 test("onboarding wizard submits a coherent batch", async ({ page }) => {
   // Nothing else visits /userflow, so this test can pay the dev server's
-  // full cold compile of the wizard — more than the default 120s.
+  // full cold compile of the wizard, more than the default 120s.
   test.slow()
   const fixture = await resolveFixture()
   const roleSystem = await resolveRoleSystem()
@@ -61,7 +55,7 @@ test("onboarding wizard submits a coherent batch", async ({ page }) => {
   await page.fill("form input[name=last-name]", "Testesen")
   await next()
 
-  // Step 2: engagement — pick the fixture unit and the first class options
+  // Step 2: engagement, picking the fixture unit and the first class options
   await searchAndPick(page, fixture.unitName)
   await pickFirstOption(page, "job-function")
   await pickFirstOption(page, "engagement-type")
@@ -73,7 +67,7 @@ test("onboarding wizard submits a coherent batch", async ({ page }) => {
   await pickFirstOption(page, "engagement-type")
   await next()
 
-  // Step 3: ituser — the system with a linked role, an account name, a role.
+  // Step 3: ituser with the system with a linked role, an account name, a role.
   // Skattestyrelsen deployments pre-seed and lock the account name. Inputs
   // are matched by name suffix: the rewritten wizard prefixes ids per tab
   // ("ituser-0-account-name"), the old one doesn't.
@@ -95,7 +89,7 @@ test("onboarding wizard submits a coherent batch", async ({ page }) => {
   await pickExactOption(page, "primary", primary.name)
   await next()
 
-  // Step 5: address — the seeded EMAIL-scope type, so the value validates
+  // Step 5: address with the seeded EMAIL-scope type, so the value validates
   await pickFirstOption(page, "visibility")
   await pickOptionByText(page, "address-type", "Email")
   await page.fill('form input[name$="value"]', "smoke@example.org")
@@ -150,7 +144,7 @@ test("onboarding wizard submits a coherent batch", async ({ page }) => {
 
   // A Stepper jump runs no step's own validation, so a tab approved earlier
   // keeps its stamp until the summary re-stamps on entry. Clearing the first
-  // engagement's start date must drop that engagement alone — the second tab
+  // engagement's start date must drop that engagement alone; the second tab
   // is untouched and stays in the batch.
   const stepTab = (index: number) =>
     // The Stepper's tabs, not the per-entity tabs inside the form: both use

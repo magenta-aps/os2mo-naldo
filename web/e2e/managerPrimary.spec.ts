@@ -2,12 +2,15 @@ import type { Page } from "@playwright/test"
 import { expect, test } from "@playwright/test"
 import {
   blockMutations,
+  createInMo,
+  deleteInMo,
   dismiss,
+  firstClassUuid,
   login,
-  moGraphql,
   pickExactOption,
   pickFirstOption,
   pickMultiFirstOption,
+  probeTag,
   resolveFixture,
   resolvePrimaryClass,
   searchAndPick,
@@ -16,15 +19,8 @@ import {
   type Fixture,
 } from "./helpers"
 
-// A unit has at most one primary manager role, which MO does not enforce, so
-// the manager forms do. A probe person and two probe units under the fixture
-// unit are seeded via the API: "taken", where the probe person holds a primary
-// manager role and a second one without a primary class, and "free", without a
-// primary manager. The roles belong to a probe person, not the fixture person, because
-// the smoke suite edits the fixture person's first manager role in parallel.
-// All are deleted afterwards; if a crashed run leaves them behind, the units'
-// user_keys are prefixed `primary-probe-` and the person is named
-// `Primary Probe Holder`.
+// The roles belong to a probe person, not the fixture person, because the
+// smoke suite edits the fixture person's first manager role in parallel.
 
 const TAKEN_MESSAGE = /allerede en primær leder|already has a primary manager/
 const LOAD_ERROR = /Noget gik galt|Something went wrong/
@@ -35,40 +31,24 @@ let holder: { uuid: string; name: string }
 let taken: { unit: string; name: string; primaryRole: string; otherRole: string }
 let free: { unit: string }
 
-const firstClass = async (facet: string): Promise<string> =>
-  (
-    await moGraphql(
-      `{ classes(filter: { facet: { user_keys: "${facet}" } }, limit: 1) { objects { uuid } } }`
-    )
-  ).classes.objects[0].uuid
-
-const create = async (mutation: string, inputType: string, input: object) =>
-  (
-    await moGraphql(
-      `mutation ($input: ${inputType}!) { ${mutation}(input: $input) { uuid } }`,
-      { input }
-    )
-  )[mutation].uuid
-
-const remove = (mutation: string, uuid: string) =>
-  moGraphql(`mutation ($uuid: UUID!) { ${mutation}(uuid: $uuid) { uuid } }`, { uuid })
-
 test.beforeAll(async () => {
   fixture = await resolveFixture()
   primary = await resolvePrimaryClass()
   const [unitType, managerType, managerLevel, responsibility] = await Promise.all(
-    ["org_unit_type", "manager_type", "manager_level", "responsibility"].map(firstClass)
+    ["org_unit_type", "manager_type", "manager_level", "responsibility"].map(
+      firstClassUuid
+    )
   )
   const createUnit = (name: string) =>
-    create("org_unit_create", "OrganisationUnitCreateInput", {
+    createInMo("org_unit", "OrganisationUnitCreateInput", {
       name: name,
-      user_key: "primary-probe-" + Math.random().toString(36).slice(2, 8),
+      user_key: `primary-probe-${probeTag()}`,
       parent: fixture.unit,
       org_unit_type: unitType,
       validity: { from: fixture.from },
     })
   const createManagerRole = (unit: string, primaryClass: string | null) =>
-    create("manager_create", "ManagerCreateInput", {
+    createInMo("manager", "ManagerCreateInput", {
       person: holder.uuid,
       org_unit: unit,
       manager_type: managerType,
@@ -78,10 +58,10 @@ test.beforeAll(async () => {
       validity: { from: fixture.from },
     })
 
-  const suffix = Math.random().toString(36).slice(2, 8)
+  const suffix = probeTag()
   const holderSurname = `Holder ${suffix}`
   holder = {
-    uuid: await create("employee_create", "EmployeeCreateInput", {
+    uuid: await createInMo("employee", "EmployeeCreateInput", {
       given_name: "Primary Probe",
       surname: holderSurname,
     }),
@@ -100,10 +80,10 @@ test.beforeAll(async () => {
 
 test.afterAll(async () => {
   for (const role of [taken?.primaryRole, taken?.otherRole].filter(Boolean))
-    await remove("manager_delete", role)
+    await deleteInMo("manager", role)
   for (const unit of [taken?.unit, free?.unit].filter(Boolean))
-    await remove("org_unit_delete", unit)
-  if (holder) await remove("employee_delete", holder.uuid)
+    await deleteInMo("org_unit", unit)
+  if (holder) await deleteInMo("employee", holder.uuid)
 })
 
 const isLookup = (postData: string | null) => !!postData?.includes("PrimaryManagers")
