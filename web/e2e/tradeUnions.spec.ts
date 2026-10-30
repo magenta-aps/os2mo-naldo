@@ -5,6 +5,7 @@ import {
   deleteInMo,
   facetUuid,
   firstClassUuid,
+  graphqlIdle,
   isoDay,
   login,
   pickExactOption,
@@ -74,7 +75,7 @@ const tradeUnionOptions = (page: Page) => selectOptions(page, "trade-union")
 
 const setStartDate = async (page: Page, value: string) => {
   await page.locator("form input[type=date]").first().fill(value)
-  await page.waitForTimeout(2000) // let the options refetch land
+  await graphqlIdle(page)
 }
 
 const posted = (page: Page) => page.locator("form input[name=trade-union]")

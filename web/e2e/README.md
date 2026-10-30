@@ -19,6 +19,18 @@ After resetting MO, run `node e2e/seed.cjs` — it idempotently creates the
 facets and classes the forms need, and on a completely empty database also
 the organisation, an org unit, an employee and an engagement.
 
+## Waiting
+
+Wait for what the page does, not for time. `helpers.ts` has the signals:
+
+- `graphqlIdle` after anything that refetches, such as a date change
+- `submitForm` to submit and wait until the form has sent its mutation or
+  decided not to, so "nothing was sent" can be asserted
+- the `pick*` helpers, which return once the pick has landed
+
+The one fixed wait left (`refetch.spec.ts`) outlasts the navbar's own date
+timer, which nothing outside the page can observe.
+
 ## Commands
 
 ```
