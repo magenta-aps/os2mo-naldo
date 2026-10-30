@@ -4,6 +4,7 @@ import {
   login,
   moGraphql,
   resolveFixture,
+  selectFor,
   selectOptions,
 } from "./helpers"
 
@@ -83,7 +84,9 @@ test("date-driven option refetching", async ({ page }) => {
   }
 
   const hasProbe = async () =>
-    (await selectOptions(page)).some((text) => text.includes(PROBE_NAME))
+    (await selectOptions(page, "job-function")).some((text) =>
+      text.includes(PROBE_NAME)
+    )
 
   expect(await hasProbe(), "probe must be absent today").toBe(false)
 
@@ -91,7 +94,7 @@ test("date-driven option refetching", async ({ page }) => {
   expect(await hasProbe(), "probe must appear at its start date").toBe(true)
 
   // Pick it: the form must post the future class's uuid.
-  await page.locator("form #select").first().click({ timeout: 8000 })
+  await selectFor(page, "job-function").click({ timeout: 8000 })
   await page.locator(`.list-item:has-text("${PROBE_NAME}")`).first().click()
   await page.waitForTimeout(400)
   await expect(page.locator("form input[name=job-function]")).toHaveValue(probeUuid)

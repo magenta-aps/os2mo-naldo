@@ -49,8 +49,8 @@ test("employee create", async ({ page }) => {
   await login(page)
   await searchAndPick(page, fixture.unitName)
   await page.fill("form input[name=user-key]", "E2E-TEST")
-  await pickFirstOption(page, 0) // job function
-  await pickFirstOption(page, 1) // engagement type
+  await pickFirstOption(page, "job-function")
+  await pickFirstOption(page, "engagement-type")
   await submit(page, "employee-create")
 })
 
@@ -61,8 +61,8 @@ test("org create", async ({ page }) => {
   await login(page)
   await searchAndPick(page, fixture.personName)
   await page.fill("form input[name=user-key]", "E2E-TEST")
-  await pickFirstOption(page, 0)
-  await pickFirstOption(page, 1)
+  await pickFirstOption(page, "job-function")
+  await pickFirstOption(page, "engagement-type")
   await submit(page, "org-create")
 })
 
@@ -79,8 +79,8 @@ test("employee create with end date", async ({ page }) => {
   await login(page)
   await searchAndPick(page, fixture.unitName)
   await page.fill("form input[name=user-key]", "E2E-TEST")
-  await pickFirstOption(page, 0) // job function
-  await pickFirstOption(page, 1) // engagement type
+  await pickFirstOption(page, "job-function")
+  await pickFirstOption(page, "engagement-type")
   await fillEndDate(page)
   await submit(page, "employee-create-end-date")
 })
@@ -126,8 +126,8 @@ test("employee create address", async ({ page }) => {
   await blockMutations(page, capture("employee-create-address"))
   await page.goto(`/employee/${fixture.person}/create/address`)
   await login(page)
-  await pickFirstOption(page, 0) // visibility
-  await pickOptionByText(page, 1, "Email") // the seeded EMAIL-scope type
+  await pickFirstOption(page, "visibility")
+  await pickOptionByText(page, "address-type", "Email") // the seeded EMAIL-scope type
   await page.fill('form input[name$="value"]', "payload@example.org")
   await submit(page, "employee-create-address")
 })
@@ -137,7 +137,7 @@ test("employee create ituser", async ({ page }) => {
   await blockMutations(page, capture("employee-create-ituser"))
   await page.goto(`/employee/${fixture.person}/create/ituser`)
   await login(page)
-  await pickFirstOption(page, 0) // it system
+  await pickFirstOption(page, "it-system")
   await page.fill('form input[name$="account-name"]', "E2E-ACCOUNT")
   await submit(page, "employee-create-ituser")
 })
@@ -150,8 +150,8 @@ test("employee create manager", async ({ page }) => {
   await searchAndPick(page, fixture.unitName)
   // The engagement link demands a conscious choice; opt out.
   await page.locator('form input[id$="no-engagement"]').check()
-  await pickFirstOption(page, 1) // manager type (0 is the engagement select)
-  await pickFirstOption(page, 2) // manager level
+  await pickFirstOption(page, "manager-type")
+  await pickFirstOption(page, "manager-level")
   await pickMultiFirstOption(page, "responsibility")
   await submit(page, "employee-create-manager")
 })

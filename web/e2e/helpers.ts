@@ -219,9 +219,18 @@ export const dismiss = async (page: Page) => {
   await page.waitForTimeout(150)
 }
 
-// Opens the nth Select in the form and returns its option texts.
-export const selectOptions = async (page: Page, nth = 0): Promise<string[]> => {
-  await page.locator(`form #select:visible >> nth=${nth}`).click({ timeout: 8000 })
+// The Select of one form field, found by its label rather than its position,
+// so adding a field to a form cannot shift which one a test opens. Matched by
+// suffix: the wizard prefixes ids with "{entityKey}-{index}-", the routes
+// don't. Hidden wizard tabs are skipped.
+export const selectFor = (page: Page, field: string) =>
+  page
+    .locator("form .form-control", { has: page.locator(`label[for$="${field}"]`) })
+    .locator("#select:visible")
+
+// Opens a field's Select and returns its option texts.
+export const selectOptions = async (page: Page, field: string): Promise<string[]> => {
+  await selectFor(page, field).click({ timeout: 8000 })
   await page.locator(".list-item").first().waitFor({ timeout: 8000 })
   const texts = await page.locator(".list-item").allInnerTexts()
   await page.keyboard.press("Escape")
@@ -229,9 +238,9 @@ export const selectOptions = async (page: Page, nth = 0): Promise<string[]> => {
   return texts.map((text) => text.trim())
 }
 
-// Opens the nth Select and picks its first option.
-export const pickFirstOption = async (page: Page, nth = 0) => {
-  await page.locator(`form #select:visible >> nth=${nth}`).click({ timeout: 8000 })
+// Opens a field's Select and picks its first option.
+export const pickFirstOption = async (page: Page, field: string) => {
+  await selectFor(page, field).click({ timeout: 8000 })
   await page.locator(".list-item").first().waitFor({ timeout: 8000 })
   await page.keyboard.press("ArrowDown")
   await page.keyboard.press("Enter")
@@ -251,8 +260,8 @@ export const pickMultiFirstOption = async (page: Page, idSuffix: string) => {
 
 // Types into the select to filter, then picks the first match — for options
 // that must be a specific one (pickFirstOption takes whatever comes first).
-export const pickOptionByText = async (page: Page, nth: number, text: string) => {
-  await page.locator(`form #select:visible >> nth=${nth}`).click({ timeout: 8000 })
+export const pickOptionByText = async (page: Page, field: string, text: string) => {
+  await selectFor(page, field).click({ timeout: 8000 })
   await page.keyboard.type(text)
   await page.locator(".list-item").first().waitFor({ timeout: 8000 })
   await page.keyboard.press("ArrowDown")
@@ -262,8 +271,8 @@ export const pickOptionByText = async (page: Page, nth: number, text: string) =>
 
 // Picks the option named exactly `text`, for options whose names contain one
 // another ("Primær" and "Ikke-primær").
-export const pickExactOption = async (page: Page, nth: number, text: string) => {
-  await page.locator(`form #select:visible >> nth=${nth}`).click({ timeout: 8000 })
+export const pickExactOption = async (page: Page, field: string, text: string) => {
+  await selectFor(page, field).click({ timeout: 8000 })
   await page
     .locator(".list-item")
     .filter({ has: page.getByText(text, { exact: true }) })
