@@ -1,273 +1,152 @@
-import { describe, expect, it } from "vitest"
+import { startOfDay } from "$lib/utils/date"
+import { Temporal } from "temporal-polyfill"
+import { readable } from "svelte/store"
+import { describe, expect, it, vi } from "vitest"
 
-/**
- * Tests that verify the _response data extraction patterns used in mainQueries.ts.
- *
- * These tests validate getValues-style logic against realistic _response shapes,
- * ensuring the insights CSV export produces correct values after the migration.
- */
+// Translation keys stand in for the translated text.
+vi.mock("svelte-i18n", () => ({ _: readable((key: string) => key) }))
 
-// Helper copied from mainQueries.ts
-const joinCurrentNames = (arr: any[]) =>
-  arr
-    ?.map((i: any) => i.current?.name)
-    .filter(Boolean)
-    .join(", ") ?? ""
+const { mainQueries } = await import("../src/routes/(app)/insights/mainQueries")
 
-describe("insights: org_units field extraction", () => {
-  it("extracts parent name from parent_response", () => {
-    const row = { parent_response: { uuid: "p-1", current: { name: "Root" } } }
-    expect(row.parent_response?.current?.name ?? "").toBe("Root")
-  })
+const field = (operation: string, label: string) => {
+  const found = mainQueries
+    .find((query) => query.operation === operation)
+    ?.fields.find((field) => field.label === label)
+  if (!found) throw new Error(`no field ${operation}.${label}`)
+  return found
+}
+const values = (operation: string, label: string, row: object) =>
+  field(operation, label).getValues(row)
 
-  it("handles null current in parent_response", () => {
-    const row = { parent_response: { uuid: "p-1", current: null as any } }
-    expect(row.parent_response?.current?.name ?? "").toBe("")
-  })
+const named = (name: string) => ({ uuid: "x", current: { name } })
+const day = (s: string) => startOfDay(Temporal.PlainDate.from(s))
 
-  it("handles missing parent_response", () => {
-    const row = {}
-    expect((row as any).parent_response?.current?.name ?? "").toBe("")
-  })
-
-  it("extracts unit_type from unit_type_response", () => {
-    const row = { unit_type_response: { uuid: "ut-1", current: { name: "Afdeling" } } }
-    expect(row.unit_type_response?.current?.name ?? "").toBe("Afdeling")
-  })
-
-  it("extracts unit_level from unit_level_response", () => {
-    const row = {
-      unit_level_response: { uuid: "ul-1", current: { name: "Niveau 3" } },
-    }
-    expect(row.unit_level_response?.current?.name ?? "").toBe("Niveau 3")
+describe("fields that read a related object's name", () => {
+  it.each([
+    ["org_units", "parent", "parent_response"],
+    ["org_units", "unit_type", "unit_type_response"],
+    ["org_units", "org_unit_level", "unit_level_response"],
+    ["engagements", "name", "person_response"],
+    ["engagements", "engagement_type", "engagement_type_response"],
+    ["engagements", "primary", "primary_response"],
+    ["associations", "name", "person_response"],
+    ["associations", "association_type", "association_type_response"],
+    ["associations", "substitute", "substitute_response"],
+    ["associations", "trade_union", "trade_union_response"],
+    ["itusers", "itsystem", "itsystem_response"],
+    ["itusers", "primary", "primary_response"],
+    ["managers", "manager_type", "manager_type_response"],
+    ["managers", "manager_level", "manager_level_response"],
+    ["owners", "name", "owner_response"],
+  ])("%s.%s reads %s, empty when it does not resolve", (operation, label, key) => {
+    expect(values(operation, label, { [key]: named("Navn") })).toEqual(["Navn"])
+    expect(values(operation, label, { [key]: { uuid: "x", current: null } })).toEqual([
+      "",
+    ])
+    expect(values(operation, label, {})).toEqual([""])
   })
 })
 
-describe("insights: engagements field extraction", () => {
-  it("extracts person name from person_response", () => {
-    const row = { person_response: { uuid: "p-1", current: { name: "Bruce Wayne" } } }
-    expect(row.person_response?.current?.name ?? "").toBe("Bruce Wayne")
+describe("validity", () => {
+  it("writes the last valid day, not MO's exclusive `to`", () => {
+    const row = { validity: { from: day("2020-01-01"), to: day("2024-11-01") } }
+    expect(values("engagements", "validity", row)).toEqual([
+      "2020-01-01T00:00:00+01:00",
+      "2024-10-31T00:00:00+01:00",
+    ])
   })
 
-  it("extracts cpr_number from person_response", () => {
+  it("leaves an open end empty", () => {
+    const row = { validity: { from: day("2020-01-01"), to: null } }
+    expect(values("engagements", "validity", row)).toEqual([
+      "2020-01-01T00:00:00+01:00",
+      "",
+    ])
+  })
+})
+
+describe("org_units.breadcrumbs", () => {
+  it("lists the ancestors from the root down", () => {
+    const row = { ancestors: [{ name: "Skole" }, { name: "Kommune" }] }
+    expect(values("org_units", "breadcrumbs", row)).toEqual(["Kommune", "Skole"])
+  })
+
+  it("has a column per level of the deepest unit", () => {
+    const data = [{ ancestors: [{ name: "A" }] }, { ancestors: [{}, {}, {}] }]
+    expect(field("org_units", "breadcrumbs").getHeaders((key) => key, data)).toEqual([
+      "Unit 1",
+      "Unit 2",
+      "Unit 3",
+    ])
+  })
+})
+
+describe("engagements", () => {
+  it.each(["email", "phone"])("joins the person's %s addresses", (label) => {
     const row = {
-      person_response: { uuid: "p-1", current: { cpr_number: "0101001234" } },
+      person_response: { current: { [label]: [{ name: "a" }, { name: "b" }] } },
     }
-    expect(row.person_response?.current?.cpr_number ?? "").toBe("0101001234")
+    expect(values("engagements", label, row)).toEqual(["a, b"])
+    expect(
+      values("engagements", label, { person_response: { current: null } })
+    ).toEqual([""])
   })
 
-  it("extracts job_function from job_function_response", () => {
+  it("names the managers, a vacant role as such", () => {
     const row = {
-      job_function_response: { uuid: "jf-1", current: { name: "Specialist" } },
+      managers: [{ person_response: named("Anna") }, { person_response: null }],
     }
-    expect(row.job_function_response?.current?.name ?? "").toBe("Specialist")
+    expect(values("engagements", "manager", row)).toEqual(["Anna, Vacant"])
   })
 
-  it("extracts engagement_type from engagement_type_response", () => {
-    const row = {
-      engagement_type_response: { uuid: "et-1", current: { name: "Ansat" } },
-    }
-    expect(row.engagement_type_response?.current?.name ?? "").toBe("Ansat")
-  })
-
-  it("extracts primary from primary_response", () => {
-    const row = { primary_response: { uuid: "pr-1", current: { name: "Primær" } } }
-    expect(row.primary_response?.current?.name ?? "").toBe("Primær")
-  })
-
-  it("extracts emails from person_response.current.email", () => {
-    const row = {
-      person_response: {
-        uuid: "p-1",
-        current: {
-          email: [{ name: "a@b.dk" }, { name: "c@d.dk" }],
-        },
-      },
-    }
-    const emails = row.person_response?.current?.email
-    const result =
-      emails
-        ?.map((i: any) => i.name)
-        .filter(Boolean)
-        .join(", ") ?? ""
-    expect(result).toBe("a@b.dk, c@d.dk")
-  })
-
-  it("handles missing emails gracefully", () => {
-    const row = { person_response: { uuid: "p-1", current: null as any } }
-    const emails = row.person_response?.current?.email
-    const result =
-      emails
-        ?.map((i: any) => i.name)
-        .filter(Boolean)
-        .join(", ") ?? ""
-    expect(result).toBe("")
-  })
-
-  it("extracts manager names from person_response", () => {
+  it("joins the managers' email addresses", () => {
     const row = {
       managers: [
-        { person_response: { uuid: "m-1", current: { name: "Manager A" } } },
-        { person_response: { uuid: "m-2", current: { name: "Manager B" } } },
+        { person_response: { current: { addresses: [{ name: "a@x.dk" }] } } },
+        { person_response: null },
+        { person_response: { current: { addresses: [{ name: "b@x.dk" }] } } },
       ],
     }
-    const names = row.managers
-      .map((m: any) => m.person_response?.current?.name ?? "Vacant")
-      .filter(Boolean)
-      .join(", ")
-    expect(names).toBe("Manager A, Manager B")
-  })
-
-  it("handles vacant managers", () => {
-    const row = {
-      managers: [{ person_response: { uuid: "m-1", current: null } }],
-    }
-    const names = row.managers
-      .map((m: any) => m.person_response?.current?.name ?? "Vacant")
-      .filter(Boolean)
-      .join(", ")
-    expect(names).toBe("Vacant")
-  })
-
-  it("extracts manager emails from person_response.current.addresses", () => {
-    const row = {
-      managers: [
-        {
-          person_response: {
-            uuid: "m-1",
-            current: { addresses: [{ name: "mgr@example.dk" }] },
-          },
-        },
-      ],
-    }
-    const emails = row.managers
-      .flatMap((m: any) => m.person_response?.current?.addresses ?? [])
-      .map((a: any) => a.name)
-      .filter(Boolean)
-      .join(", ")
-    expect(emails).toBe("mgr@example.dk")
+    expect(values("engagements", "manager_email", row)).toEqual(["a@x.dk, b@x.dk"])
+    expect(values("engagements", "manager_email", {})).toEqual([""])
   })
 })
 
-describe("insights: associations field extraction", () => {
-  it("extracts association_type from association_type_response", () => {
-    const row = {
-      association_type_response: { uuid: "at-1", current: { name: "Projektleder" } },
-    }
-    expect(row.association_type_response?.current?.name ?? "").toBe("Projektleder")
-  })
-
-  it("extracts substitute from substitute_response", () => {
-    const row = {
-      substitute_response: { uuid: "s-1", current: { name: "Katrine" } },
-    }
-    expect(row.substitute_response?.current?.name ?? "").toBe("Katrine")
-  })
-
-  it("extracts trade_union from trade_union_response", () => {
-    const row = {
-      trade_union_response: { uuid: "tu-1", current: { name: "FOA" } },
-    }
-    expect(row.trade_union_response?.current?.name ?? "").toBe("FOA")
-  })
-})
-
-describe("insights: itusers field extraction", () => {
-  it("extracts itsystem from itsystem_response", () => {
-    const row = {
-      itsystem_response: { uuid: "is-1", current: { name: "Active Directory" } },
-    }
-    expect(row.itsystem_response?.current?.name ?? "").toBe("Active Directory")
-  })
-
-  it("extracts rolebinding names from role_response", () => {
+describe("itusers.rolebinding", () => {
+  it("joins the role names, skipping unresolved roles", () => {
     const row = {
       rolebindings: [
-        { role_response: { uuid: "r-1", current: { name: "Admin" } } },
-        { role_response: { uuid: "r-2", current: { name: "Reader" } } },
+        { role_response: named("Admin") },
+        { role_response: { current: null } },
+        { role_response: named("Reader") },
       ],
     }
-    const roles = row.rolebindings
-      ?.flatMap((rb: any) => rb.role_response?.current?.name)
-      .filter(Boolean)
-      .join(", ")
-    expect(roles).toBe("Admin, Reader")
-  })
-
-  it("handles null role_response.current", () => {
-    const row = {
-      rolebindings: [{ role_response: { uuid: "r-1", current: null } }],
-    }
-    const roles = row.rolebindings
-      ?.flatMap((rb: any) => rb.role_response?.current?.name)
-      .filter(Boolean)
-      .join(", ")
-    expect(roles).toBe("")
+    expect(values("itusers", "rolebinding", row)).toEqual(["Admin, Reader"])
+    expect(values("itusers", "rolebinding", {})).toEqual([""])
   })
 })
 
-describe("insights: managers field extraction", () => {
-  it("extracts responsibilities via joinCurrentNames", () => {
-    const objects = [
-      { uuid: "r-1", current: { name: "Personale: ansættelse" } },
-      { uuid: "r-2", current: { name: "Personale: øvrige" } },
-    ]
-    expect(joinCurrentNames(objects)).toBe("Personale: ansættelse, Personale: øvrige")
+describe("managers", () => {
+  it("names a vacant manager role as such", () => {
+    expect(values("managers", "name", { person_response: null })).toEqual(["Vacant"])
   })
 
-  it("handles null current in responsibilities", () => {
-    const objects = [
-      { uuid: "r-1", current: { name: "Budget" } },
-      { uuid: "r-2", current: null },
-    ]
-    expect(joinCurrentNames(objects)).toBe("Budget")
-  })
-
-  it("extracts manager_type from manager_type_response", () => {
+  it("joins the responsibilities, skipping unresolved ones", () => {
     const row = {
-      manager_type_response: { uuid: "mt-1", current: { name: "Direktør" } },
-    }
-    expect(row.manager_type_response?.current?.name ?? "").toBe("Direktør")
-  })
-
-  it("extracts manager_level from manager_level_response", () => {
-    const row = {
-      manager_level_response: { uuid: "ml-1", current: { name: "Niveau 4" } },
-    }
-    expect(row.manager_level_response?.current?.name ?? "").toBe("Niveau 4")
-  })
-})
-
-describe("insights: owners field extraction", () => {
-  it("extracts owner name from owner_response", () => {
-    const row = {
-      owner_response: { uuid: "o-1", current: { name: "Alice" } },
-    }
-    expect(row.owner_response?.current?.name ?? "").toBe("Alice")
-  })
-})
-
-describe("insights: related_units field extraction", () => {
-  it("extracts org unit names from org_units_response", () => {
-    const row = {
-      org_units_response: {
-        objects: [
-          { uuid: "ou-1", current: { name: "Unit A" } },
-          { uuid: "ou-2", current: { name: "Unit B" } },
-        ],
+      responsibilities_response: {
+        objects: [named("Budget"), { current: null }, named("Personale")],
       },
     }
-    expect(row.org_units_response?.objects?.[0]?.current?.name ?? "").toBe("Unit A")
-    expect(row.org_units_response?.objects?.[1]?.current?.name ?? "").toBe("Unit B")
+    expect(values("managers", "manager_responsibility", row)).toEqual([
+      "Budget, Personale",
+    ])
   })
+})
 
-  it("handles missing second related unit", () => {
-    const row = {
-      org_units_response: {
-        objects: [{ uuid: "ou-1", current: { name: "Unit A" } }],
-      },
-    }
-    expect(row.org_units_response?.objects?.[0]?.current?.name ?? "").toBe("Unit A")
-    expect(row.org_units_response?.objects?.[1]?.current?.name ?? "").toBe("")
+describe("related_units.related_unit", () => {
+  it("puts the two related units in a column each", () => {
+    const row = { org_units_response: { objects: [named("A"), named("B")] } }
+    expect(values("related_units", "related_unit", row)).toEqual(["A", "B"])
+    expect(values("related_units", "related_unit", {})).toEqual(["", ""])
   })
 })
