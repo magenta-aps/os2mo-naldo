@@ -1,10 +1,6 @@
 import { isRetryableError } from "$lib/http/pagination"
 import { describe, expect, it } from "vitest"
 
-// Pins the retry predicate extracted from paginateQuery. These three
-// classes of failure were added to the retry list in #68989 after
-// network blips caused insights exports to abort mid-pagination.
-
 describe("isRetryableError", () => {
   it("retries TypeError (network failure from fetch)", () => {
     expect(isRetryableError(new TypeError("Failed to fetch"))).toBe(true)
@@ -16,7 +12,7 @@ describe("isRetryableError", () => {
     expect(isRetryableError(err)).toBe(true)
   })
 
-  it("retries when GraphQL response carries a 'Signature has expired' error", () => {
+  it("retries an expired signature in the GraphQL errors", () => {
     const err = {
       response: {
         errors: [{ message: "Signature has expired" }],
@@ -25,29 +21,27 @@ describe("isRetryableError", () => {
     expect(isRetryableError(err)).toBe(true)
   })
 
-  it("retries regardless of the expired-signature message casing", () => {
+  it("retries an expired signature in any casing", () => {
     const err = { response: { errors: [{ message: "SIGNATURE HAS EXPIRED" }] } }
     expect(isRetryableError(err)).toBe(true)
   })
 
-  it("retries when only the top-level error.message contains the expired phrase", () => {
-    // Not all clients wrap GraphQL errors the same way — the top-level
-    // message path is the fallback.
+  it("retries an expired signature in the error's own message", () => {
     expect(isRetryableError(new Error("signature has expired"))).toBe(true)
   })
 
-  it("does NOT retry generic runtime errors", () => {
+  it("does not retry other errors", () => {
     expect(isRetryableError(new Error("something else failed"))).toBe(false)
   })
 
-  it("does NOT retry GraphQL validation errors", () => {
+  it("does not retry other GraphQL errors", () => {
     const err = {
       response: { errors: [{ message: "Field 'foo' is not defined" }] },
     }
     expect(isRetryableError(err)).toBe(false)
   })
 
-  it("handles null / undefined / missing .message gracefully", () => {
+  it("does not retry a missing error", () => {
     expect(isRetryableError(null)).toBe(false)
     expect(isRetryableError(undefined)).toBe(false)
     expect(isRetryableError({})).toBe(false)

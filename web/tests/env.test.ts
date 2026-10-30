@@ -1,12 +1,6 @@
 import { bool, environment, json } from "$lib/env"
 import { describe, expect, it } from "vitest"
 
-// These parsers are tested in isolation from the env singleton so we don't
-// need to mock `$env/dynamic/public`. They each map an optional string env
-// value to a typed JS value, with an explicit throw on invalid input —
-// that throw-on-invalid is the contract #68747 added, and it's the main
-// regression guard here.
-
 describe("bool", () => {
   it("returns true for 'true'", () => {
     expect(bool("true")).toBe(true)
@@ -26,7 +20,7 @@ describe("bool", () => {
     expect(bool("", true)).toBe(true)
   })
 
-  it("throws on any other string (strict parsing, no silent fallback)", () => {
+  it("throws on any other string", () => {
     expect(() => bool("1")).toThrow(/Invalid boolean env var/)
     expect(() => bool("yes")).toThrow(/Invalid boolean env var/)
     expect(() => bool("TRUE")).toThrow(/Invalid boolean env var/)

@@ -2,9 +2,6 @@ import { json2csv } from "$lib/utils/csv"
 import type { Field, SelectedQuery } from "$lib/utils/insights"
 import { describe, expect, it } from "vitest"
 
-// Helper: build a Field with simple, data-local getHeaders/getValues so the
-// tests stay independent of svelte-i18n. `getValues` pulls from a fixed key
-// on its row argument; `getHeaders` returns a fixed set of column labels.
 const field = (headers: string[], pick: (row: any) => string[]): Field => ({
   label: headers.join("|"),
   query: "",
@@ -26,7 +23,7 @@ describe("json2csv", () => {
     expect(json2csv([], [q])).toBe("Name")
   })
 
-  it("emits org-units-only rows when no subqueries are selected (Case A)", () => {
+  it("emits a row per unit without subqueries", () => {
     const q = query("org_units", [field(["Name"], (r) => [r.name])])
     const csv = json2csv([{ name: "Unit A" }, { name: "Unit B" }], [q])
     expect(lines(csv)).toEqual(["Name", "Unit A", "Unit B"])
@@ -37,13 +34,12 @@ describe("json2csv", () => {
     const engQ = query("engagements", [field(["Job"], (r) => [r.job])])
     const csv = json2csv(
       [{ name: "U1", uuid: "u1", engagements: [{ org_unit_uuid: "u1", job: "A" }] }],
-      [engQ, ouQ] // note: engagement first in the UI selection
+      [engQ, ouQ]
     )
-    // Header order: Unit, Job (org_units promoted to front)
     expect(lines(csv)[0]).toBe(["Unit", "Job"].join(SEP))
   })
 
-  it("flattens subquery items into rows and repeats org_unit columns (Case B)", () => {
+  it("emits a row per subquery item, repeating the unit's columns", () => {
     const ouQ = query("org_units", [field(["Unit"], (r) => [r.name])])
     const engQ = query("engagements", [field(["Job"], (r) => [r.job])])
     const csv = json2csv(
@@ -74,8 +70,7 @@ describe("json2csv", () => {
   })
 
   it("skips subquery items whose org_unit_uuid does not match the current unit", () => {
-    // Guards against items that were moved to another unit and shouldn't
-    // appear again under their original home.
+    // An item moved to another unit belongs under that unit only.
     const ouQ = query("org_units", [field(["Unit"], (r) => [r.name])])
     const engQ = query("engagements", [field(["Job"], (r) => [r.job])])
     const csv = json2csv(
@@ -96,7 +91,6 @@ describe("json2csv", () => {
   })
 
   it("always emits related_units rows regardless of org_unit_uuid", () => {
-    // Carve-out for related_units — no move-filter applies.
     const ouQ = query("org_units", [field(["Unit"], (r) => [r.name])])
     const rel = query("related_units", [field(["Rel"], (r) => [r.name])])
     const csv = json2csv(
@@ -113,8 +107,7 @@ describe("json2csv", () => {
   })
 
   it("unwraps itusers from engagements[].it[].itusers[].current", () => {
-    // Special-case: IT Users are nested inside an aliased `it` array under
-    // each engagement; json2csv flattens wrappers and injects org_unit_uuid.
+    // The query nests IT users under the unit's engagements.
     const ouQ = query("org_units", [field(["Unit"], (r) => [r.name])])
     const ituQ = query("itusers", [field(["Login"], (r) => [r.user_key])])
     const csv = json2csv(
@@ -149,8 +142,6 @@ describe("json2csv", () => {
   })
 
   it("pads columns of non-active subqueries with empty cells", () => {
-    // When an item belongs to subquery A, subquery B's columns on that row
-    // must be blank so CSV columns stay aligned with headers.
     const ouQ = query("org_units", [field(["Unit"], (r) => [r.name])])
     const engQ = query("engagements", [field(["Job"], (r) => [r.job])])
     const addrQ = query("addresses", [field(["Addr"], (r) => [r.value])])
@@ -180,8 +171,6 @@ describe("json2csv", () => {
       { val: 'has"quote' },
       { val: "plain" },
     ]
-    // Note: the embedded newline makes a naive split("\n") unsafe, so we
-    // compare the whole output instead.
     const csv = json2csv(cases, [ouQ])
     expect(csv).toBe(
       ["Col", '"has;semi"', '"has\nnewline"', '"has""quote"', "plain"].join("\n")
@@ -199,7 +188,6 @@ describe("json2csv", () => {
       {
         label: "multi",
         query: "",
-        // Two headers but getValues returns only one value → padded with ""
         getHeaders: () => ["A", "B"],
         getValues: () => ["only-a"],
       },

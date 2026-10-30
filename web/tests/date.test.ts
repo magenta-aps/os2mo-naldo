@@ -27,7 +27,7 @@ describe("formatDate", () => {
   })
 
   it("converts UTC to Copenhagen local date", () => {
-    // 2020-07-15 23:30 UTC is 2020-07-16 01:30 CEST — a date boundary flip
+    // 23:30 UTC is 01:30 the next day in Copenhagen
     expect(formatDate("2020-07-15T23:30:00Z")).toBe("16-07-2020")
   })
 

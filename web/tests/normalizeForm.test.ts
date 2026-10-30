@@ -276,7 +276,7 @@ describe("normalizeItSystem", () => {
   })
 
   it("handles null/missing fields", () => {
-    expect(normalizeItSystem({ validity: { to: null }, name: null })).toEqual({
+    expect(sent(normalizeItSystem({ validity: { to: null }, name: null }))).toEqual({
       to: null,
       name: null,
       user_key: "",
