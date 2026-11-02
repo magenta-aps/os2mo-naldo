@@ -224,6 +224,7 @@
   })
 
   let explicitManager: ClassValue | undefined
+  let explicitManagerIncomplete = false
 
   let initialEngagement: any = null
   engagementPromise.then(
@@ -439,6 +440,7 @@
         {/if}
         <ExplicitManagerSelect
           bind:value={explicitManager}
+          bind:incomplete={explicitManagerIncomplete}
           at={startDate}
           storedManager={engagement.explicit_manager}
         />
@@ -452,7 +454,7 @@
             values: { item: $_("engagement", { values: { n: 1 } }) },
           })
         )}
-        disabled={!hasChanges}
+        disabled={!hasChanges || explicitManagerIncomplete}
         info={hasChanges ? undefined : $_("edit_tooltip")}
       />
       <Button

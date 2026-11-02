@@ -85,10 +85,11 @@ engagement points at that role, then asserts that:
 
 - the engagement table shows the explicit manager with its marker, on the
   employee and the unit page;
-- the create form sends the picked manager role;
+- the create form sends the picked manager role, and does not submit a
+  person without one;
 - the edit form leaves the explicit manager out of an unrelated edit, so MO
-  keeps it, and sends null when it is cleared, on the employee and the unit
-  page.
+  keeps it, and sends null when its person is cleared, on the employee and the
+  unit page.
 - the bulk form sends the picked manager role for the checked engagements
   only, and null when no role is picked.
 

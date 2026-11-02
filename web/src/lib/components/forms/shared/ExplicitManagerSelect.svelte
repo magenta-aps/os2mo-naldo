@@ -18,6 +18,10 @@
   export let person: { uuid: string; name: string } | undefined = undefined
   export let at: Temporal.ZonedDateTime | null | undefined
   export let idPrefix = ""
+  // A picked person without a manager role saves nothing on create and unsets
+  // the stored manager on edit, so the forms do not submit it. The manager is
+  // removed by clearing the person, so the role has no clear button of its own.
+  export let incomplete = false
   // The engagement's stored explicit manager, as the edit forms load it. Seeds
   // the fields, and is posted back so the action only sends an explicit
   // manager the user changed.
@@ -82,6 +86,7 @@
   $: storedActive = !!storedManager && !!findValidityAt(storedManager.validities, at)
 
   $: personUuid = person?.uuid
+  $: incomplete = !!personUuid && !value
   // The person search clears itself without an event when the date moves to
   // where the person does not exist, so the role goes here. The stored manager
   // stays: a vacant or outdated one has no person to begin with.
@@ -137,9 +142,18 @@
   id="{idPrefix}explicit-manager"
   bind:value
   iterable={options}
-  disabled={(!personUuid && !value) || !at || $managers.error}
-  isClearable={true}
+  disabled={(!personUuid && !value) ||
+    !at ||
+    $managers.error ||
+    (!!options && !options.length)}
+  isClearable={!personUuid}
+  required={!!personUuid}
 />
+{#if incomplete && options?.length}
+  <p class="-mt-3 pb-3 text-xs">
+    {capital($_("explicit_manager_pick_role"))}
+  </p>
+{/if}
 {#if options && !options.length}
   <p class="-mt-3 pb-3 text-xs text-error">
     {capital($_("explicit_manager_no_roles"))}

@@ -150,6 +150,7 @@
   }
   let explicitManagerPerson: { uuid: string; name: string } | undefined
   let explicitManager: ClassValue | undefined
+  let explicitManagerIncomplete = false
   let selectedEngagements: string[] = []
 
   // The engagement's current end, kept as it is.
@@ -247,6 +248,7 @@
       <ExplicitManagerSelect
         bind:person={explicitManagerPerson}
         bind:value={explicitManager}
+        bind:incomplete={explicitManagerIncomplete}
         at={startDate}
       />
     </div>
@@ -262,6 +264,7 @@
             : "navigation.remove_explicit_managers"
         )
       )}
+      disabled={explicitManagerIncomplete}
     />
     <Button
       type="button"

@@ -10,6 +10,7 @@ import {
   probeTag,
   resolveFixture,
   searchAndPick,
+  searchFor,
   submitForm,
   trackPageErrors,
   type Fixture,
@@ -165,6 +166,21 @@ test("employee engagement create sends the explicit manager", async ({ page }) =
   expect(errors).toEqual([])
 })
 
+test("employee engagement create does not submit a person without a manager role", async ({
+  page,
+}) => {
+  const { errors, sent } = await openForm(page, `/employee/${staff}/create/engagement`)
+  await searchAndPick(page, fixture.unitName)
+  await pickFirstOption(page, "job-function")
+  await pickFirstOption(page, "engagement-type")
+  await searchAndPick(page, manager.name, EXPLICIT_TITLE)
+  await expect(page.getByText(/Vælg en lederrolle|Choose a manager role/)).toBeVisible()
+
+  await submitForm(page)
+  expect(sent, "a person without a manager role must not be submitted").toHaveLength(0)
+  expect(errors).toEqual([])
+})
+
 test("employee engagement edit keeps the explicit manager on an unrelated edit", async ({
   page,
 }) => {
@@ -183,7 +199,7 @@ test("employee engagement edit keeps the explicit manager on an unrelated edit",
 })
 
 for (const side of ["employee", "organisation"] as const) {
-  test(`${side} engagement edit unsets a cleared explicit manager`, async ({
+  test(`${side} engagement edit unsets the explicit manager when its person is cleared`, async ({
     page,
   }) => {
     const owner = side === "employee" ? staff : fixture.unit
@@ -192,10 +208,7 @@ for (const side of ["employee", "organisation"] as const) {
       `/${side}/${owner}/edit/engagement/${engagement}?from=${fixture.from}`
     )
     await expect(managerRoleInput(page)).toHaveValue(managerRole)
-    await page
-      .locator(".form-control", { has: page.locator('label[for="explicit-manager"]') })
-      .locator(".clear-select")
-      .click()
+    await searchFor(page, EXPLICIT_TITLE).locator(".clear-select").click()
     await expect(managerRoleInput(page)).toHaveCount(0)
 
     await submitForm(page)
