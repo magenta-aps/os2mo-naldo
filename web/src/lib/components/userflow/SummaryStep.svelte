@@ -188,6 +188,15 @@
         },
         { label: capital($_("id")), value: engagement.user_key },
         { label: capital($_("primary")), value: dash(engagement.primary?.name) },
+        {
+          label: capital($_("explicit_manager")),
+          value: [
+            engagement.explicitManagerPerson?.name,
+            engagement.explicitManager?.name,
+          ]
+            .filter(Boolean)
+            .join(", "),
+        },
       ],
     }))
 

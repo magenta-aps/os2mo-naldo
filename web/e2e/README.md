@@ -78,6 +78,23 @@ The probe data is deleted afterwards;
 if a crashed run leaves it behind, the units' user_keys are prefixed
 `primary-probe-` and the person is named `Primary Probe Holder`.
 
+## explicitManager.spec.ts
+
+Seeds a boss with a manager role in a probe unit, and a staff member whose
+engagement points at that role, then asserts that:
+
+- the engagement table shows the explicit manager with its marker, on the
+  employee and the unit page;
+- the create form sends the picked manager role;
+- the edit form leaves the explicit manager out of an unrelated edit, so MO
+  keeps it, and sends null when it is cleared, on the employee and the unit
+  page.
+
+The staff member is a probe person because the smoke suite edits the fixture
+person's engagement in parallel. Leftovers from a crashed run: a unit
+prefixed `explicit-probe-` and people named `Explicit Probe Boss` /
+`Explicit Probe Staff`.
+
 ## tradeUnions.spec.ts
 
 The association forms list the trade unions valid on the form's start date,

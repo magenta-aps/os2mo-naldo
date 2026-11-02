@@ -40,6 +40,10 @@ export type EngagementValues = {
   jobFunction: ClassValue | undefined
   engagementType: ClassValue | undefined
   primary: ClassValue | undefined
+  // Not sent: the holder of the explicit manager role, so the person search
+  // and the summary can show them.
+  explicitManagerPerson: { uuid: string; name: string } | undefined
+  explicitManager: ClassValue | undefined
   extension1: string
   extension4: string
 }
@@ -52,6 +56,8 @@ export const createDefaultEngagementValues = (): EngagementValues => ({
   jobFunction: undefined,
   engagementType: undefined,
   primary: undefined,
+  explicitManagerPerson: undefined,
+  explicitManager: undefined,
   extension1: "",
   extension4: "",
 })

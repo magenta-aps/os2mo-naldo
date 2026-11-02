@@ -264,6 +264,9 @@
           ...(env.PUBLIC_SHOW_ITUSER_CONNECTIONS
             ? [{ title: capital($_("ituser", { values: { n: 2 } })) }]
             : []),
+          {
+            title: capital($_("manager", { values: { n: 1 } })),
+          },
           ...(env.PUBLIC_SHOW_PRIMARY_ENGAGEMENT
             ? [{ title: capital($_("primary")) }]
             : []),
