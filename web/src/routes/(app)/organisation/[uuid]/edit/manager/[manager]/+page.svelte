@@ -4,7 +4,11 @@
   import type { ValidityBounds } from "$lib/utils/validities"
   import { moValidityFrom } from "$lib/utils/date"
   import { _ } from "svelte-i18n"
-  import { capital } from "$lib/utils/helpers"
+  import {
+    capital,
+    formatEngagementTitlesAndUuid,
+    type EngagementTitleAndUuid,
+  } from "$lib/utils/helpers"
   import EndDateInput from "$lib/components/forms/shared/EndDateInput.svelte"
   import StartDateInput from "$lib/components/forms/shared/StartDateInput.svelte"
   import Error from "$lib/components/alerts/Error.svelte"
@@ -39,10 +43,6 @@
   import { createQuery } from "$lib/http/query"
   import { getValidities } from "$lib/http/getValidities"
   import { normalizeManager } from "$lib/utils/normalizeForm"
-  import {
-    getEngagementTitlesAndUuid,
-    type EngagementTitleAndUuid,
-  } from "$lib/utils/display"
 
   gql`
     query Manager(
@@ -399,7 +399,7 @@
     user_key: r.current?.user_key ?? "",
   }))}
   {@const engagementStartValue = manager.engagement_response
-    ? getEngagementTitlesAndUuid([
+    ? formatEngagementTitlesAndUuid([
         {
           uuid: manager.engagement_response.uuid,
           job_function_response: manager.engagement_response.current
@@ -474,7 +474,7 @@
           startValue={engagementStartValue}
           bind:value={selectedEngagement}
           iterable={$engagements.data?.length
-            ? getEngagementTitlesAndUuid($engagements.data)
+            ? formatEngagementTitlesAndUuid($engagements.data)
             : engagementStartValue
             ? [engagementStartValue]
             : []}

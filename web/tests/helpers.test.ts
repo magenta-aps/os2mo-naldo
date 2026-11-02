@@ -26,12 +26,10 @@ describe("isUUID", () => {
   })
 
   it("rejects non-v4 version digits", () => {
-    // 3rd segment must start with 4
     expect(isUUID("e0f496c4-bb51-37af-baeb-3fb771c51a9f")).toBe(false)
   })
 
   it("rejects invalid variant digits", () => {
-    // 4th segment must start with 8/9/a/b
     expect(isUUID("e0f496c4-bb51-47af-ceeb-3fb771c51a9f")).toBe(false)
   })
 
@@ -55,9 +53,7 @@ describe("capital", () => {
     expect(capital("manager")).toBe("Manager")
   })
 
-  it("handles leading whitespace by capitalising the first non-space", () => {
-    // Regex matches start-of-string OR whitespace followed by a non-space —
-    // so a leading space keeps the space and capitalises the letter after it.
+  it("capitalises past leading whitespace", () => {
     expect(capital(" hello")).toBe(" Hello")
   })
 

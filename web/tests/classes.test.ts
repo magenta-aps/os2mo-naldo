@@ -53,8 +53,8 @@ describe("filterClassesByFacetUserKey", () => {
   it("returns classes sorted by name", () => {
     const result = filterClassesByFacetUserKey(facets, "engagement_type")
     expect(result).toEqual([
-      { name: "Ansat", uuid: "class-b", user_key: "Ansat", scope: undefined },
-      { name: "Frivillig", uuid: "class-a", user_key: "Frivillig", scope: undefined },
+      { name: "Ansat", uuid: "class-b", user_key: "Ansat" },
+      { name: "Frivillig", uuid: "class-a", user_key: "Frivillig" },
     ])
   })
 

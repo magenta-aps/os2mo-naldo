@@ -19,9 +19,6 @@ describe("getValueAtPath", () => {
   })
 
   it("returns undefined when the path does not exist", () => {
-    // Regression guard: typo'd sortPaths silently return undefined, which
-    // makes sortData a no-op for every row. Tests of sortData below pin this
-    // behavior too.
     expect(getValueAtPath({ name: "Alice" }, "missing")).toBeUndefined()
     expect(getValueAtPath({ a: { b: 1 } }, "a.c")).toBeUndefined()
   })
@@ -63,10 +60,8 @@ describe("sortData", () => {
     expect(rows).toEqual(original)
   })
 
-  it("preserves order when sortKey resolves to undefined on every row", () => {
-    // This is the silent-typo hazard: a bad sortPath makes every comparison
-    // return 0, so the input order is preserved. Pinning behavior so a future
-    // change (e.g. moving invalid values to the end) is deliberate.
+  // A mistyped sort path therefore leaves a table unsorted rather than failing.
+  it("keeps the order when the path resolves on no row", () => {
     const result = sortData(rows, "nonexistent.path", 1).map((r) => r.id)
     expect(result).toEqual([1, 2, 3])
   })
@@ -95,7 +90,7 @@ describe("sortData with Temporal values", () => {
     )
   })
 
-  it("leaves a row without the value in place", () => {
+  it("does not throw on a row without the value", () => {
     const withMissing = [...rows, { validity: {} }] as typeof rows
     expect(() => sortData(withMissing, "validity.from", 1)).not.toThrow()
   })

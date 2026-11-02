@@ -63,10 +63,9 @@ describe("Select prefill survival", () => {
     expect(hidden(container)?.value).toBe("a-1")
   })
 
-  it("clears a value whose name is empty — mappers must fall back to the uuid for unresolved names", async () => {
-    // Pinned as CURRENT behavior: an empty name is indistinguishable from a
-    // cleared selection, so the component drops the value entirely — uuid and
-    // all. Seeding code must never produce { uuid, name: "" }.
+  // An empty name reads as a cleared selection, so seeding code falls back to
+  // the uuid for a name that does not resolve.
+  it("drops a value whose name is empty", async () => {
     const { container } = render(Select, {
       props: {
         id: "subject",

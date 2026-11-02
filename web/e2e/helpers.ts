@@ -1,16 +1,16 @@
-import type { Page } from "@playwright/test"
+import { expect, type Page, type Request } from "@playwright/test"
 
 const MO = process.env.MO_URL ?? "http://localhost:5000"
 const GRAPHQL_VERSION = "v29"
 // Locally MO fronts Keycloak on /auth; in CI Keycloak is its own service.
 const KEYCLOAK = process.env.KEYCLOAK_URL ?? `${MO}/auth`
 
-// The published defaults of the local OS2mo dev stack — not real credentials.
+// The published defaults of the local OS2mo dev stack, not real credentials.
 const CLIENT_ID = "dipex"
 const CLIENT_SECRET = "603f1c82-d012-4d04-9382-dbe659c533fb"
 const USER = { name: "bruce", password: "bruce" }
 
-// Keycloak access tokens expire after minutes — shorter than the suite. A
+// Keycloak access tokens expire after minutes, shorter than the suite. A
 // token cached without an expiry fails the specs that run late.
 let token: { value: string; expires: number } | undefined
 const moToken = async (): Promise<string> => {
@@ -41,6 +41,48 @@ export const moGraphql = async (query: string, variables?: object) => {
   if (json.errors) throw new Error("GraphQL: " + json.errors[0].message)
   return json.data
 }
+
+// The day `offset` days from today in Copenhagen, as the date inputs take it.
+export const isoDay = (offset = 0) =>
+  new Date(Date.now() + offset * 86_400_000).toLocaleDateString("sv-SE", {
+    timeZone: "Europe/Copenhagen",
+  })
+
+export const createInMo = async (
+  type: string,
+  inputType: string,
+  input: object
+): Promise<string> =>
+  (
+    await moGraphql(
+      `mutation ($input: ${inputType}!) { ${type}_create(input: $input) { uuid } }`,
+      { input }
+    )
+  )[`${type}_create`].uuid
+
+export const deleteInMo = (type: string, uuid: string) =>
+  moGraphql(`mutation ($uuid: UUID!) { ${type}_delete(uuid: $uuid) { uuid } }`, {
+    uuid,
+  })
+
+export const facetUuid = async (userKey: string): Promise<string> =>
+  (
+    await moGraphql(
+      "query ($keys: [String!]) { facets(filter: { user_keys: $keys }) { objects { uuid } } }",
+      { keys: [userKey] }
+    )
+  ).facets.objects[0].uuid
+
+export const firstClassUuid = async (facetUserKey: string): Promise<string> =>
+  (
+    await moGraphql(
+      "query ($keys: [String!]) { classes(filter: { facet: { user_keys: $keys } }, limit: 1) { objects { uuid } } }",
+      { keys: [facetUserKey] }
+    )
+  ).classes.objects[0].uuid
+
+// A short random tag, so probe objects from parallel or crashed runs differ.
+export const probeTag = () => Math.random().toString(36).slice(2, 8)
 
 export type Fixture = {
   person: string
@@ -97,18 +139,20 @@ export type EditTargets = Partial<
   Record<string, { person?: EditTarget; unit?: EditTarget }>
 >
 
-const EDIT_SIDES: Record<string, { collection: string; sides: ("person" | "unit")[] }> =
-  {
-    address: { collection: "addresses", sides: ["person", "unit"] },
-    ituser: { collection: "itusers", sides: ["person", "unit"] },
-    manager: { collection: "managers", sides: ["person", "unit"] },
-    association: { collection: "associations", sides: ["person", "unit"] },
-    // A rolebinding's owner side is its ituser's.
-    rolebinding: { collection: "rolebindings", sides: ["person", "unit"] },
-    leave: { collection: "leaves", sides: ["person"] },
-    kle: { collection: "kles", sides: ["unit"] },
-    owner: { collection: "owners", sides: ["unit"] },
-  }
+export const EDIT_SIDES: Record<
+  string,
+  { collection: string; sides: ("person" | "unit")[] }
+> = {
+  address: { collection: "addresses", sides: ["person", "unit"] },
+  ituser: { collection: "itusers", sides: ["person", "unit"] },
+  manager: { collection: "managers", sides: ["person", "unit"] },
+  association: { collection: "associations", sides: ["person", "unit"] },
+  // A rolebinding's owner side is its ituser's.
+  rolebinding: { collection: "rolebindings", sides: ["person", "unit"] },
+  leave: { collection: "leaves", sides: ["person"] },
+  kle: { collection: "kles", sides: ["unit"] },
+  owner: { collection: "owners", sides: ["unit"] },
+}
 
 let editTargets: Promise<EditTargets> | undefined
 export const resolveEditTargets = (): Promise<EditTargets> =>
@@ -149,7 +193,7 @@ export const login = async (page: Page) => {
   // The app renders its shell (navbar included) BEFORE auth and only then
   // bounces to Keycloak, so seeing the shell proves nothing. A session is
   // proven either by the login form appearing (fill it) or by the app's
-  // first GraphQL response — queries only fire once a token is held.
+  // first GraphQL response: queries only fire once a token is held.
   const outcome = await Promise.race([
     username.waitFor({ timeout: 30_000 }).then(() => "form"),
     firstQuery().then(() => "session"),
@@ -164,12 +208,55 @@ export const login = async (page: Page) => {
   await page.locator(".navbar input[type=date]").waitFor({ timeout: 30_000 })
 }
 
+type GraphqlTraffic = { inFlight: number; lastChange: number }
+const traffic = new WeakMap<Page, GraphqlTraffic>()
+
+const trackGraphql = (page: Page) => {
+  const state: GraphqlTraffic = { inFlight: 0, lastChange: Date.now() }
+  traffic.set(page, state)
+  const isGraphql = (request: Request) => request.url().includes("/graphql/")
+  const change = (delta: number) => (request: Request) => {
+    if (!isGraphql(request)) return
+    state.inFlight += delta
+    state.lastChange = Date.now()
+  }
+  page.on("request", change(1))
+  page.on("requestfinished", change(-1))
+  page.on("requestfailed", change(-1))
+}
+
+// Resolves once no GraphQL request has been in flight for `quietMs`, counted
+// from the call at the earliest. The forms start their option refetches in the
+// same tick as the change that causes them, so the quiet window catches them
+// starting as well as finishing.
+export const graphqlIdle = async (page: Page, quietMs = 300) => {
+  const state = traffic.get(page)
+  if (!state) throw new Error("graphqlIdle needs blockMutations on the page first")
+  const since = Date.now()
+  await expect
+    .poll(
+      () =>
+        state.inFlight === 0 &&
+        Date.now() - Math.max(state.lastChange, since) >= quietMs,
+      { message: "GraphQL requests still in flight", timeout: 30_000, intervals: [50] }
+    )
+    .toBe(true)
+}
+
+// svelte-select closes its list and reports the change in one deferred tick,
+// so once the list is gone the form has seen the pick.
+export const listClosed = (page: Page) =>
+  expect(page.locator(".svelte-select-list")).toHaveCount(0)
+
 // Blocks every GraphQL mutation from the page, so forms can never write to
 // MO. `onMutation` receives the variables a blocked mutation would have sent.
+// Every spec sets this up before navigating, so it also starts the traffic
+// tracking `graphqlIdle` reads.
 export const blockMutations = async (
   page: Page,
   onMutation?: (variables: unknown) => void
 ) => {
+  trackGraphql(page)
   await page.route("**/graphql/**", async (route) => {
     try {
       const body = route.request().postData()
@@ -183,10 +270,24 @@ export const blockMutations = async (
         })
       }
     } catch {
-      /* not JSON — let it through */
+      /* not JSON, let it through */
     }
     return route.continue()
   })
+}
+
+// Submits the form and resolves once it has decided. The forms post their
+// SvelteKit action first and only send the mutation from its callback, after
+// their own validation, so once the action has answered and GraphQL has gone
+// quiet, a mutation the form was going to send has been sent. This is what
+// lets a test assert that a blocked submit sent nothing.
+export const submitForm = async (page: Page) => {
+  const action = page.waitForResponse(
+    (r) => r.request().headers()["x-sveltekit-action"] === "true"
+  )
+  await page.locator("form button[type=submit]").click()
+  await action
+  await graphqlIdle(page)
 }
 
 // Also logs both kinds of error as they happen: a test that times out waiting
@@ -216,7 +317,7 @@ export const dismiss = async (page: Page) => {
     .first()
     .click({ timeout: 1000 })
     .catch(() => {})
-  await page.waitForTimeout(150)
+  await listClosed(page)
 }
 
 // The Select of one form field, found by its label rather than its position,
@@ -234,8 +335,15 @@ export const selectOptions = async (page: Page, field: string): Promise<string[]
   await page.locator(".list-item").first().waitFor({ timeout: 8000 })
   const texts = await page.locator(".list-item").allInnerTexts()
   await page.keyboard.press("Escape")
-  await page.waitForTimeout(200)
+  await listClosed(page)
   return texts.map((text) => text.trim())
+}
+
+// After a pick: the form has seen it, and whatever it refetched in response
+// has landed, so the next control shows current options.
+const picked = async (page: Page) => {
+  await listClosed(page)
+  await graphqlIdle(page)
 }
 
 // Opens a field's Select and picks its first option.
@@ -244,21 +352,33 @@ export const pickFirstOption = async (page: Page, field: string) => {
   await page.locator(".list-item").first().waitFor({ timeout: 8000 })
   await page.keyboard.press("ArrowDown")
   await page.keyboard.press("Enter")
-  await page.waitForTimeout(300)
+  await picked(page)
 }
 
-// SelectMultiple has no #select wrapper — target its inner input by the id
+// SelectMultiple has no #select wrapper; target its inner input by the id
 // the form gave the component. Matched by suffix: the wizard prefixes ids
 // with "{entityKey}-{index}-", the routes don't.
 export const pickMultiFirstOption = async (page: Page, idSuffix: string) => {
-  await page.locator(`form input[id$="${idSuffix}"]:visible`).click({ timeout: 8000 })
+  const input = page.locator(`form input[id$="${idSuffix}"]:visible`)
+  // A `has` locator is matched inside the outer element, so the form scope
+  // goes on the outer one.
+  const chosen = page
+    .locator("form .svelte-select", {
+      has: page.locator(`input[id$="${idSuffix}"]:visible`),
+    })
+    .locator(".multi-item")
+  const before = await chosen.count()
+  await input.click({ timeout: 8000 })
   await page.locator(".list-item").first().waitFor({ timeout: 8000 })
   await page.keyboard.press("ArrowDown")
   await page.keyboard.press("Enter")
-  await page.waitForTimeout(300)
+  await expect(chosen).toHaveCount(before + 1)
+  // Closing the list is harmless if svelte-select already did.
+  await page.keyboard.press("Escape")
+  await picked(page)
 }
 
-// Types into the select to filter, then picks the first match — for options
+// Types into the select to filter, then picks the first match, for options
 // that must be a specific one (pickFirstOption takes whatever comes first).
 export const pickOptionByText = async (page: Page, field: string, text: string) => {
   await selectFor(page, field).click({ timeout: 8000 })
@@ -266,7 +386,7 @@ export const pickOptionByText = async (page: Page, field: string, text: string) 
   await page.locator(".list-item").first().waitFor({ timeout: 8000 })
   await page.keyboard.press("ArrowDown")
   await page.keyboard.press("Enter")
-  await page.waitForTimeout(300)
+  await picked(page)
 }
 
 // Picks the option named exactly `text`, for options whose names contain one
@@ -278,7 +398,7 @@ export const pickExactOption = async (page: Page, field: string, text: string) =
     .filter({ has: page.getByText(text, { exact: true }) })
     .first()
     .click({ timeout: 8000 })
-  await page.waitForTimeout(300)
+  await picked(page)
 }
 
 // Types into the form's Search field and picks the first result.
@@ -287,5 +407,5 @@ export const searchAndPick = async (page: Page, text: string) => {
   await page.locator(".list-item").first().waitFor({ timeout: 15000 })
   await page.keyboard.press("ArrowDown")
   await page.keyboard.press("Enter")
-  await page.waitForTimeout(500)
+  await picked(page)
 }
