@@ -97,6 +97,13 @@
   // to drop it. Without a person the list stays unloaded instead of empty, so a
   // prefilled vacant role survives.
   const managers = createQuery<ClassValue[]>()
+  // An only role is picked for the user; a role the form already has is kept.
+  // A function, so the fetch below does not depend on `value`: the select
+  // re-assigns its bound value whenever its list changes, so a fetch that read
+  // it would refetch on every refetch and never settle (see AGENTS.md).
+  const pickOnlyRole = (list: ClassValue[]) => {
+    if (list.length === 1 && !value) value = list[0]
+  }
   $: if (personUuid && at) {
     const uuid = personUuid
     const fromDate = at
@@ -105,11 +112,13 @@
         person: [uuid],
         fromDate,
       })
-      return res.managers.objects.flatMap((manager) =>
+      const list = res.managers.objects.flatMap((manager) =>
         manager.current
           ? [formatManagerTitleAndUuid({ uuid: manager.uuid, ...manager.current })]
           : []
       )
+      if (!signal.aborted) pickOnlyRole(list)
+      return list
     })
   }
 

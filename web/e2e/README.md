@@ -80,13 +80,14 @@ if a crashed run leaves it behind, the units' user_keys are prefixed
 
 ## explicitManager.spec.ts
 
-Seeds a manager holding a role in a probe unit, and a staff member whose
-engagement points at that role, then asserts that:
+Seeds a manager holding roles in two probe units, a person with a single
+one, and a staff member whose engagement points at the manager's first role,
+then asserts that:
 
 - the engagement table shows the explicit manager with its marker, on the
   employee and the unit page;
-- the create form sends the picked manager role, and does not submit a
-  person without one;
+- the create form sends the picked manager role, picks a person's only role
+  by itself, and does not submit a person without one;
 - the edit form leaves the explicit manager out of an unrelated edit, so MO
   keeps it, and sends null when its person is cleared, on the employee and the
   unit page.
@@ -96,7 +97,7 @@ engagement points at that role, then asserts that:
 The staff member is a probe person because the smoke suite edits the fixture
 person's engagement in parallel. Leftovers from a crashed run: a unit
 prefixed `explicit-probe-` and people named `Explicit Probe Manager` /
-`Explicit Probe Staff`.
+`Explicit Probe Solo` / `Explicit Probe Staff`.
 
 ## moveEngagements.spec.ts
 

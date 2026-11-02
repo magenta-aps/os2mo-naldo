@@ -7,6 +7,7 @@ import {
   firstClassUuid,
   login,
   pickFirstOption,
+  pickOptionByText,
   probeTag,
   resolveFixture,
   searchAndPick,
@@ -16,20 +17,25 @@ import {
   type Fixture,
 } from "./helpers"
 
-// Seeds a manager with a manager role in a probe unit, and a probe staff member
-// whose engagement in the fixture unit points at that role; the smoke suite
-// edits the fixture person's own engagement in parallel. Leftovers from a
-// crashed run: a unit prefixed `explicit-probe-` and people named
-// `Explicit Probe Manager` / `Explicit Probe Staff`.
+// Seeds a manager holding roles in two probe units, a probe person with a
+// single one, and a probe staff member whose engagement in the fixture unit
+// points at the manager's first role; the smoke suite edits the fixture person's
+// own engagement in parallel. Leftovers from a crashed run: units prefixed
+// `explicit-probe-` and people named `Explicit Probe Manager` / `Solo` / `Staff`.
 
 const EXPLICIT_TITLE = /Eksplicit leder|Explicit manager/
 
 let fixture: Fixture
 let unit: string
+let unitName: string
+let otherUnit: string
 let manager: { uuid: string; name: string }
 let staff: string
 let staffName: string
 let managerRole: string
+let otherRole: string
+let solo: { uuid: string; name: string }
+let soloRole: string
 let engagement: string
 
 test.beforeAll(async () => {
@@ -53,13 +59,17 @@ test.beforeAll(async () => {
   )
 
   const suffix = probeTag()
-  unit = await createInMo("org_unit", "OrganisationUnitCreateInput", {
-    name: `Explicit Probe Unit ${suffix}`,
-    user_key: "explicit-probe-" + suffix,
-    parent: fixture.unit,
-    org_unit_type: unitType,
-    validity: { from: fixture.from },
-  })
+  const createUnit = (name: string) =>
+    createInMo("org_unit", "OrganisationUnitCreateInput", {
+      name,
+      user_key: `explicit-probe-${probeTag()}`,
+      parent: fixture.unit,
+      org_unit_type: unitType,
+      validity: { from: fixture.from },
+    })
+  unitName = `Explicit Probe Unit ${suffix}`
+  unit = await createUnit(unitName)
+  otherUnit = await createUnit(`Explicit Probe Other ${suffix}`)
   manager = {
     uuid: await createInMo("employee", "EmployeeCreateInput", {
       given_name: "Explicit Probe",
@@ -72,14 +82,25 @@ test.beforeAll(async () => {
     given_name: "Explicit Probe",
     surname: `Staff ${suffix}`,
   })
-  managerRole = await createInMo("manager", "ManagerCreateInput", {
-    person: manager.uuid,
-    org_unit: unit,
-    manager_type: managerType,
-    manager_level: managerLevel,
-    responsibility: [responsibility],
-    validity: { from: fixture.from },
-  })
+  const createManagerRole = (person: string, orgUnit: string) =>
+    createInMo("manager", "ManagerCreateInput", {
+      person,
+      org_unit: orgUnit,
+      manager_type: managerType,
+      manager_level: managerLevel,
+      responsibility: [responsibility],
+      validity: { from: fixture.from },
+    })
+  managerRole = await createManagerRole(manager.uuid, unit)
+  otherRole = await createManagerRole(manager.uuid, otherUnit)
+  solo = {
+    uuid: await createInMo("employee", "EmployeeCreateInput", {
+      given_name: "Explicit Probe",
+      surname: `Solo ${suffix}`,
+    }),
+    name: `Explicit Probe Solo ${suffix}`,
+  }
+  soloRole = await createManagerRole(solo.uuid, unit)
   engagement = await createInMo("engagement", "EngagementCreateInput", {
     person: staff,
     org_unit: fixture.unit,
@@ -92,9 +113,11 @@ test.beforeAll(async () => {
 
 test.afterAll(async () => {
   if (engagement) await deleteInMo("engagement", engagement)
-  if (managerRole) await deleteInMo("manager", managerRole)
-  if (unit) await deleteInMo("org_unit", unit)
-  for (const person of [staff, manager?.uuid].filter(Boolean))
+  for (const role of [managerRole, otherRole, soloRole].filter(Boolean))
+    await deleteInMo("manager", role)
+  for (const orgUnit of [unit, otherUnit].filter(Boolean))
+    await deleteInMo("org_unit", orgUnit)
+  for (const person of [staff, manager?.uuid, solo?.uuid].filter(Boolean))
     await deleteInMo("employee", person)
 })
 
@@ -121,11 +144,11 @@ const openEditForm = async (page: Page, path: string) => {
 const managerRoleInput = (page: Page) =>
   page.locator('form input[name="explicit-manager"]')
 
-// Searches the manager in the explicit manager's person field, then picks the
-// manager's only manager role.
+// Searches the manager in the explicit manager's person field, then picks
+// the role in the probe unit; the manager has a second one.
 const pickExplicitManager = async (page: Page) => {
   await searchAndPick(page, manager.name, EXPLICIT_TITLE)
-  await pickFirstOption(page, "explicit-manager")
+  await pickOptionByText(page, "explicit-manager", unitName)
   await expect(managerRoleInput(page)).toHaveValue(managerRole)
 }
 
@@ -178,6 +201,15 @@ test("employee engagement create does not submit a person without a manager role
 
   await submitForm(page)
   expect(sent, "a person without a manager role must not be submitted").toHaveLength(0)
+  expect(errors).toEqual([])
+})
+
+test("employee engagement create picks a person's only manager role", async ({
+  page,
+}) => {
+  const { errors } = await openForm(page, `/employee/${staff}/create/engagement`)
+  await searchAndPick(page, solo.name, EXPLICIT_TITLE)
+  await expect(managerRoleInput(page)).toHaveValue(soloRole)
   expect(errors).toEqual([])
 })
 
