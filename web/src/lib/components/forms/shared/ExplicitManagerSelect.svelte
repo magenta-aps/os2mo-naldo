@@ -140,6 +140,11 @@
   disabled={(!personUuid && !value) || !at || $managers.error}
   isClearable={true}
 />
+{#if options && !options.length}
+  <p class="-mt-3 pb-3 text-xs text-error">
+    {capital($_("explicit_manager_no_roles"))}
+  </p>
+{/if}
 {#if $managers.error}
   <p class="text-sm text-error">{capital($_("load_error_options"))}</p>
 {/if}

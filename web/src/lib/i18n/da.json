@@ -62,6 +62,7 @@
 	"explicit_manager": "eksplicit leder",
 	"explicit_manager_ended": "engagementets eksplicitte lederrolle er ikke aktiv på startdatoen. Den bevares, medmindre du fjerner den eller vælger en ny",
 	"explicit_manager_hint": "uden en eksplicit leder bruges lederen af engagementets enhed",
+	"explicit_manager_no_roles": "personen har ingen lederroller på startdatoen",
 	"external_id": "eksternt ID",
 	"facet": "{n, plural, =0 {facetten} one {facet} other {facetter}}",
 	"facets": {
