@@ -401,9 +401,19 @@ export const pickExactOption = async (page: Page, field: string, text: string) =
   await picked(page)
 }
 
-// Types into the form's Search field and picks the first result.
-export const searchAndPick = async (page: Page, text: string) => {
-  await page.locator("form input[type=text]:visible").first().fill(text)
+// The Search of one form field, found by its label text, for forms with more
+// than one. Every Search labels its input "autocomplete", so the label's
+// wrapper and text tell them apart.
+export const searchFor = (page: Page, field: RegExp) =>
+  page.locator('form div:has(> label[for="autocomplete"])', { hasText: field })
+
+// Types into a Search field, the form's first unless `field` names another,
+// and picks the first result.
+export const searchAndPick = async (page: Page, text: string, field?: RegExp) => {
+  const input = field
+    ? searchFor(page, field).locator("input[type=text]")
+    : page.locator("form input[type=text]:visible").first()
+  await input.fill(text)
   await page.locator(".list-item").first().waitFor({ timeout: 15000 })
   await page.keyboard.press("ArrowDown")
   await page.keyboard.press("Enter")

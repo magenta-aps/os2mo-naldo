@@ -129,6 +129,7 @@
     name: string
   }
   let explicitManager: ClassValue | undefined
+  let explicitManagerIncomplete = false
 
   const fromDate = field<Temporal.ZonedDateTime | null | undefined>("from", undefined, [
     required(),
@@ -442,6 +443,7 @@
         {/if}
         <ExplicitManagerSelect
           bind:value={explicitManager}
+          bind:incomplete={explicitManagerIncomplete}
           at={startDate}
           storedManager={engagement.explicit_manager}
         />
@@ -455,7 +457,7 @@
             values: { item: $_("engagement", { values: { n: 1 } }) },
           })
         )}
-        disabled={!hasChanges}
+        disabled={!hasChanges || explicitManagerIncomplete}
         info={hasChanges ? undefined : $_("edit_tooltip")}
       />
       <Button

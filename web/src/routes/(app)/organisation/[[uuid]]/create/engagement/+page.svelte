@@ -113,6 +113,8 @@
       )
     )
   }
+
+  let explicitManagerIncomplete = false
 </script>
 
 <title
@@ -238,7 +240,10 @@
           />
         </div>
       {/if}
-      <ExplicitManagerSelect at={startDate} />
+      <ExplicitManagerSelect
+        at={startDate}
+        bind:incomplete={explicitManagerIncomplete}
+      />
     </div>
   </div>
   <div class="flex py-6 gap-4">
@@ -249,6 +254,7 @@
           values: { item: $_("engagement", { values: { n: 1 } }) },
         })
       )}
+      disabled={explicitManagerIncomplete}
     />
     <Button
       type="button"

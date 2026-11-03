@@ -18,6 +18,10 @@
   export let person: { uuid: string; name: string } | undefined = undefined
   export let at: Temporal.ZonedDateTime | null | undefined
   export let idPrefix = ""
+  // A picked person without a manager role saves nothing on create and unsets
+  // the stored manager on edit, so the forms do not submit it. The manager is
+  // removed by clearing the person, so the role has no clear button of its own.
+  export let incomplete = false
   // The engagement's stored explicit manager, as the edit forms load it. Seeds
   // the fields, and is posted back so the action only sends an explicit
   // manager the user changed.
@@ -82,6 +86,7 @@
   $: storedActive = !!storedManager && !!findValidityAt(storedManager.validities, at)
 
   $: personUuid = person?.uuid
+  $: incomplete = !!personUuid && !value
   // The person search clears itself without an event when the date moves to
   // where the person does not exist, so the role goes here. The stored manager
   // stays: a vacant or outdated one has no person to begin with.
@@ -92,6 +97,13 @@
   // to drop it. Without a person the list stays unloaded instead of empty, so a
   // prefilled vacant role survives.
   const managers = createQuery<ClassValue[]>()
+  // An only role is picked for the user; a role the form already has is kept.
+  // A function, so the fetch below does not depend on `value`: the select
+  // re-assigns its bound value whenever its list changes, so a fetch that read
+  // it would refetch on every refetch and never settle (see AGENTS.md).
+  const pickOnlyRole = (list: ClassValue[]) => {
+    if (list.length === 1 && !value) value = list[0]
+  }
   $: if (personUuid && at) {
     const uuid = personUuid
     const fromDate = at
@@ -100,11 +112,13 @@
         person: [uuid],
         fromDate,
       })
-      return res.managers.objects.flatMap((manager) =>
+      const list = res.managers.objects.flatMap((manager) =>
         manager.current
           ? [formatManagerTitleAndUuid({ uuid: manager.uuid, ...manager.current })]
           : []
       )
+      if (!signal.aborted) pickOnlyRole(list)
+      return list
     })
   }
 
@@ -137,9 +151,23 @@
   id="{idPrefix}explicit-manager"
   bind:value
   iterable={options}
-  disabled={(!personUuid && !value) || !at || $managers.error}
-  isClearable={true}
+  disabled={(!personUuid && !value) ||
+    !at ||
+    $managers.error ||
+    (!!options && !options.length)}
+  isClearable={!personUuid}
+  required={!!personUuid}
 />
+{#if incomplete && options?.length}
+  <p class="-mt-3 pb-3 text-xs">
+    {capital($_("explicit_manager_pick_role"))}
+  </p>
+{/if}
+{#if options && !options.length}
+  <p class="-mt-3 pb-3 text-xs text-error">
+    {capital($_("explicit_manager_no_roles"))}
+  </p>
+{/if}
 {#if $managers.error}
   <p class="text-sm text-error">{capital($_("load_error_options"))}</p>
 {/if}

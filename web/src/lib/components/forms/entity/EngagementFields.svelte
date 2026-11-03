@@ -52,9 +52,11 @@
     engagementTypeField
   )
 
+  let explicitManagerIncomplete = false
+
   export const validate = async (): Promise<boolean> => {
     await svelteForm.validate()
-    return get(svelteForm).valid
+    return get(svelteForm).valid && !explicitManagerIncomplete
   }
 
   // Projected out of `value`, dates only when they change, so unrelated
@@ -205,6 +207,7 @@
 <ExplicitManagerSelect
   bind:person={value.explicitManagerPerson}
   bind:value={value.explicitManager}
+  bind:incomplete={explicitManagerIncomplete}
   at={fromDate}
   {idPrefix}
 />
