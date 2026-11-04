@@ -3,10 +3,10 @@
   import { capital } from "$lib/utils/helpers"
   import { date } from "$lib/stores/date"
   import { formatDay, lastValidDay } from "$lib/utils/date"
-  import { Temporal } from "temporal-polyfill"
   import {
     findClosestValidityWithin,
     filterValiditiesInRange,
+    mergeSameNameValidities,
   } from "$lib/utils/validities"
   import InfoTooltip from "$lib/components/shared/InfoTooltip.svelte"
 
@@ -20,7 +20,8 @@
     validity: Validity
   }
 
-  // The referenced object's name validities (fetched with `validities(start: null, end: null)`)
+  // Every validity of the referenced object (fetched with `validities(start: null, end: null)`),
+  // not only those where its name changed
   export let validities: NamedValidity[] | undefined | null
   // The validity of the row referencing the object
   export let rowValidity: Validity
@@ -37,11 +38,9 @@
 
   // Newest first; only surfaced when the name changed during the row.
   $: history = validities
-    ? filterValiditiesInRange(validities, rowValidity).sort((a, b) =>
-        a.validity.from && b.validity.from
-          ? Temporal.ZonedDateTime.compare(b.validity.from, a.validity.from)
-          : 0
-      )
+    ? mergeSameNameValidities(
+        filterValiditiesInRange(validities, rowValidity)
+      ).reverse()
     : []
 
   $: nameHistory =

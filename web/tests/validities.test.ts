@@ -6,6 +6,7 @@ import {
   findValidityAt,
   formatQueryDates,
   getMinMaxValidities,
+  mergeSameNameValidities,
 } from "$lib/utils/validities"
 import { describe, expect, it } from "vitest"
 import { dated, day, midnight, validity } from "./fixtures"
@@ -149,6 +150,55 @@ describe("filterValiditiesInRange", () => {
 
   it("keeps only open ends for a range starting after the others end", () => {
     expect(kept(validity("2020-01-01", null))).toEqual([2])
+  })
+})
+
+describe("mergeSameNameValidities", () => {
+  const unitValidity = (name: string, from: string, to: string | null) => ({
+    name,
+    ...dated(from, to),
+  })
+  // `toEqual` cannot tell Temporal values apart, so compare them as strings.
+  const periods = (validities: ReturnType<typeof unitValidity>[]) =>
+    mergeSameNameValidities(validities).map(
+      ({ name, validity }) => `${name} ${validity.from} ${validity.to}`
+    )
+
+  it("joins back-to-back validities with the same name", () => {
+    expect(
+      periods([
+        unitValidity("A", "2025-10-03", "2026-03-23"),
+        unitValidity("A", "2026-03-23", null),
+      ])
+    ).toEqual([`A ${midnight("2025-10-03")} null`])
+  })
+
+  it("does not merge the same name across a different name in between", () => {
+    expect(
+      periods([
+        unitValidity("A", "2000-01-01", "2010-01-01"),
+        unitValidity("B", "2010-01-01", "2020-01-01"),
+        unitValidity("A", "2020-01-01", null),
+      ])
+    ).toHaveLength(3)
+  })
+
+  it("does not merge the same name across a gap", () => {
+    expect(
+      periods([
+        unitValidity("A", "2000-01-01", "2010-01-01"),
+        unitValidity("A", "2015-01-01", null),
+      ])
+    ).toHaveLength(2)
+  })
+
+  it("returns the validities oldest first", () => {
+    const names = mergeSameNameValidities([
+      unitValidity("C", "2020-01-01", null),
+      unitValidity("A", "2000-01-01", "2010-01-01"),
+      unitValidity("B", "2010-01-01", "2020-01-01"),
+    ]).map(({ name }) => name)
+    expect(names).toEqual(["A", "B", "C"])
   })
 })
 

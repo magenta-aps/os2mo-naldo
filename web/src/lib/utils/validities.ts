@@ -126,6 +126,42 @@ export const filterValiditiesInRange = <T extends HasValidity>(
   })
 }
 
+// Oldest first, with back-to-back validities carrying the same name joined
+// into one. MO splits an object's validity whenever any of its fields change,
+// so consecutive validities often share a name. Validities separated by a gap
+// stay apart, since the object did not exist in between.
+export const mergeSameNameValidities = <
+  T extends HasValidity & { name?: string | null }
+>(
+  validities: T[]
+): T[] => {
+  const sorted = [...validities].sort((a, b) => {
+    if (!a.validity.from) return b.validity.from ? -1 : 0
+    if (!b.validity.from) return 1
+    return compare(a.validity.from, b.validity.from)
+  })
+
+  const merged: T[] = []
+  for (const current of sorted) {
+    const previous = merged.at(-1)
+    if (
+      previous &&
+      previous.name === current.name &&
+      previous.validity.to &&
+      current.validity.from &&
+      compare(previous.validity.to, current.validity.from) === 0
+    ) {
+      merged[merged.length - 1] = {
+        ...previous,
+        validity: { ...previous.validity, to: current.validity.to },
+      }
+    } else {
+      merged.push(current)
+    }
+  }
+  return merged
+}
+
 // The validity active at `at`, or null. Unlike findClosestValidity, never
 // falls back to an ended or future one.
 export const findValidityAt = <T extends HasValidity>(
