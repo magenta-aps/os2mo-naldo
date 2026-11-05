@@ -6,7 +6,7 @@
   import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
-  import { RolebindingsDocument, type RolebindingsQuery } from "./query.generated"
+  import { RolebindingsDocument } from "./query.generated"
   import { date } from "$lib/stores/date"
   import {
     tenseFilter,
@@ -14,7 +14,8 @@
     filterTenseToValidity,
   } from "$lib/utils/tenses"
   import { sortData } from "$lib/utils/sorting"
-  import { findClosestValidity } from "$lib/utils/validities"
+  import { findClosestValidityWithin } from "$lib/utils/validities"
+  import NameWithHistory from "$lib/components/shared/NameWithHistory.svelte"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
@@ -22,8 +23,6 @@
   import type { RoleBindingFilter } from "$lib/graphql/types"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { formatQueryDates } from "$lib/utils/validities"
-
-  type Rolebinding = RolebindingsQuery["rolebindings"]["objects"][0]["validities"]
 
   export let tense: Tense
 
@@ -51,12 +50,17 @@
             uuid
             ituser_response {
               uuid
-              validities(start: $fromDate, end: $toDate) {
-                user_key
+              validities(start: null, end: null) {
+                # The account name, under the name NameWithHistory reads
+                name: user_key
                 itsystem_response {
                   uuid
-                  current(at: $fromDate) {
+                  validities(start: null, end: null) {
                     name
+                    validity {
+                      from
+                      to
+                    }
                   }
                 }
                 validity {
@@ -86,17 +90,30 @@
       ...tenseToValidity(tense, $date),
     })
     .then((res) => {
-      const rolebindings: Rolebinding = []
-
       // Filters and flattens the data
-      for (const outer of res.rolebindings.objects) {
-        // TODO: Remove when GraphQL is able to do this for us
-        const filtered = outer.validities.filter((obj) => {
-          return tenseFilter(obj, tense)
-        })
-        rolebindings.push(...filtered)
-      }
-      return rolebindings
+      return res.rolebindings.objects.flatMap((outer) =>
+        outer.validities
+          // TODO: Remove when GraphQL is able to do this for us
+          .filter((obj) => tenseFilter(obj, tense))
+          .map((obj) => {
+            const itUserState = findClosestValidityWithin(
+              obj.ituser_response?.validities,
+              obj.validity,
+              $date
+            )
+            return {
+              ...obj,
+              // Precomputed so column sorting matches the displayed names
+              it_user_state: itUserState,
+              it_user_name: itUserState?.name,
+              itsystem_name: findClosestValidityWithin(
+                itUserState?.itsystem_response.validities,
+                obj.validity,
+                $date
+              )?.name,
+            }
+          })
+      )
     })
 </script>
 
@@ -106,17 +123,30 @@
   </tr>
 {:then data}
   {#each sortData(data, $sortKey, $sortDirection) as rolebindingObj, i}
-    {@const closestItuser = rolebindingObj.ituser_response?.validities?.length
-      ? findClosestValidity(rolebindingObj.ituser_response.validities, $date)
-      : null}
     <tr
       class="{i % 2 === 0 ? '' : 'bg-base-200'}
         leading-5 border-t border-base-300 text-base-content"
     >
-      <td class="text-sm p-4">{closestItuser?.user_key ?? ""}</td>
-      <td class="text-sm p-4"
-        >{closestItuser?.itsystem_response?.current?.name ?? ""}</td
-      >
+      <td class="text-sm p-4">
+        {#if rolebindingObj.ituser_response}
+          <NameWithHistory
+            id="{rolebindingObj.uuid}-it-user"
+            validities={rolebindingObj.ituser_response.validities}
+            rowValidity={rolebindingObj.validity}
+            fallback={rolebindingObj.ituser_response.uuid}
+          />
+        {/if}
+      </td>
+      <td class="text-sm p-4">
+        {#if rolebindingObj.it_user_state}
+          <NameWithHistory
+            id="{rolebindingObj.uuid}-itsystem"
+            validities={rolebindingObj.it_user_state.itsystem_response.validities}
+            rowValidity={rolebindingObj.validity}
+            fallback={rolebindingObj.it_user_state.itsystem_response.uuid}
+          />
+        {/if}
+      </td>
       <td class="text-sm p-4">{rolebindingObj.role_response?.current?.name}</td>
       <ValidityTableCell validity={rolebindingObj.validity} />
       <td class="flex p-4 gap-2 justify-end">

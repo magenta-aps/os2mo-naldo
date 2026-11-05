@@ -246,7 +246,7 @@
         headers={[
           {
             title: capital($_("unit", { values: { n: 1 } })),
-            sortPath: "org_unit_response.current.name",
+            sortPath: "org_unit_name",
           },
           {
             title: capital($_("association_type")),
@@ -254,7 +254,7 @@
           },
           {
             title: capital($_("substitute")),
-            sortPath: "substitute_response.current.name",
+            sortPath: "substitute_name",
           },
           ...(env.PUBLIC_ENABLE_CONFEDERATIONS
             ? [{ title: capital($_("trade_union")) }]
@@ -271,7 +271,7 @@
         headers={[
           {
             title: capital($_("unit", { values: { n: 1 } })),
-            sortPath: "org_unit_response.current.name",
+            sortPath: "org_unit_name",
           },
           {
             title: capital($_("job_function", { values: { n: 1 } })),
@@ -279,11 +279,11 @@
           },
           {
             title: capital($_("it_system")),
-            sortPath: "it_user_response.current.itsystem_response.current.name",
+            sortPath: "itsystem_name",
           },
           {
             title: capital($_("account_name")),
-            sortPath: "it_user_response.current.user_key",
+            sortPath: "it_user_name",
           },
           { title: capital($_("primary")) },
           { title: capital($_("date.date")), sortPath: "validity.from" },
@@ -302,7 +302,7 @@
           headers={[
             {
               title: capital($_("it_system")),
-              sortPath: "itsystem_response.current.name",
+              sortPath: "itsystem_name",
             },
             { title: capital($_("account_name")), sortPath: "user_key" },
             { title: capital($_("external_id")), sortPath: "external_id" },
@@ -319,11 +319,11 @@
           headers={[
             {
               title: capital($_("ituser", { values: { n: 1 } })),
-              sortPath: "ituser_response.validities[0].user_key",
+              sortPath: "it_user_name",
             },
             {
               title: capital($_("itsystem", { values: { n: 1 } })),
-              sortPath: "ituser_response.validities[0].itsystem_response.current.name",
+              sortPath: "itsystem_name",
             },
             {
               title: capital($_("role", { values: { n: 1 } })),
@@ -354,7 +354,7 @@
         headers={[
           {
             title: capital($_("unit", { values: { n: 1 } })),
-            sortPath: "org_unit_response.current.name",
+            sortPath: "org_unit_name",
           },
           {
             title: capital($_("engagement", { values: { n: 1 } })),
@@ -384,7 +384,7 @@
       <TableTensesWrapper
         table={OwnerTable}
         headers={[
-          { title: capital($_("name")), sortPath: "owner_response.current.name" },
+          { title: capital($_("name")), sortPath: "owner_name" },
           { title: capital($_("date.date")), sortPath: "validity.from" },
         ]}
       />

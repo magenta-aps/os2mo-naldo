@@ -238,7 +238,7 @@
       <TableTensesWrapper
         table={EngagementTable}
         headers={[
-          { title: capital($_("name")), sortPath: "person_response.current.name" },
+          { title: capital($_("name")), sortPath: "person_name" },
           ...(env.PUBLIC_SHOW_EXTENSION_4
             ? [{ title: capital($_("department_code")), sortPath: "extension_4" }]
             : []),
@@ -277,14 +277,14 @@
       <TableTensesWrapper
         table={AssociationTable}
         headers={[
-          { title: capital($_("name")), sortPath: "person_response.current.name" },
+          { title: capital($_("name")), sortPath: "person_name" },
           {
             title: capital($_("association_type")),
             sortPath: "association_type_response.current.name",
           },
           {
             title: capital($_("substitute")),
-            sortPath: "substitute_response.current.name",
+            sortPath: "substitute_name",
           },
           ...(env.PUBLIC_ENABLE_CONFEDERATIONS
             ? [{ title: capital($_("trade_union")) }]
@@ -308,7 +308,7 @@
           headers={[
             {
               title: capital($_("it_system")),
-              sortPath: "itsystem_response.current.name",
+              sortPath: "itsystem_name",
             },
             { title: capital($_("account_name")), sortPath: "user_key" },
             { title: capital($_("external_id")), sortPath: "external_id" },
@@ -325,11 +325,11 @@
           headers={[
             {
               title: capital($_("ituser", { values: { n: 1 } })),
-              sortPath: "ituser_response.validities[0].user_key",
+              sortPath: "it_user_name",
             },
             {
               title: capital($_("itsystem", { values: { n: 1 } })),
-              sortPath: "ituser_response.validities[0].itsystem_response.current.name",
+              sortPath: "itsystem_name",
             },
             {
               title: capital($_("role", { values: { n: 1 } })),
@@ -343,7 +343,7 @@
       <TableTensesWrapper
         table={ManagerTable}
         headers={[
-          { title: capital($_("name")), sortPath: "person_response.current.name" },
+          { title: capital($_("name")), sortPath: "person_name" },
           {
             title: capital($_("engagement", { values: { n: 1 } })),
             sortPath: "engagement_state.job_function_response.current.name",
@@ -384,7 +384,7 @@
       <TableTensesWrapper
         table={OwnerTable}
         headers={[
-          { title: capital($_("name")), sortPath: "owner_response.current.name" },
+          { title: capital($_("name")), sortPath: "owner_name" },
           { title: capital($_("date.date")), sortPath: "validity.from" },
         ]}
       />

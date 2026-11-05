@@ -6,7 +6,7 @@
   import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
-  import { AssociationsDocument, type AssociationsQuery } from "./query.generated"
+  import { AssociationsDocument } from "./query.generated"
   import { date } from "$lib/stores/date"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { sortData } from "$lib/utils/sorting"
@@ -14,12 +14,11 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
-  import { formatQueryDates } from "$lib/utils/validities"
+  import { findClosestValidityWithin, formatQueryDates } from "$lib/utils/validities"
+  import NameWithHistory from "$lib/components/shared/NameWithHistory.svelte"
   import { updateGlobalNavigation } from "$lib/stores/navigation"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
-
-  type Associations = AssociationsQuery["associations"]["objects"][0]["validities"]
 
   export let tense: Tense
 
@@ -47,14 +46,22 @@
             uuid
             org_unit_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             person_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             association_type_response {
@@ -71,8 +78,12 @@
             }
             substitute_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             primary_response {
@@ -100,21 +111,37 @@
       ...tenseToValidity(tense, $date),
     })
     .then((res) => {
-      const associations: Associations = []
-
       // Filters and flattens the data
-      for (const outer of res.associations.objects) {
-        // TODO: Remove when GraphQL is able to do this for us
-        const filtered = outer.validities.filter((obj) => {
-          if (!tenseFilter(obj, tense)) return false
-          // Check if association validity is in the current org_unit
-          // TODO: Do this with GraphQL, when following issues are resolved (#65031) (#65303)
-          if (isOrg && obj.org_unit_response.uuid !== uuid) return false
-          return true
-        })
-        associations.push(...filtered)
-      }
-      return associations
+      return res.associations.objects.flatMap((outer) =>
+        outer.validities
+          // TODO: Remove when GraphQL is able to do this for us
+          .filter((obj) => {
+            if (!tenseFilter(obj, tense)) return false
+            // Check if association validity is in the current org_unit
+            // TODO: Do this with GraphQL, when following issues are resolved (#65031) (#65303)
+            if (isOrg && obj.org_unit_response.uuid !== uuid) return false
+            return true
+          })
+          .map((obj) => ({
+            ...obj,
+            // Precomputed so column sorting matches the displayed names
+            org_unit_name: findClosestValidityWithin(
+              obj.org_unit_response?.validities,
+              obj.validity,
+              $date
+            )?.name,
+            person_name: findClosestValidityWithin(
+              obj.person_response?.validities,
+              obj.validity,
+              $date
+            )?.name,
+            substitute_name: findClosestValidityWithin(
+              obj.substitute_response?.validities,
+              obj.validity,
+              $date
+            )?.name,
+          }))
+      )
     })
 </script>
 
@@ -132,31 +159,39 @@
         {#if isOrg}
           <!-- GraphQL and Naldo doesn't allow creating vacant associations, but the old frontend did -->
           <!-- This means that some customers might have them, and therefore we need this check. -->
-          {#if association.person_response?.current?.name}
-            <a href="{base}/employee/{association.person_response.uuid}">
-              {association.person_response.current.name}
-            </a>
+          {#if association.person_response}
+            <NameWithHistory
+              id="{association.uuid}-person"
+              validities={association.person_response.validities}
+              rowValidity={association.validity}
+              fallback={association.person_response.uuid}
+              href="{base}/employee/{association.person_response.uuid}"
+            />
           {:else}
             {capital($_("vacant"))}
           {/if}
         {:else}
-          <a
+          <NameWithHistory
+            id="{association.uuid}-org-unit"
+            validities={association.org_unit_response.validities}
+            rowValidity={association.validity}
+            fallback={association.org_unit_response.uuid}
             href="{base}/organisation/{association.org_unit_response.uuid}"
             on:click={() => updateGlobalNavigation(association.org_unit_response.uuid)}
-          >
-            {association.org_unit_response.current?.name ??
-              association.org_unit_response.uuid}</a
-          >
+          />
         {/if}
       </td>
       <td class="text-sm p-4">{association.association_type_response?.current?.name}</td
       >
       <td class="text-sm p-4">
         {#if association.substitute_response}
-          <a href="{base}/employee/{association.substitute_response.uuid}">
-            {association.substitute_response.current?.name ??
-              association.substitute_response.uuid}
-          </a>
+          <NameWithHistory
+            id="{association.uuid}-substitute"
+            validities={association.substitute_response.validities}
+            rowValidity={association.validity}
+            fallback={association.substitute_response.uuid}
+            href="{base}/employee/{association.substitute_response.uuid}"
+          />
         {/if}
       </td>
       {#if env.PUBLIC_ENABLE_CONFEDERATIONS}

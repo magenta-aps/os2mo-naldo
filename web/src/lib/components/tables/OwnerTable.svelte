@@ -6,12 +6,7 @@
   import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
-  import {
-    EmployeeOwnerDocument,
-    OrgUnitOwnerDocument,
-    type EmployeeOwnerQuery,
-    type OrgUnitOwnerQuery,
-  } from "./query.generated"
+  import { EmployeeOwnerDocument, OrgUnitOwnerDocument } from "./query.generated"
   import { date } from "$lib/stores/date"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { sortData } from "$lib/utils/sorting"
@@ -19,13 +14,10 @@
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
-  import { formatQueryDates } from "$lib/utils/validities"
+  import { findClosestValidityWithin, formatQueryDates } from "$lib/utils/validities"
+  import NameWithHistory from "$lib/components/shared/NameWithHistory.svelte"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
-
-  type Owners =
-    | EmployeeOwnerQuery["owners"]["objects"][0]["validities"]
-    | OrgUnitOwnerQuery["org_units"]["objects"][0]["validities"][0]["owners"]
 
   export let tense: Tense
 
@@ -52,14 +44,22 @@
             }
             org_unit_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             owner_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
           }
@@ -85,14 +85,22 @@
               }
               org_unit_response {
                 uuid
-                current(at: $fromDate) {
+                validities(start: null, end: null) {
                   name
+                  validity {
+                    from
+                    to
+                  }
                 }
               }
               owner_response {
                 uuid
-                current(at: $fromDate) {
+                validities(start: null, end: null) {
                   name
+                  validity {
+                    from
+                    to
+                  }
                 }
               }
             }
@@ -102,43 +110,36 @@
     }
   `
 
-  $: dataPromise = isOrg
-    ? graphQLClient()
-        .request(OrgUnitOwnerDocument, {
-          uuids: uuid,
-          ...tenseToValidity(tense, $date),
-        })
-        .then((res) => {
-          const owners: Owners = []
-
-          // Filters and flattens the data
-          for (const outer of res.org_units.objects) {
-            // TODO: Remove when GraphQL is able to do this for us
-            const filtered = outer.validities[0].owners.filter((obj) => {
-              return tenseFilter(obj, tense)
-            })
-            owners.push(...filtered)
-          }
-          return owners
-        })
-    : graphQLClient()
-        .request(EmployeeOwnerDocument, {
-          uuids: uuid,
-          ...tenseToValidity(tense, $date),
-        })
-        .then((res) => {
-          const owners: Owners = []
-
-          // Filters and flattens the data
-          for (const outer of res.owners.objects) {
-            // TODO: Remove when GraphQL is able to do this for us
-            const filtered = outer.validities.filter((obj) => {
-              return tenseFilter(obj, tense)
-            })
-            owners.push(...filtered)
-          }
-          return owners
-        })
+  $: dataPromise = (
+    isOrg
+      ? graphQLClient()
+          .request(OrgUnitOwnerDocument, {
+            uuids: uuid,
+            ...tenseToValidity(tense, $date),
+          })
+          .then((res) =>
+            res.org_units.objects.flatMap((outer) => outer.validities[0].owners)
+          )
+      : graphQLClient()
+          .request(EmployeeOwnerDocument, {
+            uuids: uuid,
+            ...tenseToValidity(tense, $date),
+          })
+          .then((res) => res.owners.objects.flatMap((outer) => outer.validities))
+  ).then((owners) =>
+    owners
+      // TODO: Remove when GraphQL is able to do this for us
+      .filter((obj) => tenseFilter(obj, tense))
+      .map((obj) => ({
+        ...obj,
+        // Precomputed so column sorting matches the displayed names
+        owner_name: findClosestValidityWithin(
+          obj.owner_response?.validities,
+          obj.validity,
+          $date
+        )?.name,
+      }))
+  )
 </script>
 
 {#await dataPromise}
@@ -153,9 +154,13 @@
     >
       <td class="text-sm p-4">
         {#if ownerObj.owner_response}
-          <a href="{base}/employee/{ownerObj.owner_response.uuid}">
-            {ownerObj.owner_response.current?.name}
-          </a>
+          <NameWithHistory
+            id="{ownerObj.uuid}-owner"
+            validities={ownerObj.owner_response.validities}
+            rowValidity={ownerObj.validity}
+            fallback={ownerObj.owner_response.uuid}
+            href="{base}/employee/{ownerObj.owner_response.uuid}"
+          />
         {:else}
           {capital($_("vacant"))}
         {/if}
@@ -165,7 +170,12 @@
             title={capital(
               $_("inherited_owner", {
                 values: {
-                  org_unit: ownerObj.org_unit_response?.current?.name,
+                  org_unit:
+                    findClosestValidityWithin(
+                      ownerObj.org_unit_response?.validities,
+                      ownerObj.validity,
+                      $date
+                    )?.name ?? ownerObj.org_unit_response?.uuid,
                 },
               })
             )}>(*)</span

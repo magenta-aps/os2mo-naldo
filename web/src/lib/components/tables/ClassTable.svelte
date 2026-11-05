@@ -7,18 +7,17 @@
   import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { tenseToValidity, tenseFilter } from "$lib/utils/tenses"
-  import { formatQueryDates } from "$lib/utils/validities"
+  import { findClosestValidityWithin, formatQueryDates } from "$lib/utils/validities"
+  import NameWithHistory from "$lib/components/shared/NameWithHistory.svelte"
   import { page } from "$app/stores"
   import { date } from "$lib/stores/date"
-  import { ClassDocument, type ClassQuery } from "./query.generated"
+  import { ClassDocument } from "./query.generated"
   import { sortKey, sortDirection } from "$lib/stores/sorting"
   import { sortData } from "$lib/utils/sorting"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
   import cancelOutlineRounded from "@iconify/icons-material-symbols/cancel-outline-rounded"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
-
-  type Classes = ClassQuery["classes"]["objects"][0]["validities"]
 
   export let tense: Tense
   export let facetUuid: string
@@ -38,8 +37,12 @@
             facet_uuid
             it_system_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             parent_response {
@@ -50,8 +53,12 @@
             }
             owner_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             validity {
@@ -71,19 +78,23 @@
           ...tenseToValidity(tense, $date),
         })
         .then((res) => {
-          const classes: Classes = []
-
           // Filters and flattens the data
-          for (const outer of res.classes.objects) {
-            // TODO: Remove when GraphQL is able to do this for us
-            const filtered = outer.validities.filter((obj) => {
-              return tenseFilter(obj, tense)
-            })
-            classes.push(...filtered)
-          }
-          return classes
+          return res.classes.objects.flatMap((outer) =>
+            outer.validities
+              // TODO: Remove when GraphQL is able to do this for us
+              .filter((obj) => tenseFilter(obj, tense))
+              .map((obj) => ({
+                ...obj,
+                // Precomputed so column sorting matches the displayed name
+                owner_name: findClosestValidityWithin(
+                  obj.owner_response?.validities,
+                  obj.validity,
+                  $date
+                )?.name,
+              }))
+          )
         })
-    : Promise.resolve([] as Classes)
+    : Promise.resolve([])
 </script>
 
 {#await dataPromise}
@@ -99,12 +110,30 @@
       <td class="text-sm p-4">{cls.name}</td>
       <td class="text-sm p-4">{cls.user_key}</td>
       {#if isRoleFacet}
-        <td class="text-sm p-4">{cls.it_system_response?.current?.name ?? ""}</td>
+        <td class="text-sm p-4">
+          {#if cls.it_system_response}
+            <NameWithHistory
+              id="{cls.uuid}-itsystem"
+              validities={cls.it_system_response.validities}
+              rowValidity={cls.validity}
+              fallback={cls.it_system_response.uuid}
+            />
+          {/if}
+        </td>
       {/if}
       {#if isTradeUnionFacet}
         <td class="text-sm p-4">{cls.parent_response?.current?.name ?? ""}</td>
       {/if}
-      <td class="text-sm p-4">{cls.owner_response?.current?.name ?? ""}</td>
+      <td class="text-sm p-4">
+        {#if cls.owner_response}
+          <NameWithHistory
+            id="{cls.uuid}-owner"
+            validities={cls.owner_response.validities}
+            rowValidity={cls.validity}
+            fallback={cls.owner_response.uuid}
+          />
+        {/if}
+      </td>
       <ValidityTableCell validity={cls.validity} />
       <td class="flex p-4 gap-2 justify-end">
         <a href={`${base}/auditlog/${cls.uuid}`}>

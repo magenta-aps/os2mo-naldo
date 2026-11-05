@@ -1,6 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
-  import { capital, formatITUserITSystemName } from "$lib/utils/helpers"
+  import { capital } from "$lib/utils/helpers"
   import ValidityTableCell from "$lib/components/shared/ValidityTableCell.svelte"
   import { base } from "$app/paths"
   import { graphQLClient } from "$lib/http/client"
@@ -11,7 +11,6 @@
   import {
     clampDateToValidity,
     filterValiditiesInRange,
-    findClosestValidity,
     findClosestValidityWithin,
     findValidityAt,
   } from "$lib/utils/validities"
@@ -68,8 +67,12 @@
             org_unit_uuid
             person_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             job_function_response {
@@ -93,9 +96,12 @@
                 uuid
                 itsystem_response {
                   uuid
-                  current(at: $fromDate) {
-                    user_key
+                  validities(start: null, end: null) {
                     name
+                    validity {
+                      from
+                      to
+                    }
                   }
                 }
                 validity {
@@ -274,6 +280,11 @@
                 obj.validity,
                 $date
               )?.name,
+              person_name: findClosestValidityWithin(
+                obj.person_response.validities,
+                obj.validity,
+                $date
+              )?.name,
             }
           })
       )
@@ -292,9 +303,13 @@
     >
       <td class="text-sm p-4">
         {#if isOrg}
-          <a href="{base}/employee/{engagement.person_response.uuid}"
-            >{engagement.person_response.current?.name}</a
-          >
+          <NameWithHistory
+            id="{engagement.uuid}-person"
+            validities={engagement.person_response.validities}
+            rowValidity={engagement.validity}
+            fallback={engagement.person_response.uuid}
+            href="{base}/employee/{engagement.person_response.uuid}"
+          />
         {:else}
           <NameWithHistory
             id={engagement.uuid}
@@ -326,10 +341,18 @@
       {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
         <td class="text-sm p-4">
           {#each engagement.itusers as ituser}
-            {#if ituser.validities && ituser.validities.length}
+            {@const state = findClosestValidityWithin(
+              ituser.validities,
+              engagement.validity,
+              $date
+            )}
+            {#if state}
               <div>
-                {formatITUserITSystemName(findClosestValidity(ituser.validities, $date))
-                  .name}
+                {findClosestValidityWithin(
+                  state.itsystem_response.validities,
+                  engagement.validity,
+                  $date
+                )?.name ?? state.itsystem_response.uuid}, {state.user_key}
               </div>
             {/if}
           {/each}

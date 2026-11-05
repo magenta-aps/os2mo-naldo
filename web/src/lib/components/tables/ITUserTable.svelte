@@ -6,11 +6,12 @@
   import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
-  import { EmployeeItUsersDocument, type EmployeeItUsersQuery } from "./query.generated"
+  import { EmployeeItUsersDocument } from "./query.generated"
   import { date } from "$lib/stores/date"
   import { tenseFilter, tenseToValidity } from "$lib/utils/tenses"
   import { sortData } from "$lib/utils/sorting"
   import { findClosestValidityWithin } from "$lib/utils/validities"
+  import NameWithHistory from "$lib/components/shared/NameWithHistory.svelte"
   import { sortDirection, sortKey } from "$lib/stores/sorting"
   import Icon from "@iconify/svelte"
   import editSquareOutlineRounded from "@iconify/icons-material-symbols/edit-square-outline-rounded"
@@ -19,8 +20,6 @@
   import { getEngagementDisplay } from "$lib/utils/display"
   import historyRounded from "@iconify/icons-material-symbols/history-rounded"
   import { env } from "$lib/env"
-
-  type ITUsers = EmployeeItUsersQuery["itusers"]["objects"][0]["validities"]
 
   export let tense: Tense
 
@@ -49,8 +48,12 @@
             uuid
             itsystem_response {
               uuid
-              current(at: $fromDate) {
+              validities(start: null, end: null) {
                 name
+                validity {
+                  from
+                  to
+                }
               }
             }
             external_id
@@ -105,17 +108,21 @@
       ...tenseToValidity(tense, $date),
     })
     .then((res) => {
-      const itUsers: ITUsers = []
-
       // Filters and flattens the data
-      for (const outer of res.itusers.objects) {
-        // TODO: Remove when GraphQL is able to do this for us
-        const filtered = outer.validities.filter((obj) => {
-          return tenseFilter(obj, tense)
-        })
-        itUsers.push(...filtered)
-      }
-      return itUsers
+      return res.itusers.objects.flatMap((outer) =>
+        outer.validities
+          // TODO: Remove when GraphQL is able to do this for us
+          .filter((obj) => tenseFilter(obj, tense))
+          .map((obj) => ({
+            ...obj,
+            // Precomputed so column sorting matches the displayed name
+            itsystem_name: findClosestValidityWithin(
+              obj.itsystem_response.validities,
+              obj.validity,
+              $date
+            )?.name,
+          }))
+      )
     })
 </script>
 
@@ -129,7 +136,14 @@
       class="{i % 2 === 0 ? '' : 'bg-base-200'} 
       leading-5 border-t border-base-300 text-base-content"
     >
-      <td class="text-sm p-4">{ituser.itsystem_response.current?.name} </td>
+      <td class="text-sm p-4">
+        <NameWithHistory
+          id="{ituser.uuid}-itsystem"
+          validities={ituser.itsystem_response.validities}
+          rowValidity={ituser.validity}
+          fallback={ituser.itsystem_response.uuid}
+        />
+      </td>
       <td class="text-sm p-4">{ituser.user_key}</td>
       <td class="text-sm p-4">{ituser.external_id ?? ""}</td>
       {#if env.PUBLIC_SHOW_ITUSER_CONNECTIONS}
