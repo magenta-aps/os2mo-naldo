@@ -1,6 +1,7 @@
 import { graphQLClient } from "$lib/http/client"
 import { getMinMaxValidities } from "$lib/utils/validities"
 import {
+  GetClassValiditiesDocument,
   GetEngagementValiditiesDocument,
   GetFacetValiditiesDocument,
   GetItSystemValiditiesDocument,
@@ -38,6 +39,12 @@ export const getItSystemValidities = async (uuid: string, signal?: AbortSignal) 
     uuid: uuid,
   })
   return getMinMaxValidities(res.itsystems.objects[0].validities)
+}
+export const getClassValidities = async (uuid: string, signal?: AbortSignal) => {
+  const res = await graphQLClient(signal).request(GetClassValiditiesDocument, {
+    uuid: uuid,
+  })
+  return getMinMaxValidities(res.classes.objects[0].validities)
 }
 export const getItuserValidities = async (uuid: string, signal?: AbortSignal) => {
   const res = await graphQLClient(signal).request(GetItuserValiditiesDocument, {

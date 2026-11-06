@@ -1,6 +1,7 @@
 import {
   normalizeAddress,
   normalizeAssociation,
+  normalizeClass,
   normalizeEngagement,
   normalizeItSystem,
   normalizeITUser,
@@ -283,6 +284,44 @@ describe("normalizeItSystem", () => {
       to: null,
       name: null,
       user_key: "",
+    })
+  })
+})
+
+describe("normalizeClass", () => {
+  it("extracts expected fields", () => {
+    expect(
+      sent(
+        normalizeClass({
+          validity: { to: midnight("2025-06-01") },
+          name: "Leder",
+          user_key: "leder",
+          scope: "EMAIL",
+          it_system_response: { uuid: "its-1", current: { name: "AD" } },
+          parent_response: { uuid: "conf-1", current: { name: "FH" } },
+          owner_response: { uuid: "ou-1", current: { name: "Skole" } },
+        })
+      )
+    ).toEqual({
+      to: "2025-06-01T00:00:00+02:00",
+      name: "Leder",
+      user_key: "leder",
+      itsystem: "its-1",
+      scope: "EMAIL",
+      parent: "conf-1",
+      owner: "ou-1",
+    })
+  })
+
+  it("handles null/missing fields", () => {
+    expect(sent(normalizeClass({ validity: { to: null }, name: null }))).toEqual({
+      to: null,
+      name: null,
+      user_key: "",
+      itsystem: "",
+      scope: "",
+      parent: "",
+      owner: "",
     })
   })
 })

@@ -33,6 +33,9 @@
   import { getFacetValidities } from "$lib/http/getValidities"
   import { facetStore } from "$lib/stores/facetStore"
   import { AddressScope, isAddressTypeFacet } from "$lib/constants/addresses"
+  import { isLaterEnd } from "$lib/utils/validities"
+  import { normalizeClass } from "$lib/utils/normalizeForm"
+  import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
 
   gql`
     query Class(
@@ -139,7 +142,8 @@
 
   let chosenItSystem: { name: string; uuid: string; user_key?: string } | undefined =
     undefined
-  let itSystems: ITSystem[] | undefined = undefined
+  let chosenScope: { uuid: string; name: string } | undefined = undefined
+  let chosenParent: { uuid: string; name: string } | undefined = undefined
   let selectedOwner: { uuid: string; name: string } | undefined = undefined
 
   const fromDate = field<Temporal.ZonedDateTime | null | undefined>("from", undefined, [
@@ -153,35 +157,24 @@
   ])
   const svelteForm = form(fromDate, name, userKey, parentField)
 
-  // Logic for updating datepicker intervals
-  let validities: ValidityBounds = { from: null, to: null }
-
+  const validities = createQuery<ValidityBounds>({ from: null, to: null })
   $: if (chosenFacet) {
-    ;(async () => {
-      validities = await getFacetValidities(chosenFacet.uuid)
-    })()
+    const facetUuid = chosenFacet.uuid
+    validities.run((signal) => getFacetValidities(facetUuid, signal))
   } else {
-    validities = { from: null, to: null }
+    validities.run(async () => ({ from: null, to: null }))
   }
 
-  let itSystemController: AbortController
-  $: if (chosenFacet && chosenFacet?.user_key === "role" && !itSystems && startDate) {
-    if (itSystemController) itSystemController.abort()
-    itSystemController = new AbortController()
-    ;(async () => {
-      try {
-        const res = await graphQLClient(itSystemController.signal).request(
-          GetItSystemsDocument,
-          {
-            fromDate: startDate,
-          }
-        )
-        // Map to the format the Select component expects
-        itSystems = res.itsystems.objects
-      } catch (err: any) {
-        if (err.name !== "AbortError") console.error("Failed to fetch IT Systems:", err)
-      }
-    })()
+  // Refetched on every start date change: the IT system must be valid on it.
+  const itSystems = createQuery<ITSystem[]>()
+  $: if (chosenFacet?.user_key === "role" && startDate) {
+    const at = startDate
+    itSystems.run(async (signal) => {
+      const res = await graphQLClient(signal).request(GetItSystemsDocument, {
+        fromDate: at,
+      })
+      return res.itsystems.objects
+    })
   }
 
   $: isTradeUnion =
@@ -192,6 +185,43 @@
   $: if (isTradeUnion && startDate) {
     const at = startDate
     confederations.run((signal) => getConfederations(at, signal))
+  }
+
+  // Created in the script (not inline in the {#await} tag) so the result can
+  // be captured below without a side effect in the template.
+  const classPromise = graphQLClient().request(ClassDocument, {
+    uuid: $page.params.class,
+    fromDate: $page.url.searchParams.get("from"),
+    toDate: $page.url.searchParams.get("to"),
+    currentDate: moValidityFrom($date),
+  })
+
+  let initialClass: any = null
+  classPromise.then(
+    (data) => {
+      initialClass = normalizeClass(data.classes.objects[0].validities[0])
+    },
+    // A failed load renders the {:catch} branch; this handler only prevents
+    // an unhandled rejection from this second promise chain.
+    () => {}
+  )
+
+  let hasChanges = false
+  $: if (initialClass) {
+    // Check if any of the user-editable fields have changed compared to the original values.
+    // A relation only counts while its field is shown.
+    const editableChanged =
+      $name.value !== initialClass.name ||
+      $userKey.value !== initialClass.user_key ||
+      (selectedOwner?.uuid ?? "") !== initialClass.owner ||
+      (chosenFacet?.user_key === "role" &&
+        (chosenItSystem?.uuid ?? "") !== initialClass.itsystem) ||
+      (isAddressTypeFacet(chosenFacet?.user_key) &&
+        (chosenScope?.uuid ?? "") !== initialClass.scope) ||
+      (isTradeUnion && (chosenParent?.uuid ?? "") !== initialClass.parent)
+
+    const toDateExtended = isLaterEnd(toDate, initialClass.to)
+    hasChanges = editableChanged || toDateExtended
   }
 </script>
 
@@ -215,9 +245,22 @@
 
 <div class="divider p-0 m-0 mb-4 w-full" />
 
-{#await graphQLClient().request( ClassDocument, { uuid: $page.params.class, fromDate: $page.url.searchParams.get("from"), toDate: $page.url.searchParams.get("to"), currentDate: moValidityFrom($date) } )}
-  <!-- TODO: Should have a skeleton for the loading stage -->
-  {capital($_("loading"))}
+{#await classPromise}
+  <div class="mx-6">
+    <div class="sm:w-full md:w-3/4 xl:w-1/2 bg-base-200 rounded-sm">
+      <div class="p-8">
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+        <Skeleton />
+        <div class="flex flex-row gap-6">
+          <Skeleton extra_classes="basis-1/2" />
+          <Skeleton extra_classes="basis-1/2" />
+        </div>
+      </div>
+    </div>
+  </div>
 {:then data}
   {@const cls = data.classes.objects[0].validities[0]}
   {@const facetResponse = data.classes.objects[0].validities[0].facet_response}
@@ -232,8 +275,8 @@
             errors={$fromDate.errors}
             title={capital($_("date.start_date"))}
             id="from"
-            min={validities.from}
-            max={toDate ? toDate : validities.to}
+            min={$validities.data?.from}
+            max={toDate ? toDate : $validities.data?.to}
             required={true}
           />
           <EndDateInput
@@ -241,8 +284,8 @@
             startValue={cls.validity.to}
             title={capital($_("date.end_date"))}
             id="to"
-            min={$fromDate.value ? $fromDate.value : validities.from}
-            max={validities.to}
+            min={$fromDate.value ? $fromDate.value : $validities.data?.from}
+            max={$validities.data?.to}
           />
         </div>
         <Select
@@ -263,25 +306,39 @@
           disabled
         />
 
-        {#if itSystems}
-          <Select
-            title={capital($_("itsystem", { values: { n: 1 } }))}
-            id="itsystem"
-            bind:value={chosenItSystem}
-            startValue={cls.it_system_response?.current
-              ? {
-                  uuid: cls.it_system_response.uuid,
-                  name: cls.it_system_response.current.name,
-                }
-              : undefined}
-            iterable={formatITSystemNames(itSystems)}
-            required={true}
-          />
+        {#if chosenFacet?.user_key === "role"}
+          {#if $itSystems.loading && !$itSystems.data}
+            <Skeleton />
+          {/if}
+          {#if $itSystems.error}
+            <p class="text-sm text-error">
+              {capital($_($itSystems.data ? "load_error_options" : "load_error"))}
+            </p>
+          {/if}
+          {#if $itSystems.data}
+            <Select
+              title={capital($_("itsystem", { values: { n: 1 } }))}
+              id="itsystem"
+              bind:value={chosenItSystem}
+              startValue={cls.it_system_response
+                ? {
+                    uuid: cls.it_system_response.uuid,
+                    name:
+                      cls.it_system_response.current?.name ??
+                      cls.it_system_response.uuid,
+                  }
+                : undefined}
+              iterable={formatITSystemNames($itSystems.data)}
+              disabled={$itSystems.error}
+              required={true}
+            />
+          {/if}
         {/if}
         {#if isAddressTypeFacet(facetResponse.current?.user_key)}
           <Select
             title={capital($_("scope"))}
             id="scope"
+            bind:value={chosenScope}
             startValue={cls.scope ? { uuid: cls.scope, name: cls.scope } : undefined}
             iterable={AddressScope.map((scope) => ({ uuid: scope, name: scope }))}
             required={true}
@@ -291,6 +348,7 @@
           <Select
             title={capital($_("facets.name.confederation"))}
             id="parent"
+            bind:value={chosenParent}
             bind:name={$parentField.value}
             errors={$parentField.errors}
             startValue={cls.parent_response?.current
@@ -352,6 +410,8 @@
             values: { item: $_("class", { values: { n: 1 } }) },
           })
         )}
+        disabled={!hasChanges}
+        info={hasChanges ? undefined : $_("edit_tooltip")}
       />
       <Button
         type="button"
