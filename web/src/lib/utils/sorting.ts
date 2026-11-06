@@ -49,16 +49,11 @@ export const getValueAtPath = (obj: any, path: string) => {
  */
 export const sortData = <T>(data: T[], sortKey: string, sortDirection: number): T[] => {
   return [...data].sort((a, b) => {
-    let aVal = getValueAtPath(a, sortKey)
-    let bVal = getValueAtPath(b, sortKey)
+    const aVal = getValueAtPath(a, sortKey)
+    const bVal = getValueAtPath(b, sortKey)
 
-    // Has to be done to make the sorting case-insensitive whole generic
-    // Ensure aVal and bVal are strings before calling toLowerCase()
-    if (typeof aVal === "string") {
-      aVal = aVal.toLowerCase()
-    }
-    if (typeof bVal === "string") {
-      bVal = bVal.toLowerCase()
+    if (typeof aVal === "string" && typeof bVal === "string") {
+      return compareDanish(aVal, bVal) * sortDirection
     }
 
     // Temporal values throw when compared with < and >.

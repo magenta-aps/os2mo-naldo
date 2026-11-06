@@ -92,6 +92,16 @@ describe("sortData", () => {
     expect(result).toEqual([1, 3, 2])
   })
 
+  it("sorts strings by Danish rules", () => {
+    const danish = [
+      { id: 1, name: "Århus" },
+      { id: 2, name: "Ærø" },
+      { id: 3, name: "Zealand" },
+      { id: 4, name: "Øster" },
+    ]
+    expect(sortData(danish, "name", 1).map((r) => r.id)).toEqual([3, 2, 4, 1])
+  })
+
   it("sorts by a nested path", () => {
     const result = sortData(rows, "nested.value", 1).map((r) => r.id)
     expect(result).toEqual([2, 3, 1])
