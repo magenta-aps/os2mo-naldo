@@ -100,9 +100,8 @@
     (data) => {
       initialItSystem = normalizeItSystem(data.itsystems.objects[0].validities[0])
     },
-    // The template's {#await} has no {:catch}, so a failed load stays on the
-    // pending branch. This handler only prevents an unhandled rejection from
-    // this second promise chain.
+    // A failed load renders the {:catch} branch; this handler only prevents
+    // an unhandled rejection from this second promise chain.
     () => {}
   )
 
@@ -220,4 +219,8 @@
     </div>
     <Error />
   </form>
+{:catch}
+  <div class="mx-6">
+    <p class="text-sm text-error">{capital($_("load_error"))}</p>
+  </div>
 {/await}

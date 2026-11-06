@@ -379,4 +379,8 @@
     </div>
     <Error />
   </form>
+{:catch}
+  <div class="mx-6">
+    <p class="text-sm text-error">{capital($_("load_error"))}</p>
+  </div>
 {/await}
