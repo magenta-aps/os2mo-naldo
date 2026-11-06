@@ -244,7 +244,7 @@
           required={true}
         />
       {/if}
-      {#if itSystems}
+      {#if itSystems && chosenFacet?.user_key === "role"}
         <Select
           title={capital($_("itsystem", { values: { n: 1 } }))}
           id="itsystem"
