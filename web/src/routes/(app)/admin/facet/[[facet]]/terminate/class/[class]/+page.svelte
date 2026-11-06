@@ -20,8 +20,8 @@
   import { required } from "svelte-forms/validators"
   import { getFacets } from "$lib/http/getFacets"
   import { facetStore } from "$lib/stores/facetStore"
-  import { onMount } from "svelte"
-  import { getFacetValidities } from "$lib/http/getValidities"
+  import { createQuery } from "$lib/http/query"
+  import { getClassValidities, getFacetValidities } from "$lib/http/getValidities"
 
   gql`
     mutation TerminateClass($input: ClassTerminateInput!, $date: DateTime!) {
@@ -37,8 +37,6 @@
     required(),
   ])
   const svelteForm = form(toDate)
-
-  let facet: { name: string; uuid: string; user_key: string }
 
   const handler: SubmitFunction =
     () =>
@@ -64,7 +62,8 @@
               ),
               type: "class",
             }
-            facetStore.set(facet)
+            // Reopens the admin page on this class's facet.
+            if ($facets.data?.[0]) facetStore.set($facets.data[0])
           } catch (err) {
             $error = { message: err }
           }
@@ -72,19 +71,21 @@
       }
     }
 
-  let validities: ValidityBounds = { from: null, to: null }
+  // A class cannot end before it starts, nor outlive its facet.
+  const classValidities = createQuery<ValidityBounds>({ from: null, to: null })
+  $: if ($page.params.class) {
+    const uuid = $page.params.class
+    classValidities.run((signal) => getClassValidities(uuid, signal))
+  }
 
-  onMount(async () => {
-    validities = await getFacetValidities($page.params.facet ?? null)
-
-    let facets = await getFacets({
-      uuid: $page.params.facet ?? null,
-      fromDate: $date,
-    })
-    if ($page.params.facet) {
-      facet = facets[0] ?? null
-    }
-  })
+  const facetValidities = createQuery<ValidityBounds>({ from: null, to: null })
+  const facets = createQuery<{ name: string; uuid: string; user_key: string }[]>()
+  $: if ($page.params.facet) {
+    const uuid = $page.params.facet
+    const at = $date
+    facetValidities.run((signal) => getFacetValidities(uuid, signal))
+    facets.run((signal) => getFacets({ uuid, fromDate: at }, signal))
+  }
 </script>
 
 <title
@@ -116,8 +117,8 @@
         errors={$toDate.errors}
         title={capital($_("date.end_date"))}
         id="to"
-        min={validities.from}
-        max={validities.to}
+        min={$classValidities.data?.from}
+        max={$facetValidities.data?.to}
         required={true}
       />
     </div>
