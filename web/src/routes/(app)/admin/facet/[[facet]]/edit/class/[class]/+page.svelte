@@ -268,10 +268,11 @@
             title={capital($_("itsystem", { values: { n: 1 } }))}
             id="itsystem"
             bind:value={chosenItSystem}
-            startValue={cls.it_system_response?.current
+            startValue={cls.it_system_response
               ? {
                   uuid: cls.it_system_response.uuid,
-                  name: cls.it_system_response.current.name,
+                  name:
+                    cls.it_system_response.current?.name ?? cls.it_system_response.uuid,
                 }
               : undefined}
             iterable={formatITSystemNames(itSystems)}
