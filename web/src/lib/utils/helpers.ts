@@ -1,5 +1,6 @@
 import { graphQLClient } from "$lib/http/client"
 import { CprDocument } from "$lib/http/query.generated"
+import { byName } from "$lib/utils/sorting"
 
 export type ITUserITSystemName = {
   uuid: string
@@ -79,7 +80,7 @@ export const formatKleNumberTitleAndUuid = (kles: KleNumberTitleAndUuid[]) => {
     uuid: kle.uuid,
     name: `${kle.user_key} - ${kle.name}`,
   }))
-  return KleNumbers.sort((a, b) => (a.name > b.name ? 1 : -1))
+  return KleNumbers.sort(byName)
 }
 
 export type ITSystem = {
@@ -98,7 +99,7 @@ export const formatITSystemNames = (itsystems: ITSystem[]) => {
       name: itsystem.current!.name,
       user_key: itsystem.current?.user_key,
     }))
-  return ITSystems.sort((a, b) => (a.name > b.name ? 1 : -1))
+  return ITSystems.sort(byName)
 }
 
 // Type used for Multi-select

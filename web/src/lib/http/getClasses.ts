@@ -1,8 +1,6 @@
 import { graphQLClient } from "$lib/http/client"
 import { byName } from "$lib/utils/sorting"
 import type { At } from "$lib/utils/validities"
-import { locale } from "svelte-i18n"
-import { get } from "svelte/store"
 import {
   ConfederationsDocument,
   FacetsAndClassesDocument,
@@ -57,11 +55,7 @@ export const getConfederations = async (
   return res.classes.objects
     .map((cls) => cls.current)
     .filter((current): current is NonNullable<typeof current> => current != null)
-    .sort((a, b) =>
-      a.name.localeCompare(b.name, get(locale) ?? "da", {
-        sensitivity: "base", // Æ/æ = æ, case-insensitive
-      })
-    )
+    .sort(byName)
 }
 
 export type TradeUnionGroup = {

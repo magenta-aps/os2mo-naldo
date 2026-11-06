@@ -2,6 +2,7 @@
   import { Temporal } from "temporal-polyfill"
   import { moValidityFrom } from "$lib/utils/date"
   import { _ } from "svelte-i18n"
+  import { byName } from "$lib/utils/sorting"
   import { capital } from "$lib/utils/helpers"
   import { graphQLClient } from "$lib/http/client"
   import Node from "./node.svelte"
@@ -104,7 +105,7 @@
     })
     return res.org_units.objects
       .map((org) => ({ ...org.validities[0], fromDate }))
-      .sort((a, b) => a.name.localeCompare(b.name))
+      .sort(byName)
   }
   // The root tree depends only on `fromDate`, so cache by date: switching origin
   // (same date) reuses the in-flight/resolved tree instead of refetching it.

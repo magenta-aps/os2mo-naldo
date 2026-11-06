@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Temporal } from "temporal-polyfill"
   import { _ } from "svelte-i18n"
+  import { byName } from "$lib/utils/sorting"
   import { capital } from "$lib/utils/helpers"
   import SvelteSelect from "svelte-select"
   import { goto } from "$app/navigation"
@@ -280,7 +281,7 @@
         if (res.employees) {
           return (items = res.employees.objects
             .map((item) => findClosestValidity(item.validities, atDate))
-            .sort((a, b) => (a.name > b.name ? 1 : -1)))
+            .sort(byName))
         }
 
       case "org-unit":
@@ -307,7 +308,7 @@
         if (res.org_units) {
           return (items = res.org_units.objects
             .map((item) => findClosestValidity(item.validities, atDate))
-            .sort((a, b) => (a.name > b.name ? 1 : -1)))
+            .sort(byName))
         }
     }
     spinner = false

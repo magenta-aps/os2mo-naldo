@@ -1,12 +1,13 @@
 <script lang="ts" generics="T extends { uuid: string; name: string; end: string }">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
+  import { byName } from "$lib/utils/sorting"
 
   // `end` is the engagement's current end, posted so the action keeps it.
   export let engagements: T[]
   export let selected: string[] = []
 
-  $: sorted = [...engagements].sort((a, b) => a.name.localeCompare(b.name, "da"))
+  $: sorted = [...engagements].sort(byName)
 
   // A list reloaded for another unit or date drops the checked rows it no
   // longer has, so the select-all state compares like with like.
