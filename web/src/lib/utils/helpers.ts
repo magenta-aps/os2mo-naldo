@@ -22,7 +22,7 @@ export const formatITUserITSystemName = (ituser: ITUserITSystemName) => ({
 })
 
 export const formatITUserITSystemNames = (itusers: ITUserITSystemName[] | undefined) =>
-  itusers?.map(formatITUserITSystemName)
+  itusers?.map(formatITUserITSystemName).sort(byName)
 
 // Used to display both job_function-name and org-name on a single line, for example, in a dropdown select.
 export type EngagementTitleAndUuid = {
@@ -35,18 +35,20 @@ export type EngagementTitleAndUuid = {
 export const formatEngagementTitlesAndUuid = (
   engagements: EngagementTitleAndUuid[]
 ) => {
-  return engagements.map((engagement) => ({
-    uuid: engagement.uuid,
-    // Either half can be absent when a unit or job function no longer resolves,
-    // and Select drops an option with an empty name.
-    name:
-      [
-        engagement.job_function_response?.current?.name,
-        engagement.org_unit_response?.current?.name,
-      ]
-        .filter(Boolean)
-        .join(", ") || engagement.uuid,
-  }))
+  return engagements
+    .map((engagement) => ({
+      uuid: engagement.uuid,
+      // Either half can be absent when a unit or job function no longer resolves,
+      // and Select drops an option with an empty name.
+      name:
+        [
+          engagement.job_function_response?.current?.name,
+          engagement.org_unit_response?.current?.name,
+        ]
+          .filter(Boolean)
+          .join(", ") || engagement.uuid,
+    }))
+    .sort(byName)
 }
 
 // One person's managers differ by unit and type, so both name one in a

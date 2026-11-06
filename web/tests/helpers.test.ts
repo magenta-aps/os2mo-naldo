@@ -161,9 +161,25 @@ describe("formatEngagementTitlesAndUuid", () => {
       },
     ])
     expect(result).toEqual([
-      { uuid: "eng-1", name: "Specialist" },
       { uuid: "eng-2", name: "Sjølund skole" },
+      { uuid: "eng-1", name: "Specialist" },
     ])
+  })
+
+  it("sorts by the combined name", () => {
+    const result = formatEngagementTitlesAndUuid([
+      {
+        uuid: "eng-2",
+        job_function_response: { current: { name: "Lærer" } },
+        org_unit_response: { current: { name: "Sjølund skole" } },
+      },
+      {
+        uuid: "eng-1",
+        job_function_response: { current: { name: "Leder" } },
+        org_unit_response: { current: { name: "Haderslev skole" } },
+      },
+    ])
+    expect(result.map((engagement) => engagement.uuid)).toEqual(["eng-1", "eng-2"])
   })
 
   // Select drops an option whose name is empty, so a wholly unresolved
@@ -222,17 +238,17 @@ describe("formatITUserITSystemName", () => {
 })
 
 describe("formatITUserITSystemNames", () => {
-  it("maps the singular formatter over a list, preserving order", () => {
+  it("maps the singular formatter over a list, sorted by name", () => {
     const result = formatITUserITSystemNames([
-      {
-        uuid: "u1",
-        user_key: "bruce",
-        itsystem_response: { uuid: "s1", current: { name: "AD" } },
-      },
       {
         uuid: "u2",
         user_key: "katrine",
         itsystem_response: { uuid: "s2", current: { name: "SAP" } },
+      },
+      {
+        uuid: "u1",
+        user_key: "bruce",
+        itsystem_response: { uuid: "s1", current: { name: "AD" } },
       },
     ])
     expect(result).toEqual([
