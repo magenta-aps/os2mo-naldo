@@ -1,4 +1,5 @@
 import { graphQLClient } from "$lib/http/client"
+import { byName } from "$lib/utils/sorting"
 import type { At } from "$lib/utils/validities"
 import { locale } from "svelte-i18n"
 import { get } from "svelte/store"
@@ -68,22 +69,26 @@ export type TradeUnionGroup = {
   children: { uuid: string; name: string }[]
 }
 
-// Trade unions valid on `fromDate`, grouped by their confederation.
+// Trade unions valid on `fromDate`, grouped by their confederation. Groups
+// and the unions within them are sorted by name; the grouped Select shows
+// them in this order.
 export const getTradeUnions = async (
   fromDate: At,
   signal?: AbortSignal
 ): Promise<TradeUnionGroup[]> => {
   const res = await graphQLClient(signal).request(TradeUnionsDocument, { fromDate })
-  return res.classes.objects.flatMap(({ current }) =>
-    current
-      ? [
-          {
-            name: current.name,
-            children: current.children_response.objects.flatMap((child) =>
-              child.current ? [child.current] : []
-            ),
-          },
-        ]
-      : []
-  )
+  return res.classes.objects
+    .flatMap(({ current }) =>
+      current
+        ? [
+            {
+              name: current.name,
+              children: current.children_response.objects
+                .flatMap((child) => (child.current ? [child.current] : []))
+                .sort(byName),
+            },
+          ]
+        : []
+    )
+    .sort(byName)
 }

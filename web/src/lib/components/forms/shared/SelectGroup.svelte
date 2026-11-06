@@ -14,7 +14,7 @@
   export let title: string | undefined = undefined
   export let id: string
   export let name: string | undefined = undefined
-  // Each group's children are its options.
+  // Each group's children are its options, shown in the given order.
   export let iterable: TradeUnionGroup[] | undefined
   export let required = false
   export let placeholder: string = ""
@@ -36,15 +36,15 @@
     strategy: "fixed",
   }
 
-  $: items = iterable
-    ?.flatMap((group) =>
-      group.children.map((child) => ({
-        group: group.name,
-        label: child.name,
-        uuid: child.uuid,
-      }))
-    )
-    .sort((a, b) => (a.label > b.label ? 1 : -1))
+  // SvelteSelect orders groups by first appearance, so `iterable`'s order is
+  // kept as is.
+  $: items = iterable?.flatMap((group) =>
+    group.children.map((child) => ({
+      group: group.name,
+      label: child.name,
+      uuid: child.uuid,
+    }))
+  )
 
   // A refetch for a new date can drop the selected option. Cleared after the
   // update, not in a `$:` statement: `value` is bound to SvelteSelect. Without
