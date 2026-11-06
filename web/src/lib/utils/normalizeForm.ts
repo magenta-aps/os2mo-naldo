@@ -115,6 +115,20 @@ export const normalizeItSystem = (i: any) => {
   }
 }
 
+// Relations are compared by uuid: the form's selects resolve their names at the
+// edit date, which can differ from the names loaded with the class.
+export const normalizeClass = (c: any) => {
+  return {
+    to: c.validity?.to ?? null,
+    name: c.name ?? null,
+    user_key: c.user_key ?? "",
+    itsystem: c.it_system_response?.uuid ?? "",
+    scope: c.scope ?? "",
+    parent: c.parent_response?.uuid ?? "",
+    owner: c.owner_response?.uuid ?? "",
+  }
+}
+
 export const normalizeRolebinding = (r: any) => {
   return {
     to: r.validity?.to ?? null,

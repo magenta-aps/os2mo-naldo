@@ -33,6 +33,8 @@
   import { getFacetValidities } from "$lib/http/getValidities"
   import { facetStore } from "$lib/stores/facetStore"
   import { AddressScope, isAddressTypeFacet } from "$lib/constants/addresses"
+  import { isLaterEnd } from "$lib/utils/validities"
+  import { normalizeClass } from "$lib/utils/normalizeForm"
   import Skeleton from "$lib/components/forms/shared/Skeleton.svelte"
 
   gql`
@@ -140,6 +142,8 @@
 
   let chosenItSystem: { name: string; uuid: string; user_key?: string } | undefined =
     undefined
+  let chosenScope: { uuid: string; name: string } | undefined = undefined
+  let chosenParent: { uuid: string; name: string } | undefined = undefined
   let selectedOwner: { uuid: string; name: string } | undefined = undefined
 
   const fromDate = field<Temporal.ZonedDateTime | null | undefined>("from", undefined, [
@@ -183,12 +187,42 @@
     confederations.run((signal) => getConfederations(at, signal))
   }
 
+  // Created in the script (not inline in the {#await} tag) so the result can
+  // be captured below without a side effect in the template.
   const classPromise = graphQLClient().request(ClassDocument, {
     uuid: $page.params.class,
     fromDate: $page.url.searchParams.get("from"),
     toDate: $page.url.searchParams.get("to"),
     currentDate: moValidityFrom($date),
   })
+
+  let initialClass: any = null
+  classPromise.then(
+    (data) => {
+      initialClass = normalizeClass(data.classes.objects[0].validities[0])
+    },
+    // A failed load renders the {:catch} branch; this handler only prevents
+    // an unhandled rejection from this second promise chain.
+    () => {}
+  )
+
+  let hasChanges = false
+  $: if (initialClass) {
+    // Check if any of the user-editable fields have changed compared to the original values.
+    // A relation only counts while its field is shown.
+    const editableChanged =
+      $name.value !== initialClass.name ||
+      $userKey.value !== initialClass.user_key ||
+      (selectedOwner?.uuid ?? "") !== initialClass.owner ||
+      (chosenFacet?.user_key === "role" &&
+        (chosenItSystem?.uuid ?? "") !== initialClass.itsystem) ||
+      (isAddressTypeFacet(chosenFacet?.user_key) &&
+        (chosenScope?.uuid ?? "") !== initialClass.scope) ||
+      (isTradeUnion && (chosenParent?.uuid ?? "") !== initialClass.parent)
+
+    const toDateExtended = isLaterEnd(toDate, initialClass.to)
+    hasChanges = editableChanged || toDateExtended
+  }
 </script>
 
 <title
@@ -304,6 +338,7 @@
           <Select
             title={capital($_("scope"))}
             id="scope"
+            bind:value={chosenScope}
             startValue={cls.scope ? { uuid: cls.scope, name: cls.scope } : undefined}
             iterable={AddressScope.map((scope) => ({ uuid: scope, name: scope }))}
             required={true}
@@ -313,6 +348,7 @@
           <Select
             title={capital($_("facets.name.confederation"))}
             id="parent"
+            bind:value={chosenParent}
             bind:name={$parentField.value}
             errors={$parentField.errors}
             startValue={cls.parent_response?.current
@@ -374,6 +410,8 @@
             values: { item: $_("class", { values: { n: 1 } }) },
           })
         )}
+        disabled={!hasChanges}
+        info={hasChanges ? undefined : $_("edit_tooltip")}
       />
       <Button
         type="button"
