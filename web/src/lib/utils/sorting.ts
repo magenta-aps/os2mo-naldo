@@ -1,5 +1,15 @@
 import { Temporal } from "temporal-polyfill"
 
+// All text sorts by Danish rules whatever the UI language: MO's names and
+// classes are Danish, and English labels contain neither æ, ø, å nor "aa",
+// the only places the two orders differ. Case is ignored.
+const danishCollator = new Intl.Collator("da", { sensitivity: "base" })
+
+export const compareDanish = (a: string, b: string) => danishCollator.compare(a, b)
+
+export const byName = (a: { name: string }, b: { name: string }) =>
+  compareDanish(a.name, b.name)
+
 /**
  * Retrieves the value at a specified path within an object.
  *

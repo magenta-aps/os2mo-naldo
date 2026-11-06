@@ -1,6 +1,49 @@
 import { toCopenhagen } from "$lib/utils/date"
-import { getValueAtPath, sortData } from "$lib/utils/sorting"
+import { byName, compareDanish, getValueAtPath, sortData } from "$lib/utils/sorting"
 import { describe, expect, it } from "vitest"
+
+describe("compareDanish", () => {
+  it("puts Æ, Ø and Å after Z in that order", () => {
+    expect(["Århus", "Øster", "Zealand", "Ærø"].sort(compareDanish)).toEqual([
+      "Zealand",
+      "Ærø",
+      "Øster",
+      "Århus",
+    ])
+  })
+
+  it("sorts aa as å", () => {
+    expect(["Aalborg", "Ørsted", "Ålum"].sort(compareDanish)).toEqual([
+      "Ørsted",
+      "Aalborg",
+      "Ålum",
+    ])
+  })
+
+  it("ignores case", () => {
+    expect(["Bob", "alice", "Charlie"].sort(compareDanish)).toEqual([
+      "alice",
+      "Bob",
+      "Charlie",
+    ])
+    expect(compareDanish("valggruppe a", "Valggruppe A")).toBe(0)
+  })
+})
+
+describe("byName", () => {
+  it("sorts objects by their name", () => {
+    const groups = [
+      { name: "Valggruppe C" },
+      { name: "Valggruppe A" },
+      { name: "Valggruppe B" },
+    ]
+    expect(groups.sort(byName).map((group) => group.name)).toEqual([
+      "Valggruppe A",
+      "Valggruppe B",
+      "Valggruppe C",
+    ])
+  })
+})
 
 describe("getValueAtPath", () => {
   it("returns a top-level value", () => {
