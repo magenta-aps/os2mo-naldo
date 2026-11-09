@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Temporal } from "temporal-polyfill"
   import { _ } from "svelte-i18n"
+  import { byName } from "$lib/utils/sorting"
   import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { OrgUnitChildrenDocument, type OrgUnitChildrenQuery } from "./query.generated"
@@ -79,11 +80,7 @@
     loading = true
     try {
       const res = await fetchChildren(uuid)
-      // Sort once on assignment (not per render in the template), using
-      // localeCompare so Danish å/æ/ø match the root list's ordering.
-      children = res
-        .map((child) => child.validities[0])
-        .sort((a, b) => a.name.localeCompare(b.name))
+      children = res.map((child) => child.validities[0]).sort(byName)
       open = true
     } finally {
       // Always clear the spinner, even if the fetch rejects, so the node can be

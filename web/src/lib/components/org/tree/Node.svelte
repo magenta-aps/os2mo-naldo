@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Temporal } from "temporal-polyfill"
   import { _ } from "svelte-i18n"
+  import { byName } from "$lib/utils/sorting"
   import { base } from "$app/paths"
   import { page } from "$app/stores"
   import { graphQLClient } from "$lib/http/client"
@@ -108,7 +109,7 @@
         const res = await fetchChildren(uuid)
 
         // Overwrite with the new layer of children
-        children = res.map((child) => child.validities[0])
+        children = res.map((child) => child.validities[0]).sort(byName)
       }
 
       loading = false
@@ -181,7 +182,7 @@
 </a>
 
 {#if open}
-  {#each children.sort( (a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1) ) as child}
+  {#each children as child}
     <svelte:self
       {...child}
       {orgUnitHierarchyUuid}

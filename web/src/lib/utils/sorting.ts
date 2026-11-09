@@ -1,5 +1,15 @@
 import { Temporal } from "temporal-polyfill"
 
+// All text sorts by Danish rules whatever the UI language: MO's names and
+// classes are Danish, and English labels contain neither æ, ø, å nor "aa",
+// the only places the two orders differ. Case is ignored.
+const danishCollator = new Intl.Collator("da", { sensitivity: "base" })
+
+export const compareDanish = (a: string, b: string) => danishCollator.compare(a, b)
+
+export const byName = (a: { name: string }, b: { name: string }) =>
+  compareDanish(a.name, b.name)
+
 /**
  * Retrieves the value at a specified path within an object.
  *
@@ -39,16 +49,11 @@ export const getValueAtPath = (obj: any, path: string) => {
  */
 export const sortData = <T>(data: T[], sortKey: string, sortDirection: number): T[] => {
   return [...data].sort((a, b) => {
-    let aVal = getValueAtPath(a, sortKey)
-    let bVal = getValueAtPath(b, sortKey)
+    const aVal = getValueAtPath(a, sortKey)
+    const bVal = getValueAtPath(b, sortKey)
 
-    // Has to be done to make the sorting case-insensitive whole generic
-    // Ensure aVal and bVal are strings before calling toLowerCase()
-    if (typeof aVal === "string") {
-      aVal = aVal.toLowerCase()
-    }
-    if (typeof bVal === "string") {
-      bVal = bVal.toLowerCase()
+    if (typeof aVal === "string" && typeof bVal === "string") {
+      return compareDanish(aVal, bVal) * sortDirection
     }
 
     // Temporal values throw when compared with < and >.

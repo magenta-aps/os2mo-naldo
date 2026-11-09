@@ -3,6 +3,7 @@
   import { sameDate } from "$lib/utils/date"
   import type { ValidityBounds } from "$lib/utils/validities"
   import { _ } from "svelte-i18n"
+  import { byName } from "$lib/utils/sorting"
   import { get } from "svelte/store"
   import { capital, formatITSystemNames } from "$lib/utils/helpers"
   import type { UnpackedClass } from "$lib/utils/helpers"
@@ -118,9 +119,7 @@
         itSystemUuid: uuid,
         currentDate: currentDate,
       })
-      return res.classes?.objects
-        .map((cls) => cls.objects[0])
-        .sort((a, b) => (a.name > b.name ? 1 : -1))
+      return res.classes?.objects.map((cls) => cls.objects[0]).sort(byName)
     })
   } else {
     itSystemRoles.run(async () => [])

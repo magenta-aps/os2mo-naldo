@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Temporal } from "temporal-polyfill"
   import { _ } from "svelte-i18n"
+  import { byName } from "$lib/utils/sorting"
   import { gql } from "graphql-request"
   import { capital, formatManagerTitleAndUuid } from "$lib/utils/helpers"
   import { graphQLClient } from "$lib/http/client"
@@ -112,11 +113,13 @@
         person: [uuid],
         fromDate,
       })
-      const list = res.managers.objects.flatMap((manager) =>
-        manager.current
-          ? [formatManagerTitleAndUuid({ uuid: manager.uuid, ...manager.current })]
-          : []
-      )
+      const list = res.managers.objects
+        .flatMap((manager) =>
+          manager.current
+            ? [formatManagerTitleAndUuid({ uuid: manager.uuid, ...manager.current })]
+            : []
+        )
+        .sort(byName)
       if (!signal.aborted) pickOnlyRole(list)
       return list
     })

@@ -1,4 +1,5 @@
 import { env } from "$lib/env"
+import { byName } from "$lib/utils/sorting"
 
 // This should replace the `Facet`-type at some point
 export type FacetValidities = {
@@ -37,7 +38,7 @@ export const filterClassesByFacetUserKey = (
       user_key: c.current?.user_key ?? "",
       scope: c.current?.scope,
     }))
-    ?.sort((a, b) => (a.name > b.name ? 1 : -1))
+    ?.sort(byName)
 }
 
 export const filterClassUuidByUserKey = (classes: Class[], user_key: string) => {

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Temporal } from "temporal-polyfill"
   import { _ } from "svelte-i18n"
+  import { byName } from "$lib/utils/sorting"
   import { capital } from "$lib/utils/helpers"
   import { page } from "$app/stores"
   import { graphQLClient } from "$lib/http/client"
@@ -107,7 +108,7 @@
         fromDate: fromDate,
       })
     }
-    return orgTree
+    return orgTree.sort(byName)
   }
 
   const brutto = {
@@ -216,7 +217,7 @@
       <span class="sr-only">{capital($_("loading"))}...</span>
     </div>
   {:then orgTree}
-    {#each orgTree.sort( (a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1) ) as child}
+    {#each orgTree as child}
       <Node {...child} />
     {/each}
   {/await}

@@ -1,8 +1,9 @@
 import { graphQLClient } from "$lib/http/client"
 import { capital } from "$lib/utils/helpers"
+import { byName } from "$lib/utils/sorting"
 import type { At } from "$lib/utils/validities"
 import { findClosestValidity } from "$lib/utils/validities"
-import { _, locale } from "svelte-i18n"
+import { _ } from "svelte-i18n"
 import { get } from "svelte/store"
 import { FacetDocument } from "./query.generated"
 
@@ -27,9 +28,5 @@ export const getFacets = async (
       user_key: closest.user_key,
     }
   })
-  return items.sort((a, b) =>
-    a.name.localeCompare(b.name, get(locale) ?? "da", {
-      sensitivity: "base", // Æ/æ = æ, case-insensitive
-    })
-  )
+  return items.sort(byName)
 }

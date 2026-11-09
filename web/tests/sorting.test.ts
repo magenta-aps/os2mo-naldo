@@ -1,6 +1,49 @@
 import { toCopenhagen } from "$lib/utils/date"
-import { getValueAtPath, sortData } from "$lib/utils/sorting"
+import { byName, compareDanish, getValueAtPath, sortData } from "$lib/utils/sorting"
 import { describe, expect, it } from "vitest"
+
+describe("compareDanish", () => {
+  it("puts Æ, Ø and Å after Z in that order", () => {
+    expect(["Århus", "Øster", "Zealand", "Ærø"].sort(compareDanish)).toEqual([
+      "Zealand",
+      "Ærø",
+      "Øster",
+      "Århus",
+    ])
+  })
+
+  it("sorts aa as å", () => {
+    expect(["Aalborg", "Ørsted", "Ålum"].sort(compareDanish)).toEqual([
+      "Ørsted",
+      "Aalborg",
+      "Ålum",
+    ])
+  })
+
+  it("ignores case", () => {
+    expect(["Bob", "alice", "Charlie"].sort(compareDanish)).toEqual([
+      "alice",
+      "Bob",
+      "Charlie",
+    ])
+    expect(compareDanish("valggruppe a", "Valggruppe A")).toBe(0)
+  })
+})
+
+describe("byName", () => {
+  it("sorts objects by their name", () => {
+    const groups = [
+      { name: "Valggruppe C" },
+      { name: "Valggruppe A" },
+      { name: "Valggruppe B" },
+    ]
+    expect(groups.sort(byName).map((group) => group.name)).toEqual([
+      "Valggruppe A",
+      "Valggruppe B",
+      "Valggruppe C",
+    ])
+  })
+})
 
 describe("getValueAtPath", () => {
   it("returns a top-level value", () => {
@@ -47,6 +90,16 @@ describe("sortData", () => {
   it("sorts descending when direction is -1", () => {
     const result = sortData(rows, "name", -1).map((r) => r.id)
     expect(result).toEqual([1, 3, 2])
+  })
+
+  it("sorts strings by Danish rules", () => {
+    const danish = [
+      { id: 1, name: "Århus" },
+      { id: 2, name: "Ærø" },
+      { id: 3, name: "Zealand" },
+      { id: 4, name: "Øster" },
+    ]
+    expect(sortData(danish, "name", 1).map((r) => r.id)).toEqual([3, 2, 4, 1])
   })
 
   it("sorts by a nested path", () => {
