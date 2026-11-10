@@ -39,7 +39,11 @@
       }
 
   gql`
-    query Rolebindings($filter: RoleBindingFilter!, $fromDate: DateTime) {
+    query Rolebindings(
+      $filter: RoleBindingFilter!
+      $fromDate: DateTime
+      $toDate: DateTime
+    ) {
       rolebindings(filter: $filter) {
         objects {
           validities {
