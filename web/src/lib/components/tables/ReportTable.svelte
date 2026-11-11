@@ -44,22 +44,36 @@
       }))
     )
 
-  const downloadFile = async (fileName: string) => {
-    const res = await graphQLClient().request(ReportFileDocument, {
-      file_name: fileName,
-    })
-    const file = res.files.objects[0]
-    const bytes = Uint8Array.from(atob(file.base64_contents), (c) => c.charCodeAt(0))
-    const blob = new Blob([bytes], {
-      type: mimeTypes[extension(file.file_name)] ?? "application/octet-stream",
-    })
+  let downloading = new Set<string>()
+  let failed = new Set<string>()
 
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = file.file_name
-    a.click()
-    URL.revokeObjectURL(url)
+  const downloadFile = async (fileName: string) => {
+    downloading = new Set(downloading).add(fileName)
+    failed.delete(fileName)
+    failed = failed
+    try {
+      const res = await graphQLClient().request(ReportFileDocument, {
+        file_name: fileName,
+      })
+      const file = res.files.objects[0]
+      const bytes = Uint8Array.from(atob(file.base64_contents), (c) => c.charCodeAt(0))
+      const blob = new Blob([bytes], {
+        type: mimeTypes[extension(file.file_name)] ?? "application/octet-stream",
+      })
+
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = file.file_name
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch (e) {
+      console.error(e)
+      failed = new Set(failed).add(fileName)
+    } finally {
+      downloading.delete(fileName)
+      downloading = downloading
+    }
   }
 </script>
 
@@ -73,7 +87,12 @@
       class="{i % 2 === 0 ? '' : 'bg-base-200'}
         leading-5 border-t border-base-300 text-base-content"
     >
-      <td class="text-sm p-4 break-all">{file.file_name}</td>
+      <td class="text-sm p-4 break-all">
+        {file.file_name}
+        {#if failed.has(file.file_name)}
+          <p class="text-error">{capital($_("load_error"))}</p>
+        {/if}
+      </td>
       <td class="text-sm p-4 uppercase">{file.file_type}</td>
       <td class="flex p-4 gap-2 justify-end">
         <Button
@@ -83,6 +102,8 @@
           width="18"
           height="18"
           outline
+          disabled={downloading.has(file.file_name)}
+          spinner={downloading.has(file.file_name)}
           on:click={() => downloadFile(file.file_name)}
         />
       </td>
