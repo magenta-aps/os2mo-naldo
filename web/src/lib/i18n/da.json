@@ -44,6 +44,7 @@
 	"description": "beskrivelse",
 	"deselect_all": "fravælg alle",
 	"documentation": "dokumentation",
+	"download": "download",
 	"download_as_csv": "download som csv",
 	"edit_item": "redigér {item}",
 	"edit_tooltip": "Du kan kun sætte en tidligere slutdato, hvis der foretages ændringer i andre felter. Hvis du prøver at terminere, benyt 'Terminer'-funktionen i stedet.",
