@@ -173,15 +173,15 @@ export type AccessLogFilter = {
    * Can be used to select all reads for a data type.
    *
    * Can be one of:
-   * * `"AccessLog"`
-   * * `"Actor"`
-   * * `"Bruger"`
-   * * `"Facet"`
-   * * `"ItSystem"`
-   * * `"Klasse"`
-   * * `"Organisation"`
-   * * `"OrganisationEnhed"`
-   * * `"OrganisationFunktion"`
+   * * `ACCESS_LOG`
+   * * `ACTOR`
+   * * `PERSON`
+   * * `FACET`
+   * * `IT_SYSTEM`
+   * * `CLASS`
+   * * `ORGANISATION`
+   * * `ORGANISATION_UNIT`
+   * * `ORGANISATION_FUNCTION`
    *
    * | `models`      | Elements returned                            |
    * |--------------|----------------------------------------------|
@@ -3767,12 +3767,15 @@ export type ClassUpdateInput = {
 
 /** A collection a read rule may grant access to. */
 export enum Collection {
+  AccessLog = 'AccessLog',
   Address = 'Address',
   Association = 'Association',
   Class = 'Class',
   Employee = 'Employee',
   Engagement = 'Engagement',
   Facet = 'Facet',
+  File = 'File',
+  FullEvent = 'FullEvent',
   ItSystem = 'ITSystem',
   ItUser = 'ITUser',
   Kle = 'KLE',
@@ -4909,6 +4912,13 @@ export type EmployeeFilter = {
    *
    */
   cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
+  /**
+   * Engagement filter limiting which entries are returned.
+   *
+   * Set to `null` to only return employees without any engagements.
+   *
+   */
+  engagement?: InputMaybe<EngagementFilter>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -4918,6 +4928,16 @@ export type EmployeeFilter = {
    *
    */
   ituser?: InputMaybe<ItUserFilter>;
+  /**
+   * Manager role filter limiting which entries are returned.
+   *
+   * Returns the employees holding the matching managerial roles, i.e.
+   * the managers themselves, not the employees they manage.
+   *
+   * Set to `null` to only return employees without any managerial roles.
+   *
+   */
+  manager_role?: InputMaybe<ManagerFilter>;
   /** Owner filter limiting which entries are returned. */
   owner?: InputMaybe<OwnerFilter>;
   /**
@@ -7732,6 +7752,8 @@ export type File = {
    *
    */
   base64_contents: Scalars['String']['output'];
+  /** When the file was first uploaded. */
+  created_at: Scalars['DateTime']['output'];
   /**
    *
    * Name of the file.
@@ -7776,6 +7798,14 @@ export type File = {
    *
    */
   text_contents: Scalars['String']['output'];
+  /**
+   *
+   * When the file was last written.
+   *
+   * This is when the file was first uploaded, or last overwritten with `force`.
+   *
+   */
+  updated_at: Scalars['DateTime']['output'];
 };
 
 /** File filter. */
@@ -21238,6 +21268,13 @@ export type UuidsBoundEmployeeFilter = {
    *
    */
   cpr_numbers?: InputMaybe<Array<Scalars['CPR']['input']>>;
+  /**
+   * Engagement filter limiting which entries are returned.
+   *
+   * Set to `null` to only return employees without any engagements.
+   *
+   */
+  engagement?: InputMaybe<EngagementFilter>;
   /** Limit the elements returned by their starting validity. */
   from_date?: InputMaybe<Scalars['DateTime']['input']>;
   /**
@@ -21247,6 +21284,16 @@ export type UuidsBoundEmployeeFilter = {
    *
    */
   ituser?: InputMaybe<ItUserFilter>;
+  /**
+   * Manager role filter limiting which entries are returned.
+   *
+   * Returns the employees holding the matching managerial roles, i.e.
+   * the managers themselves, not the employees they manage.
+   *
+   * Set to `null` to only return employees without any managerial roles.
+   *
+   */
+  manager_role?: InputMaybe<ManagerFilter>;
   /** Owner filter limiting which entries are returned. */
   owner?: InputMaybe<OwnerFilter>;
   /**
