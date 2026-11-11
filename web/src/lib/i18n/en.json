@@ -44,6 +44,7 @@
 	"description": "description",
 	"deselect_all": "deselect all",
 	"documentation": "documentation",
+	"download": "download",
 	"download_as_csv": "download as csv",
 	"edit_item": "edit {item}",
 	"edit_tooltip": "You can only set an earlier end date if other fields have been edited. If you are trying to terminate, please use the 'Terminate'-function instead.",
