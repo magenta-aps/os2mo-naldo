@@ -10,6 +10,7 @@
   } from "$lib/stores/sorting"
   import ReportTable from "$lib/components/tables/ReportTable.svelte"
   import DetailTable from "$lib/components/shared/DetailTable.svelte"
+  import HeadTitle from "$lib/components/shared/HeadTitle.svelte"
 
   // The sort store is shared by every table and carries over from the last page.
   // Other tables have no `file_name` and would render unsorted if it leaked to them.
@@ -20,6 +21,8 @@
     $sortDirection = defaultSortDirection
   })
 </script>
+
+<HeadTitle type="reports" />
 
 <div class="flex px-12 pt-6">
   <main class="flex-1">
