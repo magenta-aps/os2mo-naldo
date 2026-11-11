@@ -281,6 +281,7 @@
 	"unit_level": "unit level",
 	"unit_type": "unit type",
 	"unit_number": "unit number",
+	"unsupported_file_type": "Unsupported file type",
 	"userflow": "user creation flow",
 	"user_key": "user key",
 	"user_key_tooltip": "The user-key is a user-facing identification of the object. It is currently mandatory and can simply be identical to the name.",

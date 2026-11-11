@@ -28,18 +28,38 @@ const moToken = async (): Promise<string> => {
   return token.value
 }
 
-export const moGraphql = async (query: string, variables?: object) => {
+const postToMo = async (
+  body: string | FormData,
+  headers: Record<string, string> = {}
+) => {
   const res = await fetch(`${MO}/graphql/${GRAPHQL_VERSION}`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${await moToken()}`,
-    },
-    body: JSON.stringify({ query, variables }),
+    headers: { ...headers, Authorization: `Bearer ${await moToken()}` },
+    body,
   })
   const json = await res.json()
   if (json.errors) throw new Error("GraphQL: " + json.errors[0].message)
   return json.data
+}
+
+export const moGraphql = (query: string, variables?: object) =>
+  postToMo(JSON.stringify({ query, variables }), { "Content-Type": "application/json" })
+
+// A file cannot be sent as JSON; MO takes it as a GraphQL multipart request.
+// `force` lets a retried test replace the file its first attempt uploaded.
+export const uploadExport = async (fileName: string, contents: string) => {
+  const form = new FormData()
+  form.append(
+    "operations",
+    JSON.stringify({
+      query:
+        "mutation ($file: Upload!) { upload_file(file_store: EXPORTS, file: $file, force: true) }",
+      variables: { file: null },
+    })
+  )
+  form.append("map", JSON.stringify({ file: ["variables.file"] }))
+  form.append("file", new Blob([contents]), fileName)
+  await postToMo(form)
 }
 
 // The day `offset` days from today in Copenhagen, as the date inputs take it.

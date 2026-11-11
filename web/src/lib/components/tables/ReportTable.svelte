@@ -6,6 +6,7 @@
   import { ReportsDocument, ReportFileDocument } from "./query.generated"
   import { sortKey, sortDirection } from "$lib/stores/sorting"
   import { sortData } from "$lib/utils/sorting"
+  import { error } from "$lib/stores/alert"
   import Button from "$lib/components/shared/Button.svelte"
   import fileDownload from "@iconify/icons-material-symbols/file-download"
 
@@ -44,6 +45,8 @@
       }))
     )
 
+  let downloading = new Set<string>()
+
   const base64ToBytes = (base64: string) => {
     const binary = atob(base64)
     const bytes = new Uint8Array(binary.length)
@@ -65,17 +68,23 @@
   }
 
   const downloadFile = async (fileName: string) => {
-    const res = await graphQLClient().request(ReportFileDocument, {
-      file_name: fileName,
-    })
-    const file = res.files.objects[0]
-    const mimeType = mimeTypes[extension(file.file_name)]
-    if (!mimeType) {
-      console.error(`Unsupported file type: ${file.file_name}`)
-      return
+    downloading.add(fileName)
+    downloading = downloading
+    try {
+      const res = await graphQLClient().request(ReportFileDocument, {
+        file_name: fileName,
+      })
+      const file = res.files.objects[0]
+      const mimeType = mimeTypes[extension(file.file_name)]
+      if (!mimeType) throw new Error("unsupported_file_type")
+      const blob = new Blob([base64ToBytes(file.base64_contents)], { type: mimeType })
+      saveFile(blob, file.file_name)
+    } catch (err) {
+      $error = { message: err }
+    } finally {
+      downloading.delete(fileName)
+      downloading = downloading
     }
-    const blob = new Blob([base64ToBytes(file.base64_contents)], { type: mimeType })
-    saveFile(blob, file.file_name)
   }
 </script>
 
@@ -99,6 +108,8 @@
           width="18"
           height="18"
           outline
+          disabled={downloading.has(file.file_name)}
+          spinner={downloading.has(file.file_name)}
           on:click={() => downloadFile(file.file_name)}
         />
       </td>

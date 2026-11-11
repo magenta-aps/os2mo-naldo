@@ -134,3 +134,12 @@ PAYLOAD_LABEL=old yarn e2e payloads    # on the baseline ref
 git checkout <branch>
 PAYLOAD_LABEL=new yarn e2e payloads    # captures and diffs against old
 ```
+
+## reports.spec.ts
+
+Uploads two probe reports to MO's export store, `e2e-probe-report.csv` and
+`e2e-probe-notes.json`. Asserts that a report downloads under its own name
+and contents, and that an unsupported file type shows the error toast and
+downloads nothing. Network and MO failures cannot be produced on demand, so
+those tests answer the file query themselves and assert the error toast. Every
+failure must leave no page error and the download button usable again.

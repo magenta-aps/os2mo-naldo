@@ -281,6 +281,7 @@
 	"unit_level": "enhedsniveau",
 	"unit_type": "enhedstype",
 	"unit_number": "enhedsnummer",
+	"unsupported_file_type": "Filtypen understøttes ikke",
 	"userflow": "brugeroprettelsesflow",
 	"user_key": "brugervendt nøgle (bvn)",
 	"user_key_tooltip": "Den Brugervendte Nøgle er en brugervendt identifikation af objektet. Er pt. obligatorisk og kan blot være identisk med navn.",
