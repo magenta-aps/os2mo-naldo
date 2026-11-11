@@ -13,6 +13,7 @@
     INSIGHTS = "insights",
     ADMIN = "admin",
     AUDITLOG = "auditlog",
+    REPORTS = "reports",
   }
 
   let uuidFromUrl = $page.params.uuid
@@ -68,6 +69,9 @@
 
       case Title.AUDITLOG:
         return capital($_("auditlog"))
+
+      case Title.REPORTS:
+        return capital($_("report", { values: { n: 2 } }))
 
       default:
         throw TypeError("Wrong or no title type used")
