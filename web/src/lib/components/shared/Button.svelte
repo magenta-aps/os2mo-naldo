@@ -46,13 +46,18 @@
       on:click
       {disabled}
     >
-      {#if icon}
+      {#if icon && spinner}
+        <span
+          class="loading loading-spinner"
+          style="width: {width}px; height: {height}px"
+        />
+      {:else if icon}
         <Icon {icon} {width} {height} />
       {/if}
       {#if title}
         {title}
       {/if}
-      {#if spinner}<span class="loading loading-spinner" />{/if}
+      {#if spinner && !icon}<span class="loading loading-spinner" />{/if}
       {#if info && disabled}
         <Icon icon={infoOutlineRounded} color="red" width="15" height="15" />
       {/if}
