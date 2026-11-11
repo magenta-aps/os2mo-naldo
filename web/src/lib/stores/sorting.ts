@@ -1,4 +1,7 @@
 import { writable } from "svelte/store"
 
-export const sortKey = writable("validity.from")
-export const sortDirection = writable(-1)
+export const defaultSortKey = "validity.from"
+export const defaultSortDirection = -1
+
+export const sortKey = writable(defaultSortKey)
+export const sortDirection = writable(defaultSortDirection)

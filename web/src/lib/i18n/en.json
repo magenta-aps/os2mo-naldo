@@ -122,6 +122,7 @@
 		}
 	},
 	"fields": "fields",
+	"file_type": "file type",
 	"filename": "filename",
 	"fill_or_auto": "fill or auto",
 	"for": "for",

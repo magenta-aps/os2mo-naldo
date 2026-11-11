@@ -6,6 +6,12 @@
 
   export let headers: Header[]
 
+  // TODO: The sort store is global, so a sort chosen in one table carries over to
+  // every table opened afterwards, even when they have no such column, and those
+  // tables then render unsorted. Take a `defaultSort` prop here and set the store
+  // from it on mount, so every table starts from its own default; the reports
+  // page can then drop its manual set-and-reset.
+
   const sortTable = (key: string) => {
     // If the same key is clicked, reverse the sort direction
     if ($sortKey === key) {
