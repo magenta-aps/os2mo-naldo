@@ -4,6 +4,8 @@
   import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { ReportsDocument, ReportFileDocument } from "./query.generated"
+  import { sortKey, sortDirection } from "$lib/stores/sorting"
+  import { sortData } from "$lib/utils/sorting"
   import Button from "$lib/components/shared/Button.svelte"
   import fileDownload from "@iconify/icons-material-symbols/file-download"
 
@@ -35,7 +37,12 @@
 
   const dataPromise = graphQLClient()
     .request(ReportsDocument)
-    .then((res) => res.files.objects)
+    .then((res) =>
+      res.files.objects.map(({ file_name }) => ({
+        file_name,
+        file_type: extension(file_name),
+      }))
+    )
 
   const downloadFile = async (fileName: string) => {
     const res = await graphQLClient().request(ReportFileDocument, {
@@ -61,12 +68,13 @@
     <td class="text-sm p-4">{capital($_("loading"))}</td>
   </tr>
 {:then data}
-  {#each data as file, i}
+  {#each sortData(data, $sortKey, $sortDirection) as file, i}
     <tr
       class="{i % 2 === 0 ? '' : 'bg-base-200'}
         leading-5 border-t border-base-300 text-base-content"
     >
       <td class="text-sm p-4 break-all">{file.file_name}</td>
+      <td class="text-sm p-4 uppercase">{file.file_type}</td>
       <td class="flex p-4 gap-2 justify-end">
         <Button
           type="button"

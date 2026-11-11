@@ -122,6 +122,7 @@
 		}
 	},
 	"fields": "felter",
+	"file_type": "filtype",
 	"filename": "filnavn",
 	"fill_or_auto": "udfyld eller auto",
 	"for": "for",
