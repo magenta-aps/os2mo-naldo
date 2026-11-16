@@ -1,6 +1,7 @@
 <script lang="ts">
   import { _ } from "svelte-i18n"
   import { capital } from "$lib/utils/helpers"
+  import { formatTimestamp } from "$lib/utils/date"
   import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { ReportsDocument, ReportFileDocument } from "./query.generated"
@@ -15,6 +16,8 @@
       files(filter: { file_store: EXPORTS }) {
         objects {
           file_name
+          created_at
+          updated_at
         }
       }
     }
@@ -39,9 +42,11 @@
   const dataPromise = graphQLClient()
     .request(ReportsDocument)
     .then((res) =>
-      res.files.objects.map(({ file_name }) => ({
+      res.files.objects.map(({ file_name, created_at, updated_at }) => ({
         file_name,
         file_type: extension(file_name),
+        created_at,
+        updated_at,
       }))
     )
 
@@ -100,6 +105,8 @@
     >
       <td class="text-sm p-4 break-all">{file.file_name}</td>
       <td class="text-sm p-4 uppercase">{file.file_type}</td>
+      <td class="text-sm p-4 whitespace-nowrap">{formatTimestamp(file.created_at)}</td>
+      <td class="text-sm p-4 whitespace-nowrap">{formatTimestamp(file.updated_at)}</td>
       <td class="flex p-4 gap-2 justify-end">
         <Button
           type="button"

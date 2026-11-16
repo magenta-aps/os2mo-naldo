@@ -32,6 +32,8 @@
       headers={[
         { title: capital($_("filename")), sortPath: "file_name" },
         { title: capital($_("file_type")), sortPath: "file_type" },
+        { title: capital($_("created_at")), sortPath: "created_at" },
+        { title: capital($_("last_updated")), sortPath: "updated_at" },
       ]}
     >
       <ReportTable />

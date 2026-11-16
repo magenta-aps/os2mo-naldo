@@ -29,6 +29,7 @@
 	"current_name": "nuværende navn",
 	"cpr_number": "CPR nummer",
 	"create_item": "opret {item}",
+	"created_at": "oprettet",
 	"csv_warning": "csv download blev afbrudt",
 	"date": {
 		"change": "dato for ændring",
@@ -154,6 +155,7 @@
 	"kle_aspect": "KLE aspekt",
 	"kle_aspects": "KLE aspekter",
 	"kle_number": "KLE nummer",
+	"last_updated": "senest opdateret",
 	"leave": "{n, plural, =0 {orloven} one {orlov} other {orlover}}",
 	"leave_type": "orlovstype",
 	"link": "{n, plural, =0 {linket} one {link} other {links}}",

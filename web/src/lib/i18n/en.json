@@ -29,6 +29,7 @@
 	"current_name": "current name",
 	"cpr_number": "CPR number",
 	"create_item": "create {item}",
+	"created_at": "created",
 	"csv_warning": "csv download was aborted",
 	"date": {
 		"change": "date of change",
@@ -154,6 +155,7 @@
 	"kle_aspect": "KLE aspect",
 	"kle_aspects": "KLE aspects",
 	"kle_number": "KLE number",
+	"last_updated": "last updated",
 	"leave": "{n, plural, =0 {the leave} one {leave} other {leaves}}",
 	"leave_type": "leave type",
 	"link": "{n, plural, =0 {the link} one {link} other {links}}",

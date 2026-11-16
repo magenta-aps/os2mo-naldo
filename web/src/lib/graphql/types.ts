@@ -7732,6 +7732,8 @@ export type File = {
    *
    */
   base64_contents: Scalars['String']['output'];
+  /** When the file was first uploaded. */
+  created_at: Scalars['DateTime']['output'];
   /**
    *
    * Name of the file.
@@ -7776,6 +7778,14 @@ export type File = {
    *
    */
   text_contents: Scalars['String']['output'];
+  /**
+   *
+   * When the file was last written.
+   *
+   * This is when the file was first uploaded, or last overwritten with `force`.
+   *
+   */
+  updated_at: Scalars['DateTime']['output'];
 };
 
 /** File filter. */
