@@ -203,14 +203,17 @@
   // selected date like NameWithHistory does. MO decides inheritance for the
   // whole tense, so inherited managers are missing where the unit has its own
   // manager in only part of it.
-  const managersDuringEngagement = (engagement: Engagement) => {
-    const managers = filterValiditiesInRange(engagement.managers, engagement.validity)
+  const managersDuringEngagement = (
+    allManagers: Manager[],
+    validity: Engagement["validity"]
+  ) => {
+    const managers = filterValiditiesInRange(allManagers, validity)
     const uuids = [...new Set(managers.map((manager) => manager.uuid))]
     return uuids.map(
       (uuid) =>
         findClosestValidityWithin(
           managers.filter((manager) => manager.uuid === uuid),
-          engagement.validity,
+          validity,
           $date
         )!
     )
@@ -242,52 +245,48 @@
         )
       )
 
-      // Filters and flattens the data
-      return res.engagements.objects.flatMap((outer) =>
-        outer.validities
-          // TODO: Remove when GraphQL is able to do this for us
-          .filter((obj) => {
-            if (!tenseFilter(obj, tense)) return false
-            // Check if engagement validity is in the current org_unit
-            // TODO: Do this with GraphQL, when following issues are resolved (#65031) (#65303)
-            if (isOrg && obj.org_unit_uuid !== uuid) return false
-            return true
-          })
-          .map((obj) => {
-            const org_unit_names = namesByUuid.get(obj.org_unit_response?.uuid) ?? []
-            // MO neither ends nor validates the link when its role ends, so an
-            // engagement can point at a former manager indefinitely. Only a
-            // role active on the row's date counts; otherwise the row shows the
-            // standard manager.
-            const explicitManager = findValidityAt(
-              obj.explicit_manager?.validities,
-              clampDateToValidity($date, obj.validity)
-            )
-            return {
-              ...obj,
-              managers: managersDuringEngagement(obj),
-              explicitManager: explicitManager,
-              // A vacant explicit manager is only identifiable by its unit.
-              explicitManagerUnitName: findClosestValidityWithin(
-                explicitManager?.org_unit_response.validities,
-                obj.validity,
-                $date
-              )?.name,
-              org_unit_names: org_unit_names,
-              // Precomputed so column sorting matches the displayed name
-              org_unit_name: findClosestValidityWithin(
-                org_unit_names,
-                obj.validity,
-                $date
-              )?.name,
-              person_name: findClosestValidityWithin(
-                obj.person_response.validities,
-                obj.validity,
-                $date
-              )?.name,
-            }
-          })
-      )
+      const rows = res.engagements.objects
+        .flatMap((outer) => outer.validities)
+        // TODO: Remove when GraphQL is able to do this for us
+        .filter((obj) => {
+          if (!tenseFilter(obj, tense)) return false
+          // Check if engagement validity is in the current org_unit
+          // TODO: Do this with GraphQL, when following issues are resolved (#65031) (#65303)
+          if (isOrg && obj.org_unit_uuid !== uuid) return false
+          return true
+        })
+
+      return rows.map((obj) => {
+        const org_unit_names = namesByUuid.get(obj.org_unit_response?.uuid) ?? []
+        // MO neither ends nor validates the link when its role ends, so an
+        // engagement can point at a former manager indefinitely. Only a
+        // role active on the row's date counts; otherwise the row shows the
+        // standard manager.
+        const explicitManager = findValidityAt(
+          obj.explicit_manager?.validities,
+          clampDateToValidity($date, obj.validity)
+        )
+        return {
+          ...obj,
+          managers: managersDuringEngagement(obj.managers, obj.validity),
+          explicitManager: explicitManager,
+          // A vacant explicit manager is only identifiable by its unit.
+          explicitManagerUnitName: findClosestValidityWithin(
+            explicitManager?.org_unit_response.validities,
+            obj.validity,
+            $date
+          )?.name,
+          org_unit_names: org_unit_names,
+          // Precomputed so column sorting matches the displayed name
+          org_unit_name: findClosestValidityWithin(org_unit_names, obj.validity, $date)
+            ?.name,
+          person_name: findClosestValidityWithin(
+            obj.person_response.validities,
+            obj.validity,
+            $date
+          )?.name,
+        }
+      })
     })
 </script>
 
