@@ -6,7 +6,11 @@
   import { graphQLClient } from "$lib/http/client"
   import { gql } from "graphql-request"
   import { page } from "$app/stores"
-  import { EngagementsDocument, type EngagementsQuery } from "./query.generated"
+  import {
+    EngagementsDocument,
+    OrgUnitManagersDocument,
+    type EngagementsQuery,
+  } from "./query.generated"
   import { date } from "$lib/stores/date"
   import {
     clampDateToValidity,
@@ -28,7 +32,7 @@
   import { env } from "$lib/env"
 
   type Engagement = EngagementsQuery["engagements"]["objects"][0]["validities"][0]
-  type Manager = Engagement["managers"][0]
+  type Manager = NonNullable<Engagement["managers"]>[0]
 
   export let tense: Tense
 
@@ -42,6 +46,10 @@
   // `managers` without a filter only finds the managers of today, so it gets the
   // tense's dates. Their names come from `validities`, as a past manager's
   // employee can have no `current`. `managers` ignores `explicit_manager`.
+  // MO looks up `Engagement.managers` once per engagement, which times out for
+  // a big unit, so the unit page skips it and asks the unit once through
+  // `OrgUnitManagers`. Its unit filter is unbounded like the one
+  // `Engagement.managers` uses, or a unit not active today has no managers.
   // TODO: When https://redmine.magenta.dk/issues/62968 is fixed, add date-filters to classes
   gql`
     query Engagements(
@@ -117,7 +125,7 @@
               filter: { from_date: $fromDate, to_date: $toDate }
               inherit: $inherit
               exclude_self: true
-            ) {
+            ) @skip(if: $isOrg) {
               uuid
               person_response {
                 uuid
@@ -195,6 +203,44 @@
         }
       }
     }
+
+    query OrgUnitManagers(
+      $org_unit: [UUID!]
+      $exclude: EmployeeFilter
+      $fromDate: DateTime
+      $toDate: DateTime
+      $inherit: Boolean = true
+    ) {
+      managers(
+        filter: {
+          org_unit: { uuids: $org_unit, from_date: null, to_date: null }
+          exclude: $exclude
+          from_date: $fromDate
+          to_date: $toDate
+        }
+        inherit: $inherit
+      ) {
+        objects {
+          validities {
+            uuid
+            person_response {
+              uuid
+              validities(start: null, end: null) {
+                name
+                validity {
+                  from
+                  to
+                }
+              }
+            }
+            validity {
+              from
+              to
+            }
+          }
+        }
+      }
+    }
   `
 
   // `managers` returns every validity of each manager in the tense, also
@@ -227,8 +273,19 @@
       $date
     )?.name
 
-  $: dataPromise = graphQLClient()
-    .request(EngagementsDocument, {
+  // The unit's managers, leaving out the person `exclude` if given
+  const fetchUnitManagers = async (exclude?: string) => {
+    const res = await graphQLClient().request(OrgUnitManagersDocument, {
+      org_unit: [uuid],
+      exclude: exclude ? { uuids: [exclude] } : undefined,
+      inherit: env.PUBLIC_INHERIT_MANAGER,
+      ...tenseToValidity(tense, $date),
+    })
+    return res.managers.objects.flatMap((outer) => outer.validities)
+  }
+
+  $: dataPromise = Promise.all([
+    graphQLClient().request(EngagementsDocument, {
       // The filter for the other page is left out, as a unit filter without
       // uuids matches every unit.
       org_unit: isOrg ? { uuids: [uuid] } : undefined,
@@ -236,58 +293,76 @@
       inherit: env.PUBLIC_INHERIT_MANAGER,
       isOrg: isOrg,
       ...tenseToValidity(tense, $date),
-    })
-    .then((res) => {
-      // Each unit appears once in the response however many rows point at it
-      const namesByUuid = new Map(
-        res.referencedUnits?.objects.map(
-          (unit) => [unit.uuid, unit.validities] as const
-        )
-      )
+    }),
+    isOrg ? fetchUnitManagers() : undefined,
+  ]).then(async ([res, unitManagers]) => {
+    // Each unit appears once in the response however many rows point at it
+    const namesByUuid = new Map(
+      res.referencedUnits?.objects.map((unit) => [unit.uuid, unit.validities] as const)
+    )
 
-      const rows = res.engagements.objects
-        .flatMap((outer) => outer.validities)
-        // TODO: Remove when GraphQL is able to do this for us
-        .filter((obj) => {
-          if (!tenseFilter(obj, tense)) return false
-          // Check if engagement validity is in the current org_unit
-          // TODO: Do this with GraphQL, when following issues are resolved (#65031) (#65303)
-          if (isOrg && obj.org_unit_uuid !== uuid) return false
-          return true
-        })
-
-      return rows.map((obj) => {
-        const org_unit_names = namesByUuid.get(obj.org_unit_response?.uuid) ?? []
-        // MO neither ends nor validates the link when its role ends, so an
-        // engagement can point at a former manager indefinitely. Only a
-        // role active on the row's date counts; otherwise the row shows the
-        // standard manager.
-        const explicitManager = findValidityAt(
-          obj.explicit_manager?.validities,
-          clampDateToValidity($date, obj.validity)
-        )
-        return {
-          ...obj,
-          managers: managersDuringEngagement(obj.managers, obj.validity),
-          explicitManager: explicitManager,
-          // A vacant explicit manager is only identifiable by its unit.
-          explicitManagerUnitName: findClosestValidityWithin(
-            explicitManager?.org_unit_response.validities,
-            obj.validity,
-            $date
-          )?.name,
-          org_unit_names: org_unit_names,
-          // Precomputed so column sorting matches the displayed name
-          org_unit_name: findClosestValidityWithin(org_unit_names, obj.validity, $date)
-            ?.name,
-          person_name: findClosestValidityWithin(
-            obj.person_response.validities,
-            obj.validity,
-            $date
-          )?.name,
-        }
+    const rows = res.engagements.objects
+      .flatMap((outer) => outer.validities)
+      // TODO: Remove when GraphQL is able to do this for us
+      .filter((obj) => {
+        if (!tenseFilter(obj, tense)) return false
+        // Check if engagement validity is in the current org_unit
+        // TODO: Do this with GraphQL, when following issues are resolved (#65031) (#65303)
+        if (isOrg && obj.org_unit_uuid !== uuid) return false
+        return true
       })
+
+    // A person is never their own manager: MO leaves out every manager role the
+    // person held in the tense, and walks up the tree if none are left. So the
+    // rows of anyone holding one of the unit's manager roles ask MO with that
+    // person excluded.
+    const managerPersons = new Set(
+      unitManagers?.map((manager) => manager.person_response?.uuid)
+    )
+    const rowPersons = new Set(rows.map((row) => row.person_response.uuid))
+    const managersExcludeSelf = new Map(
+      await Promise.all(
+        [...rowPersons]
+          .filter((person) => managerPersons.has(person))
+          .map(async (person) => [person, await fetchUnitManagers(person)] as const)
+      )
+    )
+
+    return rows.map((obj) => {
+      const org_unit_names = namesByUuid.get(obj.org_unit_response?.uuid) ?? []
+      // MO neither ends nor validates the link when its role ends, so an
+      // engagement can point at a former manager indefinitely. Only a
+      // role active on the row's date counts; otherwise the row shows the
+      // standard manager.
+      const explicitManager = findValidityAt(
+        obj.explicit_manager?.validities,
+        clampDateToValidity($date, obj.validity)
+      )
+      const managers = unitManagers
+        ? managersExcludeSelf.get(obj.person_response.uuid) ?? unitManagers
+        : obj.managers ?? []
+      return {
+        ...obj,
+        managers: managersDuringEngagement(managers, obj.validity),
+        explicitManager: explicitManager,
+        // A vacant explicit manager is only identifiable by its unit.
+        explicitManagerUnitName: findClosestValidityWithin(
+          explicitManager?.org_unit_response.validities,
+          obj.validity,
+          $date
+        )?.name,
+        org_unit_names: org_unit_names,
+        // Precomputed so column sorting matches the displayed name
+        org_unit_name: findClosestValidityWithin(org_unit_names, obj.validity, $date)
+          ?.name,
+        person_name: findClosestValidityWithin(
+          obj.person_response.validities,
+          obj.validity,
+          $date
+        )?.name,
+      }
     })
+  })
 </script>
 
 {#await dataPromise}
