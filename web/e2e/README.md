@@ -99,6 +99,25 @@ person's engagement in parallel. Leftovers from a crashed run: a unit
 prefixed `explicit-probe-` and people named `Explicit Probe Manager` /
 `Explicit Probe Solo` / `Explicit Probe Staff`.
 
+## engagementManagers.spec.ts
+
+The unit page's engagement table looks up the unit's managers once, and asks
+MO again for the rows of the unit's own managers, with that person excluded.
+Seeds a parent unit with a manager and, below it, a unit with two managers, a
+unit with one manager and an employee, and a unit whose only manager role
+passes from one person to another 30 days out. Each manager has an engagement
+in their own unit. Asserts that:
+
+- each of two managers shows the other, not themselves;
+- the only manager shows the parent unit's manager, and the employee shows
+  them;
+- both holders of the passed-on role show the parent unit's manager, not each
+  other, under the future, whose period holds both of them.
+
+Showing the parent unit's manager relies on `PUBLIC_INHERIT_MANAGER`, which CI
+and the dev setup set. Leftovers from a crashed run: units prefixed
+`managers-probe-` and people named `Managers Probe …`.
+
 ## moveEngagements.spec.ts
 
 Seeds a probe person with an engagement that has an end date, in one of two
