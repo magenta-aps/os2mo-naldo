@@ -141,6 +141,31 @@ fixture person and unit with the first one, then asserts that:
 The probe data is deleted afterwards; if a crashed run leaves it behind, the
 classes' user_keys are prefixed `tradeunion-probe-`.
 
+## policies.spec.ts
+
+Only admins may read policies, and the e2e user is not one, so the edit
+tests answer the policy query with a fixture policy. Asserts that:
+
+- a user MO refuses policies to, such as the e2e user, is told so on the list
+  and the edit page;
+
+- the create form sends the picked roles, fields, mutators and conditions;
+- an untouched form shows no errors, and an invalid submit sends nothing and
+  opens the closed group holding the problem;
+- saving an unchanged policy sends it back exactly as it was read, including
+  a rule on a collection the frontend's schema does not know;
+- deleting declares the policy as `null`;
+- a managed policy is shown read-only, without save or delete;
+- deprecated fields are hidden unless a rule has them;
+- a condition MO cannot parse is shown under its own grant, matched by the
+  rule's index in what was sent (MO's answer is faked, as a real one would
+  need an admin);
+- copying a policy, managed or not, starts a new one with the same rules.
+- a syntax error in a condition is pointed out as you type and blocks the
+  save (names are left to MO), and a grant with nothing ticked says it will not be saved.
+
+Nothing is written to MO, so nothing is left behind.
+
 ## payloads.spec.ts
 
 Records what the engagement forms would submit. Skipped unless
