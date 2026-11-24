@@ -21,6 +21,11 @@ export const load: LayoutLoad = async ({ url }) => {
     throw redirect(302, "/")
   }
 
+  // Redirect if not true
+  if (!env.PUBLIC_ENABLE_POLICIES && url.pathname.includes("admin/policies")) {
+    throw redirect(302, "/")
+  }
+
   if (browser) {
     locale.set(window.navigator.language)
   }
