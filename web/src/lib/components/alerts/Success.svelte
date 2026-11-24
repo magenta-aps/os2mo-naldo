@@ -21,7 +21,8 @@
       $success.type == "employee" ||
       $success.type == "class" ||
       $success.type == "itsystem" ||
-      $success.type == "role_automation"
+      $success.type == "role_automation" ||
+      $success.type == "policy"
     ) {
       setTimeout(() => {
         if ($success.uuid) {
@@ -35,6 +36,8 @@
           setTimeout(() => goto(`${base}/admin/itsystem`), 200)
         } else if ($success.type == "role_automation") {
           setTimeout(() => goto(`${base}/admin/role-automation`), 200)
+        } else if ($success.type == "policy") {
+          setTimeout(() => goto(`${base}/admin/policies`), 200)
         } else {
           setTimeout(() => goto(`${base}/`), 200)
         }

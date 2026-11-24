@@ -4,6 +4,7 @@
   export let id: string
   export let name: string = id
   export let checked: boolean = true
+  export let disabled = false
 </script>
 
 <label class="label text-sm text-base-content cursor-pointer gap-4 pb-3">
@@ -14,6 +15,7 @@
     value="true"
     class="toggle toggle-primary"
     bind:checked
+    {disabled}
   />
   {capital($_(checked ? "active" : "inactive"))}
 </label>

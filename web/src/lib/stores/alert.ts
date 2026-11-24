@@ -9,6 +9,7 @@ interface SuccessAlert {
     | "class"
     | "itsystem"
     | "role_automation"
+    | "policy"
     | "clipboard"
     | "connections"
 }
