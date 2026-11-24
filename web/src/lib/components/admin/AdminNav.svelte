@@ -8,6 +8,7 @@
   import categoryIcon from "@iconify/icons-material-symbols/category-outline"
   import computerIcon from "@iconify/icons-material-symbols/computer-outline"
   import autoModeIcon from "@iconify/icons-material-symbols/auto-mode"
+  import policyIcon from "@iconify/icons-material-symbols/policy-outline"
 
   const adminTabs = [
     {
@@ -26,6 +27,15 @@
             name: "role_automation",
             path: "/admin/role-automation",
             icon: autoModeIcon,
+          },
+        ]
+      : []),
+    ...(env.PUBLIC_ENABLE_POLICIES
+      ? [
+          {
+            name: "policy",
+            path: "/admin/policies",
+            icon: policyIcon,
           },
         ]
       : []),
