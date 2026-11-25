@@ -247,12 +247,10 @@ export type AccessLogPaged = {
   page_info: PageInfo;
 };
 
-/**
- * Interface type for all actors, implementing all shared behavior.
- *
- */
+/** A user or integration that reads and changes data in OS2mo. */
 export type Actor = {
-  /** Appropriate display text for any actor (regardless of type) */
+  __typename?: 'Actor';
+  /** Appropriate display text for the actor */
   display_name?: Maybe<Scalars['String']['output']>;
   /** Get event listeners owned by this actor. */
   event_listeners: Array<Listener>;
@@ -263,10 +261,7 @@ export type Actor = {
 };
 
 
-/**
- * Interface type for all actors, implementing all shared behavior.
- *
- */
+/** A user or integration that reads and changes data in OS2mo. */
 export type ActorEvent_ListenersArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<OwnersBoundListenerFilter>;
@@ -274,10 +269,7 @@ export type ActorEvent_ListenersArgs = {
 };
 
 
-/**
- * Interface type for all actors, implementing all shared behavior.
- *
- */
+/** A user or integration that reads and changes data in OS2mo. */
 export type ActorEvent_NamespacesArgs = {
   cursor?: InputMaybe<Scalars['Cursor']['input']>;
   filter?: InputMaybe<OwnersBoundNamespaceFilter>;
@@ -7925,40 +7917,6 @@ export enum GraphQlVersion {
   Version_28 = 'VERSION_28',
   Version_29 = 'VERSION_29',
   Version_30 = 'VERSION_30'
-}
-
-export enum HardcodedActor {
-  /** The change was made before actors were registered */
-  BeforeActor = 'BEFORE_ACTOR',
-  /** The change was made through the legacy auth system */
-  LegacyAuth = 'LEGACY_AUTH',
-  /**
-   * The change was made by an unknown actor.
-   *
-   * This could either by due to:
-   *
-   * * an invalid or unparsable token
-   * * a token missing an UUID
-   * * by-passing the authentication middleware
-   *
-   * or similar.
-   *
-   * @deprecated Deprecated as of version 43.4.0 in favor of:
-   *
-   * * UNABLE_TO_PARSE_TOKEN: for invalid or unparsable tokens
-   * * MISSING_UUID_ON_TOKEN: for tokens missing an UUID
-   * * NO_AUTH_MIDDLEWARE_UUID: for by-passing the authentication middleware
-   *
-   */
-  LoraUser = 'LORA_USER',
-  /** The change was made by a token missing an UUID */
-  MissingUuidOnToken = 'MISSING_UUID_ON_TOKEN',
-  /** The change was made when auth was disabled */
-  NoAuth = 'NO_AUTH',
-  /** The change was made by-passing the authentication middleware */
-  NoAuthMiddleware = 'NO_AUTH_MIDDLEWARE',
-  /** The change was made by an invalid or unparsable token */
-  UnableToParseToken = 'UNABLE_TO_PARSE_TOKEN'
 }
 
 /** Status on whether a specific subsystem is working */
@@ -20975,64 +20933,6 @@ export type RolebindingRuleUpdateInput = {
   uuid: Scalars['UUID']['input'];
 };
 
-/**
- * The SpecialActor type is used for special magic-number UUIDs.
- *
- * It is returned, if a change was made;
- * * While auth was disabled.
- * * Using the legacy auth system.
- * * Before registrations got actors registered.
- * or similar
- *
- */
-export type SpecialActor = Actor & {
-  __typename?: 'SpecialActor';
-  /** Appropriate display text for any actor (regardless of type) */
-  display_name?: Maybe<Scalars['String']['output']>;
-  /** Get event listeners owned by this actor. */
-  event_listeners: Array<Listener>;
-  /** Get event namespaces owned by this actor. */
-  event_namespaces: Array<Namespace>;
-  /** Enum key for the specific case of the special actor */
-  key: HardcodedActor;
-  /** UUID of the actor */
-  uuid: Scalars['UUID']['output'];
-};
-
-
-/**
- * The SpecialActor type is used for special magic-number UUIDs.
- *
- * It is returned, if a change was made;
- * * While auth was disabled.
- * * Using the legacy auth system.
- * * Before registrations got actors registered.
- * or similar
- *
- */
-export type SpecialActorEvent_ListenersArgs = {
-  cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  filter?: InputMaybe<OwnersBoundListenerFilter>;
-  limit?: InputMaybe<Scalars['int']['input']>;
-};
-
-
-/**
- * The SpecialActor type is used for special magic-number UUIDs.
- *
- * It is returned, if a change was made;
- * * While auth was disabled.
- * * Using the legacy auth system.
- * * Before registrations got actors registered.
- * or similar
- *
- */
-export type SpecialActorEvent_NamespacesArgs = {
-  cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  filter?: InputMaybe<OwnersBoundNamespaceFilter>;
-  limit?: InputMaybe<Scalars['int']['input']>;
-};
-
 /** Result page in cursor-based pagination. */
 export type UuidPaged = {
   __typename?: 'UUIDPaged';
@@ -21051,52 +20951,6 @@ export type UuidPaged = {
    *
    */
   page_info: PageInfo;
-};
-
-/**
- * The UnknownActor type is a fallback actor type for when lookup fails.
- *
- * It is returned when all attempts at actor translations have failed.
- *
- */
-export type UnknownActor = Actor & {
-  __typename?: 'UnknownActor';
-  /** Appropriate display text for any actor (regardless of type) */
-  display_name?: Maybe<Scalars['String']['output']>;
-  /** Descriptive error message */
-  error: Scalars['String']['output'];
-  /** Get event listeners owned by this actor. */
-  event_listeners: Array<Listener>;
-  /** Get event namespaces owned by this actor. */
-  event_namespaces: Array<Namespace>;
-  /** UUID of the actor */
-  uuid: Scalars['UUID']['output'];
-};
-
-
-/**
- * The UnknownActor type is a fallback actor type for when lookup fails.
- *
- * It is returned when all attempts at actor translations have failed.
- *
- */
-export type UnknownActorEvent_ListenersArgs = {
-  cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  filter?: InputMaybe<OwnersBoundListenerFilter>;
-  limit?: InputMaybe<Scalars['int']['input']>;
-};
-
-
-/**
- * The UnknownActor type is a fallback actor type for when lookup fails.
- *
- * It is returned when all attempts at actor translations have failed.
- *
- */
-export type UnknownActorEvent_NamespacesArgs = {
-  cursor?: InputMaybe<Scalars['Cursor']['input']>;
-  filter?: InputMaybe<OwnersBoundNamespaceFilter>;
-  limit?: InputMaybe<Scalars['int']['input']>;
 };
 
 export type UuidsBoundClassFilter = {
