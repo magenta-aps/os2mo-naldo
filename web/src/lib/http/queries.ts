@@ -189,14 +189,8 @@ gql`
     registrations(filter: { uuids: $uuid, start: null, end: null }) {
       objects {
         actor_object {
-          ... on SpecialActor {
-            display_name
-            uuid
-          }
-          ... on UnknownActor {
-            display_name
-            uuid
-          }
+          display_name
+          uuid
         }
         uuid
         start
