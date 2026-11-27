@@ -30,7 +30,7 @@ export const initKeycloak = async () => {
 
       // Weak check if user is admin
       // FIXME: Make correct check maybe?
-      if (keycloak.tokenParsed?.realm_access?.roles.includes("class_admin")) {
+      if (keycloak.tokenParsed?.realm_access?.roles.includes("admin")) {
         isAdmin.set(true)
       }
 
